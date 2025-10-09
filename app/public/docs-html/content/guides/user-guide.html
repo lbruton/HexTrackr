@@ -297,66 +297,54 @@
 </ul>
 <hr>
 <h2>Settings and Preferences</h2><p>Access settings by clicking <strong>Settings</strong> in the header navigation.</p>
-<h3>Theme Settings</h3><p><strong>Dark/Light Mode</strong>:</p>
+<p>The Settings modal has <strong>4 tabs</strong> for different configuration areas:</p>
+<h3>Theme Settings</h3><p><strong>Dark/Light Mode</strong> (Header toggle):</p>
 <ul>
-<li>Toggle between dark and light themes</li>
+<li>Toggle between dark and light themes using the moon/sun icon</li>
 <li>Automatically detects your system preference on first visit</li>
 <li>Theme choice persists across all pages</li>
 <li>Saves to local storage for future sessions</li>
 </ul>
-<h3>ServiceNow Integration</h3><p>Configure ServiceNow to enable clickable ticket links:</p>
+<h3>API Configuration Tab</h3><p><strong>Cisco PSIRT Integration</strong>:</p>
+<ul>
+<li>Configure Cisco Product Security Incident Response Team (PSIRT) API access</li>
+<li>Retrieve fixed versions for Cisco vulnerabilities</li>
+<li>API client ID and secret management</li>
+</ul>
+<p><strong>KEV Synchronization</strong>:</p>
+<ul>
+<li><strong>Enable/Disable Auto-Sync</strong>: Control automatic CISA KEV catalog updates</li>
+<li><strong>Manual Sync Button</strong>: Force immediate update from CISA</li>
+<li><strong>Sync Status</strong>: View last update time and record count</li>
+<li><strong>Sync Schedule</strong>: Automatic daily synchronization at 3:00 AM</li>
+</ul>
+<h3>Ticket Systems Tab</h3><p><strong>ServiceNow Integration</strong>:</p>
+<p>Configure ServiceNow to enable clickable ticket links:</p>
 <ol>
-<li>Navigate to <strong>ServiceNow</strong> tab in Settings</li>
 <li>Enter your <strong>ServiceNow instance URL</strong><ul>
 <li>Example: <code>https://yourcompany.service-now.com</code></li>
 </ul>
 </li>
-<li>Configure field mappings (if using automated ticket creation)</li>
-<li>Click <strong>Test Connection</strong> to verify setup</li>
+<li>Click <strong>Test Link</strong> to verify the URL format</li>
 <li><strong>Save Settings</strong></li>
 </ol>
-<p><strong>After Configuration</strong>: All ServiceNow ticket numbers throughout HexTrackr become clickable links.</p>
-<h3>KEV Settings</h3><p><strong>Automatic Synchronization</strong>:</p>
+<p><strong>After Configuration</strong>: All ServiceNow ticket numbers throughout HexTrackr become clickable links that open directly in your ServiceNow instance.</p>
+<h3>Data Management Tab</h3><p><strong>Backup Operations</strong>:</p>
 <ul>
-<li><strong>Enable/Disable</strong>: Control automatic CISA KEV catalog updates</li>
-<li><strong>Sync Schedule</strong>: Configure update frequency (default: daily)</li>
-<li><strong>Manual Sync</strong>: Force immediate update from CISA</li>
-<li><strong>Sync Status</strong>: View last update time and success/failure</li>
+<li><strong>Download Full Backup</strong>: Export complete database (all tickets and vulnerabilities) as ZIP archive</li>
+<li><strong>Import Backup</strong>: Restore data from previously exported backup files</li>
 </ul>
-<p><strong>Display Options</strong>:</p>
+<p><strong>Data Cleanup</strong> (Destructive Operations):</p>
 <ul>
-<li>Customize KEV badge appearance</li>
-<li>Configure KEV indicator colors</li>
-<li>Control KEV column visibility</li>
+<li><strong>Clear All Tickets</strong>: Remove all ticket records (requires confirmation)</li>
+<li><strong>Clear All Vulnerabilities</strong>: Remove all vulnerability data (requires confirmation)</li>
+<li><strong>Clear All Data</strong>: Complete database reset (requires confirmation)</li>
 </ul>
-<h3>Display Preferences</h3><p><strong>Date Format</strong>:</p>
+<p><strong>Important</strong>: All cleanup operations are irreversible. Ensure you have recent backups before performing destructive operations.</p>
+<h3>System Configuration Tab</h3><p><strong>Future Enhancements</strong>:</p>
 <ul>
-<li>US format: MM/DD/YYYY</li>
-<li>International format: DD/MM/YYYY</li>
-</ul>
-<p><strong>Table Settings</strong>:</p>
-<ul>
-<li>Row density: Compact, Comfortable, or Spacious</li>
-<li>Items per page: 6, 12, 24, or 48 cards</li>
-<li>Default view: Table, Devices, or Vulnerabilities</li>
-</ul>
-<p><strong>Performance Options</strong>:</p>
-<ul>
-<li>Auto-refresh intervals</li>
-<li>Cache duration</li>
-<li>WebSocket logging for debugging</li>
-</ul>
-<h3>Data Management</h3><p><strong>Backup and Restore</strong>:</p>
-<ul>
-<li>Export complete database backup (all tickets and vulnerabilities)</li>
-<li>Import backup files to restore data</li>
-<li>Scheduled automated backups (if configured)</li>
-</ul>
-<p><strong>Data Cleanup</strong>:</p>
-<ul>
-<li>Clear all tickets (requires confirmation)</li>
-<li>Clear all vulnerabilities (requires confirmation)</li>
-<li>Reset to factory defaults</li>
+<li>Placeholder for additional system-level settings</li>
+<li>Reserved for future configuration options</li>
 </ul>
 <hr>
 <h2>Tips and Best Practices</h2><h3>Vulnerability Management</h3><p><strong>Daily Workflow</strong>:</p>

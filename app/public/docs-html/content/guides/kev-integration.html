@@ -113,15 +113,124 @@
 
     F[Manual Sync] --&gt;|On Demand| B
     G[Settings Modal] --&gt;|Configure| B</div><h3>Database Schema</h3><p>The KEV integration adds dedicated tables for tracking exploited vulnerabilities:</p>
-<ul>
-<li><strong><code>kev_catalog</code></strong>: Stores CISA KEV data with CVE mappings</li>
-<li><strong><code>kev_sync_log</code></strong>: Tracks synchronization history and status</li>
-<li><strong>Enhanced <code>vulnerabilities</code></strong>: Includes <code>isKev</code> column for quick filtering</li>
-</ul>
+<h4>`kev_status` Table</h4><p>Stores CISA Known Exploited Vulnerabilities metadata from the KEV catalog:</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>cve_id</code></td>
+<td>TEXT</td>
+<td><strong>Primary key</strong> - CVE identifier (e.g., CVE-2021-44228)</td>
+</tr>
+<tr>
+<td><code>date_added</code></td>
+<td>DATE</td>
+<td>When CISA added vulnerability to KEV catalog (NOT NULL)</td>
+</tr>
+<tr>
+<td><code>vulnerability_name</code></td>
+<td>TEXT</td>
+<td>CISA-provided vulnerability name</td>
+</tr>
+<tr>
+<td><code>vendor_project</code></td>
+<td>TEXT</td>
+<td>Affected vendor or project</td>
+</tr>
+<tr>
+<td><code>product</code></td>
+<td>TEXT</td>
+<td>Specific product affected</td>
+</tr>
+<tr>
+<td><code>required_action</code></td>
+<td>TEXT</td>
+<td>CISA-mandated remediation action</td>
+</tr>
+<tr>
+<td><code>due_date</code></td>
+<td>DATE</td>
+<td>Federal agency remediation deadline</td>
+</tr>
+<tr>
+<td><code>known_ransomware_use</code></td>
+<td>BOOLEAN</td>
+<td>Whether used in ransomware campaigns (1/0)</td>
+</tr>
+<tr>
+<td><code>notes</code></td>
+<td>TEXT</td>
+<td>Additional CISA context and guidance</td>
+</tr>
+<tr>
+<td><code>last_synced</code></td>
+<td>TIMESTAMP</td>
+<td>Last synchronization timestamp</td>
+</tr>
+</tbody></table>
+<h4>`sync_metadata` Table</h4><p>Tracks KEV catalog synchronization history and status:</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>INTEGER</td>
+<td><strong>Primary key</strong> - Sync record identifier (AUTOINCREMENT)</td>
+</tr>
+<tr>
+<td><code>sync_type</code></td>
+<td>TEXT</td>
+<td>Type of sync operation (e.g., &#39;kev_catalog&#39;) - NOT NULL</td>
+</tr>
+<tr>
+<td><code>sync_time</code></td>
+<td>TIMESTAMP</td>
+<td>Sync execution timestamp (NOT NULL)</td>
+</tr>
+<tr>
+<td><code>version</code></td>
+<td>TEXT</td>
+<td>Catalog version or timestamp from CISA</td>
+</tr>
+<tr>
+<td><code>record_count</code></td>
+<td>INTEGER</td>
+<td>Number of KEV records synced</td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td>TEXT</td>
+<td>Sync status (completed/failed/in_progress)</td>
+</tr>
+<tr>
+<td><code>error_message</code></td>
+<td>TEXT</td>
+<td>Error details if sync failed</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>TIMESTAMP</td>
+<td>Record creation timestamp</td>
+</tr>
+</tbody></table>
+<p><strong>Relationship</strong>: <code>vulnerabilities_current</code> LEFT JOINed with <code>kev_status</code> on <code>cve</code> = <code>cve_id</code> to enrich vulnerability data with KEV flags and due dates</p>
 <h3>API Endpoints</h3><ul>
-<li><code>POST /api/kev/sync</code> - Manual synchronization trigger</li>
+<li><code>POST /api/kev/sync</code> - Manual synchronization trigger (rate limited: 3 requests per 5 minutes)</li>
 <li><code>GET /api/kev/status</code> - Current sync status and statistics</li>
-<li><code>GET /api/kev/vulnerability/:cveId</code> - Detailed KEV information for specific CVE</li>
+<li><code>GET /api/kev/:cveId</code> - Detailed KEV metadata for specific CVE</li>
+<li><code>GET /api/kev/stats</code> - KEV dashboard statistics</li>
+<li><code>GET /api/kev/all</code> - List all KEV vulnerabilities in catalog</li>
+<li><code>GET /api/kev/matched</code> - KEV vulnerabilities matched in environment (limit: 100)</li>
 </ul>
 <hr>
 <h2>Security Implications</h2><h3>Risk Assessment Impact</h3><p>KEV integration fundamentally changes vulnerability risk assessment:</p>

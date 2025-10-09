@@ -368,67 +368,60 @@ When using the import feature, HexTrackr provides live progress updates:
 
 Access settings by clicking **Settings** in the header navigation.
 
+The Settings modal has **4 tabs** for different configuration areas:
+
 ### Theme Settings
 
-**Dark/Light Mode**:
-- Toggle between dark and light themes
+**Dark/Light Mode** (Header toggle):
+- Toggle between dark and light themes using the moon/sun icon
 - Automatically detects your system preference on first visit
 - Theme choice persists across all pages
 - Saves to local storage for future sessions
 
-### ServiceNow Integration
+### API Configuration Tab
+
+**Cisco PSIRT Integration**:
+- Configure Cisco Product Security Incident Response Team (PSIRT) API access
+- Retrieve fixed versions for Cisco vulnerabilities
+- API client ID and secret management
+
+**KEV Synchronization**:
+- **Enable/Disable Auto-Sync**: Control automatic CISA KEV catalog updates
+- **Manual Sync Button**: Force immediate update from CISA
+- **Sync Status**: View last update time and record count
+- **Sync Schedule**: Automatic daily synchronization at 3:00 AM
+
+### Ticket Systems Tab
+
+**ServiceNow Integration**:
 
 Configure ServiceNow to enable clickable ticket links:
 
-1. Navigate to **ServiceNow** tab in Settings
-2. Enter your **ServiceNow instance URL**
+1. Enter your **ServiceNow instance URL**
    - Example: `https://yourcompany.service-now.com`
-3. Configure field mappings (if using automated ticket creation)
-4. Click **Test Connection** to verify setup
-5. **Save Settings**
+2. Click **Test Link** to verify the URL format
+3. **Save Settings**
 
-**After Configuration**: All ServiceNow ticket numbers throughout HexTrackr become clickable links.
+**After Configuration**: All ServiceNow ticket numbers throughout HexTrackr become clickable links that open directly in your ServiceNow instance.
 
-### KEV Settings
+### Data Management Tab
 
-**Automatic Synchronization**:
-- **Enable/Disable**: Control automatic CISA KEV catalog updates
-- **Sync Schedule**: Configure update frequency (default: daily)
-- **Manual Sync**: Force immediate update from CISA
-- **Sync Status**: View last update time and success/failure
+**Backup Operations**:
+- **Download Full Backup**: Export complete database (all tickets and vulnerabilities) as ZIP archive
+- **Import Backup**: Restore data from previously exported backup files
 
-**Display Options**:
-- Customize KEV badge appearance
-- Configure KEV indicator colors
-- Control KEV column visibility
+**Data Cleanup** (Destructive Operations):
+- **Clear All Tickets**: Remove all ticket records (requires confirmation)
+- **Clear All Vulnerabilities**: Remove all vulnerability data (requires confirmation)
+- **Clear All Data**: Complete database reset (requires confirmation)
 
-### Display Preferences
+**Important**: All cleanup operations are irreversible. Ensure you have recent backups before performing destructive operations.
 
-**Date Format**:
-- US format: MM/DD/YYYY
-- International format: DD/MM/YYYY
+### System Configuration Tab
 
-**Table Settings**:
-- Row density: Compact, Comfortable, or Spacious
-- Items per page: 6, 12, 24, or 48 cards
-- Default view: Table, Devices, or Vulnerabilities
-
-**Performance Options**:
-- Auto-refresh intervals
-- Cache duration
-- WebSocket logging for debugging
-
-### Data Management
-
-**Backup and Restore**:
-- Export complete database backup (all tickets and vulnerabilities)
-- Import backup files to restore data
-- Scheduled automated backups (if configured)
-
-**Data Cleanup**:
-- Clear all tickets (requires confirmation)
-- Clear all vulnerabilities (requires confirmation)
-- Reset to factory defaults
+**Future Enhancements**:
+- Placeholder for additional system-level settings
+- Reserved for future configuration options
 
 ---
 

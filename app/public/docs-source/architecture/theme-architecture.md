@@ -498,7 +498,6 @@ HexTrackr's JSDoc developer documentation (`/app/dev-docs-html/`) includes autom
 
 - [Frontend Architecture](./frontend.md) - Theme system integration
 - [Technology Stack](./technology-stack.md) - CSS framework details
-- [Performance](../reference/performance.md) - Theme switching performance
 
 ## Specifications
 

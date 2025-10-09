@@ -1,129 +1,643 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
-    <h1>Troubleshooting Guide</h1><h2>Common Issues & Solutions</h2><h3>Docker & Environment Issues</h3><h4>Container Won't Start</h4><p><strong>Problem</strong>: Docker container fails to start or immediately exits</p>
+    <h1>Troubleshooting Guide</h1><p><strong>Version</strong>: v1.0.54<br><strong>Last Updated</strong>: 2025-10-09</p>
+<p>This guide covers common issues, solutions, and diagnostic steps for HexTrackr. Issues are organized by category for quick reference.</p>
+<hr>
+<h2>Docker & Environment Issues</h2><h3>Container Won't Start</h3><p><strong>Problem</strong>: Docker container fails to start or immediately exits</p>
 <p><strong>Solutions</strong>:</p>
 <ol>
-<li>Check Docker daemon is running: <code>docker info</code></li>
-<li>Verify port 8989 is not in use: <code>lsof -i :8989</code></li>
-<li>Check container logs: <code>docker-compose logs hextrackr</code></li>
-<li>Rebuild container: <code>docker-compose build --no-cache</code></li>
+<li><p><strong>Check Docker daemon is running</strong>:</p>
+<pre><code class="language-bash">docker info</code></pre></li>
+<li><p><strong>Verify both containers are running</strong>:</p>
+<pre><code class="language-bash">docker ps
+<span class="hljs-comment"># Should see: hextrackr-app (Node.js) and hextrackr-nginx (HTTPS proxy)</span></code></pre></li>
+<li><p><strong>Check container logs</strong>:</p>
+<pre><code class="language-bash"><span class="hljs-comment"># App logs</span>
+docker logs hextrackr-app
+
+<span class="hljs-comment"># Nginx logs</span>
+docker logs hextrackr-nginx
+
+<span class="hljs-comment"># All logs</span>
+docker-compose logs</code></pre></li>
+<li><p><strong>Rebuild containers</strong>:</p>
+<pre><code class="language-bash">./docker-rebuild.sh
+<span class="hljs-comment"># Or manually:</span>
+docker-compose down
+docker-compose build --no-cache
+docker-compose up -d</code></pre></li>
 </ol>
-<h4>Port Already in Use</h4><p><strong>Problem</strong>: Error &quot;bind: address already in use&quot;</p>
+<h3>Port Already in Use</h3><p><strong>Problem</strong>: Error &quot;bind: address already in use&quot;</p>
+<p><strong>Typical Causes</strong>:</p>
+<ul>
+<li>Port 443 (HTTPS) is used by nginx for SSL termination</li>
+<li>Port 8080 (HTTP) is used by Express internally</li>
+<li>Port 8989 (alternative) may be mapped in some configurations</li>
+</ul>
 <p><strong>Solution</strong>:</p>
-<pre><code class="language-bash"><span class="hljs-comment"># Find process using port 8989</span>
-lsof -i :8989
-<span class="hljs-comment"># Kill the process</span>
-<span class="hljs-built_in">kill</span> -9 &lt;PID&gt;
+<pre><code class="language-bash"><span class="hljs-comment"># Find process using port 443 (nginx HTTPS)</span>
+<span class="hljs-built_in">sudo</span> lsof -i :443
+
+<span class="hljs-comment"># Find process using port 8080 (Express app)</span>
+lsof -i :8080
+
+<span class="hljs-comment"># Kill the process if it&#x27;s not HexTrackr</span>
+<span class="hljs-built_in">sudo</span> <span class="hljs-built_in">kill</span> -9 &lt;PID&gt;
+
 <span class="hljs-comment"># Restart Docker</span>
-docker-compose restart</code></pre><h3>Database Issues</h3><h4>Database Locked Error</h4><p><strong>Problem</strong>: &quot;SQLITE_BUSY: database is locked&quot;</p>
+docker-compose restart</code></pre><p><strong>Note</strong>: On macOS, port 443 may require <code>sudo</code> for <code>lsof</code>.</p>
+<h3>Docker Helper Scripts</h3><p><strong>Available Scripts</strong> (project root):</p>
+<pre><code class="language-bash"><span class="hljs-comment"># Start HexTrackr with health checks</span>
+./docker-start.sh
+
+<span class="hljs-comment"># Stop HexTrackr gracefully</span>
+./docker-stop.sh
+
+<span class="hljs-comment"># Rebuild after code changes</span>
+./docker-rebuild.sh
+
+<span class="hljs-comment"># View real-time logs</span>
+./docker-logs.sh</code></pre><p><strong>When to use <code>docker-rebuild.sh</code></strong>:</p>
+<ul>
+<li>After modifying server code</li>
+<li>After updating dependencies (<code>npm install</code>)</li>
+<li>After changing environment variables</li>
+<li>After updating Docker configuration</li>
+</ul>
+<h3>Environment Variable Issues</h3><p><strong>Problem</strong>: Server refuses to start or crashes immediately</p>
+<p><strong>Check</strong>: <code>SESSION_SECRET</code> validation</p>
+<p><strong>Solution</strong>:</p>
+<pre><code class="language-bash"><span class="hljs-comment"># Server requires SESSION_SECRET with 32+ characters</span>
+<span class="hljs-comment"># Generate secure secret:</span>
+node -e <span class="hljs-string">&quot;console.log(require(&#x27;crypto&#x27;).randomBytes(32).toString(&#x27;hex&#x27;))&quot;</span>
+
+<span class="hljs-comment"># Add to .env file:</span>
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;SESSION_SECRET=&lt;generated-secret&gt;&quot;</span> &gt;&gt; .<span class="hljs-built_in">env</span>
+
+<span class="hljs-comment"># Restart containers:</span>
+docker-compose restart</code></pre><p><strong>Required Environment Variables</strong>:</p>
+<ul>
+<li><code>SESSION_SECRET</code>: 32+ characters (REQUIRED, server exits without it)</li>
+<li><code>TRUST_PROXY</code>: Must be <code>true</code> (ALWAYS for nginx reverse proxy)</li>
+<li><code>NODE_ENV</code>: <code>development</code> or <code>production</code></li>
+</ul>
+<hr>
+<h2>Database Issues</h2><h3>Database Locked Error</h3><p><strong>Problem</strong>: &quot;SQLITE_BUSY: database is locked&quot;</p>
+<p><strong>Causes</strong>:</p>
+<ul>
+<li>Long-running transaction not committed</li>
+<li>Multiple processes accessing database</li>
+<li>Database file permission issues</li>
+</ul>
 <p><strong>Solutions</strong>:</p>
 <ol>
-<li>Check for long-running transactions</li>
-<li>Restart the application: <code>docker-compose restart</code></li>
-<li>Verify file permissions: <code>ls -la data/hextrackr.db</code></li>
+<li><p><strong>Restart the application</strong>:</p>
+<pre><code class="language-bash">docker-compose restart hextrackr-app</code></pre></li>
+<li><p><strong>Check file permissions</strong>:</p>
+<pre><code class="language-bash"><span class="hljs-built_in">ls</span> -la app/data/hextrackr.db
+<span class="hljs-comment"># Should be writable by Docker user (often node or www-data)</span></code></pre></li>
+<li><p><strong>Verify WAL mode is enabled</strong> (Write-Ahead Logging for better concurrency):</p>
+<pre><code class="language-bash">sqlite3 app/data/hextrackr.db <span class="hljs-string">&quot;PRAGMA journal_mode;&quot;</span>
+<span class="hljs-comment"># Should return: wal</span></code></pre></li>
+<li><p><strong>Check for orphaned WAL files</strong>:</p>
+<pre><code class="language-bash"><span class="hljs-built_in">ls</span> -la app/data/hextrackr.db-*
+<span class="hljs-comment"># If present: hextrackr.db-wal, hextrackr.db-shm</span></code></pre></li>
 </ol>
-<h4>Missing Data After Import</h4><p><strong>Problem</strong>: Imported data doesn&#39;t appear in dashboard</p>
+<h3>Missing Data After Import</h3><p><strong>Problem</strong>: Imported data doesn&#39;t appear in dashboard</p>
 <p><strong>Checklist</strong>:</p>
 <ol>
-<li>Verify import completed successfully (check logs)</li>
-<li>Check lifecycle_state filtering (resolved items are hidden)</li>
-<li>Verify scan date was set correctly</li>
-<li>Check for duplicate detection removing entries</li>
+<li><p><strong>Verify import completed successfully</strong>:</p>
+<pre><code class="language-bash">docker logs hextrackr-app | grep -i <span class="hljs-string">&quot;import&quot;</span></code></pre></li>
+<li><p><strong>Check vendor filter</strong> (HEX-156):</p>
+<ul>
+<li>Dashboard filter dropdown shows &quot;All Vendors&quot; (default)</li>
+<li>Try switching between CISCO, Palo Alto, Other</li>
+<li>Vendor normalization may categorize data differently</li>
+</ul>
+</li>
+<li><p><strong>Check lifecycle state filtering</strong>:</p>
+<ul>
+<li>Resolved vulnerabilities are hidden by default</li>
+<li>Use dashboard filters to show resolved items</li>
+</ul>
+</li>
+<li><p><strong>Verify scan date was set correctly</strong>:</p>
+<ul>
+<li>Import assigns scan date to all vulnerabilities</li>
+<li>Dashboard may filter by date range</li>
+</ul>
+</li>
+<li><p><strong>Check duplicate detection</strong>:</p>
+<ul>
+<li>Deduplication engine removes duplicates (5-tier confidence scoring)</li>
+<li>Check logs for &quot;duplicate detected&quot; messages</li>
+</ul>
+</li>
 </ol>
-<h3>Import/Export Issues</h3><h4>CSV Import Fails</h4><p><strong>Problem</strong>: CSV import returns error or no data imported</p>
+<h3>Database Schema Issues</h3><p><strong>Problem</strong>: Schema errors after updating HexTrackr version</p>
+<p><strong>Solution</strong>: Use migration scripts (DO NOT run <code>npm run init-db</code> on existing database)</p>
+<pre><code class="language-bash"><span class="hljs-comment"># Apply migration manually</span>
+sqlite3 app/data/hextrackr.db &lt; app/public/scripts/migrations/XXX-description.sql
+
+<span class="hljs-comment"># Check schema version</span>
+sqlite3 app/data/hextrackr.db <span class="hljs-string">&quot;SELECT * FROM schema_version;&quot;</span></code></pre><p><strong>⚠️ CRITICAL</strong>: <code>npm run init-db</code> is ONLY for fresh installations. Running it on existing databases may cause schema conflicts.</p>
+<hr>
+<h2>Authentication & Session Issues</h2><h3>Login Fails Silently</h3><p><strong>Problem</strong>: Login form submits but user remains logged out</p>
+<p><strong>Causes</strong>:</p>
+<ol>
+<li><p><strong>Trust proxy not configured</strong> (HEX-128 bug):</p>
+<ul>
+<li>Express doesn&#39;t detect HTTPS from nginx</li>
+<li>Secure cookies are rejected by browser</li>
+<li>Session appears to work (frontend) but fails (backend)</li>
+</ul>
+</li>
+<li><p><strong>Using HTTP instead of HTTPS</strong>:</p>
+<ul>
+<li>Session cookies have <code>secure: true</code> flag</li>
+<li>Browsers reject cookies over HTTP</li>
+</ul>
+</li>
+</ol>
 <p><strong>Solutions</strong>:</p>
 <ol>
-<li>Verify CSV format matches supported columns</li>
-<li>Check file encoding (UTF-8 required)</li>
-<li>Remove special characters from headers</li>
-<li>Verify file size (large files may need staging import)</li>
+<li><p><strong>Always use HTTPS URLs</strong>:</p>
+<pre><code class="language-text">✅ https://dev.hextrackr.com
+✅ https://hextrackr.com
+✅ https://localhost
+❌ http://localhost (BROKEN - returns empty API responses)
+❌ http://localhost:8080 (BROKEN - app runs on 8080 but requires HTTPS)</code></pre></li>
+<li><p><strong>Verify trust proxy is enabled</strong> (should ALWAYS be true):</p>
+<pre><code class="language-bash">docker logs hextrackr-app | grep -i <span class="hljs-string">&quot;trust proxy&quot;</span>
+<span class="hljs-comment"># Should see: &quot;Trust proxy: enabled&quot;</span></code></pre></li>
+<li><p><strong>Check nginx is running and forwarding headers</strong>:</p>
+<pre><code class="language-bash">docker logs hextrackr-nginx | grep -i <span class="hljs-string">&quot;x-forwarded-proto&quot;</span></code></pre></li>
 </ol>
-<h4>Export Generates Empty File</h4><p><strong>Problem</strong>: Export buttons create empty or corrupted files</p>
+<h3>Account Locked After Failed Logins</h3><p><strong>Problem</strong>: User locked out after too many failed attempts</p>
+<p><strong>Behavior</strong>: 5 failed attempts trigger 15-minute lockout</p>
+<p><strong>Solution</strong>:</p>
+<pre><code class="language-bash"><span class="hljs-comment"># Wait 15 minutes (lockout expires automatically)</span>
+<span class="hljs-comment"># OR manually reset in database:</span>
+
+sqlite3 app/data/hextrackr.db
+UPDATE <span class="hljs-built_in">users</span> SET failed_attempts = 0, failed_login_timestamp = NULL WHERE username = <span class="hljs-string">&#x27;username&#x27;</span>;</code></pre><h3>CSRF Token Invalid</h3><p><strong>Problem</strong>: &quot;CSRF token validation failed&quot; error</p>
+<p><strong>Causes</strong>:</p>
+<ul>
+<li>Token not included in request</li>
+<li>Token expired (tied to session)</li>
+<li>Session expired (24 hours default)</li>
+</ul>
 <p><strong>Solutions</strong>:</p>
 <ol>
-<li>Verify data exists in current view</li>
-<li>Check browser console for errors</li>
-<li>Clear browser cache and retry</li>
-<li>Try different export format</li>
+<li><p><strong>Refresh CSRF token before protected requests</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Get fresh CSRF token</span>
+<span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string">&#x27;/api/auth/csrf&#x27;</span>);
+<span class="hljs-keyword">const</span> { csrfToken } = <span class="hljs-keyword">await</span> response.<span class="hljs-title function_">json</span>();
+
+<span class="hljs-comment">// Include in request header</span>
+<span class="hljs-attr">headers</span>: { <span class="hljs-string">&#x27;X-CSRF-Token&#x27;</span>: csrfToken }</code></pre></li>
+<li><p><strong>Check session is still valid</strong>:</p>
+<pre><code class="language-bash"><span class="hljs-comment"># Check session database</span>
+sqlite3 app/data/sessions.db <span class="hljs-string">&quot;SELECT * FROM sessions WHERE expired &lt; strftime(&#x27;%s&#x27;, &#x27;now&#x27;);&quot;</span></code></pre></li>
+<li><p><strong>Verify CSRF middleware is not blocking login</strong>:</p>
+<ul>
+<li>Login endpoint (<code>/api/auth/login</code>) is EXEMPT from CSRF</li>
+<li>CSRF token endpoint (<code>/api/auth/csrf</code>) is EXEMPT</li>
+<li>Status endpoint (<code>/api/auth/status</code>) is EXEMPT</li>
+</ul>
+</li>
 </ol>
-<h3>Frontend Issues</h3><h4>Blank Page or Loading Forever</h4><p><strong>Problem</strong>: Application shows blank page or infinite loading</p>
+<h3>Session Expires Too Quickly</h3><p><strong>Problem</strong>: User logged out after short period</p>
+<p><strong>Check Session TTL</strong>:</p>
+<pre><code class="language-bash"><span class="hljs-comment"># Session TTL is 24 hours by default (86400000 ms)</span>
+docker logs hextrackr-app | grep -i <span class="hljs-string">&quot;session&quot;</span></code></pre><p><strong>&quot;Remember Me&quot; Feature</strong>:</p>
+<ul>
+<li>Standard login: 24 hours</li>
+<li>&quot;Remember Me&quot;: 30 days</li>
+<li>Check if &quot;Remember Me&quot; checkbox is working</li>
+</ul>
+<hr>
+<h2>HTTPS & SSL Issues</h2><h3>Self-Signed Certificate Warning</h3><p><strong>Problem</strong>: Browser shows &quot;Your connection is not private&quot; warning</p>
+<p><strong>Expected Behavior</strong>: This is NORMAL with self-signed development certificates</p>
+<p><strong>Solution</strong>:</p>
+<ol>
+<li><p><strong>Bypass warning</strong> (development only):</p>
+<ul>
+<li>Click anywhere in browser window</li>
+<li>Type <code>thisisunsafe</code> (no spaces)</li>
+<li>Page loads automatically</li>
+</ul>
+</li>
+<li><p><strong>For production</strong>: Replace self-signed certificates with valid certificates:</p>
+<pre><code class="language-bash"><span class="hljs-comment"># Replace certificates in nginx/certs/</span>
+<span class="hljs-built_in">cp</span> your-cert.pem nginx/certs/cert.pem
+<span class="hljs-built_in">cp</span> your-key.pem nginx/certs/key.pem
+
+<span class="hljs-comment"># Restart nginx</span>
+docker-compose restart hextrackr-nginx</code></pre></li>
+</ol>
+<h3>Empty API Responses Over HTTP</h3><p><strong>Problem</strong>: API calls return empty responses or <code>{}</code> when using HTTP</p>
+<p><strong>Cause</strong>: Authentication system requires HTTPS (secure cookies)</p>
+<p><strong>Solution</strong>: ALWAYS use HTTPS URLs</p>
+<pre><code class="language-text">❌ http://localhost           → Empty responses
+❌ http://localhost:8080      → Empty responses
+✅ https://localhost          → Works
+✅ https://dev.hextrackr.com  → Works
+✅ https://hextrackr.com      → Works (production)</code></pre><h3>Mixed Content Errors</h3><p><strong>Problem</strong>: &quot;Mixed content blocked&quot; errors in browser console</p>
+<p><strong>Cause</strong>: HTTPS page loading HTTP resources</p>
+<p><strong>Solution</strong>: Verify all resources use HTTPS or relative URLs</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// BAD: Hard-coded HTTP</span>
+&lt;script src=<span class="hljs-string">&quot;http://example.com/script.js&quot;</span>&gt;&lt;/script&gt;
+
+<span class="hljs-comment">// GOOD: Protocol-relative or HTTPS</span>
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;//example.com/script.js&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></span>
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://example.com/script.js&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></span>
+
+<span class="hljs-comment">// BEST: Relative URL</span>
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;/vendor/script.js&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></span></code></pre><hr>
+<h2>Import/Export Issues</h2><h3>CSV Import Fails</h3><p><strong>Problem</strong>: CSV import returns error or no data imported</p>
 <p><strong>Solutions</strong>:</p>
 <ol>
-<li>Check browser console for JavaScript errors</li>
-<li>Clear browser cache and cookies</li>
-<li>Verify WebSocket connection: Check Network tab</li>
-<li>Try incognito/private browsing mode</li>
-</ol>
-<h4>Theme Not Switching</h4><p><strong>Problem</strong>: Dark/light theme toggle not working</p>
-<p><strong>Solutions</strong>:</p>
-<ol>
-<li>Clear localStorage: <code>localStorage.clear()</code></li>
-<li>Check for CSS conflicts in browser inspector</li>
-<li>Verify theme CSS variables are defined</li>
-<li>Refresh page after theme change</li>
-</ol>
-<h3>API & WebSocket Issues</h3><h4>WebSocket Connection Failed</h4><p><strong>Problem</strong>: Real-time updates not working</p>
-<p><strong>Solutions</strong>:</p>
-<ol>
-<li>Check WebSocket URL in browser console</li>
-<li>Verify firewall/proxy allows WebSocket</li>
-<li>Enable debug mode: <code>localStorage.hextrackr_debug = &quot;true&quot;</code></li>
-<li>Check Docker logs for Socket.io errors</li>
-</ol>
-<h4>API Returns 404</h4><p><strong>Problem</strong>: API calls return 404 errors</p>
-<p><strong>Solutions</strong>:</p>
-<ol>
-<li>Verify API base URL is correct (/api)</li>
-<li>Check route exists in server.js</li>
-<li>Verify Docker container is running</li>
-<li>Check for typos in API endpoint</li>
-</ol>
-<h3>Performance Issues</h3><h4>Slow Dashboard Loading</h4><p><strong>Problem</strong>: Dashboard takes too long to load</p>
-<p><strong>Solutions</strong>:</p>
-<ol>
-<li>Check vulnerability count (paginate if &gt; 10000)</li>
-<li>Clear browser cache</li>
-<li>Verify database indexes exist</li>
-<li>Monitor Docker container resources</li>
-</ol>
-<h4>Import Takes Forever</h4><p><strong>Problem</strong>: CSV import appears stuck</p>
-<p><strong>Solutions</strong>:</p>
-<ol>
-<li>Check file size (large files process server-side)</li>
+<li><p><strong>Verify CSV format matches supported columns</strong>:</p>
+<ul>
+<li>Required columns documented in User Guide</li>
+<li>Column headers must match exactly (case-sensitive)</li>
+</ul>
+</li>
+<li><p><strong>Check file encoding</strong>:</p>
+<pre><code class="language-bash">file -I your-file.csv
+<span class="hljs-comment"># Should be: charset=utf-8</span>
+
+<span class="hljs-comment"># Convert if needed:</span>
+iconv -f ISO-8859-1 -t UTF-8 input.csv &gt; output.csv</code></pre></li>
+<li><p><strong>Remove special characters from headers</strong>:</p>
+<ul>
+<li>PapaParse sanitizes headers: <code>[^a-zA-Z0-9_-]</code> → <code>_</code></li>
+<li>Avoid spaces, symbols, Unicode in column names</li>
+</ul>
+</li>
+<li><p><strong>Check file size</strong>:</p>
+<ul>
+<li>Maximum: 100MB</li>
+<li>Large files process server-side (may take time)</li>
 <li>Monitor progress in browser console</li>
-<li>Check Docker logs for processing status</li>
-<li>Consider using staging import for large files</li>
+</ul>
+</li>
+<li><p><strong>Verify MIME type</strong>:</p>
+<pre><code class="language-bash">file --mime-type your-file.csv
+<span class="hljs-comment"># Should be: text/csv, application/csv, or text/plain</span></code></pre></li>
 </ol>
+<h3>Export Generates Empty File</h3><p><strong>Problem</strong>: Export buttons create empty or corrupted files</p>
+<p><strong>Solutions</strong>:</p>
+<ol>
+<li><p><strong>Verify data exists in current view</strong>:</p>
+<ul>
+<li>Check AG-Grid has rows visible</li>
+<li>Verify filters aren&#39;t hiding all data</li>
+<li>Try resetting filters</li>
+</ul>
+</li>
+<li><p><strong>Check browser console for errors</strong>:</p>
+<pre><code class="language-text">F12 → Console tab
+Look for: &quot;Export failed&quot;, &quot;No data&quot;, &quot;CSV generation error&quot;</code></pre></li>
+<li><p><strong>Clear browser cache and retry</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// In browser console</span>
+<span class="hljs-variable language_">localStorage</span>.<span class="hljs-title function_">clear</span>();
+location.<span class="hljs-title function_">reload</span>();</code></pre></li>
+<li><p><strong>Try different export format</strong>:</p>
+<ul>
+<li>Standard CSV export</li>
+<li>Vendor breakdown CSV export (Cmd+Shift+Click on VPR card)</li>
+<li>Weekly summary CSV export</li>
+</ul>
+</li>
+</ol>
+<h3>Vendor CSV Export Issues (HEX-149)</h3><p><strong>Problem</strong>: Vendor breakdown CSV export (Cmd+Shift+Click) not working</p>
+<p><strong>Checklist</strong>:</p>
+<ol>
+<li><strong>Keyboard shortcut</strong>: Cmd+Shift+Click (macOS) or Ctrl+Shift+Click (Windows/Linux)</li>
+<li><strong>Click target</strong>: VPR card (Critical, High, Medium, Low)</li>
+<li><strong>Data required</strong>: Must have vulnerabilities loaded in dashboard</li>
+<li><strong>Vendor filtering</strong>: Works with any vendor filter (All, CISCO, Palo Alto, Other)</li>
+</ol>
+<p><strong>Expected Output</strong>: CSV with vendor breakdown sections and aggregate totals</p>
+<hr>
+<h2>Frontend Issues</h2><h3>Blank Page or Loading Forever</h3><p><strong>Problem</strong>: Application shows blank page or infinite loading</p>
+<p><strong>Solutions</strong>:</p>
+<ol>
+<li><p><strong>Check browser console for JavaScript errors</strong>:</p>
+<pre><code class="language-text">F12 → Console tab
+Look for: &quot;Uncaught&quot;, &quot;TypeError&quot;, &quot;Failed to fetch&quot;</code></pre></li>
+<li><p><strong>Verify API endpoints are responding</strong>:</p>
+<pre><code class="language-text">F12 → Network tab
+Filter: XHR/Fetch
+Check: /api/vulnerabilities, /api/statistics, /api/auth/status</code></pre></li>
+<li><p><strong>Clear browser cache and cookies</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Complete reset</span>
+<span class="hljs-variable language_">localStorage</span>.<span class="hljs-title function_">clear</span>();
+<span class="hljs-variable language_">sessionStorage</span>.<span class="hljs-title function_">clear</span>();
+<span class="hljs-comment">// Then: Ctrl+Shift+R (hard reload)</span></code></pre></li>
+<li><p><strong>Verify WebSocket connection</strong>:</p>
+<pre><code class="language-text">F12 → Network tab → WS filter
+Look for: Socket.io connection to wss://...
+Status: 101 Switching Protocols (success)</code></pre></li>
+<li><p><strong>Try incognito/private browsing mode</strong> (rules out extension conflicts)</p>
+</li>
+</ol>
+<h3>Theme Not Switching</h3><p><strong>Problem</strong>: Dark/light theme toggle not working</p>
+<p><strong>Solutions</strong>:</p>
+<ol>
+<li><p><strong>Clear theme localStorage</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-variable language_">localStorage</span>.<span class="hljs-title function_">removeItem</span>(<span class="hljs-string">&#x27;hextrackr-theme&#x27;</span>);
+location.<span class="hljs-title function_">reload</span>();</code></pre></li>
+<li><p><strong>Check for CSS conflicts</strong>:</p>
+<pre><code class="language-text">F12 → Elements tab → Inspect &lt;body&gt; tag
+Should have: data-theme=&quot;dark&quot; or data-theme=&quot;light&quot;</code></pre></li>
+<li><p><strong>Verify AG-Grid theme sync</strong> (HEX-140+):</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// In browser console</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">localStorage</span>.<span class="hljs-title function_">getItem</span>(<span class="hljs-string">&#x27;hextrackr-theme&#x27;</span>));
+<span class="hljs-comment">// Should match visual theme</span></code></pre></li>
+<li><p><strong>Cross-tab sync not working</strong>:</p>
+<ul>
+<li>Open multiple tabs</li>
+<li>Change theme in one tab</li>
+<li>Other tabs should update automatically (localStorage events)</li>
+<li>If not: Check browser allows cross-tab storage events</li>
+</ul>
+</li>
+</ol>
+<h3>Vendor Filter Not Working (HEX-156, HEX-158)</h3><p><strong>Problem</strong>: Vendor dropdown doesn&#39;t filter vulnerabilities</p>
+<p><strong>Recent Changes</strong> (v1.0.53-v1.0.54):</p>
+<ul>
+<li>Vendor filtering integrated across dashboard, dropdown, and VPR cards</li>
+<li>Bidirectional synchronization (dropdown ↔ top toggles)</li>
+</ul>
+<p><strong>Solutions</strong>:</p>
+<ol>
+<li><p><strong>Verify vendor filter synchronization</strong>:</p>
+<ul>
+<li>Change vendor dropdown → top toggles should update</li>
+<li>Click top toggle → dropdown should update</li>
+<li>Both should filter AG-Grid table</li>
+</ul>
+</li>
+<li><p><strong>Check vendor normalization</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// In browser console</span>
+<span class="hljs-title function_">fetch</span>(<span class="hljs-string">&#x27;/api/vulnerabilities&#x27;</span>).<span class="hljs-title function_">then</span>(<span class="hljs-function"><span class="hljs-params">r</span> =&gt;</span> r.<span class="hljs-title function_">json</span>()).<span class="hljs-title function_">then</span>(<span class="hljs-function"><span class="hljs-params">data</span> =&gt;</span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Vendors:&#x27;</span>, [...<span class="hljs-keyword">new</span> <span class="hljs-title class_">Set</span>(data.<span class="hljs-title function_">map</span>(<span class="hljs-function"><span class="hljs-params">v</span> =&gt;</span> v.<span class="hljs-property">vendor</span>))]);
+});
+<span class="hljs-comment">// Should show: [&quot;CISCO&quot;, &quot;Palo Alto&quot;, &quot;Other&quot;]</span></code></pre></li>
+<li><p><strong>Verify import.config.json vendor patterns</strong>:</p>
+<ul>
+<li>Family vendor patterns (vendor name matching)</li>
+<li>Hostname vendor patterns (hostname prefix matching)</li>
+<li>Default fallback to &quot;Other&quot;</li>
+</ul>
+</li>
+<li><p><strong>Clear filter cache</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-variable language_">localStorage</span>.<span class="hljs-title function_">removeItem</span>(<span class="hljs-string">&#x27;hextrackr-vendor-filter&#x27;</span>);
+location.<span class="hljs-title function_">reload</span>();</code></pre></li>
+</ol>
+<hr>
+<h2>API & WebSocket Issues</h2><h3>WebSocket Connection Failed</h3><p><strong>Problem</strong>: Real-time updates not working</p>
+<p><strong>Solutions</strong>:</p>
+<ol>
+<li><p><strong>Check WebSocket URL in browser console</strong>:</p>
+<pre><code class="language-text">F12 → Network → WS filter
+Connection URL: wss://dev.hextrackr.com or wss://localhost
+Status: Should be 101 Switching Protocols</code></pre></li>
+<li><p><strong>Verify firewall/proxy allows WebSocket</strong>:</p>
+<ul>
+<li>Some corporate firewalls block WebSocket</li>
+<li>Test with: <code>wscat -c wss://dev.hextrackr.com</code></li>
+</ul>
+</li>
+<li><p><strong>Enable debug mode</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-variable language_">localStorage</span>.<span class="hljs-property">hextrackr_debug</span> = <span class="hljs-string">&quot;true&quot;</span>;
+location.<span class="hljs-title function_">reload</span>();
+<span class="hljs-comment">// Check console for WebSocket connection details</span></code></pre></li>
+<li><p><strong>Check Docker logs for Socket.io errors</strong>:</p>
+<pre><code class="language-bash">docker logs hextrackr-app | grep -i <span class="hljs-string">&quot;socket&quot;</span>
+docker logs hextrackr-app | grep -i <span class="hljs-string">&quot;websocket&quot;</span></code></pre></li>
+<li><p><strong>Verify session authentication</strong> (WebSocket requires valid session):</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">fetch</span>(<span class="hljs-string">&#x27;/api/auth/status&#x27;</span>).<span class="hljs-title function_">then</span>(<span class="hljs-function"><span class="hljs-params">r</span> =&gt;</span> r.<span class="hljs-title function_">json</span>()).<span class="hljs-title function_">then</span>(<span class="hljs-variable language_">console</span>.<span class="hljs-property">log</span>);
+<span class="hljs-comment">// Should show: { authenticated: true }</span></code></pre></li>
+</ol>
+<h3>API Returns 404</h3><p><strong>Problem</strong>: API calls return 404 errors</p>
+<p><strong>Solutions</strong>:</p>
+<ol>
+<li><p><strong>Verify API base URL is correct</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// All API endpoints start with /api/</span>
+<span class="hljs-title function_">fetch</span>(<span class="hljs-string">&#x27;/api/vulnerabilities&#x27;</span>)  <span class="hljs-comment">// ✅ Correct</span>
+<span class="hljs-title function_">fetch</span>(<span class="hljs-string">&#x27;api/vulnerabilities&#x27;</span>)   <span class="hljs-comment">// ❌ Wrong (missing leading slash)</span></code></pre></li>
+<li><p><strong>Check route exists in server.js</strong>:</p>
+<pre><code class="language-bash"><span class="hljs-comment"># List all API routes</span>
+grep -r <span class="hljs-string">&quot;app\.\(get\|post\|put\|delete\)&quot;</span> app/routes/ | grep <span class="hljs-string">&quot;/api/&quot;</span></code></pre></li>
+<li><p><strong>Verify Docker container is running</strong>:</p>
+<pre><code class="language-bash">docker ps | grep hextrackr-app
+<span class="hljs-comment"># Should show: Up (status)</span></code></pre></li>
+<li><p><strong>Check for typos in API endpoint</strong>:</p>
+<ul>
+<li><code>/api/vulnerabilities</code> (plural, not singular)</li>
+<li><code>/api/statistics</code> (not /api/stats)</li>
+<li><code>/api/auth/login</code> (not /api/login)</li>
+</ul>
+</li>
+</ol>
+<h3>API Returns 429 (Rate Limit Exceeded)</h3><p><strong>Problem</strong>: &quot;Too many requests&quot; error</p>
+<p><strong>Rate Limits</strong>:</p>
+<ul>
+<li><strong>Production</strong>: 100 requests per 15 minutes per IP</li>
+<li><strong>Development</strong>: 10,000 requests per 1 minute per IP</li>
+</ul>
+<p><strong>Solutions</strong>:</p>
+<ol>
+<li><p><strong>Wait for rate limit window to reset</strong>:</p>
+<pre><code class="language-text">Check response headers:
+RateLimit-Reset: &lt;timestamp&gt;</code></pre></li>
+<li><p><strong>If in development, verify NODE_ENV</strong>:</p>
+<pre><code class="language-bash">docker logs hextrackr-app | grep -i <span class="hljs-string">&quot;node_env&quot;</span>
+<span class="hljs-comment"># Should show: development (for higher limits)</span></code></pre></li>
+<li><p><strong>Check if legitimate traffic is being blocked</strong>:</p>
+<pre><code class="language-bash">docker logs hextrackr-app | grep -i <span class="hljs-string">&quot;rate limit&quot;</span></code></pre></li>
+</ol>
+<hr>
+<h2>Performance Issues</h2><h3>Slow Dashboard Loading</h3><p><strong>Problem</strong>: Dashboard takes too long to load</p>
+<p><strong>Solutions</strong>:</p>
+<ol>
+<li><p><strong>Check vulnerability count</strong>:</p>
+<pre><code class="language-sql">sqlite3 app<span class="hljs-operator">/</span>data<span class="hljs-operator">/</span>hextrackr.db &quot;SELECT COUNT(*) FROM vulnerabilities;&quot;</code></pre><ul>
+<li>If &gt; 10,000: Consider pagination or filtering</li>
+<li>AG-Grid handles large datasets well, but 50k+ may slow down</li>
+</ul>
+</li>
+<li><p><strong>Clear browser cache</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-variable language_">localStorage</span>.<span class="hljs-title function_">clear</span>();
+location.<span class="hljs-title function_">reload</span>();</code></pre></li>
+<li><p><strong>Verify database indexes exist</strong>:</p>
+<pre><code class="language-sql">sqlite3 app<span class="hljs-operator">/</span>data<span class="hljs-operator">/</span>hextrackr.db &quot;.indexes vulnerabilities&quot;</code></pre></li>
+<li><p><strong>Monitor Docker container resources</strong>:</p>
+<pre><code class="language-bash">docker stats hextrackr-app
+<span class="hljs-comment"># Check: CPU%, MEM%</span></code></pre></li>
+<li><p><strong>Check AG-Grid performance settings</strong>:</p>
+<ul>
+<li>Row virtualization enabled (default)</li>
+<li>Pagination enabled</li>
+<li>Deferred rendering for large datasets</li>
+</ul>
+</li>
+</ol>
+<h3>Import Takes Forever</h3><p><strong>Problem</strong>: CSV import appears stuck</p>
+<p><strong>Solutions</strong>:</p>
+<ol>
+<li><p><strong>Check file size</strong>:</p>
+<pre><code class="language-bash"><span class="hljs-built_in">ls</span> -lh your-file.csv
+<span class="hljs-comment"># Large files (&gt;50MB) process server-side</span></code></pre></li>
+<li><p><strong>Monitor progress in browser console</strong>:</p>
+<pre><code class="language-text">F12 → Console
+Look for: &quot;Import progress: X%&quot;, &quot;Processing rows...&quot;</code></pre></li>
+<li><p><strong>Check Docker logs for processing status</strong>:</p>
+<pre><code class="language-bash">docker logs -f hextrackr-app | grep -i <span class="hljs-string">&quot;import&quot;</span></code></pre></li>
+<li><p><strong>Verify deduplication isn&#39;t removing too many rows</strong>:</p>
+<pre><code class="language-bash">docker logs hextrackr-app | grep -i <span class="hljs-string">&quot;duplicate&quot;</span>
+<span class="hljs-comment"># Deduplication engine logs duplicates found</span></code></pre></li>
+<li><p><strong>Consider staging import for very large files</strong> (if implemented):</p>
+<ul>
+<li>Split large CSV into smaller chunks</li>
+<li>Import incrementally</li>
+</ul>
+</li>
+</ol>
+<h3>Chart Rendering Issues (HEX-158 Bug Fix)</h3><p><strong>Problem</strong>: VPR/Vuln totals chart doesn&#39;t maintain vendor filter</p>
+<p><strong>Fixed in</strong>: v1.0.54</p>
+<p><strong>Behavior</strong>:</p>
+<ul>
+<li>Toggle between VPR Sum and Vuln Sum buttons</li>
+<li>Chart should maintain current vendor filter (CISCO, Palo Alto, Other)</li>
+</ul>
+<p><strong>If still broken</strong>:</p>
+<ol>
+<li><p><strong>Verify you&#39;re on v1.0.54+</strong>:</p>
+<pre><code class="language-bash">docker logs hextrackr-app | grep -i <span class="hljs-string">&quot;version&quot;</span></code></pre></li>
+<li><p><strong>Check chart update order</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// In browser console</span>
+<span class="hljs-variable language_">localStorage</span>.<span class="hljs-property">hextrackr_debug</span> = <span class="hljs-string">&quot;true&quot;</span>;
+<span class="hljs-comment">// Then toggle chart buttons and watch console</span></code></pre></li>
+<li><p><strong>Clear chart cache</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-variable language_">localStorage</span>.<span class="hljs-title function_">removeItem</span>(<span class="hljs-string">&#x27;hextrackr-chart-type&#x27;</span>);
+location.<span class="hljs-title function_">reload</span>();</code></pre></li>
+</ol>
+<hr>
 <h2>Debug Mode</h2><p>Enable debug mode for detailed logging:</p>
 <pre><code class="language-javascript"><span class="hljs-comment">// In browser console</span>
 <span class="hljs-variable language_">localStorage</span>.<span class="hljs-property">hextrackr_debug</span> = <span class="hljs-string">&quot;true&quot;</span>;
-location.<span class="hljs-title function_">reload</span>();</code></pre><p>This enables:</p>
+location.<span class="hljs-title function_">reload</span>();</code></pre><p><strong>Debug mode enables</strong>:</p>
 <ul>
 <li>Verbose WebSocket logging</li>
 <li>Detailed API request/response logging</li>
 <li>Import processing details</li>
 <li>Theme switching diagnostics</li>
+<li>Vendor filter synchronization logs</li>
+<li>AG-Grid event logging</li>
 </ul>
-<h2>Log Locations</h2><ul>
-<li><strong>Application logs</strong>: <code>docker-compose logs hextrackr</code></li>
-<li><strong>Real-time logs</strong>: <code>docker-compose logs -f hextrackr</code></li>
-<li><strong>Browser console</strong>: F12 → Console tab</li>
-<li><strong>Network traffic</strong>: F12 → Network tab</li>
-</ul>
+<p><strong>Disable debug mode</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-variable language_">localStorage</span>.<span class="hljs-title function_">removeItem</span>(<span class="hljs-string">&#x27;hextrackr_debug&#x27;</span>);
+location.<span class="hljs-title function_">reload</span>();</code></pre><hr>
+<h2>Log Locations</h2><h3>Application Logs</h3><pre><code class="language-bash"><span class="hljs-comment"># Real-time logs (all containers)</span>
+docker-compose logs -f
+
+<span class="hljs-comment"># App container only</span>
+docker logs -f hextrackr-app
+
+<span class="hljs-comment"># Nginx container only</span>
+docker logs -f hextrackr-nginx
+
+<span class="hljs-comment"># Last 100 lines</span>
+docker logs --<span class="hljs-built_in">tail</span> 100 hextrackr-app
+
+<span class="hljs-comment"># Since specific time</span>
+docker logs --since 2025-10-09T10:00:00 hextrackr-app</code></pre><h3>Browser Logs</h3><pre><code class="language-text">F12 → Console tab       # JavaScript errors and logs
+F12 → Network tab       # API requests, WebSocket connections
+F12 → Application tab   # localStorage, sessionStorage, cookies</code></pre><h3>Database Logs</h3><pre><code class="language-bash"><span class="hljs-comment"># Query database directly</span>
+sqlite3 app/data/hextrackr.db
+
+<span class="hljs-comment"># Example: Check recent vulnerabilities</span>
+sqlite3 app/data/hextrackr.db <span class="hljs-string">&quot;SELECT * FROM vulnerabilities ORDER BY created_at DESC LIMIT 10;&quot;</span>
+
+<span class="hljs-comment"># Example: Check sessions</span>
+sqlite3 app/data/sessions.db <span class="hljs-string">&quot;SELECT * FROM sessions;&quot;</span></code></pre><hr>
+<h2>Common Error Messages</h2><h3>"SESSION_SECRET is missing or too short"</h3><p><strong>Error</strong>: Server refuses to start</p>
+<p><strong>Cause</strong>: SESSION_SECRET environment variable not set or &lt; 32 characters</p>
+<p><strong>Solution</strong>:</p>
+<pre><code class="language-bash"><span class="hljs-comment"># Generate secure secret</span>
+node -e <span class="hljs-string">&quot;console.log(require(&#x27;crypto&#x27;).randomBytes(32).toString(&#x27;hex&#x27;))&quot;</span>
+
+<span class="hljs-comment"># Add to .env</span>
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;SESSION_SECRET=&lt;generated-secret&gt;&quot;</span> &gt;&gt; .<span class="hljs-built_in">env</span>
+
+<span class="hljs-comment"># Restart containers</span>
+docker-compose restart</code></pre><h3>"Only HTTPS connections allowed" (CORS Error)</h3><p><strong>Error</strong>: API requests rejected with CORS error</p>
+<p><strong>Cause</strong>: Attempting HTTP cross-origin request (HexTrackr enforces HTTPS-only CORS)</p>
+<p><strong>Solution</strong>: Use HTTPS URLs only</p>
+<pre><code class="language-text">❌ http://dev.hextrackr.com
+✅ https://dev.hextrackr.com</code></pre><h3>"Path traversal detected"</h3><p><strong>Error</strong>: File operations fail with path traversal error</p>
+<p><strong>Cause</strong>: PathValidator detected <code>../</code> or <code>..\</code> in file path</p>
+<p><strong>Solution</strong>: Use absolute paths or sanitized relative paths</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// BAD: Path traversal attempt</span>
+<span class="hljs-keyword">const</span> path = <span class="hljs-string">&quot;../../../etc/passwd&quot;</span>;
+
+<span class="hljs-comment">// GOOD: Absolute path</span>
+<span class="hljs-keyword">const</span> path = <span class="hljs-string">&quot;/app/data/uploads/file.csv&quot;</span>;
+
+<span class="hljs-comment">// GOOD: Sanitized relative path</span>
+<span class="hljs-keyword">const</span> path = <span class="hljs-string">&quot;data/uploads/file.csv&quot;</span>;</code></pre><h3>"CSRF token validation failed"</h3><p><strong>Error</strong>: POST/PUT/DELETE requests fail with 403</p>
+<p><strong>Cause</strong>: CSRF token missing or invalid</p>
+<p><strong>Solution</strong>: Include CSRF token in request</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Get token</span>
+<span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string">&#x27;/api/auth/csrf&#x27;</span>);
+<span class="hljs-keyword">const</span> { csrfToken } = <span class="hljs-keyword">await</span> response.<span class="hljs-title function_">json</span>();
+
+<span class="hljs-comment">// Include in request header</span>
+<span class="hljs-title function_">fetch</span>(<span class="hljs-string">&#x27;/api/protected-endpoint&#x27;</span>, {
+    <span class="hljs-attr">method</span>: <span class="hljs-string">&#x27;POST&#x27;</span>,
+    <span class="hljs-attr">headers</span>: {
+        <span class="hljs-string">&#x27;X-CSRF-Token&#x27;</span>: csrfToken,
+        <span class="hljs-string">&#x27;Content-Type&#x27;</span>: <span class="hljs-string">&#x27;application/json&#x27;</span>
+    },
+    <span class="hljs-attr">body</span>: <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>({ data })
+});</code></pre><hr>
 <h2>Getting Help</h2><p>If issues persist after trying these solutions:</p>
 <ol>
-<li>Check the GitHub issues: <a href="https://github.com/HexTrackr/HexTrackr/issues">https://github.com/HexTrackr/HexTrackr/issues</a></li>
-<li>Gather diagnostic information:<ul>
-<li>Docker logs</li>
-<li>Browser console errors</li>
-<li>Screenshot of the issue</li>
+<li><p><strong>Check GitHub Issues</strong>: <a href="https://github.com/Lonnie-Bruton/HexTrackr/issues">HexTrackr Issues</a></p>
+</li>
+<li><p><strong>Gather diagnostic information</strong>:</p>
+<ul>
+<li>Docker logs: <code>docker-compose logs &gt; logs.txt</code></li>
+<li>Browser console errors (screenshot)</li>
+<li>Network tab (F12 → Network → Export HAR)</li>
 <li>Steps to reproduce</li>
+<li>HexTrackr version: <code>docker logs hextrackr-app | grep -i version</code></li>
 </ul>
 </li>
-<li>Create a detailed issue report</li>
+<li><p><strong>Create a detailed issue report</strong>:</p>
+<ul>
+<li>Title: Concise description of problem</li>
+<li>Environment: OS, Docker version, browser</li>
+<li>Steps to reproduce</li>
+<li>Expected behavior</li>
+<li>Actual behavior</li>
+<li>Logs and screenshots</li>
+</ul>
+</li>
+<li><p><strong>Search existing issues first</strong>:</p>
+<ul>
+<li>Your issue may already be reported</li>
+<li>Check closed issues for solutions</li>
+</ul>
+</li>
 </ol>
 <hr>
-<p><em>For performance-related issues, see <a href="#reference/performance">Performance Guidelines</a></em></p>
+<p><strong>Document Version</strong>: 2.0<br><strong>Last Updated</strong>: 2025-10-09<br><strong>Reviewed By</strong>: hextrackr-fullstack-dev agent<br><strong>Next Review</strong>: 2026-01-09 (quarterly review cycle)</p>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be

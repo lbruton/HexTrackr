@@ -178,6 +178,8 @@ docker-compose logs -f
 docker-compose restart
 ```
 
+**Note**: Use either `docker compose` (v2+) or `docker-compose` (v1). The helper scripts auto-detect the correct syntax for your Docker version.
+
 ---
 
 ## Local Development (Without Docker)
@@ -206,7 +208,11 @@ For developers working directly on the HexTrackr codebase without Docker.
 
 3. **Initialize Database**
 
-    ⚠️ **WARNING**: This command creates a fresh database and **destroys all existing data**. Only run this for fresh installations.
+    ⚠️ **WARNING**: This command creates database tables using `CREATE TABLE IF NOT EXISTS` statements. While it won't drop existing tables, running this on an existing database may cause schema conflicts. For schema migrations on existing databases, use the migration scripts in `app/public/scripts/migrations/` instead.
+
+    **Only run this for**:
+    - Fresh installations (no existing `app/data/hextrackr.db` file)
+    - Development environments where schema recreation is acceptable
 
     ```bash
     npm run init-db
@@ -282,8 +288,14 @@ npm run docs:generate  # Regenerate HTML documentation
 **Symptom**: Browser cannot load `https://dev.hextrackr.com`
 
 **Solution**:
-1. Verify containers are running: `docker ps`
-2. Check logs: `docker-compose logs -f`
+1. Verify **both** containers are running: `docker ps`
+   - You should see: `hextrackr-app` (Node.js application)
+   - And: `hextrackr-nginx` (HTTPS reverse proxy)
+   - Both should show status "Up" or "healthy"
+2. Check logs for both containers:
+   - App logs: `docker logs hextrackr-app`
+   - Nginx logs: `docker logs hextrackr-nginx`
+   - Or combined: `docker-compose logs -f`
 3. Ensure Docker daemon is running
 4. Try alternative URL: `https://localhost`
 
@@ -350,7 +362,7 @@ Now that you have HexTrackr running:
 - **Configure KEV**: Enable automatic KEV tracking in settings
 - **Create Tickets**: Start creating remediation tickets for high-priority vulnerabilities
 - **Explore Features**: Check the [User Guide](user-guide.md) for detailed feature documentation
-- **Review API**: See the [API Reference](../api-reference/overview.md) for integration options
+- **Review API**: See the [API Reference](../api-reference/index.md) for integration options
 
 ---
 
@@ -362,5 +374,5 @@ Now that you have HexTrackr running:
 
 ---
 
-**Version**: 1.0.54
+**Version**: 1.0.43
 **Last Updated**: 2025-10-09

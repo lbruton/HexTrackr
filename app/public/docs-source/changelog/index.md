@@ -2,7 +2,7 @@
 
 Welcome to the HexTrackr changelog! This page tracks all notable changes, features, and fixes across all versions of HexTrackr.
 
-**Current Version**: [v1.0.54](#changelog/versions/1.0.54)
+**Current Version**: [v1.0.55](#changelog/versions/1.0.55)
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
@@ -14,7 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### Latest Releases
 
-- [**v1.0.54**](#changelog/versions/1.0.54) - Vendor CSV Export Enhancements, UI Synchronization
+- [**v1.0.55**](#changelog/versions/1.0.55) - 2025-10-09 - Production SSL Certificate Implementation
+- [**v1.0.54**](#changelog/versions/1.0.54) - 2025-10-09 - Vendor CSV Export Enhancements, UI Synchronization
 - [**v1.0.53**](#changelog/versions/1.0.53) - 2025-10-08 - Vendor Breakdown CSV Export
 - [**v1.0.52**](#changelog/versions/1.0.52) - 2025-10-07 - Hidden Keyboard Shortcut: VPR Weekly Summary CSV Export
 - [**v1.0.51**](#changelog/versions/1.0.51) - 2025-10-06 - KEV Modal Enhancements & CSV Import UX Improvements
@@ -22,6 +23,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### Security & Authentication
 
+- [**v1.0.55**](#changelog/versions/1.0.55) - Production SSL Certificate with Multi-Domain SAN
 - [**v1.0.50**](#changelog/versions/1.0.50) - Authentication System with Argon2id, Session Management
 - [**v1.0.49**](#changelog/versions/1.0.49) - Security Headers and HTTPS Configuration
 - [**v1.0.48**](#changelog/versions/1.0.48) - Trust Proxy Configuration for Reverse Proxy Support
@@ -49,7 +51,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 | Version | Release Date | Highlights |
 |---------|--------------|------------|
-| [1.0.54](#changelog/versions/1.0.54) | Latest | Vendor CSV Export Enhancements, UI Sync |
+| [1.0.55](#changelog/versions/1.0.55) | Latest | Production SSL Certificate |
+| [1.0.54](#changelog/versions/1.0.54) | 2025-10-09 | Vendor CSV Export Enhancements, UI Sync |
 | [1.0.53](#changelog/versions/1.0.53) | 2025-10-08 | Vendor Breakdown CSV Export |
 | [1.0.52](#changelog/versions/1.0.52) | 2025-10-07 | VPR Weekly Summary CSV Export |
 | [1.0.51](#changelog/versions/1.0.51) | 2025-10-06 | KEV Modal Enhancements |
@@ -104,7 +107,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Navigation
 
-- **[Latest Version (1.0.54)](#changelog/versions/1.0.54)** - Most recent changes
+- **[Latest Version (1.0.55)](#changelog/versions/1.0.55)** - Most recent changes
 - **[Version 1.0.50](#changelog/versions/1.0.50)** - Authentication system milestone
 - **[Version 1.0.0](#changelog/versions/1.0.0)** - Initial release
 

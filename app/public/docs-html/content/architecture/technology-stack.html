@@ -1,31 +1,183 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
-    <h1>Technology Stack</h1><p>This document provides a list of the technologies used in the HexTrackr project.</p>
+    <h1>Technology Stack</h1><p>This document provides a comprehensive list of technologies, frameworks, and libraries used in the HexTrackr project with version information.</p>
 <hr>
-<h2>Frontend</h2><ul>
-<li><strong>HTML5</strong></li>
-<li><strong>CSS3</strong></li>
-<li><strong>JavaScript (ES6)</strong></li>
-<li><strong>Bootstrap</strong></li>
-<li><strong>Tabler.io</strong></li>
-<li><strong>AG Grid</strong></li>
-<li><strong>ApexCharts</strong></li>
-<li><strong>Socket.io-client</strong></li>
+<h2>Runtime Environment</h2><ul>
+<li><strong>Node.js 22.11.0 LTS</strong> - JavaScript runtime</li>
+<li><strong>CommonJS Module System</strong> - Backend module format</li>
+<li><strong>ES6 Modules</strong> - Frontend module format</li>
 </ul>
 <hr>
-<h2>Backend</h2><ul>
-<li><strong>Node.js</strong></li>
-<li><strong>Express</strong></li>
-<li><strong>Socket.io</strong></li>
-<li><strong>SQLite3</strong></li>
+<h2>Frontend Technologies</h2><h3>Core Technologies</h3><ul>
+<li><strong>HTML5</strong> - Modern semantic markup</li>
+<li><strong>CSS3</strong> - Styling with CSS custom properties (CSS variables)</li>
+<li><strong>JavaScript (ES6+)</strong> - Modern ECMAScript features (modules, async/await, classes)</li>
+</ul>
+<h3>UI Frameworks & Libraries</h3><ul>
+<li><strong>Bootstrap 5.x</strong> - Responsive CSS framework</li>
+<li><strong>Tabler.io</strong> - Dashboard UI theme and components</li>
+<li><strong>AG-Grid Community 32.x</strong> - Enterprise-grade data grid with infinite scroll</li>
+<li><strong>ApexCharts 3.x</strong> - Interactive charts and data visualization</li>
+<li><strong>DOMPurify 3.2.6</strong> - XSS sanitization library for user-generated content</li>
+</ul>
+<h3>Frontend Modules *(32 specialized modules)*</h3><table>
+<thead>
+<tr>
+<th>Module Category</th>
+<th>Modules</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Core Orchestration</strong></td>
+<td><code>vulnerability-core.js</code></td>
+<td>VulnerabilityCoreOrchestrator - central coordination hub</td>
+</tr>
+<tr>
+<td><strong>Data Management</strong></td>
+<td><code>vulnerability-data.js</code>, <code>vulnerability-statistics.js</code></td>
+<td>API communication, caching, statistical calculations</td>
+</tr>
+<tr>
+<td><strong>UI Components</strong></td>
+<td><code>vulnerability-grid.js</code>, <code>vulnerability-cards.js</code>, <code>vulnerability-chart-manager.js</code></td>
+<td>AG-Grid, card views, ApexCharts integration</td>
+</tr>
+<tr>
+<td><strong>Search &amp; Filter</strong></td>
+<td><code>vulnerability-search.js</code>, <code>vulnerability-constants.js</code></td>
+<td>Client-side search, filter constants</td>
+</tr>
+<tr>
+<td><strong>Modals</strong></td>
+<td><code>vulnerability-details-modal.js</code>, <code>device-security-modal.js</code>, <code>settings-modal.js</code>, <code>progress-modal.js</code></td>
+<td>Modal components for details, settings, progress</td>
+</tr>
+<tr>
+<td><strong>Theme System</strong></td>
+<td><code>theme-controller.js</code>, <code>theme-config.js</code>, <code>ag-grid-theme-manager.js</code></td>
+<td>Dark/light mode, AG-Grid theming, preference sync</td>
+</tr>
+<tr>
+<td><strong>Authentication</strong></td>
+<td><code>auth-state.js</code>, <code>crypto-utils.js</code></td>
+<td>Session management, CSRF token handling</td>
+</tr>
+<tr>
+<td><strong>User Preferences</strong></td>
+<td><code>preferences-service.js</code>, <code>preferences-sync.js</code></td>
+<td>Cross-device settings persistence</td>
+</tr>
+<tr>
+<td><strong>Utilities</strong></td>
+<td><code>websocket-client.js</code>, <code>toast-manager.js</code>, <code>cve-utilities.js</code>, <code>modal-monitoring.js</code></td>
+<td>WebSocket, notifications, CVE formatting, modal state</td>
+</tr>
+<tr>
+<td><strong>Templates</strong></td>
+<td><code>template-editor.js</code>, <code>template-variables.js</code></td>
+<td>Template management with variable substitution</td>
+</tr>
+<tr>
+<td><strong>Markdown Editors</strong></td>
+<td><code>vulnerability-markdown-editor.js</code>, <code>ticket-markdown-editor.js</code></td>
+<td>Rich text editing with marked.js + highlight.js</td>
+</tr>
+<tr>
+<td><strong>UI Chrome</strong></td>
+<td><code>header.js</code>, <code>header-loader.js</code>, <code>footer-loader.js</code>, <code>pagination-controller.js</code></td>
+<td>Page structure and navigation</td>
+</tr>
+<tr>
+<td><strong>Configuration</strong></td>
+<td><code>config-loader.js</code>, <code>ag-grid-responsive-config.js</code></td>
+<td>Dynamic config loading, responsive grid setup</td>
+</tr>
+</tbody></table>
+<h3>Real-Time Communication</h3><ul>
+<li><strong>Socket.io-client 4.8.1</strong> - WebSocket client for progress tracking and live updates</li>
 </ul>
 <hr>
-<h2>Development</h2><ul>
-<li><strong>Docker</strong></li>
-<li><strong>Docker Compose</strong></li>
-<li><strong>nginx</strong></li>
-<li><strong>Jest</strong></li>
-<li><strong>Playwright</strong></li>
+<h2>Backend Technologies</h2><h3>Core Framework</h3><ul>
+<li><strong>Express.js 4.18.2</strong> - Web application framework</li>
+<li><strong>Node.js Built-ins</strong> - http, https, path, fs, crypto</li>
+</ul>
+<h3>Database</h3><ul>
+<li><strong>better-sqlite3 11.10.0</strong> - Synchronous SQLite3 driver (native bindings)</li>
+<li><strong>SQLite 3</strong> - Embedded relational database</li>
+<li><strong>WAL Mode</strong> - Write-Ahead Logging for improved concurrency</li>
+</ul>
+<h3>Authentication & Security *(v1.0.46+)*</h3><ul>
+<li><strong>argon2 0.31.2</strong> - Argon2id password hashing (timing-safe)</li>
+<li><strong>express-session 1.18.2</strong> - Session management middleware</li>
+<li><strong>better-sqlite3-session-store 0.1.0</strong> - SQLite session storage adapter</li>
+<li><strong>csrf-sync 4.2.1</strong> - CSRF protection (Synchronizer Token Pattern)</li>
+<li><strong>helmet 8.1.0</strong> - Security headers middleware</li>
+<li><strong>express-rate-limit 8.1.0</strong> - API rate limiting (1,000 req/15min per IP)</li>
+</ul>
+<h3>Middleware & Utilities</h3><ul>
+<li><strong>cors 2.8.5</strong> - Cross-Origin Resource Sharing</li>
+<li><strong>compression 1.7.4</strong> - Response compression (gzip/deflate)</li>
+<li><strong>multer 2.0.2</strong> - Multipart/form-data parsing for file uploads</li>
+<li><strong>node-cache 5.1.2</strong> - In-memory caching with TTL</li>
+<li><strong>dotenv 17.2.1</strong> - Environment variable management</li>
+</ul>
+<h3>Data Processing</h3><ul>
+<li><strong>papaparse 5.4.1</strong> - CSV parsing and generation</li>
+<li><strong>jszip 3.10.1</strong> - ZIP archive creation for backups</li>
+<li><strong>marked 16.2.1</strong> - Markdown parser and renderer</li>
+<li><strong>highlight.js 11.11.1</strong> - Syntax highlighting for code blocks</li>
+<li><strong>dompurify 3.2.6</strong> - XSS sanitization (server-side)</li>
+<li><strong>esprima 4.0.1</strong> - JavaScript parser for code analysis</li>
+</ul>
+<h3>Real-Time Communication</h3><ul>
+<li><strong>Socket.io 4.8.1</strong> - WebSocket server for progress tracking (port 8988)</li>
+</ul>
+<h3>Utilities</h3><ul>
+<li><strong>uuid 12.0.0</strong> - RFC4122 UUID generation</li>
+<li><strong>node-fetch 3.3.2</strong> - HTTP client for KEV API integration</li>
+<li><strong>chart.js 4.4.0</strong> - Server-side chart generation (future use)</li>
+</ul>
+<hr>
+<h2>Development Tools</h2><h3>Code Quality</h3><ul>
+<li><strong>ESLint 9.34.0</strong> - JavaScript linter with stylistic plugin<ul>
+<li><code>@stylistic/eslint-plugin 5.2.3</code> - Code formatting rules</li>
+<li>Custom configuration in <code>eslint.config.mjs</code></li>
+</ul>
+</li>
+<li><strong>Stylelint 16.23.1</strong> - CSS linter<ul>
+<li><code>stylelint-config-standard 39.0.0</code> - Standard CSS rules</li>
+</ul>
+</li>
+<li><strong>markdownlint-cli 0.41.0</strong> - Markdown linter with auto-fix</li>
+</ul>
+<h3>Documentation</h3><ul>
+<li><strong>JSDoc 4.0.4</strong> - JavaScript API documentation generator</li>
+<li><strong>Custom JSDoc Theme</strong> - Dark/light mode support with theme wrapper injection</li>
+</ul>
+<h3>Development Workflow</h3><ul>
+<li><strong>nodemon 3.0.1</strong> - Hot-reload development server</li>
+<li><strong>Git Hooks</strong> - Pre-commit linting via <code>.githooks/</code></li>
+</ul>
+<h3>Testing & Automation</h3><ul>
+<li><strong>@browserbasehq/stagehand 1.12.1</strong> - Browser automation framework</li>
+<li><strong>zod 3.23.8</strong> - Schema validation for testing</li>
+</ul>
+<hr>
+<h2>Deployment & Infrastructure</h2><h3>Containerization</h3><ul>
+<li><strong>Docker</strong> - Application containerization</li>
+<li><strong>Docker Compose</strong> - Multi-container orchestration</li>
+<li><strong>nginx</strong> - Reverse proxy with HTTPS termination<ul>
+<li>SSL/TLS certificate management</li>
+<li>Static file serving</li>
+<li>Proxy pass to Node.js (port 8080)</li>
+<li>Compression and caching</li>
+</ul>
+</li>
+</ul>
+<h3>Hosting Environments</h3><ul>
+<li><strong>Development</strong>: Mac M4 (macOS) - Docker Desktop, localhost:8989</li>
+<li><strong>Production</strong>: Ubuntu Server 24.04 LTS (192.168.1.80) - Docker + nginx</li>
 </ul>
 <hr>
 <h2>External Integrations</h2><h3>Security Intelligence</h3><ul>

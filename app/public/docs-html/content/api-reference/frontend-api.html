@@ -232,7 +232,85 @@ themeController.<span class="hljs-title function_">initializeToggle</span>();</c
     <span class="hljs-attr">columnDefs</span>: [...],
     <span class="hljs-attr">rowData</span>: [...],
     <span class="hljs-attr">onGridReady</span>: <span class="hljs-function">(<span class="hljs-params">params</span>) =&gt;</span> {...}
-});</code></pre><h3>VulnerabilityDataManager</h3><p><strong>Location:</strong> <code>app/public/scripts/shared/vulnerability-data.js</code></p>
+});</code></pre><h3>AGGridThemeManager</h3><p><strong>Location:</strong> <code>app/public/scripts/shared/ag-grid-theme-manager.js</code><br><strong>Since:</strong> v1.0.40+</p>
+<p>Centralized theme management for all AG-Grid instances across the application.</p>
+<p><strong>Key Features:</strong></p>
+<ul>
+<li><strong>Unified Theme Control</strong>: Single source of truth for grid themes across all pages</li>
+<li><strong>Dynamic Theme Switching</strong>: Instant theme updates without page reload</li>
+<li><strong>Cross-Tab Synchronization</strong>: Theme changes propagate across browser tabs via localStorage events</li>
+<li><strong>Grid Instance Registry</strong>: Tracks all active grid instances for coordinated updates</li>
+<li><strong>Dark Mode Surface Hierarchy</strong>: Implements proper surface elevation for dark mode (base → surface-1 → surface-2)</li>
+</ul>
+<p><strong>Architecture Pattern:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Register grid instance on creation</span>
+<span class="hljs-title class_">AGGridThemeManager</span>.<span class="hljs-title function_">registerGrid</span>(gridApi, <span class="hljs-string">&#x27;vulnerabilities-grid&#x27;</span>);
+
+<span class="hljs-comment">// Theme changes automatically update all registered grids</span>
+<span class="hljs-title class_">AGGridThemeManager</span>.<span class="hljs-title function_">applyTheme</span>(<span class="hljs-string">&#x27;dark&#x27;</span>); <span class="hljs-comment">// Updates all grids instantly</span></code></pre><p><strong>Core Methods:</strong></p>
+<ul>
+<li><code>registerGrid(gridApi, gridId)</code> - Register new grid instance for theme management</li>
+<li><code>unregisterGrid(gridId)</code> - Remove grid from theme tracking</li>
+<li><code>applyTheme(theme)</code> - Apply theme to all registered grids</li>
+<li><code>getCurrentTheme()</code> - Get active theme (&#39;light&#39; or &#39;dark&#39;)</li>
+<li><code>setupCrossTabSync()</code> - Enable theme synchronization across browser tabs</li>
+</ul>
+<p><strong>Surface Hierarchy (Dark Mode):</strong></p>
+<pre><code class="language-css"><span class="hljs-comment">/* Grid theme uses proper surface elevation */</span>
+<span class="hljs-attr">--ag-background-color</span>: <span class="hljs-built_in">var</span>(--hextrackr-surface-<span class="hljs-number">2</span>);     <span class="hljs-comment">/* Table body */</span>
+<span class="hljs-attr">--ag-header-background-color</span>: <span class="hljs-built_in">var</span>(--hextrackr-surface-<span class="hljs-number">1</span>); <span class="hljs-comment">/* Headers */</span>
+<span class="hljs-attr">--ag-row-hover-color</span>: <span class="hljs-built_in">var</span>(--hextrackr-surface-<span class="hljs-number">3</span>);     <span class="hljs-comment">/* Hover state */</span></code></pre><p><strong>Cross-Tab Sync:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Automatic sync via localStorage events</span>
+<span class="hljs-variable language_">window</span>.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;storage&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">e</span>) =&gt;</span> {
+    <span class="hljs-keyword">if</span> (e.<span class="hljs-property">key</span> === <span class="hljs-string">&#x27;hextrackr-theme&#x27;</span>) {
+        <span class="hljs-title class_">AGGridThemeManager</span>.<span class="hljs-title function_">applyTheme</span>(e.<span class="hljs-property">newValue</span>);
+    }
+});</code></pre><h3>PaginationController</h3><p><strong>Location:</strong> <code>app/public/scripts/shared/pagination-controller.js</code><br><strong>Since:</strong> v1.0.42 (HEX-112)</p>
+<p>User-facing pagination controls for device cards and large datasets.</p>
+<p><strong>Key Features:</strong></p>
+<ul>
+<li><strong>Dynamic Page Size</strong>: User-selectable rows per page (10, 25, 50, 100)</li>
+<li><strong>Page Navigation</strong>: First, Previous, Next, Last buttons with keyboard shortcuts</li>
+<li><strong>Status Display</strong>: &quot;Showing X-Y of Z results&quot; with real-time updates</li>
+<li><strong>Responsive Design</strong>: Mobile-friendly pagination controls</li>
+<li><strong>State Persistence</strong>: Remembers user&#39;s page size preference</li>
+</ul>
+<p><strong>Usage:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> pagination = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PaginationController</span>({
+    <span class="hljs-attr">itemsPerPage</span>: <span class="hljs-number">25</span>,
+    <span class="hljs-attr">onPageChange</span>: <span class="hljs-function">(<span class="hljs-params">page, pageSize</span>) =&gt;</span> {
+        <span class="hljs-title function_">renderPage</span>(page, pageSize);
+    }
+});
+
+pagination.<span class="hljs-title function_">setTotalItems</span>(<span class="hljs-number">1245</span>); <span class="hljs-comment">// Update total count</span>
+pagination.<span class="hljs-title function_">goToPage</span>(<span class="hljs-number">3</span>);         <span class="hljs-comment">// Navigate to specific page</span></code></pre><p><strong>Core Methods:</strong></p>
+<ul>
+<li><code>setTotalItems(count)</code> - Update total item count and recalculate pages</li>
+<li><code>goToPage(pageNumber)</code> - Navigate to specific page</li>
+<li><code>nextPage()</code> - Move to next page</li>
+<li><code>previousPage()</code> - Move to previous page</li>
+<li><code>setPageSize(size)</code> - Change items per page</li>
+<li><code>getCurrentPage()</code> - Get active page number</li>
+<li><code>getTotalPages()</code> - Get total page count</li>
+</ul>
+<p><strong>HTML Structure:</strong></p>
+<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;pagination-controls&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;pagination-info&quot;</span>&gt;</span>Showing 1-25 of 1,245 results<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;pagination-buttons&quot;</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;btn-first&quot;</span>&gt;</span>First<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;btn-prev&quot;</span>&gt;</span>Previous<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">span</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;page-indicator&quot;</span>&gt;</span>Page 1 of 50<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;btn-next&quot;</span>&gt;</span>Next<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;btn-last&quot;</span>&gt;</span>Last<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;page-size-selector&quot;</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;10&quot;</span>&gt;</span>10 per page<span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;25&quot;</span> <span class="hljs-attr">selected</span>&gt;</span>25 per page<span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;50&quot;</span>&gt;</span>50 per page<span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;100&quot;</span>&gt;</span>100 per page<span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></code></pre><h3>VulnerabilityDataManager</h3><p><strong>Location:</strong> <code>app/public/scripts/shared/vulnerability-data.js</code></p>
 <p>Core data management for vulnerabilities.</p>
 <p><strong>Responsibilities:</strong></p>
 <ul>
@@ -307,15 +385,46 @@ themeController.<span class="hljs-title function_">initializeToggle</span>();</c
 </tr>
 </tbody></table>
 <h3>ModalManager Classes</h3><p>Multiple modal components for different purposes:</p>
-<h4>VulnerabilityDetailsModal</h4><p><strong>Location:</strong> <code>app/public/scripts/shared/vulnerability-details-modal.js</code></p>
-<p>Displays detailed vulnerability information.</p>
+<h4>VulnerabilityDetailsModal</h4><p><strong>Location:</strong> <code>app/public/scripts/shared/vulnerability-details-modal.js</code><br><strong>Since:</strong> v1.0.22 (Enhanced v2.0 in HEX-151)</p>
+<p>Displays detailed vulnerability information with integrated KEV checking and Cisco PSIRT lookup.</p>
 <p><strong>Features:</strong></p>
 <ul>
-<li>CVE links and references</li>
-<li>CVSS score breakdown</li>
-<li>Remediation guidance</li>
-<li>Plugin output display</li>
-<li>Related vulnerabilities</li>
+<li><strong>CVE Links and References</strong>: Direct links to NVD, MITRE, and vendor advisories</li>
+<li><strong>CVSS Score Breakdown</strong>: Visual representation of CVSS metrics with explanations</li>
+<li><strong>Remediation Guidance</strong>: Solution steps and patching recommendations</li>
+<li><strong>Plugin Output Display</strong>: Raw scanner output with syntax highlighting</li>
+<li><strong>Related Vulnerabilities</strong>: Shows other CVEs affecting the same device</li>
+<li><strong>KEV Integration (v1.0.51)</strong>: Automatic CISA KEV lookup with visual indicators</li>
+<li><strong>Cisco PSIRT Integration</strong>: Fixed version information for Cisco CVEs</li>
+</ul>
+<p><strong>KEV Modal Features (HEX-151 Enhancement):</strong></p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Automatic KEV lookup when modal opens</span>
+<span class="hljs-keyword">async</span> <span class="hljs-title function_">showVulnerabilityDetails</span>(<span class="hljs-params">vulnId</span>) {
+    <span class="hljs-keyword">const</span> vuln = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetchVulnerability</span>(vulnId);
+
+    <span class="hljs-comment">// Check if this CVE is in CISA KEV catalog</span>
+    <span class="hljs-keyword">if</span> (vuln.<span class="hljs-property">cve</span>) {
+        <span class="hljs-keyword">const</span> kevData = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetchKEVData</span>(vuln.<span class="hljs-property">cve</span>);
+        <span class="hljs-keyword">if</span> (kevData.<span class="hljs-property">isKEV</span>) {
+            <span class="hljs-title function_">displayKEVBanner</span>(kevData);
+        }
+    }
+
+    <span class="hljs-title function_">displayVulnerabilityDetails</span>(vuln);
+}</code></pre><p><strong>KEV Data Display:</strong></p>
+<ul>
+<li><strong>Ransomware Flag</strong>: Highlighted if CVE is known to be used in ransomware attacks</li>
+<li><strong>Vendor Project</strong>: Shows affected vendor/product from CISA</li>
+<li><strong>Date Added</strong>: When CISA added to KEV catalog</li>
+<li><strong>Required Action</strong>: CISA&#39;s mandated remediation action</li>
+<li><strong>Due Date</strong>: Federal agency remediation deadline</li>
+<li><strong>Notes</strong>: Additional CISA context and warnings</li>
+</ul>
+<p><strong>Cisco PSIRT Display:</strong></p>
+<ul>
+<li><strong>Fixed Versions</strong>: Shows which software versions patch the vulnerability</li>
+<li><strong>Advisory Link</strong>: Direct link to Cisco security advisory</li>
+<li><strong>Platform Coverage</strong>: Lists affected platforms and fixed versions per platform</li>
 </ul>
 <h4>ProgressModal</h4><p><strong>Location:</strong> <code>app/public/scripts/shared/progress-modal.js</code></p>
 <p>Shows progress for long-running operations.</p>
@@ -392,9 +501,273 @@ themeController.<span class="hljs-title function_">initializeToggle</span>();</c
 <li>Navigation state</li>
 <li>Notification badges</li>
 </ul>
-<hr>
+<h3>PreferencesService</h3><p><strong>Location:</strong> <code>app/public/scripts/shared/preferences-service.js</code><br><strong>Since:</strong> v1.0.48</p>
+<p>Frontend client for user preferences API with local caching and synchronization.</p>
+<p><strong>Key Features:</strong></p>
+<ul>
+<li><strong>API Integration</strong>: Communicates with <code>/api/preferences</code> endpoints</li>
+<li><strong>Local Caching</strong>: IndexedDB storage for offline access</li>
+<li><strong>Cross-Tab Sync</strong>: Preferences sync across browser tabs via storage events</li>
+<li><strong>Automatic Save</strong>: Debounced saves to reduce API calls</li>
+<li><strong>Typed Preferences</strong>: TypeScript-style preference definitions</li>
+</ul>
+<p><strong>Core Methods:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Get preference (returns from cache if available)</span>
+<span class="hljs-keyword">const</span> theme = <span class="hljs-keyword">await</span> <span class="hljs-title class_">PreferencesService</span>.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;dashboard.theme&#x27;</span>);
+<span class="hljs-comment">// Returns: { mode: &quot;dark&quot;, accent: &quot;blue&quot; }</span>
+
+<span class="hljs-comment">// Set preference (auto-saves to server)</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">PreferencesService</span>.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;dashboard.theme&#x27;</span>, { <span class="hljs-attr">mode</span>: <span class="hljs-string">&#x27;dark&#x27;</span>, <span class="hljs-attr">accent</span>: <span class="hljs-string">&#x27;blue&#x27;</span> });
+
+<span class="hljs-comment">// Bulk update (single API call)</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">PreferencesService</span>.<span class="hljs-title function_">bulkUpdate</span>({
+    <span class="hljs-string">&#x27;dashboard.theme&#x27;</span>: { <span class="hljs-attr">mode</span>: <span class="hljs-string">&#x27;dark&#x27;</span> },
+    <span class="hljs-string">&#x27;dashboard.defaultView&#x27;</span>: <span class="hljs-string">&#x27;grid&#x27;</span>,
+    <span class="hljs-string">&#x27;notifications.enabled&#x27;</span>: <span class="hljs-literal">true</span>
+});
+
+<span class="hljs-comment">// Reset to defaults</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">PreferencesService</span>.<span class="hljs-title function_">reset</span>();
+
+<span class="hljs-comment">// Clear cache</span>
+<span class="hljs-title class_">PreferencesService</span>.<span class="hljs-title function_">clearCache</span>();</code></pre><p><strong>Preference Keys:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>dashboard.theme</code></td>
+<td>Object</td>
+<td>Theme settings (mode, accent)</td>
+</tr>
+<tr>
+<td><code>dashboard.defaultView</code></td>
+<td>String</td>
+<td>Default view (&#39;grid&#39; or &#39;cards&#39;)</td>
+</tr>
+<tr>
+<td><code>dashboard.chartMetric</code></td>
+<td>String</td>
+<td>Chart metric (&#39;vpr&#39; or &#39;count&#39;)</td>
+</tr>
+<tr>
+<td><code>vulnerabilities.filters</code></td>
+<td>Object</td>
+<td>Saved filter configurations</td>
+</tr>
+<tr>
+<td><code>vulnerabilities.pageSize</code></td>
+<td>Number</td>
+<td>Rows per page (10, 25, 50, 100)</td>
+</tr>
+<tr>
+<td><code>notifications.enabled</code></td>
+<td>Boolean</td>
+<td>Enable/disable notifications</td>
+</tr>
+<tr>
+<td><code>export.defaultFormat</code></td>
+<td>String</td>
+<td>Default export format (&#39;csv&#39;, &#39;json&#39;, &#39;pdf&#39;)</td>
+</tr>
+<tr>
+<td><code>grid.columnState</code></td>
+<td>Array</td>
+<td>AG-Grid column visibility/order</td>
+</tr>
+</tbody></table>
+<p><strong>Cross-Tab Synchronization:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Automatic sync via storage events</span>
+<span class="hljs-variable language_">window</span>.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;storage&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">e</span>) =&gt;</span> {
+    <span class="hljs-keyword">if</span> (e.<span class="hljs-property">key</span> === <span class="hljs-string">&#x27;hextrackr-preferences&#x27;</span>) {
+        <span class="hljs-title class_">PreferencesService</span>.<span class="hljs-title function_">refreshFromStorage</span>();
+        <span class="hljs-comment">// Trigger UI updates</span>
+        <span class="hljs-title function_">applyPreferences</span>();
+    }
+});</code></pre><p><strong>Caching Strategy:</strong></p>
+<ul>
+<li><strong>IndexedDB</strong>: Primary cache for preferences (survives page reload)</li>
+<li><strong>Memory Cache</strong>: In-memory map for fast reads during session</li>
+<li><strong>TTL</strong>: Cache entries expire after 1 hour, force refresh from server</li>
+<li><strong>Invalidation</strong>: Automatic cache invalidation on set/update operations</li>
+</ul>
+<h3>AuthState</h3><p><strong>Location:</strong> <code>app/public/scripts/shared/auth-state.js</code><br><strong>Since:</strong> v1.0.46</p>
+<p>Frontend authentication state management with session monitoring.</p>
+<p><strong>Key Features:</strong></p>
+<ul>
+<li><strong>Session Monitoring</strong>: Periodic checks for session validity</li>
+<li><strong>Auto-Redirect</strong>: Redirects to login on session expiration</li>
+<li><strong>User Profile Caching</strong>: Cached user data for performance</li>
+<li><strong>CSRF Token Management</strong>: Automatic CSRF token refresh</li>
+<li><strong>State Change Events</strong>: Emits events when auth state changes</li>
+</ul>
+<p><strong>Core Methods:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Check authentication status</span>
+<span class="hljs-keyword">const</span> isAuthenticated = <span class="hljs-keyword">await</span> <span class="hljs-title class_">AuthState</span>.<span class="hljs-title function_">checkAuth</span>();
+<span class="hljs-comment">// Returns: true/false</span>
+
+<span class="hljs-comment">// Get current user</span>
+<span class="hljs-keyword">const</span> user = <span class="hljs-title class_">AuthState</span>.<span class="hljs-title function_">getCurrentUser</span>();
+<span class="hljs-comment">// Returns: { id: 1, username: &quot;admin&quot;, email: &quot;...&quot;, ... }</span>
+
+<span class="hljs-comment">// Get CSRF token for forms</span>
+<span class="hljs-keyword">const</span> csrfToken = <span class="hljs-keyword">await</span> <span class="hljs-title class_">AuthState</span>.<span class="hljs-title function_">getCsrfToken</span>();
+<span class="hljs-comment">// Returns: &quot;abc123...&quot;</span>
+
+<span class="hljs-comment">// Logout</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">AuthState</span>.<span class="hljs-title function_">logout</span>();
+<span class="hljs-comment">// Clears session, redirects to login</span>
+
+<span class="hljs-comment">// Session monitoring (auto-starts on page load)</span>
+<span class="hljs-title class_">AuthState</span>.<span class="hljs-title function_">startSessionMonitor</span>(); <span class="hljs-comment">// Checks every 5 minutes</span>
+<span class="hljs-title class_">AuthState</span>.<span class="hljs-title function_">stopSessionMonitor</span>();</code></pre><p><strong>Authentication Events:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Listen for auth state changes</span>
+<span class="hljs-title class_">AuthState</span>.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;auth-changed&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">e</span>) =&gt;</span> {
+    <span class="hljs-keyword">if</span> (e.<span class="hljs-property">detail</span>.<span class="hljs-property">authenticated</span>) {
+        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;User logged in:&#x27;</span>, e.<span class="hljs-property">detail</span>.<span class="hljs-property">user</span>);
+    } <span class="hljs-keyword">else</span> {
+        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;User logged out&#x27;</span>);
+        <span class="hljs-variable language_">window</span>.<span class="hljs-property">location</span>.<span class="hljs-property">href</span> = <span class="hljs-string">&#x27;/login.html&#x27;</span>;
+    }
+});
+
+<span class="hljs-comment">// Listen for session expiration</span>
+<span class="hljs-title class_">AuthState</span>.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;session-expired&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+    <span class="hljs-title class_">ToastManager</span>.<span class="hljs-title function_">show</span>(<span class="hljs-string">&#x27;Session expired. Please log in again.&#x27;</span>, <span class="hljs-string">&#x27;warning&#x27;</span>);
+    <span class="hljs-variable language_">window</span>.<span class="hljs-property">location</span>.<span class="hljs-property">href</span> = <span class="hljs-string">&#x27;/login.html&#x27;</span>;
+});</code></pre><p><strong>Session Monitor:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Automatic session checking (every 5 minutes)</span>
+<span class="hljs-built_in">setInterval</span>(<span class="hljs-title function_">async</span> () =&gt; {
+    <span class="hljs-keyword">const</span> status = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string">&#x27;/api/auth/status&#x27;</span>);
+    <span class="hljs-keyword">if</span> (!status.<span class="hljs-property">authenticated</span>) {
+        <span class="hljs-title class_">AuthState</span>.<span class="hljs-title function_">emit</span>(<span class="hljs-string">&#x27;session-expired&#x27;</span>);
+    }
+}, <span class="hljs-number">300000</span>); <span class="hljs-comment">// 5 minutes</span></code></pre><p><strong>CSRF Token Integration:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Automatically adds CSRF token to API requests</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">apiCall</span>(<span class="hljs-params">endpoint, method, data</span>) {
+    <span class="hljs-keyword">const</span> token = <span class="hljs-keyword">await</span> <span class="hljs-title class_">AuthState</span>.<span class="hljs-title function_">getCsrfToken</span>();
+
+    <span class="hljs-keyword">return</span> <span class="hljs-title function_">fetch</span>(endpoint, {
+        method,
+        <span class="hljs-attr">headers</span>: {
+            <span class="hljs-string">&#x27;Content-Type&#x27;</span>: <span class="hljs-string">&#x27;application/json&#x27;</span>,
+            <span class="hljs-string">&#x27;X-CSRF-Token&#x27;</span>: token
+        },
+        <span class="hljs-attr">body</span>: <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(data)
+    });
+}</code></pre><hr>
 <h2 id="utilities">Utilities</h2><p>Helper functions and security utilities.</p>
-<h3>Security Module</h3><p><strong>Location:</strong> <code>app/public/scripts/utils/security.js</code></p>
+<h3>VendorFilterUI</h3><p><strong>Location:</strong> <code>app/public/scripts/shared/vendor-filter-ui.js</code><br><strong>Since:</strong> v1.0.53 (HEX-156)</p>
+<p>Manages vendor filtering UI with bidirectional synchronization between radio buttons and dropdown.</p>
+<p><strong>Key Features:</strong></p>
+<ul>
+<li><strong>Dual Control Sync</strong>: Radio button toggles and dropdown select stay synchronized</li>
+<li><strong>Infinite Loop Prevention</strong>: Smart event handling prevents circular updates</li>
+<li><strong>Dashboard Integration</strong>: Updates statistics cards and charts when vendor changes</li>
+<li><strong>Table/Card Filtering</strong>: Synchronizes with AG-Grid and card view filters</li>
+<li><strong>URL State Persistence</strong>: Maintains filter state in query parameters</li>
+</ul>
+<p><strong>Architecture Pattern:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Radio buttons → Dropdown sync</span>
+vendorRadios.<span class="hljs-title function_">forEach</span>(<span class="hljs-function"><span class="hljs-params">radio</span> =&gt;</span> {
+    radio.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;change&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">e</span>) =&gt;</span> {
+        <span class="hljs-keyword">const</span> vendor = e.<span class="hljs-property">target</span>.<span class="hljs-property">dataset</span>.<span class="hljs-property">vendor</span>;
+
+        <span class="hljs-comment">// Sync dropdown (prevent infinite loop)</span>
+        <span class="hljs-keyword">if</span> (vendorDropdown.<span class="hljs-property">value</span> !== vendor) {
+            vendorDropdown.<span class="hljs-property">value</span> = vendor;
+            vendorDropdown.<span class="hljs-title function_">dispatchEvent</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Event</span>(<span class="hljs-string">&#x27;change&#x27;</span>));
+        }
+
+        <span class="hljs-comment">// Update dashboard</span>
+        <span class="hljs-title function_">updateStatistics</span>(vendor);
+        <span class="hljs-title function_">updateChart</span>(vendor);
+    });
+});
+
+<span class="hljs-comment">// Dropdown → Radio buttons sync</span>
+vendorDropdown.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;change&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">e</span>) =&gt;</span> {
+    <span class="hljs-keyword">const</span> vendor = e.<span class="hljs-property">target</span>.<span class="hljs-property">value</span>;
+
+    <span class="hljs-comment">// Find matching radio button</span>
+    <span class="hljs-keyword">const</span> matchingRadio = <span class="hljs-title function_">findRadioByVendor</span>(vendor);
+    <span class="hljs-keyword">if</span> (matchingRadio &amp;&amp; !matchingRadio.<span class="hljs-property">checked</span>) {
+        matchingRadio.<span class="hljs-property">checked</span> = <span class="hljs-literal">true</span>;
+        matchingRadio.<span class="hljs-title function_">dispatchEvent</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Event</span>(<span class="hljs-string">&#x27;change&#x27;</span>));
+    }
+});</code></pre><p><strong>Vendor Values:</strong></p>
+<ul>
+<li>`` (empty string) - All Vendors</li>
+<li><code>CISCO</code> - Cisco Systems</li>
+<li><code>Palo Alto</code> - Palo Alto Networks</li>
+<li><code>Other</code> - All other vendors</li>
+</ul>
+<p><strong>getCurrentVendor() Helper:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-comment">/**
+ * Get currently selected vendor from radio buttons
+ * <span class="hljs-doctag">@returns</span> {<span class="hljs-type">string</span>} Current vendor (&quot;&quot;, &quot;CISCO&quot;, &quot;Palo Alto&quot;, or &quot;Other&quot;)
+ */</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">getCurrentVendor</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-keyword">const</span> checkedRadio = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&#x27;input[name=&quot;vendor-filter&quot;]:checked&#x27;</span>);
+    <span class="hljs-keyword">if</span> (!checkedRadio) <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;&quot;</span>;
+
+    <span class="hljs-keyword">const</span> label = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">`label[for=&quot;<span class="hljs-subst">${checkedRadio.id}</span>&quot;]`</span>);
+    <span class="hljs-keyword">return</span> label ? (label.<span class="hljs-property">dataset</span>.<span class="hljs-property">vendor</span> || <span class="hljs-string">&quot;&quot;</span>) : <span class="hljs-string">&quot;&quot;</span>;
+}</code></pre><p><strong>Integration Points:</strong></p>
+<ul>
+<li><strong>Statistics Cards</strong>: <code>updateStatisticsDisplay(vendor)</code> updates VPR card metrics</li>
+<li><strong>Charts</strong>: <code>chartManager.update(false, vendor)</code> filters trend data</li>
+<li><strong>Grid/Cards</strong>: <code>applyVendorFilter(vendor)</code> filters table/card results</li>
+<li><strong>Chart Metric Toggle</strong>: Passes vendor to maintain filter when switching VPR sum ↔ vuln count</li>
+</ul>
+<h3>CVEUtilities</h3><p><strong>Location:</strong> <code>app/public/scripts/utils/cve-utilities.js</code><br><strong>Since:</strong> v1.0.22</p>
+<p>CVE data processing, validation, and external API integration.</p>
+<p><strong>Key Features:</strong></p>
+<ul>
+<li><strong>CVE ID Validation</strong>: Regex-based format validation (CVE-YYYY-NNNNN)</li>
+<li><strong>External Links Generation</strong>: Creates links to NVD, MITRE, vendor databases</li>
+<li><strong>KEV Integration</strong>: CISA KEV catalog lookup and caching</li>
+<li><strong>Cisco PSIRT</strong>: Cisco security advisory lookup for CVE fixed versions</li>
+<li><strong>Batch Processing</strong>: Efficient handling of multiple CVE lookups</li>
+</ul>
+<p><strong>Core Functions:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-comment">// CVE ID validation</span>
+<span class="hljs-title class_">CVEUtilities</span>.<span class="hljs-title function_">isValidCVE</span>(<span class="hljs-string">&#x27;CVE-2024-12345&#x27;</span>)  <span class="hljs-comment">// true</span>
+<span class="hljs-title class_">CVEUtilities</span>.<span class="hljs-title function_">isValidCVE</span>(<span class="hljs-string">&#x27;CVE-24-123&#x27;</span>)      <span class="hljs-comment">// false</span>
+
+<span class="hljs-comment">// External link generation</span>
+<span class="hljs-title class_">CVEUtilities</span>.<span class="hljs-title function_">getNVDLink</span>(<span class="hljs-string">&#x27;CVE-2024-12345&#x27;</span>)
+<span class="hljs-comment">// → https://nvd.nist.gov/vuln/detail/CVE-2024-12345</span>
+
+<span class="hljs-title class_">CVEUtilities</span>.<span class="hljs-title function_">getMITRELink</span>(<span class="hljs-string">&#x27;CVE-2024-12345&#x27;</span>)
+<span class="hljs-comment">// → https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2024-12345</span>
+
+<span class="hljs-comment">// KEV lookup</span>
+<span class="hljs-keyword">const</span> kevData = <span class="hljs-keyword">await</span> <span class="hljs-title class_">CVEUtilities</span>.<span class="hljs-title function_">checkKEV</span>(<span class="hljs-string">&#x27;CVE-2024-12345&#x27;</span>);
+<span class="hljs-comment">// Returns: { isKEV: true, dateAdded: &quot;2024-10-01&quot;, ransomware: true, ... }</span>
+
+<span class="hljs-comment">// Cisco PSIRT lookup</span>
+<span class="hljs-keyword">const</span> ciscoData = <span class="hljs-keyword">await</span> <span class="hljs-title class_">CVEUtilities</span>.<span class="hljs-title function_">lookupCiscoPSIRT</span>(<span class="hljs-string">&#x27;CVE-2024-12345&#x27;</span>);
+<span class="hljs-comment">// Returns: { advisory: &quot;cisco-sa-xxx&quot;, fixedVersions: [...], ... }</span></code></pre><p><strong>KEV Cache:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Local storage cache for KEV lookups (24h TTL)</span>
+<span class="hljs-keyword">const</span> kevCache = {
+    <span class="hljs-string">&#x27;CVE-2024-12345&#x27;</span>: {
+        <span class="hljs-attr">data</span>: { <span class="hljs-attr">isKEV</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">dateAdded</span>: <span class="hljs-string">&#x27;2024-10-01&#x27;</span>, ... },
+        <span class="hljs-attr">timestamp</span>: <span class="hljs-number">1696435200000</span>
+    }
+};
+
+<span class="hljs-comment">// Cache management</span>
+<span class="hljs-title class_">CVEUtilities</span>.<span class="hljs-title function_">clearKEVCache</span>()      <span class="hljs-comment">// Clear all cached KEV data</span>
+<span class="hljs-title class_">CVEUtilities</span>.<span class="hljs-title function_">refreshKEV</span>(cveId)    <span class="hljs-comment">// Force fresh lookup</span></code></pre><p><strong>Batch Processing:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Efficient batch KEV lookups</span>
+<span class="hljs-keyword">const</span> cveList = [<span class="hljs-string">&#x27;CVE-2024-1&#x27;</span>, <span class="hljs-string">&#x27;CVE-2024-2&#x27;</span>, <span class="hljs-string">&#x27;CVE-2024-3&#x27;</span>];
+<span class="hljs-keyword">const</span> kevResults = <span class="hljs-keyword">await</span> <span class="hljs-title class_">CVEUtilities</span>.<span class="hljs-title function_">batchKEVLookup</span>(cveList);
+<span class="hljs-comment">// Returns: Map&lt;cveId, kevData&gt;</span></code></pre><h3>Security Module</h3><p><strong>Location:</strong> <code>app/public/scripts/utils/security.js</code></p>
 <p>Security utilities for input validation and sanitization.</p>
 <p><strong>Functions:</strong></p>
 <table>

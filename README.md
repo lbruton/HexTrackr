@@ -75,9 +75,9 @@ https://localhost:8989
 
 ## Version
 
-Current version: **v1.0.33**
+Current version: **v1.0.54**
 
-See [CHANGELOG.md](app/public/docs-source/CHANGELOG.md) for detailed release notes.
+See [Changelog](app/public/docs-source/changelog/index.md) for detailed release notes.
 
 ## License
 
