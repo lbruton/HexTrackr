@@ -2,7 +2,7 @@
 <section class="doc-fragment">
     <h1>HexTrackr Development Roadmap</h1><p><em>A public overview of upcoming features and improvements</em></p>
 <h2>Overview</h2><p>HexTrackr is an enterprise vulnerability management platform that helps organizations track, prioritize, and remediate security vulnerabilities across their infrastructure. This roadmap provides visibility into planned features and improvements.</p>
-<p><strong>Current Version</strong>: v1.0.43 (October 2025)<br><strong>Current Focus</strong>: Security hardening and enterprise-grade authentication</p>
+<p><strong>Current Version</strong>: v1.0.54 (October 2025)<br><strong>Current Focus</strong>: Enhanced reporting and vendor analytics</p>
 <hr>
 <h2>✅ Recently Completed (v1.0.22-v1.0.30)</h2><h3>KEV Integration Suite (v1.0.22-v1.0.30)</h3><p><strong>Comprehensive CISA Known Exploited Vulnerabilities integration across all UI components</strong></p>
 <ul>
@@ -28,21 +28,50 @@
 <li>✅ Improved async processing for large datasets (24,660+ vulnerabilities)</li>
 </ul>
 <hr>
-<h2>🛡️ Security & Authentication</h2><h3>User Management System</h3><p>Comprehensive user authentication and role-based access control to secure vulnerability data and provide proper audit trails.</p>
-<p><strong>Features:</strong></p>
+<h2>✅ Recently Completed (v1.0.44-v1.0.54)</h2><h3>Authentication System (v1.0.46-v1.0.50)</h3><p><strong>Complete enterprise-grade authentication infrastructure</strong></p>
 <ul>
-<li>User registration and secure login</li>
-<li>Role-based permissions (Admin, Security Analyst, Viewer)</li>
-<li>Session management and secure cookies</li>
-<li>Password security with industry standards</li>
+<li>✅ Argon2id password hashing with timing-safe comparison (v1.0.46)</li>
+<li>✅ Session management with SQLite session store (v1.0.46)</li>
+<li>✅ Failed login tracking with account lockout protection (5 attempts in 15 minutes) (v1.0.46)</li>
+<li>✅ Authentication service layer with login/logout/password management (v1.0.46)</li>
+<li>✅ API route protection across 46 endpoints with requireAuth middleware (v1.0.46)</li>
+<li>✅ Trust proxy configuration for nginx reverse proxy support (v1.0.48)</li>
+<li>✅ HTTP security headers with Helmet.js (HSTS, Referrer Policy, CSP) (v1.0.49)</li>
+<li>✅ CSRF protection for all forms (v1.0.49)</li>
+<li>✅ Documentation portal authentication menu integration (v1.0.50)</li>
 </ul>
-<h3>Advanced Security Hardening</h3><p>Enterprise-grade security measures to protect sensitive vulnerability data and ensure compliance with security frameworks.</p>
+<h3>Dashboard & Reporting (v1.0.44-v1.0.54)</h3><p><strong>Advanced vulnerability analytics and export capabilities</strong></p>
+<ul>
+<li>✅ Dashboard VPR cards with interactive statistics (v1.0.46)</li>
+<li>✅ Vulnerability trends with historical data tracking (v1.0.45)</li>
+<li>✅ AG-Grid performance optimizations for large datasets (v1.0.47)</li>
+<li>✅ VPR weekly summary CSV export via keyboard shortcut (v1.0.52)</li>
+<li>✅ Vendor breakdown CSV export with side-by-side VPR/Count tables (v1.0.53-v1.0.54)</li>
+<li>✅ Vendor filter UI synchronization between radio buttons and dropdown (v1.0.54)</li>
+<li>✅ Backend API integration for vendor-specific metrics (v1.0.54)</li>
+</ul>
+<h3>KEV Integration Enhancements (v1.0.44, v1.0.51)</h3><p><strong>Extended Known Exploited Vulnerabilities capabilities</strong></p>
+<ul>
+<li>✅ KEV modal system with NIST NVD integration (v1.0.44)</li>
+<li>✅ KEV modal enhancements with improved UX (v1.0.51)</li>
+<li>✅ CSV import UX improvements with progress polling (v1.0.51)</li>
+</ul>
+<hr>
+<h2>🛡️ Security & Authentication</h2><h3>User Management Enhancements</h3><p>Extended user management capabilities for multi-user deployments.</p>
 <p><strong>Features:</strong></p>
 <ul>
-<li>CSRF protection for all forms</li>
-<li>Content Security Policy (CSP) implementation</li>
-<li>HTTP security headers (HSTS, Referrer Policy)</li>
-<li>Real-time connection security and rate limiting</li>
+<li>User registration and self-service account creation</li>
+<li>Role-based permissions (Admin, Security Analyst, Viewer)</li>
+<li>User account management interface</li>
+<li>Audit logging for authentication events</li>
+</ul>
+<h3>Advanced Security Hardening</h3><p>Additional security measures for enterprise deployments.</p>
+<p><strong>Features:</strong></p>
+<ul>
+<li>WebSocket connection authentication and authorization</li>
+<li>API rate limiting per user/endpoint</li>
+<li>Real-time intrusion detection</li>
+<li>Enhanced Content Security Policy (CSP) refinements</li>
 </ul>
 <h2>🎨 User Interface & Experience</h2><h3>Dark Mode Enhancement</h3><p>Improved visual hierarchy and depth in dark mode to enhance usability and reduce eye strain during extended vulnerability analysis sessions.</p>
 <p><strong>Features:</strong></p>
