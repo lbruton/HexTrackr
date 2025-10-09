@@ -2,7 +2,7 @@
 
 Welcome to the HexTrackr changelog! This page tracks all notable changes, features, and fixes across all versions of HexTrackr.
 
-**Current Version**: [v1.0.55](#changelog/versions/1.0.55)
+**Current Version**: [v1.0.56](#changelog/versions/1.0.56)
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
@@ -14,12 +14,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### Latest Releases
 
+- [**v1.0.56**](#changelog/versions/1.0.56) - 2025-10-09 - Automated Version Propagation System
 - [**v1.0.55**](#changelog/versions/1.0.55) - 2025-10-09 - Production SSL Certificate Implementation
 - [**v1.0.54**](#changelog/versions/1.0.54) - 2025-10-09 - Vendor CSV Export Enhancements, UI Synchronization
 - [**v1.0.53**](#changelog/versions/1.0.53) - 2025-10-08 - Vendor Breakdown CSV Export
 - [**v1.0.52**](#changelog/versions/1.0.52) - 2025-10-07 - Hidden Keyboard Shortcut: VPR Weekly Summary CSV Export
 - [**v1.0.51**](#changelog/versions/1.0.51) - 2025-10-06 - KEV Modal Enhancements & CSV Import UX Improvements
 - [**v1.0.50**](#changelog/versions/1.0.50) - 2025-10-04 - Authentication System Complete
+
+#### Developer Tools & Automation
+
+- [**v1.0.56**](#changelog/versions/1.0.56) - Automated Version Propagation System (HEX-171)
 
 #### Security & Authentication
 
@@ -51,7 +56,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 | Version | Release Date | Highlights |
 |---------|--------------|------------|
-| [1.0.55](#changelog/versions/1.0.55) | Latest | Production SSL Certificate |
+| [1.0.56](#changelog/versions/1.0.56) | Latest | Automated Version Propagation |
+| [1.0.55](#changelog/versions/1.0.55) | 2025-10-09 | Production SSL Certificate |
 | [1.0.54](#changelog/versions/1.0.54) | 2025-10-09 | Vendor CSV Export Enhancements, UI Sync |
 | [1.0.53](#changelog/versions/1.0.53) | 2025-10-08 | Vendor Breakdown CSV Export |
 | [1.0.52](#changelog/versions/1.0.52) | 2025-10-07 | VPR Weekly Summary CSV Export |
