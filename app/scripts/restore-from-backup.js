@@ -24,6 +24,16 @@ if (!NEW_PASSWORD) {
     process.exit(1);
 }
 
+/**
+ * Validates SQL identifier (table/column name) to prevent SQL injection
+ * @param {string} identifier - Table or column name to validate
+ * @returns {boolean} True if identifier is safe
+ */
+function isValidIdentifier(identifier) {
+    // Only allow alphanumeric characters and underscores (standard SQL identifier rules)
+    return /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(identifier);
+}
+
 async function restoreDatabase() {
     console.log("🔄 Starting database restoration...\n");
 
@@ -45,6 +55,12 @@ async function restoreDatabase() {
 
         for (const { name } of tables) {
             try {
+                // SECURITY: Validate table name to prevent SQL injection
+                if (!isValidIdentifier(name)) {
+                    console.error(`   ⚠️  Skipping invalid table name: ${name} (potential SQL injection)`);
+                    continue;
+                }
+
                 // Get row count from backup
                 const backupCount = backup.prepare(`SELECT COUNT(*) as count FROM ${name}`).get();
 
@@ -60,6 +76,14 @@ async function restoreDatabase() {
 
                 // Get column info
                 const columns = backup.prepare(`PRAGMA table_info(${name})`).all();
+
+                // SECURITY: Validate all column names to prevent SQL injection
+                for (const column of columns) {
+                    if (!isValidIdentifier(column.name)) {
+                        throw new Error(`Invalid column name detected: ${column.name} (potential SQL injection)`);
+                    }
+                }
+
                 const columnNames = columns.map(c => c.name).join(", ");
                 const placeholders = columns.map(() => "?").join(", ");
 
