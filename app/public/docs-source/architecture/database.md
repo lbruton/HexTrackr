@@ -237,70 +237,129 @@ Database migrations are handled automatically by the application through runtime
 
 ---
 
-## KEV Integration Tables (v1.0.22)
+## KEV Integration Tables *(v1.0.22+)*
 
-The CISA Known Exploited Vulnerabilities (KEV) integration introduces dedicated tables for tracking exploited vulnerabilities.
+The CISA Known Exploited Vulnerabilities (KEV) integration introduces dedicated tables for tracking actively exploited vulnerabilities.
 
-### kev_status
+### `kev_status`
 
-Stores Known Exploited Vulnerabilities metadata from CISA's KEV catalog.
-
-| Column | Type | Description |
-|--------|------|-------------|
-| cve_id | TEXT | Primary key, matches CVE ID from vulnerabilities table |
-| date_added | DATE | When CISA added vulnerability to KEV catalog |
-| vulnerability_name | TEXT | CISA's descriptive vulnerability name |
-| vendor_project | TEXT | Affected vendor or project |
-| product | TEXT | Specific product affected |
-| required_action | TEXT | CISA recommended remediation action |
-| due_date | DATE | Federal agency remediation deadline |
-| known_ransomware_use | BOOLEAN | Indicates use in ransomware campaigns |
-| notes | TEXT | Additional CISA context and guidance |
-| short_description | TEXT | Brief vulnerability description |
-| catalog_version | TEXT | CISA catalog version when added |
-| cisa_date_released | TIMESTAMP | When CISA released this catalog version |
-| created_at | TIMESTAMP | Record creation timestamp |
-| updated_at | TIMESTAMP | Last update timestamp |
-
-**Foreign Key**: `cve_id` references `vulnerabilities(cve_id)` with CASCADE delete
-
-### kev_sync_log
-
-Tracks KEV synchronization operations and status.
+Stores Known Exploited Vulnerabilities metadata from CISA's KEV catalog (https://www.cisa.gov/known-exploited-vulnerabilities-catalog).
 
 | Column | Type | Description |
 |--------|------|-------------|
-| id | INTEGER | Primary key |
-| sync_started_at | TIMESTAMP | When synchronization began |
-| sync_completed_at | TIMESTAMP | When synchronization finished |
-| status | TEXT | Sync status (success, error, in_progress) |
-| total_kevs | INTEGER | Total KEV records processed |
-| matched_count | INTEGER | Vulnerabilities matched with KEV status |
-| error_message | TEXT | Error details if sync failed |
-| catalog_version | TEXT | CISA catalog version synchronized |
+| `cve_id` | TEXT | **Primary key** - CVE identifier (e.g., CVE-2021-44228) |
+| `date_added` | DATE | When CISA added vulnerability to KEV catalog (NOT NULL) |
+| `vulnerability_name` | TEXT | CISA-provided vulnerability name |
+| `vendor_project` | TEXT | Affected vendor or project |
+| `product` | TEXT | Specific product affected |
+| `required_action` | TEXT | CISA-mandated remediation action |
+| `due_date` | DATE | Federal agency remediation deadline |
+| `known_ransomware_use` | BOOLEAN | Whether used in ransomware campaigns (1 = Yes, 0 = No) |
+| `notes` | TEXT | Additional CISA context and guidance |
+| `last_synced` | TIMESTAMP | Last synchronization timestamp (DEFAULT CURRENT_TIMESTAMP) |
 
-### Enhanced Vulnerability Table
+**Relationship**: `vulnerabilities_current` LEFT JOINed with `kev_status` on `cve` = `cve_id` to enrich vulnerability data with KEV flags and due dates.
 
-The main `vulnerabilities` table now includes KEV integration:
+### `sync_metadata`
 
-**New Column:**
-- `isKev` TEXT - KEV status ('Yes'/'No') for filtering and display
+Tracks KEV catalog synchronization history and status.
 
-**Performance Indexes:**
-- `idx_vulnerabilities_kev` ON `vulnerabilities(isKev)`
-- `idx_kev_status_cve` ON `kev_status(cve_id)`
-- `idx_kev_sync_log_status` ON `kev_sync_log(status)`
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | INTEGER | **Primary key** - Sync record identifier (AUTOINCREMENT) |
+| `sync_type` | TEXT | Type of sync operation (e.g., 'kev_catalog') - NOT NULL |
+| `sync_time` | TIMESTAMP | Sync execution timestamp (NOT NULL) |
+| `version` | TEXT | Catalog version or timestamp from CISA |
+| `record_count` | INTEGER | Number of KEV records synced |
+| `status` | TEXT | Sync status (completed/failed/in_progress) - DEFAULT 'completed' |
+| `error_message` | TEXT | Error details if sync failed |
+| `created_at` | TIMESTAMP | Record creation timestamp (DEFAULT CURRENT_TIMESTAMP) |
+
+**Purpose**: Audit trail for KEV sync operations, enables monitoring and troubleshooting of catalog updates.
 
 ### KEV Data Flow
 
 ```mermaid
 graph TD
-    A[CISA KEV API] -->|Daily Sync| B[kev_sync_log]
-    A -->|Catalog Data| C[kev_status]
-    C -->|CVE Matching| D[vulnerabilities.isKev]
-    D -->|Display| E[UI Components]
-    B -->|Status| F[Settings Modal]
+    A[CISA KEV API] -->|HTTPS GET| B[KEV Service]
+    B -->|Parse JSON| C[sync_metadata]
+    B -->|Upsert Records| D[kev_status]
+    D -->|LEFT JOIN| E[vulnerabilities_current]
+    E -->|Enrich with KEV flags| F[UI: Vulnerability Grid]
+    C -->|Sync Status| G[Settings Modal]
 ```
+
+---
+
+## Authentication & User Management Tables *(v1.0.46+)*
+
+### `users`
+
+Stores user accounts with Argon2id password hashing and account lockout tracking.
+
+**Key Fields**:
+- `id` (TEXT, PK): User identifier
+- `username` (TEXT, UNIQUE): Login username
+- `password_hash` (TEXT): Argon2id hash (never plaintext)
+- `role` (TEXT): User role (superadmin/admin/user)
+- `failed_attempts` (INTEGER): Consecutive failed logins (account locked after 5)
+- `last_login` (DATETIME): Last successful login timestamp
+
+**Security**: Passwords hashed with Argon2id, account locked for 15 minutes after 5 failed attempts.
+
+### `user_preferences`
+
+Stores user-specific UI preferences for cross-device synchronization (HEX-138).
+
+**Key Fields**:
+- `user_id` (TEXT, FK): References `users.id` with CASCADE DELETE
+- `preference_key` (TEXT): Setting identifier (e.g., 'theme', 'dashboard_layout')
+- `preference_value` (TEXT): Setting value (JSON or plain text)
+- **UNIQUE** constraint on (`user_id`, `preference_key`)
+
+**Trigger**: `user_preferences_updated_at` auto-updates `updated_at` on modification.
+
+**Session Storage**: Sessions stored in separate `sessions` table (auto-created by `better-sqlite3-session-store`).
+
+---
+
+## Template System Tables *(v1.0.46+)*
+
+HexTrackr provides customizable templates with variable substitution for emails, tickets, and reports.
+
+### `email_templates`, `ticket_templates`, `vulnerability_templates`
+
+All three template tables share identical schema structure:
+
+**Key Fields**:
+- `name` (TEXT, UNIQUE): Template identifier
+- `template_content` (TEXT): Customized template (user-modified)
+- `default_content` (TEXT): Original default (for reset)
+- `variables` (TEXT): JSON array of supported variables (e.g., `{{cve}}`, `{{hostname}}`)
+- `category` (TEXT): Template category
+- `is_active` (BOOLEAN): Whether template is enabled
+
+**Variable Substitution**: Templates use Mustache-style variables like `{{ticket_id}}`, `{{severity}}`, `{{vpr_score}}` replaced at runtime.
+
+---
+
+## Enhanced Staging & Performance
+
+### `vulnerability_staging`
+
+Bulk import staging area for high-performance CSV processing with enhanced deduplication.
+
+**Key Features**:
+- **4-tier deduplication scoring**: Tier 1-4 with confidence scores (0.95, 0.75, 0.50, 0.25)
+- **Bulk loading**: 10k+ rows with preprocessing before production commit
+- **Error tracking**: `processing_error` field for failed rows
+- **Audit trail**: `raw_csv_row` JSON preserves original data
+
+**Fields of Note**:
+- `enhanced_unique_key`: 4-tier deduplication key
+- `confidence_score`: Deduplication reliability (0.0-1.0)
+- `dedup_tier`: Tier level (1 = highest confidence, 4 = lowest)
+- `processed`: Boolean flag for migration to `vulnerabilities_current`
 
 ---
 

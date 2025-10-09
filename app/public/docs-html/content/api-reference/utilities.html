@@ -1,613 +1,1166 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
     <h1>Utilities Reference</h1><blockquote>
-<p>Core utility classes and helper functions for HexTrackr</p>
+<p>Core utility modules and helper functions for HexTrackr vulnerability management</p>
 </blockquote>
-<h2>Overview</h2><p>HexTrackr&#39;s utility layer provides essential helper functions, security validators, and progress tracking capabilities used throughout the application.</p>
-<hr>
-<h2 id="utilities">Core Utilities</h2><h3>PathValidator</h3><p><strong>Location:</strong> <code>app/utils/PathValidator.js</code></p>
-<p>Critical security utility for validating and sanitizing file paths to prevent directory traversal attacks.</p>
-<p><strong>Key Features:</strong></p>
+<h2>Overview</h2><p>HexTrackr&#39;s utility layer provides 31+ specialized modules across backend and frontend for vulnerability processing, security validation, theme management, template systems, and data transformation. This reference documents all production utilities with code examples and usage patterns.</p>
+<p><strong>Utility Categories</strong>:</p>
 <ul>
-<li>Path normalization and resolution</li>
-<li>Directory traversal prevention</li>
-<li>Symlink validation</li>
-<li>Whitelist/blacklist support</li>
-<li>Cross-platform compatibility</li>
+<li><strong>Backend Core</strong> (6 modules): Vulnerability processing, security, progress tracking, constants</li>
+<li><strong>Backend Configuration</strong> (1 module): Dynamic vendor pattern configuration</li>
+<li><strong>Frontend Validation</strong> (3 modules): CVE processing, validation, secure ID generation</li>
+<li><strong>Frontend Theme System</strong> (2 modules): Theme configuration, VPR color management</li>
+<li><strong>Frontend Template System</strong> (1 module): Template variable definitions</li>
+<li><strong>Component Utilities</strong> (13 modules): Shared frontend components</li>
+<li><strong>Database Scripts</strong> (4 modules): Schema initialization and migrations</li>
+<li><strong>Development Tools</strong> (1 module): Version management</li>
 </ul>
-<p><strong>Main Methods:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Method</th>
-<th>Purpose</th>
-<th>Returns</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>validatePath(inputPath, options)</code></td>
-<td>Validates and sanitizes a file path</td>
-<td>Safe path or throws error</td>
-</tr>
-<tr>
-<td><code>isPathSafe(inputPath)</code></td>
-<td>Checks if path is safe without throwing</td>
-<td>Boolean</td>
-</tr>
-<tr>
-<td><code>normalizeP ath(inputPath)</code></td>
-<td>Normalizes path separators</td>
-<td>Normalized path string</td>
-</tr>
-<tr>
-<td><code>isWithinBase(path, basePath)</code></td>
-<td>Checks if path is within base directory</td>
-<td>Boolean</td>
-</tr>
-<tr>
-<td><code>checkSymlinks(path)</code></td>
-<td>Validates symlink safety</td>
-<td>Boolean</td>
-</tr>
-</tbody></table>
-<p><strong>Usage Example:</strong></p>
+<hr>
+<h2 id="backend-core">Backend Core Utilities</h2><h3>helpers.js - Vulnerability Processing Library</h3><p><strong>Location:</strong> <code>app/utils/helpers.js</code><br><strong>Since:</strong> v1.0.0 (Core module)<br><strong>Purpose:</strong> Primary utility library for CSV import, vulnerability normalization, and deduplication</p>
+<h4>Data Normalization Functions</h4><p><strong><code>normalizeVendor(vendor, hostname)</code></strong></p>
+<p>Normalize vendor names using pattern matching against <code>import.config.json</code> rules.</p>
+<p><strong>Returns:</strong> <code>&quot;CISCO&quot;</code>, <code>&quot;Palo Alto&quot;</code>, or <code>&quot;Other&quot;</code></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> { normalizeVendor } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/helpers&#x27;</span>);
+
+<span class="hljs-comment">// Family field matching</span>
+<span class="hljs-title function_">normalizeVendor</span>(<span class="hljs-string">&quot;Cisco Systems&quot;</span>, <span class="hljs-string">&quot;fw-01&quot;</span>) <span class="hljs-comment">// → &quot;CISCO&quot;</span>
+<span class="hljs-title function_">normalizeVendor</span>(<span class="hljs-string">&quot;palo alto networks&quot;</span>, <span class="hljs-string">&quot;pan-fw&quot;</span>) <span class="hljs-comment">// → &quot;Palo Alto&quot;</span>
+
+<span class="hljs-comment">// Hostname pattern matching</span>
+<span class="hljs-title function_">normalizeVendor</span>(<span class="hljs-string">&quot;Unknown&quot;</span>, <span class="hljs-string">&quot;nfpan-fw01&quot;</span>) <span class="hljs-comment">// → &quot;Palo Alto&quot; (hostname prefix)</span>
+<span class="hljs-title function_">normalizeVendor</span>(<span class="hljs-string">&quot;Unknown&quot;</span>, <span class="hljs-string">&quot;nrwan-rtr01&quot;</span>) <span class="hljs-comment">// → &quot;CISCO&quot; (hostname prefix)</span>
+
+<span class="hljs-comment">// Default fallback</span>
+<span class="hljs-title function_">normalizeVendor</span>(<span class="hljs-string">&quot;Fortinet&quot;</span>, <span class="hljs-string">&quot;fg-fw01&quot;</span>) <span class="hljs-comment">// → &quot;Other&quot;</span></code></pre><p><strong>Configuration:</strong> Patterns defined in <code>app/config/import.config.json</code>:</p>
+<ul>
+<li><code>familyVendorPatterns</code>: Match vendor name in &quot;family&quot; field</li>
+<li><code>hostnameVendorPatterns</code>: Match vendor in hostname (e.g., &quot;nfpan&quot; → Palo Alto)</li>
+</ul>
+<hr>
+<p><strong><code>normalizeHostname(hostname)</code></strong></p>
+<p>Normalize hostnames for consistent deduplication (handles IP addresses vs domain names).</p>
+<p><strong>Returns:</strong> Normalized hostname string or <code>null</code></p>
+<pre><code class="language-javascript"><span class="hljs-title function_">normalizeHostname</span>(<span class="hljs-string">&quot;192.168.1.1&quot;</span>) <span class="hljs-comment">// → &quot;192.168.1.1&quot;</span>
+<span class="hljs-title function_">normalizeHostname</span>(<span class="hljs-string">&quot;fw-01.corp.local&quot;</span>) <span class="hljs-comment">// → &quot;fw-01.corp.local&quot;</span>
+<span class="hljs-title function_">normalizeHostname</span>(<span class="hljs-string">&quot;&quot;</span>) <span class="hljs-comment">// → null</span>
+<span class="hljs-title function_">normalizeHostname</span>(<span class="hljs-literal">null</span>) <span class="hljs-comment">// → null</span></code></pre><hr>
+<p><strong><code>normalizeIPAddress(ipAddress)</code></strong></p>
+<p>Extract and validate first IP from multi-IP strings.</p>
+<p><strong>Returns:</strong> First valid IP address or original value</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">normalizeIPAddress</span>(<span class="hljs-string">&quot;192.168.1.1, 10.0.0.1&quot;</span>) <span class="hljs-comment">// → &quot;192.168.1.1&quot;</span>
+<span class="hljs-title function_">normalizeIPAddress</span>(<span class="hljs-string">&quot;192.168.1.1&quot;</span>) <span class="hljs-comment">// → &quot;192.168.1.1&quot;</span>
+<span class="hljs-title function_">normalizeIPAddress</span>(<span class="hljs-string">&quot;invalid&quot;</span>) <span class="hljs-comment">// → &quot;invalid&quot; (unchanged)</span></code></pre><hr>
+<p><strong><code>isValidIPAddress(ip)</code></strong></p>
+<p>Validate IPv4 addresses with octet range checking (0-255).</p>
+<p><strong>Returns:</strong> <code>true</code> if valid IPv4, <code>false</code> otherwise</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">isValidIPAddress</span>(<span class="hljs-string">&quot;192.168.1.1&quot;</span>) <span class="hljs-comment">// → true</span>
+<span class="hljs-title function_">isValidIPAddress</span>(<span class="hljs-string">&quot;255.255.255.255&quot;</span>) <span class="hljs-comment">// → true</span>
+<span class="hljs-title function_">isValidIPAddress</span>(<span class="hljs-string">&quot;256.1.1.1&quot;</span>) <span class="hljs-comment">// → false (octet &gt; 255)</span>
+<span class="hljs-title function_">isValidIPAddress</span>(<span class="hljs-string">&quot;192.168.1&quot;</span>) <span class="hljs-comment">// → false (incomplete)</span></code></pre><hr>
+<p><strong><code>normalizeXtNumber(value)</code></strong></p>
+<p>Normalize XT ticket numbers to 4-digit zero-padded format.</p>
+<p><strong>Returns:</strong> Zero-padded string (e.g., &quot;0042&quot;) or original value if invalid</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">normalizeXtNumber</span>(<span class="hljs-string">&quot;42&quot;</span>) <span class="hljs-comment">// → &quot;0042&quot;</span>
+<span class="hljs-title function_">normalizeXtNumber</span>(<span class="hljs-string">&quot;123&quot;</span>) <span class="hljs-comment">// → &quot;0123&quot;</span>
+<span class="hljs-title function_">normalizeXtNumber</span>(<span class="hljs-string">&quot;XT-42&quot;</span>) <span class="hljs-comment">// → &quot;0042&quot; (strips prefix)</span>
+<span class="hljs-title function_">normalizeXtNumber</span>(<span class="hljs-string">&quot;invalid&quot;</span>) <span class="hljs-comment">// → &quot;invalid&quot; (unchanged)</span></code></pre><hr>
+<h4>String & Hashing Functions</h4><p><strong><code>createDescriptionHash(description)</code></strong></p>
+<p>Generate MD5 hash of normalized description (first 8 characters).</p>
+<p><strong>Returns:</strong> 8-character hash string</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">createDescriptionHash</span>(<span class="hljs-string">&quot;Apache vulnerability on port 80&quot;</span>) <span class="hljs-comment">// → &quot;a3f2c1d4&quot;</span>
+<span class="hljs-title function_">createDescriptionHash</span>(<span class="hljs-string">&quot;Apache vulnerability on port 80&quot;</span>) <span class="hljs-comment">// → &quot;a3f2c1d4&quot; (same hash)</span>
+<span class="hljs-title function_">createDescriptionHash</span>(<span class="hljs-string">&quot;Different description&quot;</span>) <span class="hljs-comment">// → &quot;b7e9f3a2&quot;</span></code></pre><p><strong>Use Case:</strong> Deduplication when CVE and plugin ID unavailable.</p>
+<hr>
+<p><strong><code>extractScanDateFromFilename(filename)</code></strong></p>
+<p>Parse scan dates from CSV filenames using 4 pattern types.</p>
+<p><strong>Supported Formats:</strong></p>
+<ul>
+<li><code>YYYY-MM-DD</code> (e.g., <code>scan-2024-01-15.csv</code>)</li>
+<li><code>MM-DD-YYYY</code> (e.g., <code>scan-01-15-2024.csv</code>)</li>
+<li><code>YYYYMMDD</code> (e.g., <code>scan-20240115.csv</code>)</li>
+<li><code>DD-MM-YYYY</code> (e.g., <code>scan-15-01-2024.csv</code>)</li>
+</ul>
+<p><strong>Returns:</strong> ISO date string (<code>YYYY-MM-DD</code>) or <code>null</code></p>
+<pre><code class="language-javascript"><span class="hljs-title function_">extractScanDateFromFilename</span>(<span class="hljs-string">&quot;vulnerabilities-2024-01-15.csv&quot;</span>) <span class="hljs-comment">// → &quot;2024-01-15&quot;</span>
+<span class="hljs-title function_">extractScanDateFromFilename</span>(<span class="hljs-string">&quot;scan-01-15-2024.csv&quot;</span>) <span class="hljs-comment">// → &quot;2024-01-15&quot;</span>
+<span class="hljs-title function_">extractScanDateFromFilename</span>(<span class="hljs-string">&quot;export-20240115.csv&quot;</span>) <span class="hljs-comment">// → &quot;2024-01-15&quot;</span>
+<span class="hljs-title function_">extractScanDateFromFilename</span>(<span class="hljs-string">&quot;data.csv&quot;</span>) <span class="hljs-comment">// → null (no date found)</span></code></pre><hr>
+<h4>Deduplication Engine</h4><p><strong><code>generateEnhancedUniqueKey(mapped)</code></strong></p>
+<p>Multi-tier deduplication key generation with confidence scoring.</p>
+<p><strong>Deduplication Tiers:</strong></p>
+<ol>
+<li><strong>Tier 1 (95% confidence)</strong>: Asset Hostname + CVE + Plugin ID</li>
+<li><strong>Tier 2 (85% confidence)</strong>: Asset Hostname + CVE + Description Hash</li>
+<li><strong>Tier 3 (75% confidence)</strong>: Asset Hostname + Plugin ID + Description Hash</li>
+<li><strong>Tier 4 (50% confidence)</strong>: Asset Hostname + Description Hash</li>
+<li><strong>Tier 5 (25% confidence)</strong>: Description Hash only (fallback)</li>
+</ol>
+<p><strong>Returns:</strong> <code>{ key: string, tier: number, confidence: number }</code></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> mapped = {
+    <span class="hljs-attr">assetHostname</span>: <span class="hljs-string">&quot;fw-01&quot;</span>,
+    <span class="hljs-attr">cve</span>: <span class="hljs-string">&quot;CVE-2024-1234&quot;</span>,
+    <span class="hljs-attr">pluginId</span>: <span class="hljs-string">&quot;12345&quot;</span>
+};
+
+<span class="hljs-title function_">generateEnhancedUniqueKey</span>(mapped)
+<span class="hljs-comment">// → {</span>
+<span class="hljs-comment">//     key: &quot;fw-01|CVE-2024-1234|12345&quot;,</span>
+<span class="hljs-comment">//     tier: 1,</span>
+<span class="hljs-comment">//     confidence: 95</span>
+<span class="hljs-comment">//   }</span></code></pre><p><strong>Use Case:</strong> Prevents duplicate vulnerability imports with confidence scoring.</p>
+<hr>
+<p><strong><code>generateUniqueKey(mapped)</code></strong></p>
+<p>Legacy deduplication key (backward compatibility).</p>
+<p><strong>Returns:</strong> Simple concatenated key string</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">generateUniqueKey</span>(mapped) <span class="hljs-comment">// → &quot;fw-01|CVE-2024-1234|12345&quot;</span></code></pre><hr>
+<p><strong><code>calculateDeduplicationConfidence(uniqueKey)</code></strong></p>
+<p>Calculate confidence percentage from unique key structure.</p>
+<p><strong>Returns:</strong> Confidence percentage (25-95%)</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">calculateDeduplicationConfidence</span>(<span class="hljs-string">&quot;fw-01|CVE-2024-1234|12345&quot;</span>) <span class="hljs-comment">// → 95 (tier 1)</span>
+<span class="hljs-title function_">calculateDeduplicationConfidence</span>(<span class="hljs-string">&quot;fw-01|CVE-2024-1234|hash:a3f2c1d4&quot;</span>) <span class="hljs-comment">// → 85 (tier 2)</span>
+<span class="hljs-title function_">calculateDeduplicationConfidence</span>(<span class="hljs-string">&quot;hash:a3f2c1d4&quot;</span>) <span class="hljs-comment">// → 25 (tier 5)</span></code></pre><hr>
+<p><strong><code>getDeduplicationTier(uniqueKey)</code></strong></p>
+<p>Classify deduplication tier (1-5) from unique key.</p>
+<p><strong>Returns:</strong> Tier number (1-5)</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">getDeduplicationTier</span>(<span class="hljs-string">&quot;fw-01|CVE-2024-1234|12345&quot;</span>) <span class="hljs-comment">// → 1</span>
+<span class="hljs-title function_">getDeduplicationTier</span>(<span class="hljs-string">&quot;fw-01|CVE-2024-1234|hash:a3f2c1d4&quot;</span>) <span class="hljs-comment">// → 2</span>
+<span class="hljs-title function_">getDeduplicationTier</span>(<span class="hljs-string">&quot;hash:a3f2c1d4&quot;</span>) <span class="hljs-comment">// → 5</span></code></pre><hr>
+<h4>CSV Data Mapping Functions</h4><p><strong><code>mapVulnerabilityRow(row)</code></strong></p>
+<p>Map Tenable CSV row to vulnerability object(s) with multi-CVE splitting.</p>
+<p><strong>Returns:</strong> Array of vulnerability objects (1+ per row)</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> row = {
+    <span class="hljs-string">&quot;Asset Hostname&quot;</span>: <span class="hljs-string">&quot;fw-01&quot;</span>,
+    <span class="hljs-string">&quot;CVE&quot;</span>: <span class="hljs-string">&quot;CVE-2024-1234, CVE-2024-5678&quot;</span>,
+    <span class="hljs-string">&quot;Plugin&quot;</span>: <span class="hljs-string">&quot;12345&quot;</span>,
+    <span class="hljs-string">&quot;VPR Score&quot;</span>: <span class="hljs-string">&quot;9.2&quot;</span>,
+    <span class="hljs-comment">// ... other Tenable columns</span>
+};
+
+<span class="hljs-title function_">mapVulnerabilityRow</span>(row)
+<span class="hljs-comment">// → [</span>
+<span class="hljs-comment">//     { assetHostname: &quot;fw-01&quot;, cve: &quot;CVE-2024-1234&quot;, pluginId: &quot;12345&quot;, vprScore: 9.2, ... },</span>
+<span class="hljs-comment">//     { assetHostname: &quot;fw-01&quot;, cve: &quot;CVE-2024-5678&quot;, pluginId: &quot;12345&quot;, vprScore: 9.2, ... }</span>
+<span class="hljs-comment">//   ]</span></code></pre><p><strong>Multi-CVE Splitting:</strong> Single row with multiple CVEs creates separate vulnerability records.</p>
+<hr>
+<p><strong><code>mapTicketRow(row, index)</code></strong></p>
+<p>Map CSV row to ticket object structure.</p>
+<p><strong>Returns:</strong> Ticket object with normalized fields</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> row = {
+    <span class="hljs-string">&quot;XT Number&quot;</span>: <span class="hljs-string">&quot;42&quot;</span>,
+    <span class="hljs-string">&quot;Site Name&quot;</span>: <span class="hljs-string">&quot;HQ&quot;</span>,
+    <span class="hljs-string">&quot;Status&quot;</span>: <span class="hljs-string">&quot;Open&quot;</span>
+};
+
+<span class="hljs-title function_">mapTicketRow</span>(row, <span class="hljs-number">0</span>)
+<span class="hljs-comment">// → {</span>
+<span class="hljs-comment">//     xtNumber: &quot;0042&quot;,</span>
+<span class="hljs-comment">//     siteName: &quot;HQ&quot;,</span>
+<span class="hljs-comment">//     status: &quot;Open&quot;,</span>
+<span class="hljs-comment">//     rowIndex: 0</span>
+<span class="hljs-comment">//   }</span></code></pre><hr>
+<h4>Documentation Helper</h4><p><strong><code>findDocsSectionForFilename(filename)</code></strong></p>
+<p>Locate documentation HTML files for dynamic loading in docs portal.</p>
+<p><strong>Returns:</strong> Section path string or <code>null</code></p>
+<pre><code class="language-javascript"><span class="hljs-title function_">findDocsSectionForFilename</span>(<span class="hljs-string">&quot;backend-api.html&quot;</span>) <span class="hljs-comment">// → &quot;api-reference&quot;</span>
+<span class="hljs-title function_">findDocsSectionForFilename</span>(<span class="hljs-string">&quot;getting-started.html&quot;</span>) <span class="hljs-comment">// → &quot;guides&quot;</span>
+<span class="hljs-title function_">findDocsSectionForFilename</span>(<span class="hljs-string">&quot;unknown.html&quot;</span>) <span class="hljs-comment">// → null</span></code></pre><p><strong>Used By:</strong> Documentation portal for file path resolution.</p>
+<hr>
+<h3>constants.js - Application Constants</h3><p><strong>Location:</strong> <code>app/utils/constants.js</code><br><strong>Since:</strong> v1.0.0 (Core module)<br><strong>Purpose:</strong> Centralized configuration constants for network, security, database, and API</p>
+<h4>Constant Categories</h4><p><strong>Network Configuration</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> {
+    <span class="hljs-variable constant_">PORT</span>,                  <span class="hljs-comment">// 8080 (application server)</span>
+    <span class="hljs-variable constant_">WEBSOCKET_PORT</span>,        <span class="hljs-comment">// WebSocket server port</span>
+    <span class="hljs-variable constant_">CORS_ORIGINS</span>,          <span class="hljs-comment">// Allowed CORS origins array</span>
+    <span class="hljs-variable constant_">CORS_METHODS</span>,          <span class="hljs-comment">// Allowed HTTP methods array</span>
+    <span class="hljs-variable constant_">CORS_HEADERS</span>           <span class="hljs-comment">// Allowed headers array</span>
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/constants&#x27;</span>);</code></pre><p><strong>File System Paths</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> {
+    <span class="hljs-variable constant_">UPLOADS_DIRECTORY</span>,     <span class="hljs-comment">// /tmp/hextrackr-uploads</span>
+    <span class="hljs-variable constant_">DATA_DIRECTORY</span>,        <span class="hljs-comment">// app/data</span>
+    <span class="hljs-variable constant_">BACKUPS_DIRECTORY</span>,     <span class="hljs-comment">// app/data/backups</span>
+    <span class="hljs-variable constant_">DATABASE_FILENAME</span>      <span class="hljs-comment">// hextrackr.db</span>
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/constants&#x27;</span>);</code></pre><p><strong>File Size Limits</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> {
+    <span class="hljs-variable constant_">MAX_FILE_SIZE</span>,         <span class="hljs-comment">// 100MB (104857600 bytes)</span>
+    <span class="hljs-variable constant_">EXPRESS_JSON_LIMIT</span>,    <span class="hljs-comment">// &quot;50mb&quot;</span>
+    <span class="hljs-variable constant_">EXPRESS_URLENCODED_LIMIT</span> <span class="hljs-comment">// &quot;50mb&quot;</span>
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/constants&#x27;</span>);</code></pre><p><strong>Rate Limiting</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> {
+    <span class="hljs-variable constant_">RATE_LIMIT_WINDOW_MS</span>,  <span class="hljs-comment">// 15 minutes</span>
+    <span class="hljs-variable constant_">RATE_LIMIT_MAX_REQUESTS</span> <span class="hljs-comment">// 100 (prod) / 1000 (dev)</span>
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/constants&#x27;</span>);</code></pre><p><strong>Security Headers</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> {
+    <span class="hljs-variable constant_">X_CONTENT_TYPE_OPTIONS</span>, <span class="hljs-comment">// &quot;nosniff&quot;</span>
+    <span class="hljs-variable constant_">X_FRAME_OPTIONS</span>,        <span class="hljs-comment">// &quot;DENY&quot;</span>
+    <span class="hljs-variable constant_">X_XSS_PROTECTION</span>        <span class="hljs-comment">// &quot;1; mode=block&quot;</span>
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/constants&#x27;</span>);</code></pre><p><strong>Progress Tracking</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> {
+    <span class="hljs-variable constant_">PROGRESS_THROTTLE_INTERVAL</span>,  <span class="hljs-comment">// 100ms (WebSocket event throttle)</span>
+    <span class="hljs-variable constant_">SESSION_CLEANUP_INTERVAL</span>,    <span class="hljs-comment">// 30 minutes</span>
+    <span class="hljs-variable constant_">STALE_SESSION_THRESHOLD</span>      <span class="hljs-comment">// 30 minutes</span>
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/constants&#x27;</span>);</code></pre><p><strong>Database Processing</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> {
+    <span class="hljs-variable constant_">BATCH_SIZE</span>,                  <span class="hljs-comment">// 1000 (bulk insert batch size)</span>
+    <span class="hljs-variable constant_">PROGRESS_UPDATE_INTERVAL</span>,    <span class="hljs-comment">// 100 (update progress every N rows)</span>
+    <span class="hljs-variable constant_">DESCRIPTION_TRUNCATE_LENGTH</span>  <span class="hljs-comment">// 500 characters</span>
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/constants&#x27;</span>);</code></pre><p><strong>API Endpoints</strong> (Complete object with 39+ endpoint paths)</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> { <span class="hljs-variable constant_">API_ENDPOINTS</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/constants&#x27;</span>);
+
+<span class="hljs-variable constant_">API_ENDPOINTS</span>.<span class="hljs-property">VULNERABILITIES</span>      <span class="hljs-comment">// &quot;/api/vulnerabilities&quot;</span>
+<span class="hljs-variable constant_">API_ENDPOINTS</span>.<span class="hljs-property">TICKETS</span>              <span class="hljs-comment">// &quot;/api/tickets&quot;</span>
+<span class="hljs-variable constant_">API_ENDPOINTS</span>.<span class="hljs-property">AUTH_LOGIN</span>           <span class="hljs-comment">// &quot;/api/auth/login&quot;</span>
+<span class="hljs-variable constant_">API_ENDPOINTS</span>.<span class="hljs-property">KEV_LOOKUP</span>           <span class="hljs-comment">// &quot;/api/kev/lookup&quot;</span>
+<span class="hljs-comment">// ... 35+ more endpoints</span></code></pre><p><strong>Database Query Limits</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> {
+    <span class="hljs-variable constant_">RECENT_TRENDS_LIMIT</span>,           <span class="hljs-comment">// 30 days</span>
+    <span class="hljs-variable constant_">BACKUP_QUERY_LIMIT</span>,            <span class="hljs-comment">// 100 backups</span>
+    <span class="hljs-variable constant_">VULNERABILITY_EXPORT_LIMIT</span>     <span class="hljs-comment">// 10,000 vulnerabilities</span>
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/constants&#x27;</span>);</code></pre><p><strong>Time Intervals</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> {
+    <span class="hljs-variable constant_">FIFTEEN_MINUTES</span>,  <span class="hljs-comment">// 900000ms</span>
+    <span class="hljs-variable constant_">THIRTY_MINUTES</span>,   <span class="hljs-comment">// 1800000ms</span>
+    <span class="hljs-variable constant_">ONE_HOUR</span>,         <span class="hljs-comment">// 3600000ms</span>
+    <span class="hljs-variable constant_">ONE_DAY</span>,          <span class="hljs-comment">// 86400000ms</span>
+    <span class="hljs-variable constant_">ONE_WEEK</span>          <span class="hljs-comment">// 604800000ms</span>
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/constants&#x27;</span>);</code></pre><p><strong>File Processing</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> {
+    <span class="hljs-variable constant_">CSV_IMPORT_OPERATION</span>,  <span class="hljs-comment">// &quot;csv_import&quot;</span>
+    <span class="hljs-variable constant_">WEB_UPLOAD_FILENAME</span>,   <span class="hljs-comment">// &quot;web-upload.csv&quot;</span>
+    <span class="hljs-variable constant_">WEB_IMPORT_SOURCE</span>      <span class="hljs-comment">// &quot;web&quot;</span>
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/constants&#x27;</span>);</code></pre><p><strong>Used By:</strong> All backend modules (server, controllers, services, middleware)</p>
+<hr>
+<h3>PathValidator.js - Security Utility Class</h3><p><strong>Location:</strong> <code>app/utils/PathValidator.js</code><br><strong>Since:</strong> v1.0.46 (Security enhancement)<br><strong>Purpose:</strong> Prevent directory traversal attacks and validate file paths</p>
+<h4>Key Methods</h4><p><strong><code>PathValidator.validatePath(filePath)</code></strong></p>
+<p>Validate and normalize paths, detect traversal attempts.</p>
+<p><strong>Throws:</strong> Error if path contains traversal patterns (<code>../</code>, absolute paths, null bytes)</p>
+<p><strong>Returns:</strong> Normalized safe path</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> <span class="hljs-title class_">PathValidator</span> = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/PathValidator&#x27;</span>);
 
-<span class="hljs-comment">// Validate user-provided file path</span>
-<span class="hljs-keyword">try</span> {
-    <span class="hljs-keyword">const</span> safePath = <span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">validatePath</span>(userInput, {
-        <span class="hljs-attr">basePath</span>: <span class="hljs-string">&#x27;/app/uploads&#x27;</span>,
-        <span class="hljs-attr">allowSymlinks</span>: <span class="hljs-literal">false</span>,
-        <span class="hljs-attr">blacklist</span>: [<span class="hljs-string">&#x27;../secrets&#x27;</span>, <span class="hljs-string">&#x27;/etc&#x27;</span>]
-    });
-    <span class="hljs-comment">// Safe to use safePath</span>
-} <span class="hljs-keyword">catch</span> (error) {
-    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;Invalid path:&#x27;</span>, error.<span class="hljs-property">message</span>);
-}</code></pre><p><strong>Security Patterns Blocked:</strong></p>
+<span class="hljs-comment">// Valid path</span>
+<span class="hljs-keyword">const</span> safe = <span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">validatePath</span>(<span class="hljs-string">&quot;uploads/data.csv&quot;</span>);
+<span class="hljs-comment">// → &quot;/app/uploads/data.csv&quot; (normalized)</span>
+
+<span class="hljs-comment">// Invalid paths (throws Error)</span>
+<span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">validatePath</span>(<span class="hljs-string">&quot;../../../etc/passwd&quot;</span>); <span class="hljs-comment">// ❌ Directory traversal</span>
+<span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">validatePath</span>(<span class="hljs-string">&quot;/etc/shadow&quot;</span>);         <span class="hljs-comment">// ❌ Absolute path</span>
+<span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">validatePath</span>(<span class="hljs-string">&quot;uploads/../secrets&quot;</span>);  <span class="hljs-comment">// ❌ Traversal attempt</span></code></pre><p><strong>Security Patterns Blocked:</strong></p>
 <ul>
-<li><code>../../../etc/passwd</code> - Directory traversal</li>
-<li><code>/etc/shadow</code> - Absolute path escape</li>
-<li><code>uploads/../../../</code> - Relative path escape</li>
+<li><code>../</code> (directory traversal)</li>
+<li>Absolute paths (<code>/etc/</code>, <code>C:\</code>, etc.)</li>
+<li>Null byte injection (<code>\0</code>)</li>
 <li>Symlink attacks</li>
-<li>Null byte injection</li>
-</ul>
-<h3>ProgressTracker</h3><p><strong>Location:</strong> <code>app/utils/ProgressTracker.js</code></p>
-<p>Manages progress tracking for long-running operations with WebSocket integration.</p>
-<p><strong>Features:</strong></p>
-<ul>
-<li>Multi-operation tracking</li>
-<li>Real-time progress updates</li>
-<li>ETA calculations</li>
-<li>WebSocket event emission</li>
-<li>Memory-efficient circular buffer</li>
-</ul>
-<p><strong>Main Methods:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Method</th>
-<th>Purpose</th>
-<th>Returns</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>createOperation(id, total)</code></td>
-<td>Start tracking new operation</td>
-<td>Operation object</td>
-</tr>
-<tr>
-<td><code>updateProgress(id, current)</code></td>
-<td>Update operation progress</td>
-<td>Progress percentage</td>
-</tr>
-<tr>
-<td><code>completeOperation(id)</code></td>
-<td>Mark operation as complete</td>
-<td>Final stats</td>
-</tr>
-<tr>
-<td><code>getProgress(id)</code></td>
-<td>Get current progress</td>
-<td>Progress object</td>
-</tr>
-<tr>
-<td><code>calculateETA(id)</code></td>
-<td>Estimate time remaining</td>
-<td>ETA in seconds</td>
-</tr>
-</tbody></table>
-<p><strong>Progress Object Structure:</strong></p>
-<pre><code class="language-javascript">{
-    <span class="hljs-attr">id</span>: <span class="hljs-string">&#x27;import-123&#x27;</span>,
-    <span class="hljs-attr">total</span>: <span class="hljs-number">1000</span>,
-    <span class="hljs-attr">current</span>: <span class="hljs-number">450</span>,
-    <span class="hljs-attr">percentage</span>: <span class="hljs-number">45</span>,
-    <span class="hljs-attr">startTime</span>: <span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>(),
-    <span class="hljs-attr">eta</span>: <span class="hljs-number">65</span>, <span class="hljs-comment">// seconds</span>
-    <span class="hljs-attr">status</span>: <span class="hljs-string">&#x27;processing&#x27;</span>,
-    <span class="hljs-attr">message</span>: <span class="hljs-string">&#x27;Processing row 450 of 1000&#x27;</span>
-}</code></pre><p><strong>Usage with WebSocket:</strong></p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> progressTracker = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ProgressTracker</span>(io);
-
-<span class="hljs-comment">// Start operation</span>
-<span class="hljs-keyword">const</span> op = progressTracker.<span class="hljs-title function_">createOperation</span>(<span class="hljs-string">&#x27;import-123&#x27;</span>, totalRows);
-
-<span class="hljs-comment">// Update progress</span>
-<span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; totalRows; i++) {
-    <span class="hljs-keyword">await</span> <span class="hljs-title function_">processRow</span>(data[i]);
-    progressTracker.<span class="hljs-title function_">updateProgress</span>(<span class="hljs-string">&#x27;import-123&#x27;</span>, i + <span class="hljs-number">1</span>);
-    <span class="hljs-comment">// Automatically emits WebSocket event</span>
-}
-
-<span class="hljs-comment">// Complete</span>
-progressTracker.<span class="hljs-title function_">completeOperation</span>(<span class="hljs-string">&#x27;import-123&#x27;</span>);</code></pre><h3>DataHelpers</h3><p><strong>Location:</strong> <code>app/utils/helpers.js</code></p>
-<p>Collection of data manipulation and formatting utilities.</p>
-<p><strong>Key Functions:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Function</th>
-<th>Purpose</th>
-<th>Example</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>formatBytes(bytes)</code></td>
-<td>Human-readable file sizes</td>
-<td><code>1024</code> → <code>&quot;1 KB&quot;</code></td>
-</tr>
-<tr>
-<td><code>formatDate(date)</code></td>
-<td>Consistent date formatting</td>
-<td>ISO → <code>&quot;Jan 15, 2024&quot;</code></td>
-</tr>
-<tr>
-<td><code>truncateText(text, length)</code></td>
-<td>Smart text truncation</td>
-<td>Adds ellipsis</td>
-</tr>
-<tr>
-<td><code>parseCSV(text)</code></td>
-<td>CSV parsing wrapper</td>
-<td>Returns array of objects</td>
-</tr>
-<tr>
-<td><code>escapeHtml(text)</code></td>
-<td>XSS prevention</td>
-<td>Escapes HTML entities</td>
-</tr>
-<tr>
-<td><code>generateId()</code></td>
-<td>Unique ID generation</td>
-<td>Returns UUID</td>
-</tr>
-<tr>
-<td><code>deepClone(obj)</code></td>
-<td>Deep object cloning</td>
-<td>Handles circular refs</td>
-</tr>
-<tr>
-<td><code>debounce(fn, delay)</code></td>
-<td>Function debouncing</td>
-<td>Delays execution</td>
-</tr>
-<tr>
-<td><code>throttle(fn, limit)</code></td>
-<td>Function throttling</td>
-<td>Limits execution rate</td>
-</tr>
-</tbody></table>
-<p><strong>Formatting Examples:</strong></p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> helpers = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/helpers&#x27;</span>);
-
-<span class="hljs-comment">// File size formatting</span>
-helpers.<span class="hljs-title function_">formatBytes</span>(<span class="hljs-number">1536</span>); <span class="hljs-comment">// &quot;1.5 KB&quot;</span>
-helpers.<span class="hljs-title function_">formatBytes</span>(<span class="hljs-number">1048576</span>); <span class="hljs-comment">// &quot;1 MB&quot;</span>
-
-<span class="hljs-comment">// Date formatting</span>
-helpers.<span class="hljs-title function_">formatDate</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>()); <span class="hljs-comment">// &quot;Jan 15, 2024 10:30 AM&quot;</span>
-helpers.<span class="hljs-title function_">formatDate</span>(<span class="hljs-string">&#x27;2024-01-15T10:30:00Z&#x27;</span>); <span class="hljs-comment">// &quot;Jan 15, 2024&quot;</span>
-
-<span class="hljs-comment">// Text truncation</span>
-helpers.<span class="hljs-title function_">truncateText</span>(<span class="hljs-string">&#x27;Long text here...&#x27;</span>, <span class="hljs-number">10</span>); <span class="hljs-comment">// &quot;Long te...&quot;</span></code></pre><h3>CryptoHelpers</h3><p><strong>Location:</strong> <code>app/utils/crypto.js</code></p>
-<p>Cryptographic utilities for hashing and encryption.</p>
-<p><strong>Functions:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Function</th>
-<th>Purpose</th>
-<th>Algorithm</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>hashPassword(password)</code></td>
-<td>Password hashing</td>
-<td>bcrypt with salt</td>
-</tr>
-<tr>
-<td><code>verifyPassword(password, hash)</code></td>
-<td>Password verification</td>
-<td>bcrypt compare</td>
-</tr>
-<tr>
-<td><code>generateToken()</code></td>
-<td>Secure token generation</td>
-<td>crypto.randomBytes</td>
-</tr>
-<tr>
-<td><code>hashFile(filePath)</code></td>
-<td>File integrity hashing</td>
-<td>SHA-256</td>
-</tr>
-<tr>
-<td><code>encrypt(data, key)</code></td>
-<td>Data encryption</td>
-<td>AES-256-GCM</td>
-</tr>
-<tr>
-<td><code>decrypt(encrypted, key)</code></td>
-<td>Data decryption</td>
-<td>AES-256-GCM</td>
-</tr>
-</tbody></table>
-<p><strong>Security Example:</strong></p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> crypto = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/crypto&#x27;</span>);
-
-<span class="hljs-comment">// Password hashing</span>
-<span class="hljs-keyword">const</span> hash = <span class="hljs-keyword">await</span> crypto.<span class="hljs-title function_">hashPassword</span>(<span class="hljs-string">&#x27;user_password&#x27;</span>);
-<span class="hljs-keyword">const</span> isValid = <span class="hljs-keyword">await</span> crypto.<span class="hljs-title function_">verifyPassword</span>(<span class="hljs-string">&#x27;user_password&#x27;</span>, hash);
-
-<span class="hljs-comment">// Token generation</span>
-<span class="hljs-keyword">const</span> token = crypto.<span class="hljs-title function_">generateToken</span>(); <span class="hljs-comment">// 32-byte hex string</span>
-
-<span class="hljs-comment">// File integrity</span>
-<span class="hljs-keyword">const</span> fileHash = <span class="hljs-keyword">await</span> crypto.<span class="hljs-title function_">hashFile</span>(<span class="hljs-string">&#x27;/path/to/file.csv&#x27;</span>);</code></pre><h3>ValidationHelpers</h3><p><strong>Location:</strong> <code>app/utils/validation.js</code></p>
-<p>Input validation utilities for common data types.</p>
-<p><strong>Validators:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Function</th>
-<th>Purpose</th>
-<th>Returns</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>isEmail(email)</code></td>
-<td>Email format validation</td>
-<td>Boolean</td>
-</tr>
-<tr>
-<td><code>isURL(url)</code></td>
-<td>URL format validation</td>
-<td>Boolean</td>
-</tr>
-<tr>
-<td><code>isIPAddress(ip)</code></td>
-<td>IP address validation</td>
-<td>Boolean</td>
-</tr>
-<tr>
-<td><code>isCVE(cve)</code></td>
-<td>CVE ID format</td>
-<td>Boolean</td>
-</tr>
-<tr>
-<td><code>isPort(port)</code></td>
-<td>Port number validation</td>
-<td>Boolean</td>
-</tr>
-<tr>
-<td><code>isMACAddress(mac)</code></td>
-<td>MAC address format</td>
-<td>Boolean</td>
-</tr>
-<tr>
-<td><code>isUUID(uuid)</code></td>
-<td>UUID validation</td>
-<td>Boolean</td>
-</tr>
-<tr>
-<td><code>sanitizeInput(input)</code></td>
-<td>General input sanitization</td>
-<td>Clean string</td>
-</tr>
-</tbody></table>
-<p><strong>Validation Patterns:</strong></p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> validators = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/validation&#x27;</span>);
-
-<span class="hljs-comment">// Email validation</span>
-validators.<span class="hljs-title function_">isEmail</span>(<span class="hljs-string">&#x27;user@example.com&#x27;</span>); <span class="hljs-comment">// true</span>
-validators.<span class="hljs-title function_">isEmail</span>(<span class="hljs-string">&#x27;invalid.email&#x27;</span>); <span class="hljs-comment">// false</span>
-
-<span class="hljs-comment">// CVE validation</span>
-validators.<span class="hljs-title function_">isCVE</span>(<span class="hljs-string">&#x27;CVE-2024-12345&#x27;</span>); <span class="hljs-comment">// true</span>
-validators.<span class="hljs-title function_">isCVE</span>(<span class="hljs-string">&#x27;CVE-24-123&#x27;</span>); <span class="hljs-comment">// false</span>
-
-<span class="hljs-comment">// IP validation (supports IPv4 and IPv6)</span>
-validators.<span class="hljs-title function_">isIPAddress</span>(<span class="hljs-string">&#x27;192.168.1.1&#x27;</span>); <span class="hljs-comment">// true</span>
-validators.<span class="hljs-title function_">isIPAddress</span>(<span class="hljs-string">&#x27;2001:db8::1&#x27;</span>); <span class="hljs-comment">// true</span></code></pre><h3>FileHelpers</h3><p><strong>Location:</strong> <code>app/utils/file-helpers.js</code></p>
-<p>File system operation utilities.</p>
-<p><strong>Functions:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Function</th>
-<th>Purpose</th>
-<th>Returns</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>ensureDir(path)</code></td>
-<td>Create directory if not exists</td>
-<td>Promise</td>
-</tr>
-<tr>
-<td><code>cleanTempFiles(dir, age)</code></td>
-<td>Remove old temp files</td>
-<td>Files deleted count</td>
-</tr>
-<tr>
-<td><code>getFileExtension(filename)</code></td>
-<td>Extract file extension</td>
-<td>Extension string</td>
-</tr>
-<tr>
-<td><code>getMimeType(filename)</code></td>
-<td>Determine MIME type</td>
-<td>MIME string</td>
-</tr>
-<tr>
-<td><code>isFileTypeAllowed(filename, types)</code></td>
-<td>Check allowed file types</td>
-<td>Boolean</td>
-</tr>
-<tr>
-<td><code>readJSONFile(path)</code></td>
-<td>Safe JSON file reading</td>
-<td>Parsed object</td>
-</tr>
-<tr>
-<td><code>writeJSONFile(path, data)</code></td>
-<td>Safe JSON file writing</td>
-<td>Promise</td>
-</tr>
-</tbody></table>
-<p><strong>File Operations Example:</strong></p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> fileHelpers = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/file-helpers&#x27;</span>);
-
-<span class="hljs-comment">// Ensure directory exists</span>
-<span class="hljs-keyword">await</span> fileHelpers.<span class="hljs-title function_">ensureDir</span>(<span class="hljs-string">&#x27;/app/uploads/temp&#x27;</span>);
-
-<span class="hljs-comment">// Clean old temp files (older than 1 hour)</span>
-<span class="hljs-keyword">const</span> cleaned = <span class="hljs-keyword">await</span> fileHelpers.<span class="hljs-title function_">cleanTempFiles</span>(<span class="hljs-string">&#x27;/tmp&#x27;</span>, <span class="hljs-number">3600000</span>);
-
-<span class="hljs-comment">// Check file type</span>
-<span class="hljs-keyword">if</span> (fileHelpers.<span class="hljs-title function_">isFileTypeAllowed</span>(<span class="hljs-string">&#x27;data.csv&#x27;</span>, [<span class="hljs-string">&#x27;csv&#x27;</span>, <span class="hljs-string">&#x27;json&#x27;</span>])) {
-    <span class="hljs-comment">// Process file</span>
-}</code></pre><h3>DatabaseHelpers</h3><p><strong>Location:</strong> <code>app/utils/db-helpers.js</code></p>
-<p>Database operation utilities for SQLite.</p>
-<p><strong>Functions:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Function</th>
-<th>Purpose</th>
-<th>Returns</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>runMigration(db, sql)</code></td>
-<td>Execute migration safely</td>
-<td>Promise</td>
-</tr>
-<tr>
-<td><code>createIndex(db, table, column)</code></td>
-<td>Create database index</td>
-<td>Promise</td>
-</tr>
-<tr>
-<td><code>tableExists(db, table)</code></td>
-<td>Check if table exists</td>
-<td>Boolean</td>
-</tr>
-<tr>
-<td><code>getTableSchema(db, table)</code></td>
-<td>Get table structure</td>
-<td>Schema object</td>
-</tr>
-<tr>
-<td><code>vacuum(db)</code></td>
-<td>Optimize database</td>
-<td>Promise</td>
-</tr>
-<tr>
-<td><code>backup(db, path)</code></td>
-<td>Create database backup</td>
-<td>Promise</td>
-</tr>
-</tbody></table>
-<p><strong>Database Operations:</strong></p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> dbHelpers = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/db-helpers&#x27;</span>);
-
-<span class="hljs-comment">// Check table existence</span>
-<span class="hljs-keyword">if</span> (<span class="hljs-keyword">await</span> dbHelpers.<span class="hljs-title function_">tableExists</span>(db, <span class="hljs-string">&#x27;vulnerabilities&#x27;</span>)) {
-    <span class="hljs-comment">// Table operations</span>
-}
-
-<span class="hljs-comment">// Create index for performance</span>
-<span class="hljs-keyword">await</span> dbHelpers.<span class="hljs-title function_">createIndex</span>(db, <span class="hljs-string">&#x27;vulnerabilities&#x27;</span>, <span class="hljs-string">&#x27;scan_date&#x27;</span>);
-
-<span class="hljs-comment">// Optimize database</span>
-<span class="hljs-keyword">await</span> dbHelpers.<span class="hljs-title function_">vacuum</span>(db);</code></pre><hr>
-<h2 id="error-handling">Error Handling Utilities</h2><h3>CustomErrors</h3><p><strong>Location:</strong> <code>app/utils/errors.js</code></p>
-<p>Custom error classes for better error handling.</p>
-<p><strong>Error Classes:</strong></p>
-<table>
-<thead>
-<tr>
-<th>Class</th>
-<th>Purpose</th>
-<th>Status Code</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>ValidationError</code></td>
-<td>Input validation failures</td>
-<td>400</td>
-</tr>
-<tr>
-<td><code>AuthenticationError</code></td>
-<td>Auth failures</td>
-<td>401</td>
-</tr>
-<tr>
-<td><code>AuthorizationError</code></td>
-<td>Permission denied</td>
-<td>403</td>
-</tr>
-<tr>
-<td><code>NotFoundError</code></td>
-<td>Resource not found</td>
-<td>404</td>
-</tr>
-<tr>
-<td><code>ConflictError</code></td>
-<td>Resource conflicts</td>
-<td>409</td>
-</tr>
-<tr>
-<td><code>RateLimitError</code></td>
-<td>Too many requests</td>
-<td>429</td>
-</tr>
-<tr>
-<td><code>ServerError</code></td>
-<td>Internal errors</td>
-<td>500</td>
-</tr>
-</tbody></table>
-<p><strong>Usage:</strong></p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> { <span class="hljs-title class_">ValidationError</span>, <span class="hljs-title class_">NotFoundError</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/errors&#x27;</span>);
-
-<span class="hljs-comment">// Throw custom error</span>
-<span class="hljs-keyword">if</span> (!isValid) {
-    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ValidationError</span>(<span class="hljs-string">&#x27;Invalid input format&#x27;</span>);
-}
-
-<span class="hljs-comment">// Handle in middleware</span>
-app.<span class="hljs-title function_">use</span>(<span class="hljs-function">(<span class="hljs-params">err, req, res, next</span>) =&gt;</span> {
-    <span class="hljs-keyword">if</span> (err <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">ValidationError</span>) {
-        res.<span class="hljs-title function_">status</span>(err.<span class="hljs-property">statusCode</span>).<span class="hljs-title function_">json</span>({
-            <span class="hljs-attr">error</span>: err.<span class="hljs-property">message</span>,
-            <span class="hljs-attr">field</span>: err.<span class="hljs-property">field</span>
-        });
-    }
-});</code></pre><hr>
-<h2 id="performance">Performance Utilities</h2><h3>CacheManager</h3><p><strong>Location:</strong> <code>app/utils/cache.js</code></p>
-<p>In-memory caching with TTL support.</p>
-<p><strong>Features:</strong></p>
-<ul>
-<li>TTL-based expiration</li>
-<li>LRU eviction policy</li>
-<li>Size limits</li>
-<li>Hit/miss statistics</li>
-</ul>
-<p><strong>Methods:</strong></p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> cache = <span class="hljs-keyword">new</span> <span class="hljs-title class_">CacheManager</span>({
-    <span class="hljs-attr">maxSize</span>: <span class="hljs-number">100</span>,
-    <span class="hljs-attr">defaultTTL</span>: <span class="hljs-number">300000</span> <span class="hljs-comment">// 5 minutes</span>
-});
-
-<span class="hljs-comment">// Set with TTL</span>
-cache.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;key&#x27;</span>, value, <span class="hljs-number">60000</span>); <span class="hljs-comment">// 1 minute TTL</span>
-
-<span class="hljs-comment">// Get value</span>
-<span class="hljs-keyword">const</span> value = cache.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;key&#x27;</span>);
-
-<span class="hljs-comment">// Check existence</span>
-<span class="hljs-keyword">if</span> (cache.<span class="hljs-title function_">has</span>(<span class="hljs-string">&#x27;key&#x27;</span>)) {
-    <span class="hljs-comment">// Use cached value</span>
-}
-
-<span class="hljs-comment">// Clear cache</span>
-cache.<span class="hljs-title function_">clear</span>();</code></pre><h3>RateLimiter</h3><p><strong>Location:</strong> <code>app/utils/rate-limiter.js</code></p>
-<p>Custom rate limiting implementation.</p>
-<p><strong>Configuration:</strong></p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> limiter = <span class="hljs-keyword">new</span> <span class="hljs-title class_">RateLimiter</span>({
-    <span class="hljs-attr">windowMs</span>: <span class="hljs-number">15</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>, <span class="hljs-comment">// 15 minutes</span>
-    <span class="hljs-attr">maxRequests</span>: <span class="hljs-number">100</span>,
-    <span class="hljs-attr">keyGenerator</span>: <span class="hljs-function">(<span class="hljs-params">req</span>) =&gt;</span> req.<span class="hljs-property">ip</span>
-});
-
-<span class="hljs-comment">// Check limit</span>
-<span class="hljs-keyword">if</span> (limiter.<span class="hljs-title function_">isLimited</span>(key)) {
-    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RateLimitError</span>(<span class="hljs-string">&#x27;Too many requests&#x27;</span>);
-}
-
-<span class="hljs-comment">// Track request</span>
-limiter.<span class="hljs-title function_">track</span>(key);</code></pre><hr>
-<h2 id="logging">Logging Utilities</h2><h3>Logger</h3><p><strong>Location:</strong> <code>app/utils/logger.js</code></p>
-<p>Structured logging with multiple transports.</p>
-<p><strong>Log Levels:</strong></p>
-<ul>
-<li><code>error</code> - Error conditions</li>
-<li><code>warn</code> - Warning conditions</li>
-<li><code>info</code> - Informational messages</li>
-<li><code>debug</code> - Debug messages</li>
-<li><code>verbose</code> - Verbose debug info</li>
-</ul>
-<p><strong>Usage:</strong></p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> logger = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/logger&#x27;</span>);
-
-<span class="hljs-comment">// Log with metadata</span>
-logger.<span class="hljs-title function_">info</span>(<span class="hljs-string">&#x27;Operation completed&#x27;</span>, {
-    <span class="hljs-attr">operation</span>: <span class="hljs-string">&#x27;import&#x27;</span>,
-    <span class="hljs-attr">duration</span>: <span class="hljs-number">1523</span>,
-    <span class="hljs-attr">records</span>: <span class="hljs-number">1000</span>
-});
-
-<span class="hljs-comment">// Log errors with stack</span>
-logger.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;Operation failed&#x27;</span>, {
-    <span class="hljs-attr">error</span>: err.<span class="hljs-property">message</span>,
-    <span class="hljs-attr">stack</span>: err.<span class="hljs-property">stack</span>,
-    <span class="hljs-attr">context</span>: { userId, operation }
-});</code></pre><hr>
-<h2 id="testing">Testing Utilities</h2><h3>TestHelpers</h3><p><strong>Location:</strong> <code>app/utils/test-helpers.js</code></p>
-<p>Utilities for testing.</p>
-<p><strong>Functions:</strong></p>
-<ul>
-<li><code>createTestDatabase()</code> - In-memory test DB</li>
-<li><code>seedTestData(db)</code> - Populate test data</li>
-<li><code>cleanupTest()</code> - Clean test artifacts</li>
-<li><code>mockWebSocket()</code> - WebSocket mock</li>
-<li><code>generateTestCSV()</code> - Test CSV generation</li>
+<li>Path normalization exploits</li>
 </ul>
 <hr>
-<h2 id="constants">Constants</h2><h3>ApplicationConstants</h3><p><strong>Location:</strong> <code>app/utils/constants.js</code></p>
-<p>Application-wide constants.</p>
-<pre><code class="language-javascript"><span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = {
-    <span class="hljs-comment">// File limits</span>
-    <span class="hljs-attr">MAX_FILE_SIZE</span>: <span class="hljs-number">100</span> * <span class="hljs-number">1024</span> * <span class="hljs-number">1024</span>, <span class="hljs-comment">// 100MB</span>
-    <span class="hljs-attr">ALLOWED_EXTENSIONS</span>: [<span class="hljs-string">&#x27;.csv&#x27;</span>, <span class="hljs-string">&#x27;.json&#x27;</span>, <span class="hljs-string">&#x27;.xml&#x27;</span>],
+<p><strong><code>PathValidator.safeReadFileSync(filePath, options)</code></strong></p>
+<p>Secure file reading wrapper with path validation.</p>
+<p><strong>Returns:</strong> File contents (Buffer or string based on encoding)</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Safe read with validation</span>
+<span class="hljs-keyword">const</span> data = <span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">safeReadFileSync</span>(<span class="hljs-string">&quot;uploads/data.csv&quot;</span>, <span class="hljs-string">&quot;utf8&quot;</span>);
 
-    <span class="hljs-comment">// Pagination</span>
-    <span class="hljs-attr">DEFAULT_PAGE_SIZE</span>: <span class="hljs-number">50</span>,
-    <span class="hljs-attr">MAX_PAGE_SIZE</span>: <span class="hljs-number">1000</span>,
+<span class="hljs-comment">// Unsafe path blocked</span>
+<span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">safeReadFileSync</span>(<span class="hljs-string">&quot;../secrets/key.pem&quot;</span>); <span class="hljs-comment">// ❌ Throws Error</span></code></pre><hr>
+<p><strong><code>PathValidator.safeWriteFileSync(filePath, data, options)</code></strong></p>
+<p>Secure file writing wrapper.</p>
+<pre><code class="language-javascript"><span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">safeWriteFileSync</span>(<span class="hljs-string">&quot;uploads/output.json&quot;</span>, <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(data));</code></pre><hr>
+<p><strong><code>PathValidator.safeReaddirSync(dirPath, options)</code></strong></p>
+<p>Secure directory reading wrapper.</p>
+<p><strong>Returns:</strong> Array of filenames</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> files = <span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">safeReaddirSync</span>(<span class="hljs-string">&quot;uploads&quot;</span>);
+<span class="hljs-comment">// → [&quot;file1.csv&quot;, &quot;file2.csv&quot;]</span></code></pre><hr>
+<p><strong><code>PathValidator.safeStatSync(filePath)</code></strong></p>
+<p>Secure file stat wrapper.</p>
+<p><strong>Returns:</strong> <code>fs.Stats</code> object</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> stats = <span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">safeStatSync</span>(<span class="hljs-string">&quot;uploads/data.csv&quot;</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(stats.<span class="hljs-property">size</span>); <span class="hljs-comment">// File size in bytes</span></code></pre><hr>
+<p><strong><code>PathValidator.safeExistsSync(filePath)</code></strong></p>
+<p>Secure file existence check wrapper.</p>
+<p><strong>Returns:</strong> <code>true</code> if file exists, <code>false</code> otherwise</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">if</span> (<span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">safeExistsSync</span>(<span class="hljs-string">&quot;uploads/data.csv&quot;</span>)) {
+    <span class="hljs-comment">// File exists</span>
+}</code></pre><hr>
+<p><strong><code>PathValidator.safeUnlinkSync(filePath)</code></strong></p>
+<p>Secure file deletion wrapper.</p>
+<pre><code class="language-javascript"><span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">safeUnlinkSync</span>(<span class="hljs-string">&quot;uploads/temp.csv&quot;</span>); <span class="hljs-comment">// Delete file</span></code></pre><hr>
+<p><strong>Used By:</strong> helpers.js, version-manager.js, documentation controllers, file upload handlers</p>
+<hr>
+<h3>ProgressTracker.js - Real-time Progress Management</h3><p><strong>Location:</strong> <code>app/utils/ProgressTracker.js</code><br><strong>Since:</strong> v1.0.0 (WebSocket integration)<br><strong>Purpose:</strong> WebSocket-based progress tracking for long-running operations (CSV imports, backups)</p>
+<h4>Key Methods</h4><p><strong><code>constructor(io)</code></strong></p>
+<p>Initialize with Socket.io instance.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> <span class="hljs-title class_">ProgressTracker</span> = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/ProgressTracker&#x27;</span>);
+<span class="hljs-keyword">const</span> progressTracker = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ProgressTracker</span>(io);</code></pre><hr>
+<p><strong><code>createSession(metadata)</code></strong></p>
+<p>Create new progress session with auto-generated UUID.</p>
+<p><strong>Returns:</strong> Session ID (UUID v4)</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> sessionId = progressTracker.<span class="hljs-title function_">createSession</span>({
+    <span class="hljs-attr">operation</span>: <span class="hljs-string">&quot;csv_import&quot;</span>,
+    <span class="hljs-attr">filename</span>: <span class="hljs-string">&quot;vulnerabilities.csv&quot;</span>,
+    <span class="hljs-attr">totalRows</span>: <span class="hljs-number">1000</span>
+});
+<span class="hljs-comment">// → &quot;550e8400-e29b-41d4-a716-446655440000&quot;</span></code></pre><hr>
+<p><strong><code>createSessionWithId(sessionId, metadata)</code></strong></p>
+<p>Create session with specific ID (for pre-generated session IDs).</p>
+<pre><code class="language-javascript">progressTracker.<span class="hljs-title function_">createSessionWithId</span>(<span class="hljs-string">&quot;custom-session-id&quot;</span>, {
+    <span class="hljs-attr">operation</span>: <span class="hljs-string">&quot;backup&quot;</span>,
+    <span class="hljs-attr">filename</span>: <span class="hljs-string">&quot;backup.db&quot;</span>
+});</code></pre><hr>
+<p><strong><code>updateProgress(sessionId, progress, message, additionalData)</code></strong></p>
+<p>Throttled progress updates (100ms interval to prevent WebSocket spam).</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>sessionId</code> - Session identifier</li>
+<li><code>progress</code> - Percentage (0-100)</li>
+<li><code>message</code> - Status message</li>
+<li><code>additionalData</code> - Optional extra data</li>
+</ul>
+<pre><code class="language-javascript"><span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; totalRows; i++) {
+    <span class="hljs-keyword">await</span> <span class="hljs-title function_">processRow</span>(data[i]);
 
-    <span class="hljs-comment">// Timeouts</span>
-    <span class="hljs-attr">REQUEST_TIMEOUT</span>: <span class="hljs-number">30000</span>, <span class="hljs-comment">// 30 seconds</span>
-    <span class="hljs-attr">IMPORT_TIMEOUT</span>: <span class="hljs-number">600000</span>, <span class="hljs-comment">// 10 minutes</span>
+    progressTracker.<span class="hljs-title function_">updateProgress</span>(sessionId,
+        <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">round</span>((i / totalRows) * <span class="hljs-number">100</span>),
+        <span class="hljs-string">`Processing row <span class="hljs-subst">${i + <span class="hljs-number">1</span>}</span> of <span class="hljs-subst">${totalRows}</span>`</span>,
+        { <span class="hljs-attr">currentRow</span>: i + <span class="hljs-number">1</span>, totalRows }
+    );
+}</code></pre><p><strong>Throttling:</strong> Updates are throttled to 100ms intervals to prevent overwhelming WebSocket clients.</p>
+<hr>
+<p><strong><code>completeSession(sessionId, message, finalData)</code></strong></p>
+<p>Mark session complete.</p>
+<pre><code class="language-javascript">progressTracker.<span class="hljs-title function_">completeSession</span>(sessionId,
+    <span class="hljs-string">&quot;Import completed successfully&quot;</span>,
+    {
+        <span class="hljs-attr">imported</span>: <span class="hljs-number">950</span>,
+        <span class="hljs-attr">duplicates</span>: <span class="hljs-number">50</span>,
+        <span class="hljs-attr">errors</span>: <span class="hljs-number">0</span>
+    }
+);</code></pre><p><strong>Cleanup:</strong> Session is auto-deleted 5 seconds after completion.</p>
+<hr>
+<p><strong><code>errorSession(sessionId, errorMessage, errorData)</code></strong></p>
+<p>Mark session errored.</p>
+<pre><code class="language-javascript">progressTracker.<span class="hljs-title function_">errorSession</span>(sessionId,
+    <span class="hljs-string">&quot;Import failed: Invalid CSV format&quot;</span>,
+    { <span class="hljs-attr">error</span>: err.<span class="hljs-property">message</span> }
+);</code></pre><p><strong>Cleanup:</strong> Session is auto-deleted 5 seconds after error.</p>
+<hr>
+<p><strong><code>getSession(sessionId)</code></strong></p>
+<p>Retrieve session data.</p>
+<p><strong>Returns:</strong> Session object or <code>undefined</code></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> session = progressTracker.<span class="hljs-title function_">getSession</span>(sessionId);
+<span class="hljs-comment">// → {</span>
+<span class="hljs-comment">//     id: &quot;550e8400-...&quot;,</span>
+<span class="hljs-comment">//     operation: &quot;csv_import&quot;,</span>
+<span class="hljs-comment">//     progress: 75,</span>
+<span class="hljs-comment">//     status: &quot;processing&quot;,</span>
+<span class="hljs-comment">//     startTime: 1672531200000,</span>
+<span class="hljs-comment">//     ...metadata</span>
+<span class="hljs-comment">//   }</span></code></pre><hr>
+<p><strong><code>cleanupStaleSessions()</code></strong></p>
+<p>Auto-cleanup of stale sessions (runs every 30 minutes).</p>
+<p><strong>Criteria:</strong></p>
+<ul>
+<li>Sessions inactive for 30+ minutes</li>
+<li>Completed/errored sessions 5+ seconds old</li>
+</ul>
+<pre><code class="language-javascript"><span class="hljs-comment">// Automatic cleanup runs every 30 minutes</span>
+<span class="hljs-comment">// Manual cleanup:</span>
+progressTracker.<span class="hljs-title function_">cleanupStaleSessions</span>();</code></pre><hr>
+<h4>WebSocket Events</h4><p><strong>Room-based Broadcasting</strong></p>
+<p>Each session broadcasts to room <code>progress-{sessionId}</code>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Client joins progress room</span>
+socket.<span class="hljs-title function_">emit</span>(<span class="hljs-string">&quot;join-progress&quot;</span>, { sessionId });
 
-    <span class="hljs-comment">// Security</span>
-    <span class="hljs-attr">MAX_LOGIN_ATTEMPTS</span>: <span class="hljs-number">5</span>,
-    <span class="hljs-attr">LOCKOUT_DURATION</span>: <span class="hljs-number">900000</span>, <span class="hljs-comment">// 15 minutes</span>
+<span class="hljs-comment">// Server broadcasts to room</span>
+io.<span class="hljs-title function_">to</span>(<span class="hljs-string">`progress-<span class="hljs-subst">${sessionId}</span>`</span>).<span class="hljs-title function_">emit</span>(<span class="hljs-string">&quot;progress&quot;</span>, {
+    sessionId,
+    <span class="hljs-attr">progress</span>: <span class="hljs-number">75</span>,
+    <span class="hljs-attr">message</span>: <span class="hljs-string">&quot;Processing...&quot;</span>,
+    ...additionalData
+});</code></pre><p><strong>Event Types:</strong></p>
+<ul>
+<li><code>progress</code> - Progress update</li>
+<li><code>complete</code> - Operation completed</li>
+<li><code>error</code> - Operation failed</li>
+</ul>
+<hr>
+<p><strong>Used By:</strong> importController, backupController, all long-running operations</p>
+<hr>
+<h3>seedEmailTemplates.js - Template Seeding Utilities</h3><p><strong>Location:</strong> <code>app/utils/seedEmailTemplates.js</code><br><strong>Since:</strong> v1.0.21 (Template Editor feature)<br><strong>Purpose:</strong> Seed and repair default email/ticket/vulnerability templates</p>
+<h4>Key Functions</h4><p><strong><code>seedEmailTemplates(db)</code></strong></p>
+<p>Seed default email template.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> { seedEmailTemplates } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/seedEmailTemplates&#x27;</span>);
 
-    <span class="hljs-comment">// Cache</span>
-    <span class="hljs-attr">CACHE_TTL</span>: <span class="hljs-number">300000</span>, <span class="hljs-comment">// 5 minutes</span>
-    <span class="hljs-attr">MAX_CACHE_SIZE</span>: <span class="hljs-number">100</span>
-};</code></pre>
+<span class="hljs-title function_">seedEmailTemplates</span>(db);
+<span class="hljs-comment">// Creates default email template with 11 variables</span></code></pre><p><strong>Default Email Template:</strong></p>
+<pre><code class="language-markdown">Subject: Vulnerability Report - {{SITE<span class="hljs-emphasis">_NAME}}
+
+Dear {{SUPERVISOR}},
+
+A vulnerability report has been generated for {{SITE_</span>NAME}}.
+
+<span class="hljs-strong">**Summary:**</span>
+<span class="hljs-bullet">-</span> Total Vulnerabilities: {{TOTAL<span class="hljs-emphasis">_VULNERABILITIES}}
+- Critical: {{CRITICAL_</span>COUNT}}
+<span class="hljs-bullet">-</span> High: {{HIGH<span class="hljs-emphasis">_COUNT}}
+
+{{VULNERABILITY_</span>SUMMARY}}
+
+Generated: {{GENERATED<span class="hljs-emphasis">_TIME}}</span></code></pre><hr>
+<p><strong><code>seedTicketTemplates(db)</code></strong></p>
+<p>Seed default ticket template.</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">seedTicketTemplates</span>(db);
+<span class="hljs-comment">// Creates default ticket template with 14 variables</span></code></pre><p><strong>Default Ticket Template:</strong></p>
+<pre><code class="language-markdown"><span class="hljs-section"># Hexagon Work Request</span>
+
+<span class="hljs-strong">**XT Number:**</span> {{XT<span class="hljs-emphasis">_NUMBER}}
+<span class="hljs-strong">**Site:**</span> {{SITE_</span>NAME}}
+<span class="hljs-strong">**Location:**</span> {{LOCATION}}
+
+<span class="hljs-section">## Device List</span>
+{{DEVICE<span class="hljs-emphasis">_LIST}}
+
+## Notes
+{{NOTES}}
+
+<span class="hljs-strong">**Submitted:**</span> {{DATE_</span>SUBMITTED}}
+<span class="hljs-strong">**Due:**</span> {{DATE<span class="hljs-emphasis">_DUE}}</span></code></pre><hr>
+<p><strong><code>seedVulnerabilityTemplates(db)</code></strong></p>
+<p>Seed default vulnerability report template.</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">seedVulnerabilityTemplates</span>(db);
+<span class="hljs-comment">// Creates default vulnerability template with 11 variables</span></code></pre><hr>
+<p><strong><code>seedAllTemplates(db)</code></strong></p>
+<p>Seed all templates at once.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> { seedAllTemplates } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/seedEmailTemplates&#x27;</span>);
+
+<span class="hljs-title function_">seedAllTemplates</span>(db);
+<span class="hljs-comment">// Seeds email, ticket, and vulnerability templates</span></code></pre><hr>
+<p><strong><code>resetTemplateToDefault(db, templateName)</code></strong></p>
+<p>Reset template to default content (repair corrupted templates).</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>templateName</code> - <code>&quot;email&quot;</code>, <code>&quot;ticket&quot;</code>, or <code>&quot;vulnerability&quot;</code></li>
+</ul>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> { resetTemplateToDefault } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/seedEmailTemplates&#x27;</span>);
+
+<span class="hljs-title function_">resetTemplateToDefault</span>(db, <span class="hljs-string">&quot;email&quot;</span>);
+<span class="hljs-comment">// Resets email template to default</span></code></pre><hr>
+<p><strong><code>contentLooksMismatched(content, category)</code></strong></p>
+<p>Validate template content integrity.</p>
+<p><strong>Returns:</strong> <code>true</code> if content appears corrupted/mismatched</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> { contentLooksMismatched } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/seedEmailTemplates&#x27;</span>);
+
+<span class="hljs-keyword">if</span> (<span class="hljs-title function_">contentLooksMismatched</span>(emailContent, <span class="hljs-string">&quot;email&quot;</span>)) {
+    <span class="hljs-title function_">resetTemplateToDefault</span>(db, <span class="hljs-string">&quot;email&quot;</span>);
+}</code></pre><p><strong>Validation Checks:</strong></p>
+<ul>
+<li>Email templates should contain email-specific variables (<code>{{SUPERVISOR}}</code>, <code>Subject:</code>)</li>
+<li>Ticket templates should contain ticket-specific variables (<code>{{XT_NUMBER}}</code>)</li>
+<li>Vulnerability templates should contain vulnerability-specific variables</li>
+</ul>
+<hr>
+<p><strong>Template Variables</strong></p>
+<p><strong>Email Template (11 variables):</strong></p>
+<ul>
+<li><code>{{SUPERVISOR}}</code> - Supervisor name</li>
+<li><code>{{SITE_NAME}}</code> - Site name</li>
+<li><code>{{TOTAL_VULNERABILITIES}}</code> - Total vulnerability count</li>
+<li><code>{{CRITICAL_COUNT}}</code> - Critical vulnerabilities</li>
+<li><code>{{HIGH_COUNT}}</code> - High severity</li>
+<li><code>{{MEDIUM_COUNT}}</code> - Medium severity</li>
+<li><code>{{LOW_COUNT}}</code> - Low severity</li>
+<li><code>{{VULNERABILITY_SUMMARY}}</code> - Summary text</li>
+<li><code>{{GENERATED_TIME}}</code> - Generation timestamp</li>
+<li><code>{{GREETING}}</code> - Greeting text</li>
+<li><code>{{NOTES}}</code> - Additional notes</li>
+</ul>
+<p><strong>Ticket Template (14 variables):</strong></p>
+<ul>
+<li><code>{{XT_NUMBER}}</code> - XT ticket number</li>
+<li><code>{{HEXAGON_TICKET}}</code> - Hexagon ticket number</li>
+<li><code>{{SERVICENOW_TICKET}}</code> - ServiceNow ticket number</li>
+<li><code>{{STATUS}}</code> - Ticket status</li>
+<li><code>{{SITE_NAME}}</code> - Site name</li>
+<li><code>{{LOCATION}}</code> - Location details</li>
+<li><code>{{DATE_SUBMITTED}}</code> - Submission date</li>
+<li><code>{{DATE_DUE}}</code> - Due date</li>
+<li><code>{{DEVICE_LIST}}</code> - List of devices</li>
+<li><code>{{DEVICE_COUNT}}</code> - Number of devices</li>
+<li><code>{{NOTES}}</code> - Ticket notes</li>
+<li><code>{{SUPERVISOR}}</code> - Supervisor name</li>
+<li><code>{{TECHNICIAN}}</code> - Technician name</li>
+<li><code>{{GENERATED_TIME}}</code> - Generation timestamp</li>
+</ul>
+<p><strong>Vulnerability Template (11 variables):</strong></p>
+<ul>
+<li><code>{{VULNERABILITY_SUMMARY}}</code> - Summary section</li>
+<li><code>{{VULNERABILITY_DETAILS}}</code> - Detailed information</li>
+<li><code>{{TOTAL_VULNERABILITIES}}</code> - Total count</li>
+<li><code>{{CRITICAL_COUNT}}</code> - Critical count</li>
+<li><code>{{HIGH_COUNT}}</code> - High count</li>
+<li><code>{{MEDIUM_COUNT}}</code> - Medium count</li>
+<li><code>{{LOW_COUNT}}</code> - Low count</li>
+<li><code>{{SITE_NAME}}</code> - Site name</li>
+<li><code>{{LOCATION}}</code> - Location</li>
+<li><code>{{GENERATED_TIME}}</code> - Timestamp</li>
+<li><code>{{NOTES}}</code> - Additional notes</li>
+</ul>
+<hr>
+<p><strong>Used By:</strong> init-database.js, template repair during server startup</p>
+<hr>
+<h2 id="backend-config">Backend Configuration Utilities</h2><h3>importConfig.js - Vendor Pattern Configuration</h3><p><strong>Location:</strong> <code>app/config/importConfig.js</code><br><strong>Since:</strong> v1.0.53 (Dynamic vendor configuration)<br><strong>Purpose:</strong> Dynamic vendor normalization patterns (CISCO, Palo Alto) with regex caching</p>
+<h4>Key Functions</h4><p><strong><code>getImportConfig()</code></strong></p>
+<p>Get cached config or load from disk.</p>
+<p><strong>Returns:</strong> Configuration object with compiled regex patterns</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> { getImportConfig } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;../config/importConfig&#x27;</span>);
+
+<span class="hljs-keyword">const</span> config = <span class="hljs-title function_">getImportConfig</span>();
+<span class="hljs-comment">// → {</span>
+<span class="hljs-comment">//     familyVendorPatterns: { ... },</span>
+<span class="hljs-comment">//     hostnameVendorPatterns: { ... }</span>
+<span class="hljs-comment">//   }</span></code></pre><p><strong>Caching:</strong> Configuration is cached in memory for performance.</p>
+<hr>
+<p><strong><code>refreshImportConfig()</code></strong></p>
+<p>Force reload of configuration (for config file changes).</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> { refreshImportConfig } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;../config/importConfig&#x27;</span>);
+
+<span class="hljs-title function_">refreshImportConfig</span>();
+<span class="hljs-comment">// Clears cache and reloads import.config.json</span></code></pre><hr>
+<p><strong><code>resolveConfigPath()</code></strong></p>
+<p>Resolve config file path (environment variable or default).</p>
+<p><strong>Environment Variable:</strong> <code>IMPORT_CONFIG_PATH</code></p>
+<p><strong>Default:</strong> <code>app/config/import.config.json</code></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> { resolveConfigPath } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;../config/importConfig&#x27;</span>);
+
+<span class="hljs-keyword">const</span> path = <span class="hljs-title function_">resolveConfigPath</span>();
+<span class="hljs-comment">// → &quot;/app/config/import.config.json&quot;</span></code></pre><hr>
+<p><strong><code>preparePatterns(patterns)</code></strong></p>
+<p>Compile regex patterns from JSON config (internal).</p>
+<p><strong>Returns:</strong> Object with compiled regex patterns</p>
+<hr>
+<p><strong><code>loadConfigFromDisk(configPath)</code></strong></p>
+<p>Load and parse <code>import.config.json</code> (internal).</p>
+<p><strong>Returns:</strong> Parsed configuration object</p>
+<hr>
+<h4>Configuration Structure</h4><p><strong>File:</strong> <code>app/config/import.config.json</code></p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;familyVendorPatterns&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;CISCO&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;cisco&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;cisco systems&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;Palo Alto&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;palo alto&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;palo alto networks&quot;</span><span class="hljs-punctuation">]</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;hostnameVendorPatterns&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;CISCO&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;nrwan&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;cisco&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;Palo Alto&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;nfpan&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;paloalto&quot;</span><span class="hljs-punctuation">]</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code></pre><p><strong>Pattern Matching:</strong></p>
+<ul>
+<li><code>familyVendorPatterns</code>: Match vendor name in &quot;family&quot; field (case-insensitive)</li>
+<li><code>hostnameVendorPatterns</code>: Match prefix/substring in hostname</li>
+</ul>
+<hr>
+<p><strong>Used By:</strong> helpers.js (<code>normalizeVendor</code> function), importService</p>
+<hr>
+<h2 id="frontend-validation">Frontend Validation Utilities</h2><h3>cve-utilities.js - CVE Link & Event Management</h3><p><strong>Location:</strong> <code>app/public/scripts/shared/cve-utilities.js</code><br><strong>Since:</strong> v1.0.0 (T038 - CVE Link System Fix)<br><strong>Spec:</strong> 004-cve-link-system-fix<br><strong>Purpose:</strong> Centralized CVE validation, parsing, link creation, and event handling</p>
+<h4>Validation Functions</h4><p><strong><code>validateCVE(cve)</code></strong></p>
+<p>Validate CVE-YYYY-NNNNN format.</p>
+<p><strong>Returns:</strong> <code>true</code> if valid, <code>false</code> otherwise</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">validateCVE</span>(<span class="hljs-string">&quot;CVE-2024-1234&quot;</span>) <span class="hljs-comment">// → true</span>
+<span class="hljs-title function_">validateCVE</span>(<span class="hljs-string">&quot;CVE-2024-12345678&quot;</span>) <span class="hljs-comment">// → true (any length after year)</span>
+<span class="hljs-title function_">validateCVE</span>(<span class="hljs-string">&quot;CVE-24-1234&quot;</span>) <span class="hljs-comment">// → false (invalid year)</span>
+<span class="hljs-title function_">validateCVE</span>(<span class="hljs-string">&quot;invalid&quot;</span>) <span class="hljs-comment">// → false</span></code></pre><hr>
+<p><strong><code>validateCiscoSA(id)</code></strong></p>
+<p>Validate Cisco Security Advisory format: <code>cisco-sa-YYYYMMDD-name</code></p>
+<p><strong>Returns:</strong> <code>true</code> if valid, <code>false</code> otherwise</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">validateCiscoSA</span>(<span class="hljs-string">&quot;cisco-sa-20240115-apache&quot;</span>) <span class="hljs-comment">// → true</span>
+<span class="hljs-title function_">validateCiscoSA</span>(<span class="hljs-string">&quot;invalid&quot;</span>) <span class="hljs-comment">// → false</span></code></pre><hr>
+<h4>Parsing Functions</h4><p><strong><code>parseCVEString(cveString)</code></strong></p>
+<p>Parse comma/space-separated CVE lists.</p>
+<p><strong>Returns:</strong> Array of valid CVE IDs</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">parseCVEString</span>(<span class="hljs-string">&quot;CVE-2024-1234, CVE-2024-5678&quot;</span>)
+<span class="hljs-comment">// → [&quot;CVE-2024-1234&quot;, &quot;CVE-2024-5678&quot;]</span>
+
+<span class="hljs-title function_">parseCVEString</span>(<span class="hljs-string">&quot;CVE-2024-1234 CVE-2024-5678&quot;</span>)
+<span class="hljs-comment">// → [&quot;CVE-2024-1234&quot;, &quot;CVE-2024-5678&quot;]</span>
+
+<span class="hljs-title function_">parseCVEString</span>(<span class="hljs-string">&quot;CVE-2024-1234, invalid, CVE-2024-5678&quot;</span>)
+<span class="hljs-comment">// → [&quot;CVE-2024-1234&quot;, &quot;CVE-2024-5678&quot;] (filters invalid)</span></code></pre><hr>
+<p><strong><code>extractCVEIds(cveString, firstOnly = false)</code></strong></p>
+<p>Extract CVE IDs as array or single value.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>cveString</code> - CVE string to parse</li>
+<li><code>firstOnly</code> - Return only first CVE (default: <code>false</code>)</li>
+</ul>
+<p><strong>Returns:</strong> Array of CVEs or single CVE string</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">extractCVEIds</span>(<span class="hljs-string">&quot;CVE-2024-1234, CVE-2024-5678&quot;</span>)
+<span class="hljs-comment">// → [&quot;CVE-2024-1234&quot;, &quot;CVE-2024-5678&quot;]</span>
+
+<span class="hljs-title function_">extractCVEIds</span>(<span class="hljs-string">&quot;CVE-2024-1234, CVE-2024-5678&quot;</span>, <span class="hljs-literal">true</span>)
+<span class="hljs-comment">// → &quot;CVE-2024-1234&quot;</span></code></pre><hr>
+<p><strong><code>getFirstCVE(cveString)</code></strong></p>
+<p>Get first CVE from multi-CVE string.</p>
+<p><strong>Returns:</strong> First CVE ID or empty string</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">getFirstCVE</span>(<span class="hljs-string">&quot;CVE-2024-1234, CVE-2024-5678&quot;</span>) <span class="hljs-comment">// → &quot;CVE-2024-1234&quot;</span>
+<span class="hljs-title function_">getFirstCVE</span>(<span class="hljs-string">&quot;invalid&quot;</span>) <span class="hljs-comment">// → &quot;&quot;</span></code></pre><hr>
+<p><strong><code>normalizeCVE(cve)</code></strong></p>
+<p>Normalize to uppercase standard format.</p>
+<p><strong>Returns:</strong> Normalized CVE string</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">normalizeCVE</span>(<span class="hljs-string">&quot;cve-2024-1234&quot;</span>) <span class="hljs-comment">// → &quot;CVE-2024-1234&quot;</span>
+<span class="hljs-title function_">normalizeCVE</span>(<span class="hljs-string">&quot;CVE-2024-1234&quot;</span>) <span class="hljs-comment">// → &quot;CVE-2024-1234&quot;</span></code></pre><hr>
+<p><strong><code>countCVEs(cveString)</code></strong></p>
+<p>Count valid CVEs in string.</p>
+<p><strong>Returns:</strong> Number of valid CVEs</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">countCVEs</span>(<span class="hljs-string">&quot;CVE-2024-1234, CVE-2024-5678&quot;</span>) <span class="hljs-comment">// → 2</span>
+<span class="hljs-title function_">countCVEs</span>(<span class="hljs-string">&quot;CVE-2024-1234, invalid, CVE-2024-5678&quot;</span>) <span class="hljs-comment">// → 2</span>
+<span class="hljs-title function_">countCVEs</span>(<span class="hljs-string">&quot;invalid&quot;</span>) <span class="hljs-comment">// → 0</span></code></pre><hr>
+<h4>Link Creation Functions</h4><p><strong><code>createCVELink(cveId, options = {})</code></strong></p>
+<p>Create single CVE link with event isolation.</p>
+<p><strong>Options:</strong></p>
+<ul>
+<li><code>classes</code> - CSS classes for link</li>
+<li><code>target</code> - Link target (<code>_blank</code> default)</li>
+<li><code>dataAttributes</code> - Additional data attributes</li>
+</ul>
+<p><strong>Returns:</strong> HTML link element (string)</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">createCVELink</span>(<span class="hljs-string">&quot;CVE-2024-1234&quot;</span>)
+<span class="hljs-comment">// → &#x27;&lt;a href=&quot;#&quot; class=&quot;cve-link&quot; data-cve=&quot;CVE-2024-1234&quot; target=&quot;_blank&quot;&gt;CVE-2024-1234&lt;/a&gt;&#x27;</span>
+
+<span class="hljs-title function_">createCVELink</span>(<span class="hljs-string">&quot;CVE-2024-1234&quot;</span>, {
+    <span class="hljs-attr">classes</span>: <span class="hljs-string">&quot;btn btn-sm&quot;</span>,
+    <span class="hljs-attr">dataAttributes</span>: { <span class="hljs-attr">severity</span>: <span class="hljs-string">&quot;critical&quot;</span> }
+})
+<span class="hljs-comment">// → &#x27;&lt;a href=&quot;#&quot; class=&quot;btn btn-sm cve-link&quot; data-cve=&quot;CVE-2024-1234&quot; data-severity=&quot;critical&quot; target=&quot;_blank&quot;&gt;CVE-2024-1234&lt;/a&gt;&#x27;</span></code></pre><hr>
+<p><strong><code>createMultipleCVELinks(cveString, options = {})</code></strong></p>
+<p>Create multiple CVE links with separator.</p>
+<p><strong>Options:</strong></p>
+<ul>
+<li><code>separator</code> - HTML separator between links (default: <code>&quot;, &quot;</code>)</li>
+<li><code>classes</code> - CSS classes</li>
+<li><code>limit</code> - Maximum links to show (default: all)</li>
+</ul>
+<p><strong>Returns:</strong> HTML string with multiple links</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">createMultipleCVELinks</span>(<span class="hljs-string">&quot;CVE-2024-1234, CVE-2024-5678&quot;</span>)
+<span class="hljs-comment">// → &#x27;&lt;a href=&quot;#&quot; class=&quot;cve-link&quot; data-cve=&quot;CVE-2024-1234&quot;&gt;CVE-2024-1234&lt;/a&gt;, &lt;a href=&quot;#&quot; class=&quot;cve-link&quot; data-cve=&quot;CVE-2024-5678&quot;&gt;CVE-2024-5678&lt;/a&gt;&#x27;</span>
+
+<span class="hljs-title function_">createMultipleCVELinks</span>(<span class="hljs-string">&quot;CVE-2024-1234, CVE-2024-5678&quot;</span>, {
+    <span class="hljs-attr">separator</span>: <span class="hljs-string">&quot; | &quot;</span>,
+    <span class="hljs-attr">limit</span>: <span class="hljs-number">1</span>
+})
+<span class="hljs-comment">// → &#x27;&lt;a href=&quot;#&quot; class=&quot;cve-link&quot; data-cve=&quot;CVE-2024-1234&quot;&gt;CVE-2024-1234&lt;/a&gt; &lt;span class=&quot;cve-more&quot;&gt;+1 more&lt;/span&gt;&#x27;</span></code></pre><hr>
+<p><strong><code>createCVESummary(cveString, options = {})</code></strong></p>
+<p>Create &quot;CVE-XXX +N more&quot; summary display.</p>
+<p><strong>Options:</strong></p>
+<ul>
+<li><code>maxVisible</code> - Maximum CVEs to show (default: 1)</li>
+<li><code>classes</code> - CSS classes</li>
+<li><code>showTooltip</code> - Show full list on hover (default: <code>true</code>)</li>
+</ul>
+<p><strong>Returns:</strong> HTML summary string</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">createCVESummary</span>(<span class="hljs-string">&quot;CVE-2024-1234, CVE-2024-5678, CVE-2024-9999&quot;</span>)
+<span class="hljs-comment">// → &#x27;&lt;a href=&quot;#&quot; class=&quot;cve-link&quot; data-cve=&quot;CVE-2024-1234&quot;&gt;CVE-2024-1234&lt;/a&gt; &lt;span class=&quot;cve-more&quot; title=&quot;CVE-2024-5678, CVE-2024-9999&quot;&gt;+2 more&lt;/span&gt;&#x27;</span></code></pre><hr>
+<h4>Event Handling Functions</h4><p><strong><code>attachCVEEventHandlers(container, lookupHandler, options = {})</code></strong></p>
+<p>Event delegation for CVE clicks (prevents event handler duplication).</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>container</code> - DOM element to attach listeners to</li>
+<li><code>lookupHandler</code> - Callback function <code>(cveId) =&gt; void</code></li>
+<li><code>options</code> - Optional configuration</li>
+</ul>
+<p><strong>Returns:</strong> <code>void</code></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> container = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelector</span>(<span class="hljs-string">&quot;.vulnerability-grid&quot;</span>);
+
+<span class="hljs-title function_">attachCVEEventHandlers</span>(container, <span class="hljs-function">(<span class="hljs-params">cveId</span>) =&gt;</span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`CVE clicked: <span class="hljs-subst">${cveId}</span>`</span>);
+    <span class="hljs-comment">// Open KEV modal, fetch CVE details, etc.</span>
+});</code></pre><p><strong>Event Isolation:</strong> Uses event delegation to prevent duplicate handlers on dynamic content.</p>
+<hr>
+<p><strong><code>removeCVEEventHandlers(container)</code></strong></p>
+<p>Cleanup event handlers.</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">removeCVEEventHandlers</span>(container);</code></pre><hr>
+<p><strong>Used By:</strong> vulnerability-grid.js, vulnerability-details-modal.js, vulnerability-cards.js, all CVE display components</p>
+<hr>
+<h3>crypto-utils.js - Secure ID Generation</h3><p><strong>Location:</strong> <code>app/public/scripts/shared/crypto-utils.js</code><br><strong>Since:</strong> v1.0.31<br><strong>Purpose:</strong> Cryptographically secure random ID generation with HTTPS/HTTP fallback</p>
+<h4>Key Function</h4><p><strong><code>generateSecureId(prefix = &quot;&quot;, randomBytes = 8)</code></strong></p>
+<p>Generate unique IDs with Web Crypto API or timestamp fallback.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>prefix</code> - Optional prefix string</li>
+<li><code>randomBytes</code> - Number of random bytes (default: 8)</li>
+</ul>
+<p><strong>Returns:</strong> Unique ID string (prefix + base36 encoded random bytes)</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { generateSecureId } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./crypto-utils.js&#x27;</span>;
+
+<span class="hljs-comment">// HTTPS context (secure)</span>
+<span class="hljs-title function_">generateSecureId</span>(<span class="hljs-string">&quot;toast&quot;</span>)
+<span class="hljs-comment">// → &quot;toast-a3f2c1d4b5e6f7&quot;</span>
+
+<span class="hljs-title function_">generateSecureId</span>(<span class="hljs-string">&quot;modal&quot;</span>, <span class="hljs-number">16</span>)
+<span class="hljs-comment">// → &quot;modal-a3f2c1d4b5e6f7a8b9c0d1e2f3a4b5c6&quot;</span>
+
+<span class="hljs-comment">// HTTP context (fallback to timestamp)</span>
+<span class="hljs-title function_">generateSecureId</span>(<span class="hljs-string">&quot;session&quot;</span>)
+<span class="hljs-comment">// → &quot;session-1672531200000-123.456&quot;</span></code></pre><p><strong>Security:</strong></p>
+<ul>
+<li><strong>HTTPS</strong>: Uses <code>window.crypto.getRandomValues()</code> for cryptographically secure random IDs</li>
+<li><strong>HTTP fallback</strong>: Uses <code>Date.now() + performance.now()</code> for non-secure contexts</li>
+<li><strong>Compact encoding</strong>: Base36 encoding for shorter IDs</li>
+</ul>
+<hr>
+<p><strong>Used By:</strong> toast-manager.js, progress-modal.js, modal-monitoring.js, all dynamic ID generation</p>
+<hr>
+<h3>validation-utils.js - Frontend Validation Library</h3><p><strong>Location:</strong> <code>app/public/scripts/validation-utils.js</code><br><strong>Since:</strong> v1.0.41<br><strong>Purpose:</strong> Comprehensive validation and error handling for CSV imports and forms</p>
+<h4>Validation Functions</h4><p><strong><code>isValidCVE(cve)</code></strong></p>
+<p>CVE format validation: <code>CVE-YYYY-NNNN+</code></p>
+<p><strong>Returns:</strong> <code>true</code> if valid, <code>false</code> otherwise</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">isValidCVE</span>(<span class="hljs-string">&quot;CVE-2024-1234&quot;</span>) <span class="hljs-comment">// → true</span>
+<span class="hljs-title function_">isValidCVE</span>(<span class="hljs-string">&quot;CVE-2024-12345678&quot;</span>) <span class="hljs-comment">// → true</span>
+<span class="hljs-title function_">isValidCVE</span>(<span class="hljs-string">&quot;CVE-24-1234&quot;</span>) <span class="hljs-comment">// → false (invalid year)</span></code></pre><hr>
+<p><strong><code>isValidIP(ip)</code></strong></p>
+<p>IPv4 and IPv6 validation.</p>
+<p><strong>Returns:</strong> <code>true</code> if valid IP, <code>false</code> otherwise</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">isValidIP</span>(<span class="hljs-string">&quot;192.168.1.1&quot;</span>) <span class="hljs-comment">// → true (IPv4)</span>
+<span class="hljs-title function_">isValidIP</span>(<span class="hljs-string">&quot;2001:db8::1&quot;</span>) <span class="hljs-comment">// → true (IPv6)</span>
+<span class="hljs-title function_">isValidIP</span>(<span class="hljs-string">&quot;256.1.1.1&quot;</span>) <span class="hljs-comment">// → false (invalid IPv4)</span></code></pre><hr>
+<p><strong><code>isValidVPR(score)</code></strong></p>
+<p>VPR score validation (0.0-10.0).</p>
+<p><strong>Returns:</strong> <code>true</code> if valid VPR score, <code>false</code> otherwise</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">isValidVPR</span>(<span class="hljs-number">9.2</span>) <span class="hljs-comment">// → true</span>
+<span class="hljs-title function_">isValidVPR</span>(<span class="hljs-string">&quot;9.2&quot;</span>) <span class="hljs-comment">// → true (string coerced to number)</span>
+<span class="hljs-title function_">isValidVPR</span>(<span class="hljs-number">10.5</span>) <span class="hljs-comment">// → false (out of range)</span>
+<span class="hljs-title function_">isValidVPR</span>(-<span class="hljs-number">1</span>) <span class="hljs-comment">// → false (negative)</span></code></pre><hr>
+<p><strong><code>normalizeDate(dateInput)</code></strong></p>
+<p>Normalize dates to ISO 8601 format (YYYY-MM-DD).</p>
+<p><strong>Supported Formats:</strong></p>
+<ul>
+<li>ISO 8601 (<code>2024-01-15T10:30:00Z</code>)</li>
+<li>MM/DD/YYYY (<code>01/15/2024</code>)</li>
+<li>DD/MM/YYYY (<code>15/01/2024</code>)</li>
+<li>YYYY-MM-DD (<code>2024-01-15</code>)</li>
+<li>Unix timestamp (milliseconds)</li>
+</ul>
+<p><strong>Returns:</strong> ISO date string or <code>null</code></p>
+<pre><code class="language-javascript"><span class="hljs-title function_">normalizeDate</span>(<span class="hljs-string">&quot;2024-01-15T10:30:00Z&quot;</span>) <span class="hljs-comment">// → &quot;2024-01-15&quot;</span>
+<span class="hljs-title function_">normalizeDate</span>(<span class="hljs-string">&quot;01/15/2024&quot;</span>) <span class="hljs-comment">// → &quot;2024-01-15&quot;</span>
+<span class="hljs-title function_">normalizeDate</span>(<span class="hljs-string">&quot;15/01/2024&quot;</span>) <span class="hljs-comment">// → &quot;2024-01-15&quot;</span>
+<span class="hljs-title function_">normalizeDate</span>(<span class="hljs-number">1672531200000</span>) <span class="hljs-comment">// → &quot;2024-01-15&quot;</span>
+<span class="hljs-title function_">normalizeDate</span>(<span class="hljs-string">&quot;invalid&quot;</span>) <span class="hljs-comment">// → null</span></code></pre><hr>
+<p><strong><code>isValidHostname(hostname)</code></strong></p>
+<p>DNS hostname validation.</p>
+<p><strong>Returns:</strong> <code>true</code> if valid hostname, <code>false</code> otherwise</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">isValidHostname</span>(<span class="hljs-string">&quot;fw-01.corp.local&quot;</span>) <span class="hljs-comment">// → true</span>
+<span class="hljs-title function_">isValidHostname</span>(<span class="hljs-string">&quot;server123&quot;</span>) <span class="hljs-comment">// → true</span>
+<span class="hljs-title function_">isValidHostname</span>(<span class="hljs-string">&quot;invalid..hostname&quot;</span>) <span class="hljs-comment">// → false</span></code></pre><hr>
+<p><strong><code>isValidSeverity(severity)</code></strong></p>
+<p>Severity level validation.</p>
+<p><strong>Valid Values:</strong> <code>&quot;critical&quot;</code>, <code>&quot;high&quot;</code>, <code>&quot;medium&quot;</code>, <code>&quot;low&quot;</code>, <code>&quot;info&quot;</code></p>
+<p><strong>Returns:</strong> <code>true</code> if valid severity, <code>false</code> otherwise</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">isValidSeverity</span>(<span class="hljs-string">&quot;critical&quot;</span>) <span class="hljs-comment">// → true</span>
+<span class="hljs-title function_">isValidSeverity</span>(<span class="hljs-string">&quot;high&quot;</span>) <span class="hljs-comment">// → true</span>
+<span class="hljs-title function_">isValidSeverity</span>(<span class="hljs-string">&quot;invalid&quot;</span>) <span class="hljs-comment">// → false</span></code></pre><hr>
+<h4>Error Handling</h4><p><strong><code>AppError</code> Class</strong></p>
+<p>Custom error class with status codes and operational flags.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">AppError</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_ inherited__">Error</span> {
+    <span class="hljs-title function_">constructor</span>(<span class="hljs-params">message, statusCode = <span class="hljs-number">500</span>, isOperational = <span class="hljs-literal">true</span></span>) {
+        <span class="hljs-variable language_">super</span>(message);
+        <span class="hljs-variable language_">this</span>.<span class="hljs-property">statusCode</span> = statusCode;
+        <span class="hljs-variable language_">this</span>.<span class="hljs-property">isOperational</span> = isOperational;
+    }
+}
+
+<span class="hljs-comment">// Usage</span>
+<span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">AppError</span>(<span class="hljs-string">&quot;Invalid CSV format&quot;</span>, <span class="hljs-number">400</span>);</code></pre><hr>
+<p><strong><code>formatApiError(err)</code></strong></p>
+<p>Format errors for consistent API responses.</p>
+<p><strong>Returns:</strong> Formatted error object</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">formatApiError</span>(err)
+<span class="hljs-comment">// → {</span>
+<span class="hljs-comment">//     error: &quot;Invalid CSV format&quot;,</span>
+<span class="hljs-comment">//     statusCode: 400,</span>
+<span class="hljs-comment">//     timestamp: &quot;2024-01-15T10:30:00Z&quot;</span>
+<span class="hljs-comment">//   }</span></code></pre><hr>
+<p><strong><code>log(level, message, data)</code></strong></p>
+<p>Simple logging utility.</p>
+<p><strong>Levels:</strong> <code>&quot;info&quot;</code>, <code>&quot;warn&quot;</code>, <code>&quot;error&quot;</code>, <code>&quot;debug&quot;</code></p>
+<pre><code class="language-javascript"><span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;info&quot;</span>, <span class="hljs-string">&quot;Import started&quot;</span>, { <span class="hljs-attr">filename</span>: <span class="hljs-string">&quot;data.csv&quot;</span> });
+<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;error&quot;</span>, <span class="hljs-string">&quot;Import failed&quot;</span>, { <span class="hljs-attr">error</span>: err.<span class="hljs-property">message</span> });</code></pre><hr>
+<p><strong><code>errorMessages</code> Object</strong></p>
+<p>User-friendly error templates.</p>
+<pre><code class="language-javascript">errorMessages.<span class="hljs-property">csv</span>.<span class="hljs-property">invalidFormat</span>     <span class="hljs-comment">// &quot;Invalid CSV format&quot;</span>
+errorMessages.<span class="hljs-property">csv</span>.<span class="hljs-property">missingColumns</span>    <span class="hljs-comment">// &quot;Missing required columns&quot;</span>
+errorMessages.<span class="hljs-property">db</span>.<span class="hljs-property">connectionFailed</span>   <span class="hljs-comment">// &quot;Database connection failed&quot;</span>
+errorMessages.<span class="hljs-property">api</span>.<span class="hljs-property">timeout</span>           <span class="hljs-comment">// &quot;Request timeout&quot;</span></code></pre><hr>
+<h4>Integration Wrappers</h4><p><strong><code>validateCsvRow(row, rowIndex)</code></strong></p>
+<p>Pipeline function for CSV row validation.</p>
+<p><strong>Returns:</strong> <code>{ valid: boolean, errors: Array&lt;string&gt; }</code></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> result = <span class="hljs-title function_">validateCsvRow</span>(row, <span class="hljs-number">5</span>);
+<span class="hljs-comment">// → {</span>
+<span class="hljs-comment">//     valid: false,</span>
+<span class="hljs-comment">//     errors: [&quot;Invalid CVE format at row 5&quot;, &quot;Missing required field: hostname&quot;]</span>
+<span class="hljs-comment">//   }</span></code></pre><hr>
+<p><strong><code>handleDbOperation(dbOperation)</code></strong></p>
+<p>Async wrapper for database operations (returns <code>[data, error]</code> tuple).</p>
+<p><strong>Returns:</strong> <code>[data, null]</code> on success, <code>[null, error]</code> on failure</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> [data, error] = <span class="hljs-keyword">await</span> <span class="hljs-title function_">handleDbOperation</span>(
+    db.<span class="hljs-title function_">prepare</span>(<span class="hljs-string">&quot;SELECT * FROM vulnerabilities&quot;</span>).<span class="hljs-title function_">all</span>()
+);
+
+<span class="hljs-keyword">if</span> (error) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&quot;Database error:&quot;</span>, error);
+    <span class="hljs-keyword">return</span>;
+}
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Data:&quot;</span>, data);</code></pre><hr>
+<p><strong>Used By:</strong> All frontend forms, CSV import validation, API error handling</p>
+<hr>
+<h2 id="frontend-theme">Frontend Theme System</h2><h3>theme-config.js - Theme Configuration Module</h3><p><strong>Location:</strong> <code>app/public/scripts/shared/theme-config.js</code><br><strong>Since:</strong> v1.0.40 (Theme architecture)<br><strong>Purpose:</strong> Single source of truth for all theme parameters (CSS, AG-Grid, ApexCharts)</p>
+<h4>Exported Configuration</h4><p><strong><code>COLOR_PALETTE</code></strong></p>
+<p>Navy/light color schemes with semantic colors.</p>
+<pre><code class="language-javascript"><span class="hljs-variable constant_">COLOR_PALETTE</span>.<span class="hljs-property">navy</span>.<span class="hljs-property">primary</span>       <span class="hljs-comment">// &quot;#1a237e&quot;</span>
+<span class="hljs-variable constant_">COLOR_PALETTE</span>.<span class="hljs-property">navy</span>.<span class="hljs-property">secondary</span>     <span class="hljs-comment">// &quot;#283593&quot;</span>
+<span class="hljs-variable constant_">COLOR_PALETTE</span>.<span class="hljs-property">navy</span>.<span class="hljs-property">background</span>    <span class="hljs-comment">// &quot;#0a0e27&quot;</span>
+<span class="hljs-variable constant_">COLOR_PALETTE</span>.<span class="hljs-property">light</span>.<span class="hljs-property">primary</span>      <span class="hljs-comment">// &quot;#1976d2&quot;</span>
+<span class="hljs-variable constant_">COLOR_PALETTE</span>.<span class="hljs-property">light</span>.<span class="hljs-property">background</span>   <span class="hljs-comment">// &quot;#ffffff&quot;</span></code></pre><hr>
+<p><strong><code>TYPOGRAPHY</code></strong></p>
+<p>Font families, sizes, weights.</p>
+<pre><code class="language-javascript"><span class="hljs-variable constant_">TYPOGRAPHY</span>.<span class="hljs-property">fontFamily</span>           <span class="hljs-comment">// &quot;Inter, system-ui, sans-serif&quot;</span>
+<span class="hljs-variable constant_">TYPOGRAPHY</span>.<span class="hljs-property">monoFamily</span>           <span class="hljs-comment">// &quot;Fira Code, monospace&quot;</span>
+<span class="hljs-variable constant_">TYPOGRAPHY</span>.<span class="hljs-property">sizes</span>.<span class="hljs-property">xs</span>             <span class="hljs-comment">// &quot;0.75rem&quot;</span>
+<span class="hljs-variable constant_">TYPOGRAPHY</span>.<span class="hljs-property">sizes</span>.<span class="hljs-property">base</span>           <span class="hljs-comment">// &quot;1rem&quot;</span>
+<span class="hljs-variable constant_">TYPOGRAPHY</span>.<span class="hljs-property">weights</span>.<span class="hljs-property">normal</span>       <span class="hljs-comment">// 400</span>
+<span class="hljs-variable constant_">TYPOGRAPHY</span>.<span class="hljs-property">weights</span>.<span class="hljs-property">bold</span>         <span class="hljs-comment">// 700</span></code></pre><hr>
+<p><strong><code>SPACING</code></strong></p>
+<p>Spacing scale (xs → 3xl).</p>
+<pre><code class="language-javascript"><span class="hljs-variable constant_">SPACING</span>.<span class="hljs-property">xs</span>    <span class="hljs-comment">// &quot;0.25rem&quot;</span>
+<span class="hljs-variable constant_">SPACING</span>.<span class="hljs-property">sm</span>    <span class="hljs-comment">// &quot;0.5rem&quot;</span>
+<span class="hljs-variable constant_">SPACING</span>.<span class="hljs-property">md</span>    <span class="hljs-comment">// &quot;1rem&quot;</span>
+<span class="hljs-variable constant_">SPACING</span>.<span class="hljs-property">lg</span>    <span class="hljs-comment">// &quot;1.5rem&quot;</span>
+<span class="hljs-variable constant_">SPACING</span>.<span class="hljs-property">xl</span>    <span class="hljs-comment">// &quot;2rem&quot;</span>
+<span class="hljs-variable constant_">SPACING</span>[<span class="hljs-string">&#x27;2xl&#x27;</span>] <span class="hljs-comment">// &quot;3rem&quot;</span>
+<span class="hljs-variable constant_">SPACING</span>[<span class="hljs-string">&#x27;3xl&#x27;</span>] <span class="hljs-comment">// &quot;4rem&quot;</span></code></pre><hr>
+<p><strong><code>SHADOWS</code></strong></p>
+<p>Shadow definitions for light/dark themes.</p>
+<pre><code class="language-javascript"><span class="hljs-variable constant_">SHADOWS</span>.<span class="hljs-property">light</span>.<span class="hljs-property">sm</span>    <span class="hljs-comment">// &quot;0 1px 2px rgba(0,0,0,0.05)&quot;</span>
+<span class="hljs-variable constant_">SHADOWS</span>.<span class="hljs-property">dark</span>.<span class="hljs-property">sm</span>     <span class="hljs-comment">// &quot;0 1px 2px rgba(0,0,0,0.3)&quot;</span></code></pre><hr>
+<p><strong><code>AG_GRID_THEMES</code></strong></p>
+<p>AG-Grid Quartz theme parameters.</p>
+<pre><code class="language-javascript"><span class="hljs-variable constant_">AG_GRID_THEMES</span>.<span class="hljs-property">light</span>.<span class="hljs-property">accentColor</span>      <span class="hljs-comment">// &quot;#1976d2&quot;</span>
+<span class="hljs-variable constant_">AG_GRID_THEMES</span>.<span class="hljs-property">dark</span>.<span class="hljs-property">backgroundColor</span>   <span class="hljs-comment">// &quot;#0a0e27&quot;</span>
+<span class="hljs-variable constant_">AG_GRID_THEMES</span>.<span class="hljs-property">dark</span>.<span class="hljs-property">foregroundColor</span>   <span class="hljs-comment">// &quot;#e0e0e0&quot;</span></code></pre><hr>
+<p><strong><code>APEX_CHARTS_THEMES</code></strong></p>
+<p>ApexCharts theme configuration.</p>
+<pre><code class="language-javascript"><span class="hljs-variable constant_">APEX_CHARTS_THEMES</span>.<span class="hljs-property">light</span>.<span class="hljs-property">mode</span>         <span class="hljs-comment">// &quot;light&quot;</span>
+<span class="hljs-variable constant_">APEX_CHARTS_THEMES</span>.<span class="hljs-property">light</span>.<span class="hljs-property">palette</span>      <span class="hljs-comment">// &quot;palette1&quot;</span>
+<span class="hljs-variable constant_">APEX_CHARTS_THEMES</span>.<span class="hljs-property">dark</span>.<span class="hljs-property">mode</span>          <span class="hljs-comment">// &quot;dark&quot;</span></code></pre><hr>
+<p><strong><code>CSS_VARIABLES</code></strong></p>
+<p>CSS custom property mappings.</p>
+<pre><code class="language-javascript"><span class="hljs-variable constant_">CSS_VARIABLES</span>.<span class="hljs-property">light</span>[<span class="hljs-string">&#x27;--primary-color&#x27;</span>]     <span class="hljs-comment">// &quot;#1976d2&quot;</span>
+<span class="hljs-variable constant_">CSS_VARIABLES</span>.<span class="hljs-property">dark</span>[<span class="hljs-string">&#x27;--background-color&#x27;</span>]   <span class="hljs-comment">// &quot;#0a0e27&quot;</span></code></pre><hr>
+<h4>Key Methods</h4><p><strong><code>THEME_CONFIG.getTheme(theme)</code></strong></p>
+<p>Get complete theme configuration.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>theme</code> - <code>&quot;light&quot;</code> or <code>&quot;dark&quot;</code></li>
+</ul>
+<p><strong>Returns:</strong> Complete theme object</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> theme = <span class="hljs-variable constant_">THEME_CONFIG</span>.<span class="hljs-title function_">getTheme</span>(<span class="hljs-string">&quot;dark&quot;</span>);
+<span class="hljs-comment">// → {</span>
+<span class="hljs-comment">//     colors: { ... },</span>
+<span class="hljs-comment">//     typography: { ... },</span>
+<span class="hljs-comment">//     spacing: { ... },</span>
+<span class="hljs-comment">//     shadows: { ... }</span>
+<span class="hljs-comment">//   }</span></code></pre><hr>
+<p><strong><code>THEME_CONFIG.getAgGridTheme(isDark)</code></strong></p>
+<p>Get AG-Grid theme params.</p>
+<p><strong>Returns:</strong> AG-Grid theme parameters object</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> gridTheme = <span class="hljs-variable constant_">THEME_CONFIG</span>.<span class="hljs-title function_">getAgGridTheme</span>(<span class="hljs-literal">true</span>); <span class="hljs-comment">// dark mode</span></code></pre><hr>
+<p><strong><code>THEME_CONFIG.getApexChartsTheme(isDark)</code></strong></p>
+<p>Get ApexCharts theme.</p>
+<p><strong>Returns:</strong> ApexCharts theme configuration</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> chartTheme = <span class="hljs-variable constant_">THEME_CONFIG</span>.<span class="hljs-title function_">getApexChartsTheme</span>(<span class="hljs-literal">false</span>); <span class="hljs-comment">// light mode</span></code></pre><hr>
+<p><strong><code>THEME_CONFIG.getCssVariables(isDark)</code></strong></p>
+<p>Get CSS variables for theme.</p>
+<p><strong>Returns:</strong> CSS variable object</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> vars = <span class="hljs-variable constant_">THEME_CONFIG</span>.<span class="hljs-title function_">getCssVariables</span>(<span class="hljs-literal">true</span>);
+<span class="hljs-comment">// → {</span>
+<span class="hljs-comment">//     &#x27;--primary-color&#x27;: &#x27;#3b82f6&#x27;,</span>
+<span class="hljs-comment">//     &#x27;--background-color&#x27;: &#x27;#0a0e27&#x27;,</span>
+<span class="hljs-comment">//     ...</span>
+<span class="hljs-comment">//   }</span></code></pre><hr>
+<p><strong><code>THEME_CONFIG.applyCssVariables(element, isDark)</code></strong></p>
+<p>Apply CSS variables to DOM element.</p>
+<pre><code class="language-javascript"><span class="hljs-variable constant_">THEME_CONFIG</span>.<span class="hljs-title function_">applyCssVariables</span>(<span class="hljs-variable language_">document</span>.<span class="hljs-property">documentElement</span>, <span class="hljs-literal">true</span>);
+<span class="hljs-comment">// Sets all CSS variables on &lt;html&gt; element</span></code></pre><hr>
+<p><strong>Used By:</strong> theme-controller.js, ag-grid-theme-manager.js, chart managers, all themed components</p>
+<hr>
+<h3>vulnerability-constants.js - VPR Color Constants</h3><p><strong>Location:</strong> <code>app/public/scripts/shared/vulnerability-constants.js</code><br><strong>Since:</strong> v1.0.40<br><strong>Purpose:</strong> VPR severity color definitions and utility functions</p>
+<h4>Exported Constants</h4><p><strong><code>VPR_COLORS</code></strong></p>
+<p>Complete color definitions for critical/high/medium/low (light/dark modes).</p>
+<pre><code class="language-javascript"><span class="hljs-variable constant_">VPR_COLORS</span>.<span class="hljs-property">critical</span>.<span class="hljs-property">light</span>      <span class="hljs-comment">// &quot;#dc3545&quot; (red)</span>
+<span class="hljs-variable constant_">VPR_COLORS</span>.<span class="hljs-property">critical</span>.<span class="hljs-property">dark</span>       <span class="hljs-comment">// &quot;#ef5350&quot; (lighter red)</span>
+<span class="hljs-variable constant_">VPR_COLORS</span>.<span class="hljs-property">critical</span>.<span class="hljs-property">rgb</span>        <span class="hljs-comment">// &quot;220, 53, 69&quot;</span>
+<span class="hljs-variable constant_">VPR_COLORS</span>.<span class="hljs-property">critical</span>.<span class="hljs-property">cssVar</span>     <span class="hljs-comment">// &quot;--severity-critical&quot;</span>
+<span class="hljs-variable constant_">VPR_COLORS</span>.<span class="hljs-property">critical</span>.<span class="hljs-property">textClass</span>  <span class="hljs-comment">// &quot;text-danger&quot;</span>
+<span class="hljs-variable constant_">VPR_COLORS</span>.<span class="hljs-property">critical</span>.<span class="hljs-property">bgClass</span>    <span class="hljs-comment">// &quot;bg-danger&quot;</span>
+<span class="hljs-variable constant_">VPR_COLORS</span>.<span class="hljs-property">critical</span>.<span class="hljs-property">icon</span>       <span class="hljs-comment">// &quot;fa-exclamation-circle&quot;</span>
+<span class="hljs-variable constant_">VPR_COLORS</span>.<span class="hljs-property">critical</span>.<span class="hljs-property">priority</span>   <span class="hljs-comment">// 1</span></code></pre><p><strong>Severity Levels:</strong></p>
+<ul>
+<li><code>critical</code> - Red (VPR 9.0-10.0)</li>
+<li><code>high</code> - Orange (VPR 7.0-8.9)</li>
+<li><code>medium</code> - Yellow (VPR 4.0-6.9)</li>
+<li><code>low</code> - Blue (VPR 0.1-3.9)</li>
+</ul>
+<hr>
+<h4>Key Functions</h4><p><strong><code>getVPRColors(theme)</code></strong></p>
+<p>Get severity colors array for theme.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>theme</code> - <code>&quot;light&quot;</code> or <code>&quot;dark&quot;</code></li>
+</ul>
+<p><strong>Returns:</strong> Array of color strings <code>[critical, high, medium, low]</code></p>
+<pre><code class="language-javascript"><span class="hljs-title function_">getVPRColors</span>(<span class="hljs-string">&quot;dark&quot;</span>)
+<span class="hljs-comment">// → [&quot;#ef5350&quot;, &quot;#ff9800&quot;, &quot;#fdd835&quot;, &quot;#42a5f5&quot;]</span></code></pre><hr>
+<p><strong><code>getSeverityColor(severity, theme)</code></strong></p>
+<p>Get color config for specific severity.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>severity</code> - <code>&quot;critical&quot;</code>, <code>&quot;high&quot;</code>, <code>&quot;medium&quot;</code>, or <code>&quot;low&quot;</code></li>
+<li><code>theme</code> - <code>&quot;light&quot;</code> or <code>&quot;dark&quot;</code></li>
+</ul>
+<p><strong>Returns:</strong> Color configuration object</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">getSeverityColor</span>(<span class="hljs-string">&quot;critical&quot;</span>, <span class="hljs-string">&quot;dark&quot;</span>)
+<span class="hljs-comment">// → {</span>
+<span class="hljs-comment">//     name: &quot;critical&quot;,</span>
+<span class="hljs-comment">//     light: &quot;#dc3545&quot;,</span>
+<span class="hljs-comment">//     dark: &quot;#ef5350&quot;,</span>
+<span class="hljs-comment">//     rgb: &quot;220, 53, 69&quot;,</span>
+<span class="hljs-comment">//     cssVar: &quot;--severity-critical&quot;,</span>
+<span class="hljs-comment">//     textClass: &quot;text-danger&quot;,</span>
+<span class="hljs-comment">//     bgClass: &quot;bg-danger&quot;,</span>
+<span class="hljs-comment">//     icon: &quot;fa-exclamation-circle&quot;,</span>
+<span class="hljs-comment">//     priority: 1</span>
+<span class="hljs-comment">//   }</span></code></pre><hr>
+<p><strong><code>getVPRColorsFromCSS()</code></strong></p>
+<p>Get colors from CSS custom properties (theme-aware).</p>
+<p><strong>Returns:</strong> Array of color strings from <code>--severity-*</code> CSS variables</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">getVPRColorsFromCSS</span>()
+<span class="hljs-comment">// → [&quot;#ef5350&quot;, &quot;#ff9800&quot;, &quot;#fdd835&quot;, &quot;#42a5f5&quot;]</span></code></pre><hr>
+<p><strong><code>getVPRContrastColorsFromCSS()</code></strong></p>
+<p>Get WCAG contrast-optimized colors from CSS.</p>
+<p><strong>Returns:</strong> Array of contrast colors</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">getVPRContrastColorsFromCSS</span>()
+<span class="hljs-comment">// → [&quot;#ffffff&quot;, &quot;#000000&quot;, &quot;#000000&quot;, &quot;#ffffff&quot;]</span></code></pre><hr>
+<p><strong><code>getCurrentTheme()</code></strong></p>
+<p>Get current theme from document body.</p>
+<p><strong>Returns:</strong> <code>&quot;dark&quot;</code> or <code>&quot;light&quot;</code></p>
+<pre><code class="language-javascript"><span class="hljs-title function_">getCurrentTheme</span>()
+<span class="hljs-comment">// → &quot;dark&quot; (if body has data-bs-theme=&quot;dark&quot;)</span></code></pre><hr>
+<p><strong>Used By:</strong> vulnerability-statistics.js, vulnerability-chart-manager.js, all VPR color displays</p>
+<hr>
+<h2 id="frontend-template">Frontend Template System</h2><h3>template-variables.js - Template Variable System</h3><p><strong>Location:</strong> <code>app/public/scripts/shared/template-variables.js</code><br><strong>Since:</strong> v1.0.21 (Template Editor feature)<br><strong>Purpose:</strong> Unified template variable definitions for email/ticket/vulnerability templates</p>
+<h4>Exported Object</h4><p><strong><code>window.HexTrackrTemplateVariables</code></strong></p>
+<p>Contains all template variable definitions.</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> {
+    variables,                    <span class="hljs-comment">// Array of 20 template variables</span>
+    getVariablesByCategory,       <span class="hljs-comment">// Filter by category</span>
+    getAllVariables,              <span class="hljs-comment">// Get all variables</span>
+    getRecommendedVariables       <span class="hljs-comment">// Get recommended vars for template type</span>
+} = <span class="hljs-variable language_">window</span>.<span class="hljs-property">HexTrackrTemplateVariables</span>;</code></pre><hr>
+<h4>Variable Categories</h4><p><strong>ticket</strong> (4 variables):</p>
+<ul>
+<li><code>{{XT_NUMBER}}</code> - XT ticket number</li>
+<li><code>{{HEXAGON_TICKET}}</code> - Hexagon ticket number</li>
+<li><code>{{SERVICENOW_TICKET}}</code> - ServiceNow ticket number</li>
+<li><code>{{STATUS}}</code> - Ticket status</li>
+</ul>
+<p><strong>location</strong> (2 variables):</p>
+<ul>
+<li><code>{{SITE_NAME}}</code> - Site name</li>
+<li><code>{{LOCATION}}</code> - Location details</li>
+</ul>
+<p><strong>dates</strong> (3 variables):</p>
+<ul>
+<li><code>{{DATE_SUBMITTED}}</code> - Submission date</li>
+<li><code>{{DATE_DUE}}</code> - Due date</li>
+<li><code>{{GENERATED_TIME}}</code> - Generation timestamp</li>
+</ul>
+<p><strong>devices</strong> (2 variables):</p>
+<ul>
+<li><code>{{DEVICE_LIST}}</code> - List of devices</li>
+<li><code>{{DEVICE_COUNT}}</code> - Number of devices</li>
+</ul>
+<p><strong>personnel</strong> (3 variables):</p>
+<ul>
+<li><code>{{SUPERVISOR}}</code> - Supervisor name</li>
+<li><code>{{TECHNICIAN}}</code> - Technician name</li>
+<li><code>{{GREETING}}</code> - Greeting text</li>
+</ul>
+<p><strong>content</strong> (3 variables):</p>
+<ul>
+<li><code>{{NOTES}}</code> - Additional notes</li>
+<li><code>{{VULNERABILITY_SUMMARY}}</code> - Summary text</li>
+<li><code>{{VULNERABILITY_DETAILS}}</code> - Detailed information</li>
+</ul>
+<p><strong>counts</strong> (5 variables):</p>
+<ul>
+<li><code>{{TOTAL_VULNERABILITIES}}</code> - Total vulnerability count</li>
+<li><code>{{CRITICAL_COUNT}}</code> - Critical vulnerabilities</li>
+<li><code>{{HIGH_COUNT}}</code> - High severity</li>
+<li><code>{{MEDIUM_COUNT}}</code> - Medium severity</li>
+<li><code>{{LOW_COUNT}}</code> - Low severity</li>
+</ul>
+<hr>
+<h4>Key Methods</h4><p><strong><code>getVariablesByCategory(categories)</code></strong></p>
+<p>Filter variables by category.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>categories</code> - Array of category names or single category string</li>
+</ul>
+<p><strong>Returns:</strong> Array of variable objects</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">getVariablesByCategory</span>([<span class="hljs-string">&quot;ticket&quot;</span>, <span class="hljs-string">&quot;dates&quot;</span>])
+<span class="hljs-comment">// → [</span>
+<span class="hljs-comment">//     { name: &quot;{{XT_NUMBER}}&quot;, description: &quot;...&quot;, category: &quot;ticket&quot;, required: true },</span>
+<span class="hljs-comment">//     { name: &quot;{{DATE_SUBMITTED}}&quot;, description: &quot;...&quot;, category: &quot;dates&quot;, required: false },</span>
+<span class="hljs-comment">//     ...</span>
+<span class="hljs-comment">//   ]</span>
+
+<span class="hljs-title function_">getVariablesByCategory</span>(<span class="hljs-string">&quot;content&quot;</span>)
+<span class="hljs-comment">// → [</span>
+<span class="hljs-comment">//     { name: &quot;{{NOTES}}&quot;, description: &quot;...&quot;, category: &quot;content&quot;, required: false },</span>
+<span class="hljs-comment">//     ...</span>
+<span class="hljs-comment">//   ]</span></code></pre><hr>
+<p><strong><code>getAllVariables()</code></strong></p>
+<p>Get all variables (backward compatibility).</p>
+<p><strong>Returns:</strong> Array of all 20 template variables</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">getAllVariables</span>()
+<span class="hljs-comment">// → [</span>
+<span class="hljs-comment">//     { name: &quot;{{XT_NUMBER}}&quot;, description: &quot;...&quot;, ... },</span>
+<span class="hljs-comment">//     { name: &quot;{{SITE_NAME}}&quot;, description: &quot;...&quot;, ... },</span>
+<span class="hljs-comment">//     ...</span>
+<span class="hljs-comment">//   ]</span></code></pre><hr>
+<p><strong><code>getRecommendedVariables(templateType)</code></strong></p>
+<p>Get recommended variables for template type.</p>
+<p><strong>Parameters:</strong></p>
+<ul>
+<li><code>templateType</code> - <code>&quot;ticket&quot;</code>, <code>&quot;email&quot;</code>, or <code>&quot;vulnerability&quot;</code></li>
+</ul>
+<p><strong>Returns:</strong> Array of recommended variable objects</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">getRecommendedVariables</span>(<span class="hljs-string">&quot;ticket&quot;</span>)
+<span class="hljs-comment">// → [</span>
+<span class="hljs-comment">//     { name: &quot;{{XT_NUMBER}}&quot;, ... },</span>
+<span class="hljs-comment">//     { name: &quot;{{SITE_NAME}}&quot;, ... },</span>
+<span class="hljs-comment">//     { name: &quot;{{DEVICE_LIST}}&quot;, ... },</span>
+<span class="hljs-comment">//     ...</span>
+<span class="hljs-comment">//   ]</span>
+
+<span class="hljs-title function_">getRecommendedVariables</span>(<span class="hljs-string">&quot;email&quot;</span>)
+<span class="hljs-comment">// → [</span>
+<span class="hljs-comment">//     { name: &quot;{{SUPERVISOR}}&quot;, ... },</span>
+<span class="hljs-comment">//     { name: &quot;{{VULNERABILITY_SUMMARY}}&quot;, ... },</span>
+<span class="hljs-comment">//     ...</span>
+<span class="hljs-comment">//   ]</span></code></pre><hr>
+<p><strong>Variable Object Structure</strong></p>
+<p>Each variable has:</p>
+<ul>
+<li><code>name</code> - Variable placeholder (e.g., <code>&quot;{{XT_NUMBER}}&quot;</code>)</li>
+<li><code>description</code> - Human-readable description</li>
+<li><code>required</code> - Whether variable is required for template type</li>
+<li><code>category</code> - Category name (<code>&quot;ticket&quot;</code>, <code>&quot;location&quot;</code>, etc.)</li>
+</ul>
+<pre><code class="language-javascript">{
+    <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;{{XT_NUMBER}}&quot;</span>,
+    <span class="hljs-attr">description</span>: <span class="hljs-string">&quot;XT ticket number (e.g., 0042)&quot;</span>,
+    <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attr">category</span>: <span class="hljs-string">&quot;ticket&quot;</span>
+}</code></pre><hr>
+<p><strong>Used By:</strong> template-editor.js, vulnerability-markdown-editor.js, ticket-markdown-editor.js</p>
+<hr>
+<h2 id="component-utilities">Component Utilities</h2><h3>Shared Frontend Components</h3><p>The following modules in <code>app/public/scripts/shared/</code> provide component-level utilities:</p>
+<h4>Navigation & Layout</h4><ul>
+<li><strong>header-loader.js</strong> - Dynamic header loading</li>
+<li><strong>footer-loader.js</strong> - Dynamic footer loading</li>
+<li><strong>config-loader.js</strong> - Client-side configuration loading</li>
+</ul>
+<h4>User Experience</h4><ul>
+<li><strong>pagination-controller.js</strong> - Pagination state management (HEX-112)</li>
+<li><strong>toast-manager.js</strong> - Toast notification system</li>
+<li><strong>modal-monitoring.js</strong> - Modal state tracking</li>
+</ul>
+<h4>Authentication & Preferences</h4><ul>
+<li><strong>auth-state.js</strong> - Authentication state management (session monitoring, CSRF tokens)</li>
+<li><strong>preferences-service.js</strong> - User preference persistence (IndexedDB caching, 3-tier cache)</li>
+<li><strong>preferences-sync.js</strong> - Cross-tab preference synchronization</li>
+</ul>
+<h4>Theme Management</h4><ul>
+<li><strong>theme-controller.js</strong> - Theme switching logic</li>
+<li><strong>ag-grid-theme-manager.js</strong> - AG-Grid theme synchronization (cross-tab sync)</li>
+<li><strong>ag-grid-responsive-config.js</strong> - AG-Grid responsive breakpoints</li>
+</ul>
+<h4>WebSocket</h4><ul>
+<li><strong>websocket-client.js</strong> - WebSocket connection management</li>
+</ul>
+<hr>
+<h2 id="database-scripts">Database Scripts</h2><h3>Schema & Migration Scripts</h3><p><strong><code>app/public/scripts/init-database.js</code></strong></p>
+<p>Database schema initialization (<strong>DESTRUCTIVE</strong> - drops all tables).</p>
+<p><strong>⚠️ WARNING</strong>: This script destroys ALL data. Only use for fresh installations.</p>
+<pre><code class="language-bash">npm run init-db</code></pre><hr>
+<p><strong><code>app/public/scripts/fix-markdown.js</code></strong></p>
+<p>One-time markdown field migration (legacy).</p>
+<hr>
+<p><strong><code>app/public/scripts/fix-truncated-cves.js</code></strong></p>
+<p>One-time CVE truncation fix (legacy).</p>
+<hr>
+<p><strong><code>app/public/scripts/split-changelog.js</code></strong></p>
+<p>Changelog file splitting utility.</p>
+<hr>
+<h2 id="development-tools">Development Tools</h2><h3>version-manager.js - Version Management CLI</h3><p><strong>Location:</strong> <code>app/public/scripts/version-manager.js</code><br><strong>Since:</strong> v1.0.0<br><strong>Purpose:</strong> Automated version number updates across all application files</p>
+<h4>Key Functions</h4><p><strong><code>getCurrentVersion()</code></strong></p>
+<p>Get version from package.json.</p>
+<p><strong>Returns:</strong> Version string (e.g., <code>&quot;1.0.54&quot;</code>)</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> version = <span class="hljs-title function_">getCurrentVersion</span>();
+<span class="hljs-comment">// → &quot;1.0.54&quot;</span></code></pre><hr>
+<p><strong><code>updateVersion(newVersion)</code></strong></p>
+<p>Update version across 6+ files.</p>
+<p><strong>Updated Files:</strong></p>
+<ul>
+<li><code>package.json</code></li>
+<li><code>tickets.html</code> (version span)</li>
+<li><code>vulnerabilities.html</code> (version span)</li>
+<li><code>scripts/shared/footer.html</code> (badge URL)</li>
+<li><code>CLAUDE.md</code> (version header)</li>
+<li><code>hextrackr-specs/roadmap.json</code> (metadata)</li>
+</ul>
+<p><strong>Security:</strong> Uses <code>PathValidator</code> class for secure file operations.</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">updateVersion</span>(<span class="hljs-string">&quot;1.0.55&quot;</span>);
+<span class="hljs-comment">// Updates all files with new version</span></code></pre><hr>
+<p><strong><code>validateVersion(version)</code></strong></p>
+<p>Validate semver format (X.Y.Z).</p>
+<p><strong>Returns:</strong> <code>true</code> if valid semver, <code>false</code> otherwise</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">validateVersion</span>(<span class="hljs-string">&quot;1.0.54&quot;</span>) <span class="hljs-comment">// → true</span>
+<span class="hljs-title function_">validateVersion</span>(<span class="hljs-string">&quot;1.0&quot;</span>) <span class="hljs-comment">// → false (incomplete)</span>
+<span class="hljs-title function_">validateVersion</span>(<span class="hljs-string">&quot;v1.0.54&quot;</span>) <span class="hljs-comment">// → false (no prefix)</span></code></pre><hr>
+<p><strong>CLI Usage:</strong></p>
+<pre><code class="language-bash">node app/public/scripts/version-manager.js 1.0.55
+<span class="hljs-comment"># Updates all files to version 1.0.55</span></code></pre><hr>
+<h2>Summary</h2><p>HexTrackr&#39;s utility layer provides 31+ specialized modules across backend and frontend:</p>
+<ul>
+<li><strong>Backend Core</strong> (6 modules): 40+ functions for vulnerability processing, security, progress tracking</li>
+<li><strong>Frontend Validation</strong> (3 modules): 19+ functions for CVE processing, validation, secure ID generation</li>
+<li><strong>Frontend Theme System</strong> (2 modules): Comprehensive theme management with AG-Grid/ApexCharts integration</li>
+<li><strong>Frontend Template System</strong> (1 module): 20 template variables with category-based filtering</li>
+<li><strong>Component Utilities</strong> (13 modules): Shared frontend components for navigation, UX, auth, theme management</li>
+<li><strong>Database Scripts</strong> (4 modules): Schema initialization and migrations</li>
+<li><strong>Development Tools</strong> (1 module): Version management automation</li>
+</ul>
+<p><strong>Key Patterns:</strong></p>
+<ul>
+<li><strong>Security-first</strong>: PathValidator prevents directory traversal attacks</li>
+<li><strong>Real-time updates</strong>: ProgressTracker with throttled WebSocket events</li>
+<li><strong>Multi-tier deduplication</strong>: 5-tier confidence scoring for vulnerability imports</li>
+<li><strong>Vendor normalization</strong>: Dynamic pattern-based vendor classification (CISCO, Palo Alto, Other)</li>
+<li><strong>CVE processing</strong>: 12 functions for parsing, validation, link creation, event handling</li>
+<li><strong>Theme consistency</strong>: Centralized theme configuration for CSS, AG-Grid, ApexCharts</li>
+<li><strong>Template variables</strong>: 20 variables across 6 categories with type-based recommendations</li>
+</ul>
+<hr>
+<p><strong>Last Updated:</strong> 2025-10-09<br><strong>Version:</strong> 1.0.54</p>
+
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be
              fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->

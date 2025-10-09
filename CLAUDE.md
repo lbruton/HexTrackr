@@ -55,6 +55,149 @@ docker-compose logs -f   # Follow container logs
 docker-compose restart   # Restart after code changes
 ```
 
+## Changelog & Version Management
+
+**Current Version**: v1.0.54 (tracked in `app/public/docs-source/ROADMAP.md`)
+
+### Changelog Structure
+
+HexTrackr uses a **modular changelog system** with individual files per version:
+
+```text
+app/public/docs-source/changelog/
+├── index.md              # Changelog landing page with navigation
+└── versions/             # Individual version files
+    ├── 1.0.54.md        # Latest version (current)
+    ├── 1.0.53.md
+    ├── 1.0.52.md
+    └── ...
+```
+
+### Creating a New Changelog Entry
+
+When creating a new version, follow this process:
+
+**1. Create Version File**
+
+Create `app/public/docs-source/changelog/versions/X.Y.Z.md` using this template:
+
+```markdown
+# Version X.Y.Z
+
+---
+
+## [X.Y.Z]
+
+### Added
+
+#### Feature Name (Linear Issue IDs) - YYYY-MM-DD
+
+**Description**: Brief summary of what was added.
+
+**Key Features**:
+- Feature 1 details
+- Feature 2 details
+- Feature 3 details
+
+**Files Modified**:
+- `path/to/file1.js`: Description of changes
+- `path/to/file2.js`: Description of changes
+
+**Validation**:
+- ✅ Test case 1 passed
+- ✅ Test case 2 passed
+
+**Issues**:
+- [HEX-XXX](https://linear.app/hextrackr/issue/HEX-XXX) - Issue title
+
+### Fixed
+
+- Fixed bug 1 description
+- Fixed bug 2 description
+- Fixed bug 3 description
+
+### Changed
+
+- Changed behavior 1
+- Changed behavior 2
+
+### Deprecated
+
+- Deprecated feature 1 (use X instead)
+
+### Removed
+
+- Removed obsolete feature 1
+
+### Security
+
+- Security improvement 1
+- Security improvement 2
+```
+
+**2. Update Changelog Index**
+
+Update `app/public/docs-source/changelog/index.md`:
+
+```markdown
+**Current Version**: [vX.Y.Z](#changelog/versions/X.Y.Z)
+
+## Recent Releases
+
+### Version 1.0.x Series (Current)
+
+#### Latest Releases
+
+- [**vX.Y.Z**](#changelog/versions/X.Y.Z) - Brief description
+- [**v1.0.54**](#changelog/versions/1.0.54) - Vendor CSV Export Enhancements
+...
+
+## Complete Version History
+
+| Version | Release Date | Highlights |
+|---------|--------------|------------|
+| [X.Y.Z](#changelog/versions/X.Y.Z) | YYYY-MM-DD | Brief highlights |
+| [1.0.54](#changelog/versions/1.0.54) | Latest | Vendor CSV Export |
+...
+```
+
+**3. Update Version References**
+
+After creating changelog entry, update these files:
+
+- **ROADMAP.md**: `**Current Version**: vX.Y.Z`
+- **package.json**: `"version": "X.Y.Z"` (use `npm version patch|minor|major`)
+- **README.md**: Version badge reference
+
+**4. Link Format**
+
+Always use this format for version links in changelog:
+- `#changelog/versions/X.Y.Z` (internal navigation)
+- `https://linear.app/hextrackr/issue/HEX-XXX` (Linear issues)
+
+### Changelog Best Practices
+
+✅ **Group changes by type** (Added, Fixed, Changed, etc.)
+✅ **Include Linear issue IDs** for traceability
+✅ **List modified files** for code archaeology
+✅ **Add validation checkmarks** to show testing
+✅ **Use descriptive feature names** in headers
+✅ **Keep entries concise** but complete
+
+❌ **Don't edit old version files** (changelog is immutable history)
+❌ **Don't skip validation section** (shows due diligence)
+❌ **Don't forget to update index.md** (users need navigation)
+
+### Version Numbering (Semantic Versioning)
+
+- **Major (X.0.0)**: Breaking changes, major rewrites
+- **Minor (1.X.0)**: New features, backward-compatible
+- **Patch (1.0.X)**: Bug fixes, small improvements
+
+Current series: **1.0.x** (stable feature additions)
+
+---
+
 ## Testing URLs
 
 **CRITICAL**: Always test via HTTPS through nginx reverse proxy. HTTP endpoints return empty API responses.
@@ -93,6 +236,61 @@ docker-compose restart   # Restart after code changes
 - **Async/Await**: Preferred over callbacks or raw promises
 - **Security**: All user input validated, parameterized SQL queries, CSRF protection enabled
 - **Error Messages**: Descriptive error objects with context for debugging
+
+## Documentation Format
+
+**Markdown Link Format**: The documentation generator (`html-content-updater.js`) uses `marked` which processes links differently in headings vs. lists.
+
+### ✅ Correct Format (Works with Generator)
+
+**Index pages** (index.md files) should use **list-based links**:
+
+```markdown
+## Section Name
+
+- **[Document Title](./document.md)**: Brief description of the document content
+
+- **[Another Document](./another.md)**: Description of another document
+```
+
+**Why**: Links in list items are correctly transformed to hash-based navigation (`#section/document`)
+
+### ❌ Incorrect Format (Links Don't Work)
+
+**Do NOT use heading-based links**:
+
+```markdown
+## Section Name
+
+### [Document Title](./document.md)
+
+Description of the document
+```
+
+**Why**: `marked` doesn't process links embedded in headings - they render as literal text
+
+### Working Examples
+
+- ✅ `architecture/index.md` - Uses list-based links
+- ✅ `api-reference/index.md` - Uses list-based links
+- ✅ `reference/index.md` - Fixed to use list-based links
+- ✅ `guides/index.md` - Fixed to use list-based links
+
+### Table of Contents Anchors
+
+**Current Limitation**: The generator doesn't auto-generate heading IDs, so TOC anchor links (`#heading-name`) don't work unless using manual syntax.
+
+**Manual Anchor Syntax** (optional):
+```markdown
+## My Heading {#custom-id}
+```
+
+Renders as:
+```html
+<h2 id="custom-id">My Heading</h2>
+```
+
+**Future Enhancement**: Tech debt issue created to add automatic slug generation from heading text (standard markdown behavior)
 
 # RPI (Research → Plan → Implement) — Lightweight Workflow
 

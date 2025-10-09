@@ -243,7 +243,281 @@
 <td>Get KEV details for specific CVE</td>
 </tr>
 </tbody></table>
-<hr>
+<h3>AuthController</h3><p><strong>Location:</strong> <code>app/controllers/authController.js</code><br><strong>Since:</strong> v1.0.46</p>
+<p>Handles user authentication, session management, and security features including CSRF protection and account lockout.</p>
+<p><strong>Key Features:</strong></p>
+<ul>
+<li><strong>Argon2id Password Hashing</strong> - Industry-standard secure password storage with timing-safe comparison</li>
+<li><strong>Session Management</strong> - SQLite-backed session store with configurable expiration (24h/30d)</li>
+<li><strong>Account Lockout Protection</strong> - 5 failed login attempts trigger 15-minute lockout</li>
+<li><strong>CSRF Token Generation</strong> - Stateless double-submit cookie pattern for state-changing requests</li>
+<li><strong>Profile Management</strong> - User profile retrieval and password change functionality</li>
+</ul>
+<p><strong>Security Architecture:</strong></p>
+<ul>
+<li>Passwords hashed with Argon2id (time cost: 2, memory cost: 19MB, parallelism: 1)</li>
+<li>Sessions stored in SQLite with automatic cleanup of expired sessions</li>
+<li>Failed login attempts tracked per username with automatic expiry</li>
+<li>Trust proxy enabled for nginx reverse proxy X-Forwarded-Proto headers</li>
+<li>Secure cookies require HTTPS in production</li>
+</ul>
+<p><strong>Main Endpoints:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Auth Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>POST</td>
+<td><code>/api/auth/login</code></td>
+<td>❌ Public</td>
+<td>Authenticate user with username/password</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/auth/logout</code></td>
+<td>✅ Protected</td>
+<td>End user session and clear cookies</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/auth/status</code></td>
+<td>❌ Public</td>
+<td>Check current authentication status</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/auth/csrf</code></td>
+<td>❌ Public</td>
+<td>Retrieve CSRF token for forms</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/auth/change-password</code></td>
+<td>✅ Protected</td>
+<td>Update user password (requires current password)</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/auth/profile</code></td>
+<td>✅ Protected</td>
+<td>Get current user profile information</td>
+</tr>
+</tbody></table>
+<p><strong>Login Request Example:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-variable constant_">POST</span> /api/auth/login
+<span class="hljs-title class_">Content</span>-<span class="hljs-title class_">Type</span>: application/json
+
+{
+  <span class="hljs-string">&quot;username&quot;</span>: <span class="hljs-string">&quot;admin&quot;</span>,
+  <span class="hljs-string">&quot;password&quot;</span>: <span class="hljs-string">&quot;secure-password&quot;</span>
+}</code></pre><p><strong>Login Response (Success):</strong></p>
+<pre><code class="language-javascript">{
+  <span class="hljs-string">&quot;success&quot;</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-string">&quot;user&quot;</span>: {
+    <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">1</span>,
+    <span class="hljs-string">&quot;username&quot;</span>: <span class="hljs-string">&quot;admin&quot;</span>,
+    <span class="hljs-string">&quot;email&quot;</span>: <span class="hljs-string">&quot;admin@hextrackr.local&quot;</span>,
+    <span class="hljs-string">&quot;created_at&quot;</span>: <span class="hljs-string">&quot;2025-10-04T12:00:00.000Z&quot;</span>
+  },
+  <span class="hljs-string">&quot;message&quot;</span>: <span class="hljs-string">&quot;Login successful&quot;</span>
+}</code></pre><p><strong>Login Response (Account Locked):</strong></p>
+<pre><code class="language-javascript">{
+  <span class="hljs-string">&quot;success&quot;</span>: <span class="hljs-literal">false</span>,
+  <span class="hljs-string">&quot;error&quot;</span>: <span class="hljs-string">&quot;Account temporarily locked due to too many failed login attempts. Please try again in 15 minutes.&quot;</span>,
+  <span class="hljs-string">&quot;lockoutRemaining&quot;</span>: <span class="hljs-number">892</span> <span class="hljs-comment">// seconds</span>
+}</code></pre><p><strong>Status Check Response:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-variable constant_">GET</span> /api/auth/status
+
+{
+  <span class="hljs-string">&quot;authenticated&quot;</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-string">&quot;user&quot;</span>: {
+    <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">1</span>,
+    <span class="hljs-string">&quot;username&quot;</span>: <span class="hljs-string">&quot;admin&quot;</span>,
+    <span class="hljs-string">&quot;email&quot;</span>: <span class="hljs-string">&quot;admin@hextrackr.local&quot;</span>
+  }
+}</code></pre><p><strong>Change Password Request:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-variable constant_">POST</span> /api/auth/change-password
+<span class="hljs-title class_">Content</span>-<span class="hljs-title class_">Type</span>: application/json
+X-<span class="hljs-variable constant_">CSRF</span>-<span class="hljs-title class_">Token</span>: &lt;token-<span class="hljs-keyword">from</span>-csrf-endpoint&gt;
+
+{
+  <span class="hljs-string">&quot;currentPassword&quot;</span>: <span class="hljs-string">&quot;old-password&quot;</span>,
+  <span class="hljs-string">&quot;newPassword&quot;</span>: <span class="hljs-string">&quot;new-secure-password&quot;</span>
+}</code></pre><h3>PreferencesController</h3><p><strong>Location:</strong> <code>app/controllers/preferencesController.js</code><br><strong>Since:</strong> v1.0.48</p>
+<p>Manages user-specific preferences and application settings with flexible JSON value storage.</p>
+<p><strong>Key Features:</strong></p>
+<ul>
+<li>User-scoped preference management (isolated per user)</li>
+<li>Flexible JSON value storage for complex data structures</li>
+<li>Transaction support for atomic bulk updates</li>
+<li>Automatic timestamp tracking (created_at, updated_at)</li>
+<li>Validation for preference key format and value structure</li>
+</ul>
+<p><strong>Main Endpoints:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Auth Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GET</td>
+<td><code>/api/preferences</code></td>
+<td>✅ Protected</td>
+<td>Get all preferences for current user</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/preferences/:key</code></td>
+<td>✅ Protected</td>
+<td>Get specific preference by key</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/preferences</code></td>
+<td>✅ Protected</td>
+<td>Create new preference</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/preferences/:key</code></td>
+<td>✅ Protected</td>
+<td>Update existing preference</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/api/preferences/:key</code></td>
+<td>✅ Protected</td>
+<td>Delete specific preference</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/preferences/bulk</code></td>
+<td>✅ Protected</td>
+<td>Bulk update multiple preferences (transaction)</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/api/preferences</code></td>
+<td>✅ Protected</td>
+<td>Delete all user preferences</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/preferences/reset</code></td>
+<td>✅ Protected</td>
+<td>Reset preferences to defaults</td>
+</tr>
+</tbody></table>
+<p><strong>Preference Object Structure:</strong></p>
+<pre><code class="language-javascript">{
+  <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">1</span>,
+  <span class="hljs-string">&quot;user_id&quot;</span>: <span class="hljs-number">1</span>,
+  <span class="hljs-string">&quot;key&quot;</span>: <span class="hljs-string">&quot;dashboard.theme&quot;</span>,
+  <span class="hljs-string">&quot;value&quot;</span>: {<span class="hljs-string">&quot;mode&quot;</span>: <span class="hljs-string">&quot;dark&quot;</span>, <span class="hljs-string">&quot;accent&quot;</span>: <span class="hljs-string">&quot;blue&quot;</span>},
+  <span class="hljs-string">&quot;created_at&quot;</span>: <span class="hljs-string">&quot;2025-10-04T12:00:00.000Z&quot;</span>,
+  <span class="hljs-string">&quot;updated_at&quot;</span>: <span class="hljs-string">&quot;2025-10-04T14:30:00.000Z&quot;</span>
+}</code></pre><p><strong>Common Preference Keys:</strong></p>
+<ul>
+<li><code>dashboard.theme</code> - UI theme settings</li>
+<li><code>dashboard.defaultView</code> - Default dashboard view (grid/cards)</li>
+<li><code>vulnerabilities.filters</code> - Saved filter configurations</li>
+<li><code>notifications.enabled</code> - Notification preferences</li>
+<li><code>export.defaultFormat</code> - Default export format</li>
+</ul>
+<p><strong>Bulk Update Example:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-variable constant_">POST</span> /api/preferences/bulk
+<span class="hljs-title class_">Content</span>-<span class="hljs-title class_">Type</span>: application/json
+X-<span class="hljs-variable constant_">CSRF</span>-<span class="hljs-title class_">Token</span>: &lt;token&gt;
+
+{
+  <span class="hljs-string">&quot;preferences&quot;</span>: [
+    {<span class="hljs-string">&quot;key&quot;</span>: <span class="hljs-string">&quot;dashboard.theme&quot;</span>, <span class="hljs-string">&quot;value&quot;</span>: {<span class="hljs-string">&quot;mode&quot;</span>: <span class="hljs-string">&quot;dark&quot;</span>}},
+    {<span class="hljs-string">&quot;key&quot;</span>: <span class="hljs-string">&quot;dashboard.defaultView&quot;</span>, <span class="hljs-string">&quot;value&quot;</span>: <span class="hljs-string">&quot;grid&quot;</span>},
+    {<span class="hljs-string">&quot;key&quot;</span>: <span class="hljs-string">&quot;notifications.enabled&quot;</span>, <span class="hljs-string">&quot;value&quot;</span>: <span class="hljs-literal">true</span>}
+  ]
+}</code></pre><h3>TemplateController</h3><p><strong>Location:</strong> <code>app/controllers/templateController.js</code><br><strong>Since:</strong> v1.0.21</p>
+<p>Manages email and ticket templates for consistent communication and ticket creation.</p>
+<p><strong>Key Features:</strong></p>
+<ul>
+<li>Template CRUD operations for email and ticket templates</li>
+<li>Variable substitution system for dynamic content</li>
+<li>Template categories (email, ticket, notification)</li>
+<li>Version tracking for template changes</li>
+<li>Default template management</li>
+</ul>
+<p><strong>Main Endpoints:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Auth Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GET</td>
+<td><code>/api/templates</code></td>
+<td>✅ Protected</td>
+<td>List all templates</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/templates/:id</code></td>
+<td>✅ Protected</td>
+<td>Get specific template</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/templates</code></td>
+<td>✅ Protected</td>
+<td>Create new template</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/templates/:id</code></td>
+<td>✅ Protected</td>
+<td>Update template</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/api/templates/:id</code></td>
+<td>✅ Protected</td>
+<td>Delete template</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/templates/category/:category</code></td>
+<td>✅ Protected</td>
+<td>Get templates by category</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/templates/:id/render</code></td>
+<td>✅ Protected</td>
+<td>Render template with variables</td>
+</tr>
+</tbody></table>
+<p><strong>Template Object Structure:</strong></p>
+<pre><code class="language-javascript">{
+  <span class="hljs-string">&quot;id&quot;</span>: <span class="hljs-number">1</span>,
+  <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Critical Vulnerability Alert&quot;</span>,
+  <span class="hljs-string">&quot;category&quot;</span>: <span class="hljs-string">&quot;email&quot;</span>,
+  <span class="hljs-string">&quot;subject&quot;</span>: <span class="hljs-string">&quot;Critical Vulnerability Detected: {{cve_id}}&quot;</span>,
+  <span class="hljs-string">&quot;body&quot;</span>: <span class="hljs-string">&quot;A critical vulnerability has been detected...&quot;</span>,
+  <span class="hljs-string">&quot;variables&quot;</span>: [<span class="hljs-string">&quot;cve_id&quot;</span>, <span class="hljs-string">&quot;hostname&quot;</span>, <span class="hljs-string">&quot;severity&quot;</span>],
+  <span class="hljs-string">&quot;created_at&quot;</span>: <span class="hljs-string">&quot;2025-10-04T12:00:00.000Z&quot;</span>,
+  <span class="hljs-string">&quot;updated_at&quot;</span>: <span class="hljs-string">&quot;2025-10-04T14:30:00.000Z&quot;</span>
+}</code></pre><hr>
 <h2 id="services">Services</h2><p>Services encapsulate business logic and data access. They are injected into controllers during initialization.</p>
 <h3>VulnerabilityService</h3><p><strong>Location:</strong> <code>app/services/vulnerabilityService.js</code></p>
 <p>Core service for vulnerability data operations.</p>
@@ -434,10 +708,95 @@
 <li><code>matchVulnerabilities()</code> - Update vulnerability KEV flags</li>
 <li><code>scheduleAutoSync()</code> - Configure automatic sync intervals</li>
 </ul>
+<h3>AuthService</h3><p><strong>Location:</strong> <code>app/services/authService.js</code><br><strong>Since:</strong> v1.0.46</p>
+<p>Core authentication logic including password verification, session management, and account security.</p>
+<p><strong>Key Features:</strong></p>
+<ul>
+<li><strong>Argon2id Password Hashing</strong> - Time cost: 2, Memory cost: 19456KB, Parallelism: 1</li>
+<li><strong>Timing-Safe Password Comparison</strong> - Prevents timing attacks during verification</li>
+<li><strong>Failed Login Tracking</strong> - In-memory store with automatic expiry (15 minutes)</li>
+<li><strong>Account Lockout Management</strong> - 5 attempts trigger 15-minute lockout</li>
+<li><strong>Session Lifecycle</strong> - Creation, validation, destruction with configurable TTL</li>
+</ul>
+<p><strong>Core Methods:</strong></p>
+<ul>
+<li><code>verifyPassword(username, password)</code> - Authenticate user credentials with lockout check</li>
+<li><code>hashPassword(password)</code> - Generate Argon2id hash for new passwords</li>
+<li><code>createSession(userId, username)</code> - Initialize user session</li>
+<li><code>validateSession(sessionId)</code> - Verify active session</li>
+<li><code>destroySession(sessionId)</code> - End user session</li>
+<li><code>checkAccountLockout(username)</code> - Verify if account is locked</li>
+<li><code>recordFailedLogin(username)</code> - Increment failed login counter</li>
+<li><code>resetFailedLogins(username)</code> - Clear failed login tracking on success</li>
+</ul>
+<p><strong>Security Configuration:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Argon2id parameters</span>
+{
+  <span class="hljs-attr">type</span>: argon2.<span class="hljs-property">argon2id</span>,
+  <span class="hljs-attr">timeCost</span>: <span class="hljs-number">2</span>,        <span class="hljs-comment">// Number of iterations</span>
+  <span class="hljs-attr">memoryCost</span>: <span class="hljs-number">19456</span>,  <span class="hljs-comment">// Memory in KB (19MB)</span>
+  <span class="hljs-attr">parallelism</span>: <span class="hljs-number">1</span>,     <span class="hljs-comment">// Number of threads</span>
+  <span class="hljs-attr">hashLength</span>: <span class="hljs-number">32</span>      <span class="hljs-comment">// Output hash length</span>
+}
+
+<span class="hljs-comment">// Account lockout policy</span>
+{
+  <span class="hljs-attr">maxAttempts</span>: <span class="hljs-number">5</span>,
+  <span class="hljs-attr">lockoutDuration</span>: <span class="hljs-number">900000</span>  <span class="hljs-comment">// 15 minutes in ms</span>
+}</code></pre><p><strong>Failed Login Tracking:</strong></p>
+<pre><code class="language-javascript">{
+  <span class="hljs-attr">username</span>: {
+    <span class="hljs-attr">attempts</span>: <span class="hljs-number">3</span>,
+    <span class="hljs-attr">firstAttempt</span>: <span class="hljs-number">1696435200000</span>,
+    <span class="hljs-attr">lastAttempt</span>: <span class="hljs-number">1696435260000</span>
+  }
+}</code></pre><h3>PreferencesService</h3><p><strong>Location:</strong> <code>app/services/preferencesService.js</code><br><strong>Since:</strong> v1.0.48</p>
+<p>User preference management with flexible JSON value storage and transaction support.</p>
+<p><strong>Key Features:</strong></p>
+<ul>
+<li>User-scoped preference isolation (each user has independent preferences)</li>
+<li>JSON value serialization/deserialization for complex data structures</li>
+<li>Transaction support for atomic bulk updates</li>
+<li>Automatic timestamp management (created_at, updated_at)</li>
+<li>Key validation and sanitization</li>
+</ul>
+<p><strong>Core Methods:</strong></p>
+<ul>
+<li><code>getUserPreferences(userId)</code> - Retrieve all preferences for user</li>
+<li><code>getPreference(userId, key)</code> - Get specific preference value</li>
+<li><code>setPreference(userId, key, value)</code> - Create or update preference</li>
+<li><code>deletePreference(userId, key)</code> - Remove specific preference</li>
+<li><code>bulkUpdatePreferences(userId, preferences)</code> - Atomic multi-preference update (transaction)</li>
+<li><code>resetToDefaults(userId)</code> - Clear all preferences and restore defaults</li>
+<li><code>validatePreferenceKey(key)</code> - Ensure key follows naming convention</li>
+</ul>
+<p><strong>Transaction Pattern:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Bulk update uses SQLite transaction for atomicity</span>
+db.<span class="hljs-title function_">transaction</span>(<span class="hljs-function">() =&gt;</span> {
+  preferences.<span class="hljs-title function_">forEach</span>(<span class="hljs-function">(<span class="hljs-params">{key, value}</span>) =&gt;</span> {
+    db.<span class="hljs-title function_">prepare</span>(<span class="hljs-string">&#x27;INSERT OR REPLACE INTO preferences...&#x27;</span>).<span class="hljs-title function_">run</span>(userId, key, <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(value));
+  });
+});</code></pre><h3>DocsService</h3><p><strong>Location:</strong> <code>app/services/docsService.js</code><br><strong>Since:</strong> v1.0.38</p>
+<p>Documentation statistics and coverage analysis.</p>
+<p><strong>Key Features:</strong></p>
+<ul>
+<li>JSDoc coverage calculation</li>
+<li>File type distribution analysis</li>
+<li>Documentation completeness metrics</li>
+<li>API endpoint inventory</li>
+</ul>
+<p><strong>Core Methods:</strong></p>
+<ul>
+<li><code>getDocumentationStats()</code> - Calculate comprehensive documentation metrics</li>
+<li><code>analyzeJSDocCoverage()</code> - Determine percentage of documented functions</li>
+<li><code>getFileTypeCounts()</code> - Breakdown of file types in codebase</li>
+<li><code>getEndpointInventory()</code> - List all API routes with documentation status</li>
+</ul>
 <hr>
 <h2 id="routes">Routes</h2><p>Route modules define API endpoints and apply middleware.</p>
 <h3>Vulnerability Routes</h3><p><strong>File:</strong> <code>app/routes/vulnerabilities.js</code><br><strong>Base Path:</strong> <code>/api/vulnerabilities</code></p>
-<pre><code class="language-javascript"><span class="hljs-variable constant_">GET</span>    /stats                 <span class="hljs-comment">// Statistics dashboard data</span>
+<pre><code class="language-javascript"><span class="hljs-variable constant_">GET</span>    /stats                 <span class="hljs-comment">// Statistics dashboard data (supports vendor filtering)</span>
+<span class="hljs-variable constant_">GET</span>    /recent-trends         <span class="hljs-comment">// Historical vulnerability trends (supports vendor filtering)</span>
 <span class="hljs-variable constant_">GET</span>    /                      <span class="hljs-comment">// List vulnerabilities</span>
 <span class="hljs-variable constant_">POST</span>   /                      <span class="hljs-comment">// Create vulnerability</span>
 <span class="hljs-variable constant_">PUT</span>    /:id                   <span class="hljs-comment">// Update vulnerability</span>
@@ -445,7 +804,41 @@
 <span class="hljs-variable constant_">POST</span>   /<span class="hljs-keyword">import</span>                <span class="hljs-comment">// Import CSV</span>
 <span class="hljs-variable constant_">POST</span>   /<span class="hljs-keyword">import</span>/staging        <span class="hljs-comment">// Staged import</span>
 <span class="hljs-variable constant_">GET</span>    /<span class="hljs-keyword">import</span>/progress/:id   <span class="hljs-comment">// Import progress</span>
-<span class="hljs-variable constant_">DELETE</span> /all                   <span class="hljs-comment">// Clear all data</span></code></pre><h3>Ticket Routes</h3><p><strong>File:</strong> <code>app/routes/tickets.js</code><br><strong>Base Path:</strong> <code>/api/tickets</code></p>
+<span class="hljs-variable constant_">DELETE</span> /all                   <span class="hljs-comment">// Clear all data</span></code></pre><p><strong>Vendor Filtering (Since v1.0.53):</strong></p>
+<p>The <code>/stats</code> and <code>/recent-trends</code> endpoints support vendor-based filtering via query parameter:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Get statistics for all vendors (default)</span>
+<span class="hljs-variable constant_">GET</span> /api/vulnerabilities/stats
+
+<span class="hljs-comment">// Get statistics for Cisco devices only</span>
+<span class="hljs-variable constant_">GET</span> /api/vulnerabilities/stats?vendor=<span class="hljs-variable constant_">CISCO</span>
+
+<span class="hljs-comment">// Get statistics for Palo Alto devices</span>
+<span class="hljs-variable constant_">GET</span> /api/vulnerabilities/stats?vendor=<span class="hljs-title class_">Palo</span>%20Alto
+
+<span class="hljs-comment">// Get statistics for other vendors</span>
+<span class="hljs-variable constant_">GET</span> /api/vulnerabilities/stats?vendor=<span class="hljs-title class_">Other</span></code></pre><p><strong>Vendor Values:</strong></p>
+<ul>
+<li>`` (empty) - All vendors (default)</li>
+<li><code>CISCO</code> - Cisco Systems devices</li>
+<li><code>Palo Alto</code> - Palo Alto Networks devices</li>
+<li><code>Other</code> - All other vendors</li>
+</ul>
+<p><strong>Response Format (with vendor filter):</strong></p>
+<pre><code class="language-javascript">{
+  <span class="hljs-string">&quot;success&quot;</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-string">&quot;stats&quot;</span>: {
+    <span class="hljs-string">&quot;vendor&quot;</span>: <span class="hljs-string">&quot;CISCO&quot;</span>,  <span class="hljs-comment">// null if no filter applied</span>
+    <span class="hljs-string">&quot;total&quot;</span>: <span class="hljs-number">1245</span>,
+    <span class="hljs-string">&quot;vprTotal&quot;</span>: <span class="hljs-number">8934.5</span>,
+    <span class="hljs-string">&quot;severityCounts&quot;</span>: {
+      <span class="hljs-string">&quot;Critical&quot;</span>: <span class="hljs-number">45</span>,
+      <span class="hljs-string">&quot;High&quot;</span>: <span class="hljs-number">234</span>,
+      <span class="hljs-string">&quot;Medium&quot;</span>: <span class="hljs-number">456</span>,
+      <span class="hljs-string">&quot;Low&quot;</span>: <span class="hljs-number">510</span>
+    },
+    <span class="hljs-string">&quot;hasKev&quot;</span>: <span class="hljs-number">12</span>
+  }
+}</code></pre><h3>Ticket Routes</h3><p><strong>File:</strong> <code>app/routes/tickets.js</code><br><strong>Base Path:</strong> <code>/api/tickets</code></p>
 <pre><code class="language-javascript"><span class="hljs-variable constant_">GET</span>    /                      <span class="hljs-comment">// List tickets</span>
 <span class="hljs-variable constant_">GET</span>    /:id                   <span class="hljs-comment">// Get ticket</span>
 <span class="hljs-variable constant_">POST</span>   /                      <span class="hljs-comment">// Create ticket</span>
@@ -460,7 +853,38 @@
 <span class="hljs-variable constant_">DELETE</span> /:filename             <span class="hljs-comment">// Delete backup</span></code></pre><h3>KEV Routes</h3><p><strong>File:</strong> <code>app/routes/kev.js</code><br><strong>Base Path:</strong> <code>/api/kev</code><br><strong>Since:</strong> v1.0.22</p>
 <pre><code class="language-javascript"><span class="hljs-variable constant_">POST</span>   /sync                  <span class="hljs-comment">// Manual KEV synchronization</span>
 <span class="hljs-variable constant_">GET</span>    /status                <span class="hljs-comment">// Sync status and statistics</span>
-<span class="hljs-variable constant_">GET</span>    /vulnerability/:cveId  <span class="hljs-comment">// KEV details for specific CVE</span></code></pre><h3>Device Routes</h3><p><strong>File:</strong> <code>app/routes/devices.js</code><br><strong>Base Path:</strong> <code>/api/devices</code><br><strong>Since:</strong> v1.0.42</p>
+<span class="hljs-variable constant_">GET</span>    /vulnerability/:cveId  <span class="hljs-comment">// KEV details for specific CVE</span></code></pre><h3>Authentication Routes</h3><p><strong>File:</strong> <code>app/routes/auth.js</code><br><strong>Base Path:</strong> <code>/api/auth</code><br><strong>Since:</strong> v1.0.46</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Public endpoints (no authentication required)</span>
+<span class="hljs-variable constant_">POST</span>   /login                 <span class="hljs-comment">// User login with username/password</span>
+<span class="hljs-variable constant_">GET</span>    /status                <span class="hljs-comment">// Check authentication status</span>
+<span class="hljs-variable constant_">GET</span>    /csrf                  <span class="hljs-comment">// Get CSRF token for forms</span>
+
+<span class="hljs-comment">// Protected endpoints (require authentication)</span>
+<span class="hljs-variable constant_">POST</span>   /logout                <span class="hljs-comment">// User logout (clears session)</span>
+<span class="hljs-variable constant_">POST</span>   /change-password       <span class="hljs-comment">// Update user password</span>
+<span class="hljs-variable constant_">GET</span>    /profile               <span class="hljs-comment">// Get current user profile</span></code></pre><p><strong>Middleware:</strong></p>
+<ul>
+<li><code>requireAuth</code> applied to <code>/logout</code>, <code>/change-password</code>, <code>/profile</code></li>
+<li>CSRF validation required for all POST requests except <code>/login</code></li>
+</ul>
+<h3>Preferences Routes</h3><p><strong>File:</strong> <code>app/routes/preferences.js</code><br><strong>Base Path:</strong> <code>/api/preferences</code><br><strong>Since:</strong> v1.0.48<br><strong>Authentication:</strong> All endpoints require <code>requireAuth</code> middleware</p>
+<pre><code class="language-javascript"><span class="hljs-variable constant_">GET</span>    /                      <span class="hljs-comment">// Get all user preferences</span>
+<span class="hljs-variable constant_">GET</span>    /:key                  <span class="hljs-comment">// Get specific preference</span>
+<span class="hljs-variable constant_">POST</span>   /                      <span class="hljs-comment">// Create new preference</span>
+<span class="hljs-variable constant_">PUT</span>    /:key                  <span class="hljs-comment">// Update existing preference</span>
+<span class="hljs-variable constant_">DELETE</span> /:key                  <span class="hljs-comment">// Delete specific preference</span>
+<span class="hljs-variable constant_">POST</span>   /bulk                  <span class="hljs-comment">// Bulk update preferences (transaction)</span>
+<span class="hljs-variable constant_">DELETE</span> /                      <span class="hljs-comment">// Delete all user preferences</span>
+<span class="hljs-variable constant_">POST</span>   /reset                 <span class="hljs-comment">// Reset to default preferences</span></code></pre><p><strong>CSRF Protection:</strong> All state-changing operations (POST, PUT, DELETE) require valid CSRF token</p>
+<h3>Template Routes</h3><p><strong>File:</strong> <code>app/routes/templates.js</code><br><strong>Base Path:</strong> <code>/api/templates</code><br><strong>Since:</strong> v1.0.21<br><strong>Authentication:</strong> All endpoints require <code>requireAuth</code> middleware</p>
+<pre><code class="language-javascript"><span class="hljs-variable constant_">GET</span>    /                      <span class="hljs-comment">// List all templates</span>
+<span class="hljs-variable constant_">GET</span>    /:id                   <span class="hljs-comment">// Get specific template</span>
+<span class="hljs-variable constant_">POST</span>   /                      <span class="hljs-comment">// Create new template</span>
+<span class="hljs-variable constant_">PUT</span>    /:id                   <span class="hljs-comment">// Update template</span>
+<span class="hljs-variable constant_">DELETE</span> /:id                   <span class="hljs-comment">// Delete template</span>
+<span class="hljs-variable constant_">GET</span>    /category/:category    <span class="hljs-comment">// Get templates by category</span>
+<span class="hljs-variable constant_">POST</span>   /:id/render            <span class="hljs-comment">// Render template with variables</span></code></pre><p><strong>CSRF Protection:</strong> All state-changing operations require valid CSRF token</p>
+<h3>Device Routes</h3><p><strong>File:</strong> <code>app/routes/devices.js</code><br><strong>Base Path:</strong> <code>/api/devices</code><br><strong>Since:</strong> v1.0.42</p>
 <pre><code class="language-javascript"><span class="hljs-variable constant_">GET</span>    /stats                 <span class="hljs-comment">// Aggregated device statistics with vulnerability counts</span></code></pre><p><strong>Device Statistics Response Format:</strong></p>
 <pre><code class="language-javascript">{
   <span class="hljs-attr">success</span>: <span class="hljs-literal">true</span>,
@@ -772,14 +1196,79 @@ app.<span class="hljs-title function_">use</span>(<span class="hljs-title functi
 <li><code>500</code> - Server error</li>
 </ul>
 <hr>
-<h2>Security</h2><h3>Authentication</h3><p>Currently using session-based authentication with planned JWT migration.</p>
-<h3>Input Validation</h3><ul>
+<h2>Security</h2><h3>Authentication System (Since v1.0.46)</h3><p><strong>Architecture:</strong> Session-based authentication with SQLite session store</p>
+<p><strong>Core Components:</strong></p>
+<h4>Password Security</h4><ul>
+<li><strong>Hashing Algorithm:</strong> Argon2id (winner of Password Hashing Competition)</li>
+<li><strong>Timing-Safe Comparison:</strong> Prevents timing attacks during credential verification</li>
+<li><strong>Parameters:</strong><ul>
+<li>Time cost: 2 iterations</li>
+<li>Memory cost: 19456 KB (19 MB)</li>
+<li>Parallelism: 1 thread</li>
+<li>Hash length: 32 bytes</li>
+</ul>
+</li>
+</ul>
+<h4>Session Management</h4><ul>
+<li><strong>Storage:</strong> SQLite database (<code>sessions</code> table)</li>
+<li><strong>Expiration:</strong> 24 hours (remember me: 30 days)</li>
+<li><strong>Cookie Settings:</strong><ul>
+<li><code>httpOnly: true</code> - Prevents XSS access to cookies</li>
+<li><code>secure: true</code> - HTTPS only (production)</li>
+<li><code>sameSite: &#39;lax&#39;</code> - CSRF protection</li>
+</ul>
+</li>
+<li><strong>Automatic Cleanup:</strong> Expired sessions removed on startup and periodically</li>
+</ul>
+<h4>Account Lockout Protection</h4><ul>
+<li><strong>Failed Attempts:</strong> 5 consecutive failures</li>
+<li><strong>Lockout Duration:</strong> 15 minutes</li>
+<li><strong>Tracking:</strong> In-memory store with automatic expiry</li>
+<li><strong>Reset:</strong> Successful login clears failed attempt counter</li>
+</ul>
+<h4>CSRF Protection</h4><ul>
+<li><strong>Method:</strong> Double-submit cookie pattern</li>
+<li><strong>Token Endpoint:</strong> <code>GET /api/auth/csrf</code></li>
+<li><strong>Required For:</strong> All state-changing requests (POST, PUT, DELETE)</li>
+<li><strong>Validation:</strong> Automatic via <code>csrf-sync</code> middleware</li>
+<li><strong>Excluded Routes:</strong> <code>/api/auth/login</code> (CSRF token needed for form)</li>
+</ul>
+<h4>Protected Endpoints</h4><p>All API endpoints require authentication (<code>requireAuth</code> middleware) <strong>except</strong>:</p>
+<ul>
+<li><code>POST /api/auth/login</code> - Public (login endpoint)</li>
+<li><code>GET /api/auth/status</code> - Public (status check)</li>
+<li><code>GET /api/auth/csrf</code> - Public (token retrieval)</li>
+</ul>
+<p><strong>Protected Endpoint Categories:</strong></p>
+<ul>
+<li>All <code>/api/vulnerabilities/*</code> endpoints</li>
+<li>All <code>/api/tickets/*</code> endpoints</li>
+<li>All <code>/api/preferences/*</code> endpoints</li>
+<li>All <code>/api/templates/*</code> endpoints</li>
+<li>All <code>/api/backup/*</code> endpoints</li>
+<li>All <code>/api/kev/*</code> endpoints</li>
+<li>All <code>/api/devices/*</code> endpoints</li>
+</ul>
+<h3>Trust Proxy Configuration</h3><p><strong>Setting:</strong> <code>app.set(&#39;trust proxy&#39;, true)</code></p>
+<p><strong>Purpose:</strong> Enable Express to trust nginx reverse proxy headers</p>
+<p><strong>Why Critical:</strong></p>
+<ul>
+<li>Allows reading <code>X-Forwarded-Proto</code> header to detect HTTPS</li>
+<li>Enables secure cookies with HTTPS termination at nginx</li>
+<li>Required for authentication system to function correctly</li>
+<li>Without this, all authentication will fail (cookies not set)</li>
+</ul>
+<p><strong>Network Flow:</strong></p>
+<pre><code class="language-text">Client → HTTPS (443) → nginx → HTTP (8080) → Express
+         Sets header:    Reads header:
+         X-Forwarded-Proto: https</code></pre><h3>Input Validation</h3><ul>
 <li>All file paths validated with PathValidator</li>
-<li>SQL queries use parameterized statements</li>
+<li>SQL queries use parameterized statements (prepared statements)</li>
 <li>HTML content escaped before storage</li>
 <li>File uploads restricted by type and size</li>
+<li>User input sanitized to prevent injection attacks</li>
 </ul>
-<h3>Rate Limiting</h3><p>Configurable per-endpoint limits to prevent abuse.</p>
+<h3>Rate Limiting</h3><p>Configurable per-endpoint limits to prevent abuse and brute force attacks.</p>
 <h3>CORS Policy</h3><p>Whitelist-based origin control with credentials support.</p>
 <hr>
 <h2>Environment Variables</h2><pre><code class="language-bash"><span class="hljs-comment"># Server Configuration</span>
@@ -790,9 +1279,10 @@ NODE_ENV=production
 <span class="hljs-comment"># Database</span>
 DATABASE_PATH=data/hextrackr.db
 
-<span class="hljs-comment"># Security</span>
+<span class="hljs-comment"># Security &amp; Authentication (Since v1.0.46)</span>
+SESSION_SECRET=&lt;your-32-byte-hex-string&gt;  <span class="hljs-comment"># REQUIRED - Cryptographically secure random string</span>
+TRUST_PROXY=<span class="hljs-literal">true</span>                          <span class="hljs-comment"># REQUIRED - Enable for nginx reverse proxy</span>
 ALLOWED_ORIGINS=http://localhost:8080
-SESSION_SECRET=your-secret-key
 
 <span class="hljs-comment"># File Handling</span>
 MAX_FILE_SIZE=100MB
@@ -801,7 +1291,40 @@ BACKUP_DIR=backups
 
 <span class="hljs-comment"># Features</span>
 ENABLE_WEBSOCKET=<span class="hljs-literal">true</span>
-ENABLE_COMPRESSION=<span class="hljs-literal">true</span></code></pre>
+ENABLE_COMPRESSION=<span class="hljs-literal">true</span></code></pre><p><strong>Critical Environment Variables:</strong></p>
+<h3>SESSION_SECRET (Required)</h3><p><strong>Purpose:</strong> Cryptographic key for signing session cookies</p>
+<p><strong>Requirements:</strong></p>
+<ul>
+<li><strong>Minimum length:</strong> 32 characters (64 recommended)</li>
+<li><strong>Format:</strong> Hexadecimal string or random alphanumeric</li>
+<li><strong>Security:</strong> Must be kept secret, never committed to version control</li>
+</ul>
+<p><strong>Generate Secure Secret:</strong></p>
+<pre><code class="language-bash"><span class="hljs-comment"># Using Node.js crypto module (recommended)</span>
+node -e <span class="hljs-string">&quot;console.log(require(&#x27;crypto&#x27;).randomBytes(32).toString(&#x27;hex&#x27;))&quot;</span>
+
+<span class="hljs-comment"># Using OpenSSL</span>
+openssl rand -hex 32</code></pre><p><strong>Server Behavior:</strong></p>
+<ul>
+<li>Server <strong>refuses to start</strong> if SESSION_SECRET is missing</li>
+<li>Server <strong>refuses to start</strong> if SESSION_SECRET is less than 32 characters</li>
+<li>Error message: <code>&quot;CRITICAL: SESSION_SECRET must be at least 32 characters&quot;</code></li>
+</ul>
+<h3>TRUST_PROXY (Required for HTTPS)</h3><p><strong>Purpose:</strong> Enable Express to trust nginx reverse proxy headers</p>
+<p><strong>Value:</strong> <code>true</code> or <code>1</code></p>
+<p><strong>Why Required:</strong></p>
+<ul>
+<li>Allows Express to read <code>X-Forwarded-Proto</code> header from nginx</li>
+<li>Enables secure cookies to work correctly with HTTPS termination</li>
+<li>Required for authentication system to detect HTTPS connections</li>
+<li>Without this, authentication cookies will not be set correctly</li>
+</ul>
+<p><strong>Architecture:</strong></p>
+<pre><code class="language-text">Browser (HTTPS 443) → nginx → Express (HTTP 8080)
+                        ↓
+            Sets X-Forwarded-Proto: https
+                        ↓
+        Express reads header via trust proxy</code></pre>
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be
              fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->

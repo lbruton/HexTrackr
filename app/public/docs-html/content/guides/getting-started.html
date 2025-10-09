@@ -100,7 +100,8 @@ docker-compose down
 docker-compose logs -f
 
 <span class="hljs-comment"># Restart after changes</span>
-docker-compose restart</code></pre><hr>
+docker-compose restart</code></pre><p><strong>Note</strong>: Use either <code>docker compose</code> (v2+) or <code>docker-compose</code> (v1). The helper scripts auto-detect the correct syntax for your Docker version.</p>
+<hr>
 <h2>Local Development (Without Docker)</h2><p>For developers working directly on the HexTrackr codebase without Docker.</p>
 <h3>Prerequisites</h3><ul>
 <li><strong>Node.js</strong>: v18.x or later (v22.11.0 LTS recommended)</li>
@@ -113,7 +114,12 @@ docker-compose restart</code></pre><hr>
 <li><p><strong>Install Dependencies</strong></p>
 <pre><code class="language-bash">npm install</code></pre></li>
 <li><p><strong>Initialize Database</strong></p>
-<p> ⚠️ <strong>WARNING</strong>: This command creates a fresh database and <strong>destroys all existing data</strong>. Only run this for fresh installations.</p>
+<p> ⚠️ <strong>WARNING</strong>: This command creates database tables using <code>CREATE TABLE IF NOT EXISTS</code> statements. While it won&#39;t drop existing tables, running this on an existing database may cause schema conflicts. For schema migrations on existing databases, use the migration scripts in <code>app/public/scripts/migrations/</code> instead.</p>
+<p> <strong>Only run this for</strong>:</p>
+<ul>
+<li>Fresh installations (no existing <code>app/data/hextrackr.db</code> file)</li>
+<li>Development environments where schema recreation is acceptable</li>
+</ul>
 <pre><code class="language-bash">npm run init-db</code></pre></li>
 <li><p><strong>Configure Environment</strong></p>
 <p> Create a <code>.env</code> file in the project root:</p>
@@ -153,8 +159,18 @@ npm run docs:generate  <span class="hljs-comment"># Regenerate HTML documentatio
 <h2>Troubleshooting</h2><h3>Cannot Access Application</h3><p><strong>Symptom</strong>: Browser cannot load <code>https://dev.hextrackr.com</code></p>
 <p><strong>Solution</strong>:</p>
 <ol>
-<li>Verify containers are running: <code>docker ps</code></li>
-<li>Check logs: <code>docker-compose logs -f</code></li>
+<li>Verify <strong>both</strong> containers are running: <code>docker ps</code><ul>
+<li>You should see: <code>hextrackr-app</code> (Node.js application)</li>
+<li>And: <code>hextrackr-nginx</code> (HTTPS reverse proxy)</li>
+<li>Both should show status &quot;Up&quot; or &quot;healthy&quot;</li>
+</ul>
+</li>
+<li>Check logs for both containers:<ul>
+<li>App logs: <code>docker logs hextrackr-app</code></li>
+<li>Nginx logs: <code>docker logs hextrackr-nginx</code></li>
+<li>Or combined: <code>docker-compose logs -f</code></li>
+</ul>
+</li>
 <li>Ensure Docker daemon is running</li>
 <li>Try alternative URL: <code>https://localhost</code></li>
 </ol>
@@ -193,7 +209,7 @@ docker-compose up -d --build</code></pre><hr>
 <li><strong>Configure KEV</strong>: Enable automatic KEV tracking in settings</li>
 <li><strong>Create Tickets</strong>: Start creating remediation tickets for high-priority vulnerabilities</li>
 <li><strong>Explore Features</strong>: Check the <a href="#user-guide">User Guide</a> for detailed feature documentation</li>
-<li><strong>Review API</strong>: See the <a href="#api-reference/overview">API Reference</a> for integration options</li>
+<li><strong>Review API</strong>: See the <a href="#api-reference/index">API Reference</a> for integration options</li>
 </ul>
 <hr>
 <h2>Getting Help</h2><ul>
@@ -202,7 +218,7 @@ docker-compose up -d --build</code></pre><hr>
 <li><strong>API Documentation</strong>: <code>/docs-html/jsdocs/</code> (technical reference)</li>
 </ul>
 <hr>
-<p><strong>Version</strong>: 1.0.54<br><strong>Last Updated</strong>: 2025-10-09</p>
+<p><strong>Version</strong>: 1.0.43<br><strong>Last Updated</strong>: 2025-10-09</p>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be

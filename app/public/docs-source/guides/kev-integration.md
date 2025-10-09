@@ -136,15 +136,48 @@ graph TD
 
 The KEV integration adds dedicated tables for tracking exploited vulnerabilities:
 
-- **`kev_catalog`**: Stores CISA KEV data with CVE mappings
-- **`kev_sync_log`**: Tracks synchronization history and status
-- **Enhanced `vulnerabilities`**: Includes `isKev` column for quick filtering
+#### `kev_status` Table
+
+Stores CISA Known Exploited Vulnerabilities metadata from the KEV catalog:
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `cve_id` | TEXT | **Primary key** - CVE identifier (e.g., CVE-2021-44228) |
+| `date_added` | DATE | When CISA added vulnerability to KEV catalog (NOT NULL) |
+| `vulnerability_name` | TEXT | CISA-provided vulnerability name |
+| `vendor_project` | TEXT | Affected vendor or project |
+| `product` | TEXT | Specific product affected |
+| `required_action` | TEXT | CISA-mandated remediation action |
+| `due_date` | DATE | Federal agency remediation deadline |
+| `known_ransomware_use` | BOOLEAN | Whether used in ransomware campaigns (1/0) |
+| `notes` | TEXT | Additional CISA context and guidance |
+| `last_synced` | TIMESTAMP | Last synchronization timestamp |
+
+#### `sync_metadata` Table
+
+Tracks KEV catalog synchronization history and status:
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | INTEGER | **Primary key** - Sync record identifier (AUTOINCREMENT) |
+| `sync_type` | TEXT | Type of sync operation (e.g., 'kev_catalog') - NOT NULL |
+| `sync_time` | TIMESTAMP | Sync execution timestamp (NOT NULL) |
+| `version` | TEXT | Catalog version or timestamp from CISA |
+| `record_count` | INTEGER | Number of KEV records synced |
+| `status` | TEXT | Sync status (completed/failed/in_progress) |
+| `error_message` | TEXT | Error details if sync failed |
+| `created_at` | TIMESTAMP | Record creation timestamp |
+
+**Relationship**: `vulnerabilities_current` LEFT JOINed with `kev_status` on `cve` = `cve_id` to enrich vulnerability data with KEV flags and due dates
 
 ### API Endpoints
 
-- `POST /api/kev/sync` - Manual synchronization trigger
+- `POST /api/kev/sync` - Manual synchronization trigger (rate limited: 3 requests per 5 minutes)
 - `GET /api/kev/status` - Current sync status and statistics
-- `GET /api/kev/vulnerability/:cveId` - Detailed KEV information for specific CVE
+- `GET /api/kev/:cveId` - Detailed KEV metadata for specific CVE
+- `GET /api/kev/stats` - KEV dashboard statistics
+- `GET /api/kev/all` - List all KEV vulnerabilities in catalog
+- `GET /api/kev/matched` - KEV vulnerabilities matched in environment (limit: 100)
 
 ---
 

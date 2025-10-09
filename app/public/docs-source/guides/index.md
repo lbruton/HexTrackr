@@ -1,36 +1,50 @@
 # User Guides
 
-> Comprehensive guides for using HexTrackr effectively
+> Comprehensive guides for using and customizing HexTrackr
 
-## Available Guides
+## Getting Started
 
-### [Getting Started](./getting-started.md)
+- **[Getting Started Guide](./getting-started.md)**: Quick start guide to get HexTrackr up and running in your environment, covering Docker installation, HTTPS setup, SSL certificates, database initialization, and troubleshooting
 
-Quick start guide to get HexTrackr up and running in your environment. Covers Docker setup, initial configuration, and basic usage.
+---
 
-### [User Guide](./user-guide.md)
+## Daily Operations
 
-Complete guide for daily operations including:
+- **[User Guide](./user-guide.md)**: Complete guide for day-to-day operations including vulnerability dashboard (VPR cards, vendor filtering, KEV tracking, trend analysis), ticket management (creating tickets, device assignment, bundle downloads), import & export (CSV imports, multi-format exports, backup operations), and settings & preferences (API configuration, ServiceNow integration, data management)
 
-- **Ticket Management** - Creating, editing, and managing maintenance tickets
-- **Vulnerability Management** - Importing, analyzing, and tracking vulnerabilities
-- **Import & Export** - Working with CSV imports and various export formats
-- **Settings & Preferences** - Customizing HexTrackr for your workflow
+---
+
+## Advanced Features
+
+- **[KEV Integration Guide](./kev-integration.md)**: Understanding CISA Known Exploited Vulnerabilities (KEV) integration including what KEV is, automatic tracking with daily synchronization, priority remediation workflows, settings configuration, KEV badges, threat intelligence, and compliance tracking
+
+- **[HTTPS Setup Guide](./https-setup.md)**: Complete guide for configuring HTTPS support across different platforms (macOS, Ubuntu/Linux, Windows), production deployment with Let's Encrypt and nginx reverse proxy, certificate management (self-signed certificates, SubjectAltName extensions), and troubleshooting certificate errors and port conflicts
+
+---
+
+## Customization
+
+- **[CSS Customization Guide](./css-customization.md)**: Customize HexTrackr's appearance to match your organization's branding including brand colors, custom logo, custom fonts, component styling (cards, buttons, badges, navigation), CSS variables, and theme compatibility
+
+---
 
 ## Quick Links
 
-- [Ticket Management](./user-guide.md#ticket-management)
-- [Vulnerability Dashboard](./user-guide.md#vulnerability-management)
-- [CSV Import Guide](./user-guide.md#importing-vulnerability-data)
-- [Device Management](./user-guide.md#device-management)
+### Common Tasks
+- [Install HexTrackr with Docker](./getting-started.md#quick-start-docker-installation-recommended)
+- [Import Vulnerability Scans](./user-guide.md#csv-import)
+- [Create Remediation Tickets](./user-guide.md#creating-and-managing-tickets)
+- [Configure ServiceNow Integration](./user-guide.md#servicenow-integration)
+- [Enable KEV Auto-Sync](./kev-integration.md#configuration-and-settings)
+- [Setup HTTPS for Production](./https-setup.md#production-https-with-lets-encrypt)
+- [Customize Brand Colors](./css-customization.md#quick-start-change-your-brand-colors)
 
 ## Need Help?
 
 If you encounter issues while using HexTrackr:
 
 1. Check the [Troubleshooting Guide](../reference/troubleshooting.md)
-2. Review the [Performance Guidelines](../reference/performance.md)
-3. Consult the [API Reference](../api-reference/index.md) for technical details
+2. Consult the [API Reference](../api-reference/index.md) for technical details
 
 ---
 

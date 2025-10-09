@@ -1,0 +1,92 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.55</h1><hr>
+<h2>[1.0.55] - 2025-10-09</h2><h3>Added</h3><h4>Production SSL Certificate Implementation (HEX-176, HEXP-17)</h4><p><strong>Overview</strong>: Replaced self-signed SSL certificates with professional Sectigo-issued Multi-Domain certificate across both development and production environments, eliminating browser security warnings and establishing trusted HTTPS connections.</p>
+<p><strong>Certificate Details</strong>:</p>
+<ul>
+<li><strong>Provider</strong>: Namecheap PositiveSSL Multi-Domain Certificate</li>
+<li><strong>Issuer</strong>: Sectigo Limited (Sectigo Public Server Authentication CA DV R36)</li>
+<li><strong>Coverage</strong>: 3 domains via Subject Alternative Names (SAN)<ul>
+<li>hextrackr.com (primary domain)</li>
+<li><a href="http://www.hextrackr.com">www.hextrackr.com</a> (www subdomain)</li>
+<li>dev.hextrackr.com (development environment)</li>
+</ul>
+</li>
+<li><strong>Validation Method</strong>: DNS CNAME validation (compatible with private IP infrastructure)</li>
+<li><strong>Validity Period</strong>: October 9, 2025 → November 9, 2026 (13 months)</li>
+<li><strong>Cost</strong>: $20/year (vs $8/year × 3 domains = $24 for individual certificates)</li>
+</ul>
+<p><strong>Implementation Architecture</strong>:</p>
+<ul>
+<li>Multi-Domain (SAN) certificate enables dev/prod parity with single certificate file set</li>
+<li>Same cert.pem/key.pem/bundle.pem files deployed to both environments:<ul>
+<li>Production: Ubuntu server at 192.168.1.80 (private IP, airgapped)</li>
+<li>Development: Mac M4 Docker container at 127.0.0.1</li>
+</ul>
+</li>
+<li>nginx reverse proxy terminates SSL at port 443, forwards to Node.js on port 8080</li>
+<li>Version-independent: SSL operates at nginx layer, decoupled from application version</li>
+</ul>
+<p><strong>User Experience Improvements</strong>:</p>
+<ul>
+<li>✅ No more &quot;Your connection is not private&quot; browser warnings</li>
+<li>✅ No more typing &quot;thisisunsafe&quot; to bypass self-signed certificate alerts</li>
+<li>✅ Professional appearance with valid certificate chain trusted by all browsers</li>
+<li>✅ PositiveSSL trust seal badge displayed in footer</li>
+<li>✅ Consistent SSL configuration between dev and prod environments</li>
+</ul>
+<p><strong>Technical Benefits</strong>:</p>
+<ul>
+<li><strong>Simplified Certificate Management</strong>: Single certificate renewal annually (vs 3 separate renewals)</li>
+<li><strong>Deployment Parity</strong>: Identical SSL configuration across all environments</li>
+<li><strong>Airgapped Compatibility</strong>: DNS CNAME validation works with private IPs where HTTP-01 challenge fails</li>
+<li><strong>Version Independence</strong>: Production can run v1.0.49 (pre-auth) while dev runs v1.0.54+ without SSL conflicts</li>
+<li><strong>Security</strong>: CA-signed certificate with proper chain of trust to Sectigo root CA</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>certs/cert.pem</code>: Public certificate from Sectigo (644 permissions)</li>
+<li><code>certs/key.pem</code>: Private key (600 permissions for security)</li>
+<li><code>certs/bundle.pem</code>: Intermediate certificate chain (644 permissions)</li>
+<li><code>app/public/scripts/shared/footer.html</code>: Replaced &quot;Coded with Vibes&quot; badge with PositiveSSL trust seal</li>
+</ul>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li>✅ Certificate verified on production (hextrackr.com) - Sectigo issuer confirmed</li>
+<li>✅ Certificate verified on development (dev.hextrackr.com) - Sectigo issuer confirmed</li>
+<li>✅ All 3 SANs present in certificate (hextrackr.com, www, dev)</li>
+<li>✅ nginx containers restarted and serving new certificates</li>
+<li>✅ Browser warnings eliminated on both environments</li>
+<li>✅ Footer badge displays PositiveSSL trust seal</li>
+</ul>
+<p><strong>Issues</strong>:</p>
+<ul>
+<li><a href="https://linear.app/hextrackr/issue/HEX-176">HEX-176</a> - SSL Certificate Implementation (Research/Planning)</li>
+<li><a href="https://linear.app/hextrackr/issue/HEXP-17">HEXP-17</a> - SSL Certificate Installation (Production Deployment)</li>
+</ul>
+<hr>
+<h3>Changed</h3><h4>Footer Badge Update</h4><p><strong>Change</strong>: Replaced &quot;Coded with Vibes&quot; Reddit community badge with PositiveSSL certificate trust seal in shared footer component.</p>
+<p><strong>Rationale</strong>:</p>
+<ul>
+<li>Displays professional security credential to users</li>
+<li>Reinforces trust and credibility with valid SSL certificate</li>
+<li>Links to PositiveSSL certificate information</li>
+<li>Maintains consistent badge styling with other footer elements</li>
+</ul>
+<p><strong>Badge Details</strong>:</p>
+<ul>
+<li><strong>Image</strong>: Official PositiveSSL trust seal (124x32px)</li>
+<li><strong>Link</strong>: <a href="https://www.positivessl.com">https://www.positivessl.com</a> (certificate provider information)</li>
+<li><strong>Title</strong>: &quot;Secured with PositiveSSL Multi-Domain Certificate&quot;</li>
+<li><strong>Styling</strong>: 20px height, responsive with img-fluid class</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/footer.html</code>: Badge replacement (line 42-44)</li>
+</ul>
+<p><strong>Visual Impact</strong>: Footer now displays security-focused trust seal alongside technology stack badges (SQLite, Express.js, Tabler UI).</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
