@@ -147,11 +147,47 @@ docker-compose restart   # Restart after code changes
 
 ## Issue Structure (Linear)
 - **Parent**: `RESEARCH: <short name>` → e.g. `HEX-123`
-- **Children**: 
+- **Children**:
   - `PLAN: <same short name>` (child of research) → e.g. `HEX-124`
   - `IMPLEMENT: <same short name>` (child of plan) → e.g. `HEX-125`
 
 *Note: The Linear MCP auto-assigns HEX-XXX numbers to each issue*
+
+## Real Example: Vendor CSV Export Feature
+
+Here's how the RPI workflow looks in practice for a recent feature:
+
+**RESEARCH: [HEX-148](https://linear.app/hextrackr/issue/HEX-148)** - "Add Vendor Breakdown to CSV Export"
+- Analyzed existing CSV export feature (HEX-144)
+- Researched data access patterns (`this.dataManager.vulnerabilities`)
+- Identified vendor normalization in helpers.js
+- Assessed performance implications (O(n) aggregation)
+- Determined optimal approach: vendor-filtered aggregations
+- Risk level: Low, no database changes needed
+- **Output**: Current state summary, proposed change, implementation strategy
+
+**PLAN: [HEX-149](https://linear.app/hextrackr/issue/HEX-149)** - "Add Vendor Breakdown to CSV Export" (child of HEX-148)
+- Broke down into 5 tasks (45-60 min each)
+- Task 1.1: Add vendor aggregation helper function
+- Task 1.2: Add CSV table formatting helper
+- Task 1.3: Extend export function with vendor sections
+- Task 1.4: Add arithmetic validation
+- Task 1.5: Update documentation and testing
+- Each task includes: before/after code blocks, validation steps, risk notes
+- Commit strategy: Every 2 tasks
+- **Output**: Step-by-step implementation guide with code examples
+
+**IMPLEMENT: [HEX-150](https://linear.app/hextrackr/issue/HEX-150)** - "Add Vendor Breakdown to CSV Export" (child of HEX-149)
+- Pre-implementation: Git checkpoint, branch creation
+- Executed tasks 1.1-1.5 in order from PLAN
+- Checked off each task as completed
+- Committed every 2 tasks with task IDs in messages
+- Ran ESLint validation after each change
+- Updated Linear with progress and completion summary
+- **Output**: Working feature, git commits, updated Linear issues
+
+**Branch**: `feature/hex-149-vendor-csv-breakdown`
+**Result**: All 3 issues marked "Done", feature deployed to dev environment
 
 ## Guardrails
 1. **Never edit code before a git checkpoint** (clean worktree; commit with a snapshot message).
