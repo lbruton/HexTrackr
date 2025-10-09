@@ -1,247 +1,450 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
-    <h1>HexTrackr User Guide</h1><blockquote>
-<p>Your complete guide to managing tickets and vulnerabilities with HexTrackr</p>
-</blockquote>
-<h2>Table of Contents</h2><ul>
-<li><a href="#ticket-management">Ticket Management</a></li>
-<li><a href="#vulnerability-management">Vulnerability Management</a></li>
-<li><a href="#kev-known-exploited-vulnerabilities">KEV (Known Exploited Vulnerabilities)</a></li>
-<li><a href="#import--export">Import & Export</a></li>
-<li><a href="#settings--preferences">Settings & Preferences</a></li>
-</ul>
+    <h1>HexTrackr User Guide</h1><p>Welcome to HexTrackr! This guide will help you make the most of your vulnerability and ticket management workflow.</p>
 <hr>
-<h2>Ticket Management</h2><h3>Creating Tickets</h3><ol>
-<li>Click the <strong>Add New Ticket</strong> button</li>
-<li>The <strong>Ticket Number</strong> is automatically generated (e.g., <code>0001</code>)</li>
-<li>Fill in required fields:<ul>
-<li><strong>Date Submitted</strong> and <strong>Date Due</strong></li>
-<li><strong>Site</strong> and <strong>Location</strong></li>
-<li><strong>Supervisor</strong> and <strong>Tech</strong> assignments</li>
+<h2>Table of Contents</h2><ul>
+<li><a href="#quick-start">Quick Start</a></li>
+<li><a href="#vulnerability-dashboard">Vulnerability Dashboard</a><ul>
+<li><a href="#vpr-cards-and-statistics">VPR Cards and Statistics</a></li>
+<li><a href="#vendor-filtering">Vendor Filtering</a></li>
+<li><a href="#data-views">Data Views</a></li>
+<li><a href="#kev-integration">KEV Integration</a></li>
 </ul>
 </li>
-<li>Add devices to the ticket using the device manager</li>
+<li><a href="#ticket-management">Ticket Management</a><ul>
+<li><a href="#creating-and-managing-tickets">Creating and Managing Tickets</a></li>
+<li><a href="#device-management">Device Management</a></li>
+<li><a href="#ticket-bundles">Ticket Bundles</a></li>
+</ul>
+</li>
+<li><a href="#import-and-export">Import and Export</a><ul>
+<li><a href="#csv-import">CSV Import</a></li>
+<li><a href="#exporting-data">Exporting Data</a></li>
+</ul>
+</li>
+<li><a href="#advanced-features">Advanced Features</a></li>
+<li><a href="#settings-and-preferences">Settings and Preferences</a></li>
+</ul>
+<hr>
+<h2>Quick Start</h2><p>After installation, access HexTrackr through your browser:</p>
+<ul>
+<li><strong>Development</strong>: <code>https://dev.hextrackr.com</code></li>
+<li><strong>Production</strong>: <code>https://hextrackr.com</code></li>
+</ul>
+<p><strong>Note</strong>: Type <code>thisisunsafe</code> to bypass the self-signed certificate warning in development.</p>
+<h3>First Steps</h3><ol>
+<li><strong>Import Vulnerability Data</strong>: Click the Import button on the Vulnerabilities page</li>
+<li><strong>Select Scan Date</strong>: Choose when the scan was performed (critical for trending)</li>
+<li><strong>Upload CSV</strong>: Select your vulnerability scan export file</li>
+<li><strong>Review Dashboard</strong>: View your vulnerability landscape in real-time</li>
+</ol>
+<hr>
+<h2>Vulnerability Dashboard</h2><p>The vulnerability dashboard at <code>/vulnerabilities.html</code> is your central hub for tracking and analyzing security vulnerabilities across your environment.</p>
+<h3>VPR Cards and Statistics</h3><p>At the top of the dashboard, you&#39;ll see four risk cards displaying vulnerability statistics:</p>
+<ul>
+<li><strong>Critical</strong> (Red): Highest-priority vulnerabilities requiring immediate attention</li>
+<li><strong>High</strong> (Orange): Significant vulnerabilities needing prompt remediation</li>
+<li><strong>Medium</strong> (Yellow): Moderate-risk vulnerabilities for scheduled remediation</li>
+<li><strong>Low</strong> (Blue): Lower-priority vulnerabilities for routine maintenance</li>
+</ul>
+<p><strong>Toggle Between Views</strong>: Click any card to switch between:</p>
+<ul>
+<li><strong>VPR Totals</strong> (default): Sum of Vulnerability Priority Rating scores (risk-based view)</li>
+<li><strong>Vulnerability Counts</strong>: Total number of vulnerabilities in each severity level</li>
+</ul>
+<h4>Hidden Power Feature: Vendor Breakdown Export</h4><p><strong>Secret Shortcut</strong>: Hold Cmd+Shift (Mac) or Ctrl+Shift (Windows) and click any VPR card to instantly export a detailed vendor breakdown CSV with severity totals for each vendor.</p>
+<h3>Vendor Filtering</h3><p>Filter vulnerabilities by vendor to focus on specific technology stacks:</p>
+<ul>
+<li><strong>CISCO</strong>: Cisco Systems vulnerabilities (IOS, IOS-XE, ASA, etc.)</li>
+<li><strong>Palo Alto</strong>: Palo Alto Networks devices and PAN-OS</li>
+<li><strong>Other</strong>: All other vendors (Tenable plugins, third-party software, etc.)</li>
+</ul>
+<p><strong>Two Ways to Filter</strong>:</p>
+<ol>
+<li><strong>Toggle Buttons</strong>: Click vendor buttons above the statistics cards</li>
+<li><strong>Dropdown Menu</strong>: Use the vendor dropdown in the filter bar</li>
+</ol>
+<p>Both filtering methods stay synchronized - selecting a vendor in one updates the other automatically.</p>
+<h3>Data Views</h3><p>Switch between three views to analyze vulnerabilities from different perspectives:</p>
+<h4>Table View (Default)</h4><p>A comprehensive, sortable table powered by AG-Grid showing all vulnerability details:</p>
+<ul>
+<li><strong>Quick Search</strong>: Filter by CVE, hostname, severity, or any field</li>
+<li><strong>Column Sorting</strong>: Click headers to sort by any column</li>
+<li><strong>Advanced Filtering</strong>: Use the filter bar for complex queries</li>
+<li><strong>Column Customization</strong>: Resize and reorder columns to your preference</li>
+</ul>
+<h4>Devices View</h4><p>Group vulnerabilities by affected devices:</p>
+<ul>
+<li><strong>Device Cards</strong>: One card per device showing vulnerability count and total VPR score</li>
+<li><strong>Severity Breakdown</strong>: Visual breakdown of vulnerability severities per device</li>
+<li><strong>KEV Indicators</strong>: Red badges show if device has Known Exploited Vulnerabilities</li>
+<li><strong>Click to Explore</strong>: Click &quot;View Device Details&quot; to see all vulnerabilities on that device</li>
+<li><strong>Pagination</strong>: Browse through devices with 6 cards per page</li>
+</ul>
+<h4>Vulnerabilities View</h4><p>Group by unique vulnerabilities (CVE, Cisco SA, or Plugin ID):</p>
+<ul>
+<li><strong>Vulnerability Cards</strong>: One card per unique vulnerability</li>
+<li><strong>Impact Scope</strong>: Shows how many devices are affected</li>
+<li><strong>Total Risk</strong>: Displays combined VPR score across all affected devices</li>
+<li><strong>Severity Badge</strong>: Color-coded severity indicator on each card</li>
+<li><strong>KEV Badge</strong>: Red indicator for Known Exploited Vulnerabilities</li>
+<li><strong>Click to Explore</strong>: Click any card to see all affected devices</li>
+</ul>
+<h3>KEV Integration</h3><p><strong>KEV (Known Exploited Vulnerabilities)</strong> are vulnerabilities actively being exploited in the wild according to CISA.</p>
+<h4>Identifying KEV Vulnerabilities</h4><p>KEV vulnerabilities are marked throughout the interface:</p>
+<ul>
+<li><strong>Table View</strong>: Dedicated KEV column with YES/NO badges<ul>
+<li>Red &quot;YES&quot; badge = In CISA catalog (prioritize!)</li>
+<li>Blue &quot;NO&quot; badge = Not in KEV catalog</li>
+</ul>
+</li>
+<li><strong>Vulnerability Cards</strong>: Red KEV badge in upper-right corner</li>
+<li><strong>Device Cards</strong>: KEV badge appears if ANY vulnerability on that device is a KEV</li>
+</ul>
+<h4>Using KEV Information</h4><p><strong>Why KEV Matters</strong>:</p>
+<ul>
+<li><strong>Active Exploitation</strong>: These vulnerabilities are being exploited right now</li>
+<li><strong>Higher Priority</strong>: Should be remediated before non-KEV vulnerabilities</li>
+<li><strong>Compliance</strong>: Many frameworks require tracking KEV vulnerabilities</li>
+</ul>
+<p><strong>How to Use</strong>:</p>
+<ol>
+<li><strong>Filter by KEV</strong>: Use the KEV column filter or severity dropdown</li>
+<li><strong>Click for Details</strong>: Click any KEV badge to see full CISA information</li>
+<li><strong>Cross-Reference</strong>: Links to NIST NVD for complete CVE details</li>
+<li><strong>Prioritize Remediation</strong>: Create tickets for KEV vulnerabilities first</li>
+</ol>
+<p><strong>Automatic Updates</strong>: HexTrackr syncs with the CISA KEV catalog daily, so KEV status is always current.</p>
+<hr>
+<h2>Ticket Management</h2><p>The tickets page at <code>/tickets.html</code> helps you manage remediation work with a sophisticated AG-Grid interface.</p>
+<h3>Creating and Managing Tickets</h3><h4>Create a New Ticket</h4><ol>
+<li>Click <strong>Add New Ticket</strong> button</li>
+<li><strong>Ticket Number</strong> is auto-generated (4-digit format: 0001, 0002, etc.)</li>
+<li>Fill in required fields:<ul>
+<li><strong>Date Submitted</strong>: When the ticket was created</li>
+<li><strong>Date Due</strong>: Remediation deadline</li>
+<li><strong>Site</strong>: Physical location or network zone</li>
+<li><strong>Location</strong>: Specific building/datacenter</li>
+<li><strong>Supervisor</strong>: Who owns the work</li>
+<li><strong>Tech</strong>: Who will perform the work</li>
+</ul>
+</li>
+<li>Add devices using the device management interface (see below)</li>
 <li>Click <strong>Save Ticket</strong></li>
 </ol>
-<h3>Managing Devices on Tickets</h3><p>The device manager lets you organize maintenance sequences efficiently:</p>
+<h4>Edit Existing Tickets</h4><ol>
+<li>Find the ticket in the main table</li>
+<li>Click the <strong>Edit</strong> (pencil) icon</li>
+<li>Make your changes</li>
+<li>Click <strong>Save Ticket</strong></li>
+</ol>
+<h3>Device Management</h3><p>The device management interface in the ticket modal provides powerful tools for organizing remediation work:</p>
+<h4>Adding Devices</h4><p><strong>Manual Entry</strong>:</p>
 <ul>
-<li><strong>Add Device</strong>: Click the <strong>+</strong> button (smart-increments names like <code>host01</code> → <code>host02</code>)</li>
-<li><strong>Remove Device</strong>: Click the <strong>-</strong> button</li>
-<li><strong>Reorder Devices</strong>:<ul>
-<li>Drag and drop using the <code>::</code> handle</li>
-<li>Use up/down arrow buttons for precise positioning</li>
-<li>Click <strong>Reverse</strong> to flip the entire sequence</li>
+<li>Click the <strong>+</strong> button to add a new device row</li>
+<li><strong>Smart Increment</strong>: System automatically suggests the next device name<ul>
+<li>Example: Adding after <code>host01</code> suggests <code>host02</code></li>
+<li>Example: Adding after <code>server-a</code> suggests <code>server-b</code></li>
 </ul>
 </li>
 </ul>
-<blockquote>
-<p><strong>Tip</strong>: Device order is preserved exactly as entered - perfect for reboot sequences and patch orders!</p>
-</blockquote>
-<h3>Viewing and Exporting Tickets</h3><ul>
-<li><strong>View Details</strong>: Click the eye icon for a clean, formatted view</li>
-<li><strong>Download Bundle</strong>: Click the download icon for a ZIP archive containing:<ul>
+<p><strong>Bulk Import</strong>: Add comma-separated or line-separated device lists</p>
+<h4>Ordering Devices</h4><p>Device order matters for sequential operations (reboots, patching, etc.). Three ways to reorder:</p>
+<ol>
+<li><strong>Drag and Drop</strong>: Click and hold the <code>::</code> handle, drag to new position</li>
+<li><strong>Arrow Buttons</strong>: Click ↑ or ↓ to move device up or down one position</li>
+<li><strong>Reverse Order</strong>: Click <strong>Reverse</strong> button to flip the entire list</li>
+</ol>
+<p><strong>Why Order Matters</strong>:</p>
+<ul>
+<li>Boot sequences for cluster failover</li>
+<li>Patching order to maintain service availability</li>
+<li>Troubleshooting flow documentation</li>
+</ul>
+<h4>Removing Devices</h4><p>Click the <strong>-</strong> button next to any device to remove it from the list.</p>
+<h3>Ticket Bundles</h3><p>Generate complete documentation packages for remediation work:</p>
+<p><strong>Download Ticket Bundle</strong>:</p>
+<ol>
+<li>Find the ticket in the main table</li>
+<li>Click the <strong>Download Bundle</strong> (download) icon</li>
+<li>Receive a ZIP file containing:<ul>
 <li>Ticket details in PDF format</li>
 <li>Ticket details in Markdown format</li>
-<li>Any attached documentation</li>
-<li>File attachments (renamed to match ticket number)</li>
+<li>Any shared documentation uploaded during the session</li>
+<li>File attachments stored with the ticket</li>
 </ul>
 </li>
+</ol>
+<p><strong>Perfect for</strong>: Handoffs to field technicians, audit documentation, ServiceNow attachments</p>
+<h3>Filtering and Searching</h3><p><strong>Global Search Bar</strong>: Filters tickets by:</p>
+<ul>
+<li>Ticket number</li>
+<li>Hexagon number</li>
+<li>ServiceNow number</li>
+<li>Location</li>
+<li>Site</li>
+<li>Supervisor name</li>
+<li>Tech name</li>
+<li>Device names</li>
 </ul>
-<h3>Searching and Filtering</h3><ul>
-<li><strong>Global Search</strong>: Searches across ticket numbers, locations, sites, supervisor names, tech names, and device names</li>
-<li><strong>Status Filter</strong>: Filter by status (Open, Overdue, Completed, Closed, etc.)</li>
-<li><strong>Location Filter</strong>: Dynamically populated with all locations in your database</li>
-</ul>
-<h3>Interactive Statistics Cards</h3><p>Click the statistics cards at the top to quickly filter tickets:</p>
+<p><strong>Status Filter</strong>: Show tickets by status (Open, Closed, Completed, Overdue, etc.)</p>
+<p><strong>Location Filter</strong>: Dynamically populated with all locations in your database</p>
+<h4>Interactive Statistics Cards</h4><p>Click statistics cards at the top of the page to filter the ticket list:</p>
 <ul>
 <li><strong>Total Tickets</strong>: Reset all filters, show everything</li>
-<li><strong>Open Tickets</strong>: Show only active tickets (excludes Closed, Completed, Failed)</li>
-<li><strong>Overdue</strong>: Show tickets requiring immediate attention</li>
-<li><strong>Completed</strong>: Display finished work (Completed + Closed)</li>
+<li><strong>Open Tickets</strong>: Show active work (excludes Closed, Completed, Failed)</li>
+<li><strong>Overdue</strong>: Show urgent tickets needing immediate attention</li>
+<li><strong>Completed</strong>: Show finished work (Completed + Closed)</li>
 </ul>
-<p>Active cards are highlighted with borders to show your current filter.</p>
-<h3>Importing Ticket Data</h3><ol>
-<li>Click <strong>Import CSV</strong></li>
-<li>Select your CSV file</li>
-<li>Choose import mode:<ul>
-<li><strong>Replace All Data</strong>: Clears existing tickets first</li>
-<li><strong>Add to Existing Data</strong>: Merges with current tickets</li>
+<p><strong>Visual Feedback</strong>: Active filter cards are highlighted with borders and shadows.</p>
+<h3>ServiceNow Integration</h3><p>If you&#39;ve configured ServiceNow in Settings:</p>
+<ul>
+<li>All ServiceNow ticket numbers become <strong>clickable links</strong></li>
+<li>Links open directly to the corresponding ticket in your ServiceNow instance</li>
+<li>No copying and pasting ticket numbers!</li>
+</ul>
+<hr>
+<h2>Import and Export</h2><p>HexTrackr provides comprehensive import/export capabilities for data migration, backup, and reporting.</p>
+<h3>CSV Import</h3><h4>Importing Vulnerabilities</h4><ol>
+<li>Click <strong>Import</strong> button on Vulnerabilities page</li>
+<li><strong>Select Scan Date</strong>: Choose when the vulnerability scan was performed<ul>
+<li>This date is critical for accurate trend analysis</li>
+<li>Use the scan completion date from your vulnerability scanner</li>
 </ul>
 </li>
+<li><strong>Choose CSV File</strong>: Select your export from Tenable, Cisco, or compatible scanner</li>
+<li><strong>Watch Progress</strong>: Real-time progress modal shows import status</li>
+<li><strong>Review Results</strong>: Dashboard updates automatically with new data</li>
 </ol>
-<p>The system automatically:</p>
+<p><strong>Supported Formats</strong>:</p>
 <ul>
-<li>Generates ticket numbers if missing</li>
-<li>Normalizes device lists (handles arrays, commas, or semicolons)</li>
-<li>Validates data and shows errors for invalid rows</li>
+<li>Tenable.io comprehensive exports</li>
+<li>Cisco vulnerability exports (standard and legacy)</li>
+<li>Any CSV with standard vulnerability fields</li>
 </ul>
-<h3>Exporting Ticket Data</h3><p>Export your filtered data in multiple formats:</p>
+<h4>Importing Tickets</h4><ol>
+<li>Click <strong>Import CSV</strong> button on Tickets page</li>
+<li><strong>Select File</strong>: Choose your ticket data CSV</li>
+<li><strong>Choose Import Mode</strong>:<ul>
+<li><strong>Replace All Data</strong>: Clears existing tickets, imports new dataset</li>
+<li><strong>Add to Existing</strong>: Merges with current tickets (upsert mode)</li>
+</ul>
+</li>
+<li><strong>Review Progress</strong>: Import summary shows migrated and failed rows</li>
+</ol>
+<p><strong>CSV Requirements</strong>:</p>
 <ul>
-<li><strong>CSV</strong>: Compatible with Excel and import back into HexTrackr</li>
-<li><strong>Excel</strong>: Native Excel format with formatted columns</li>
-<li><strong>JSON</strong>: For automation and API integration</li>
-<li><strong>PDF</strong>: Print-ready format</li>
-<li><strong>HTML</strong>: Standalone web pages with embedded styling</li>
+<li>Include ticket number, dates, site, location</li>
+<li>Device lists can be comma-separated or line-separated</li>
+<li>Missing ticket numbers are auto-generated</li>
 </ul>
-<blockquote>
-<p><strong>Export Tip</strong>: The CSV export format matches the import format - perfect for backups and round-trips!</p>
-</blockquote>
-<h3>ServiceNow Integration</h3><p>If configured in Settings, ServiceNow ticket numbers become clickable links that open directly in your ServiceNow instance.</p>
-<hr>
-<h2>Vulnerability Management</h2><p>The Vulnerability Dashboard helps you analyze, track, and manage security vulnerabilities across all your assets.</p>
-<h3>Dashboard Overview</h3><ul>
-<li><strong>VPR Summary Cards</strong>: Quick view of Critical, High, Medium, and Low vulnerabilities</li>
-<li><strong>Trend Charts</strong>: Historical vulnerability data and trend analysis</li>
-<li><strong>AG-Grid Table</strong>: Powerful filtering, sorting, and searching</li>
-<li><strong>Device Cards</strong>: Vulnerability counts by hostname</li>
-<li><strong>Vendor Filtering</strong>: Filter by CISCO, Palo Alto, or Other vendors</li>
-</ul>
-<h3>Viewing Vulnerability Details</h3><p>Click any vulnerability in the table to see:</p>
+<h3>Exporting Data</h3><h4>Quick Exports from Vulnerabilities</h4><p>Export your current filtered view in multiple formats:</p>
 <ul>
-<li><strong>CVE Information</strong>: Full vulnerability description</li>
-<li><strong>Affected Devices</strong>: All devices with this vulnerability</li>
-<li><strong>NIST NVD Links</strong>: External links to authoritative CVE data</li>
-<li><strong>KEV Status</strong>: Known Exploited Vulnerability indicator (if applicable)</li>
-<li><strong>VPR Score</strong>: Vulnerability Priority Rating</li>
-<li><strong>Severity Level</strong>: Critical, High, Medium, or Low</li>
+<li><strong>CSV</strong>: Spreadsheet-compatible format</li>
+<li><strong>Excel</strong>: Native .xlsx format with formatting</li>
+<li><strong>JSON</strong>: API-compatible format for automation</li>
+<li><strong>PDF</strong>: Print-ready report format</li>
+<li><strong>HTML</strong>: Self-contained web report</li>
 </ul>
-<h3>Vendor Filtering</h3><p>Use the vendor toggle buttons to filter the entire dashboard:</p>
+<p><strong>All exports respect your current filters</strong> - export exactly what you see on screen.</p>
+<h4>Quick Exports from Tickets</h4><p>Same export formats available for tickets:</p>
 <ul>
-<li><strong>Overall</strong>: All vulnerabilities across all vendors</li>
-<li><strong>CISCO</strong>: Vulnerabilities on CISCO devices only</li>
-<li><strong>Palo Alto</strong>: Vulnerabilities on Palo Alto devices only</li>
-<li><strong>Other</strong>: Vulnerabilities on other vendor devices</li>
+<li><strong>CSV</strong>: Perfect for backup and re-import</li>
+<li><strong>Excel</strong>: Formatted spreadsheet with device lists</li>
+<li><strong>JSON</strong>: API-ready format for integrations</li>
+<li><strong>PDF</strong>: Professional report format</li>
+<li><strong>HTML</strong>: Shareable web reports</li>
 </ul>
-<p>The vendor filter synchronizes with the search dropdown and updates all statistics, charts, and tables simultaneously.</p>
-<h3>VPR Weekly Summary Export</h3><p><strong>Hidden Power Feature</strong>: Cmd+Shift+Click (Mac) or Ctrl+Shift+Click (Windows) on any VPR summary card to export a comprehensive CSV report with:</p>
-<ul>
-<li>Overall VPR totals by severity</li>
-<li>Vendor-specific breakdowns (CISCO, Palo Alto, Other)</li>
-<li>Previous week vs. current week comparisons</li>
-<li>Vulnerability counts alongside VPR scores</li>
-</ul>
-<p>Perfect for weekly supervisor meetings and reporting!</p>
-<hr>
-<h2>KEV (Known Exploited Vulnerabilities)</h2><p>HexTrackr integrates with CISA&#39;s Known Exploited Vulnerabilities catalog to help you prioritize actively exploited threats.</p>
-<h3>Identifying KEV Vulnerabilities</h3><p>KEV vulnerabilities are marked throughout the interface:</p>
-<ul>
-<li><strong>KEV Column</strong>: Red &quot;YES&quot; badge for known exploited vulnerabilities</li>
-<li><strong>Vulnerability Cards</strong>: KEV badge in the upper-right corner</li>
-<li><strong>Device Cards</strong>: KEV badge when ANY vulnerability on that device is a known KEV</li>
-<li><strong>Details Modal</strong>: KEV badge in the modal header</li>
-</ul>
-<h3>KEV Modal</h3><p>Click any KEV badge to see:</p>
-<ul>
-<li><strong>CISA KEV Status</strong>: Confirmation of Known Exploited Vulnerability designation</li>
-<li><strong>NIST NVD Links</strong>: Authoritative CVE information</li>
-<li><strong>Additional Notes</strong>: Special guidance from CISA</li>
-<li><strong>CVE Details Button</strong>: Seamless transition to full vulnerability details</li>
-</ul>
-<h3>Filtering KEV Vulnerabilities</h3><p>Focus on exploited vulnerabilities using:</p>
+<h4>Import Summary Reports</h4><p>After importing vulnerabilities, download professional HTML reports:</p>
 <ol>
-<li><strong>KEV Column Filter</strong>: Click the filter icon in the KEV column header</li>
-<li><strong>Severity Dropdown</strong>: Select &quot;KEV&quot; from the main filter dropdown</li>
-<li><strong>Combined Filtering</strong>: Mix KEV filter with severity, VPR, or vendor filters</li>
+<li><strong>Download Report Button</strong>: Appears in progress modal after import completes</li>
+<li><strong>Complete Reports</strong>: Self-contained HTML with embedded CSS</li>
+<li><strong>Print-Friendly</strong>: Optimized for screen and professional printing</li>
+<li><strong>Descriptive Names</strong>: Files named <code>HexTrackr_Import_Report_YYYY-MM-DD_[source].html</code></li>
 </ol>
-<h3>KEV Synchronization</h3><p>HexTrackr automatically maintains current KEV data:</p>
+<hr>
+<h2>Advanced Features</h2><h3>Vulnerability Trend Analysis</h3><p>The main chart on the Vulnerabilities page shows trends over time:</p>
 <ul>
-<li><strong>Daily Sync</strong>: CISA KEV catalog updates automatically every 24 hours</li>
-<li><strong>Background Process</strong>: Updates happen without interrupting your workflow</li>
-<li><strong>No Authentication Required</strong>: Uses CISA&#39;s public KEV feed</li>
-<li><strong>Manual Sync</strong>: Force immediate update from Settings modal</li>
+<li><strong>Toggle View</strong>: Switch between Vulnerability Count and VPR Score Sum</li>
+<li><strong>Date Range</strong>: Automatically adjusts based on your scan history</li>
+<li><strong>Severity Breakdown</strong>: Color-coded lines for each severity level</li>
+<li><strong>Vendor Filtering</strong>: Trends update when you filter by vendor</li>
 </ul>
-<h3>KEV Settings</h3><p>Configure KEV integration in the Settings modal:</p>
+<p><strong>Use Cases</strong>:</p>
 <ul>
-<li><strong>Enable/Disable Sync</strong>: Control automatic KEV updates</li>
-<li><strong>Sync Schedule</strong>: Customize update frequency (default: daily)</li>
-<li><strong>Display Options</strong>: Customize KEV indicators and badges</li>
-<li><strong>Sync Status</strong>: View last update time and status</li>
+<li>Track remediation progress over time</li>
+<li>Identify periods of increased risk</li>
+<li>Measure security improvement initiatives</li>
+<li>Report to stakeholders with visual data</li>
 </ul>
-<h3>Using KEV for Prioritization</h3><ul>
-<li><strong>Immediate Attention</strong>: KEV vulnerabilities require urgent remediation</li>
-<li><strong>Regulatory Compliance</strong>: Many frameworks mandate KEV tracking</li>
-<li><strong>Risk Assessment</strong>: Combine KEV status with VPR scores for comprehensive prioritization</li>
-<li><strong>Threat Intelligence</strong>: Real-world exploitation data from CISA</li>
+<h3>Cross-Navigation Between Views</h3><p>Click through the interface seamlessly:</p>
+<ul>
+<li><strong>Hostname Links</strong>: Click any hostname to jump to that device&#39;s details</li>
+<li><strong>CVE Links</strong>: Click CVE identifiers to see all affected devices</li>
+<li><strong>KEV Badges</strong>: Click to view full CISA KEV information</li>
+<li><strong>Modal Navigation</strong>: Smoothly transition between device and vulnerability views</li>
+</ul>
+<h3>Keyboard Shortcuts</h3><ul>
+<li><strong>Cmd+Shift+Click</strong> (Mac) or <strong>Ctrl+Shift+Click</strong> (Windows) on VPR cards: Export vendor breakdown</li>
+<li><strong>Escape</strong>: Close open modals</li>
+<li><strong>Tab</strong>: Navigate through form fields</li>
+</ul>
+<h3>Real-Time Updates</h3><p>When using the import feature, HexTrackr provides live progress updates:</p>
+<ul>
+<li><strong>WebSocket Connection</strong>: Real-time progress bar during imports</li>
+<li><strong>Fallback Mode</strong>: If WebSocket fails, manual progress updates continue</li>
+<li><strong>Status Messages</strong>: Clear feedback at each stage of import process</li>
 </ul>
 <hr>
-<h2>Import & Export</h2><h3>Importing Vulnerability Data</h3><ol>
-<li>Click the <strong>Import</strong> button on the dashboard</li>
-<li>Select a <strong>Scan Date</strong> (critical for accurate trending)</li>
-<li>Choose your CSV file from the vulnerability scanner</li>
-<li>Monitor the progress modal for real-time status</li>
+<h2>Settings and Preferences</h2><p>Access settings by clicking <strong>Settings</strong> in the header navigation.</p>
+<h3>Theme Settings</h3><p><strong>Dark/Light Mode</strong>:</p>
+<ul>
+<li>Toggle between dark and light themes</li>
+<li>Automatically detects your system preference on first visit</li>
+<li>Theme choice persists across all pages</li>
+<li>Saves to local storage for future sessions</li>
+</ul>
+<h3>ServiceNow Integration</h3><p>Configure ServiceNow to enable clickable ticket links:</p>
+<ol>
+<li>Navigate to <strong>ServiceNow</strong> tab in Settings</li>
+<li>Enter your <strong>ServiceNow instance URL</strong><ul>
+<li>Example: <code>https://yourcompany.service-now.com</code></li>
+</ul>
+</li>
+<li>Configure field mappings (if using automated ticket creation)</li>
+<li>Click <strong>Test Connection</strong> to verify setup</li>
+<li><strong>Save Settings</strong></li>
 </ol>
-<p>The system automatically:</p>
+<p><strong>After Configuration</strong>: All ServiceNow ticket numbers throughout HexTrackr become clickable links.</p>
+<h3>KEV Settings</h3><p><strong>Automatic Synchronization</strong>:</p>
 <ul>
-<li>Validates the CSV format</li>
-<li>Normalizes vendor names (CISCO, Palo Alto, etc.)</li>
-<li>Updates the dashboard with new data</li>
-<li>Refreshes statistics and trends</li>
+<li><strong>Enable/Disable</strong>: Control automatic CISA KEV catalog updates</li>
+<li><strong>Sync Schedule</strong>: Configure update frequency (default: daily)</li>
+<li><strong>Manual Sync</strong>: Force immediate update from CISA</li>
+<li><strong>Sync Status</strong>: View last update time and success/failure</li>
 </ul>
-<h3>Import Progress</h3><p>The import progress modal shows:</p>
+<p><strong>Display Options</strong>:</p>
 <ul>
-<li><strong>Real-time Status</strong>: Live updates as the import processes</li>
-<li><strong>Error Reporting</strong>: Detailed feedback for any issues</li>
-<li><strong>Completion Summary</strong>: Total records imported and any failures</li>
-<li><strong>Download Report</strong>: Export a professional HTML report of the import results</li>
+<li>Customize KEV badge appearance</li>
+<li>Configure KEV indicator colors</li>
+<li>Control KEV column visibility</li>
 </ul>
-<h3>Exporting Vulnerability Data</h3><p>Export vulnerability data in multiple formats:</p>
+<h3>Display Preferences</h3><p><strong>Date Format</strong>:</p>
 <ul>
-<li><strong>CSV</strong>: Full vulnerability dataset</li>
-<li><strong>Excel</strong>: Formatted Excel spreadsheet</li>
-<li><strong>JSON</strong>: For automation and integrations</li>
-<li><strong>Vendor Breakdown CSV</strong>: Hidden power feature (see VPR Weekly Summary above)</li>
+<li>US format: MM/DD/YYYY</li>
+<li>International format: DD/MM/YYYY</li>
 </ul>
-<blockquote>
-<p><strong>Backup Strategy</strong>: Regular CSV exports provide complete data backups that can be re-imported if needed.</p>
-</blockquote>
-<hr>
-<h2>Settings & Preferences</h2><p>Access the Settings modal to configure HexTrackr for your environment.</p>
-<h3>ServiceNow Integration</h3><ul>
-<li><strong>Instance URL</strong>: Your ServiceNow instance URL (e.g., <code>https://yourcompany.service-now.com</code>)</li>
-<li><strong>Enable Links</strong>: Make ServiceNow ticket numbers clickable throughout the interface</li>
+<p><strong>Table Settings</strong>:</p>
+<ul>
+<li>Row density: Compact, Comfortable, or Spacious</li>
+<li>Items per page: 6, 12, 24, or 48 cards</li>
+<li>Default view: Table, Devices, or Vulnerabilities</li>
 </ul>
-<h3>KEV Configuration</h3><ul>
-<li><strong>Enable Sync</strong>: Automatic daily synchronization with CISA KEV catalog</li>
-<li><strong>Sync Schedule</strong>: Customize update frequency</li>
-<li><strong>Display Options</strong>: Badge styles and visual indicators</li>
-<li><strong>Manual Sync</strong>: Force immediate update</li>
+<p><strong>Performance Options</strong>:</p>
+<ul>
+<li>Auto-refresh intervals</li>
+<li>Cache duration</li>
+<li>WebSocket logging for debugging</li>
 </ul>
-<h3>Theme Preferences</h3><ul>
-<li><strong>Color Scheme</strong>: Light or dark mode</li>
-<li><strong>Accent Colors</strong>: Customize interface colors</li>
-<li><strong>Table Density</strong>: Adjust row spacing in data tables</li>
+<h3>Data Management</h3><p><strong>Backup and Restore</strong>:</p>
+<ul>
+<li>Export complete database backup (all tickets and vulnerabilities)</li>
+<li>Import backup files to restore data</li>
+<li>Scheduled automated backups (if configured)</li>
 </ul>
-<h3>Data Management</h3><ul>
-<li><strong>Clear Cache</strong>: Reset cached data</li>
-<li><strong>Export Settings</strong>: Backup your configuration</li>
-<li><strong>Import Settings</strong>: Restore configuration from backup</li>
+<p><strong>Data Cleanup</strong>:</p>
+<ul>
+<li>Clear all tickets (requires confirmation)</li>
+<li>Clear all vulnerabilities (requires confirmation)</li>
+<li>Reset to factory defaults</li>
 </ul>
 <hr>
-<h2>Tips & Tricks</h2><h3>Keyboard Shortcuts</h3><ul>
-<li><strong>Cmd/Ctrl+Shift+Click on VPR Cards</strong>: Export vendor breakdown CSV</li>
-<li><strong>Cmd/Ctrl+F</strong>: Quick search in tables</li>
-<li><strong>Escape</strong>: Close modals and dialogs</li>
-<li><strong>Arrow Keys</strong>: Navigate within tables</li>
+<h2>Tips and Best Practices</h2><h3>Vulnerability Management</h3><p><strong>Daily Workflow</strong>:</p>
+<ol>
+<li>Check VPR cards for total risk overview</li>
+<li>Filter by vendor to focus on specific technology stacks</li>
+<li>Check KEV vulnerabilities first (active exploitation)</li>
+<li>Review new vulnerabilities in Table view</li>
+<li>Create tickets for high-priority items</li>
+</ol>
+<p><strong>Weekly Workflow</strong>:</p>
+<ol>
+<li>Import latest vulnerability scans</li>
+<li>Review trend chart for progress</li>
+<li>Identify devices with highest vulnerability counts</li>
+<li>Update ticket statuses as remediation completes</li>
+</ol>
+<h3>Ticket Management</h3><p><strong>Creating Effective Tickets</strong>:</p>
+<ul>
+<li>Use specific, descriptive locations</li>
+<li>Order devices by patching sequence</li>
+<li>Include supervisor and tech assignments</li>
+<li>Set realistic due dates based on complexity</li>
 </ul>
-<h3>Best Practices</h3><ul>
-<li><strong>Regular Backups</strong>: Export CSV data weekly as backups</li>
-<li><strong>KEV Monitoring</strong>: Check KEV filter daily for new exploited vulnerabilities</li>
-<li><strong>Vendor Filtering</strong>: Use vendor filters for targeted remediation planning</li>
-<li><strong>Device Sequences</strong>: Maintain accurate device order for patch coordination</li>
+<p><strong>Tracking Progress</strong>:</p>
+<ul>
+<li>Update ticket status as work progresses</li>
+<li>Use bundle downloads for documentation</li>
+<li>Link to ServiceNow for external coordination</li>
 </ul>
-<h3>Performance Tips</h3><ul>
-<li><strong>Filter Early</strong>: Use filters to reduce dataset size for faster operations</li>
-<li><strong>Clear Old Data</strong>: Periodically archive historical data</li>
-<li><strong>Browser Cache</strong>: Clear browser cache if experiencing slowness</li>
+<h3>Import Best Practices</h3><p><strong>Before Importing</strong>:</p>
+<ul>
+<li>Verify scan date is correct (critical for trends)</li>
+<li>Check CSV file size (large files may take longer)</li>
+<li>Have previous import available for comparison</li>
+</ul>
+<p><strong>After Importing</strong>:</p>
+<ul>
+<li>Review import summary for any errors</li>
+<li>Check vulnerability counts match expectations</li>
+<li>Verify new vulnerabilities appear in Table view</li>
+<li>Download import summary report for records</li>
+</ul>
+<h3>Export Best Practices</h3><p><strong>Regular Backups</strong>:</p>
+<ul>
+<li>Export complete data monthly (CSV or JSON)</li>
+<li>Store exports in version control or backup system</li>
+<li>Test restore process periodically</li>
+</ul>
+<p><strong>Reporting</strong>:</p>
+<ul>
+<li>Use vendor filtering + export for vendor-specific reports</li>
+<li>Export KEV vulnerabilities separately for compliance</li>
+<li>Generate HTML reports for non-technical stakeholders</li>
 </ul>
 <hr>
-<h2>Getting Help</h2><ul>
-<li><strong>Documentation Portal</strong>: Complete technical documentation at <code>/docs-html/</code></li>
-<li><strong>API Reference</strong>: For integrations and automation</li>
-<li><strong>Roadmap</strong>: View planned features and improvements</li>
-<li><strong>Changelog</strong>: Track all updates and fixes by version</li>
+<h2>Troubleshooting</h2><h3>Common Issues</h3><p><strong>Vulnerabilities Not Appearing After Import</strong></p>
+<ul>
+<li><strong>Check Filters</strong>: Ensure no active filters are hiding data</li>
+<li><strong>Verify Scan Date</strong>: Incorrect date may cause lifecycle issues</li>
+<li><strong>Review Import Summary</strong>: Check for errors in import report</li>
 </ul>
-<p>Need more help? Check the <strong>Troubleshooting</strong> section in the reference documentation or contact your system administrator.</p>
+<p><strong>Empty API Responses</strong></p>
+<ul>
+<li><strong>Use HTTPS</strong>: Always access via <code>https://</code> URLs</li>
+<li><strong>Check Browser Console</strong>: Look for CORS or network errors</li>
+<li><strong>Verify Server Status</strong>: Ensure Docker containers are running</li>
+</ul>
+<p><strong>CSV Import Errors</strong></p>
+<ul>
+<li><strong>Column Mapping</strong>: Verify CSV has required columns</li>
+<li><strong>File Format</strong>: Ensure CSV is UTF-8 encoded</li>
+<li><strong>File Size</strong>: Very large files (&gt;100MB) may need splitting</li>
+</ul>
+<p><strong>ServiceNow Links Not Working</strong></p>
+<ul>
+<li><strong>Verify Settings</strong>: Check ServiceNow URL is correctly configured</li>
+<li><strong>Check Format</strong>: Ensure URL ends without trailing slash</li>
+<li><strong>Test Connection</strong>: Use the &quot;Test Connection&quot; button in Settings</li>
+</ul>
+<hr>
+<h2>Getting More Help</h2><ul>
+<li><strong>Documentation Portal</strong>: Built-in at <code>/docs-html/</code></li>
+<li><strong>API Documentation</strong>: Technical reference at <code>/docs-html/jsdocs/</code></li>
+<li><strong>GitHub Issues</strong>: Report bugs at <a href="https://github.com/Lonnie-Bruton/HexTrackr/issues">HexTrackr GitHub</a></li>
+</ul>
+<hr>
+<p><strong>Version</strong>: 1.0.54<br><strong>Last Updated</strong>: 2025-10-09</p>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be
