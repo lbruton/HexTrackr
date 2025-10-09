@@ -1,0 +1,34 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.28</h1><p><strong>Release Date</strong>: 2025-09-24</p>
+<hr>
+<h2>[1.0.28] - 2025-09-24</h2><h3>Fixed - KEV Badge Modal Issue on Device Cards</h3><h4>Bug Resolution</h4><ul>
+<li><strong>Fixed Modal Behavior</strong>: KEV badges on device cards now correctly open the KEV details modal instead of the device security modal<ul>
+<li><strong>Root Cause</strong>: Incorrect onclick handler was calling <code>vulnManager.viewDeviceDetails()</code> instead of <code>showKevDetails()</code></li>
+<li><strong>User Impact</strong>: Security teams can now quickly access KEV vulnerability details directly from device cards</li>
+<li><strong>Consistency Restored</strong>: KEV badge behavior is now uniform across vulnerability cards and device cards</li>
+</ul>
+</li>
+</ul>
+<h4>Technical Implementation</h4><ul>
+<li><strong>Device Aggregation Enhancement</strong>: Extended <code>getFilteredDevices()</code> in <code>vulnerability-data.js</code> to track first KEV CVE per device<ul>
+<li>Added <code>kevCve: null</code> property to device object initialization</li>
+<li>Implemented KEV CVE tracking: <code>if (!device.kevCve) { device.kevCve = vuln.cve; }</code></li>
+</ul>
+</li>
+<li><strong>Event Handler Correction</strong>: Fixed onclick handler in <code>vulnerability-cards.js</code> line 93<ul>
+<li><strong>Before</strong>: <code>onclick=&quot;event.stopPropagation(); vulnManager.viewDeviceDetails(&#39;${device.hostname}&#39;)&quot;</code></li>
+<li><strong>After</strong>: <code>onclick=&quot;event.stopPropagation(); showKevDetails(&#39;${device.kevCve}&#39;)&quot;</code></li>
+<li>Also updated onkeydown handler for accessibility consistency</li>
+</ul>
+</li>
+</ul>
+<h4>Files Modified (2)</h4><ul>
+<li><code>app/public/scripts/shared/vulnerability-data.js</code> - Device aggregation logic for KEV CVE tracking</li>
+<li><code>app/public/scripts/shared/vulnerability-cards.js</code> - KEV badge event handlers</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

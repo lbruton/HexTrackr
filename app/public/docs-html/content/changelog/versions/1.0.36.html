@@ -1,0 +1,76 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.36</h1><p><strong>Release Date</strong>: 2025-09-30</p>
+<hr>
+<h2>[1.0.36] - 2025-09-30</h2><h3>Performance (2)</h3><h4>HEX-91: Optimize HTTPS Performance - 3x Slowdown with 30K Vulnerability Records</h4><p><strong>Issue</strong>: After implementing HTTPS with nginx reverse proxy (HEXP-14), the vulnerabilities page loaded 3x slower than direct HTTPS in dev environment. Page load time increased from 2-4 seconds to 6-12 seconds when loading 30,000 vulnerability records.</p>
+<p><strong>Root Causes Identified</strong>:</p>
+<ol>
+<li><strong>Double Compression</strong>: Nginx gzip + Express compression middleware both compressing the same response</li>
+<li><strong>No Application Cache</strong>: Every request triggered fresh database query for 30K records</li>
+<li><strong>Aggressive Browser Cache</strong>: 10-minute browser TTL prevented fresh data after CSV imports</li>
+<li><strong>Missing Cache Headers</strong>: No Cache-Control headers for browser-side caching coordination</li>
+</ol>
+<p><strong>Solution - Two-Layer Caching Architecture</strong>:</p>
+<h5>Layer 1: Application-Level Caching (node-cache)</h5><ul>
+<li>Implemented aggressive server-side caching with 5-10 minute TTL</li>
+<li>Separate cache zones for statistics and trends data</li>
+<li>Memory footprint: ~5-10MB for 30K records</li>
+<li>Performance: 400-1000ms initial load → 2-5ms cached responses</li>
+</ul>
+<h5>Layer 2: Browser Cache Coordination (Cache-Control headers)</h5><ul>
+<li>Right-sized browser cache TTL: 30-60 seconds for fresh data visibility</li>
+<li>Automatic cache invalidation on CSV imports and KEV sync</li>
+<li>X-Cache headers (HIT/MISS) for monitoring and debugging</li>
+</ul>
+<p><strong>Technical Implementation</strong>:</p>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/services/cacheService.js</code> - New caching service with dual-zone architecture (statistics + trends)</li>
+<li><code>app/controllers/vulnerabilityController.js</code> - Integrated caching for all stats and trends endpoints</li>
+<li><code>app/public/server.js</code> - Conditionally disabled Express compression when <code>TRUST_PROXY=true</code></li>
+</ul>
+<p><strong>Key Innovation - withCaching() Helper</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">async</span> <span class="hljs-title function_">withCaching</span>(<span class="hljs-params">res, cacheType, cacheKey, serverTTL, handler, browserTTL = <span class="hljs-literal">null</span></span>) {
+    <span class="hljs-comment">// Server cache: Aggressive (5-10min) for performance</span>
+    <span class="hljs-comment">// Browser cache: Light (30-60s) for freshness</span>
+}</code></pre><p><strong>Cache Configuration by Endpoint</strong>:</p>
+<ul>
+<li>Vulnerability Stats: 300s server / 60s browser</li>
+<li>Recent Trends: 600s server / 60s browser</li>
+<li>Historical Trends: 600s server / 60s browser</li>
+<li>Vulnerabilities List: 600s server / 30s browser (most critical for filtering)</li>
+</ul>
+<p><strong>Double Compression Fix</strong>:</p>
+<ul>
+<li>Added <code>TRUST_PROXY</code> environment variable check in <code>server.js:130</code></li>
+<li>Express compression disabled when nginx handles compression</li>
+<li>Eliminates wasted CPU cycles and response delays</li>
+</ul>
+<p><strong>Performance Results</strong>:</p>
+<ul>
+<li>Page load time: 6-12s → under 2s (80-85% improvement)</li>
+<li>Cached API responses: 2-5ms vs 400-1000ms uncached</li>
+<li>Cache hit rate: 61% improvement on vulnerabilities endpoint</li>
+<li>Fresh data visible: Within 30-60s after import without hard refresh</li>
+</ul>
+<p><strong>Code Quality</strong>:</p>
+<ul>
+<li>Refactored duplicate caching logic using withCaching() helper (Codacy fix)</li>
+<li>Eliminated 44 lines of duplicated code across controllers</li>
+<li>Single source of truth for cache TTL management</li>
+<li>X-Cache headers enable cache effectiveness monitoring</li>
+</ul>
+<p><strong>Production Impact</strong>:</p>
+<ul>
+<li>Maintains ability to filter across all 30,000 records</li>
+<li>Cache automatically cleared on KEV sync and CSV imports</li>
+<li>No breaking changes to existing functionality</li>
+<li>Ready for Claude-Prod deployment to Ubuntu production</li>
+</ul>
+<p><strong>Linear Issue</strong>: <a href="https://linear.app/hextrackr/issue/HEX-91">HEX-91</a></p>
+<hr>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

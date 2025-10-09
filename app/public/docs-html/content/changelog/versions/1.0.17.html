@@ -1,0 +1,98 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.17</h1><p><strong>Release Date</strong>: 2025-09-19</p>
+<hr>
+<h2>[1.0.17] - 2025-09-19</h2><h3>Added (11)</h3><h4>UI/UX Enhancements (2)</h4><ul>
+<li><strong>tickets2.html Beta Implementation</strong>: Introduced beta version of redesigned tickets page with AG-Grid integration<ul>
+<li>Advanced table with column filtering, sorting, resizing, and responsive design</li>
+<li>SITE and LOCATION columns with ticket accent colors for visual categorization</li>
+<li>Enhanced user experience with modern data table interface</li>
+<li>Maintains backward compatibility with existing tickets.html</li>
+</ul>
+</li>
+</ul>
+<h3>Fixed (13)</h3><h4>Theme Engine & Visual Improvements</h4><ul>
+<li><p><strong>Card Border Visibility</strong>: Fixed critical card border issue where vulnerability and device cards blended into page background</p>
+<ul>
+<li>Root cause: CSS specificity conflicts with <code>border-color: transparent !important</code> overrides in dark theme</li>
+<li>Solution: Standardized border variables from <code>--tblr-border-color</code> to <code>--hextrackr-border-subtle</code></li>
+<li>Enhanced border opacity from 0.08 to 0.15 for better visibility across both light and dark modes</li>
+<li>Applied Five Whys root cause analysis to identify true underlying issues</li>
+</ul>
+</li>
+<li><p><strong>AG-Grid Dark Mode Contrast</strong>: Fixed poor contrast for SITE and LOCATION ticket accent colors in dark mode</p>
+<ul>
+<li>Moved ticket accent colors from <code>.ag-theme-quartz</code> scope to global <code>[data-bs-theme=&quot;dark&quot;]</code> scope</li>
+<li>Optimized colors for WCAG AA compliance with enhanced contrast ratios:<ul>
+<li>Teal: #2dd4bf → #5eead4 (9.5:1 contrast ratio)</li>
+<li>Amber: #fbbf24 → #fcd34d (11.2:1 contrast ratio)</li>
+<li>Slate: #94a3b8 → #cbd5e1 (10.2:1 contrast ratio)</li>
+</ul>
+</li>
+<li>All ticket accent colors now meet accessibility standards for dark backgrounds</li>
+</ul>
+</li>
+<li><p><strong>CSS Variable Consolidation</strong>: Comprehensive cleanup of CSS variable architecture</p>
+<ul>
+<li>Fixed Stylelint duplicate variable warnings by creating properly namespaced versions</li>
+<li>Implemented standard and <code>-contrast</code> variants for VPR (Vulnerability Priority Rating) colors</li>
+<li>Consolidated shadow variables with theme-specific opacity values</li>
+<li>Created single source of truth for all color definitions across light/dark themes</li>
+</ul>
+</li>
+<li><p><strong>Device Card Interactivity</strong>: Enhanced device cards with click functionality matching vulnerability cards</p>
+<ul>
+<li>Made device cards clickable with proper cursor styling and modal integration</li>
+<li>Unified user experience patterns between vulnerability and device card interactions</li>
+<li>Added comprehensive JSDoc documentation for improved code maintainability</li>
+</ul>
+</li>
+</ul>
+<h4>CSV Import Pipeline</h4><ul>
+<li><p><strong>Daily Totals Calculation</strong>: Fixed critical bug where <code>calculateAndStoreDailyTotalsEnhanced</code> was missing scan_date filter</p>
+<ul>
+<li>Root cause: Spec 001 backend refactoring removed the WHERE clause filtering by specific scan date</li>
+<li>Impact: Each import would overwrite all previous daily totals instead of updating only the current date</li>
+<li>Solution: Restored <code>WHERE scan_date = ?</code> filter in importService.js line 985</li>
+</ul>
+</li>
+<li><p><strong>Batch Processing Restoration</strong>: Re-implemented <code>processStagingToFinalTables</code> function with proper lifecycle management</p>
+<ul>
+<li>Restored grace period handling for vulnerability state transitions</li>
+<li>Fixed batch processing with 1000-record chunks for performance</li>
+<li>Ensured atomic imports via staging table approach</li>
+</ul>
+</li>
+<li><p><strong>API Response Format</strong>: Fixed /api/vulnerabilities/stats returning array instead of expected object format</p>
+<ul>
+<li>Frontend expected severity-keyed object but received array after modularization</li>
+<li>Restored legacy response contract to maintain backward compatibility</li>
+</ul>
+</li>
+</ul>
+<h3>Documentation (4)</h3><ul>
+<li><p><strong>CSS Theme Architecture</strong>: Added comprehensive documentation for theme system architecture</p>
+<ul>
+<li>Documented CSS variable hierarchy and naming conventions</li>
+<li>Added WCAG contrast guidelines and accessibility best practices</li>
+<li>Provided CSS customization guide for theme modifications</li>
+</ul>
+</li>
+<li><p><strong>Developer Documentation Link</strong>: Fixed broken dev docs link in documentation portal</p>
+<ul>
+<li>Changed from <code>/dev-docs/</code> to <code>/dev-docs-html/</code> to match actual directory structure</li>
+</ul>
+</li>
+<li><p><strong>JSDoc Regeneration</strong>: Updated developer documentation with all recent fixes</p>
+<ul>
+<li>Documented new import service functions and batch processing</li>
+<li>Added comprehensive function descriptions for ImportService</li>
+<li>Enhanced vulnerability-cards.js with detailed JSDoc comments</li>
+</ul>
+</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

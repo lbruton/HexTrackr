@@ -1,0 +1,56 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.52</h1><p><strong>Release Date</strong>: 2025-10-07</p>
+<hr>
+<h2>[1.0.52] - 2025-10-07</h2><h3>Added</h3><h4>Hidden Keyboard Shortcut: VPR Weekly Summary CSV Export (HEX-144)</h4><p><strong>Feature</strong>: Power user feature for instant CSV export of weekly VPR totals via keyboard shortcut.</p>
+<p><strong>Usage</strong>: Cmd+Shift+Click (Mac) or Ctrl+Shift+Click (Windows) on any of the 4 VPR summary cards (Critical, High, Medium, Low)</p>
+<p><strong>CSV Format</strong>:</p>
+<ul>
+<li><strong>Columns</strong>: PERIOD, CRITICAL, HIGH, MEDIUM, LOW, TOTAL</li>
+<li><strong>Rows</strong>: PREV WEEK, THIS WEEK, CHANGE</li>
+<li><strong>Filename</strong>: <code>vpr-weekly-summary-YYYY-MM-DD.csv</code></li>
+<li><strong>Excel Compatible</strong>: UTF-8 BOM encoding for proper character display</li>
+</ul>
+<p><strong>Security</strong>:</p>
+<ul>
+<li>Authentication required - feature only available to logged-in users</li>
+<li>Early return with console warning if unauthenticated</li>
+</ul>
+<p><strong>Implementation Details</strong>:</p>
+<ul>
+<li>Extracts current VPR values from displayed stat cards</li>
+<li>Reverse-calculates previous week values from percentage change badges</li>
+<li>Formula: <code>prevWeek = thisWeek / (1 + percentChange/100)</code></li>
+<li>Automatically calculates TOTAL column across all severity levels</li>
+<li>Prevents card flip behavior when export modifiers are active</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/vulnerability-statistics.js</code>: Added <code>setupVprExportShortcut()</code>, <code>exportVprWeeklySummary()</code>, <code>_handleCardClick()</code>, and <code>downloadCSV()</code> methods</li>
+</ul>
+<p><strong>Use Case</strong>: Security managers can quickly export weekly VPR summaries for Slack/Teams communications and email reports without manual transcription.</p>
+<p><strong>Issue</strong>: <a href="https://linear.app/hextrackr/issue/HEX-144">HEX-144</a></p>
+<h3>Changed</h3><h4>Extended VPR Trends Chart Timeline (HEX-142)</h4><p><strong>Feature</strong>: Expanded Historical VPR Trends chart from 14-day to 30-day view for better long-term trend analysis.</p>
+<p><strong>Changes</strong>:</p>
+<ul>
+<li>Updated chart default zoom to display 30 days of vulnerability trend data</li>
+<li>Modified chart header text: &quot;Last 14 Days&quot; → &quot;Last 30 Days&quot;</li>
+<li>No backend changes required - API already serves unlimited historical data</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/vulnerability-chart-manager.js</code>: Updated <code>zoomToRecentData()</code> default parameter and call site</li>
+<li><code>app/public/vulnerabilities.html</code>: Updated chart header text</li>
+</ul>
+<p><strong>Technical Notes</strong>:</p>
+<ul>
+<li>Backend <code>/api/vulnerabilities/trends</code> endpoint already supports flexible date ranges</li>
+<li>Chart zoom was the only constraint limiting visibility to 14 days</li>
+<li>Full historical dataset now visible by default while maintaining responsive performance</li>
+</ul>
+<p><strong>Issue</strong>: <a href="https://linear.app/hextrackr/issue/HEX-142">HEX-142</a></p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

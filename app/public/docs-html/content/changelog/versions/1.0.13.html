@@ -1,0 +1,80 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.13</h1><p><strong>Release Date</strong>: 2025-09-13</p>
+<hr>
+<h2>[1.0.13] - 2025-09-13</h2><h3>Added (14)</h3><h4>Dark Mode Theme System (Spec 005)</h4><ul>
+<li><strong>Complete Dark/Light Theme Implementation</strong>: Full theme switching system with accessibility focus<ul>
+<li>System preference detection using <code>prefers-color-scheme</code> media query</li>
+<li>Manual theme toggle with persistent localStorage storage (sessionStorage fallback for private browsing)</li>
+<li>Smooth CSS transitions between light and dark themes</li>
+<li>WCAG AA compliance with automated contrast ratio validation</li>
+<li>Screen reader announcements for theme changes via accessibility API</li>
+<li>Cross-tab synchronization of theme preferences</li>
+</ul>
+</li>
+<li><strong>Component Integration</strong>: Seamless theming across all UI components<ul>
+<li>AG-Grid theme integration with custom dark/light variants</li>
+<li>ApexCharts automatic theme adaptation</li>
+<li>Tabler framework theme variables override system</li>
+<li>Modal and overlay components with theme-aware styling</li>
+</ul>
+</li>
+<li><strong>Developer Features</strong>: Comprehensive theme development tools<ul>
+<li>Theme validation utilities with contrast checking</li>
+<li>Debugging tools for theme state management</li>
+<li>Performance optimizations for theme switching</li>
+<li>Extensible architecture for future theme variants</li>
+</ul>
+</li>
+</ul>
+<h3>Fixed (17)</h3><h4>Card Border Consistency (Dark Mode)</h4><ul>
+<li><strong>Card Border Styling</strong>: Fixed inconsistent border appearance between device cards and vulnerability cards in dark mode<ul>
+<li>Resolved thick white borders on device cards that didn&#39;t match the thin dark borders on vulnerability cards</li>
+<li>Updated <code>.device-card, .vuln-card</code> CSS rule in <code>vulnerabilities.html</code> to use theme-aware CSS variables</li>
+<li>Changed hard-coded values to CSS variables for proper theme adaptation:<ul>
+<li><code>background: white</code> → <code>background: var(--tblr-bg-surface)</code></li>
+<li><code>border: 1px solid #e2e8f0</code> → <code>border: 1px solid var(--tblr-border-color)</code></li>
+</ul>
+</li>
+<li>Both card types now display consistent borders across light and dark themes</li>
+<li><strong>Engineering Insight</strong>: Hard-coded CSS values prevented proper theme adaptation despite external stylesheet rules</li>
+<li><strong>Resolution Method</strong>: Systematic investigation using sequential thinking and disciplined Memento documentation</li>
+</ul>
+</li>
+</ul>
+<h4>AG-Grid Table Container Overflow (Spec 004)</h4><ul>
+<li>Fixed AG-Grid table overflow causing excessive white space in Vulnerability Data Workspace</li>
+<li>Removed problematic grid-height-manager.js calculations and vulnerability-table-fix.css</li>
+<li>Implemented clean flexbox solution for natural container sizing:<ul>
+<li><code>.card-body.p-2</code> uses <code>display: flex</code> with consistent minimum height</li>
+<li><code>.view-content</code> with <code>flex-grow: 1</code> for proper space distribution</li>
+<li><code>#vulnGrid</code> with <code>height: 100%; flex-grow: 1</code> for natural expansion</li>
+</ul>
+</li>
+<li>Table now properly expands for 10, 25, 50, 200 items without overflow or excessive padding</li>
+<li><strong>Engineering Insight</strong>: Simple CSS flexbox approach solved what complex JavaScript calculations could not</li>
+<li><strong>Lesson Learned</strong>: Elegant solutions often emerge from removing complexity rather than adding it</li>
+</ul>
+<h2>[1.0.12](https://github.com/Lonnie-Bruton/HexTrackr/releases/tag/v1.0.12) - 2025-09-09</h2><h3>Completed Tasks</h3><h4>Javascript Module Extraction (Spec 001)</h4><ul>
+<li>vulnerability-statistics.js (364 lines) - Task 1.2 ✅ COMPLETED</li>
+<li>vulnerability-data.js (571 lines) - Task 1.1 ✅ COMPLETED</li>
+<li>vulnerability-chart-manager.js (590 lines) - Task 2.2 ✅ COMPLETED</li>
+<li>vulnerability-details-modal.js (935 lines) - Task 3.3 ✅ COMPLETED</li>
+<li>device-security-modal.js (637 lines) - Additional modal ✅ COMPLETED</li>
+<li>progress-modal.js (649 lines) - Additional modal ✅ COMPLETED</li>
+<li>settings-modal.js (1,296 lines) - Settings management ✅ COMPLETED</li>
+<li>ag-grid-responsive-config.js (356 lines) - Grid configuration ✅ COMPLETED</li>
+<li>vulnerability-search.js (268 lines) - Task 2.1 ✅ COMPLETED (Sept 8)</li>
+<li>vulnerability-grid.js (195 lines) - Task 3.1 ✅ COMPLETED (Sept 8)</li>
+<li>vulnerability-cards.js (345 lines) - Task 3.2 ✅ COMPLETED (Sept 8)</li>
+<li>vulnerability-core.js (571 lines) - T004 ✅ COMPLETED (Sept 8)</li>
+<li>T001 Extract vulnerability-search.js ✅ COMPLETED</li>
+<li>T002 Extract vulnerability-grid.js ✅ COMPLETED</li>
+<li>T003 Extract vulnerability-cards.js ✅ COMPLETED</li>
+<li>T004 Create vulnerability-core.js ✅ COMPLETED</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

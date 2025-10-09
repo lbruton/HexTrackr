@@ -1,0 +1,50 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.15</h1><p><strong>Release Date</strong>: 2025-09-17</p>
+<hr>
+<h2>[1.0.15] - 2025-09-17</h2><h3>Changed (5)</h3><h4>Backend Modularization Complete</h4><ul>
+<li><strong>Monolithic Refactor Achievement</strong>: Successfully modularized 3,805-line monolithic server.js<ul>
+<li>Reduced main server.js to ~205 lines (94.6% reduction)</li>
+<li>Extracted into 5 controllers, 4 services, 5 routes, 3 config modules, and 3 utilities</li>
+<li>Implemented singleton pattern for controllers with dependency injection</li>
+<li>Maintained 100% backward compatibility with all existing APIs</li>
+</ul>
+</li>
+<li><strong>Module Organization</strong>:<ul>
+<li><code>/app/controllers/</code> - Business logic with singleton pattern (5 controllers)</li>
+<li><code>/app/services/</code> - Data access layer (4 services)</li>
+<li><code>/app/routes/</code> - Express route definitions (5 route modules)</li>
+<li><code>/app/config/</code> - Configuration modules (database, middleware, websocket)</li>
+<li><code>/app/utils/</code> - Utility classes (PathValidator, ProgressTracker, helpers)</li>
+</ul>
+</li>
+<li><strong>Critical Initialization Sequence</strong>: Established proper dependency injection order<ul>
+<li>Database initialization → Controller initialization → Route imports → Server start</li>
+<li>Fixed initialization timing issues that caused &quot;Controller not initialized&quot; errors</li>
+</ul>
+</li>
+</ul>
+<h3>Added (12)</h3><ul>
+<li><strong>Documentation Updates</strong>:<ul>
+<li>Module dependency diagram with ASCII visualization</li>
+<li>Migration rollback procedure for emergency recovery</li>
+<li>Updated CLAUDE.md with modular patterns and initialization sequence</li>
+<li>Comprehensive architecture documentation reflecting new structure</li>
+</ul>
+</li>
+</ul>
+<h3>Fixed (15)</h3><ul>
+<li><strong>Controller Reference Pattern</strong>: Fixed class vs instance pattern in all route files</li>
+<li><strong>Route Mounting</strong>: Corrected path concatenation issues (e.g., /api/imports/imports)</li>
+<li><strong>File Name Case Sensitivity</strong>: Standardized on lowercase controller filenames</li>
+</ul>
+<h3>Technical Debt Resolved</h3><ul>
+<li><strong>T053 Backend Modularization</strong>: Completed full extraction from monolithic architecture</li>
+<li><strong>Maintainability</strong>: Improved code organization from single 3,805-line file to 15+ focused modules</li>
+<li><strong>Testability</strong>: Enabled unit testing through dependency injection and service separation</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

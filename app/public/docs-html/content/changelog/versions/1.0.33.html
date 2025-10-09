@@ -1,0 +1,48 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.33</h1><p><strong>Release Date</strong>: 2025-09-28</p>
+<hr>
+<h2>[1.0.33] - 2025-09-28</h2><h3>Added (6)</h3><h4>HEX-87: HTTPS Support with Self-Signed Certificates</h4><p><strong>Feature</strong>: Development environment HTTPS implementation using self-signed certificates</p>
+<p><strong>Purpose</strong>: Critical security foundation for upcoming authentication implementation (HEX-80/81)</p>
+<p><strong>Technical Implementation</strong>:</p>
+<ul>
+<li>Generated 10-year self-signed SSL certificate for localhost development</li>
+<li>Enhanced Express server to support both HTTP and HTTPS modes via environment configuration</li>
+<li>Added dotenv configuration loading to server.js for environment variable support</li>
+<li>Implemented protocol-aware server creation maintaining Socket.io compatibility</li>
+<li>Updated Docker configuration to support HTTPS container deployment</li>
+<li>Enhanced health checks to work with both HTTP and HTTPS protocols</li>
+<li>Added certificate directory structure with proper .gitignore exclusions</li>
+</ul>
+<p><strong>Environment Configuration</strong>:</p>
+<ul>
+<li><code>USE_HTTPS=true</code> enables HTTPS mode</li>
+<li><code>SSL_KEY_PATH</code> and <code>SSL_CERT_PATH</code> for certificate locations</li>
+<li>Maintains backward compatibility with HTTP mode for testing</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/server.js</code> - Added HTTPS server creation and dotenv support</li>
+<li><code>docker-compose.yml</code> - Added HTTPS port mapping and certificate volume mounts</li>
+<li><code>Dockerfile</code> - Updated health check to support both protocols</li>
+<li><code>.env</code> - Added HTTPS configuration variables</li>
+<li><code>.gitignore</code> - Added certificate exclusions</li>
+<li><code>certs/</code> - New directory with self-signed certificate files</li>
+</ul>
+<p><strong>Security Impact</strong>:</p>
+<ul>
+<li>Enables secure cookie testing for authentication</li>
+<li>Provides foundation for session-based authentication</li>
+<li>Prepares development environment for production-like HTTPS workflows</li>
+<li>Browser certificate warnings expected and acceptable for development</li>
+</ul>
+<p><strong>Browser Access</strong>:</p>
+<ul>
+<li>HTTP: <code>http://localhost:8080</code> (development) / <code>http://localhost:8989</code> (Docker)</li>
+<li>HTTPS: <code>https://localhost:8080</code> (development) / <code>https://localhost:8989</code> (Docker)</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

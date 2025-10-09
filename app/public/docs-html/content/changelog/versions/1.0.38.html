@@ -1,0 +1,30 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.38</h1><p><strong>Release Date</strong>: 2025-09-30</p>
+<hr>
+<h2>[1.0.38] - 2025-09-30</h2><h3>Fixed (5)</h3><h4>HEX-98: Broken CVE Discovery Query in Import Summaries</h4><p><strong>Critical Bug</strong>: Duplicate CSV imports incorrectly showed 51-54 &quot;new CVEs&quot; instead of 0. Import summaries were completely unreliable for CVE discovery tracking.</p>
+<p><strong>Evidence</strong>:</p>
+<ul>
+<li>Import 1 (01:06 AM): 54 new CVEs affecting 1,556 vulnerabilities ❌</li>
+<li>Import 2 (02:30 PM): 54 new CVEs affecting 1,556 vulnerabilities ❌</li>
+<li>Import 3 (03:17 PM): 51 new CVEs affecting 442 vulnerabilities ❌</li>
+<li><strong>Expected</strong>: 0 new CVEs for duplicate imports</li>
+</ul>
+<p><strong>Root Cause</strong>: SQL query attempted to join <code>vulnerability_daily_totals</code> (aggregated table) with <code>vulnerabilities_current</code> (detailed records) without proper join condition, creating cartesian product with non-deterministic results. Query would mark ancient CVEs (CVE-2017-12240, CVE-2018-0171) as &quot;new&quot; on every import.</p>
+<p><strong>Solution</strong>:</p>
+<ul>
+<li>Replaced broken query with correct <code>vulnerability_snapshots</code> lookup</li>
+<li>Added database indexes on CVE columns for performance optimization</li>
+<li>Reduced query complexity from O(n²) to O(n log n)</li>
+</ul>
+<p><strong>Verification</strong>: Duplicate imports now correctly show 0 new CVEs.</p>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/services/importService.js</code> - Fixed CVE discovery query</li>
+<li><code>app/public/scripts/init-database.js</code> - Added <code>idx_snapshots_cve</code> and <code>idx_current_cve</code> indexes</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

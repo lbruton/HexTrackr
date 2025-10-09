@@ -1,0 +1,56 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.25</h1><p><strong>Release Date</strong>: 2025-09-23</p>
+<hr>
+<h2>[1.0.25] - 2025-09-23</h2><h3>Added - Import Summary HTML Export</h3><h4>Professional Report Generation</h4><ul>
+<li><strong>Standalone HTML Reports</strong>: Added ability to download import summaries as complete HTML documents with embedded CSS styling<ul>
+<li><strong>Export Button</strong>: New &quot;Download Report&quot; button appears in progress modal when CVE import summaries are available</li>
+<li><strong>Self-Contained Files</strong>: Reports include all necessary CSS (Tabler.io framework, HexTrackr variables, component styles) embedded inline</li>
+<li><strong>Professional Formatting</strong>: Complete document structure with metadata headers, generation timestamps, and HexTrackr branding</li>
+<li><strong>Print-Friendly Styling</strong>: Optimized CSS for both screen viewing and professional printing</li>
+</ul>
+</li>
+</ul>
+<h4>Technical Implementation (4)</h4><ul>
+<li><strong>CSS Extraction Engine</strong>: Automated system fetches and combines 7 key stylesheets into single embedded block<ul>
+<li>Tabler.io framework, CSS custom properties, modal styles, badges, cards, tables, and base styles</li>
+<li>Font Awesome icons via CDN import for universal compatibility</li>
+<li>Custom print media queries for professional output</li>
+</ul>
+</li>
+<li><strong>Dynamic File Naming</strong>: Descriptive filenames using pattern <code>HexTrackr_Import_Report_YYYY-MM-DD_[source-filename].html</code></li>
+<li><strong>Blob Download Pattern</strong>: Follows established file export approach with proper MIME types and browser compatibility</li>
+</ul>
+<h4>User Experience Enhancements</h4><ul>
+<li><strong>Visual Feedback System</strong>: Export button provides clear state indicators<ul>
+<li>Loading state with spinner and &quot;Generating...&quot; text</li>
+<li>Success confirmation with checkmark and &quot;Downloaded!&quot; message</li>
+<li>Error handling with warning icon and failure notification</li>
+</ul>
+</li>
+<li><strong>Conditional Visibility</strong>: Export option only appears when import summaries contain meaningful CVE discovery data</li>
+<li><strong>Non-Disruptive Integration</strong>: Feature seamlessly extends existing import workflow without affecting standard operations</li>
+</ul>
+<h3>Fixed - Import Modal State Persistence</h3><h4>Clean Loading States</h4><ul>
+<li><strong>Resolved Stale Data Display</strong>: Fixed issue where previous import summaries appeared during new import loading phases<ul>
+<li><strong>Root Cause</strong>: <code>resetProgressState()</code> function didn&#39;t clear <code>importSummary</code> data or associated DOM elements</li>
+<li><strong>Solution</strong>: Added explicit <code>importSummary: null</code> reset and summary container cleanup</li>
+</ul>
+</li>
+<li><strong>Complete State Reset</strong>: Enhanced modal initialization to properly clear all previous session data<ul>
+<li>Hide and clear <code>progressSummary</code> container content during reset</li>
+<li>Reset export button visibility to prevent stale UI states</li>
+<li>Ensure clean slate for each new import operation</li>
+</ul>
+</li>
+</ul>
+<h4>Technical Improvements</h4><ul>
+<li><strong>Data Lifecycle Management</strong>: Improved progress modal data handling to prevent state leakage between sessions</li>
+<li><strong>DOM Cleanup</strong>: Systematic clearing of dynamically created summary content and UI elements</li>
+<li><strong>ESLint Compliance</strong>: All code modifications passed linting validation with zero errors</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

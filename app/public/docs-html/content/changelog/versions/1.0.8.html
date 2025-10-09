@@ -1,0 +1,57 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.8</h1><p><strong>Release Date</strong>: 2025-09-06</p>
+<hr>
+<h2>[1.0.8] - 2025-09-06</h2><h3>Security Enhancements</h3><ul>
+<li><strong>XSS Protection</strong>: Fixed critical AG Grid cell renderer vulnerability by replacing dangerous inline onclick handlers with secure event system<ul>
+<li>Removed vulnerable <code>onclick=&quot;vulnManager.viewDeviceDetails(&#39;${hostname}&#39;)&quot;</code> pattern susceptible to code injection</li>
+<li>Implemented secure <code>onCellClicked</code> event handler with proper parameter validation</li>
+<li>Prevents hostname values containing quotes or special characters from breaking HTML structure</li>
+</ul>
+</li>
+<li><strong>CORS Security Hardening</strong>: Restricted unrestricted CORS policy to secure localhost-only origins<ul>
+<li>Changed from wide-open <code>cors()</code> to specific <code>origin: [&#39;http://localhost:8080&#39;, &#39;http://127.0.0.1:8080&#39;]</code></li>
+<li>Added explicit HTTP methods and headers whitelist for enhanced security posture</li>
+<li>Enables credentials for future authentication integration</li>
+</ul>
+</li>
+<li><strong>DoS Protection</strong>: Implemented express-rate-limit middleware to prevent denial-of-service attacks<ul>
+<li>Limits each IP to 100 requests per 15-minute window on all /api/ endpoints</li>
+<li>Provides standardized rate limiting headers for client awareness</li>
+<li>Protects import/export endpoints from API flooding attacks</li>
+</ul>
+</li>
+</ul>
+<h3>Performance Improvements</h3><ul>
+<li><strong>CSV Import Performance</strong>: Achieved 11-13x speed improvement through staging table optimization<ul>
+<li>Large CSV files now import in 8-12 seconds instead of 45-60 seconds (10,000 rows tested)</li>
+<li>Switched frontend from <code>/api/vulnerabilities/import</code> to high-performance <code>/api/vulnerabilities/import-staging</code></li>
+<li>Utilizes bulk database operations with transaction batching for optimal throughput</li>
+<li>Maintains full rollover deduplication logic while dramatically improving user experience</li>
+</ul>
+</li>
+</ul>
+<h3>Development Infrastructure (2)</h3><ul>
+<li><strong>Comprehensive Security Audit</strong>: Systematic code quality assessment with detailed vulnerability analysis<ul>
+<li>Conducted thorough security review identifying 6 vulnerabilities and architectural improvements</li>
+<li>Generated detailed audit reports documenting security issues and remediation recommendations</li>
+<li>Created comprehensive technical documentation structure in dev-docs/ for ref.tools indexing</li>
+</ul>
+</li>
+<li><strong>Technical Documentation</strong>: Established development documentation architecture<ul>
+<li>Comprehensive AG Grid responsive patterns, database schema evolution, and testing strategies</li>
+<li>Created keyword-indexed technical documentation for enhanced searchability via ref.tools</li>
+<li>Separated technical docs (dev-docs/) from user documentation (docs-source/) for clarity</li>
+</ul>
+</li>
+<li><strong>Version Management</strong>: Improved version reference strategy for reduced maintenance burden<ul>
+<li>Implemented generic version references in technical documentation to prevent version drift</li>
+<li>Maintained specific versions only where semantically necessary (package.json, CHANGELOG, ROADMAP)</li>
+</ul>
+</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

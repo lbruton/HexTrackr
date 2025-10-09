@@ -1,0 +1,80 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.22</h1><p><strong>Release Date</strong>: 2025-09-21</p>
+<hr>
+<h2>[1.0.22] - 2025-09-21</h2><h3>Enhanced - KEV (Known Exploited Vulnerabilities) Integration</h3><h4>AG-Grid Table Improvements</h4><ul>
+<li><p><strong>Filterable KEV Column</strong>: Replaced fire emoji (🔥) with filterable YES/NO pills in KEV column</p>
+<ul>
+<li>Red badge for &quot;YES&quot; (vulnerability is in KEV catalog)</li>
+<li>Blue badge for &quot;NO&quot; (not in KEV catalog)</li>
+<li>Follows same design pattern as severity and VPR columns for consistency</li>
+<li>Enables proper filtering using AG-Grid&#39;s built-in text-based filter system</li>
+</ul>
+</li>
+<li><p><strong>KEV Column Filtering Fix</strong>: Fixed KEV column filtering to work with AG-Grid&#39;s filtering system</p>
+<ul>
+<li>Changed database query to return &#39;Yes&#39;/&#39;No&#39; text values instead of 1/0 boolean</li>
+<li>Updated column renderer to parse text values for proper filtering compatibility</li>
+<li>Made KEV badges clickable to open detailed KEV modal for vulnerability information</li>
+</ul>
+</li>
+</ul>
+<h4>KEV Modal Enhancements</h4><ul>
+<li><p><strong>CVE Details Integration</strong>: Added &quot;View CVE Details&quot; button in KEV modal</p>
+<ul>
+<li>Opens vulnerability details modal for comprehensive CVE information</li>
+<li>Provides seamless navigation between KEV catalog info and full vulnerability details</li>
+<li>Uses existing <code>showVulnerabilityDetailsByCVE()</code> function for consistency</li>
+</ul>
+</li>
+<li><p><strong>NIST NVD Integration</strong>: Replaced CISA KEV Catalog link with NIST NVD link</p>
+<ul>
+<li>Uses pattern <code>https://nvd.nist.gov/vuln/detail/${cveId}</code> for direct CVE lookup</li>
+<li>Provides more comprehensive vulnerability information from authoritative source</li>
+<li>Both modal buttons now use consistent primary button style for better UI cohesion</li>
+</ul>
+</li>
+<li><p><strong>Clickable Links in Notes</strong>: Made all HTTPS links in KEV additional notes clickable</p>
+<ul>
+<li>Links open in 1200x1200px popup windows for consistency with rest of application</li>
+<li>Automatic regex replacement converts plain URLs to clickable links</li>
+<li>Preserves existing text while enhancing usability</li>
+</ul>
+</li>
+</ul>
+<h4>Filter Dropdown Improvements</h4><ul>
+<li><p><strong>Filter Option Cleanup</strong>: Removed fire emoji from KEV filter option in severity dropdown</p>
+<ul>
+<li>Changed dropdown option from &quot;🔥 KEV&quot; to simply &quot;KEV&quot; for cleaner interface</li>
+<li>Maintains clear identification of KEV filtering without emoji clutter</li>
+</ul>
+</li>
+<li><p><strong>KEV Filter Logic Fix</strong>: Fixed KEV filter to properly match vulnerabilities</p>
+<ul>
+<li>Added special handling in filter logic to distinguish KEV from severity filtering</li>
+<li>Fixed filter matching to properly check <code>isKev === &quot;Yes&quot;</code> when KEV filter selected</li>
+<li>Ensures consistent filtering behavior across grid, cards, and modal contexts</li>
+</ul>
+</li>
+</ul>
+<h3>Fixed - KEV Data Handling</h3><ul>
+<li><p><strong>Database Service Updates</strong>: Updated vulnerability service to return text-based KEV values</p>
+<ul>
+<li>Changed database query from returning 1/0 to &#39;Yes&#39;/&#39;No&#39; text values</li>
+<li>Ensures compatibility with AG-Grid&#39;s text-based filtering system</li>
+<li>Maintains data integrity while improving UI functionality</li>
+</ul>
+</li>
+<li><p><strong>Component Consistency</strong>: Fixed KEV handling across all vulnerability components</p>
+<ul>
+<li>Updated vulnerability cards to check for text value &quot;Yes&quot; instead of boolean</li>
+<li>Ensured consistent KEV data interpretation in grid, cards, modals, and filters</li>
+<li>Eliminated discrepancies between different UI components</li>
+</ul>
+</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
