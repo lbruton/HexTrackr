@@ -143,9 +143,11 @@ document.addEventListener("DOMContentLoaded", () => {
 /**
  * Setup vendor toggle event listeners
  * Updates dashboard stats cards and chart when vendor filter changes
+ * Also syncs with vendor dropdown in search area
  */
 function setupVendorToggle() {
     const vendorRadios = document.querySelectorAll("input[name=\"vendor-filter\"]");
+    const vendorDropdown = document.getElementById("vendorFilter");
 
     vendorRadios.forEach(radio => {
         radio.addEventListener("change", async (e) => {
@@ -157,6 +159,13 @@ function setupVendorToggle() {
             console.log(`Vendor filter changed to: ${vendor || "All Vendors"}`);
 
             try {
+                // Sync dropdown to match radio button (prevent infinite loop by checking current value)
+                if (vendorDropdown && vendorDropdown.value !== vendor) {
+                    vendorDropdown.value = vendor;
+                    // Trigger change event on dropdown to update table/cards filtering
+                    vendorDropdown.dispatchEvent(new Event("change"));
+                }
+
                 // Update stats cards
                 await window.modernVulnManager.statisticsManager.updateStatisticsDisplay(vendor);
 
@@ -171,9 +180,40 @@ function setupVendorToggle() {
     });
 }
 
-// Wire up vendor toggle on page load
+/**
+ * Setup vendor dropdown sync with radio buttons
+ * When dropdown changes, update radio buttons to match
+ */
+function setupVendorDropdownSync() {
+    const vendorDropdown = document.getElementById("vendorFilter");
+    const vendorRadios = document.querySelectorAll("input[name=\"vendor-filter\"]");
+
+    if (!vendorDropdown) {return;}
+
+    vendorDropdown.addEventListener("change", async (e) => {
+        const selectedVendor = e.target.value; // "" = All, "CISCO", "Palo Alto", "Other"
+
+        // Find matching radio button and check it
+        vendorRadios.forEach(radio => {
+            const label = document.querySelector(`label[for="${radio.id}"]`);
+            const radioVendor = label.dataset.vendor;
+
+            if (radioVendor === selectedVendor) {
+                // Only trigger change if not already checked (prevents infinite loop)
+                if (!radio.checked) {
+                    radio.checked = true;
+                    // Trigger change event to update stats/charts
+                    radio.dispatchEvent(new Event("change"));
+                }
+            }
+        });
+    });
+}
+
+// Wire up vendor toggle and dropdown sync on page load
 document.addEventListener("DOMContentLoaded", () => {
     setupVendorToggle();
+    setupVendorDropdownSync();
 });
 
 // Handle browser back/forward cache (bfcache) restoration
