@@ -105,7 +105,25 @@
 <li>Webhook support for real-time notifications</li>
 <li>Rate limiting and API security</li>
 </ul>
-<h2>🔌 Integrations & Analytics</h2><h3>Advanced Reporting</h3><p>Enhanced reporting capabilities for security teams and management dashboards.</p>
+<h2>🔌 Integrations & Analytics</h2><h3>Cisco PSIRT Integration Enhancements</h3><p><strong>Status</strong>: Planned (HEX-141)<br><strong>Priority</strong>: High<br><strong>Business Value</strong>: Critical remediation intelligence for Cisco products</p>
+<p>Enhance the vulnerability details modal to display <strong>Cisco fixed software versions</strong> by utilizing the existing Cisco PSIRT API integration.</p>
+<p><strong>Current State</strong>: Cisco API working but underutilized (shows basic alert with 4 fields)</p>
+<p><strong>Planned Features:</strong></p>
+<ul>
+<li>Display Cisco fixed software versions in vulnerability details modal</li>
+<li>Show affected product releases and versions</li>
+<li>Link to full Cisco security advisories</li>
+<li>Handle multiple fix versions across different platforms</li>
+<li>Graceful fallback when no Cisco advisory exists</li>
+</ul>
+<p><strong>Implementation Approach</strong> (3 phases):</p>
+<ul>
+<li><strong>Phase 1 (MVP)</strong>: Enhance modal with <code>firstFixed</code> field display (4-6 hours)</li>
+<li><strong>Phase 2 (Performance)</strong>: Add OAuth token caching and credential security (8-10 hours)</li>
+<li><strong>Phase 3 (Enterprise)</strong>: Backend proxy pattern with database caching (16-20 hours)</li>
+</ul>
+<p><strong>Why This Matters</strong>: Security teams need immediate access to patch information. Currently, users must manually look up Cisco advisories - this integration brings remediation guidance directly into the vulnerability workflow.</p>
+<h3>Advanced Reporting</h3><p>Enhanced reporting capabilities for security teams and management dashboards.</p>
 <p><strong>Features:</strong></p>
 <ul>
 <li>Executive summary reports</li>
