@@ -260,18 +260,27 @@ class HtmlContentUpdater {
                 console.warn(`  ⚠️  Could not update footer.html: ${error.message}`);
             }
 
-            // 3. Update README.md version badge
+            // 3. Update README.md version (supports both badge and text formats)
             try {
                 const readmePath = path.join(process.cwd(), "README.md");
                 const readmeContent = await fs.readFile(readmePath, "utf8");
-                const updatedReadme = readmeContent.replace(
+                let updatedReadme = readmeContent;
+
+                // Update badge URL format (HexTrackr-v1.0.55-blue)
+                updatedReadme = updatedReadme.replace(
                     /HexTrackr-v[\d.]+-blue/g,
                     `HexTrackr-v${currentVersion}-blue`
                 );
 
+                // Update plain text format (Current version: **v1.0.54**)
+                updatedReadme = updatedReadme.replace(
+                    /Current version: \*\*v[\d.]+\*\*/g,
+                    `Current version: **v${currentVersion}**`
+                );
+
                 if (readmeContent !== updatedReadme) {
                     await fs.writeFile(readmePath, updatedReadme);
-                    console.log("  ✅ Updated README.md version badge");
+                    console.log("  ✅ Updated README.md version");
                     updatesApplied++;
                 }
             } catch (error) {
