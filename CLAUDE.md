@@ -1,490 +1,513 @@
-# CLAUDE.md
+# CLAUDE.md - Operational Memory
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+**Purpose**: This file is YOUR operational memory. It contains critical patterns, workflows, and checks to function efficiently. Not a reference manual for the user.
 
-## Project Overview
+## Project Identity
 
-HexTrackr is a vulnerability management system for tracking security vulnerabilities, tickets, and Known Exploited Vulnerabilities (KEV). Built with Node.js/Express backend, SQLite database, and vanilla JavaScript frontend with AG-Grid and ApexCharts.
+**HexTrackr**: Vulnerability management system (Node.js/Express, SQLite, vanilla JS, AG-Grid, ApexCharts)
 
-**Tech Stack**: Node.js 22.11.0 LTS, Express.js, better-sqlite3, Socket.io, Argon2id authentication, Helmet.js security, vanilla JavaScript, AG-Grid Community, ApexCharts
+**Tech Stack**: Node.js 22.11.0 LTS, Express.js, better-sqlite3, Socket.io, Argon2id auth, Helmet.js, vanilla JavaScript, AG-Grid Community, ApexCharts
 
-## Architecture
+**Current Version**: v1.0.56 (automated via `npm run release`)
+
+## File System Layout
 
 ```text
-app/
-├── public/              # Frontend assets (HTML, CSS, JS modules)
-│   └── scripts/         # Database initialization and utilities
-├── config/              # Server configuration modules
-├── middleware/          # Express middleware (auth, CSRF)
-├── controllers/         # Request handlers (singleton pattern with initialize())
-├── services/            # Business logic layer (returns {success, data, error})
-└── routes/              # Express route definitions
+/Volumes/DATA/GitHub/HexTrackr/
+├── app/
+│   ├── public/
+│   │   ├── *.html                    # Frontend pages
+│   │   ├── scripts/
+│   │   │   ├── init-database.js      # Schema (DESTRUCTIVE - git hooks block)
+│   │   │   ├── migrations/           # SQL migrations (incremental)
+│   │   │   ├── pages/                # Page-specific modules
+│   │   │   └── shared/               # Shared utilities
+│   │   ├── docs-html/                # Generated documentation
+│   │   │   ├── html-content-updater.js  # Version automation + docs generator
+│   │   │   └── content/              # Generated HTML
+│   │   └── docs-source/              # Markdown sources
+│   │       ├── changelog/versions/   # Version changelog files
+│   │       └── guides/               # User guides
+│   ├── config/                       # Server configuration
+│   ├── middleware/                   # Express middleware (auth, CSRF)
+│   ├── controllers/                  # Request handlers (singleton + initialize())
+│   ├── services/                     # Business logic ({success, data, error})
+│   └── routes/                       # Express route definitions
+├── docs/
+│   ├── TEMPLATE_RESEARCH.md          # RPI Research template
+│   ├── TEMPLATE_PLAN.md              # RPI Plan template
+│   ├── TEMPLATE_IMPLEMENT.md         # RPI Implement template
+│   ├── RPI_PROCESS.md                # Complete RPI workflow
+│   └── GIT_WORKFLOW.md               # Git branching strategy
+├── CLAUDE.md                         # This file (operational memory)
+├── package.json                      # Version source of truth
+└── docker-compose.yml                # Docker deployment config
 ```
 
-**Key Patterns**:
-- **Module System**: CommonJS (`require`/`module.exports`) throughout backend
-- **Controllers**: Singleton pattern with `initialize(db, progressTracker)` method
-- **Services**: Business logic returns `{success, data, error}` objects
-- **Error Handling**: Service layer handles errors, controllers propagate to Express
-- **Database**: better-sqlite3 synchronous API
+## Mandatory Startup Checks
+
+**CRITICAL**: Before any code work, ALWAYS verify:
+
+### 1. Claude-Context Index Status
+
+```javascript
+// Check if codebase is indexed
+mcp__claude-context__get_indexing_status({
+  path: "/Volumes/DATA/GitHub/HexTrackr"
+})
+
+// If unindexed or >1 hour old, re-index
+mcp__claude-context__index_codebase({
+  path: "/Volumes/DATA/GitHub/HexTrackr",
+  splitter: "ast",  // Syntax-aware with auto-fallback
+  force: false      // Set true only if user confirms
+})
+```
+
+**Why**: Semantic code search is MANDATORY for RPI workflow verification. Stale indexes lead to incorrect line numbers and architectural misidentification.
+
+### 2. Git Status Check
+
+```bash
+git status  # Clean worktree before starting
+git pull origin main  # Sync dev branch
+```
+
+### 3. Testing Environment URLs
+
+- ✅ **Dev**: `https://dev.hextrackr.com` (Mac M4 Docker :8989)
+- ✅ **Prod**: `https://hextrackr.com` (Ubuntu 192.168.1.80 :8443)
+- ✅ **Legacy**: `https://localhost` (same as dev)
+- ❌ **NEVER**: `http://localhost` (empty API responses)
+- 🔒 **SSL Bypass**: Type `thisisunsafe` on cert warning
+
+## SlashCommand Abstractions
+
+**Purpose**: Efficient workflow shortcuts that wrap MCP tools with consistent parameters.
+
+### Codebase Analysis
+
+**`/status-code`** - Check claude-context indexing status
+```bash
+/status-code
+# Returns: Index status, progress %, last update timestamp
+# Wraps: mcp__claude-context__get_indexing_status
+```
+
+**`/search-code [natural language query]`** - Semantic codebase search
+```bash
+/search-code authentication middleware patterns
+# Returns: Top 10 relevant code snippets with file paths and line numbers
+# Wraps: mcp__claude-context__search_code with path + limit defaults
+```
+
+**`/index-code`** - Index or re-index codebase
+```bash
+/index-code
+# Wraps: mcp__claude-context__index_codebase with splitter: "ast"
+```
+
+### Git & Status
+
+**`/load-git`** - Get current git context
+```bash
+/load-git
+# Returns: Current time, last 3 commits, status, branch
+# Wraps: Multiple Bash commands (date, git log, git status, git branch)
+```
+
+### Security
+
+**`/sec-scan`** - Full security vulnerability scan
+```bash
+/sec-scan
+# Invokes: hextrackr-fullstack-dev agent
+# Scans: SQL injection, XSS, exposed credentials, insecure configs
+# Returns: Comprehensive security audit report with severity ratings
+```
+
+### Problem Analysis
+
+**`/why [question or problem]`** - Five Whys root cause analysis
+```bash
+# Use general-purpose Task tool to invoke:
+Task({
+  subagent_type: "general-purpose",
+  prompt: "/why Why is the session cookie not being set?"
+})
+# Returns: Iterative root cause analysis using 5 Whys methodology
+```
+
+**`/think`** - Sequential thinking for complex problems
+```bash
+# Prompts subagent to use sequential-thinking MCP
+# Use for: Multi-step analysis, design decisions, debugging
+```
+
+### Knowledge Management
+
+**`/save-insights`** - Save important insights to Memento
+```bash
+/save-insights
+# Extracts key learnings from session
+# Creates Memento entities with proper taxonomy
+# Tags: breakthrough, lesson-learned, best-practice
+```
+
+**`/save-handoff`** - Generate handoff for new session
+```bash
+/save-handoff
+# Creates comprehensive handoff document
+# Includes: Current state, pending tasks, critical context
+# Saves to Memento with HANDOFF entity type
+```
+
+**`/save-conversation`** - Save session key details before compact
+```bash
+/save-conversation
+# Archives complete session context to Memento
+# Use before: Context limit, session transition, major milestone
+```
+
+### Reporting
+
+**`/report-insights`** - Save 7-day insights report to Linear
+```bash
+/report-insights
+# Queries Memento for last 7 days
+# Generates summary report
+# Creates Linear issue in Reports team
+```
+
+**`/create-report`** - Generate full standup report for team
+```bash
+/create-report
+# Compiles: Completed work, in-progress, blockers
+# Sources: Linear issues, git commits, Memento sessions
+```
+
+**`/compare-reports`** - Compare dev/prod standups
+```bash
+/compare-reports
+# Compares: HexTrackr-Dev vs HexTrackr-Prod team status
+# Returns: Overall project health, handoff opportunities
+```
+
+## Three-Agent Architecture
+
+**Multi-Claude Instance Pattern** (Memento/Linear coordination):
+
+### Claude Desktop (Planning/Coordination)
+- **Role**: Issue creation, sprint planning, cross-team orchestration
+- **Location**: Mac M4 (user's desktop)
+- **Linear Access**: All teams (HexTrackr-Dev, HexTrackr-Prod, HexTrackr-Docs, Reports)
+- **Focus**: Strategic planning, workflow coordination
+
+### Claude-Dev (Development/Implementation)
+- **Role**: Feature development, refactoring, code reviews
+- **Location**: Mac M4 (local Docker, private repo)
+- **Environment**: `https://dev.hextrackr.com` (127.0.0.1:8989)
+- **Linear Team**: HexTrackr-Dev (HEX-XX issues)
+- **Focus**: Code implementation, testing, documentation
+
+### Claude-Prod (Deployment/Security)
+- **Role**: Production deployment, security hardening, performance
+- **Location**: Ubuntu server (192.168.1.80)
+- **Environment**: `https://hextrackr.com` (public :8443)
+- **Linear Team**: HexTrackr-Prod (HEXP-XX issues)
+- **Focus**: Production releases, nginx optimization, security
+
+### Shared Resources
+
+- **Memento Knowledge Graph**: Neo4j at 192.168.1.80 (all instances write to same graph)
+- **Linear Teams**: Issue-based coordination and handoffs
+- **Claude-Context**: Codebase indexing (each instance maintains own index)
+
+### Handoff Pattern
+
+```text
+1. Desktop creates HEX-XX (RESEARCH) → delegates to Dev
+2. Dev completes implementation → creates HEXP-XX for Prod
+3. Linear issue description contains full context (never comments!)
+4. Memento entities reference Linear issue IDs for traceability
+```
+
+## Linear-First Workflow
+
+**Core Principle**: Linear issues are source of truth, NOT markdown files or comments.
+
+### Issue Creation (RPI Templates)
+
+**Templates are NOT in Linear API** - Must read from `/docs/TEMPLATE_*.md` and apply programmatically:
+
+```javascript
+// 1. Read template
+const templateContent = await fs.readFile('/docs/TEMPLATE_RESEARCH.md', 'utf8');
+
+// 2. Replace placeholders
+const description = templateContent
+  .replace(/HEX-XXX/g, 'HEX-171')  // Will be updated after creation
+  .replace(/<short name>/g, 'Version Automation')
+  .replace(/<your name>/g, 'Lonnie B.')
+  .replace(/YYYY-MM-DD/g, '2025-10-09');
+
+// 3. Create issue
+mcp__linear-server__create_issue({
+  team: "HexTrackr-Dev",
+  title: "RESEARCH: Version Automation",
+  description: description  // Full template content
+})
+```
+
+### Update Descriptions, NOT Comments
+
+**ANTI-PATTERN**: Adding findings as Linear comments wastes context
+**CORRECT PATTERN**: Update issue description (authoritative source)
+
+```javascript
+// ❌ Wrong - Comments create chronological noise
+mcp__linear-server__create_comment({
+  issueId: "HEX-171",
+  body: "Found code at line 245"
+})
+
+// ✅ Right - Update description with verified findings
+mcp__linear-server__update_issue({
+  id: "HEX-171",
+  description: updatedDescription  // Replace placeholders with claude-context verified locations
+})
+```
+
+### Linear Issue Hierarchy
+
+```text
+RESEARCH: <name>     (HEX-123, parent)
+└── PLAN: <name>     (HEX-124, child of RESEARCH)
+    └── IMPLEMENT: <name>  (HEX-125, child of PLAN)
+```
+
+**Title Prefixes**: RESEARCH:, PLAN:, IMPLEMENT: (for filtering)
+**Auto-Assignment**: Linear assigns sequential IDs (HEX-XX)
+
+## RPI Process (Compressed)
+
+**Full Documentation**: `/docs/RPI_PROCESS.md`
+
+### Critical Patterns
+
+1. **Always verify assumptions with claude-context before updating Linear**
+   - Don't trust documentation or memory
+   - Search semantically, read files, verify line numbers
+   - Update RESEARCH/PLAN descriptions with verified locations
+
+2. **Complete ALL process gates before proceeding**
+   - RESEARCH: Readiness Gate (5 checkboxes) + Auto-Quiz (8 questions)
+   - PLAN: Preflight (5 checkboxes) + Auto-Quiz (4 questions)
+   - IMPLEMENT: Task checklist from PLAN
+
+3. **Git checkpoints before code changes**
+   ```bash
+   git status  # Must be clean
+   git commit -m "🔐 pre-work snapshot (HEX-171)"
+   ```
+
+4. **Commit every 1-5 tasks with task IDs**
+   ```bash
+   git commit -m "feat(automation): Add version sync (HEX-171 Task 2.1)"
+   ```
+
+5. **Agent delegation workflow**
+   - Agent does code implementation FIRST
+   - Then human/Desktop reviews and updates Linear/CHANGELOG/Memento
+   - Separation of concerns: agents code, humans document
+
+## Memento Taxonomy (Inline)
+
+**Authority**: DOCS-14 (Memento Knowledge Graph Taxonomy v1.2.0)
+
+### Entity Naming: PROJECT:DOMAIN:TYPE
+
+**Projects**: HEXTRACKR, SYSTEM, PROJECT, MEMENTO, SPEC-KIT
+**Domains**: DEVELOPMENT, ARCHITECTURE, SECURITY, FRONTEND, BACKEND, DATABASE, WORKFLOW, DOCUMENTATION
+**Types**: SESSION, HANDOFF, INSIGHT, PATTERN, ANALYSIS, DECISION, ISSUE, BREAKTHROUGH
+
+### Required Tags (Every Entity)
+
+**Must Have**:
+- Project tag: `project:hextrackr`, `project:system`
+- Category tag: `frontend`, `backend`, `database`, `documentation`, `testing`
+- Temporal tag: `week-XX-YYYY`, `vX.X.X`, `sprint-X`
+
+**Spec Work**:
+- Specification tag: `spec:001` through `spec:999`
+- Workflow tag: `in-progress`, `completed`, `blocked`, `needs-review`
+
+**Knowledge Capture**:
+- Learning tag: `lesson-learned`, `pattern`, `breakthrough`, `anti-pattern`, `best-practice`
+- Cross-project: `reusable` (if applicable to other projects)
+
+### Search Strategy
+
+**Use `mcp__memento__search_nodes` for**:
+- Exact ID matching (SESSION_ID, HANDOFF_ID)
+- Specific tag queries (spec:001, week-38-2025)
+- Status checks (completed, in-progress, blocked)
+
+**Use `mcp__memento__semantic_search` for**:
+- Conceptual queries ("performance optimization techniques")
+- Natural language ("WebSocket authentication best practices")
+- Cross-cutting themes ("architectural decisions from last month")
+
+**NEVER use `read_graph`** (will fail with 200K+ tokens)
+
+### Tagging Pattern
+
+```javascript
+// 1. Create entity
+mcp__memento__create_entities([{
+  name: "Session: HEXTRACKR-VERSION-20251009-212600",
+  entityType: "HEXTRACKR:DEVELOPMENT:SESSION",
+  observations: [
+    "TIMESTAMP: 2025-10-09T21:26:00.000Z",
+    "ABSTRACT: Version automation system implementation",
+    "SUMMARY: Implemented unified release workflow...",
+    "SESSION_ID: HEXTRACKR-VERSION-20251009-212600"
+  ]
+}]);
+
+// 2. Add tags using add_observations with "TAG: " prefix
+mcp__memento__add_observations({
+  observations: [{
+    entityName: "Session: HEXTRACKR-VERSION-20251009-212600",
+    contents: [
+      "TAG: project:hextrackr",
+      "TAG: linear:HEX-171",
+      "TAG: backend",
+      "TAG: frontend",
+      "TAG: automation",
+      "TAG: breakthrough",
+      "TAG: completed",
+      "TAG: week-41-2025",
+      "TAG: v1.0.56",
+      "TAG: reusable"
+    ]
+  }]
+});
+```
+
+## Git Workflow
+
+**Main Branch**: Protected on GitHub
+**Working Branch**: `dev` (daily baseline)
+
+```bash
+# Daily pattern
+git checkout dev
+git pull origin main  # Sync with GitHub
+# ... work on feature branches ...
+git push origin dev
+
+# Feature branches
+git checkout -b feature/hex-171-version-automation
+# ... commits ...
+git push origin feature/hex-171-version-automation
+# Create PR: feature → dev (review) → main (protected)
+```
+
+**Commit Messages**:
+```bash
+# Format: type(scope): description (Linear ID)
+git commit -m "feat(automation): Unified release workflow (HEX-171)"
+git commit -m "fix(auth): Trust proxy configuration (HEX-128)"
+git commit -m "docs: Update CLAUDE.md with RPI patterns (HEX-171)"
+```
+
+## Version Management (Automated)
+
+**Source of Truth**: Root `package.json`
+
+**Workflow** (2 steps):
+```bash
+# 1. Manual: Update version + changelog
+vim package.json  # Change "version": "1.0.56" → "1.0.57"
+vim app/public/docs-source/changelog/versions/1.0.57.md
+
+# 2. Automated: Run release command
+npm run release
+# ✅ Syncs version to 5 files
+# ✅ Generates 79 HTML docs
+# ✅ Generates JSDoc API reference
+```
+
+**Auto-Updated Files** (NEVER edit manually):
+1. `app/public/package.json`
+2. `app/public/scripts/shared/footer.html`
+3. `README.md`
+4. `docker-compose.yml`
+5. `app/public/server.js` (reads env var)
+
+## Critical Configurations
+
+### Trust Proxy (ALWAYS Enabled)
+
+```javascript
+// app/public/server.js
+app.set("trust proxy", true);  // Required for nginx reverse proxy
+```
+
+**Why**: nginx terminates SSL, Express needs `X-Forwarded-Proto` to detect HTTPS for secure cookies.
+
+### Session Management
+
+- `SESSION_SECRET` env var required (32+ characters)
+- Generate: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
+- Server refuses to start without valid SESSION_SECRET
+
+### Database Migrations
+
+**NEVER run `npm run init-db` on existing database** (DESTROYS DATA, git hooks block)
+
+**Migration Process**:
+```bash
+# 1. Create migration file
+app/public/scripts/migrations/003-add-vendor-column.sql
+
+# 2. Apply manually
+sqlite3 app/data/hextrackr.db < app/public/scripts/migrations/003-add-vendor-column.sql
+
+# 3. Update init-database.js (for fresh installs)
+```
 
 ## Essential Commands
 
 ```bash
 # Development
-npm start                # Production server (port 8080)
-npm run dev              # Development with nodemon hot-reload
+npm start                # Production server (:8080)
+npm run dev              # Development with nodemon
+npm run release          # Version sync + docs generation
 
-# Database (CRITICAL: init-db DESTROYS ALL DATA)
-npm run init-db          # Initialize schema (FRESH INSTALLS ONLY - DESTRUCTIVE)
+# Linting
+npm run lint:all         # All linters (md, eslint, stylelint)
+npm run fix:all          # Auto-fix all issues
 
-# Quality & Linting
-npm run lint:all         # Run all linters (markdown, eslint, stylelint)
-npm run fix:all          # Auto-fix all linting issues
-npm run eslint           # ESLint only
-npm run eslint:fix       # Auto-fix ESLint issues
-
-# Documentation
-npm run docs:dev         # Generate JSDoc documentation
-npm run docs:generate    # Update HTML content from markdown
-npm run docs:all         # Full documentation build
-
-# Docker (Required for Testing)
-docker-compose up -d     # Start nginx reverse proxy + app
-docker-compose logs -f   # Follow container logs
-docker-compose restart   # Restart after code changes
+# Docker (REQUIRED for testing)
+docker-compose up -d     # Start nginx + app
+docker-compose logs -f   # Follow logs
+docker-compose restart   # Restart after changes
 ```
 
-## Changelog & Version Management
+## Code Patterns
 
-**Current Version**: v1.0.56
-
-### Changelog Structure
-
-HexTrackr uses a **modular changelog system** with individual files per version:
-
-```text
-app/public/docs-source/changelog/
-├── index.md              # Changelog landing page with navigation
-└── versions/             # Individual version files
-    ├── 1.0.54.md        # Latest version (current)
-    ├── 1.0.53.md
-    ├── 1.0.52.md
-    └── ...
-```
-
-### Creating a New Changelog Entry
-
-When creating a new version, follow this process:
-
-**1. Create Version File**
-
-Create `app/public/docs-source/changelog/versions/X.Y.Z.md` using this template:
-
-```markdown
-# Version X.Y.Z
+- **Module System**: CommonJS (`require`/`module.exports`)
+- **Controllers**: Singleton with `initialize(db, progressTracker)` method
+- **Services**: Return `{success, data, error}` objects
+- **Error Handling**: Services handle, controllers propagate to Express
+- **Database**: better-sqlite3 synchronous API
+- **JSDoc**: Required on all functions
+- **Security**: Parameterized SQL, CSRF protection, Helmet.js headers
 
 ---
 
-## [X.Y.Z]
-
-### Added
-
-#### Feature Name (Linear Issue IDs) - YYYY-MM-DD
-
-**Description**: Brief summary of what was added.
-
-**Key Features**:
-- Feature 1 details
-- Feature 2 details
-- Feature 3 details
-
-**Files Modified**:
-- `path/to/file1.js`: Description of changes
-- `path/to/file2.js`: Description of changes
-
-**Validation**:
-- ✅ Test case 1 passed
-- ✅ Test case 2 passed
-
-**Issues**:
-- [HEX-XXX](https://linear.app/hextrackr/issue/HEX-XXX) - Issue title
-
-### Fixed
-
-- Fixed bug 1 description
-- Fixed bug 2 description
-- Fixed bug 3 description
-
-### Changed
-
-- Changed behavior 1
-- Changed behavior 2
-
-### Deprecated
-
-- Deprecated feature 1 (use X instead)
-
-### Removed
-
-- Removed obsolete feature 1
-
-### Security
-
-- Security improvement 1
-- Security improvement 2
-```
-
-**2. Update Changelog Index**
-
-Update `app/public/docs-source/changelog/index.md`:
-
-```markdown
-**Current Version**: [vX.Y.Z](#changelog/versions/X.Y.Z)
-
-## Recent Releases
-
-### Version 1.0.x Series (Current)
-
-#### Latest Releases
-
-- [**vX.Y.Z**](#changelog/versions/X.Y.Z) - Brief description
-- [**v1.0.54**](#changelog/versions/1.0.54) - Vendor CSV Export Enhancements
-...
-
-## Complete Version History
-
-| Version | Release Date | Highlights |
-|---------|--------------|------------|
-| [X.Y.Z](#changelog/versions/X.Y.Z) | YYYY-MM-DD | Brief highlights |
-| [1.0.54](#changelog/versions/1.0.54) | Latest | Vendor CSV Export |
-...
-```
-
-**3. Run Automated Release Workflow**
-
-The version automation system (HEX-171) handles all file updates automatically:
-
-```bash
-# Update root package.json version
-vim package.json  # Change "version": "X.Y.Z"
-
-# Run unified release command
-npm run release
-```
-
-**What the automation does**:
-- ✅ Syncs version to 5 files: app/public/package.json, footer.html, README.md, docker-compose.yml, server.js
-- ✅ Generates 79 markdown → HTML documentation files
-- ✅ Generates JSDoc HTML API reference
-- ✅ Creates update report in logs/docs-source/
-
-**Source of Truth**: Root `package.json` is authoritative (updated by `npm version` commands or manual edit)
-
-**Files Auto-Updated**:
-1. `app/public/package.json` - Application package version
-2. `app/public/scripts/shared/footer.html` - Version badge on all pages
-3. `README.md` - Header version text and badge
-4. `docker-compose.yml` - HEXTRACKR_VERSION environment variable
-5. `app/public/server.js` - Reads from docker-compose.yml env var (dynamic)
-
-**⚠️ Important**: Never manually edit the 5 auto-updated files above. Always update root `package.json` and run `npm run release`.
-
-**4. Link Format**
-
-Always use this format for version links in changelog:
-- `#changelog/versions/X.Y.Z` (internal navigation)
-- `https://linear.app/hextrackr/issue/HEX-XXX` (Linear issues)
-
-### Changelog Best Practices
-
-✅ **Group changes by type** (Added, Fixed, Changed, etc.)
-✅ **Include Linear issue IDs** for traceability
-✅ **List modified files** for code archaeology
-✅ **Add validation checkmarks** to show testing
-✅ **Use descriptive feature names** in headers
-✅ **Keep entries concise** but complete
-
-❌ **Don't edit old version files** (changelog is immutable history)
-❌ **Don't skip validation section** (shows due diligence)
-❌ **Don't forget to update index.md** (users need navigation)
-
-### Version Numbering (Semantic Versioning)
-
-- **Major (X.0.0)**: Breaking changes, major rewrites
-- **Minor (1.X.0)**: New features, backward-compatible
-- **Patch (1.0.X)**: Bug fixes, small improvements
-
-Current series: **1.0.x** (stable feature additions)
-
----
-
-## Testing URLs
-
-**CRITICAL**: Always test via HTTPS through nginx reverse proxy. HTTP endpoints return empty API responses.
-
-- ✅ **Development**: `https://dev.hextrackr.com` (127.0.0.1 → Docker on Mac M4)
-- ✅ **Production**: `https://hextrackr.com` (192.168.1.80 → Ubuntu server)
-- ✅ **Legacy**: `https://localhost` (also valid for dev)
-- ❌ **NEVER**: `http://localhost` (broken - returns empty responses)
-- 🔒 **SSL Bypass**: Type `thisisunsafe` on certificate warning page
-
-## Database Schema Changes
-
-**⚠️ CRITICAL**: `npm run init-db` DROPS ALL TABLES and DESTROYS DATA. Git hooks block this to prevent accidents.
-
-**Migration Process** (when schema changes are needed):
-
-1. **Create SQL Migration File**: `app/public/scripts/migrations/XXX-description.sql`
-   - Use incremental numbering (001, 002, 003...)
-   - Pure SQL only (DDL statements)
-   - Test on database backup first
-
-2. **Apply Migration Manually**:
-   ```bash
-   sqlite3 app/data/hextrackr.db < app/public/scripts/migrations/XXX-description.sql
-   ```
-
-3. **Update init-database.js**: Add schema change to `app/public/scripts/init-database.js`
-   - Keeps fresh installs in sync with migrations
-   - Single source of truth for complete schema
-
-**Why This Matters**: `init-db` destroys ALL data. Migrations are additive and preserve existing data.
-
-## Code Style
-
-- **JSDoc Required**: All functions must have complete JSDoc comments
-- **Async/Await**: Preferred over callbacks or raw promises
-- **Security**: All user input validated, parameterized SQL queries, CSRF protection enabled
-- **Error Messages**: Descriptive error objects with context for debugging
-
-## Documentation Format
-
-**Markdown Link Format**: The documentation generator (`html-content-updater.js`) uses `marked` which processes links differently in headings vs. lists.
-
-### ✅ Correct Format (Works with Generator)
-
-**Index pages** (index.md files) should use **list-based links**:
-
-```markdown
-## Section Name
-
-- **[Document Title](./document.md)**: Brief description of the document content
-
-- **[Another Document](./another.md)**: Description of another document
-```
-
-**Why**: Links in list items are correctly transformed to hash-based navigation (`#section/document`)
-
-### ❌ Incorrect Format (Links Don't Work)
-
-**Do NOT use heading-based links**:
-
-```markdown
-## Section Name
-
-### [Document Title](./document.md)
-
-Description of the document
-```
-
-**Why**: `marked` doesn't process links embedded in headings - they render as literal text
-
-### Working Examples
-
-- ✅ `architecture/index.md` - Uses list-based links
-- ✅ `api-reference/index.md` - Uses list-based links
-- ✅ `reference/index.md` - Fixed to use list-based links
-- ✅ `guides/index.md` - Fixed to use list-based links
-
-### Table of Contents Anchors
-
-**Current Limitation**: The generator doesn't auto-generate heading IDs, so TOC anchor links (`#heading-name`) don't work unless using manual syntax.
-
-**Manual Anchor Syntax** (optional):
-```markdown
-## My Heading {#custom-id}
-```
-
-Renders as:
-```html
-<h2 id="custom-id">My Heading</h2>
-```
-
-**Future Enhancement**: Tech debt issue created to add automatic slug generation from heading text (standard markdown behavior)
-
-# RPI (Research → Plan → Implement) — Lightweight Workflow
-
-**Tool**: The Linear MCP is the primary source of truth for the project planning. We use a 3 phase approach called RPI+, or (Research, Plan, Implement+Test)
-
-**Templates**: Linear MCP does not support templates via API. When creating issues, you MUST read and apply the template content programmatically:
-- **RESEARCH**: `/docs/TEMPLATE_RESEARCH.md`
-- **PLAN**: `/docs/TEMPLATE_PLAN.md`
-- **IMPLEMENT**: `/docs/TEMPLATE_IMPLEMENT.md`
-
-**Goal**: Make every change safe, explainable, and repeatable across tools (Claude Code, Codex CLI, Gemini CLI) using structured Linear issues.
-
-## Issue Creation Workflow
-
-**CRITICAL**: Always read the appropriate template file and use its content as the issue description.
-
-### Creating RESEARCH Issue (Parent):
-1. Read `/docs/TEMPLATE_RESEARCH.md`
-2. Replace placeholder values:
-   - `HEX-XXX` → actual issue ID (after creation)
-   - `<short name>` → descriptive name
-   - `<your name>` → assignee
-   - Date fields → current date
-3. Create issue with:
-   - Title: `RESEARCH: <short name>`
-   - Description: Template content with frontmatter + all sections
-   - Team: `HexTrackr-Dev`
-
-### Creating PLAN Issue (Child of Research):
-1. Read `/docs/TEMPLATE_PLAN.md`
-2. Replace placeholder values:
-   - `HEX-YYY` → new issue ID
-   - `HEX-XXX` → parent research issue ID
-   - `<same short name>` → same as research
-3. Create issue with:
-   - Title: `PLAN: <same short name>`
-   - Description: Template content
-   - Team: `HexTrackr-Dev`
-   - ParentId: Research issue ID
-
-### Creating IMPLEMENT Issue (Child of Plan):
-1. Read `/docs/TEMPLATE_IMPLEMENT.md`
-2. Replace placeholder values:
-   - `HEX-ZZZ` → new issue ID
-   - `HEX-YYY` → parent plan issue ID
-   - Branch name, dates, etc.
-3. Create issue with:
-   - Title: `IMPLEMENT: <same short name>`
-   - Description: Template content
-   - Team: `HexTrackr-Dev`
-   - ParentId: Plan issue ID
-
-## Issue Structure (Linear)
-- **Parent**: `RESEARCH: <short name>` → e.g. `HEX-123`
-- **Children**:
-  - `PLAN: <same short name>` (child of research) → e.g. `HEX-124`
-  - `IMPLEMENT: <same short name>` (child of plan) → e.g. `HEX-125`
-
-*Note: The Linear MCP auto-assigns HEX-XXX numbers to each issue*
-
-## Real Example: Vendor CSV Export Feature
-
-Here's how the RPI workflow looks in practice for a recent feature:
-
-**RESEARCH: [HEX-148](https://linear.app/hextrackr/issue/HEX-148)** - "Add Vendor Breakdown to CSV Export"
-- Analyzed existing CSV export feature (HEX-144)
-- Researched data access patterns (`this.dataManager.vulnerabilities`)
-- Identified vendor normalization in helpers.js
-- Assessed performance implications (O(n) aggregation)
-- Determined optimal approach: vendor-filtered aggregations
-- Risk level: Low, no database changes needed
-- **Output**: Current state summary, proposed change, implementation strategy
-
-**PLAN: [HEX-149](https://linear.app/hextrackr/issue/HEX-149)** - "Add Vendor Breakdown to CSV Export" (child of HEX-148)
-- Broke down into 5 tasks (45-60 min each)
-- Task 1.1: Add vendor aggregation helper function
-- Task 1.2: Add CSV table formatting helper
-- Task 1.3: Extend export function with vendor sections
-- Task 1.4: Add arithmetic validation
-- Task 1.5: Update documentation and testing
-- Each task includes: before/after code blocks, validation steps, risk notes
-- Commit strategy: Every 2 tasks
-- **Output**: Step-by-step implementation guide with code examples
-
-**IMPLEMENT: [HEX-150](https://linear.app/hextrackr/issue/HEX-150)** - "Add Vendor Breakdown to CSV Export" (child of HEX-149)
-- Pre-implementation: Git checkpoint, branch creation
-- Executed tasks 1.1-1.5 in order from PLAN
-- Checked off each task as completed
-- Committed every 2 tasks with task IDs in messages
-- Ran ESLint validation after each change
-- Updated Linear with progress and completion summary
-- **Output**: Working feature, git commits, updated Linear issues
-
-**Branch**: `feature/hex-149-vendor-csv-breakdown`
-**Result**: All 3 issues marked "Done", feature deployed to dev environment
-
-## Guardrails
-1. **Never edit code before a git checkpoint** (clean worktree; commit with a snapshot message).
-2. **Research Readiness Gate must be ✅** before creating/starting the Plan.
-3. **Plan Preflight must be ✅** before starting Implement.
-4. Commit every **1–5 tasks** (as defined in Plan) with clear messages and references to task IDs.
-5. If anything feels ambiguous: **pause, ask, and revise the doc** (don’t guess).
-
-## Tooling Hints
-- **Linear MCP**: sync status/links; read template files from `/docs/TEMPLATE_*.md` and apply programmatically; keep titles prefixed (`RESEARCH:`, `PLAN:`, `IMPLEMENT:`).
-- **Memento MCP (Neo4j)**: pull past related work, decisions, and code notes for context.
-- **Claude-Context**: enumerate impacted files, surfaces, and public APIs.
-- **Context7**: snapshot current framework/library standards relevant to this change.
-
----
-
-**Definition of Done (DoD) for a change**
-- Research: Readiness Gate ✅ with risks, rollback, test/validation notes.
-- Plan: Step-by-step tasks (1–2h chunks), explicit before/after code blocks, validation & backout.
-- Implement: All plan tasks checked ✅, tests pass, PR checklist completed, Linear issues updated.
-
-**See `/docs/RPI_PROCESS.md` for complete RPI workflow.**
-
-## Git Workflow
-
-**CRITICAL**: GitHub `main` branch is protected. Use `dev` branch as working baseline.
-
-```bash
-# Daily pattern
-git checkout dev
-git pull origin main              # Sync dev with GitHub main
-# ... make changes, test, commit to dev ...
-git push origin dev
-
-# Create PR on GitHub: dev → main
-# After PR merge: git pull origin main (sync dev)
-```
-
-**See `/docs/GIT_WORKFLOW.md` for complete git workflow.**
-
-## Server Configuration
-
-**Trust Proxy**: ALWAYS enabled (`app.set("trust proxy", true)`)
-- Required for nginx reverse proxy to pass HTTPS headers
-- Enables secure cookies with `X-Forwarded-Proto` detection
-- Critical for authentication system (HEX-128 fix)
-
-**Session Management**:
-- `SESSION_SECRET` environment variable required (32+ characters)
-- Server refuses to start without valid SESSION_SECRET
-- Generate: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
-
-## Testing Notes
-
-- **Chrome DevTools MCP**: Not enabled by default - ask user to load config if needed
-- **UI Testing Workflow**:
-  1. Open production tab: `https://hextrackr.com/page.html`
-  2. Open development tab: `https://dev.hextrackr.com/page.html`
-  3. Compare side-by-side for visual regression testing
-  4. Capture screenshots for documentation
-
-## MCP Tools Available
-
-- **memento**: Knowledge graph (Neo4j at 192.168.1.80) for persistent memory
-- **claude-context**: Semantic codebase search (re-indexes if >1 hour old)
-- **linear-server**: Issue tracking (HexTrackr-Dev, HexTrackr-Prod, HexTrackr-Docs teams)
-- **context7**: Framework documentation (MANDATORY for Express, AG-Grid, ApexCharts)
-- **brave-search**: Web research via `the-brain` agent
-- **sequential-thinking**: Multi-step problem analysis
-
-**See user's global CLAUDE.md for detailed MCP tool usage patterns.**
-
-## Specialized Agents
-
-- **the-brain**: Web research + codebase analysis + framework verification (Opus)
-- **codebase-navigator**: Architecture analysis and code discovery
-- **memento-oracle**: Historical context from knowledge graph
-- **hextrackr-fullstack-dev**: Feature implementation across all layers
-- **docker-restart**: Container restart automation (Haiku)
-
-**See user's global CLAUDE.md for detailed agent invocation patterns.**
+**Version**: 1.0.56
+**Last Updated**: 2025-10-09
+**Authority**: This file overrides defaults - always verify claude-context and Linear before coding
