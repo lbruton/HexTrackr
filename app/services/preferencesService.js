@@ -49,7 +49,7 @@ class PreferencesService {
                     let parsedValue;
                     try {
                         parsedValue = JSON.parse(row.preference_value);
-                    } catch (parseError) {
+                    } catch (_parseError) {
                         // Not JSON - return as string
                         parsedValue = row.preference_value;
                     }
@@ -91,7 +91,7 @@ class PreferencesService {
                         let parsedValue;
                         try {
                             parsedValue = JSON.parse(row.preference_value);
-                        } catch (parseError) {
+                        } catch (_parseError) {
                             parsedValue = row.preference_value;
                         }
 
