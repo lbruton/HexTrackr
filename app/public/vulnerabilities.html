@@ -97,7 +97,31 @@
                                 Modern security vulnerability tracking and analysis
                             </div>
                         </div>
-                        <!-- Header actions removed - functionality moved to user dropdown menu -->
+
+                        <!-- NEW: Vendor Toggle (Right Side of Header) -->
+                        <div class="col-auto">
+                            <div class="btn-group" role="group" aria-label="Vendor filter">
+                                <input type="radio" class="btn-check" name="vendor-filter" id="vendor-all" autocomplete="off" checked>
+                                <label class="btn btn-outline-primary" for="vendor-all" data-vendor="">
+                                    <i class="fas fa-globe me-1"></i>All Vendors
+                                </label>
+
+                                <input type="radio" class="btn-check" name="vendor-filter" id="vendor-cisco" autocomplete="off">
+                                <label class="btn btn-outline-primary" for="vendor-cisco" data-vendor="CISCO">
+                                    <i class="fas fa-network-wired me-1"></i>CISCO
+                                </label>
+
+                                <input type="radio" class="btn-check" name="vendor-filter" id="vendor-palo" autocomplete="off">
+                                <label class="btn btn-outline-primary" for="vendor-palo" data-vendor="Palo Alto">
+                                    <i class="fas fa-shield-alt me-1"></i>Palo Alto
+                                </label>
+
+                                <input type="radio" class="btn-check" name="vendor-filter" id="vendor-other" autocomplete="off">
+                                <label class="btn btn-outline-primary" for="vendor-other" data-vendor="Other">
+                                    <i class="fas fa-server me-1"></i>Other
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
