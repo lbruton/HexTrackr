@@ -158,106 +158,180 @@
 
     User-&gt;&gt;API: { ticketData }
     API-&gt;&gt;DB: INSERT (or UPDATE for modifications) into tickets
-    API--&gt;&gt;User: { success, id }
-
----
-
-## Legacy Table Notice
-
-The original `vulnerabilities` table remains in the database to support existing backup endpoints (`/api/backup/vulnerabilities`, `/api/backup/all`). This table is used ONLY for exports - all new imports and analytics use the rollover architecture. New analytics and UI panels rely exclusively on the rollover trio:
-
-- `vulnerability_snapshots` (historical log)
-- `vulnerabilities_current` (deduplicated active set)
-- `vulnerability_daily_totals` (aggregated trends)
-
-Migration plan (tracked in roadmap) will eventually deprecate the legacy ingestion path and unify export logic on the rollover schema.
-
----
-
-## Lifecycle State Management
-
-The `vulnerabilities_current` table uses a `lifecycle_state` column to track vulnerability status:
-
-- **active**: Currently detected vulnerability
-- **resolved**: Vulnerability no longer detected (marked with resolved_date)
-- **reopened**: Previously resolved vulnerability that reappeared
-
-This enables accurate tracking of vulnerability remediation and regression.
-
----
-
-## Index Overview
-
-| Table | Index | Purpose |
-| ----- | ----- | ------- |
-| vulnerability_snapshots | scan_date, hostname, severity | Historical filtering & trends |
-| vulnerabilities_current | unique_key, scan_date | Fast dedupe lookups & date filtering |
-| vulnerability_daily_totals | scan_date (UNIQUE) | Idempotent aggregates |
-| tickets | multiple (location, status, date_submitted, date_due, external refs) | UI filtering & reporting |
-| sites / locations | code (UNIQUE) | Lookup by code |
-
----
-
-## Staging Tables
-
-HexTrackr uses staging tables to process new data before it is moved into the production tables. This allows for data validation and transformation without affecting the live data.
-
-- `vulnerabilities_staging`: Used for staging new vulnerability data.
-
-For more information on the data lifecycle, see the [Data Lifecycle and Rollover Mechanism](./data-lifecycle.md) documentation.
-
----
-
-## Database Migrations
-
-Database migrations are handled automatically by the application through runtime schema evolution using idempotent ALTER TABLE statements.
-
----
-
-## KEV Integration Tables *(v1.0.22+)*
-
-The CISA Known Exploited Vulnerabilities (KEV) integration introduces dedicated tables for tracking actively exploited vulnerabilities.
-
-### `kev_status`
-
-Stores Known Exploited Vulnerabilities metadata from CISA's KEV catalog (https://www.cisa.gov/known-exploited-vulnerabilities-catalog).
-
-| Column | Type | Description |
-|--------|------|-------------|
-| `cve_id` | TEXT | **Primary key** - CVE identifier (e.g., CVE-2021-44228) |
-| `date_added` | DATE | When CISA added vulnerability to KEV catalog (NOT NULL) |
-| `vulnerability_name` | TEXT | CISA-provided vulnerability name |
-| `vendor_project` | TEXT | Affected vendor or project |
-| `product` | TEXT | Specific product affected |
-| `required_action` | TEXT | CISA-mandated remediation action |
-| `due_date` | DATE | Federal agency remediation deadline |
-| `known_ransomware_use` | BOOLEAN | Whether used in ransomware campaigns (1 = Yes, 0 = No) |
-| `notes` | TEXT | Additional CISA context and guidance |
-| `last_synced` | TIMESTAMP | Last synchronization timestamp (DEFAULT CURRENT_TIMESTAMP) |
-
-**Relationship**: `vulnerabilities_current` LEFT JOINed with `kev_status` on `cve` = `cve_id` to enrich vulnerability data with KEV flags and due dates.
-
-### `sync_metadata`
-
-Tracks KEV catalog synchronization history and status.
-
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | INTEGER | **Primary key** - Sync record identifier (AUTOINCREMENT) |
-| `sync_type` | TEXT | Type of sync operation (e.g., 'kev_catalog') - NOT NULL |
-| `sync_time` | TIMESTAMP | Sync execution timestamp (NOT NULL) |
-| `version` | TEXT | Catalog version or timestamp from CISA |
-| `record_count` | INTEGER | Number of KEV records synced |
-| `status` | TEXT | Sync status (completed/failed/in_progress) - DEFAULT 'completed' |
-| `error_message` | TEXT | Error details if sync failed |
-| `created_at` | TIMESTAMP | Record creation timestamp (DEFAULT CURRENT_TIMESTAMP) |
-
-**Purpose**: Audit trail for KEV sync operations, enables monitoring and troubleshooting of catalog updates.
-
-### KEV Data Flow
-
-```mermaid
-graph TD
+    API--&gt;&gt;User: { success, id }</div><hr>
+<h2>Legacy Table Notice</h2><p>The original <code>vulnerabilities</code> table remains in the database to support existing backup endpoints (<code>/api/backup/vulnerabilities</code>, <code>/api/backup/all</code>). This table is used ONLY for exports - all new imports and analytics use the rollover architecture. New analytics and UI panels rely exclusively on the rollover trio:</p>
+<ul>
+<li><code>vulnerability_snapshots</code> (historical log)</li>
+<li><code>vulnerabilities_current</code> (deduplicated active set)</li>
+<li><code>vulnerability_daily_totals</code> (aggregated trends)</li>
+</ul>
+<p>Migration plan (tracked in roadmap) will eventually deprecate the legacy ingestion path and unify export logic on the rollover schema.</p>
+<hr>
+<h2>Lifecycle State Management</h2><p>The <code>vulnerabilities_current</code> table uses a <code>lifecycle_state</code> column to track vulnerability status:</p>
+<ul>
+<li><strong>active</strong>: Currently detected vulnerability</li>
+<li><strong>resolved</strong>: Vulnerability no longer detected (marked with resolved_date)</li>
+<li><strong>reopened</strong>: Previously resolved vulnerability that reappeared</li>
+</ul>
+<p>This enables accurate tracking of vulnerability remediation and regression.</p>
+<hr>
+<h2>Index Overview</h2><table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Index</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>vulnerability_snapshots</td>
+<td>scan_date, hostname, severity</td>
+<td>Historical filtering &amp; trends</td>
+</tr>
+<tr>
+<td>vulnerabilities_current</td>
+<td>unique_key, scan_date</td>
+<td>Fast dedupe lookups &amp; date filtering</td>
+</tr>
+<tr>
+<td>vulnerability_daily_totals</td>
+<td>scan_date (UNIQUE)</td>
+<td>Idempotent aggregates</td>
+</tr>
+<tr>
+<td>tickets</td>
+<td>multiple (location, status, date_submitted, date_due, external refs)</td>
+<td>UI filtering &amp; reporting</td>
+</tr>
+<tr>
+<td>sites / locations</td>
+<td>code (UNIQUE)</td>
+<td>Lookup by code</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Staging Tables</h2><p>HexTrackr uses staging tables to process new data before it is moved into the production tables. This allows for data validation and transformation without affecting the live data.</p>
+<ul>
+<li><code>vulnerabilities_staging</code>: Used for staging new vulnerability data.</li>
+</ul>
+<p>For more information on the data lifecycle, see the <a href="#architecture/data-lifecycle">Data Lifecycle and Rollover Mechanism</a> documentation.</p>
+<hr>
+<h2>Database Migrations</h2><p>Database migrations are handled automatically by the application through runtime schema evolution using idempotent ALTER TABLE statements.</p>
+<hr>
+<h2>KEV Integration Tables *(v1.0.22+)*</h2><p>The CISA Known Exploited Vulnerabilities (KEV) integration introduces dedicated tables for tracking actively exploited vulnerabilities.</p>
+<h3>`kev_status`</h3><p>Stores Known Exploited Vulnerabilities metadata from CISA&#39;s KEV catalog (<a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog">https://www.cisa.gov/known-exploited-vulnerabilities-catalog</a>).</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>cve_id</code></td>
+<td>TEXT</td>
+<td><strong>Primary key</strong> - CVE identifier (e.g., CVE-2021-44228)</td>
+</tr>
+<tr>
+<td><code>date_added</code></td>
+<td>DATE</td>
+<td>When CISA added vulnerability to KEV catalog (NOT NULL)</td>
+</tr>
+<tr>
+<td><code>vulnerability_name</code></td>
+<td>TEXT</td>
+<td>CISA-provided vulnerability name</td>
+</tr>
+<tr>
+<td><code>vendor_project</code></td>
+<td>TEXT</td>
+<td>Affected vendor or project</td>
+</tr>
+<tr>
+<td><code>product</code></td>
+<td>TEXT</td>
+<td>Specific product affected</td>
+</tr>
+<tr>
+<td><code>required_action</code></td>
+<td>TEXT</td>
+<td>CISA-mandated remediation action</td>
+</tr>
+<tr>
+<td><code>due_date</code></td>
+<td>DATE</td>
+<td>Federal agency remediation deadline</td>
+</tr>
+<tr>
+<td><code>known_ransomware_use</code></td>
+<td>BOOLEAN</td>
+<td>Whether used in ransomware campaigns (1 = Yes, 0 = No)</td>
+</tr>
+<tr>
+<td><code>notes</code></td>
+<td>TEXT</td>
+<td>Additional CISA context and guidance</td>
+</tr>
+<tr>
+<td><code>last_synced</code></td>
+<td>TIMESTAMP</td>
+<td>Last synchronization timestamp (DEFAULT CURRENT_TIMESTAMP)</td>
+</tr>
+</tbody></table>
+<p><strong>Relationship</strong>: <code>vulnerabilities_current</code> LEFT JOINed with <code>kev_status</code> on <code>cve</code> = <code>cve_id</code> to enrich vulnerability data with KEV flags and due dates.</p>
+<h3>`sync_metadata`</h3><p>Tracks KEV catalog synchronization history and status.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>INTEGER</td>
+<td><strong>Primary key</strong> - Sync record identifier (AUTOINCREMENT)</td>
+</tr>
+<tr>
+<td><code>sync_type</code></td>
+<td>TEXT</td>
+<td>Type of sync operation (e.g., &#39;kev_catalog&#39;) - NOT NULL</td>
+</tr>
+<tr>
+<td><code>sync_time</code></td>
+<td>TIMESTAMP</td>
+<td>Sync execution timestamp (NOT NULL)</td>
+</tr>
+<tr>
+<td><code>version</code></td>
+<td>TEXT</td>
+<td>Catalog version or timestamp from CISA</td>
+</tr>
+<tr>
+<td><code>record_count</code></td>
+<td>INTEGER</td>
+<td>Number of KEV records synced</td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td>TEXT</td>
+<td>Sync status (completed/failed/in_progress) - DEFAULT &#39;completed&#39;</td>
+</tr>
+<tr>
+<td><code>error_message</code></td>
+<td>TEXT</td>
+<td>Error details if sync failed</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>TIMESTAMP</td>
+<td>Record creation timestamp (DEFAULT CURRENT_TIMESTAMP)</td>
+</tr>
+</tbody></table>
+<p><strong>Purpose</strong>: Audit trail for KEV sync operations, enables monitoring and troubleshooting of catalog updates.</p>
+<h3>KEV Data Flow</h3><div class="mermaid">graph TD
     A[CISA KEV API] --&gt;|HTTPS GET| B[KEV Service]
     B --&gt;|Parse JSON| C[sync_metadata]
     B --&gt;|Upsert Records| D[kev_status]

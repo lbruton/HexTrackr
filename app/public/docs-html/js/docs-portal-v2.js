@@ -1251,9 +1251,9 @@ class DocumentationPortalV2 {
             // Custom link renderer to handle shields.io badges
             renderer.link = function(token) {
                 console.log("Link renderer token:", token);
-                
+
                 let href, text, title;
-                
+
                 // Handle different token formats
                 if (typeof token === "object") {
                     href = token.href;
@@ -1265,18 +1265,39 @@ class DocumentationPortalV2 {
                     title = arguments[1];
                     text = arguments[2];
                 }
-                
+
                 console.log("Extracted values:", { href, text, title });
-                
+
                 // Check if this is a shields.io badge
                 if (href && (href.includes("shields.io") || href.includes("img.shields.io"))) {
                     return `<a href="${href}" target="_blank" title="${title}"><img src="${href}" alt="${text}" class="badge-img"></a>`;
                 }
-                
+
                 // Regular link
                 return `<a href="${href || ""}" ${title ? `title="${title}"` : ""}>${text || ""}</a>`;
             };
-            
+
+            // Custom code block renderer for Prism.js syntax highlighting (HEX-167)
+            renderer.code = function(token) {
+                const code = token.text;
+                const lang = token.lang || "";
+
+                // Escape HTML in code to prevent XSS
+                const escapedCode = code
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+
+                // Return Prism-compatible HTML with language- prefix
+                if (lang) {
+                    return `<pre><code class="language-${lang}">${escapedCode}</code></pre>`;
+                } else {
+                    return `<pre><code>${escapedCode}</code></pre>`;
+                }
+            };
+
             // Configure marked with our custom renderer
             marked.setOptions({
                 renderer: renderer,
@@ -1316,9 +1337,16 @@ class DocumentationPortalV2 {
         const contentArea = document.getElementById("contentArea");
         contentArea.innerHTML = content;
 
-        // Apply syntax highlighting
+        // Apply syntax highlighting with theme awareness
         if (window.Prism) {
+            // Detect current theme for Prism
+            const isDarkMode = document.documentElement.getAttribute("data-bs-theme") === "dark";
+
+            // Apply syntax highlighting
             Prism.highlightAllUnder(contentArea);
+
+            // Note: Prism theme styling is handled via CSS in docs-tabler.css
+            // which applies theme-specific colors based on [data-bs-theme] attribute
         }
 
         // Handle clicks on anchor links within the content

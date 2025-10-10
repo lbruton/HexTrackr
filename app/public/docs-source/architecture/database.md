@@ -182,6 +182,7 @@ sequenceDiagram
     User->>API: { ticketData }
     API->>DB: INSERT (or UPDATE for modifications) into tickets
     API-->>User: { success, id }
+```
 
 ---
 

@@ -409,3 +409,226 @@ table thead th {
 .modal {
     z-index: 1050;
 }
+
+/* ========================================
+   PRISM.JS SYNTAX HIGHLIGHTING (HEX-167)
+   ========================================
+   Custom theme matching HexTrackr color palette
+   Light and dark mode support with proper contrast
+*/
+
+/* Code block container styling */
+code[class*="language-"],
+pre[class*="language-"] {
+    font-family: 'Fira Code', Consolas, Monaco, 'Courier New', monospace;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    direction: ltr;
+    text-align: left;
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+    tab-size: 4;
+    hyphens: none;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+    padding: 0.1em 0.3em;
+    border-radius: 0.3em;
+    white-space: normal;
+}
+
+/* Light mode code blocks */
+pre[class*="language-"] {
+    padding: 1rem;
+    margin: 1rem 0;
+    overflow: auto;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: var(--bs-border-radius, 0.375rem);
+}
+
+code[class*="language-"] {
+    background: transparent;
+    color: #212529;
+}
+
+/* Light mode syntax colors */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+    color: #6c757d;
+    font-style: italic;
+}
+
+.token.punctuation {
+    color: #495057;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol {
+    color: #d63384; /* Pink/magenta */
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+    color: #198754; /* Green */
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string,
+.token.variable {
+    color: #0dcaf0; /* Cyan */
+}
+
+.token.atrule,
+.token.attr-value,
+.token.function,
+.token.class-name {
+    color: #ffc107; /* Amber */
+}
+
+.token.keyword {
+    color: #0d6efd; /* Blue */
+}
+
+.token.regex,
+.token.important {
+    color: #fd7e14; /* Orange */
+    font-weight: bold;
+}
+
+.token.important,
+.token.bold {
+    font-weight: bold;
+}
+
+.token.italic {
+    font-style: italic;
+}
+
+.token.entity {
+    cursor: help;
+}
+
+.token.deleted {
+    color: #dc3545;
+}
+
+/* ========================================
+   DARK MODE SYNTAX HIGHLIGHTING
+   ========================================
+   Enhanced contrast for WCAG AA compliance
+*/
+
+[data-bs-theme="dark"] pre[class*="language-"] {
+    background: #0f172a; /* Deep navy background */
+    border: 1px solid #374151;
+    color: #e2e8f0;
+}
+
+[data-bs-theme="dark"] code[class*="language-"] {
+    color: #e2e8f0; /* Light text */
+}
+
+[data-bs-theme="dark"] .token.comment,
+[data-bs-theme="dark"] .token.prolog,
+[data-bs-theme="dark"] .token.doctype,
+[data-bs-theme="dark"] .token.cdata {
+    color: #94a3b8; /* Muted gray */
+    font-style: italic;
+}
+
+[data-bs-theme="dark"] .token.punctuation {
+    color: #cbd5e1; /* Light gray */
+}
+
+[data-bs-theme="dark"] .token.property,
+[data-bs-theme="dark"] .token.tag,
+[data-bs-theme="dark"] .token.boolean,
+[data-bs-theme="dark"] .token.number,
+[data-bs-theme="dark"] .token.constant,
+[data-bs-theme="dark"] .token.symbol {
+    color: #f97316; /* Bright orange */
+}
+
+[data-bs-theme="dark"] .token.selector,
+[data-bs-theme="dark"] .token.attr-name,
+[data-bs-theme="dark"] .token.string,
+[data-bs-theme="dark"] .token.char,
+[data-bs-theme="dark"] .token.builtin,
+[data-bs-theme="dark"] .token.inserted {
+    color: #10b981; /* Bright green */
+}
+
+[data-bs-theme="dark"] .token.operator,
+[data-bs-theme="dark"] .token.entity,
+[data-bs-theme="dark"] .token.url,
+[data-bs-theme="dark"] .language-css .token.string,
+[data-bs-theme="dark"] .style .token.string,
+[data-bs-theme="dark"] .token.variable {
+    color: #4299e1; /* HexTrackr blue */
+}
+
+[data-bs-theme="dark"] .token.atrule,
+[data-bs-theme="dark"] .token.attr-value,
+[data-bs-theme="dark"] .token.function,
+[data-bs-theme="dark"] .token.class-name {
+    color: #fbbf24; /* Bright amber */
+}
+
+[data-bs-theme="dark"] .token.keyword {
+    color: #3b82f6; /* Bright blue */
+}
+
+[data-bs-theme="dark"] .token.regex,
+[data-bs-theme="dark"] .token.important {
+    color: #fb923c; /* Bright orange */
+    font-weight: bold;
+}
+
+[data-bs-theme="dark"] .token.deleted {
+    color: #ef4444; /* Bright red */
+}
+
+/* Inline code in dark mode */
+[data-bs-theme="dark"] :not(pre) > code[class*="language-"] {
+    background: #1e293b;
+    border: 1px solid #374151;
+}
+
+/* ========================================
+   NAVIGATION HEADER VISIBILITY (HEX-177)
+   ========================================
+   Fix for Navigation header lacking visual boundary in dark mode
+*/
+
+/* Ensure Navigation header has proper background in dark mode - increased specificity */
+[data-bs-theme="dark"] .page-body .card .card-header {
+    background-color: var(--hextrackr-surface-2, #1e293b) !important;
+    border-bottom: 1px solid var(--bs-border-color, #374151) !important;
+}
+
+/* Navigation header title should have proper contrast */
+[data-bs-theme="dark"] .page-body .card .card-header .card-title {
+    color: var(--bs-emphasis-color, #f1f5f9) !important;
+}
+
+/* Navigation header icon should match text color */
+[data-bs-theme="dark"] .page-body .card .card-header .icon {
+    color: var(--bs-emphasis-color, #f1f5f9) !important;
+    opacity: 0.8;
+}
