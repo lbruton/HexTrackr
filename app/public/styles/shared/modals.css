@@ -166,6 +166,20 @@
     margin: -0.5rem -0.5rem -0.5rem auto;
 }
 
+/* Disable all focus/active states on close button (HEX-168) */
+.modal .btn-close,
+.modal .btn-close:focus,
+.modal .btn-close:focus-visible,
+.modal .btn-close:active,
+.modal .btn-close:hover,
+.modal .btn-close::before,
+.modal .btn-close::after {
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    transform: none !important;
+}
+
 /* Export buttons in modal footers */
 .modal-footer .btn-outline-primary i,
 .modal-footer .btn-primary i,
@@ -282,7 +296,7 @@
 /* Disable modal animations to prevent visual artifacts (HEX-168)
    Instant close provides better UX for utility modals */
 
-/* Disable all transitions on modal and children */
+/* Disable all transitions, animations, and transforms on modal and children */
 .modal,
 .modal *,
 .modal.fade,
@@ -290,10 +304,13 @@
 .modal.fade .modal-content,
 .modal-backdrop,
 .modal-backdrop.fade,
-.modal-backdrop.show {
-    transition: none !important;
-    transition: none !important;
-    transition: none !important;
+.modal-backdrop.show,
+.modal .btn-close,
+.modal-header .btn-close {
+    transition-property: none !important;
+    transition-duration: 0s !important;
+    animation: none !important;
+    animation-duration: 0s !important;
     transition: none !important;
 }
 
@@ -301,9 +318,20 @@
 .modal.fade .modal-dialog,
 .modal.show .modal-dialog {
     transform: none !important;
-    transform: none !important;
-    transform: none !important;
-    transform: none !important;
+}
+
+/* Force immediate display changes */
+.modal.show,
+.modal.fade.show {
+    opacity: 1 !important;
+}
+
+.modal-backdrop.show {
+    opacity: 0.5 !important;
+}
+
+[data-bs-theme="dark"] .modal-backdrop.show {
+    opacity: 0.6 !important;
 }
 
 /* ===========================
