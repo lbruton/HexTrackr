@@ -297,17 +297,6 @@
     transition: none !important;
 }
 
-/* Force instant opacity changes */
-.modal.fade,
-.modal-backdrop.fade {
-    opacity: 1 !important;
-}
-
-.modal.fade.show,
-.modal-backdrop.fade.show {
-    opacity: 1 !important;
-}
-
 /* Disable transforms that cause visual artifacts */
 .modal.fade .modal-dialog,
 .modal.show .modal-dialog {
