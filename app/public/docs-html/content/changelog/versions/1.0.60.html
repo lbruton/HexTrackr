@@ -63,6 +63,64 @@
 <li><a href="https://linear.app/hextrackr/issue/HEX-184">HEX-184</a> - PLAN: Vendor Filter Trend Percentage Inconsistency</li>
 </ul>
 <hr>
+<h4>Vulnerability Dashboard View Switching on Browser Resize (HEX-185)</h4><p><strong>Overview</strong>: Fixed bug where resizing the browser window forced automatic view switching between table and device cards, ignoring user&#39;s manual view selection.</p>
+<p><strong>Problem</strong>:</p>
+<ul>
+<li>Resizing browser window (maximize, widen, narrow) automatically switched views</li>
+<li>Desktop width (&gt;768px) forced table view</li>
+<li>Mobile/tablet width (&lt;=768px) forced device cards view</li>
+<li>User&#39;s manual view selection completely ignored</li>
+<li>Table button automatically hidden on mobile viewports</li>
+<li>Particularly frustrating for users who frequently resize windows</li>
+</ul>
+<p><strong>Root Cause</strong>:</p>
+<ul>
+<li>Window resize event listener in <code>vulnerability-core.js</code> (lines 163-186)</li>
+<li>Legacy code from when Table was the default view</li>
+<li>Attempted to restore table view when resizing from mobile back to desktop</li>
+<li>Became redundant when default view changed to Device Cards</li>
+<li>Debounced handler (250ms) forced view switches based solely on viewport width</li>
+</ul>
+<p><strong>Solution</strong>:</p>
+<ul>
+<li><strong>Removed entire window resize event listener</strong> (deleted 24 lines)</li>
+<li>Users now have full manual control over view selection</li>
+<li>View choice persists across all window resizing operations</li>
+<li>Table button always visible (no automatic hiding)</li>
+<li>Simplified code by removing redundant responsive logic</li>
+</ul>
+<p><strong>Result</strong>:</p>
+<ul>
+<li>✅ Device Cards view persists when maximizing window</li>
+<li>✅ Device Cards view persists when widening/narrowing window</li>
+<li>✅ Table view persists after manual switch during resize</li>
+<li>✅ Table button always visible on all screen sizes</li>
+<li>✅ Users control their view preference manually</li>
+<li>✅ No JavaScript errors during resize operations</li>
+</ul>
+<p><strong>Testing</strong>:</p>
+<ul>
+<li>Verified view persistence across maximize/restore operations</li>
+<li>Tested with multiple window widths (desktop → tablet → mobile ranges)</li>
+<li>Confirmed manual view switching works correctly</li>
+<li>Validated no console errors during resize</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/vulnerability-core.js</code> - Removed lines 163-186 (resize event listener)</li>
+</ul>
+<p><strong>Impact</strong>:</p>
+<ul>
+<li>Better desktop-focused user experience (primary use case)</li>
+<li>Cleaner, simpler code (24 lines removed)</li>
+<li>Users maintain control over their view preference</li>
+<li>No forced view switching on any screen size</li>
+</ul>
+<p><strong>Issue</strong>:</p>
+<ul>
+<li><a href="https://linear.app/hextrackr/issue/HEX-185">HEX-185</a> - BUG: Vulnerability Dashboard Resets to Table View on Browser Resize</li>
+</ul>
+<hr>
 <h4>Documentation Portal Dark Mode Issues (HEX-166, HEX-167, HEX-177)</h4><p><strong>Overview</strong>: Resolved three critical dark mode issues in the Documentation Portal affecting diagram rendering, code syntax highlighting, and navigation visibility. All fixes improve the documentation reading experience in dark mode without breaking light mode functionality.</p>
 <hr>
 <h3>HEX-166: Mermaid Diagram Syntax Error</h3><p><strong>Problem</strong>:</p>
