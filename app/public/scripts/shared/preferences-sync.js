@@ -120,6 +120,7 @@ class PreferencesSync {
                     const existingValue = localStorage.getItem(storageKey);
 
                     let shouldUpdate = true;
+                    let cachedTheme = null; // Store parsed theme for reuse (backward compatibility)
 
                     if (existingValue && pref.key === "theme") {
                         // Theme preferences have timestamps - preserve if VERY fresh (< 500ms old)
@@ -138,8 +139,13 @@ class PreferencesSync {
                                     console.log(`🔄 Updating stale localStorage theme (${age}ms old) with database value`);
                                 }
                             }
+                            // Store theme for reuse (handles both old and new JSON formats)
+                            cachedTheme = cached?.theme || cached;
                         } catch (_e) {
-                            // Not JSON or no timestamp, safe to update
+                            // BACKWARD COMPATIBILITY FIX: Legacy format stored plain strings like "dark" or "light"
+                            // Don't throw error - just use the plain string value directly
+                            cachedTheme = existingValue;
+                            console.log(`🔄 Migrating legacy theme format: "${existingValue}" → JSON`);
                         }
                     }
 
@@ -148,8 +154,10 @@ class PreferencesSync {
                     }
 
                     // Track theme preference for application after sync
+                    // CRITICAL FIX: Reuse already-parsed value instead of calling JSON.parse again
+                    // This prevents SyntaxError when legacy users have plain string themes
                     if (pref.key === "theme") {
-                        themePreference = shouldUpdate ? pref.value : (existingValue ? JSON.parse(existingValue).theme : pref.value);
+                        themePreference = shouldUpdate ? pref.value : (cachedTheme || pref.value);
                     }
                 });
 
