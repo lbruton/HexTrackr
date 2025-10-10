@@ -226,7 +226,7 @@
 .card-body.p-2 {
     display: flex;
     flex-direction: column;
-    min-height: 600px; /* Ensure a minimum height for the workspace */
+    min-height: 300px; /* Reduced from 600px - let AG-Grid autoHeight control sizing */
 }
 
 .view-content {
