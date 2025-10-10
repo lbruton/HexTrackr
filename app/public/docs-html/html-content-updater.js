@@ -780,6 +780,15 @@ ${this.stats.filesRemoved > 0 ? `\nAdditionally, ${this.stats.filesRemoved} orph
 
             console.log("\n✨ Complete documentation workflow finished successfully!\n");
 
+            // MANUAL STEP REMINDER
+            console.log("⚠️  MANUAL STEP REQUIRED:");
+            console.log("📝 Update app/public/docs-source/changelog/index.md with new version:");
+            console.log("   1. Current Version reference (line ~5)");
+            console.log("   2. Latest Releases list (line ~17)");
+            console.log("   3. Version History table (line ~60)");
+            console.log("   4. Navigation section (line ~118)");
+            console.log("\n🔄 Then run: npm run docs:generate && docker-compose restart\n");
+
         } catch (error) {
             console.error("❌ Documentation generation process failed:", error);
             process.exit(1);
