@@ -281,16 +281,40 @@
 
 /* Disable modal animations to prevent visual artifacts (HEX-168)
    Instant close provides better UX for utility modals */
-.modal.fade .modal-dialog {
+
+/* Disable all transitions on modal and children */
+.modal,
+.modal *,
+.modal.fade,
+.modal.fade .modal-dialog,
+.modal.fade .modal-content,
+.modal-backdrop,
+.modal-backdrop.fade,
+.modal-backdrop.show {
+    transition: none !important;
+    transition: none !important;
+    transition: none !important;
     transition: none !important;
 }
 
-.modal.fade {
-    transition: none !important;
-}
-
+/* Force instant opacity changes */
+.modal.fade,
 .modal-backdrop.fade {
-    transition: none !important;
+    opacity: 1 !important;
+}
+
+.modal.fade.show,
+.modal-backdrop.fade.show {
+    opacity: 1 !important;
+}
+
+/* Disable transforms that cause visual artifacts */
+.modal.fade .modal-dialog,
+.modal.show .modal-dialog {
+    transform: none !important;
+    transform: none !important;
+    transform: none !important;
+    transform: none !important;
 }
 
 /* ===========================
