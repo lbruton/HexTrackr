@@ -102,13 +102,8 @@
 </tr>
 <tr>
 <td><code>pages/tickets.css</code></td>
-<td>Original tickets page styles</td>
+<td>AG-Grid tickets page styles</td>
 <td>tickets.html</td>
-</tr>
-<tr>
-<td><code>pages/tickets2.css</code></td>
-<td>AG-Grid tickets prototype styles</td>
-<td>tickets2.html</td>
 </tr>
 </tbody></table>
 <h3>Utility Styles</h3><table>
@@ -264,7 +259,7 @@
     <span class="hljs-comment">// ... other parameters</span>
 });
 
-gridApi.<span class="hljs-title function_">setGridOption</span>(<span class="hljs-string">&quot;theme&quot;</span>, quartzTheme);</code></pre><h3>Grid Surface Styling (tickets2 & vulnerabilities)</h3><p>Inline overrides in the grid pages now lean exclusively on the shared theme tokens so light/dark parity stays centralized in <code>css-variables.css</code>:</p>
+gridApi.<span class="hljs-title function_">setGridOption</span>(<span class="hljs-string">&quot;theme&quot;</span>, quartzTheme);</code></pre><h3>Grid Surface Styling (tickets & vulnerabilities)</h3><p>Inline overrides in the grid pages now lean exclusively on the shared theme tokens so light/dark parity stays centralized in <code>css-variables.css</code>:</p>
 <pre><code class="language-css"><span class="hljs-selector-class">.hextrackr-tickets-grid</span> <span class="hljs-selector-class">.ag-row-hover</span> <span class="hljs-selector-class">.ag-cell</span> {
     <span class="hljs-attribute">background-color</span>: <span class="hljs-built_in">rgba</span>(<span class="hljs-built_in">var</span>(--hextrackr-primary-rgb), <span class="hljs-number">0.08</span>);
 }
