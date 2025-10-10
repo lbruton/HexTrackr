@@ -73,6 +73,10 @@ class DeviceSecurityModal {
      * @param {Object} device - The device data object
      */
     populateDeviceInfo(device) {
+        // HEX-174: Get IP from first vulnerability that has one (mirrors AG-Grid table behavior)
+        // This is a short-term fix until database-first device endpoint is implemented
+        const ipAddress = device.vulnerabilities?.find(v => v.ip_address)?.ip_address || device.ipAddress || "N/A";
+
         document.getElementById("deviceInfo").innerHTML = `
             <div class="mb-3">
                 <div class="row">
@@ -84,7 +88,7 @@ class DeviceSecurityModal {
                 <div class="row">
                     <div class="col-sm-4 text-muted">IP Address:</div>
                     <div class="col-sm-8">
-                        <span class="font-monospace text-primary">${device.ipAddress || "N/A"}</span>
+                        <span class="font-monospace text-primary">${ipAddress}</span>
                     </div>
                 </div>
             </div>
