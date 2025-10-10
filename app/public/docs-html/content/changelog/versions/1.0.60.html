@@ -1,7 +1,69 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
     <h1>Version 1.0.60</h1><hr>
-<h2>[1.0.60] - 2025-10-10</h2><h3>Fixed</h3><h4>Documentation Portal Dark Mode Issues (HEX-166, HEX-167, HEX-177)</h4><p><strong>Overview</strong>: Resolved three critical dark mode issues in the Documentation Portal affecting diagram rendering, code syntax highlighting, and navigation visibility. All fixes improve the documentation reading experience in dark mode without breaking light mode functionality.</p>
+<h2>[1.0.60] - 2025-10-10</h2><h3>Fixed</h3><h4>Vendor Filter Trend Percentage Inconsistency (HEX-183)</h4><p><strong>Overview</strong>: Fixed data consistency bug where vendor filter correctly updated VPR card totals and charts but not trend percentage badges. Trend percentages now reflect vendor-specific changes between uploads instead of global trends.</p>
+<p><strong>Problem</strong>:</p>
+<ul>
+<li>When filtering vulnerabilities by vendor (CISCO, Palo Alto, Other), VPR card totals and charts updated correctly</li>
+<li>Trend percentage badges on cards (e.g., &quot;+12%&quot;, &quot;-5.2%&quot;) showed <strong>global</strong> trends instead of <strong>vendor-specific</strong> trends</li>
+<li>Example: Filtering to &quot;CISCO&quot; showed 450 CISCO vulnerabilities with &quot;+12%&quot; trend from ALL vendors combined, not CISCO-only trend</li>
+<li>Created misleading information for users making decisions based on vendor-filtered views</li>
+</ul>
+<p><strong>Root Cause</strong>:</p>
+<ul>
+<li>Vendor filter parameter wired through <code>setupVendorToggle()</code> → <code>updateStatisticsDisplay(vendor)</code> for card totals</li>
+<li>Trend calculation path (lines 91-122 in <code>vulnerability-statistics.js</code>) ignored vendor parameter entirely</li>
+<li>Always fetched global trends regardless of active vendor filter</li>
+</ul>
+<p><strong>Solution</strong>:</p>
+<ul>
+<li>Created <code>updateTrendDisplay(severity, currentStat, trendBucket, vendorFilter)</code> method with vendor-aware trend fetching</li>
+<li>Added <code>_fetchVendorTrends(vendorFilter)</code> helper to call existing backend API <code>/api/vulnerabilities/trends?vendor=X</code></li>
+<li>Wired vendor parameter through call chain: filter → stats → trends</li>
+<li>Reused existing backend endpoint from CSV export feature (no backend changes required)</li>
+</ul>
+<p><strong>Edge Cases Fixed</strong>:</p>
+<p><strong>1. First Upload with No Previous Data</strong>:</p>
+<ul>
+<li>Problem: Showed invalid percentages like <code>+59883801295192064.0%</code> due to division by zero</li>
+<li>Solution: Check if <code>previous === 0</code> before calculating, display &quot;N/A&quot; instead</li>
+<li>Cap maximum display at 999.9% to prevent overflow</li>
+</ul>
+<p><strong>2. Async Race Condition</strong>:</p>
+<ul>
+<li>Problem: Rapidly toggling filters (All → CISCO → Palo → Other) caused overlapping async calls completing out of order, leaving Critical/Low cards stuck</li>
+<li>Solution: Collect trend update promises in array, use <code>await Promise.all(promises)</code> to ensure all 5 severity updates complete before next filter change</li>
+</ul>
+<p><strong>3. Zero-Count Vendor Severities</strong>:</p>
+<ul>
+<li>Problem: Palo Alto with 0 Critical/Low vulnerabilities left CISCO values displayed (43 Critical, 3192 Low) because backend returns <code>null</code> for zero-count severities</li>
+<li>Solution: Remove <code>if(stat)</code> guard, use default object fallback <code>statistics[severity] || {count: 0, total_vpr: 0}</code> to always update DOM</li>
+</ul>
+<p><strong>Result</strong>:</p>
+<ul>
+<li>Trend percentages dynamically update when switching between vendor filters</li>
+<li>Each vendor shows different trend percentages reflecting their specific data</li>
+<li>&quot;N/A&quot; displayed when no previous data available for comparison</li>
+<li>All cards update reliably even with sparse data (zero counts, first uploads)</li>
+<li>No race conditions from rapid filter toggling</li>
+</ul>
+<p><strong>Testing</strong>:</p>
+<ul>
+<li>Validated with multi-date dataset across all vendor filters</li>
+<li>Tested edge cases: first upload, zero-count severities, rapid toggling</li>
+<li>Confirmed mathematical accuracy of percentage calculations</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/vulnerability-statistics.js</code> - Added vendor-aware trend display with edge case handling</li>
+</ul>
+<p><strong>Issues</strong>:</p>
+<ul>
+<li><a href="https://linear.app/hextrackr/issue/HEX-183">HEX-183</a> - RESEARCH: Vendor Filter Trend Percentage Inconsistency</li>
+<li><a href="https://linear.app/hextrackr/issue/HEX-184">HEX-184</a> - PLAN: Vendor Filter Trend Percentage Inconsistency</li>
+</ul>
+<hr>
+<h4>Documentation Portal Dark Mode Issues (HEX-166, HEX-167, HEX-177)</h4><p><strong>Overview</strong>: Resolved three critical dark mode issues in the Documentation Portal affecting diagram rendering, code syntax highlighting, and navigation visibility. All fixes improve the documentation reading experience in dark mode without breaking light mode functionality.</p>
 <hr>
 <h3>HEX-166: Mermaid Diagram Syntax Error</h3><p><strong>Problem</strong>:</p>
 <ul>
