@@ -1,0 +1,166 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.60</h1><hr>
+<h2>[1.0.60] - 2025-10-10</h2><h3>Fixed</h3><h4>Documentation Portal Dark Mode Issues (HEX-166, HEX-167, HEX-177)</h4><p><strong>Overview</strong>: Resolved three critical dark mode issues in the Documentation Portal affecting diagram rendering, code syntax highlighting, and navigation visibility. All fixes improve the documentation reading experience in dark mode without breaking light mode functionality.</p>
+<hr>
+<h3>HEX-166: Mermaid Diagram Syntax Error</h3><p><strong>Problem</strong>:</p>
+<ul>
+<li>&quot;Ticket Creation/Update&quot; sequence diagram in database architecture docs displayed &quot;Syntax error in text&quot;</li>
+<li>Mermaid parser failed to render the diagram due to malformed markdown code fence</li>
+</ul>
+<p><strong>Root Cause</strong>:</p>
+<ul>
+<li>Missing closing fence (<code>```</code>) for Mermaid code block in <code>/app/public/docs-source/architecture/database.md:185</code></li>
+<li>Markdown had <code>---</code> separator without proper fence closure</li>
+<li>Mermaid.js couldn&#39;t distinguish between diagram code and following content</li>
+</ul>
+<p><strong>Solution</strong>:</p>
+<pre><code class="language-markdown"><span class="hljs-section"># Before (line 185):</span>
+User-&gt;&gt;API: { ticketData }
+API-&gt;&gt;DB: INSERT (or UPDATE for modifications) into tickets
+<span class="hljs-section">API--&gt;&gt;User: { success, id }
+---</span>
+
+<span class="hljs-section"># After (line 185):</span>
+User-&gt;&gt;API: { ticketData }
+API-&gt;&gt;DB: INSERT (or UPDATE for modifications) into tickets
+API--&gt;&gt;User: { success, id }</code></pre><hr>
+<pre><code class="language-">
+**Result**:
+- Mermaid diagram renders correctly in both light and dark modes
+- Proper fence closure prevents parser confusion
+- All sequence diagrams in database.md validated
+
+---
+
+### HEX-167: Code Block Syntax Highlighting in Dark Mode
+
+**Problem**:
+- Code blocks in documentation showed all white text in dark mode
+- No colorized syntax highlighting for keywords, strings, functions, etc.
+- Plain monochrome code was difficult to read
+
+**Root Causes**:
+1. **Prism CDN stylesheet conflict**: CDN theme CSS (`prism.min.css`) loaded after custom dark theme CSS, overriding token colors
+2. **Marked.js HTML output**: Default markdown renderer didn&#x27;t add Prism-compatible `language-` class prefix
+3. **Prism autoloader not configured**: Language grammars weren&#x27;t loading from CDN
+
+**Solution Implemented**:
+
+**1. Removed conflicting CDN stylesheet** (`/app/public/docs-html/index.html:60`):
+```html
+&lt;!-- Before --&gt;
+&lt;link href=&quot;https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css&quot; rel=&quot;stylesheet&quot;&gt;
+
+&lt;!-- After --&gt;
+&lt;!-- Prism.js custom theme in docs-tabler.css (HEX-167) - DO NOT load CDN theme --&gt;</code></pre><p><strong>2. Added custom code renderer</strong> (<code>/app/public/docs-html/js/docs-portal-v2.js:1280-1299</code>):</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Custom code block renderer for Prism.js syntax highlighting (HEX-167)</span>
+renderer.<span class="hljs-property">code</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params">token</span>) {
+    <span class="hljs-keyword">const</span> code = token.<span class="hljs-property">text</span>;
+    <span class="hljs-keyword">const</span> lang = token.<span class="hljs-property">lang</span> || <span class="hljs-string">&quot;&quot;</span>;
+
+    <span class="hljs-comment">// Escape HTML in code to prevent XSS</span>
+    <span class="hljs-keyword">const</span> escapedCode = code
+        .<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/&amp;/g</span>, <span class="hljs-string">&quot;&amp;amp;&quot;</span>)
+        .<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/&lt;/g</span>, <span class="hljs-string">&quot;&amp;lt;&quot;</span>)
+        .<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/&gt;/g</span>, <span class="hljs-string">&quot;&amp;gt;&quot;</span>)
+        .<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/&quot;/g</span>, <span class="hljs-string">&quot;&amp;quot;&quot;</span>)
+        .<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/&#x27;/g</span>, <span class="hljs-string">&quot;&amp;#039;&quot;</span>);
+
+    <span class="hljs-comment">// Return Prism-compatible HTML with language- prefix</span>
+    <span class="hljs-keyword">if</span> (lang) {
+        <span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;pre&gt;&lt;code class=&quot;language-<span class="hljs-subst">${lang}</span>&quot;&gt;<span class="hljs-subst">${escapedCode}</span>&lt;/code&gt;&lt;/pre&gt;`</span>;
+    } <span class="hljs-keyword">else</span> {
+        <span class="hljs-keyword">return</span> <span class="hljs-string">`&lt;pre&gt;&lt;code&gt;<span class="hljs-subst">${escapedCode}</span>&lt;/code&gt;&lt;/pre&gt;`</span>;
+    }
+};</code></pre><p><strong>3. Configured Prism autoloader</strong> (<code>/app/public/docs-html/index.html:151-156</code>):</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Configure Prism autoloader to load language grammars from CDN</span>
+<span class="hljs-keyword">if</span> (<span class="hljs-variable language_">window</span>.<span class="hljs-property">Prism</span>) {
+    <span class="hljs-title class_">Prism</span>.<span class="hljs-property">plugins</span>.<span class="hljs-property">autoloader</span>.<span class="hljs-property">languages_path</span> = <span class="hljs-string">&#x27;https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/&#x27;</span>;
+}</code></pre><p><strong>4. Enhanced CSS specificity</strong> (<code>/app/public/docs-html/css/docs-tabler.css</code>):</p>
+<ul>
+<li>Custom dark mode token colors properly applied</li>
+<li>Light mode colors preserved</li>
+<li>WCAG AA contrast compliance maintained</li>
+</ul>
+<p><strong>Token Colors (Dark Mode)</strong>:</p>
+<ul>
+<li>Keywords: <code>#3b82f6</code> (bright blue)</li>
+<li>Strings: <code>#10b981</code> (bright green)</li>
+<li>Functions: <code>#fbbf24</code> (bright amber)</li>
+<li>Numbers/Constants: <code>#f97316</code> (bright orange)</li>
+<li>Comments: <code>#94a3b8</code> (muted gray, italic)</li>
+</ul>
+<p><strong>Result</strong>:</p>
+<ul>
+<li>Full colorized syntax highlighting in both light and dark modes</li>
+<li>Proper token classification for JavaScript, CSS, SQL, shell, etc.</li>
+<li>WCAG AA accessible contrast ratios</li>
+<li>No CSS cascade conflicts</li>
+</ul>
+<hr>
+<h3>HEX-177: Navigation Header Visibility in Dark Mode</h3><p><strong>Problem</strong>:</p>
+<ul>
+<li>Navigation panel header in docs portal had no visual boundary in dark mode</li>
+<li>Header background matched page background (<code>#0f172a</code>)</li>
+<li>&quot;Navigation&quot; title and icon blended into the dark background</li>
+</ul>
+<p><strong>Root Cause</strong>:</p>
+<ul>
+<li>Tabler.io CSS specificity overriding custom dark mode header styles</li>
+<li>Bootstrap classes applied broad card header styling</li>
+<li>Custom CSS lacked sufficient specificity to win cascade</li>
+</ul>
+<p><strong>Solution</strong> (<code>/app/public/docs-html/css/docs-tabler.css:619-634</code>):</p>
+<pre><code class="language-css"><span class="hljs-comment">/* Increased specificity with .page-body .card prefix and !important */</span>
+<span class="hljs-selector-attr">[data-bs-theme=<span class="hljs-string">&quot;dark&quot;</span>]</span> <span class="hljs-selector-class">.page-body</span> <span class="hljs-selector-class">.card</span> <span class="hljs-selector-class">.card-header</span> {
+    <span class="hljs-attribute">background-color</span>: <span class="hljs-built_in">var</span>(--hextrackr-surface-<span class="hljs-number">2</span>, <span class="hljs-number">#1e293b</span>) <span class="hljs-meta">!important</span>;
+    <span class="hljs-attribute">border-bottom</span>: <span class="hljs-number">1px</span> solid <span class="hljs-built_in">var</span>(--bs-border-color, <span class="hljs-number">#374151</span>) <span class="hljs-meta">!important</span>;
+}
+
+<span class="hljs-comment">/* Navigation header title with proper contrast */</span>
+<span class="hljs-selector-attr">[data-bs-theme=<span class="hljs-string">&quot;dark&quot;</span>]</span> <span class="hljs-selector-class">.page-body</span> <span class="hljs-selector-class">.card</span> <span class="hljs-selector-class">.card-header</span> <span class="hljs-selector-class">.card-title</span> {
+    <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--bs-emphasis-color, <span class="hljs-number">#f1f5f9</span>) <span class="hljs-meta">!important</span>;
+}
+
+<span class="hljs-comment">/* Navigation header icon with proper contrast */</span>
+<span class="hljs-selector-attr">[data-bs-theme=<span class="hljs-string">&quot;dark&quot;</span>]</span> <span class="hljs-selector-class">.page-body</span> <span class="hljs-selector-class">.card</span> <span class="hljs-selector-class">.card-header</span> <span class="hljs-selector-class">.icon</span> {
+    <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--bs-emphasis-color, <span class="hljs-number">#f1f5f9</span>) <span class="hljs-meta">!important</span>;
+    <span class="hljs-attribute">opacity</span>: <span class="hljs-number">0.8</span>;
+}</code></pre><p><strong>Result</strong>:</p>
+<ul>
+<li>Clear visual separation between navigation header and content</li>
+<li>Proper contrast for header text and icon</li>
+<li>Consistent styling with other HexTrackr cards</li>
+<li>Light mode unaffected</li>
+</ul>
+<hr>
+<h3>Known Limitations</h3><p><strong>Mermaid Diagram Theme Refresh</strong>:</p>
+<ul>
+<li>Diagrams maintain their original theme colors after toggling light/dark mode until page refresh</li>
+<li>This is an acceptable edge case as users rarely toggle themes from the documentation portal</li>
+<li>Theme preference is typically set once during initial login and persists</li>
+<li>Fixing would require significant architectural changes to the documentation generation system</li>
+</ul>
+<hr>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/docs-source/architecture/database.md</code> - Fixed Mermaid diagram fence (line 185)</li>
+<li><code>app/public/docs-html/index.html</code> - Removed Prism CDN stylesheet, added autoloader config (lines 60, 151-156)</li>
+<li><code>app/public/docs-html/js/docs-portal-v2.js</code> - Added custom code renderer for Prism (lines 1280-1299)</li>
+<li><code>app/public/docs-html/css/docs-tabler.css</code> - Increased navigation header specificity (lines 619-634)</li>
+<li><code>app/public/docs-html/content/</code> - Regenerated HTML from updated markdown sources</li>
+</ul>
+<p><strong>Issues</strong>:</p>
+<ul>
+<li><a href="https://linear.app/hextrackr/issue/HEX-166">HEX-166</a> - Mermaid diagram syntax error in database documentation</li>
+<li><a href="https://linear.app/hextrackr/issue/HEX-167">HEX-167</a> - Code block syntax highlighting missing in dark mode</li>
+<li><a href="https://linear.app/hextrackr/issue/HEX-177">HEX-177</a> - Navigation header lacks visual boundary in dark mode</li>
+</ul>
+<hr>
+<p><strong>Version</strong>: 1.0.60<br><strong>Last Updated</strong>: 2025-10-10</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
