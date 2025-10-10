@@ -42,8 +42,7 @@ The theme system is built on four core layers that work together to provide cons
 | File | Purpose | Page |
 |------|---------|------|
 | `pages/vulnerabilities.css` | Vulnerability dashboard specific styles | vulnerabilities.html |
-| `pages/tickets.css` | Original tickets page styles | tickets.html |
-| `pages/tickets2.css` | AG-Grid tickets prototype styles | tickets2.html |
+| `pages/tickets.css` | AG-Grid tickets page styles | tickets.html |
 
 ### Utility Styles
 
@@ -251,7 +250,7 @@ const quartzTheme = window.agGrid.themeQuartz.withParams({
 gridApi.setGridOption("theme", quartzTheme);
 ```
 
-### Grid Surface Styling (tickets2 & vulnerabilities)
+### Grid Surface Styling (tickets & vulnerabilities)
 
 Inline overrides in the grid pages now lean exclusively on the shared theme tokens so light/dark parity stays centralized in `css-variables.css`:
 

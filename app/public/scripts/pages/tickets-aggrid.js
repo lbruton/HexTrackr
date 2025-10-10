@@ -2,14 +2,14 @@
 /* global agGrid, HexagonTicketsManager */
 
 /**
- * AG Grid integration layer for the tickets2.html demo page.
+ * AG Grid integration layer for the tickets.html page.
  * Reuses the existing HexagonTicketsManager data layer while providing
  * a modern AG Grid v33 presentation that matches the Quartz theme used
  * by the vulnerabilities workspace.
  */
 (function() {
     if (typeof HexagonTicketsManager === "undefined" || typeof agGrid === "undefined") {
-        console.warn("HexagonTicketsManager or AG Grid not available for tickets2.html demo.");
+        console.warn("HexagonTicketsManager or AG Grid not available for tickets.html.");
         return;
     }
 
