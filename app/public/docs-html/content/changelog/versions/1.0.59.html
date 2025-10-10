@@ -1,0 +1,83 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.59</h1><hr>
+<h2>[1.0.59] - 2025-10-09</h2><h3>Fixed</h3><h4>Documentation Portal Settings Modal Transparency (HEX-165)</h4><p><strong>Overview</strong>: Fixed critical transparency issue in the Documentation Portal&#39;s settings modal where the modal appeared completely transparent in dark mode, making it unusable. The root cause was missing CSS dependencies that were present in other pages.</p>
+<p><strong>Problem</strong>:</p>
+<ul>
+<li>Documentation portal settings modal had completely transparent background in dark mode</li>
+<li>Modal content was unreadable due to <code>rgba(0, 0, 0, 0)</code> background</li>
+<li>Other pages (vulnerabilities.html, tickets.html) had proper modal styling</li>
+<li>CSS dependency chain was broken: <code>modals.css</code> referenced CSS variables that weren&#39;t defined</li>
+</ul>
+<p><strong>Investigation Process</strong>:</p>
+<ol>
+<li>Used <code>mcp__claude-context__search_code</code> to locate modal implementations</li>
+<li>Compared CSS loading between working pages and documentation portal</li>
+<li>Used <code>mcp__chrome-devtools__take_snapshot</code> to inspect computed styles</li>
+<li>Identified missing CSS custom properties (<code>--hextrackr-modal-bg</code> undefined)</li>
+<li>Traced back to missing <code>css-variables.css</code> and <code>modals.css</code> imports</li>
+</ol>
+<p><strong>Solution Implemented</strong>:</p>
+<p>Added two critical CSS files to <code>/app/public/docs-html/index.html</code>:</p>
+<pre><code class="language-html"><span class="hljs-comment">&lt;!-- Line 58-59 --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;../styles/css-variables.css&quot;</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;../styles/shared/modals.css&quot;</span>&gt;</span></code></pre><p><strong>Technical Details</strong>:</p>
+<p>The documentation portal lives in a subdirectory (<code>/docs-html/</code>), requiring the <code>../styles/</code> path prefix to traverse up one level. The modular CSS architecture requires:</p>
+<ol>
+<li><p><strong>Foundation Layer</strong>: <code>css-variables.css</code> defines custom properties</p>
+<ul>
+<li><code>--hextrackr-modal-bg</code></li>
+<li><code>--hextrackr-text</code></li>
+<li>Theme-aware color tokens</li>
+</ul>
+</li>
+<li><p><strong>Component Layer</strong>: <code>modals.css</code> uses these variables</p>
+<pre><code class="language-css"><span class="hljs-selector-attr">[data-bs-theme=<span class="hljs-string">&quot;dark&quot;</span>]</span> <span class="hljs-selector-class">.modal-content</span> {
+    <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--hextrackr-modal-bg);
+    <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--hextrackr-text);
+}</code></pre></li>
+</ol>
+<p>Without the foundation layer, variables resolve to empty strings, causing transparent backgrounds.</p>
+<p><strong>Verification</strong>:</p>
+<p><strong>Dark Mode</strong> ✅</p>
+<ul>
+<li>Modal background: <code>rgb(26, 34, 52)</code> - proper dark theme color</li>
+<li>All card backgrounds: solid, readable</li>
+<li>No transparency issues</li>
+</ul>
+<p><strong>Light Mode</strong> ✅</p>
+<ul>
+<li>Modal background: <code>rgb(255, 255, 255)</code> - solid white</li>
+<li>No regression detected</li>
+<li>Theme switching works correctly</li>
+</ul>
+<p><strong>Design Philosophy</strong>:</p>
+<ul>
+<li>Maintain consistent CSS imports across all pages</li>
+<li>Failed dependencies should be caught during development</li>
+<li>Path resolution must account for directory structure</li>
+<li>Silent CSS failures (undefined variables) need better detection</li>
+</ul>
+<p><strong>Result</strong>:</p>
+<ul>
+<li>Documentation portal settings modal fully functional in both themes</li>
+<li>Visual consistency maintained across all application pages</li>
+<li>Proper theme inheritance restored</li>
+<li>CSS dependency chain complete and verified</li>
+</ul>
+<hr>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/docs-html/index.html</code> - Added missing CSS imports (lines 58-59)</li>
+</ul>
+<p><strong>Issues</strong>:</p>
+<ul>
+<li><a href="https://linear.app/hextrackr/issue/HEX-165">HEX-165</a> - Documentation Portal Settings Modal transparency issue</li>
+</ul>
+<hr>
+<p><strong>Version</strong>: 1.0.59<br><strong>Last Updated</strong>: 2025-10-09</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
