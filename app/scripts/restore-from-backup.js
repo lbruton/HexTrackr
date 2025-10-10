@@ -4,9 +4,9 @@
  * Database Restoration Script
  *
  * Restores data from backup database to fresh database, excluding users table.
- * Then sets admin password to ***REMOVED***
+ * Then sets admin password using ADMIN_PASSWORD environment variable.
  *
- * Usage: node app/scripts/restore-from-backup.js
+ * Usage: ADMIN_PASSWORD="your-password" node app/scripts/restore-from-backup.js
  */
 
 const Database = require("better-sqlite3");
@@ -15,7 +15,24 @@ const path = require("path");
 
 const BACKUP_DB = path.join(__dirname, "../../app/data/hextrackr-backup-20250929-235802.db");
 const TARGET_DB = path.join(__dirname, "../../app/data/hextrackr.db");
-const NEW_PASSWORD = "***REMOVED***";
+// SECURITY: Password must be provided via environment variable
+const NEW_PASSWORD = process.env.ADMIN_PASSWORD || null;
+
+if (!NEW_PASSWORD) {
+    console.error('❌ ERROR: ADMIN_PASSWORD environment variable not set');
+    console.error('Usage: ADMIN_PASSWORD="your-password" node app/scripts/restore-from-backup.js');
+    process.exit(1);
+}
+
+/**
+ * Validates SQL identifier (table/column name) to prevent SQL injection
+ * @param {string} identifier - Table or column name to validate
+ * @returns {boolean} True if identifier is safe
+ */
+function isValidIdentifier(identifier) {
+    // Only allow alphanumeric characters and underscores (standard SQL identifier rules)
+    return /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(identifier);
+}
 
 async function restoreDatabase() {
     console.log("🔄 Starting database restoration...\n");
@@ -38,6 +55,12 @@ async function restoreDatabase() {
 
         for (const { name } of tables) {
             try {
+                // SECURITY: Validate table name to prevent SQL injection
+                if (!isValidIdentifier(name)) {
+                    console.error(`   ⚠️  Skipping invalid table name: ${name} (potential SQL injection)`);
+                    continue;
+                }
+
                 // Get row count from backup
                 const backupCount = backup.prepare(`SELECT COUNT(*) as count FROM ${name}`).get();
 
@@ -53,6 +76,14 @@ async function restoreDatabase() {
 
                 // Get column info
                 const columns = backup.prepare(`PRAGMA table_info(${name})`).all();
+
+                // SECURITY: Validate all column names to prevent SQL injection
+                for (const column of columns) {
+                    if (!isValidIdentifier(column.name)) {
+                        throw new Error(`Invalid column name detected: ${column.name} (potential SQL injection)`);
+                    }
+                }
+
                 const columnNames = columns.map(c => c.name).join(", ");
                 const placeholders = columns.map(() => "?").join(", ");
 
