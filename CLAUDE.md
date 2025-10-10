@@ -34,10 +34,11 @@
 │   ├── services/                     # Business logic ({success, data, error})
 │   └── routes/                       # Express route definitions
 ├── docs/
-│   ├── TEMPLATE_RESEARCH.md          # RPI Research template
-│   ├── TEMPLATE_PLAN.md              # RPI Plan template
-│   ├── TEMPLATE_IMPLEMENT.md         # RPI Implement template
-│   ├── RPI_PROCESS.md                # Complete RPI workflow
+│   ├── TEMPLATE_SPECIFICATION.md     # SRPI Specification template
+│   ├── TEMPLATE_RESEARCH.md          # SRPI Research template
+│   ├── TEMPLATE_PLAN.md              # SRPI Plan template
+│   ├── TEMPLATE_IMPLEMENT.md         # SRPI Implement template
+│   ├── SRPI_PROCESS.md               # Complete SRPI workflow
 │   └── GIT_WORKFLOW.md               # Git branching strategy
 ├── CLAUDE.md                         # This file (operational memory)
 ├── package.json                      # Version source of truth
@@ -64,7 +65,7 @@ mcp__claude-context__index_codebase({
 })
 ```
 
-**Why**: Semantic code search is MANDATORY for RPI workflow verification. Stale indexes lead to incorrect line numbers and architectural misidentification.
+**Why**: Semantic code search is MANDATORY for SRPI workflow verification. Stale indexes lead to incorrect line numbers and architectural misidentification.
 
 ### 2. Git Status Check
 
@@ -247,8 +248,8 @@ Task({
 ### Handoff Pattern
 
 ```text
-1. Desktop creates HEX-XX (RESEARCH) → delegates to Dev
-2. Dev completes implementation → creates HEXP-XX for Prod
+1. Desktop creates HEX-XX (SPECIFICATION) → delegates to Dev
+2. Dev creates RESEARCH child → completes implementation → creates HEXP-XX for Prod
 3. Linear issue description contains full context (never comments!)
 4. Memento entities reference Linear issue IDs for traceability
 ```
@@ -257,25 +258,25 @@ Task({
 
 **Core Principle**: Linear issues are source of truth, NOT markdown files or comments.
 
-### Issue Creation (RPI Templates)
+### Issue Creation (SRPI Templates)
 
 **Templates are NOT in Linear API** - Must read from `/docs/TEMPLATE_*.md` and apply programmatically:
 
 ```javascript
 // 1. Read template
-const templateContent = await fs.readFile('/docs/TEMPLATE_RESEARCH.md', 'utf8');
+const templateContent = await fs.readFile('/docs/TEMPLATE_SPECIFICATION.md', 'utf8');
 
 // 2. Replace placeholders
 const description = templateContent
-  .replace(/HEX-XXX/g, 'HEX-171')  // Will be updated after creation
-  .replace(/<short name>/g, 'Version Automation')
+  .replace(/HEX-XXX/g, 'HEX-190')  // Will be updated after creation
+  .replace(/<short name>/g, 'Device Ticket Power Tool')
   .replace(/<your name>/g, 'Lonnie B.')
-  .replace(/YYYY-MM-DD/g, '2025-10-09');
+  .replace(/YYYY-MM-DD/g, '2025-10-10');
 
 // 3. Create issue
 mcp__linear-server__create_issue({
   team: "HexTrackr-Dev",
-  title: "RESEARCH: Version Automation",
+  title: "SPECIFICATION: Device Ticket Power Tool",
   description: description  // Full template content
 })
 ```
@@ -301,46 +302,104 @@ mcp__linear-server__update_issue({
 
 ### Linear Issue Hierarchy
 
+**SRPI Model** (Specification → Research → Plan → Implement):
+```text
+SPECIFICATION: <name>     (HEX-190, parent) - The WHY
+└── RESEARCH: <name>      (HEX-191, child)  - The WHAT
+    └── PLAN: <name>      (HEX-192, child)  - The HOW
+        └── IMPLEMENT: <name> (HEX-193, child) - The BUILD
+```
+
+**Legacy RPI Model** (for bug fixes, technical debt):
 ```text
 RESEARCH: <name>     (HEX-123, parent)
 └── PLAN: <name>     (HEX-124, child of RESEARCH)
     └── IMPLEMENT: <name>  (HEX-125, child of PLAN)
 ```
 
-**Title Prefixes**: RESEARCH:, PLAN:, IMPLEMENT: (for filtering)
+**Title Prefixes**: SPECIFICATION:, RESEARCH:, PLAN:, IMPLEMENT: (for filtering)
 **Auto-Assignment**: Linear assigns sequential IDs (HEX-XX)
 
-## RPI Process (Compressed)
+**When to Use Each**:
+- **SRPI**: New features, user-facing enhancements, cross-system changes
+- **RPI**: Bug fixes, technical debt, small refinements to existing features
 
-**Full Documentation**: `/docs/RPI_PROCESS.md`
+## SRPI Process (Compressed)
+
+**Full Documentation**: `/docs/SRPI_PROCESS.md`
+
+### The Four Phases
+
+1. **SPECIFICATION** (The WHY) - Define user requirements and business value
+   - User story (As a... I want... So that...)
+   - Functional & non-functional requirements
+   - Acceptance criteria (Given/When/Then)
+   - Business rules, UI/UX flow, success metrics
+   - **Readiness Gate**: 7 checkboxes before RESEARCH
+
+2. **RESEARCH** (The WHAT) - Technical discovery and feasibility
+   - Current state analysis using claude-context semantic search
+   - Impact analysis (UI, DB, security, performance)
+   - Risk assessment and safeguards
+   - Context7 framework verification
+   - **Readiness Gate**: 5 checkboxes + 8 Auto-Quiz questions before PLAN
+
+3. **PLAN** (The HOW) - Task breakdown and implementation strategy
+   - Detailed task table with time estimates, files, validation
+   - Before/after code snippets for each task
+   - Validation plan, backout strategy
+   - **Preflight**: 5 checkboxes + 4 Auto-Quiz questions before IMPLEMENT
+
+4. **IMPLEMENT** (The BUILD) - Execute tasks with git checkpoints
+   - Live checklist with task-by-task execution
+   - Git safety commit before starting
+   - Commit every 1-5 tasks with task IDs
+   - Verification and PR checklist
 
 ### Critical Patterns
 
-1. **Always verify assumptions with claude-context before updating Linear**
-   - Don't trust documentation or memory
-   - Search semantically, read files, verify line numbers
-   - Update RESEARCH/PLAN descriptions with verified locations
+1. **Always use MCP tools first before manual file operations** (Token Efficiency)
+   - `mcp__memento__semantic_search` for knowledge retrieval (historical patterns, decisions)
+   - `mcp__claude-context__search_code` for codebase discovery (find file:line locations)
+   - `mcp__sequential-thinking__sequentialthinking` for complex problem decomposition
+   - **AVOID**: Manual Grep/Glob/Read on large files when semantic search exists
+   - **Token Savings**: 80-95% by using indexed search vs. reading full files
 
-2. **Complete ALL process gates before proceeding**
+2. **Always verify assumptions with claude-context before updating Linear**
+   - Don't trust documentation or memory
+   - Search semantically, read specific files, verify line numbers
+   - Update SPECIFICATION/RESEARCH/PLAN descriptions with verified locations
+
+3. **Complete ALL process gates before proceeding**
+   - SPECIFICATION: Readiness Gate (7 checkboxes)
    - RESEARCH: Readiness Gate (5 checkboxes) + Auto-Quiz (8 questions)
    - PLAN: Preflight (5 checkboxes) + Auto-Quiz (4 questions)
    - IMPLEMENT: Task checklist from PLAN
 
-3. **Git checkpoints before code changes**
+4. **Git checkpoints before code changes**
    ```bash
    git status  # Must be clean
-   git commit -m "🔐 pre-work snapshot (HEX-171)"
+   git commit -m "🔐 pre-work snapshot (HEX-190)"
    ```
 
-4. **Commit every 1-5 tasks with task IDs**
+5. **Commit every 1-5 tasks with task IDs**
    ```bash
-   git commit -m "feat(automation): Add version sync (HEX-171 Task 2.1)"
+   git commit -m "feat(devices): Add hostname parsing (HEX-190 Task 2.1)"
    ```
 
-5. **Agent delegation workflow**
+6. **Agent delegation workflow**
    - Agent does code implementation FIRST
    - Then human/Desktop reviews and updates Linear/CHANGELOG/Memento
    - Separation of concerns: agents code, humans document
+
+### Legacy RPI Process
+
+For bug fixes and technical debt, use the 3-phase RPI model (skip SPECIFICATION):
+- Start with RESEARCH (The WHAT) for existing code analysis
+- Proceed to PLAN (The HOW) for task breakdown
+- Execute IMPLEMENT (The BUILD)
+
+**Full RPI Documentation**: `/docs/RPI_PROCESS.md` (maintained for backward compatibility)
 
 ## Memento Taxonomy (Inline)
 
