@@ -6,3 +6,14 @@ tools:
     - lizard@1.17.31
     - pylint@3.3.7
     - trivy@0.66.0
+
+# Duplication detection configuration
+duplication:
+    enabled: true
+    config:
+        # Minimum number of tokens to consider as duplication
+        # Default: 25, Increasing to reduce false positives
+        minTokens: 50
+        # Minimum number of lines to consider as duplication
+        # Default: 5, Increasing to reduce false positives
+        minLines: 10
