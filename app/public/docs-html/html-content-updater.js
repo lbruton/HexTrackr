@@ -417,6 +417,117 @@ class HtmlContentUpdater {
         return this.marked.parse(markdownContent);
     }
 
+    /**
+     * Process changelog content with collapsible accordion sections
+     * @param {string} markdownContent - The changelog markdown content
+     * @returns {string} HTML content with Bootstrap accordion structure
+     */
+    processChangelogContent(markdownContent) {
+        // Split content into lines for processing
+        const lines = markdownContent.split("\n");
+        let result = "";
+        let currentVersionContent = "";
+        let versionCount = 0;
+        let inVersionSection = false;
+        let versionHeader = "";
+        let versionId = "";
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+
+            // Check if this is a version header (## [x.x.x] - date)
+            const versionMatch = line.match(/^## \[([^\]]+)\] - (.+)$/);
+
+            if (versionMatch) {
+                // If we were processing a previous version, close it
+                if (inVersionSection && versionHeader) {
+                    const versionHtml = this.marked.parse(currentVersionContent);
+                    const isFirstVersion = versionCount === 1;
+                    const collapseClass = isFirstVersion ? "show" : "";
+                    const buttonClass = isFirstVersion ? "" : "collapsed";
+                    const ariaExpanded = isFirstVersion ? "true" : "false";
+
+                    result += `
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button ${buttonClass}"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#${versionId}"
+                                    aria-expanded="${ariaExpanded}"
+                                    aria-controls="${versionId}">
+                                ${versionHeader}
+                            </button>
+                        </h2>
+                        <div id="${versionId}"
+                             class="accordion-collapse collapse ${collapseClass}"
+                             data-bs-parent="#changelogAccordion">
+                            <div class="accordion-body">
+                                ${versionHtml}
+                            </div>
+                        </div>
+                    </div>`;
+                }
+
+                // Start new version section
+                versionCount++;
+                const version = versionMatch[1];
+                const date = versionMatch[2];
+                versionHeader = `[${version}] - ${date}`;
+                versionId = `version-${version.replace(/\./g, "-")}`;
+                currentVersionContent = "";
+                inVersionSection = true;
+            } else if (inVersionSection) {
+                // Add line to current version content
+                currentVersionContent += line + "\n";
+            } else if (!inVersionSection) {
+                // This is header content before any versions
+                const headerHtml = this.marked.parse(line + "\n");
+                result += headerHtml;
+            }
+        }
+
+        // Handle the last version if there is one
+        if (inVersionSection && versionHeader) {
+            const versionHtml = this.marked.parse(currentVersionContent);
+            const isFirstVersion = versionCount === 1;
+            const collapseClass = isFirstVersion ? "show" : "";
+            const buttonClass = isFirstVersion ? "" : "collapsed";
+            const ariaExpanded = isFirstVersion ? "true" : "false";
+
+            result += `
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button ${buttonClass}"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#${versionId}"
+                            aria-expanded="${ariaExpanded}"
+                            aria-controls="${versionId}">
+                        ${versionHeader}
+                    </button>
+                </h2>
+                <div id="${versionId}"
+                     class="accordion-collapse collapse ${collapseClass}"
+                     data-bs-parent="#changelogAccordion">
+                    <div class="accordion-body">
+                        ${versionHtml}
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        // If we found any versions, wrap in accordion container
+        if (versionCount > 0) {
+            result = `<div class="accordion" id="changelogAccordion">${result}</div>`;
+        } else {
+            // Fallback to regular markdown processing if no versions found
+            result = this.marked.parse(markdownContent);
+        }
+
+        return result;
+    }
+
 
     /**
      * Generate a single HTML file from a markdown source using the template.
