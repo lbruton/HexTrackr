@@ -2,6 +2,14 @@
 
 This document provides a definitive overview of the HexTrackr database schema. The primary bootstrap is `scripts/init-database.js`; however, the live schema evolves further at runtime via idempotent `ALTER TABLE` and index creation logic inside `server.js` and migration code executed during imports. The authoritative state is therefore the **live SQLite schema** (captured below) rather than the historical `schema.sql` file (now outdated and retained only for legacy reference).
 
+**Schema Summary** (v1.0.54):
+- **15 Core Tables**: Vulnerabilities (4), Tickets (2), KEV (2), Templates (3), Authentication (2), Import/Staging (2)
+- **37+ Indexes**: Performance-optimized queries on critical fields
+- **4-Tier Deduplication**: Enhanced unique key generation with confidence scoring
+- **KEV Integration**: CISA Known Exploited Vulnerabilities catalog synchronization
+- **Template System**: Email, ticket, and vulnerability report templates with variable substitution
+- **Authentication**: Argon2id password hashing with account lockout protection
+
 ## Database Engine
 
 - **Engine**: SQLite 3
@@ -121,6 +129,191 @@ This table stores pre-calculated daily aggregates to power the dashboard charts 
 | `reopened_count` | INTEGER | Count of previously resolved vulnerabilities that reappeared. |
 | `created_at` | DATETIME | Record creation timestamp. |
 | `updated_at` | DATETIME | Last update timestamp. |
+
+### `vulnerability_staging`
+
+This table serves as a **bulk import staging area** for high-performance CSV processing with enhanced deduplication scoring.
+
+| Column | Type | Constraints | Description |
+| --- | --- | --- | --- |
+| `id` | INTEGER | PK AUTOINCREMENT | Staging row identifier. |
+| `import_id` | INTEGER | FK to `vulnerability_imports.id`, NOT NULL | Associated import batch. |
+| `hostname` | TEXT |  | Raw hostname (pre-normalization). |
+| `ip_address` | TEXT |  | Optional IP address. |
+| `cve` | TEXT |  | CVE identifier if present. |
+| `severity` | TEXT |  | Critical/High/Medium/Low. |
+| `vpr_score` | REAL |  | Vulnerability Priority Rating. |
+| `cvss_score` | REAL |  | CVSS Base score. |
+| `plugin_id` | TEXT |  | Scanner plugin identifier. |
+| `plugin_name` | TEXT |  | Scanner plugin name. |
+| `description` | TEXT |  | Vulnerability description. |
+| `solution` | TEXT |  | Remediation guidance. |
+| `vendor_reference` | TEXT |  | Original vendor family string. |
+| `vendor` | TEXT |  | Normalized vendor. |
+| `vulnerability_date` | TEXT |  | Publication date. |
+| `state` | TEXT |  | Physical state (open/closed). |
+| `enhanced_unique_key` | TEXT |  | 4-tier deduplication key (see Rollover section). |
+| `confidence_score` | REAL |  | Deduplication confidence (0.0-1.0): Tier 1 = 0.95, Tier 2 = 0.75, Tier 3 = 0.50, Tier 4 = 0.25. |
+| `dedup_tier` | INTEGER |  | Tier level (1-4): 1 = Asset+Plugin (highest), 2 = CVE+Host, 3 = Plugin+Host+Vendor, 4 = Desc Hash (lowest). |
+| `lifecycle_state` | TEXT | DEFAULT 'staging' | Processing state (staging/processed/error). |
+| `raw_csv_row` | JSON |  | Complete original CSV row for audit trail. |
+| `processed` | BOOLEAN | DEFAULT 0 | Whether row has been processed into `vulnerabilities_current`. |
+| `batch_id` | INTEGER |  | Sub-batch identifier for parallel processing. |
+| `processing_error` | TEXT |  | Error message if processing failed. |
+| `created_at` | DATETIME | DEFAULT CURRENT_TIMESTAMP | Staging timestamp. |
+| `processed_at` | DATETIME |  | Processing completion timestamp. |
+
+**Purpose**: Enables bulk loading of large CSV files (10k+ rows) with preprocessing, deduplication scoring, and error tracking before committing to production tables.
+
+---
+
+## KEV Integration *(v1.0.22+)*
+
+HexTrackr integrates with CISA's **Known Exploited Vulnerabilities (KEV) catalog** to track actively exploited vulnerabilities.
+
+### `kev_status`
+
+Stores CISA KEV catalog data synced from https://www.cisa.gov/known-exploited-vulnerabilities-catalog.
+
+| Column | Type | Constraints | Description |
+| --- | --- | --- | --- |
+| `cve_id` | TEXT | PRIMARY KEY | CVE identifier (e.g., CVE-2021-44228). |
+| `date_added` | DATE | NOT NULL | Date CISA added this CVE to KEV catalog. |
+| `vulnerability_name` | TEXT |  | CISA-provided vulnerability name. |
+| `vendor_project` | TEXT |  | Affected vendor/project. |
+| `product` | TEXT |  | Affected product. |
+| `required_action` | TEXT |  | CISA-mandated remediation action. |
+| `due_date` | DATE |  | Federal agency remediation deadline. |
+| `known_ransomware_use` | BOOLEAN | DEFAULT 0 | Whether used in ransomware campaigns (1 = Yes, 0 = No). |
+| `notes` | TEXT |  | Additional context or references. |
+| `last_synced` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Last sync timestamp. |
+
+**Relationship**: Vulnerabilities in `vulnerabilities_current` are LEFT JOINed with `kev_status` on `cve` = `cve_id` to enrich data with KEV flags and due dates.
+
+### `sync_metadata`
+
+Tracks KEV catalog synchronization history and status.
+
+| Column | Type | Constraints | Description |
+| --- | --- | --- | --- |
+| `id` | INTEGER | PK AUTOINCREMENT | Sync record identifier. |
+| `sync_type` | TEXT | NOT NULL | Type of sync (e.g., 'kev_catalog'). |
+| `sync_time` | TIMESTAMP | NOT NULL | Sync execution timestamp. |
+| `version` | TEXT |  | Catalog version or timestamp from CISA. |
+| `record_count` | INTEGER |  | Number of KEV records synced. |
+| `status` | TEXT | DEFAULT 'completed' | Sync status (completed/failed/in_progress). |
+| `error_message` | TEXT |  | Error details if sync failed. |
+| `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Record creation timestamp. |
+
+**Purpose**: Audit trail for KEV sync operations, enables troubleshooting and monitoring of catalog updates.
+
+---
+
+## Template System *(v1.0.46+)*
+
+HexTrackr provides customizable templates for emails, tickets, and vulnerability reports with variable substitution.
+
+### `email_templates`
+
+Stores email notification templates with dynamic variable support.
+
+| Column | Type | Constraints | Description |
+| --- | --- | --- | --- |
+| `id` | INTEGER | PK AUTOINCREMENT | Template identifier. |
+| `name` | TEXT | UNIQUE NOT NULL | Template name (e.g., 'vulnerability_notification'). |
+| `description` | TEXT |  | Template purpose and usage notes. |
+| `template_content` | TEXT | NOT NULL | Customized template content (user-modified). |
+| `default_content` | TEXT | NOT NULL | Original default template (for reset). |
+| `variables` | TEXT | NOT NULL | JSON array of supported variables (e.g., `{{ticket_id}}`, `{{hostname}}`). |
+| `category` | TEXT | DEFAULT 'ticket' | Template category (ticket/vulnerability/system). |
+| `is_active` | BOOLEAN | DEFAULT 1 | Whether template is active (1 = enabled, 0 = disabled). |
+| `created_at` | DATETIME | DEFAULT CURRENT_TIMESTAMP | Creation timestamp. |
+| `updated_at` | DATETIME | DEFAULT CURRENT_TIMESTAMP | Last modification timestamp. |
+
+### `ticket_templates`
+
+Stores ticket creation templates with pre-filled fields and workflows.
+
+| Column | Type | Constraints | Description |
+| --- | --- | --- | --- |
+| `id` | INTEGER | PK AUTOINCREMENT | Template identifier. |
+| `name` | TEXT | UNIQUE NOT NULL | Template name (e.g., 'critical_vulnerability_ticket'). |
+| `description` | TEXT |  | Template purpose and usage notes. |
+| `template_content` | TEXT | NOT NULL | Customized template content (JSON structure). |
+| `default_content` | TEXT | NOT NULL | Original default template. |
+| `variables` | TEXT | NOT NULL | JSON array of supported variables. |
+| `category` | TEXT | DEFAULT 'ticket' | Template category. |
+| `is_active` | BOOLEAN | DEFAULT 1 | Whether template is active. |
+| `created_at` | DATETIME | DEFAULT CURRENT_TIMESTAMP | Creation timestamp. |
+| `updated_at` | DATETIME | DEFAULT CURRENT_TIMESTAMP | Last modification timestamp. |
+
+### `vulnerability_templates`
+
+Stores vulnerability report templates for exports and notifications.
+
+| Column | Type | Constraints | Description |
+| --- | --- | --- | --- |
+| `id` | INTEGER | PK AUTOINCREMENT | Template identifier. |
+| `name` | TEXT | UNIQUE NOT NULL | Template name (e.g., 'executive_summary'). |
+| `description` | TEXT |  | Template purpose and usage notes. |
+| `template_content` | TEXT | NOT NULL | Customized template content. |
+| `default_content` | TEXT | NOT NULL | Original default template. |
+| `variables` | TEXT | NOT NULL | JSON array of supported variables (e.g., `{{cve}}`, `{{severity}}`, `{{vpr_score}}`). |
+| `category` | TEXT | DEFAULT 'vulnerability' | Template category. |
+| `is_active` | BOOLEAN | DEFAULT 1 | Whether template is active. |
+| `created_at` | DATETIME | DEFAULT CURRENT_TIMESTAMP | Creation timestamp. |
+| `updated_at` | DATETIME | DEFAULT CURRENT_TIMESTAMP | Last modification timestamp. |
+
+**Variable Substitution**: Templates support dynamic variables like `{{ticket_id}}`, `{{hostname}}`, `{{cve}}`, `{{severity}}` which are replaced at runtime with actual values.
+
+---
+
+## Authentication & User Management *(v1.0.46+)*
+
+### `users`
+
+Stores user accounts with Argon2id password hashing and account lockout tracking.
+
+| Column | Type | Constraints | Description |
+| --- | --- | --- | --- |
+| `id` | TEXT | PRIMARY KEY | User identifier (UUID or similar). |
+| `username` | TEXT | UNIQUE NOT NULL | Login username. |
+| `email` | TEXT |  | User email address (optional). |
+| `password_hash` | TEXT | NOT NULL | Argon2id password hash (never stored plaintext). |
+| `role` | TEXT | DEFAULT 'superadmin' | User role (superadmin/admin/user). |
+| `is_active` | INTEGER | DEFAULT 1 | Account status (1 = active, 0 = disabled). |
+| `last_login` | DATETIME |  | Last successful login timestamp. |
+| `failed_attempts` | INTEGER | DEFAULT 0 | Consecutive failed login attempts (reset on success). |
+| `failed_login_timestamp` | DATETIME |  | Most recent failed login timestamp (for lockout calculation). |
+| `created_at` | DATETIME | DEFAULT CURRENT_TIMESTAMP | Account creation timestamp. |
+| `updated_at` | DATETIME | DEFAULT CURRENT_TIMESTAMP | Last modification timestamp. |
+
+**Account Lockout**: After 5 failed login attempts, account is locked for 15 minutes (enforced in `authService.js`, not database constraint).
+
+**Password Security**: Passwords are hashed using Argon2id with timing-safe comparison to prevent timing attacks.
+
+### `user_preferences`
+
+Stores user-specific UI preferences for cross-device synchronization (HEX-138).
+
+| Column | Type | Constraints | Description |
+| --- | --- | --- | --- |
+| `id` | INTEGER | PK AUTOINCREMENT | Preference record identifier. |
+| `user_id` | TEXT | FK to `users.id`, NOT NULL | Associated user. |
+| `preference_key` | TEXT | NOT NULL | Preference identifier (e.g., 'theme', 'dashboard_layout'). |
+| `preference_value` | TEXT | NOT NULL | Preference value (JSON or plain text). |
+| `created_at` | DATETIME | DEFAULT CURRENT_TIMESTAMP | Creation timestamp. |
+| `updated_at` | DATETIME | DEFAULT CURRENT_TIMESTAMP | Last modification timestamp (auto-updated via trigger). |
+| **UNIQUE** | (user_id, preference_key) |  | One value per user per preference key. |
+| **FOREIGN KEY** | ON DELETE CASCADE |  | Preferences deleted when user is deleted. |
+
+**Trigger**: `user_preferences_updated_at` automatically updates `updated_at` timestamp on modification.
+
+**Common Preferences**:
+- `theme`: 'light' or 'dark'
+- `dashboard_layout`: JSON configuration
+- `default_page`: Starting page after login
+- `table_preferences`: AG-Grid column state
 
 ---
 

@@ -1,0 +1,206 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>System Requirements</h1><blockquote>
+<p>Verified deployment specifications based on HexTrackr production environment</p>
+</blockquote>
+<hr>
+<h2>Production Environment</h2><p>HexTrackr is currently deployed and tested on the following hardware and software configuration:</p>
+<h3>Hardware Specifications</h3><p><strong>Appliance</strong>: <a href="https://www.amazon.com/dp/B0F2DY52JY">ACEMAGICIAN Mini PC (Intel N100)</a></p>
+<ul>
+<li><strong>CPU</strong>: Intel N100 (4 cores)</li>
+<li><strong>RAM</strong>: 4GB DDR4 (runs comfortably with 2GB allocated)</li>
+<li><strong>Storage</strong>: NVMe SSD</li>
+<li><strong>Network</strong>: Gigabit Ethernet</li>
+</ul>
+<h3>Software Environment</h3><p><strong>Virtualization</strong>:</p>
+<ul>
+<li><strong>Platform</strong>: Proxmox VE</li>
+<li><strong>Container</strong>: Docker + Docker Compose</li>
+</ul>
+<p><strong>Operating System</strong>:</p>
+<ul>
+<li><strong>Distribution</strong>: Ubuntu Server 24.04 LTS</li>
+<li><strong>Kernel</strong>: Linux 6.x</li>
+</ul>
+<p><strong>Runtime</strong>:</p>
+<ul>
+<li><strong>Node.js</strong>: v18.x or later (v22.11.0 LTS recommended)</li>
+<li><strong>Database</strong>: SQLite 3.x (better-sqlite3)</li>
+</ul>
+<hr>
+<h2>Minimum Requirements</h2><p>Based on production deployment, the minimum system requirements are:</p>
+<h3>Hardware Minimum</h3><ul>
+<li><strong>CPU</strong>: 2-core x86_64 processor (Intel/AMD)</li>
+<li><strong>RAM</strong>: 2GB minimum, 4GB recommended</li>
+<li><strong>Storage</strong>: 10GB free space (database grows ~1MB per 10,000 vulnerabilities)</li>
+<li><strong>Network</strong>: 100 Mbps Ethernet or faster</li>
+</ul>
+<h3>Software Requirements</h3><p><strong>Required</strong>:</p>
+<ul>
+<li>Docker 20.10+ and Docker Compose 2.0+ (recommended deployment)</li>
+<li>OR Node.js 18.x+ for bare-metal installation</li>
+<li>Modern web browser (Chrome, Firefox, Safari, Edge)</li>
+</ul>
+<p><strong>Supported Operating Systems</strong>:</p>
+<ul>
+<li>Ubuntu Server 20.04+ (production tested)</li>
+<li>Debian 11+</li>
+<li>RHEL/CentOS 8+</li>
+<li>macOS 12+ (development)</li>
+<li>Windows 10/11 + WSL2 (development)</li>
+</ul>
+<hr>
+<h2>Recommended Hardware</h2><p>For optimal performance with large datasets (50,000+ vulnerabilities):</p>
+<ul>
+<li><strong>CPU</strong>: Intel N100 or equivalent (4+ cores)</li>
+<li><strong>RAM</strong>: 4GB</li>
+<li><strong>Storage</strong>: NVMe SSD (database I/O intensive)</li>
+<li><strong>Network</strong>: Gigabit Ethernet</li>
+</ul>
+<hr>
+<h2>Docker Resource Allocation</h2><p>HexTrackr runs efficiently in containerized environments:</p>
+<pre><code class="language-yaml"><span class="hljs-comment"># Recommended Docker resource limits</span>
+<span class="hljs-attr">services:</span>
+  <span class="hljs-attr">hextrackr:</span>
+    <span class="hljs-attr">deploy:</span>
+      <span class="hljs-attr">resources:</span>
+        <span class="hljs-attr">limits:</span>
+          <span class="hljs-attr">cpus:</span> <span class="hljs-string">&#x27;2.0&#x27;</span>
+          <span class="hljs-attr">memory:</span> <span class="hljs-string">2G</span>
+        <span class="hljs-attr">reservations:</span>
+          <span class="hljs-attr">cpus:</span> <span class="hljs-string">&#x27;1.0&#x27;</span>
+          <span class="hljs-attr">memory:</span> <span class="hljs-string">1G</span></code></pre><p><strong>Observed Resource Usage</strong> (production deployment):</p>
+<ul>
+<li><strong>Idle State</strong>: ~150MB RAM, &lt;5% CPU</li>
+<li><strong>Active Operations</strong>: ~300MB RAM, 20-30% CPU</li>
+<li><strong>Large CSV Imports</strong>: ~500MB RAM (peak), 40-60% CPU</li>
+</ul>
+<hr>
+<h2>Network Requirements</h2><h3>Ports</h3><p><strong>Required</strong>:</p>
+<ul>
+<li><code>443/tcp</code> - HTTPS (nginx reverse proxy)</li>
+<li><code>8080/tcp</code> - Node.js application (internal)</li>
+</ul>
+<p><strong>Optional</strong>:</p>
+<ul>
+<li><code>8989/tcp</code> - Alternative HTTPS port (Docker external mapping)</li>
+</ul>
+<h3>Bandwidth</h3><ul>
+<li><strong>Typical Usage</strong>: &lt;10 Mbps</li>
+<li><strong>CSV Import/Export</strong>: Burst to 50 Mbps for large files</li>
+<li><strong>WebSocket</strong>: Low bandwidth (&lt;1 Mbps for real-time updates)</li>
+</ul>
+<hr>
+<h2>Browser Requirements</h2><p>HexTrackr is tested and supported on:</p>
+<ul>
+<li><strong>Chrome/Edge</strong>: Version 90+ (Chromium-based)</li>
+<li><strong>Firefox</strong>: Version 88+</li>
+<li><strong>Safari</strong>: Version 14+</li>
+</ul>
+<p><strong>Required Features</strong>:</p>
+<ul>
+<li>JavaScript ES6+ support</li>
+<li>WebSocket support</li>
+<li>Local Storage API</li>
+<li>CSS Grid and Flexbox</li>
+</ul>
+<hr>
+<h2>Database Storage</h2><p>SQLite database growth is predictable and linear:</p>
+<table>
+<thead>
+<tr>
+<th>Vulnerabilities</th>
+<th>Database Size</th>
+<th>Recommended Storage</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>10,000</td>
+<td>~10 MB</td>
+<td>1 GB</td>
+</tr>
+<tr>
+<td>50,000</td>
+<td>~50 MB</td>
+<td>2 GB</td>
+</tr>
+<tr>
+<td>100,000</td>
+<td>~100 MB</td>
+<td>5 GB</td>
+</tr>
+<tr>
+<td>500,000</td>
+<td>~500 MB</td>
+<td>10 GB</td>
+</tr>
+</tbody></table>
+<p><strong>Note</strong>: Add 2-3x buffer for backups, logs, and CSV uploads.</p>
+<hr>
+<h2>Proxmox VE Configuration</h2><p>HexTrackr runs well in Proxmox containers or VMs:</p>
+<h3>Container (LXC) - Recommended</h3><pre><code class="language-bash"><span class="hljs-comment"># Proxmox LXC configuration</span>
+cores: 2
+memory: 2048
+swap: 512
+rootfs: 10GB</code></pre><p><strong>Benefits</strong>:</p>
+<ul>
+<li>Lower overhead than VM</li>
+<li>Direct hardware access</li>
+<li>Better performance</li>
+</ul>
+<h3>Virtual Machine (KVM)</h3><pre><code class="language-bash"><span class="hljs-comment"># Proxmox VM configuration</span>
+cores: 2
+memory: 2048
+disk: 20GB</code></pre><p><strong>Use When</strong>:</p>
+<ul>
+<li>Need full OS isolation</li>
+<li>Running on different kernel</li>
+</ul>
+<hr>
+<h2>Scaling Considerations</h2><p>HexTrackr is designed for single-server deployment. For larger deployments:</p>
+<h3>Small Organization (< 100,000 vulnerabilities)</h3><ul>
+<li><strong>Hardware</strong>: Intel N100 or equivalent</li>
+<li><strong>RAM</strong>: 2-4GB</li>
+<li><strong>Storage</strong>: 10GB</li>
+</ul>
+<h3>Medium Organization (100,000 - 500,000 vulnerabilities)</h3><ul>
+<li><strong>Hardware</strong>: 4-core CPU (Intel i5 or equivalent)</li>
+<li><strong>RAM</strong>: 8GB</li>
+<li><strong>Storage</strong>: 50GB SSD</li>
+</ul>
+<h3>Large Organization (500,000+ vulnerabilities)</h3><ul>
+<li><strong>Hardware</strong>: 6-8 core CPU</li>
+<li><strong>RAM</strong>: 16GB</li>
+<li><strong>Storage</strong>: 100GB NVMe SSD</li>
+<li><strong>Consider</strong>: Database optimization, pagination, archival strategy</li>
+</ul>
+<hr>
+<h2>Tested Hardware</h2><p>The following hardware has been verified to run HexTrackr in production:</p>
+<p>✅ <strong>ACEMAGICIAN Mini PC (Intel N100)</strong></p>
+<ul>
+<li>Production deployment reference</li>
+<li>Runs multiple Docker containers</li>
+<li>Handles 100,000+ vulnerabilities comfortably</li>
+<li><a href="https://www.amazon.com/dp/B0F2DY52JY">Amazon Product Link</a></li>
+</ul>
+<hr>
+<h2>Performance Notes</h2><p>Performance testing and benchmarking are <strong>in development</strong>. Current system requirements are based on:</p>
+<ol>
+<li><strong>Production Deployment</strong>: Real-world usage on Intel N100 hardware</li>
+<li><strong>Resource Monitoring</strong>: Proxmox metrics over 6+ months</li>
+<li><strong>User Feedback</strong>: Field testing with varying dataset sizes</li>
+</ol>
+<p><strong>Future Testing</strong>: Formal performance benchmarking methodology is planned to provide specific response time guarantees and load testing results.</p>
+<hr>
+<h2>Related Documentation</h2><ul>
+<li><a href="#guides/getting-started">Getting Started</a> - Installation guide</li>
+<li><a href="#guides/https-setup">HTTPS Setup</a> - Security configuration</li>
+<li><a href="#reference/troubleshooting">Troubleshooting</a> - Common issues and solutions</li>
+</ul>
+<hr>
+<p><em>Last Updated: 2025-10-09 | Version 1.0.54</em></p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

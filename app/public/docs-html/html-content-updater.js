@@ -214,20 +214,35 @@ class HtmlContentUpdater {
 
     /**
      * Update version across all project files to match package.json version
-     * Source of truth: app/public/package.json
+     * Source of truth: ROOT package.json (updated by npm version commands)
      */
     async updateVersionsAcrossFiles() {
         try {
-            // Read current version from package.json (source of truth)
-            const packagePath = path.join(process.cwd(), "app", "public", "package.json");
-            const packageContent = JSON.parse(await fs.readFile(packagePath, "utf8"));
-            const currentVersion = packageContent.version;
+            // Read current version from ROOT package.json (source of truth)
+            const rootPackagePath = path.join(process.cwd(), "package.json");
+            const rootPackageContent = JSON.parse(await fs.readFile(rootPackagePath, "utf8"));
+            const currentVersion = rootPackageContent.version;
 
             console.log(`🔄 Updating all version references to v${currentVersion}...`);
 
             let updatesApplied = 0;
 
-            // 1. Update footer.html badge
+            // 1. Update app/public/package.json (sync FROM root)
+            try {
+                const appPackagePath = path.join(process.cwd(), "app", "public", "package.json");
+                const appPackageContent = JSON.parse(await fs.readFile(appPackagePath, "utf8"));
+
+                if (appPackageContent.version !== currentVersion) {
+                    appPackageContent.version = currentVersion;
+                    await fs.writeFile(appPackagePath, JSON.stringify(appPackageContent, null, 2) + "\n");
+                    console.log("  ✅ Updated app/public/package.json version");
+                    updatesApplied++;
+                }
+            } catch (error) {
+                console.warn(`  ⚠️  Could not update app/public/package.json: ${error.message}`);
+            }
+
+            // 2. Update footer.html version badge
             try {
                 const footerPath = path.join(process.cwd(), "app", "public", "scripts", "shared", "footer.html");
                 const footerContent = await fs.readFile(footerPath, "utf8");
@@ -245,7 +260,34 @@ class HtmlContentUpdater {
                 console.warn(`  ⚠️  Could not update footer.html: ${error.message}`);
             }
 
-            // 2. Update docker-compose.yml HEXTRACKR_VERSION
+            // 3. Update README.md version (supports both badge and text formats)
+            try {
+                const readmePath = path.join(process.cwd(), "README.md");
+                const readmeContent = await fs.readFile(readmePath, "utf8");
+                let updatedReadme = readmeContent;
+
+                // Update badge URL format (HexTrackr-v1.0.55-blue)
+                updatedReadme = updatedReadme.replace(
+                    /HexTrackr-v[\d.]+-blue/g,
+                    `HexTrackr-v${currentVersion}-blue`
+                );
+
+                // Update plain text format (Current version: **v1.0.54**)
+                updatedReadme = updatedReadme.replace(
+                    /Current version: \*\*v[\d.]+\*\*/g,
+                    `Current version: **v${currentVersion}**`
+                );
+
+                if (readmeContent !== updatedReadme) {
+                    await fs.writeFile(readmePath, updatedReadme);
+                    console.log("  ✅ Updated README.md version");
+                    updatesApplied++;
+                }
+            } catch (error) {
+                console.warn(`  ⚠️  Could not update README.md: ${error.message}`);
+            }
+
+            // 4. Update docker-compose.yml HEXTRACKR_VERSION
             try {
                 const dockerComposePath = path.join(process.cwd(), "docker-compose.yml");
                 const dockerContent = await fs.readFile(dockerComposePath, "utf8");
@@ -263,22 +305,7 @@ class HtmlContentUpdater {
                 console.warn(`  ⚠️  Could not update docker-compose.yml: ${error.message}`);
             }
 
-            // 3. Update root package.json
-            try {
-                const rootPackagePath = path.join(process.cwd(), "package.json");
-                const rootPackageContent = JSON.parse(await fs.readFile(rootPackagePath, "utf8"));
-
-                if (rootPackageContent.version !== currentVersion) {
-                    rootPackageContent.version = currentVersion;
-                    await fs.writeFile(rootPackagePath, JSON.stringify(rootPackageContent, null, 2) + "\n");
-                    console.log("  ✅ Updated root package.json version");
-                    updatesApplied++;
-                }
-            } catch (error) {
-                console.warn(`  ⚠️  Could not update root package.json: ${error.message}`);
-            }
-
-            // 4. Update server.js fallback version (optional - for consistency)
+            // 5. Update server.js fallback version
             try {
                 const serverPath = path.join(process.cwd(), "app", "public", "server.js");
                 const serverContent = await fs.readFile(serverPath, "utf8");
@@ -303,7 +330,7 @@ class HtmlContentUpdater {
             }
 
         } catch (error) {
-            console.warn("⚠️  Could not read source package.json:", error.message);
+            console.warn("⚠️  Could not read root package.json:", error.message);
             // Non-fatal - continue with HTML generation
         }
     }
@@ -384,11 +411,9 @@ class HtmlContentUpdater {
         // Store the current section for the link renderer
         this.currentSection = currentSection;
 
-        // Special handling for CHANGELOG.md
-        if (sourcePath && sourcePath.toLowerCase().includes("changelog.md")) {
-            return this.processChangelogContent(markdownContent);
-        }
-
+        // Simple markdown to HTML conversion
+        // Note: CHANGELOG.md has been split into individual version files in changelog/versions/
+        // No special accordion processing needed - each version is now a standalone markdown file
         return this.marked.parse(markdownContent);
     }
 
@@ -556,12 +581,12 @@ class HtmlContentUpdater {
         // Process regular sectioned files
         for (const source of sources) {
             const parts = source.relativePath.split("/");
-            
+
             // Handle root-level special files
             if (parts.length === 1) {
                 const fileName = parts[0].replace(".md", "");
                 const upperFileName = fileName.toUpperCase();
-                
+
                 // Special root files (CHANGELOG, ROADMAP, etc.)
                 if (["CHANGELOG", "ROADMAP", "SPRINT", "OVERVIEW"].includes(upperFileName)) {
                     manifest.specialFiles[fileName.toLowerCase()] = {
@@ -574,10 +599,10 @@ class HtmlContentUpdater {
                 continue;
             }
 
-            // Handle sectioned files
+            // Handle sectioned files (supports nested folders like changelog/versions/*)
             const sectionName = parts[0];
-            const fileName = parts[1].replace(".md", "");
-            
+
+            // Initialize section if it doesn't exist
             if (!manifest.sections[sectionName]) {
                 manifest.sections[sectionName] = {
                     title: this.sanitizeTitle(sectionName),
@@ -587,14 +612,65 @@ class HtmlContentUpdater {
                 };
             }
 
-            // Skip index files as they're handled at section level
-            if (fileName !== "index") {
+            // Handle 2-part paths: section/file.md
+            if (parts.length === 2) {
+                const fileName = parts[1].replace(".md", "");
+
+                // Skip index files as they're handled at section level
+                if (fileName !== "index") {
+                    manifest.sections[sectionName].children[fileName] = {
+                        file: `${sectionName}/${fileName}`,
+                        title: this.sanitizeTitle(fileName),
+                        path: `${sectionName}/${fileName}.html`
+                    };
+                }
+            }
+
+            // Handle 3+ part paths (nested folders): section/subfolder/file.md
+            // Example: changelog/versions/1.0.54.md
+            if (parts.length >= 3) {
+                const subPath = parts.slice(1, -1).join("/");  // "versions"
+                const fileName = parts[parts.length - 1].replace(".md", "");  // "1.0.54"
+                const fullPath = `${sectionName}/${subPath}/${fileName}`;  // "changelog/versions/1.0.54"
+
+                // Use just the filename as the key for cleaner navigation
+                // This makes version files appear as direct children of the changelog section
                 manifest.sections[sectionName].children[fileName] = {
-                    file: `${sectionName}/${fileName}`,
+                    file: fullPath,
                     title: this.sanitizeTitle(fileName),
-                    path: `${sectionName}/${fileName}.html`
+                    path: `${fullPath}.html`
                 };
             }
+        }
+
+        // Sort changelog versions (newest first) if changelog section exists
+        if (manifest.sections.changelog && manifest.sections.changelog.children) {
+            const sortedChildren = {};
+            const versionKeys = Object.keys(manifest.sections.changelog.children);
+
+            // Sort version numbers in descending order (newest first)
+            versionKeys.sort((a, b) => {
+                // Parse version numbers (e.g., "1.0.54" -> [1, 0, 54])
+                const aParts = a.split('.').map(Number);
+                const bParts = b.split('.').map(Number);
+
+                // Compare each part from left to right
+                for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
+                    const aNum = aParts[i] || 0;
+                    const bNum = bParts[i] || 0;
+                    if (aNum !== bNum) {
+                        return bNum - aNum;  // Descending order (newest first)
+                    }
+                }
+                return 0;
+            });
+
+            // Rebuild children object in sorted order
+            versionKeys.forEach(key => {
+                sortedChildren[key] = manifest.sections.changelog.children[key];
+            });
+
+            manifest.sections.changelog.children = sortedChildren;
         }
 
         // Write manifest file
@@ -723,17 +799,47 @@ ${this.stats.filesRemoved > 0 ? `\nAdditionally, ${this.stats.filesRemoved} orph
     }
 
     /**
-     * Main execution function.
+     * Generate JSDoc HTML documentation from code comments
+     */
+    async generateJSDoc() {
+        const { exec } = require("child_process");
+        const util = require("util");
+        const execPromise = util.promisify(exec);
+
+        try {
+            console.log("\n📚 Generating JSDoc HTML documentation...");
+
+            // Run JSDoc generation (equivalent to npm run docs:dev)
+            await execPromise("npm run docs:dev", {
+                cwd: process.cwd(),
+                maxBuffer: 10 * 1024 * 1024 // 10MB buffer for large output
+            });
+
+            console.log("✅ JSDoc HTML generation complete!");
+
+        } catch (error) {
+            console.warn(`⚠️  JSDoc generation encountered an issue: ${error.message}`);
+            // Non-fatal - continue with process
+        }
+    }
+
+    /**
+     * Main execution function - Complete release workflow
+     * 1. Sync versions across all files
+     * 2. Generate markdown → HTML documentation
+     * 3. Generate JSDoc → HTML API reference
      */
     async run() {
-        console.log("🚀 Starting HTML generation from markdown sources...");
+        console.log("🚀 Starting complete documentation generation workflow...\n");
 
         try {
             // Initialize marked library first
             await this.initializeMarked();
 
-            // Update version across all project files to maintain consistency
+            // STEP 1: Update version across all project files to maintain consistency
             await this.updateVersionsAcrossFiles();
+
+            console.log("\n📝 Generating markdown documentation...");
 
             // Load the template first
             await this.loadTemplate();
@@ -741,14 +847,14 @@ ${this.stats.filesRemoved > 0 ? `\nAdditionally, ${this.stats.filesRemoved} orph
             // Find all markdown source files
             const sources = await this.findAllMarkdownSources();
             console.log(`📊 Found ${sources.length} markdown source files to convert.`);
-            
+
             if (sources.length === 0) {
                 console.log("ℹ️ No markdown files found in docs-source. Nothing to generate.");
                 return;
             }
 
             const generatedFiles = [];
-            
+
             // Generate each HTML file
             for (const source of sources) {
                 const success = await this.generateHtmlFile(source);
@@ -758,31 +864,44 @@ ${this.stats.filesRemoved > 0 ? `\nAdditionally, ${this.stats.filesRemoved} orph
                 // Small delay to prevent overwhelming the system
                 await new Promise(resolve => setTimeout(resolve, 50));
             }
-            
+
             // Clean up deleted files
             await this.cleanupDeletedFiles(generatedFiles);
-            
+
             // Generate content manifest for dynamic navigation
             await this.generateContentManifest(sources);
-            
+
             // Generate summary report
             await this.generateUpdateReport(generatedFiles);
-            
+
             const elapsed = (Date.now() - this.stats.startTime) / 1000;
-            console.log(`
-🎉 HTML generation complete!`);
+            console.log(`\n🎉 Markdown HTML generation complete!`);
             console.log(`📈 Generated ${this.stats.filesGenerated} files in ${elapsed.toFixed(1)}s`);
-            
+
             if (this.stats.filesRemoved > 0) {
                 console.log(`🧹 Removed ${this.stats.filesRemoved} orphaned HTML files`);
             }
-            
+
             if (this.stats.errors > 0) {
-                console.log(`⚠️  ${this.stats.errors} errors encountered during generation.`);
+                console.log(`⚠️  ${this.stats.errors} errors encountered during markdown generation.`);
             }
-            
+
+            // STEP 2: Generate JSDoc HTML documentation
+            await this.generateJSDoc();
+
+            console.log("\n✨ Complete documentation workflow finished successfully!\n");
+
+            // MANUAL STEP REMINDER
+            console.log("⚠️  MANUAL STEP REQUIRED:");
+            console.log("📝 Update app/public/docs-source/changelog/index.md with new version:");
+            console.log("   1. Current Version reference (line ~5)");
+            console.log("   2. Latest Releases list (line ~17)");
+            console.log("   3. Version History table (line ~60)");
+            console.log("   4. Navigation section (line ~118)");
+            console.log("\n🔄 Then run: npm run docs:generate && docker-compose restart\n");
+
         } catch (error) {
-            console.error("❌ HTML generation process failed:", error);
+            console.error("❌ Documentation generation process failed:", error);
             process.exit(1);
         }
     }

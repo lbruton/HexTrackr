@@ -215,6 +215,119 @@ const gridOptions = AGGridResponsiveConfig.getDefaultGridOptions({
 });
 ```
 
+### AGGridThemeManager
+
+**Location:** `app/public/scripts/shared/ag-grid-theme-manager.js`
+**Since:** v1.0.40+
+
+Centralized theme management for all AG-Grid instances across the application.
+
+**Key Features:**
+
+- **Unified Theme Control**: Single source of truth for grid themes across all pages
+- **Dynamic Theme Switching**: Instant theme updates without page reload
+- **Cross-Tab Synchronization**: Theme changes propagate across browser tabs via localStorage events
+- **Grid Instance Registry**: Tracks all active grid instances for coordinated updates
+- **Dark Mode Surface Hierarchy**: Implements proper surface elevation for dark mode (base → surface-1 → surface-2)
+
+**Architecture Pattern:**
+
+```javascript
+// Register grid instance on creation
+AGGridThemeManager.registerGrid(gridApi, 'vulnerabilities-grid');
+
+// Theme changes automatically update all registered grids
+AGGridThemeManager.applyTheme('dark'); // Updates all grids instantly
+```
+
+**Core Methods:**
+
+- `registerGrid(gridApi, gridId)` - Register new grid instance for theme management
+- `unregisterGrid(gridId)` - Remove grid from theme tracking
+- `applyTheme(theme)` - Apply theme to all registered grids
+- `getCurrentTheme()` - Get active theme ('light' or 'dark')
+- `setupCrossTabSync()` - Enable theme synchronization across browser tabs
+
+**Surface Hierarchy (Dark Mode):**
+
+```css
+/* Grid theme uses proper surface elevation */
+--ag-background-color: var(--hextrackr-surface-2);     /* Table body */
+--ag-header-background-color: var(--hextrackr-surface-1); /* Headers */
+--ag-row-hover-color: var(--hextrackr-surface-3);     /* Hover state */
+```
+
+**Cross-Tab Sync:**
+
+```javascript
+// Automatic sync via localStorage events
+window.addEventListener('storage', (e) => {
+    if (e.key === 'hextrackr-theme') {
+        AGGridThemeManager.applyTheme(e.newValue);
+    }
+});
+```
+
+### PaginationController
+
+**Location:** `app/public/scripts/shared/pagination-controller.js`
+**Since:** v1.0.42 (HEX-112)
+
+User-facing pagination controls for device cards and large datasets.
+
+**Key Features:**
+
+- **Dynamic Page Size**: User-selectable rows per page (10, 25, 50, 100)
+- **Page Navigation**: First, Previous, Next, Last buttons with keyboard shortcuts
+- **Status Display**: "Showing X-Y of Z results" with real-time updates
+- **Responsive Design**: Mobile-friendly pagination controls
+- **State Persistence**: Remembers user's page size preference
+
+**Usage:**
+
+```javascript
+const pagination = new PaginationController({
+    itemsPerPage: 25,
+    onPageChange: (page, pageSize) => {
+        renderPage(page, pageSize);
+    }
+});
+
+pagination.setTotalItems(1245); // Update total count
+pagination.goToPage(3);         // Navigate to specific page
+```
+
+**Core Methods:**
+
+- `setTotalItems(count)` - Update total item count and recalculate pages
+- `goToPage(pageNumber)` - Navigate to specific page
+- `nextPage()` - Move to next page
+- `previousPage()` - Move to previous page
+- `setPageSize(size)` - Change items per page
+- `getCurrentPage()` - Get active page number
+- `getTotalPages()` - Get total page count
+
+**HTML Structure:**
+
+```html
+<div class="pagination-controls">
+    <div class="pagination-info">Showing 1-25 of 1,245 results</div>
+    <div class="pagination-buttons">
+        <button class="btn-first">First</button>
+        <button class="btn-prev">Previous</button>
+        <span class="page-indicator">Page 1 of 50</span>
+        <button class="btn-next">Next</button>
+        <button class="btn-last">Last</button>
+    </div>
+    <select class="page-size-selector">
+        <option value="10">10 per page</option>
+        <option value="25" selected>25 per page</option>
+        <option value="50">50 per page</option>
+        <option value="100">100 per page</option>
+    </select>
+</div>
+```
+
 ### VulnerabilityDataManager
 
 **Location:** `app/public/scripts/shared/vulnerability-data.js`
@@ -267,16 +380,53 @@ Multiple modal components for different purposes:
 #### VulnerabilityDetailsModal
 
 **Location:** `app/public/scripts/shared/vulnerability-details-modal.js`
+**Since:** v1.0.22 (Enhanced v2.0 in HEX-151)
 
-Displays detailed vulnerability information.
+Displays detailed vulnerability information with integrated KEV checking and Cisco PSIRT lookup.
 
 **Features:**
 
-- CVE links and references
-- CVSS score breakdown
-- Remediation guidance
-- Plugin output display
-- Related vulnerabilities
+- **CVE Links and References**: Direct links to NVD, MITRE, and vendor advisories
+- **CVSS Score Breakdown**: Visual representation of CVSS metrics with explanations
+- **Remediation Guidance**: Solution steps and patching recommendations
+- **Plugin Output Display**: Raw scanner output with syntax highlighting
+- **Related Vulnerabilities**: Shows other CVEs affecting the same device
+- **KEV Integration (v1.0.51)**: Automatic CISA KEV lookup with visual indicators
+- **Cisco PSIRT Integration**: Fixed version information for Cisco CVEs
+
+**KEV Modal Features (HEX-151 Enhancement):**
+
+```javascript
+// Automatic KEV lookup when modal opens
+async showVulnerabilityDetails(vulnId) {
+    const vuln = await fetchVulnerability(vulnId);
+
+    // Check if this CVE is in CISA KEV catalog
+    if (vuln.cve) {
+        const kevData = await fetchKEVData(vuln.cve);
+        if (kevData.isKEV) {
+            displayKEVBanner(kevData);
+        }
+    }
+
+    displayVulnerabilityDetails(vuln);
+}
+```
+
+**KEV Data Display:**
+
+- **Ransomware Flag**: Highlighted if CVE is known to be used in ransomware attacks
+- **Vendor Project**: Shows affected vendor/product from CISA
+- **Date Added**: When CISA added to KEV catalog
+- **Required Action**: CISA's mandated remediation action
+- **Due Date**: Federal agency remediation deadline
+- **Notes**: Additional CISA context and warnings
+
+**Cisco PSIRT Display:**
+
+- **Fixed Versions**: Shows which software versions patch the vulnerability
+- **Advisory Link**: Direct link to Cisco security advisory
+- **Platform Coverage**: Lists affected platforms and fixed versions per platform
 
 #### ProgressModal
 
@@ -388,11 +538,313 @@ Dynamic header with theme toggle and user menu.
 - Navigation state
 - Notification badges
 
+### PreferencesService
+
+**Location:** `app/public/scripts/shared/preferences-service.js`
+**Since:** v1.0.48
+
+Frontend client for user preferences API with local caching and synchronization.
+
+**Key Features:**
+
+- **API Integration**: Communicates with `/api/preferences` endpoints
+- **Local Caching**: IndexedDB storage for offline access
+- **Cross-Tab Sync**: Preferences sync across browser tabs via storage events
+- **Automatic Save**: Debounced saves to reduce API calls
+- **Typed Preferences**: TypeScript-style preference definitions
+
+**Core Methods:**
+
+```javascript
+// Get preference (returns from cache if available)
+const theme = await PreferencesService.get('dashboard.theme');
+// Returns: { mode: "dark", accent: "blue" }
+
+// Set preference (auto-saves to server)
+await PreferencesService.set('dashboard.theme', { mode: 'dark', accent: 'blue' });
+
+// Bulk update (single API call)
+await PreferencesService.bulkUpdate({
+    'dashboard.theme': { mode: 'dark' },
+    'dashboard.defaultView': 'grid',
+    'notifications.enabled': true
+});
+
+// Reset to defaults
+await PreferencesService.reset();
+
+// Clear cache
+PreferencesService.clearCache();
+```
+
+**Preference Keys:**
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `dashboard.theme` | Object | Theme settings (mode, accent) |
+| `dashboard.defaultView` | String | Default view ('grid' or 'cards') |
+| `dashboard.chartMetric` | String | Chart metric ('vpr' or 'count') |
+| `vulnerabilities.filters` | Object | Saved filter configurations |
+| `vulnerabilities.pageSize` | Number | Rows per page (10, 25, 50, 100) |
+| `notifications.enabled` | Boolean | Enable/disable notifications |
+| `export.defaultFormat` | String | Default export format ('csv', 'json', 'pdf') |
+| `grid.columnState` | Array | AG-Grid column visibility/order |
+
+**Cross-Tab Synchronization:**
+
+```javascript
+// Automatic sync via storage events
+window.addEventListener('storage', (e) => {
+    if (e.key === 'hextrackr-preferences') {
+        PreferencesService.refreshFromStorage();
+        // Trigger UI updates
+        applyPreferences();
+    }
+});
+```
+
+**Caching Strategy:**
+
+- **IndexedDB**: Primary cache for preferences (survives page reload)
+- **Memory Cache**: In-memory map for fast reads during session
+- **TTL**: Cache entries expire after 1 hour, force refresh from server
+- **Invalidation**: Automatic cache invalidation on set/update operations
+
+### AuthState
+
+**Location:** `app/public/scripts/shared/auth-state.js`
+**Since:** v1.0.46
+
+Frontend authentication state management with session monitoring.
+
+**Key Features:**
+
+- **Session Monitoring**: Periodic checks for session validity
+- **Auto-Redirect**: Redirects to login on session expiration
+- **User Profile Caching**: Cached user data for performance
+- **CSRF Token Management**: Automatic CSRF token refresh
+- **State Change Events**: Emits events when auth state changes
+
+**Core Methods:**
+
+```javascript
+// Check authentication status
+const isAuthenticated = await AuthState.checkAuth();
+// Returns: true/false
+
+// Get current user
+const user = AuthState.getCurrentUser();
+// Returns: { id: 1, username: "admin", email: "...", ... }
+
+// Get CSRF token for forms
+const csrfToken = await AuthState.getCsrfToken();
+// Returns: "abc123..."
+
+// Logout
+await AuthState.logout();
+// Clears session, redirects to login
+
+// Session monitoring (auto-starts on page load)
+AuthState.startSessionMonitor(); // Checks every 5 minutes
+AuthState.stopSessionMonitor();
+```
+
+**Authentication Events:**
+
+```javascript
+// Listen for auth state changes
+AuthState.addEventListener('auth-changed', (e) => {
+    if (e.detail.authenticated) {
+        console.log('User logged in:', e.detail.user);
+    } else {
+        console.log('User logged out');
+        window.location.href = '/login.html';
+    }
+});
+
+// Listen for session expiration
+AuthState.addEventListener('session-expired', () => {
+    ToastManager.show('Session expired. Please log in again.', 'warning');
+    window.location.href = '/login.html';
+});
+```
+
+**Session Monitor:**
+
+```javascript
+// Automatic session checking (every 5 minutes)
+setInterval(async () => {
+    const status = await fetch('/api/auth/status');
+    if (!status.authenticated) {
+        AuthState.emit('session-expired');
+    }
+}, 300000); // 5 minutes
+```
+
+**CSRF Token Integration:**
+
+```javascript
+// Automatically adds CSRF token to API requests
+async function apiCall(endpoint, method, data) {
+    const token = await AuthState.getCsrfToken();
+
+    return fetch(endpoint, {
+        method,
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': token
+        },
+        body: JSON.stringify(data)
+    });
+}
+```
+
 ---
 
 ## Utilities {#utilities}
 
 Helper functions and security utilities.
+
+### VendorFilterUI
+
+**Location:** `app/public/scripts/shared/vendor-filter-ui.js`
+**Since:** v1.0.53 (HEX-156)
+
+Manages vendor filtering UI with bidirectional synchronization between radio buttons and dropdown.
+
+**Key Features:**
+
+- **Dual Control Sync**: Radio button toggles and dropdown select stay synchronized
+- **Infinite Loop Prevention**: Smart event handling prevents circular updates
+- **Dashboard Integration**: Updates statistics cards and charts when vendor changes
+- **Table/Card Filtering**: Synchronizes with AG-Grid and card view filters
+- **URL State Persistence**: Maintains filter state in query parameters
+
+**Architecture Pattern:**
+
+```javascript
+// Radio buttons → Dropdown sync
+vendorRadios.forEach(radio => {
+    radio.addEventListener('change', (e) => {
+        const vendor = e.target.dataset.vendor;
+
+        // Sync dropdown (prevent infinite loop)
+        if (vendorDropdown.value !== vendor) {
+            vendorDropdown.value = vendor;
+            vendorDropdown.dispatchEvent(new Event('change'));
+        }
+
+        // Update dashboard
+        updateStatistics(vendor);
+        updateChart(vendor);
+    });
+});
+
+// Dropdown → Radio buttons sync
+vendorDropdown.addEventListener('change', (e) => {
+    const vendor = e.target.value;
+
+    // Find matching radio button
+    const matchingRadio = findRadioByVendor(vendor);
+    if (matchingRadio && !matchingRadio.checked) {
+        matchingRadio.checked = true;
+        matchingRadio.dispatchEvent(new Event('change'));
+    }
+});
+```
+
+**Vendor Values:**
+
+- `` (empty string) - All Vendors
+- `CISCO` - Cisco Systems
+- `Palo Alto` - Palo Alto Networks
+- `Other` - All other vendors
+
+**getCurrentVendor() Helper:**
+
+```javascript
+/**
+ * Get currently selected vendor from radio buttons
+ * @returns {string} Current vendor ("", "CISCO", "Palo Alto", or "Other")
+ */
+function getCurrentVendor() {
+    const checkedRadio = document.querySelector('input[name="vendor-filter"]:checked');
+    if (!checkedRadio) return "";
+
+    const label = document.querySelector(`label[for="${checkedRadio.id}"]`);
+    return label ? (label.dataset.vendor || "") : "";
+}
+```
+
+**Integration Points:**
+
+- **Statistics Cards**: `updateStatisticsDisplay(vendor)` updates VPR card metrics
+- **Charts**: `chartManager.update(false, vendor)` filters trend data
+- **Grid/Cards**: `applyVendorFilter(vendor)` filters table/card results
+- **Chart Metric Toggle**: Passes vendor to maintain filter when switching VPR sum ↔ vuln count
+
+### CVEUtilities
+
+**Location:** `app/public/scripts/utils/cve-utilities.js`
+**Since:** v1.0.22
+
+CVE data processing, validation, and external API integration.
+
+**Key Features:**
+
+- **CVE ID Validation**: Regex-based format validation (CVE-YYYY-NNNNN)
+- **External Links Generation**: Creates links to NVD, MITRE, vendor databases
+- **KEV Integration**: CISA KEV catalog lookup and caching
+- **Cisco PSIRT**: Cisco security advisory lookup for CVE fixed versions
+- **Batch Processing**: Efficient handling of multiple CVE lookups
+
+**Core Functions:**
+
+```javascript
+// CVE ID validation
+CVEUtilities.isValidCVE('CVE-2024-12345')  // true
+CVEUtilities.isValidCVE('CVE-24-123')      // false
+
+// External link generation
+CVEUtilities.getNVDLink('CVE-2024-12345')
+// → https://nvd.nist.gov/vuln/detail/CVE-2024-12345
+
+CVEUtilities.getMITRELink('CVE-2024-12345')
+// → https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2024-12345
+
+// KEV lookup
+const kevData = await CVEUtilities.checkKEV('CVE-2024-12345');
+// Returns: { isKEV: true, dateAdded: "2024-10-01", ransomware: true, ... }
+
+// Cisco PSIRT lookup
+const ciscoData = await CVEUtilities.lookupCiscoPSIRT('CVE-2024-12345');
+// Returns: { advisory: "cisco-sa-xxx", fixedVersions: [...], ... }
+```
+
+**KEV Cache:**
+
+```javascript
+// Local storage cache for KEV lookups (24h TTL)
+const kevCache = {
+    'CVE-2024-12345': {
+        data: { isKEV: true, dateAdded: '2024-10-01', ... },
+        timestamp: 1696435200000
+    }
+};
+
+// Cache management
+CVEUtilities.clearKEVCache()      // Clear all cached KEV data
+CVEUtilities.refreshKEV(cveId)    // Force fresh lookup
+```
+
+**Batch Processing:**
+
+```javascript
+// Efficient batch KEV lookups
+const cveList = ['CVE-2024-1', 'CVE-2024-2', 'CVE-2024-3'];
+const kevResults = await CVEUtilities.batchKEVLookup(cveList);
+// Returns: Map<cveId, kevData>
+```
 
 ### Security Module
 

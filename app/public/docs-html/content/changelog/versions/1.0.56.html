@@ -1,0 +1,184 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.56</h1><hr>
+<h2>[1.0.56] - 2025-10-09</h2><h3>Added</h3><h4>Automated Version Propagation System (HEX-171)</h4><p><strong>Overview</strong>: Implemented unified release workflow that automatically synchronizes version numbers across all project files and generates complete documentation in a single command, eliminating manual updates and version drift.</p>
+<p><strong>Problem Solved</strong>:</p>
+<ul>
+<li>Version numbers were hardcoded in 15+ locations (package.json, README.md, footer.html, docker-compose.yml, server.js)</li>
+<li>Version drift: package.json at v1.0.43, README.md 21 versions behind at v1.0.33, CHANGELOG at v1.0.54</li>
+<li>Manual update burden: 9 steps, ~5 minutes per release, error-prone</li>
+<li>Inconsistent user experience with different versions shown in different places</li>
+</ul>
+<p><strong>Solution Implemented</strong>:</p>
+<p><strong>Single Command Release Workflow</strong>:</p>
+<pre><code class="language-bash">npm run release</code></pre><p>Executes complete automation pipeline:</p>
+<ol>
+<li><strong>Version Sync</strong>: Updates 5 files from root package.json</li>
+<li><strong>Documentation Generation</strong>: Converts 78 markdown files → HTML (~4s)</li>
+<li><strong>API Reference</strong>: Generates JSDoc HTML documentation</li>
+<li><strong>Update Report</strong>: Creates detailed change log</li>
+</ol>
+<p><strong>Auto-Updated Files</strong> (from root package.json source of truth):</p>
+<ol>
+<li><code>app/public/package.json</code> - Application package version</li>
+<li><code>app/public/scripts/shared/footer.html</code> - Version badge on all pages</li>
+<li><code>README.md</code> - Header version badge (fixed 21-version lag)</li>
+<li><code>docker-compose.yml</code> - HEXTRACKR_VERSION environment variable</li>
+<li><code>app/public/server.js</code> - Fallback version constant</li>
+</ol>
+<p><strong>Technical Architecture</strong>:</p>
+<p><strong>Source of Truth Pattern</strong>:</p>
+<ul>
+<li>Root <code>package.json</code> is authoritative (updated by <code>npm version</code> commands)</li>
+<li>All other version references sync FROM root package.json</li>
+<li>One-way propagation prevents version conflicts</li>
+</ul>
+<p><strong>Critical Fix - Sync Direction Inversion</strong>:</p>
+<ul>
+<li><strong>Problem Found</strong>: Existing script read from <code>app/public/package.json</code> and synced TO root (backwards!)</li>
+<li><strong>Impact</strong>: Manual root package.json updates were overwritten by stale app/public version</li>
+<li><strong>Fix Applied</strong>: Inverted sync direction - root → all files (correct flow)</li>
+</ul>
+<p><strong>Implementation Details</strong>:</p>
+<p><strong>File Modified</strong>: <code>app/public/docs-html/html-content-updater.js</code></p>
+<p><strong>New Methods</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Version synchronization across project files</span>
+<span class="hljs-keyword">async</span> <span class="hljs-title function_">updateVersionsAcrossFiles</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-comment">// Reads from ROOT package.json (source of truth)</span>
+  <span class="hljs-comment">// Syncs version to 5 dependent files using regex replacement</span>
+  <span class="hljs-comment">// Non-fatal error handling for partial success</span>
+}
+
+<span class="hljs-comment">// JSDoc HTML generation integration</span>
+<span class="hljs-keyword">async</span> <span class="hljs-title function_">generateJSDoc</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-comment">// Uses child_process.exec with 10MB buffer</span>
+  <span class="hljs-comment">// Non-fatal warnings don&#x27;t block release</span>
+}
+
+<span class="hljs-comment">// Unified workflow orchestration</span>
+<span class="hljs-keyword">async</span> <span class="hljs-title function_">run</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-comment">// 1. Sync versions</span>
+  <span class="hljs-comment">// 2. Generate markdown → HTML</span>
+  <span class="hljs-comment">// 3. Generate JSDoc → HTML</span>
+}</code></pre><p><strong>Regex Patterns Used</strong>:</p>
+<ul>
+<li>Footer badge: <code>/HexTrackr-v[\d.]+(-blue\?style=flat)/g</code></li>
+<li>README badge: <code>/HexTrackr-v[\d.]+-blue/g</code></li>
+<li>Docker env: <code>/HEXTRACKR_VERSION=[\d.]+/g</code></li>
+<li>Server.js: <code>/HEXTRACKR_VERSION \|\| &quot;[\d.]+&quot;/g</code></li>
+</ul>
+<p><strong>Error Handling</strong>:</p>
+<ul>
+<li>Try-catch around each file update</li>
+<li>Partial success allowed (if 3/5 files update, release continues)</li>
+<li>JSDoc warnings logged but non-fatal</li>
+<li>Descriptive console output for debugging</li>
+</ul>
+<p><strong>Workflow Comparison</strong>:</p>
+<p><strong>Before</strong> (Manual, Error-Prone):</p>
+<ol>
+<li>Update root package.json manually</li>
+<li>Update app/public/package.json manually</li>
+<li>Update footer.html badge manually</li>
+<li>Update README.md badge manually</li>
+<li>Update docker-compose.yml manually</li>
+<li>Update server.js manually</li>
+<li>Run <code>npm run docs:generate</code></li>
+<li>Run <code>npm run docs:dev</code> (JSDoc)</li>
+<li>Hope nothing was missed</li>
+</ol>
+<p><strong>After</strong> (Automated, 2 Steps):</p>
+<ol>
+<li>Update root package.json + changelog markdown</li>
+<li>Run <code>npm run release</code></li>
+</ol>
+<p><strong>Time Savings</strong>: 5 minutes → 30 seconds per release (90% reduction)</p>
+<p><strong>Testing Results</strong>:</p>
+<p><strong>Command Executed</strong>: <code>npm run release</code> (v1.0.56 test)</p>
+<pre><code class="language-bash">🚀 Starting complete documentation generation workflow...
+
+🔄 Updating all version references to v1.0.56...
+  ✅ Updated app/public/package.json version
+  ✅ Updated footer.html version badge
+  ✅ Updated README.md version badge
+  ✅ Updated docker-compose.yml HEXTRACKR_VERSION
+  ✅ Updated server.js fallback version
+✨ Version <span class="hljs-built_in">sync</span> complete: 5 files updated to v1.0.56
+
+📝 Generating markdown documentation...
+📊 Found 78 markdown <span class="hljs-built_in">source</span> files to convert.
+🎉 Markdown HTML generation complete!
+📈 Generated 78 files <span class="hljs-keyword">in</span> 4.3s
+
+📚 Generating JSDoc HTML documentation...
+✅ JSDoc HTML generation complete!
+
+✨ Complete documentation workflow finished successfully!</code></pre><p><strong>Validation</strong>: All 5 version references confirmed synchronized to v1.0.56</p>
+<hr>
+<h3>Changed</h3><h4>Documentation Generation Workflow</h4><p><strong>Change</strong>: Merged version sync, markdown documentation, and JSDoc generation into single unified workflow.</p>
+<p><strong>Previous Workflow</strong>:</p>
+<ul>
+<li><code>npm run docs:generate</code> - Markdown → HTML only</li>
+<li><code>npm run docs:dev</code> - JSDoc → HTML only</li>
+<li>Manual version updates to multiple files</li>
+</ul>
+<p><strong>New Workflow</strong>:</p>
+<ul>
+<li><code>npm run release</code> - Complete pipeline (version sync + both doc types)</li>
+<li><code>npm run docs:generate</code> - Still available for markdown-only updates</li>
+<li><code>npm run docs:dev</code> - Still available for JSDoc-only updates</li>
+</ul>
+<p><strong>Backward Compatibility</strong>: All existing commands still work, unified command is additive.</p>
+<hr>
+<h3>Fixed</h3><h4>Version Sync Source of Truth Inversion</h4><p><strong>Bug</strong>: <code>html-content-updater.js</code> was reading version from <code>app/public/package.json</code> and syncing TO root package.json (backwards flow).</p>
+<p><strong>Impact</strong>:</p>
+<ul>
+<li>Manual updates to root package.json were overwritten by stale app/public version</li>
+<li>npm version commands (which update root) had no effect</li>
+<li>Version drift between root and application packages</li>
+</ul>
+<p><strong>Fix</strong>: Inverted sync direction to read from root package.json (authoritative) and propagate to application files.</p>
+<p><strong>Root Cause</strong>: Misunderstanding of npm version command behavior - it updates the ROOT package.json in project directory, not nested package.json files.</p>
+<hr>
+<h3>Developer Experience</h3><p><strong>New Release Process</strong>:</p>
+<pre><code class="language-bash"><span class="hljs-comment"># 1. Manual: Update version and create changelog</span>
+vim package.json  <span class="hljs-comment"># Bump version: 1.0.55 → 1.0.56</span>
+vim app/public/docs-source/changelog/versions/1.0.56.md
+
+<span class="hljs-comment"># 2. Automated: Run unified release command</span>
+npm run release
+
+<span class="hljs-comment"># 3. Verify and commit</span>
+git add .
+git commit -m <span class="hljs-string">&quot;chore: release v1.0.56&quot;</span>
+git push</code></pre><p><strong>Benefits</strong>:</p>
+<ul>
+<li>✅ Single source of truth (root package.json)</li>
+<li>✅ Zero manual file updates (5 files auto-synced)</li>
+<li>✅ Consistency guaranteed across all version references</li>
+<li>✅ Documentation always in sync with code version</li>
+<li>✅ 90% time reduction per release (5 min → 30 sec)</li>
+<li>✅ C-level presentation ready (professional automation)</li>
+</ul>
+<hr>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>package.json</code> - Version bumped to 1.0.56, added <code>release</code> script</li>
+<li><code>app/public/docs-html/html-content-updater.js</code> - Major refactor with version sync and JSDoc integration</li>
+<li><code>app/public/package.json</code> - Auto-synced to v1.0.56</li>
+<li><code>app/public/scripts/shared/footer.html</code> - Version badge auto-updated</li>
+<li><code>README.md</code> - Version badge auto-updated (was v1.0.33, now v1.0.56)</li>
+<li><code>docker-compose.yml</code> - HEXTRACKR_VERSION auto-updated</li>
+<li><code>app/public/server.js</code> - Fallback version auto-updated</li>
+</ul>
+<p><strong>Issues</strong>:</p>
+<ul>
+<li><a href="https://linear.app/hextrackr/issue/HEX-171">HEX-171</a> - Automated Version Number Propagation System</li>
+</ul>
+<hr>
+<p><strong>Version</strong>: 1.0.56<br><strong>Last Updated</strong>: 2025-10-09</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

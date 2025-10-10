@@ -1,0 +1,67 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.58</h1><hr>
+<h2>[1.0.58] - 2025-10-10</h2><h3>Fixed</h3><h4>KEV Modal Light Mode Readability (HEX-172)</h4><p><strong>Overview</strong>: Fixed KEV (Known Exploited Vulnerability) modal header readability in light theme by adding appropriate contrast and warning colors while preserving dark mode&#39;s existing perfect styling.</p>
+<p><strong>Problem</strong>:</p>
+<ul>
+<li>Light mode KEV modal header had white background with white text - completely unreadable</li>
+<li>Close button (X) was too light to see clearly</li>
+<li>Dark mode was working perfectly with red header and white text</li>
+</ul>
+<p><strong>User Feedback</strong>:</p>
+<ul>
+<li>&quot;cannot read the header, its white, along with the text&quot;</li>
+<li>&quot;lets make the text black, and the header a light red&quot;</li>
+<li>&quot;the X in the corner to close the window is too light, lets make it black&quot;</li>
+</ul>
+<p><strong>Solution Implemented</strong>:</p>
+<p><strong>Light Mode Only Changes</strong>:</p>
+<ul>
+<li><strong>Header Background</strong>: Light red gradient (#fecaca → #fca5a5) for urgency signaling</li>
+<li><strong>Header Text</strong>: Pure black (#000000) for maximum readability</li>
+<li><strong>Close Button</strong>: Black (using CSS filter: brightness(0))</li>
+<li><strong>Border</strong>: Red accent (#dc2626) for critical alert context</li>
+</ul>
+<p><strong>Dark Mode</strong>: Completely untouched - red header with white text remains perfect</p>
+<p><strong>Technical Details</strong>:</p>
+<pre><code class="language-css"><span class="hljs-comment">/* Light mode only - make header readable with warning color */</span>
+<span class="hljs-selector-attr">[data-bs-theme=<span class="hljs-string">&quot;light&quot;</span>]</span> <span class="hljs-selector-id">#kevDetailsModal</span> <span class="hljs-selector-class">.modal-header</span> {
+    <span class="hljs-attribute">background</span>: <span class="hljs-built_in">linear-gradient</span>(<span class="hljs-number">135deg</span>, <span class="hljs-number">#fecaca</span> <span class="hljs-number">0%</span>, <span class="hljs-number">#fca5a5</span> <span class="hljs-number">100%</span>) <span class="hljs-meta">!important</span>;
+    <span class="hljs-attribute">color</span>: <span class="hljs-number">#000000</span> <span class="hljs-meta">!important</span>;
+    <span class="hljs-attribute">border-bottom</span>: <span class="hljs-number">1px</span> solid <span class="hljs-number">#dc2626</span> <span class="hljs-meta">!important</span>;
+}
+
+<span class="hljs-comment">/* Make close button black for readability */</span>
+<span class="hljs-selector-attr">[data-bs-theme=<span class="hljs-string">&quot;light&quot;</span>]</span> <span class="hljs-selector-id">#kevDetailsModal</span> <span class="hljs-selector-class">.modal-header</span> <span class="hljs-selector-class">.btn-close</span> {
+    <span class="hljs-attribute">filter</span>: <span class="hljs-built_in">brightness</span>(<span class="hljs-number">0</span>);
+}</code></pre><p><strong>Design Philosophy</strong>:</p>
+<ul>
+<li>Light mode uses soft red tones with high-contrast black text for professional appearance</li>
+<li>Dark mode retains bold red header for dramatic urgency signaling</li>
+<li>Critical nature communicated through header color without overwhelming the interface</li>
+<li>Fire emoji 🔥 and alert banner provide additional urgency context</li>
+</ul>
+<p><strong>Result</strong>:</p>
+<ul>
+<li>Fully readable KEV modal in both light and dark themes</li>
+<li>Professional, accessible design with WCAG AA contrast compliance</li>
+<li>Theme-appropriate urgency signaling (subtle in light, bold in dark)</li>
+<li>Preserved existing dark mode styling that was already working</li>
+</ul>
+<hr>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>package.json</code> - Version bumped to 1.0.58</li>
+<li><code>app/public/styles/shared/modals.css</code> - Added light mode KEV modal styling</li>
+</ul>
+<p><strong>Issues</strong>:</p>
+<ul>
+<li><a href="https://linear.app/hextrackr/issue/HEX-172">HEX-172</a> - KEV modal missing appropriate light mode styling</li>
+</ul>
+<hr>
+<p><strong>Version</strong>: 1.0.58<br><strong>Last Updated</strong>: 2025-10-10</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

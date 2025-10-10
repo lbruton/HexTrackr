@@ -1,0 +1,33 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.45</h1><p><strong>Release Date</strong>: 2025-10-03</p>
+<hr>
+<h2>[1.0.45] - 2025-10-03</h2><h3>Security (2)</h3><h4>HEX-124: Security Vulnerability Fix - tar-fs CVE-2025-59343</h4><p><strong>Achievement</strong>: Resolved HIGH severity vulnerability (CVE-2025-59343) in tar-fs dependency through npm overrides mechanism.</p>
+<p><strong>Implementation</strong>:</p>
+<ul>
+<li>Updated tar-fs from version 2.1.3 to 2.1.4 using npm overrides field</li>
+<li>tar-fs is a transitive dependency: sqlite3 → prebuild-install → tar-fs</li>
+<li>Added <code>&quot;overrides&quot;: { &quot;tar-fs&quot;: &quot;2.1.4&quot; }</code> to package.json to force version update</li>
+<li>Verified zero HIGH or CRITICAL vulnerabilities remain after fix</li>
+</ul>
+<p><strong>Vulnerability Details</strong>:</p>
+<ul>
+<li><strong>CVE</strong>: CVE-2025-59343</li>
+<li><strong>Severity</strong>: HIGH</li>
+<li><strong>Issue</strong>: Symlink validation bypass in <a href="mailto:tar-fs@2.1.3">tar-fs@2.1.3</a></li>
+<li><strong>Impact</strong>: HexTrackr does not directly use tar-fs, but vulnerability was present in dependency tree</li>
+<li><strong>Resolution</strong>: Patch version 2.1.4 fixes symlink validation vulnerability</li>
+</ul>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li>npm audit shows zero HIGH vulnerabilities after fix</li>
+<li>All ESLint checks pass with no errors</li>
+<li>Docker container starts successfully with full functionality</li>
+<li>Application tested via nginx reverse proxy on localhost:80/443</li>
+</ul>
+<p><strong>Linear Issue</strong>: <a href="https://linear.app/hextrackr/issue/HEX-124">HEX-124</a></p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

@@ -1,26 +1,39 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
     <h1>User Guides</h1><blockquote>
-<p>Comprehensive guides for using HexTrackr effectively</p>
+<p>Comprehensive guides for using and customizing HexTrackr</p>
 </blockquote>
-<h2>Available Guides</h2><h3>[Getting Started](./getting-started.md)</h3><p>Quick start guide to get HexTrackr up and running in your environment. Covers Docker setup, initial configuration, and basic usage.</p>
-<h3>[User Guide](./user-guide.md)</h3><p>Complete guide for daily operations including:</p>
-<ul>
-<li><strong>Ticket Management</strong> - Creating, editing, and managing maintenance tickets</li>
-<li><strong>Vulnerability Management</strong> - Importing, analyzing, and tracking vulnerabilities</li>
-<li><strong>Import &amp; Export</strong> - Working with CSV imports and various export formats</li>
-<li><strong>Settings &amp; Preferences</strong> - Customizing HexTrackr for your workflow</li>
+<h2>Getting Started</h2><ul>
+<li><strong><a href="#guides/getting-started">Getting Started Guide</a></strong>: Quick start guide to get HexTrackr up and running in your environment, covering Docker installation, HTTPS setup, SSL certificates, database initialization, and troubleshooting</li>
 </ul>
-<h2>Quick Links</h2><ul>
-<li><a href="./user-guide.md#ticket-management">Ticket Management</a></li>
-<li><a href="./user-guide.md#vulnerability-management">Vulnerability Dashboard</a></li>
-<li><a href="./user-guide.md#importing-vulnerability-data">CSV Import Guide</a></li>
-<li><a href="./user-guide.md#device-management">Device Management</a></li>
+<hr>
+<h2>Daily Operations</h2><ul>
+<li><strong><a href="#guides/user-guide">User Guide</a></strong>: Complete guide for day-to-day operations including vulnerability dashboard (VPR cards, vendor filtering, KEV tracking, trend analysis), ticket management (creating tickets, device assignment, bundle downloads), import &amp; export (CSV imports, multi-format exports, backup operations), and settings &amp; preferences (API configuration, ServiceNow integration, data management)</li>
+</ul>
+<hr>
+<h2>Advanced Features</h2><ul>
+<li><p><strong><a href="#guides/kev-integration">KEV Integration Guide</a></strong>: Understanding CISA Known Exploited Vulnerabilities (KEV) integration including what KEV is, automatic tracking with daily synchronization, priority remediation workflows, settings configuration, KEV badges, threat intelligence, and compliance tracking</p>
+</li>
+<li><p><strong><a href="#guides/https-setup">HTTPS Setup Guide</a></strong>: Complete guide for configuring HTTPS support across different platforms (macOS, Ubuntu/Linux, Windows), production deployment with Let&#39;s Encrypt and nginx reverse proxy, certificate management (self-signed certificates, SubjectAltName extensions), and troubleshooting certificate errors and port conflicts</p>
+</li>
+</ul>
+<hr>
+<h2>Customization</h2><ul>
+<li><strong><a href="#guides/css-customization">CSS Customization Guide</a></strong>: Customize HexTrackr&#39;s appearance to match your organization&#39;s branding including brand colors, custom logo, custom fonts, component styling (cards, buttons, badges, navigation), CSS variables, and theme compatibility</li>
+</ul>
+<hr>
+<h2>Quick Links</h2><h3>Common Tasks</h3><ul>
+<li><a href="./getting-started.md#quick-start-docker-installation-recommended">Install HexTrackr with Docker</a></li>
+<li><a href="./user-guide.md#csv-import">Import Vulnerability Scans</a></li>
+<li><a href="./user-guide.md#creating-and-managing-tickets">Create Remediation Tickets</a></li>
+<li><a href="./user-guide.md#servicenow-integration">Configure ServiceNow Integration</a></li>
+<li><a href="./kev-integration.md#configuration-and-settings">Enable KEV Auto-Sync</a></li>
+<li><a href="./https-setup.md#production-https-with-lets-encrypt">Setup HTTPS for Production</a></li>
+<li><a href="./css-customization.md#quick-start-change-your-brand-colors">Customize Brand Colors</a></li>
 </ul>
 <h2>Need Help?</h2><p>If you encounter issues while using HexTrackr:</p>
 <ol>
 <li>Check the <a href="#reference/troubleshooting">Troubleshooting Guide</a></li>
-<li>Review the <a href="#reference/performance">Performance Guidelines</a></li>
 <li>Consult the <a href="#api-reference/index">API Reference</a> for technical details</li>
 </ol>
 <hr>

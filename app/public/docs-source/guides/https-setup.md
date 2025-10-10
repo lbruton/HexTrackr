@@ -4,7 +4,7 @@
 
 ## Overview
 
-HexTrackr v1.0.33+ includes built-in HTTPS support for secure deployment and authentication. This guide covers platform-specific setup for self-signed certificates and production HTTPS configuration.
+HexTrackr v1.0.33+ (current: v1.0.54) includes built-in HTTPS support for secure deployment and authentication. This guide covers platform-specific setup for self-signed certificates and production HTTPS configuration.
 
 ### When You Need HTTPS
 
@@ -53,13 +53,14 @@ Follow the platform-specific instructions below for manual certificate generatio
    # Create certificates directory
    mkdir -p certs
 
-   # Generate 10-year certificate for localhost
+   # Generate 10-year certificate for localhost with SubjectAltName extension
    openssl req -x509 -newkey rsa:4096 \
      -keyout certs/key.pem \
      -out certs/cert.pem \
      -days 3650 \
      -nodes \
-     -subj "/C=US/ST=State/L=City/O=HexTrackr/CN=localhost"
+     -subj "/C=US/ST=State/L=City/O=HexTrackr/CN=localhost" \
+     -addext "subjectAltName=DNS:localhost,DNS:dev.hextrackr.com,IP:127.0.0.1"
 
    # Set proper permissions
    chmod 600 certs/key.pem
@@ -114,13 +115,14 @@ Follow the platform-specific instructions below for manual certificate generatio
    # Create certificates directory
    mkdir -p certs
 
-   # Generate certificate with your domain/IP
+   # Generate certificate with your domain/IP and SubjectAltName extension
    openssl req -x509 -newkey rsa:4096 \
      -keyout certs/key.pem \
      -out certs/cert.pem \
      -days 3650 \
      -nodes \
-     -subj "/C=US/ST=State/L=City/O=HexTrackr/CN=your-domain.com"
+     -subj "/C=US/ST=State/L=City/O=HexTrackr/CN=your-domain.com" \
+     -addext "subjectAltName=DNS:your-domain.com,DNS:hextrackr.com,IP:192.168.1.80"
 
    # Set secure permissions
    chmod 600 certs/key.pem
@@ -142,10 +144,12 @@ Follow the platform-specific instructions below for manual certificate generatio
    ```bash
    NODE_ENV=production
    USE_HTTPS=true
-   PORT=443
+   PORT=8080  # Keep 8080 for Docker deployments (nginx handles 443)
    SSL_KEY_PATH=/app/certs/key.pem
    SSL_CERT_PATH=/app/certs/cert.pem
    ```
+
+   **Note**: For Docker deployments with nginx reverse proxy, keep `PORT=8080`. nginx listens on port 443 and proxies to the Node.js app on port 8080. Only use `PORT=443` for bare-metal deployments where Node.js directly serves HTTPS without nginx.
 
 ### Windows Development
 
@@ -168,7 +172,8 @@ Follow the platform-specific instructions below for manual certificate generatio
      -out certs/cert.pem \
      -days 3650 \
      -nodes \
-     -subj "/C=US/ST=State/L=City/O=HexTrackr/CN=localhost"
+     -subj "/C=US/ST=State/L=City/O=HexTrackr/CN=localhost" \
+     -addext "subjectAltName=DNS:localhost,DNS:dev.hextrackr.com,IP:127.0.0.1"
    ```
 
 2. **Configure Environment**
@@ -231,11 +236,23 @@ For production, consider using Nginx for SSL termination:
 
 ```nginx
 server {
-    listen 443 ssl;
+    listen 443 ssl http2;
     server_name your-domain.com;
 
+    # SSL Certificate Configuration
     ssl_certificate /etc/letsencrypt/live/your-domain.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/your-domain.com/privkey.pem;
+
+    # SSL Security Settings
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+
+    # Security Headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
 
     # Increase upload limit for large CSV imports (Tenable, etc.)
     client_max_body_size 100M;
@@ -327,9 +344,13 @@ chmod 644 certs/cert.pem
 
 **Solution**:
 ```bash
-# Check what's using the port
+# macOS/Linux: Check what's using the port
 sudo lsof -i :443
-# Stop conflicting service or change port
+
+# Windows: Check what's using the port
+netstat -ano | findstr :443
+
+# Stop conflicting service or change port in docker-compose.yml
 ```
 
 ### Testing HTTPS Setup
@@ -388,4 +409,4 @@ If you encounter issues:
 
 ---
 
-*For more security information, see the [Security Guide](../security/overview.md)*
+*For more security information, see the [Security Guide](../reference/security.md)*

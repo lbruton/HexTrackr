@@ -1,0 +1,47 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.53</h1><p><strong>Release Date</strong>: 2025-10-08</p>
+<hr>
+<h2>[1.0.53] - 2025-10-08</h2><h3>Added</h3><h4>Vendor Breakdown CSV Export (HEX-148/149/150)</h4><p><strong>Feature</strong>: Extended VPR weekly summary CSV export to include vendor-specific breakdown tables for supervisor meeting presentations.</p>
+<p><strong>Usage</strong>: Cmd+Shift+Click (Mac) or Ctrl+Shift+Click (Windows) on any VPR summary card (same keyboard shortcut as HEX-144).</p>
+<p><strong>CSV Structure</strong>:</p>
+<ol>
+<li><strong>Overall VPR Totals</strong>: All devices (preserves existing HEX-144 format)</li>
+<li><strong>CISCO Devices</strong>: Vulnerabilities on CISCO-classified devices only</li>
+<li><strong>Palo Alto Devices</strong>: Vulnerabilities on Palo Alto-classified devices only</li>
+<li><strong>Other Devices</strong>: Remaining vulnerabilities (unmatched or alternative vendors)</li>
+</ol>
+<p>Each table includes:</p>
+<ul>
+<li><strong>PREV WEEK</strong>: Previous period VPR totals (calculated from percentage change badges)</li>
+<li><strong>THIS WEEK</strong>: Current period VPR totals by severity (Critical, High, Medium, Low)</li>
+<li><strong>CHANGE</strong>: Difference between current and previous periods</li>
+<li><strong>TOTAL</strong>: Row sum across all severity levels</li>
+</ul>
+<p><strong>Filename</strong>: <code>vpr-vendor-breakdown-YYYY-MM-DD.csv</code></p>
+<p><strong>Validation</strong>: Subtable totals (CISCO + Palo Alto + Other) sum to Overall totals across all severities.</p>
+<p><strong>Use Case</strong>: Weekly supervisor meetings requiring vendor-specific vulnerability metrics for presentation materials. Export CSV, copy vendor-specific tables into slide deck.</p>
+<p><strong>Implementation Highlights</strong>:</p>
+<ul>
+<li><strong>Critical Bug Fix</strong>: Implemented deduplication logic to prevent over-counting VPR scores when same CVE appears on multiple devices</li>
+<li><strong>Deduplication Strategy</strong>: Uses composite key <code>severity|hostname|plugin_id</code> with MAX(vpr_score) aggregation matching backend stats API</li>
+<li><strong>Impact</strong>: Fixed potential 15.7x inflation in vendor totals (e.g., CISCO would have shown 88,408.6 instead of correct 5,630.2)</li>
+<li><strong>Vendor Classification</strong>: Uses pre-normalized <code>vendor</code> field from CSV import (helpers.js:normalizeVendor)</li>
+<li><strong>Data Access</strong>: <code>this.dataManager.vulnerabilities</code> (in-memory dataset)</li>
+<li><strong>Performance</strong>: O(n) aggregation with Map-based deduplication over vulnerability dataset</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/vulnerability-statistics.js</code>: Added <code>_aggregateVprByVendor()</code>, <code>_formatVendorTable()</code>, extended <code>exportVprWeeklySummary()</code>, enhanced <code>downloadCSV()</code> to support string-based CSV content</li>
+</ul>
+<p><strong>Issues</strong>:</p>
+<ul>
+<li><a href="https://linear.app/hextrackr/issue/HEX-148">HEX-148</a> - RESEARCH: Vendor Breakdown CSV Export</li>
+<li><a href="https://linear.app/hextrackr/issue/HEX-149">HEX-149</a> - PLAN: Add Vendor Breakdown to CSV Export</li>
+<li><a href="https://linear.app/hextrackr/issue/HEX-150">HEX-150</a> - IMPLEMENT: Vendor Breakdown CSV Export</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

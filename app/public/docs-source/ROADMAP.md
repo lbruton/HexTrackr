@@ -6,8 +6,79 @@
 
 HexTrackr is an enterprise vulnerability management platform that helps organizations track, prioritize, and remediate security vulnerabilities across their infrastructure. This roadmap provides visibility into planned features and improvements.
 
-**Current Version**: v1.0.43 (October 2025)
-**Current Focus**: Security hardening and enterprise-grade authentication
+**Current Version**: v1.0.54 (October 2025)
+**Current Focus**: Enhanced reporting and vendor analytics
+
+---
+
+## ✅ Recently Completed (v1.0.22-v1.0.30)
+
+### KEV Integration Suite (v1.0.22-v1.0.30)
+
+**Comprehensive CISA Known Exploited Vulnerabilities integration across all UI components**
+
+- ✅ Filterable YES/NO badges in vulnerability table (v1.0.22)
+- ✅ KEV modal with NIST NVD integration and CVE details navigation (v1.0.22)
+- ✅ KEV filter in severity dropdown without emoji clutter (v1.0.22)
+- ✅ Clickable HTTPS links in KEV notes with popup windows (v1.0.22)
+- ✅ KEV badges on device cards when any vulnerability is KEV (v1.0.27)
+- ✅ Fixed KEV badge click handlers on device cards (v1.0.28)
+- ✅ KEV badge in vulnerability details modal header (v1.0.30)
+
+### UI Enhancements (v1.0.23-v1.0.25)
+
+**Improved user experience and data accessibility**
+
+- ✅ Interactive statistics filtering for ticket management (v1.0.23)
+- ✅ Vulnerability card UI polish with streamlined layout (v1.0.24)
+- ✅ Import summary HTML export for professional reporting (v1.0.25)
+- ✅ Accessibility improvements with keyboard navigation and ARIA labels
+
+### Critical Fixes (v1.0.26, v1.0.29)
+
+**Essential bug fixes for core functionality**
+
+- ✅ Fixed Low severity vulnerability visibility issue affecting 3,314 items (v1.0.26)
+- ✅ Fixed JSDoc dark mode theme injection for all 121 documentation files (v1.0.29)
+- ✅ Improved async processing for large datasets (24,660+ vulnerabilities)
+
+---
+
+## ✅ Recently Completed (v1.0.44-v1.0.54)
+
+### Authentication System (v1.0.46-v1.0.50)
+
+**Complete enterprise-grade authentication infrastructure**
+
+- ✅ Argon2id password hashing with timing-safe comparison (v1.0.46)
+- ✅ Session management with SQLite session store (v1.0.46)
+- ✅ Failed login tracking with account lockout protection (5 attempts in 15 minutes) (v1.0.46)
+- ✅ Authentication service layer with login/logout/password management (v1.0.46)
+- ✅ API route protection across 46 endpoints with requireAuth middleware (v1.0.46)
+- ✅ Trust proxy configuration for nginx reverse proxy support (v1.0.48)
+- ✅ HTTP security headers with Helmet.js (HSTS, Referrer Policy, CSP) (v1.0.49)
+- ✅ CSRF protection for all forms (v1.0.49)
+- ✅ Documentation portal authentication menu integration (v1.0.50)
+
+### Dashboard & Reporting (v1.0.44-v1.0.54)
+
+**Advanced vulnerability analytics and export capabilities**
+
+- ✅ Dashboard VPR cards with interactive statistics (v1.0.46)
+- ✅ Vulnerability trends with historical data tracking (v1.0.45)
+- ✅ AG-Grid performance optimizations for large datasets (v1.0.47)
+- ✅ VPR weekly summary CSV export via keyboard shortcut (v1.0.52)
+- ✅ Vendor breakdown CSV export with side-by-side VPR/Count tables (v1.0.53-v1.0.54)
+- ✅ Vendor filter UI synchronization between radio buttons and dropdown (v1.0.54)
+- ✅ Backend API integration for vendor-specific metrics (v1.0.54)
+
+### KEV Integration Enhancements (v1.0.44, v1.0.51)
+
+**Extended Known Exploited Vulnerabilities capabilities**
+
+- ✅ KEV modal system with NIST NVD integration (v1.0.44)
+- ✅ KEV modal enhancements with improved UX (v1.0.51)
+- ✅ CSV import UX improvements with progress polling (v1.0.51)
 
 ---
 
@@ -46,27 +117,27 @@ HexTrackr is an enterprise vulnerability management platform that helps organiza
 
 ## 🛡️ Security & Authentication
 
-### User Management System
+### User Management Enhancements
 
-Comprehensive user authentication and role-based access control to secure vulnerability data and provide proper audit trails.
+Extended user management capabilities for multi-user deployments.
 
 **Features:**
 
-- User registration and secure login
+- User registration and self-service account creation
 - Role-based permissions (Admin, Security Analyst, Viewer)
-- Session management and secure cookies
-- Password security with industry standards
+- User account management interface
+- Audit logging for authentication events
 
 ### Advanced Security Hardening
 
-Enterprise-grade security measures to protect sensitive vulnerability data and ensure compliance with security frameworks.
+Additional security measures for enterprise deployments.
 
 **Features:**
 
-- CSRF protection for all forms
-- Content Security Policy (CSP) implementation
-- HTTP security headers (HSTS, Referrer Policy)
-- Real-time connection security and rate limiting
+- WebSocket connection authentication and authorization
+- API rate limiting per user/endpoint
+- Real-time intrusion detection
+- Enhanced Content Security Policy (CSP) refinements
 
 ## 🎨 User Interface & Experience
 
@@ -117,6 +188,32 @@ Extended REST API capabilities for integration with security tools and enterpris
 - Rate limiting and API security
 
 ## 🔌 Integrations & Analytics
+
+### Cisco PSIRT Integration Enhancements
+
+**Status**: Planned (HEX-141)
+**Priority**: High
+**Business Value**: Critical remediation intelligence for Cisco products
+
+Enhance the vulnerability details modal to display **Cisco fixed software versions** by utilizing the existing Cisco PSIRT API integration.
+
+**Current State**: Cisco API working but underutilized (shows basic alert with 4 fields)
+
+**Planned Features:**
+
+- Display Cisco fixed software versions in vulnerability details modal
+- Show affected product releases and versions
+- Link to full Cisco security advisories
+- Handle multiple fix versions across different platforms
+- Graceful fallback when no Cisco advisory exists
+
+**Implementation Approach** (3 phases):
+
+- **Phase 1 (MVP)**: Enhance modal with `firstFixed` field display (4-6 hours)
+- **Phase 2 (Performance)**: Add OAuth token caching and credential security (8-10 hours)
+- **Phase 3 (Enterprise)**: Backend proxy pattern with database caching (16-20 hours)
+
+**Why This Matters**: Security teams need immediate access to patch information. Currently, users must manually look up Cisco advisories - this integration brings remediation guidance directly into the vulnerability workflow.
 
 ### Advanced Reporting
 

@@ -1,0 +1,39 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.49</h1><p><strong>Release Date</strong>: 2025-10-05</p>
+<hr>
+<h2>[1.0.49] - 2025-10-05</h2><h3>Fixed</h3><h4>Dark Mode Card Background Colors and Rounded Corners (HEX-122)</h4><p><strong>Issue</strong>: Cards in dark mode had two problems:</p>
+<ol>
+<li>Cards shared the same background color as the page background, eliminating visual hierarchy</li>
+<li>Card headers and bodies appeared as square elements floating on top of rounded containers</li>
+</ol>
+<p><strong>Root Cause</strong>:</p>
+<ol>
+<li>September 25th revert (commit <code>e01b7dd</code>) removed 33 lines of Bootstrap card dark mode styling</li>
+<li>CSS load order issue - <code>cards.css</code> loads after <code>dark-theme.css</code>, and <code>.card-body</code> and <code>.card-header</code> lacked explicit <code>border-radius</code> values</li>
+</ol>
+<p><strong>Resolution</strong>:</p>
+<p><strong>Dark Theme Colors</strong> (<code>app/public/styles/shared/dark-theme.css</code>):</p>
+<ul>
+<li>Cards now use <code>#1e293b</code> (lighter slate) background, visibly distinct from page background <code>#1a2234</code> (darker)</li>
+<li>Card headers use <code>#1a2234</code> background matching page background for subtle hierarchy</li>
+<li>Card bodies have consistent <code>#1e293b</code> background with proper text color (<code>#e2e8f0</code>)</li>
+<li>Stats cards have enhanced hover effects with border color transitions</li>
+</ul>
+<p><strong>Border Radius Fix</strong> (<code>app/public/styles/shared/cards.css</code>):</p>
+<ul>
+<li><code>.card-body</code> - Added <code>border-radius: 8px</code> to match parent <code>.card</code> (all corners rounded)</li>
+<li><code>.card-header</code> - Added <code>border-radius: 8px 8px 0 0 !important</code> (top corners only, requires <code>!important</code> to override Tabler.io)</li>
+</ul>
+<p><strong>Testing</strong>: Verified in both light and dark modes via Chrome DevTools - cards now have proper visual hierarchy with lighter backgrounds and clean rounded corners throughout.</p>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/styles/shared/dark-theme.css</code> - Lines 24-55 (Bootstrap Card Dark Mode Styling)</li>
+<li><code>app/public/styles/shared/cards.css</code> - Line 29 (card-header border-radius), Line 45 (card-body border-radius)</li>
+</ul>
+<hr>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

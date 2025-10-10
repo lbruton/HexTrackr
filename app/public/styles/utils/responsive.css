@@ -4,7 +4,7 @@
 @media (max-width: 768px) {
     /* Grid adjustments */
     #vulnGrid {
-        height: 500px;
+        /* height removed - AG-Grid domLayout: "autoHeight" handles sizing */
         font-size: 0.9em;
     }
 
@@ -63,7 +63,7 @@
 @media (max-width: 576px) {
     /* Further grid optimizations */
     #vulnGrid {
-        height: 400px;
+        /* height removed - AG-Grid domLayout: "autoHeight" handles sizing */
         font-size: 0.85em;
     }
 

@@ -373,11 +373,15 @@ class ProgressModal {
      * @param {Object} data - Completion data from WebSocket
      */
     handleProgressComplete(data) {
+        console.log("📨 handleProgressComplete() received data:", data);
+        console.log("Modal state - isVisible:", this.isVisible, "currentSessionId:", this.currentSessionId, "data.sessionId:", data.sessionId);
+        
         if (!this.isVisible || data.sessionId !== this.currentSessionId) {
+            console.warn("⚠️ Progress complete ignored - modal not visible or session mismatch");
             return;
         }
 
-        console.log("Progress complete event received:", data);
+        console.log("✅ Progress complete event accepted for processing");
 
         // Update progress data to completion
         this.progressData.progress = 100;
@@ -387,13 +391,16 @@ class ProgressModal {
         // Store import summary if available
         if (data.metadata && data.metadata.importSummary) {
             this.progressData.importSummary = data.metadata.importSummary;
-            console.log("Import summary received:", data.metadata.importSummary);
+            console.log("📊 Import summary received:", data.metadata.importSummary);
+        } else {
+            console.log("ℹ️ No import summary in metadata");
         }
 
         // Update UI to show 100% completion
         this.updateUI();
 
         // Show success state with summary
+        console.log("🎯 Calling showSuccess() from handleProgressComplete...");
         this.showSuccess(this.progressData.message, data.metadata ? data.metadata.importSummary : null);
 
         // Modal will stay open until user manually closes it
@@ -465,6 +472,8 @@ class ProgressModal {
      * @param {Object} importSummary - Optional import summary data
      */
     showSuccess(message, importSummary = null) {
+        console.log("🎯 showSuccess() called with:", { message, hasImportSummary: !!importSummary });
+        
         // Hide spinner
         const spinner = this.modal.querySelector(".spinner-border");
         if (spinner) {
@@ -475,6 +484,7 @@ class ProgressModal {
         const header = this.modal.querySelector(".modal-header");
         if (header) {
             header.className = "modal-header bg-success text-white";
+            console.log("✅ Modal header updated to success state");
         }
 
         // Show success alert
@@ -483,20 +493,24 @@ class ProgressModal {
         if (successAlert && successMessage) {
             successMessage.textContent = message;
             successAlert.classList.remove("d-none");
+            console.log("✅ Success alert shown with message:", message);
         }
 
         // Display import summary if available
         if (importSummary) {
             this.displayImportSummary(importSummary);
+        } else {
+            console.log("ℹ️ No import summary to display");
         }
 
         // Update buttons
+        console.log("🔘 Calling showCompleteButtons()...");
         this.showCompleteButtons();
 
         // Update progress bar to 100%
         this.update({ progress: 100 });
 
-        console.log("Progress modal: Success state shown", importSummary ? "with summary" : "");
+        console.log("✅ showSuccess() completed", importSummary ? "with summary" : "without summary");
     }
 
     /**
@@ -534,6 +548,14 @@ class ProgressModal {
     generateSummaryHTML(summary) {
         const { cveDiscovery, severityImpact, comparison } = summary;
 
+        // Helper function to safely format numbers (handles null/undefined)
+        const formatNumber = (value) => {
+            if (value === null || value === undefined || isNaN(value)) {
+                return "0";
+            }
+            return value.toLocaleString();
+        };
+
         let html = `
             <div class="card border-info">
                 <div class="card-header bg-info text-white">
@@ -550,8 +572,8 @@ class ProgressModal {
                         <h6 class="text-primary">🔍 New CVEs Discovered</h6>
                         <div class="alert alert-warning">
                             <strong>${cveDiscovery.totalNewCves} new CVE${cveDiscovery.totalNewCves !== 1 ? "s" : ""}</strong>
-                            affecting <strong>${cveDiscovery.totalNewVulnerabilities.toLocaleString()} vulnerabilities</strong>
-                            <small class="d-block mt-1">Total VPR Impact: +${cveDiscovery.totalNewVpr.toLocaleString()}</small>
+                            affecting <strong>${formatNumber(cveDiscovery.totalNewVulnerabilities)} vulnerabilities</strong>
+                            <small class="d-block mt-1">Total VPR Impact: +${formatNumber(cveDiscovery.totalNewVpr)}</small>
                         </div>
                     </div>
                 </div>
@@ -578,8 +600,62 @@ class ProgressModal {
                         <tr>
                             <td><code>${cve.cve}</code></td>
                             <td><span class="badge severity-${severityClass}">${cve.severity}</span></td>
-                            <td>${cve.hostCount.toLocaleString()}</td>
-                            <td>${cve.totalVpr.toLocaleString()}</td>
+                            <td>${formatNumber(cve.hostCount)}</td>
+                            <td>${formatNumber(cve.totalVpr)}</td>
+                        </tr>
+                    `;
+                });
+
+                html += `
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Resolved CVEs Section
+        if (cveDiscovery && cveDiscovery.totalResolvedCves > 0) {
+            html += `
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <h6 class="text-success">✅ Resolved CVEs</h6>
+                        <div class="alert alert-success">
+                            <strong>${cveDiscovery.totalResolvedCves} CVE${cveDiscovery.totalResolvedCves !== 1 ? "s" : ""} resolved</strong>
+                            (previously affected <strong>${formatNumber(cveDiscovery.totalResolvedVulnerabilities)} vulnerabilities</strong>)
+                            <small class="d-block mt-1">Total VPR Reduction: -${formatNumber(cveDiscovery.totalResolvedVpr)}</small>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Show top resolved CVEs (limit to 5)
+            if (cveDiscovery.resolvedCves && cveDiscovery.resolvedCves.length > 0) {
+                const topResolved = cveDiscovery.resolvedCves.slice(0, 5);
+                html += `
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6 class="mb-2">Top Resolved CVEs:</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr><th>CVE</th><th>Severity</th><th>Hosts</th><th>VPR Total</th><th>Last Seen</th></tr>
+                                    </thead>
+                                    <tbody>
+                `;
+
+                topResolved.forEach(cve => {
+                    const severityClass = cve.severity.toLowerCase();
+                    const lastSeenDate = new Date(cve.lastSeen).toLocaleDateString();
+                    html += `
+                        <tr>
+                            <td><code>${cve.cve}</code></td>
+                            <td><span class="badge severity-${severityClass}">${cve.severity}</span></td>
+                            <td>${formatNumber(cve.hostCount)}</td>
+                            <td>${formatNumber(cve.totalVpr)}</td>
+                            <td><small>${lastSeenDate}</small></td>
                         </tr>
                     `;
                 });
@@ -667,8 +743,8 @@ class ProgressModal {
                         <div class="col-6 col-md-3 mb-2">
                             <div class="text-center">
                                 <div class="fw-bold text-${severity === "critical" ? "danger" : severity === "high" ? "warning" : severity === "medium" ? "info" : "secondary"}">${severity.toUpperCase()}</div>
-                                <div class="${changeClass}">${changeIcon} ${impact.netChange > 0 ? "+" : ""}${impact.netChange.toLocaleString()}</div>
-                                <small class="text-muted">${impact.current.toLocaleString()} total</small>
+                                <div class="${changeClass}">${changeIcon} ${impact.netChange > 0 ? "+" : ""}${formatNumber(impact.netChange)}</div>
+                                <small class="text-muted">${formatNumber(impact.current)} total</small>
                             </div>
                         </div>
                     `;
@@ -696,7 +772,7 @@ class ProgressModal {
                             <strong>Overall Impact:</strong>
                             <span class="${changeClass}">
                                 ${changeIcon} ${changePercentage > 0 ? "+" : ""}${changePercentage.toFixed(1)}%
-                                (${comparison.netChange > 0 ? "+" : ""}${comparison.netChange.toLocaleString()} vulnerabilities)
+                                (${comparison.netChange > 0 ? "+" : ""}${formatNumber(comparison.netChange)} vulnerabilities)
                             </span>
                             ${comparison.significantChange ? " <small class=\"badge bg-warning text-dark\">Significant Change</small>" : ""}
                         </div>
@@ -754,25 +830,45 @@ class ProgressModal {
         const exportBtn = document.getElementById("progressExportBtn");
         const closeBtn = document.getElementById("progressCloseBtn");
 
-        if (cancelBtn) {cancelBtn.classList.add("d-none");}
+        console.log("showCompleteButtons() called - Button elements:", {
+            cancelBtn: !!cancelBtn,
+            exportBtn: !!exportBtn,
+            closeBtn: !!closeBtn
+        });
+
+        if (cancelBtn) {
+            cancelBtn.classList.add("d-none");
+            console.log("✅ Cancel button hidden");
+        } else {
+            console.error("❌ Cancel button not found!");
+        }
 
         // Show export button only if import summary is present
         if (exportBtn) {
             if (this.progressData.importSummary) {
                 exportBtn.classList.remove("d-none");
+                console.log("✅ Export button shown (import summary present)");
             } else {
                 exportBtn.classList.add("d-none");
+                console.log("ℹ️ Export button hidden (no import summary)");
             }
         }
 
         if (closeBtn) {
             closeBtn.classList.remove("d-none");
 
-            // Update button text if import summary is present
-            if (this.progressData.importSummary) {
-                closeBtn.innerHTML = "<i class=\"fas fa-check me-1\"></i>OK - Refresh Page";
-                closeBtn.classList.add("btn-pulse");
-            }
+            // ALWAYS update button text to "OK - Refresh Page" on completion
+            // This ensures cache is busted even without import summary
+            closeBtn.innerHTML = "<i class=\"fas fa-check me-1\"></i>OK - Refresh Page";
+            closeBtn.classList.add("btn-pulse");
+            
+            // Make button more prominent with success styling
+            closeBtn.classList.remove("btn-secondary");
+            closeBtn.classList.add("btn-success");
+            
+            console.log("✅ Close button shown with text:", closeBtn.innerHTML);
+        } else {
+            console.error("❌ Close button not found!");
         }
     }
     
@@ -803,12 +899,19 @@ class ProgressModal {
      * Handle close button click
      */
     handleClose() {
-        const hasImportSummary = this.progressData.importSummary;
+        const wasSuccessfulImport = this.progressData.progress === 100 && !this.progressData.error;
+        
         this.hide();
 
-        // Trigger page refresh if we just completed an import with summary
-        if (hasImportSummary && window.refreshPageData) {
-            window.refreshPageData("vulnerabilities");
+        // ALWAYS trigger page refresh after successful import (with or without summary)
+        // This ensures cache is busted and new data is loaded
+        if (wasSuccessfulImport && window.refreshPageData) {
+            console.log("Progress modal closed: Triggering page refresh to bust cache");
+            window.refreshPageData("vulnerabilities", true);
+        } else if (wasSuccessfulImport && window.vulnManager && typeof window.vulnManager.loadData === "function") {
+            // Fallback: directly call loadData with cache bust
+            console.log("Progress modal closed: Triggering loadData with cache bust");
+            window.vulnManager.loadData(true);
         }
     }
 

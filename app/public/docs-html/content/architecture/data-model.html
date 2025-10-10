@@ -1,6 +1,15 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
     <h1>HexTrackr Data Model</h1><p>This document provides a definitive overview of the HexTrackr database schema. The primary bootstrap is <code>scripts/init-database.js</code>; however, the live schema evolves further at runtime via idempotent <code>ALTER TABLE</code> and index creation logic inside <code>server.js</code> and migration code executed during imports. The authoritative state is therefore the <strong>live SQLite schema</strong> (captured below) rather than the historical <code>schema.sql</code> file (now outdated and retained only for legacy reference).</p>
+<p><strong>Schema Summary</strong> (v1.0.54):</p>
+<ul>
+<li><strong>15 Core Tables</strong>: Vulnerabilities (4), Tickets (2), KEV (2), Templates (3), Authentication (2), Import/Staging (2)</li>
+<li><strong>37+ Indexes</strong>: Performance-optimized queries on critical fields</li>
+<li><strong>4-Tier Deduplication</strong>: Enhanced unique key generation with confidence scoring</li>
+<li><strong>KEV Integration</strong>: CISA Known Exploited Vulnerabilities catalog synchronization</li>
+<li><strong>Template System</strong>: Email, ticket, and vulnerability report templates with variable substitution</li>
+<li><strong>Authentication</strong>: Argon2id password hashing with account lockout protection</li>
+</ul>
 <h2>Database Engine</h2><ul>
 <li><strong>Engine</strong>: SQLite 3</li>
 <li><strong>Database File</strong>: <code>data/hextrackr.db</code></li>
@@ -441,6 +450,671 @@
 <td>Last update timestamp.</td>
 </tr>
 </tbody></table>
+<h3>`vulnerability_staging`</h3><p>This table serves as a <strong>bulk import staging area</strong> for high-performance CSV processing with enhanced deduplication scoring.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Constraints</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>INTEGER</td>
+<td>PK AUTOINCREMENT</td>
+<td>Staging row identifier.</td>
+</tr>
+<tr>
+<td><code>import_id</code></td>
+<td>INTEGER</td>
+<td>FK to <code>vulnerability_imports.id</code>, NOT NULL</td>
+<td>Associated import batch.</td>
+</tr>
+<tr>
+<td><code>hostname</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Raw hostname (pre-normalization).</td>
+</tr>
+<tr>
+<td><code>ip_address</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Optional IP address.</td>
+</tr>
+<tr>
+<td><code>cve</code></td>
+<td>TEXT</td>
+<td></td>
+<td>CVE identifier if present.</td>
+</tr>
+<tr>
+<td><code>severity</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Critical/High/Medium/Low.</td>
+</tr>
+<tr>
+<td><code>vpr_score</code></td>
+<td>REAL</td>
+<td></td>
+<td>Vulnerability Priority Rating.</td>
+</tr>
+<tr>
+<td><code>cvss_score</code></td>
+<td>REAL</td>
+<td></td>
+<td>CVSS Base score.</td>
+</tr>
+<tr>
+<td><code>plugin_id</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Scanner plugin identifier.</td>
+</tr>
+<tr>
+<td><code>plugin_name</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Scanner plugin name.</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Vulnerability description.</td>
+</tr>
+<tr>
+<td><code>solution</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Remediation guidance.</td>
+</tr>
+<tr>
+<td><code>vendor_reference</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Original vendor family string.</td>
+</tr>
+<tr>
+<td><code>vendor</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Normalized vendor.</td>
+</tr>
+<tr>
+<td><code>vulnerability_date</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Publication date.</td>
+</tr>
+<tr>
+<td><code>state</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Physical state (open/closed).</td>
+</tr>
+<tr>
+<td><code>enhanced_unique_key</code></td>
+<td>TEXT</td>
+<td></td>
+<td>4-tier deduplication key (see Rollover section).</td>
+</tr>
+<tr>
+<td><code>confidence_score</code></td>
+<td>REAL</td>
+<td></td>
+<td>Deduplication confidence (0.0-1.0): Tier 1 = 0.95, Tier 2 = 0.75, Tier 3 = 0.50, Tier 4 = 0.25.</td>
+</tr>
+<tr>
+<td><code>dedup_tier</code></td>
+<td>INTEGER</td>
+<td></td>
+<td>Tier level (1-4): 1 = Asset+Plugin (highest), 2 = CVE+Host, 3 = Plugin+Host+Vendor, 4 = Desc Hash (lowest).</td>
+</tr>
+<tr>
+<td><code>lifecycle_state</code></td>
+<td>TEXT</td>
+<td>DEFAULT &#39;staging&#39;</td>
+<td>Processing state (staging/processed/error).</td>
+</tr>
+<tr>
+<td><code>raw_csv_row</code></td>
+<td>JSON</td>
+<td></td>
+<td>Complete original CSV row for audit trail.</td>
+</tr>
+<tr>
+<td><code>processed</code></td>
+<td>BOOLEAN</td>
+<td>DEFAULT 0</td>
+<td>Whether row has been processed into <code>vulnerabilities_current</code>.</td>
+</tr>
+<tr>
+<td><code>batch_id</code></td>
+<td>INTEGER</td>
+<td></td>
+<td>Sub-batch identifier for parallel processing.</td>
+</tr>
+<tr>
+<td><code>processing_error</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Error message if processing failed.</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Staging timestamp.</td>
+</tr>
+<tr>
+<td><code>processed_at</code></td>
+<td>DATETIME</td>
+<td></td>
+<td>Processing completion timestamp.</td>
+</tr>
+</tbody></table>
+<p><strong>Purpose</strong>: Enables bulk loading of large CSV files (10k+ rows) with preprocessing, deduplication scoring, and error tracking before committing to production tables.</p>
+<hr>
+<h2>KEV Integration *(v1.0.22+)*</h2><p>HexTrackr integrates with CISA&#39;s <strong>Known Exploited Vulnerabilities (KEV) catalog</strong> to track actively exploited vulnerabilities.</p>
+<h3>`kev_status`</h3><p>Stores CISA KEV catalog data synced from <a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog">https://www.cisa.gov/known-exploited-vulnerabilities-catalog</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Constraints</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>cve_id</code></td>
+<td>TEXT</td>
+<td>PRIMARY KEY</td>
+<td>CVE identifier (e.g., CVE-2021-44228).</td>
+</tr>
+<tr>
+<td><code>date_added</code></td>
+<td>DATE</td>
+<td>NOT NULL</td>
+<td>Date CISA added this CVE to KEV catalog.</td>
+</tr>
+<tr>
+<td><code>vulnerability_name</code></td>
+<td>TEXT</td>
+<td></td>
+<td>CISA-provided vulnerability name.</td>
+</tr>
+<tr>
+<td><code>vendor_project</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Affected vendor/project.</td>
+</tr>
+<tr>
+<td><code>product</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Affected product.</td>
+</tr>
+<tr>
+<td><code>required_action</code></td>
+<td>TEXT</td>
+<td></td>
+<td>CISA-mandated remediation action.</td>
+</tr>
+<tr>
+<td><code>due_date</code></td>
+<td>DATE</td>
+<td></td>
+<td>Federal agency remediation deadline.</td>
+</tr>
+<tr>
+<td><code>known_ransomware_use</code></td>
+<td>BOOLEAN</td>
+<td>DEFAULT 0</td>
+<td>Whether used in ransomware campaigns (1 = Yes, 0 = No).</td>
+</tr>
+<tr>
+<td><code>notes</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Additional context or references.</td>
+</tr>
+<tr>
+<td><code>last_synced</code></td>
+<td>TIMESTAMP</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Last sync timestamp.</td>
+</tr>
+</tbody></table>
+<p><strong>Relationship</strong>: Vulnerabilities in <code>vulnerabilities_current</code> are LEFT JOINed with <code>kev_status</code> on <code>cve</code> = <code>cve_id</code> to enrich data with KEV flags and due dates.</p>
+<h3>`sync_metadata`</h3><p>Tracks KEV catalog synchronization history and status.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Constraints</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>INTEGER</td>
+<td>PK AUTOINCREMENT</td>
+<td>Sync record identifier.</td>
+</tr>
+<tr>
+<td><code>sync_type</code></td>
+<td>TEXT</td>
+<td>NOT NULL</td>
+<td>Type of sync (e.g., &#39;kev_catalog&#39;).</td>
+</tr>
+<tr>
+<td><code>sync_time</code></td>
+<td>TIMESTAMP</td>
+<td>NOT NULL</td>
+<td>Sync execution timestamp.</td>
+</tr>
+<tr>
+<td><code>version</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Catalog version or timestamp from CISA.</td>
+</tr>
+<tr>
+<td><code>record_count</code></td>
+<td>INTEGER</td>
+<td></td>
+<td>Number of KEV records synced.</td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td>TEXT</td>
+<td>DEFAULT &#39;completed&#39;</td>
+<td>Sync status (completed/failed/in_progress).</td>
+</tr>
+<tr>
+<td><code>error_message</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Error details if sync failed.</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>TIMESTAMP</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Record creation timestamp.</td>
+</tr>
+</tbody></table>
+<p><strong>Purpose</strong>: Audit trail for KEV sync operations, enables troubleshooting and monitoring of catalog updates.</p>
+<hr>
+<h2>Template System *(v1.0.46+)*</h2><p>HexTrackr provides customizable templates for emails, tickets, and vulnerability reports with variable substitution.</p>
+<h3>`email_templates`</h3><p>Stores email notification templates with dynamic variable support.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Constraints</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>INTEGER</td>
+<td>PK AUTOINCREMENT</td>
+<td>Template identifier.</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>TEXT</td>
+<td>UNIQUE NOT NULL</td>
+<td>Template name (e.g., &#39;vulnerability_notification&#39;).</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Template purpose and usage notes.</td>
+</tr>
+<tr>
+<td><code>template_content</code></td>
+<td>TEXT</td>
+<td>NOT NULL</td>
+<td>Customized template content (user-modified).</td>
+</tr>
+<tr>
+<td><code>default_content</code></td>
+<td>TEXT</td>
+<td>NOT NULL</td>
+<td>Original default template (for reset).</td>
+</tr>
+<tr>
+<td><code>variables</code></td>
+<td>TEXT</td>
+<td>NOT NULL</td>
+<td>JSON array of supported variables (e.g., <code>{{ticket_id}}</code>, <code>{{hostname}}</code>).</td>
+</tr>
+<tr>
+<td><code>category</code></td>
+<td>TEXT</td>
+<td>DEFAULT &#39;ticket&#39;</td>
+<td>Template category (ticket/vulnerability/system).</td>
+</tr>
+<tr>
+<td><code>is_active</code></td>
+<td>BOOLEAN</td>
+<td>DEFAULT 1</td>
+<td>Whether template is active (1 = enabled, 0 = disabled).</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Creation timestamp.</td>
+</tr>
+<tr>
+<td><code>updated_at</code></td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Last modification timestamp.</td>
+</tr>
+</tbody></table>
+<h3>`ticket_templates`</h3><p>Stores ticket creation templates with pre-filled fields and workflows.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Constraints</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>INTEGER</td>
+<td>PK AUTOINCREMENT</td>
+<td>Template identifier.</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>TEXT</td>
+<td>UNIQUE NOT NULL</td>
+<td>Template name (e.g., &#39;critical_vulnerability_ticket&#39;).</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Template purpose and usage notes.</td>
+</tr>
+<tr>
+<td><code>template_content</code></td>
+<td>TEXT</td>
+<td>NOT NULL</td>
+<td>Customized template content (JSON structure).</td>
+</tr>
+<tr>
+<td><code>default_content</code></td>
+<td>TEXT</td>
+<td>NOT NULL</td>
+<td>Original default template.</td>
+</tr>
+<tr>
+<td><code>variables</code></td>
+<td>TEXT</td>
+<td>NOT NULL</td>
+<td>JSON array of supported variables.</td>
+</tr>
+<tr>
+<td><code>category</code></td>
+<td>TEXT</td>
+<td>DEFAULT &#39;ticket&#39;</td>
+<td>Template category.</td>
+</tr>
+<tr>
+<td><code>is_active</code></td>
+<td>BOOLEAN</td>
+<td>DEFAULT 1</td>
+<td>Whether template is active.</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Creation timestamp.</td>
+</tr>
+<tr>
+<td><code>updated_at</code></td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Last modification timestamp.</td>
+</tr>
+</tbody></table>
+<h3>`vulnerability_templates`</h3><p>Stores vulnerability report templates for exports and notifications.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Constraints</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>INTEGER</td>
+<td>PK AUTOINCREMENT</td>
+<td>Template identifier.</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>TEXT</td>
+<td>UNIQUE NOT NULL</td>
+<td>Template name (e.g., &#39;executive_summary&#39;).</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Template purpose and usage notes.</td>
+</tr>
+<tr>
+<td><code>template_content</code></td>
+<td>TEXT</td>
+<td>NOT NULL</td>
+<td>Customized template content.</td>
+</tr>
+<tr>
+<td><code>default_content</code></td>
+<td>TEXT</td>
+<td>NOT NULL</td>
+<td>Original default template.</td>
+</tr>
+<tr>
+<td><code>variables</code></td>
+<td>TEXT</td>
+<td>NOT NULL</td>
+<td>JSON array of supported variables (e.g., <code>{{cve}}</code>, <code>{{severity}}</code>, <code>{{vpr_score}}</code>).</td>
+</tr>
+<tr>
+<td><code>category</code></td>
+<td>TEXT</td>
+<td>DEFAULT &#39;vulnerability&#39;</td>
+<td>Template category.</td>
+</tr>
+<tr>
+<td><code>is_active</code></td>
+<td>BOOLEAN</td>
+<td>DEFAULT 1</td>
+<td>Whether template is active.</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Creation timestamp.</td>
+</tr>
+<tr>
+<td><code>updated_at</code></td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Last modification timestamp.</td>
+</tr>
+</tbody></table>
+<p><strong>Variable Substitution</strong>: Templates support dynamic variables like <code>{{ticket_id}}</code>, <code>{{hostname}}</code>, <code>{{cve}}</code>, <code>{{severity}}</code> which are replaced at runtime with actual values.</p>
+<hr>
+<h2>Authentication & User Management *(v1.0.46+)*</h2><h3>`users`</h3><p>Stores user accounts with Argon2id password hashing and account lockout tracking.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Constraints</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>TEXT</td>
+<td>PRIMARY KEY</td>
+<td>User identifier (UUID or similar).</td>
+</tr>
+<tr>
+<td><code>username</code></td>
+<td>TEXT</td>
+<td>UNIQUE NOT NULL</td>
+<td>Login username.</td>
+</tr>
+<tr>
+<td><code>email</code></td>
+<td>TEXT</td>
+<td></td>
+<td>User email address (optional).</td>
+</tr>
+<tr>
+<td><code>password_hash</code></td>
+<td>TEXT</td>
+<td>NOT NULL</td>
+<td>Argon2id password hash (never stored plaintext).</td>
+</tr>
+<tr>
+<td><code>role</code></td>
+<td>TEXT</td>
+<td>DEFAULT &#39;superadmin&#39;</td>
+<td>User role (superadmin/admin/user).</td>
+</tr>
+<tr>
+<td><code>is_active</code></td>
+<td>INTEGER</td>
+<td>DEFAULT 1</td>
+<td>Account status (1 = active, 0 = disabled).</td>
+</tr>
+<tr>
+<td><code>last_login</code></td>
+<td>DATETIME</td>
+<td></td>
+<td>Last successful login timestamp.</td>
+</tr>
+<tr>
+<td><code>failed_attempts</code></td>
+<td>INTEGER</td>
+<td>DEFAULT 0</td>
+<td>Consecutive failed login attempts (reset on success).</td>
+</tr>
+<tr>
+<td><code>failed_login_timestamp</code></td>
+<td>DATETIME</td>
+<td></td>
+<td>Most recent failed login timestamp (for lockout calculation).</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Account creation timestamp.</td>
+</tr>
+<tr>
+<td><code>updated_at</code></td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Last modification timestamp.</td>
+</tr>
+</tbody></table>
+<p><strong>Account Lockout</strong>: After 5 failed login attempts, account is locked for 15 minutes (enforced in <code>authService.js</code>, not database constraint).</p>
+<p><strong>Password Security</strong>: Passwords are hashed using Argon2id with timing-safe comparison to prevent timing attacks.</p>
+<h3>`user_preferences`</h3><p>Stores user-specific UI preferences for cross-device synchronization (HEX-138).</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Constraints</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>INTEGER</td>
+<td>PK AUTOINCREMENT</td>
+<td>Preference record identifier.</td>
+</tr>
+<tr>
+<td><code>user_id</code></td>
+<td>TEXT</td>
+<td>FK to <code>users.id</code>, NOT NULL</td>
+<td>Associated user.</td>
+</tr>
+<tr>
+<td><code>preference_key</code></td>
+<td>TEXT</td>
+<td>NOT NULL</td>
+<td>Preference identifier (e.g., &#39;theme&#39;, &#39;dashboard_layout&#39;).</td>
+</tr>
+<tr>
+<td><code>preference_value</code></td>
+<td>TEXT</td>
+<td>NOT NULL</td>
+<td>Preference value (JSON or plain text).</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Creation timestamp.</td>
+</tr>
+<tr>
+<td><code>updated_at</code></td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Last modification timestamp (auto-updated via trigger).</td>
+</tr>
+<tr>
+<td><strong>UNIQUE</strong></td>
+<td>(user_id, preference_key)</td>
+<td></td>
+<td>One value per user per preference key.</td>
+</tr>
+<tr>
+<td><strong>FOREIGN KEY</strong></td>
+<td>ON DELETE CASCADE</td>
+<td></td>
+<td>Preferences deleted when user is deleted.</td>
+</tr>
+</tbody></table>
+<p><strong>Trigger</strong>: <code>user_preferences_updated_at</code> automatically updates <code>updated_at</code> timestamp on modification.</p>
+<p><strong>Common Preferences</strong>:</p>
+<ul>
+<li><code>theme</code>: &#39;light&#39; or &#39;dark&#39;</li>
+<li><code>dashboard_layout</code>: JSON configuration</li>
+<li><code>default_page</code>: Starting page after login</li>
+<li><code>table_preferences</code>: AG-Grid column state</li>
+</ul>
 <hr>
 <h2>Junction Tables</h2><h3>`ticket_vulnerabilities`</h3><p>Many-to-many relationship between tickets and (legacy) <code>vulnerabilities</code> (pre-rollover) or conceptually <code>vulnerabilities_current</code> for future adaptation.</p>
 <table>

@@ -6,6 +6,7 @@
 const crypto = require("crypto");
 const PathValidator = require("./PathValidator");
 const path = require("path");
+const { getImportConfig } = require("../config/importConfig");
 
 // =============================================================================
 // DATA NORMALIZATION HELPERS
@@ -47,20 +48,37 @@ function normalizeHostname(hostname) {
  * @param {string} vendor - Raw vendor name
  * @returns {string} Normalized vendor name
  */
-function normalizeVendor(vendor) {
-    if (!vendor) {
-        return "Other";
+function normalizeVendor(vendor, hostname = "") {
+    const config = getImportConfig();
+
+    const cleanVendor = (vendor || "").trim().toLowerCase();
+    const cleanHostname = (hostname || "").trim().toLowerCase();
+
+    if (cleanHostname && Array.isArray(config.hostnameVendorPatterns)) {
+        for (const rule of config.hostnameVendorPatterns) {
+            if (rule.regex && rule.regex.test(cleanHostname)) {
+                return rule.vendor;
+            }
+        }
     }
 
-    const cleanVendor = vendor.trim().toLowerCase();
+    if (cleanVendor && Array.isArray(config.familyVendorPatterns)) {
+        for (const rule of config.familyVendorPatterns) {
+            if (rule.regex && rule.regex.test(cleanVendor)) {
+                return rule.vendor;
+            }
+        }
+    }
 
     if (cleanVendor.includes("cisco")) {
         return "CISCO";
-    } else if (cleanVendor.includes("palo alto")) {
-        return "Palo Alto";
-    } else {
-        return "Other";
     }
+
+    if (cleanVendor.includes("palo alto")) {
+        return "Palo Alto";
+    }
+
+    return "Other";
 }
 
 /**
@@ -324,7 +342,7 @@ function mapVulnerabilityRow(row) {
     const cvssScore = Number.isFinite(parsedCvss) ? parsedCvss : null;
 
     const state = row["state"] || row["State"] || "ACTIVE";
-    const vendor = normalizeVendor(row["definition.family"] || row["vendor"] || row["Vendor"] || "");
+    const vendor = normalizeVendor(row["definition.family"] || row["vendor"] || row["Vendor"] || "", hostname);
     const pluginId = row["definition.id"] || row["plugin_id"] || row["Plugin ID"] || "";
     const pluginPublished = row["definition.plugin_published"] || row["definition.plugin_updated"] || row["definition.vulnerability_published"] || row["vulnerability_date"] || row["plugin_published"] || "";
     const firstSeen = row["first_seen"] || row["First Seen"] || "";

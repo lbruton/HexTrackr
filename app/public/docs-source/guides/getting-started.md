@@ -1,33 +1,32 @@
 # Getting Started with HexTrackr
 
-This guide provides everything you need to get HexTrackr up and running, whether for a production-like environment using Docker or for local development.
+This guide will help you get HexTrackr up and running. Whether you're deploying to production or setting up a local development environment, this guide covers everything you need.
 
 ---
 
-## Key Features
+## What is HexTrackr?
 
-HexTrackr is a comprehensive vulnerability management system featuring:
+HexTrackr is a comprehensive vulnerability management platform that helps security teams track, prioritize, and remediate security vulnerabilities. Key features include:
 
-- **AG-Grid Powered Interface**: Modern, high-performance data grid for tickets management
-- **Template System**: Reusable templates for tickets and vulnerability reports
-- **Backup/Restore**: ZIP-based backup with cross-platform support
-- **KEV Integration**: CISA Known Exploited Vulnerabilities tracking
-- **Cross-Platform Docker**: Unified setup for macOS, Linux, and Ubuntu
+- **Vulnerability Dashboard**: Track vulnerabilities with VPR (Vulnerability Priority Rating) scoring
+- **Ticket Management**: Create and manage remediation tickets with drag-and-drop device assignment
+- **Vendor Filtering**: Filter and analyze vulnerabilities by vendor (CISCO, Palo Alto, Other)
+- **KEV Integration**: Automatic tracking of CISA Known Exploited Vulnerabilities
+- **CSV Import/Export**: Bulk import vulnerabilities and export filtered results
+- **Real-time Statistics**: Live vulnerability counts, trends, and risk analysis
 
 ---
 
-## Recommended Setup: Docker & Docker Compose
+## Quick Start: Docker Installation (Recommended)
 
-The most reliable and consistent way to run HexTrackr is by using Docker. This method encapsulates the application and its dependencies, avoiding potential conflicts with your local environment.
+The fastest and most reliable way to run HexTrackr is using Docker. This method works identically on macOS, Linux, and Ubuntu.
 
 ### Prerequisites
 
-- [Docker](https://docs.docker.com/get-docker/)
-- [Docker Compose](https://docs.docker.com/compose/install/)
+- [Docker](https://docs.docker.com/get-docker/) (20.10+)
+- [Docker Compose](https://docs.docker.com/compose/install/) (2.0+)
 
-### Quick Start with Install Script (Recommended)
-
-HexTrackr includes an automated installation script that detects your platform and configures everything automatically.
+### Installation Steps
 
 1. **Clone the Repository**
 
@@ -36,121 +35,165 @@ HexTrackr includes an automated installation script that detects your platform a
     cd HexTrackr
     ```
 
-2. **Run the Installation Script**
+2. **Run the Automated Installer**
 
     ```bash
     chmod +x install.sh
     ./install.sh
     ```
 
-    The script will:
-    - Detect your platform (macOS/Linux)
-    - Check Docker prerequisites
-    - Create necessary directories
-    - Build and start the container
-    - Verify the installation
+    The installer will:
+    - Detect your platform (macOS/Linux/Ubuntu)
+    - Verify Docker is running
+    - Create required directories
+    - Generate SSL certificates for HTTPS
+    - Build and start the containers
+    - Verify the application is healthy
 
 3. **Access HexTrackr**
 
-    The application will be available at `http://localhost:8989`.
+    Once installation completes, access the application via HTTPS:
 
-    - **Tickets Management**: `http://localhost:8989/tickets.html` (AG-Grid interface)
-    - **Vulnerabilities Management**: `http://localhost:8989/vulnerabilities.html`
-    - **Documentation Portal**: `http://localhost:8989/docs-html/`
+    **Development Environment:**
+    - Primary: `https://dev.hextrackr.com`
+    - Alternative: `https://localhost`
+
+    **Production Environment:**
+    - `https://hextrackr.com` (requires DNS/hosts configuration)
+
+    **⚠️ Important**: You'll see a security warning about the self-signed SSL certificate. To bypass it, click in the browser window and type `thisisunsafe` (no spaces). The page will load automatically.
+
+    **❌ Never use HTTP**: `http://localhost` or `http://localhost:8989` will fail with empty API responses due to authentication requirements.
+
+### Key Application URLs
+
+Once running, you can access:
+
+- **Vulnerability Dashboard**: `/vulnerabilities.html`
+- **Ticket Management**: `/tickets.html`
+- **Documentation Portal**: `/docs-html/`
+- **API Endpoints**: `/api/*`
 
 ---
 
-## HTTPS Configuration (Optional)
+## HTTPS Setup Explained
 
-HexTrackr v1.0.33+ includes built-in HTTPS support for secure deployment and authentication testing.
+HexTrackr requires HTTPS for several critical features:
 
-### Quick HTTPS Setup
+### Why HTTPS is Required
 
-The installation script includes an optional HTTPS configuration step, or you can set it up manually:
+1. **Authentication**: Secure session cookies require HTTPS
+2. **Session Management**: Express sessions with `secure` flag enabled
+3. **CSRF Protection**: Anti-CSRF tokens require secure transport
+4. **Production Readiness**: Industry standard for web applications
 
-```bash
-# Run the SSL setup script
-./scripts/setup-ssl.sh
+### How It Works
 
-# Or configure during installation
-./install.sh  # Choose 'y' when prompted for HTTPS
+HexTrackr uses an nginx reverse proxy architecture:
+
+```text
+Browser (HTTPS 443) → nginx → Node.js App (HTTP 8080)
 ```
 
-### When You Need HTTPS
+- **nginx** handles SSL/TLS termination on port 443
+- **Node.js** runs the application on port 8080 (internal only)
+- **X-Forwarded-Proto** header tells Express the original protocol was HTTPS
+- **Trust Proxy** enabled in Express to read nginx headers
 
-- **Authentication**: Required for secure session cookies and login functionality
-- **Production Deployment**: Essential for any internet-facing deployment
-- **Development Testing**: Testing authentication features locally
+### SSL Certificate Setup
 
-### Access with HTTPS
+The `install.sh` script automatically generates self-signed certificates for development. For production deployments:
 
-Once configured, access your application via:
+```bash
+# Manual SSL setup (if needed)
+./scripts/setup-ssl.sh
+```
 
-- **HTTPS**: `https://localhost:8989` (with self-signed certificate warning)
-- **HTTP**: `http://localhost:8989` (still available)
+For production with valid certificates, replace the self-signed certificates in:
+- `nginx/certs/cert.pem` (certificate)
+- `nginx/certs/key.pem` (private key)
 
-For complete HTTPS setup instructions, see the [HTTPS Setup Guide](./https-setup.md).
+Then restart the containers:
 
----
-
-### Using Helper Scripts
-
-HexTrackr includes convenient helper scripts for Docker management:
-
-- **Start the Application**:
-    ```bash
-    ./docker-start.sh
-    ```
-    Starts the container with health checks and status monitoring.
-
-- **Stop the Application**:
-    ```bash
-    ./docker-stop.sh
-    ```
-    Gracefully stops the container with proper cleanup.
-
-- **Rebuild the Container**:
-    ```bash
-    ./docker-rebuild.sh
-    ```
-    Rebuilds the Docker image and restarts with latest changes.
-
-- **View Logs**:
-    ```bash
-    ./docker-logs.sh
-    ```
-    Shows real-time container logs for troubleshooting.
-
-### Manual Docker Setup
-
-If you prefer manual control over the Docker setup:
-
-1. **Build and Start Services**
-
-    ```bash
-    docker-compose up -d --build
-    ```
-
-2. **Stop Services**
-
-    ```bash
-    docker-compose down
-    ```
+```bash
+docker-compose restart
+```
 
 ---
 
-## Local Development Setup (Without Docker)
+## Docker Helper Scripts
 
-For developers who want to work on the HexTrackr source code directly.
+HexTrackr includes convenient helper scripts for managing the Docker environment:
+
+### Start the Application
+
+```bash
+./docker-start.sh
+```
+
+Starts the containers with health monitoring and status checks.
+
+### Stop the Application
+
+```bash
+./docker-stop.sh
+```
+
+Gracefully stops containers with proper cleanup.
+
+### Rebuild After Code Changes
+
+```bash
+./docker-rebuild.sh
+```
+
+Rebuilds the Docker image and restarts with latest changes. Use this after:
+- Modifying server code
+- Updating dependencies
+- Changing environment variables
+
+### View Application Logs
+
+```bash
+./docker-logs.sh
+```
+
+Shows real-time logs for troubleshooting and monitoring.
+
+### Manual Docker Commands
+
+If you prefer direct control:
+
+```bash
+# Build and start
+docker-compose up -d --build
+
+# Stop containers
+docker-compose down
+
+# View logs
+docker-compose logs -f
+
+# Restart after changes
+docker-compose restart
+```
+
+**Note**: Use either `docker compose` (v2+) or `docker-compose` (v1). The helper scripts auto-detect the correct syntax for your Docker version.
+
+---
+
+## Local Development (Without Docker)
+
+For developers working directly on the HexTrackr codebase without Docker.
 
 ### Prerequisites
 
-- **Node.js**: v18.x or later
-- **npm**: v8.x or later (typically comes with Node.js)
+- **Node.js**: v18.x or later (v22.11.0 LTS recommended)
+- **npm**: v8.x or later
 
-### Setup Instructions
+### Setup Steps
 
-1. **Clone the Repository** (if you haven't already)
+1. **Clone Repository** (if not already done)
 
     ```bash
     git clone https://github.com/Lonnie-Bruton/HexTrackr.git
@@ -159,92 +202,190 @@ For developers who want to work on the HexTrackr source code directly.
 
 2. **Install Dependencies**
 
-    Install the required Node.js packages.
-
     ```bash
     npm install
     ```
 
-3. **Initialize the Database**
+3. **Initialize Database**
 
-    This script creates the `hextrackr.db` SQLite file in the `data/` directory and sets up the necessary tables.
+    ⚠️ **WARNING**: This command creates database tables using `CREATE TABLE IF NOT EXISTS` statements. While it won't drop existing tables, running this on an existing database may cause schema conflicts. For schema migrations on existing databases, use the migration scripts in `app/public/scripts/migrations/` instead.
+
+    **Only run this for**:
+    - Fresh installations (no existing `app/data/hextrackr.db` file)
+    - Development environments where schema recreation is acceptable
 
     ```bash
     npm run init-db
     ```
 
-4. **Start the Development Server**
+    **Initial Admin Credentials**:
+
+    After database initialization, the console will display your admin credentials:
+
+    ```
+    🔐 INITIAL ADMIN CREDENTIALS (SAVE THESE!)
+    Username: admin
+    Password: admin123!
+    ⚠️  CHANGE THIS PASSWORD IMMEDIATELY AFTER FIRST LOGIN!
+    ```
+
+    **Security Note**: The default password `admin123!` is a convenience for first-time setup. You **must** change it immediately after logging in for the first time.
+
+4. **Configure Environment**
+
+    Create a `.env` file in the project root:
+
+    ```bash
+    SESSION_SECRET=your-secure-random-string-here
+    TRUST_PROXY=true
+    ```
+
+    Generate a secure session secret:
+
+    ```bash
+    node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+    ```
+
+5. **Start Development Server**
 
     ```bash
     npm run dev
     ```
 
-    The server will start on port 8080 internally. When running locally without Docker, access the application at `http://localhost:8080`.
-
-    **Note**: When using Docker, the application is accessible at `http://localhost:8989` due to port mapping.
+    The server runs on `http://localhost:8080` (note: authentication features require HTTPS via nginx proxy).
 
 ### Development Scripts
 
-The project includes several scripts in the `package.json` to aid development:
+```bash
+npm start              # Production server
+npm run dev            # Development with auto-reload
+npm run init-db        # Initialize database (DESTRUCTIVE)
+npm run lint:all       # Run all linters
+npm run fix:all        # Auto-fix linting issues
+npm run docs:generate  # Regenerate HTML documentation
+```
 
-- `npm start`: Starts the production server.
-- `npm run dev`: Starts the server with `nodemon` for automatic restarts on file changes.
-- `npm run init-db`: Initializes or re-initializes the database.
-- `npm run lint:all`: Runs all code quality checks (ESLint for JS, Stylelint for CSS, Markdownlint for docs).
-- `npm run fix:all`: Attempts to automatically fix all code quality issues.
-- `npm run docs:generate`: **Regenerates the complete HTML documentation portal**.
-- `npm run docs:sync-specs`: Syncs specification tasks to the roadmap (part of docs:generate).
-- `npm run docs:sync-all`: Comprehensive documentation synchronization across all sources.
+---
+
+## Using HexTrackr
+
+### Vulnerability Management
+
+1. **Import Vulnerabilities**: Use CSV import to bulk-load vulnerability data
+2. **Filter by Vendor**: Toggle between CISCO, Palo Alto, and Other vendors
+3. **View Statistics**: VPR cards show risk distribution (Critical, High, Medium, Low)
+4. **KEV Tracking**: Vulnerabilities in CISA's KEV catalog are automatically flagged
+5. **Export Results**: Use CSV export to share filtered vulnerability lists
+
+**Hidden Power Feature**: Cmd+Shift+Click on any VPR card to export a vendor breakdown CSV.
+
+### Ticket Management
+
+1. **Create Tickets**: Click "New Ticket" to create remediation tickets
+2. **Assign Devices**: Drag and drop devices onto tickets for assignment
+3. **Track Progress**: Update ticket status as remediation progresses
+4. **Bundle Export**: Export multiple tickets to CSV for reporting
+
+### Statistics and Trends
+
+- **Vulnerability Trends**: Track vulnerability counts over time by severity
+- **Vendor Breakdown**: Analyze risk by vendor
+- **Age Analysis**: Identify long-standing vulnerabilities
 
 ---
 
 ## Troubleshooting
 
-### Backup and Restore Issues
+### Cannot Access Application
 
-If you encounter issues with backup restoration:
+**Symptom**: Browser cannot load `https://dev.hextrackr.com`
 
-1. **Ensure the backup file is a valid ZIP**: The system expects ZIP files containing JSON data
-2. **Check file permissions**: Docker container needs write access to `/tmp/` directory
-3. **Verify data format**: Backups support both legacy and new nested data structures
+**Solution**:
+1. Verify **both** containers are running: `docker ps`
+   - You should see: `hextrackr-app` (Node.js application)
+   - And: `hextrackr-nginx` (HTTPS reverse proxy)
+   - Both should show status "Up" or "healthy"
+2. Check logs for both containers:
+   - App logs: `docker logs hextrackr-app`
+   - Nginx logs: `docker logs hextrackr-nginx`
+   - Or combined: `docker-compose logs -f`
+3. Ensure Docker daemon is running
+4. Try alternative URL: `https://localhost`
 
-### Cross-Platform Considerations
+### Empty API Responses
 
-#### macOS
-- Docker Desktop handles file permissions automatically
-- Use the provided helper scripts for best experience
+**Symptom**: API calls return empty responses or fail silently
 
-#### Linux/Ubuntu
-- Ensure Docker daemon is running: `sudo systemctl status docker`
-- Add your user to docker group: `sudo usermod -aG docker $USER`
-- File permissions are handled automatically by the unified Dockerfile
+**Cause**: Using HTTP instead of HTTPS
 
-### Common Issues
+**Solution**: Always use `https://` URLs. HTTP is not supported for authenticated endpoints.
 
-1. **Port 8989 Already in Use**
-   ```bash
-   docker ps  # Check for existing containers
-   docker stop $(docker ps -q)  # Stop all containers
-   ```
+### Self-Signed Certificate Warning
 
-2. **Database Access Errors**
-   - The database is stored in `app/public/data/hextrackr.db`
-   - Ensure proper permissions: `chmod 777 app/public/data`
+**Symptom**: Browser shows "Your connection is not private" warning
 
-3. **Container Won't Start**
-   ```bash
-   docker logs hextrackr-hextrackr-1  # Check logs for errors
-   ./docker-rebuild.sh  # Rebuild from scratch
-   ```
+**Solution**: This is expected with self-signed certificates. Type `thisisunsafe` in the browser window to bypass (development only).
+
+### Port 443 Already in Use
+
+**Symptom**: nginx fails to start, port conflict error
+
+**Solution**:
+```bash
+# Check what's using port 443
+sudo lsof -i :443
+
+# Stop conflicting service or change HexTrackr's port in docker-compose.yml
+```
+
+### Database Errors
+
+**Symptom**: Cannot read/write vulnerabilities or tickets
+
+**Solution**:
+1. Check database file exists: `ls -la app/data/hextrackr.db`
+2. Verify Docker volume is mounted: `docker inspect hextrackr-app | grep data`
+3. Check container logs: `docker logs hextrackr-app`
+4. Restart container: `docker-compose restart hextrackr`
+
+### Container Won't Start
+
+**Symptom**: `docker-compose up` fails immediately
+
+**Solution**:
+```bash
+# View error logs
+docker-compose logs
+
+# Rebuild from scratch
+./docker-rebuild.sh
+
+# Or manually
+docker-compose down -v
+docker-compose up -d --build
+```
 
 ---
 
 ## Next Steps
 
-- Review the [User Guide](user-guide.md) for detailed feature documentation
-- Explore the [API Reference](../api-reference/overview.md) for integration options
-- Check the [Architecture Guide](../architecture/overview.md) for system design details
+Now that you have HexTrackr running:
+
+- **Import Data**: Use the CSV import feature to load your vulnerability scan results
+- **Configure KEV**: Enable automatic KEV tracking in settings
+- **Create Tickets**: Start creating remediation tickets for high-priority vulnerabilities
+- **Explore Features**: Check the [User Guide](user-guide.md) for detailed feature documentation
+- **Review API**: See the [API Reference](../api-reference/index.md) for integration options
 
 ---
 
-For additional support, please refer to the [HexTrackr GitHub repository](https://github.com/Lonnie-Bruton/HexTrackr) or open an issue.
+## Getting Help
+
+- **Documentation Portal**: `/docs-html/` (built-in)
+- **GitHub Issues**: [HexTrackr Issues](https://github.com/Lonnie-Bruton/HexTrackr/issues)
+- **API Documentation**: `/docs-html/jsdocs/` (technical reference)
+
+---
+
+**Version**: 1.0.43
+**Last Updated**: 2025-10-09

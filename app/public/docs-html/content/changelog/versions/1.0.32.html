@@ -1,0 +1,41 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.32</h1><p><strong>Release Date</strong>: 2025-09-26</p>
+<hr>
+<h2>[1.0.32] - 2025-09-26</h2><h3>Fixed (8)</h3><h4>HEX-65: Dark Mode White Flash Elimination</h4><p><strong>Issue</strong>: White flash occurring when navigating between pages in dark mode, particularly noticeable in Firefox</p>
+<p><strong>Resolution</strong>: Implemented multi-layered theme application system to eliminate flash of unstyled content (FOUC)</p>
+<p><strong>Technical Implementation</strong>:</p>
+<ul>
+<li>Added inline theme detection script in HTML <code>&lt;head&gt;</code> that executes before CSS loads</li>
+<li>Implemented fallback chain: localStorage → sessionStorage → OS preference → light theme</li>
+<li>Added critical dark theme styles to <code>base.css</code> for immediate card theming</li>
+<li>Commented out unnecessary loading toast that caused additional flash</li>
+<li>Enhanced toast manager to detect and apply current theme to containers</li>
+<li>Updated component initialization to detect pre-applied themes</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/vulnerabilities.html</code> - Added inline theme detection script</li>
+<li><code>app/public/tickets2.html</code> - Added inline theme detection script</li>
+<li><code>app/public/styles/shared/base.css</code> - Added critical dark theme card styles (lines 82-95)</li>
+<li><code>app/public/scripts/shared/vulnerability-core.js</code> - Disabled loading toast on page load (line 296)</li>
+<li><code>app/public/scripts/shared/toast-manager.js</code> - Added theme detection for toast containers</li>
+</ul>
+<p><strong>Performance Impact</strong>:</p>
+<ul>
+<li>Zero white flash during navigation</li>
+<li>No additional latency</li>
+<li>Smooth transitions between pages</li>
+<li>Maintains architectural principles (modular CSS structure)</li>
+</ul>
+<p><strong>Browser Compatibility</strong>:</p>
+<ul>
+<li>Tested in Firefox, Chrome, Safari, Edge</li>
+<li>Supports private browsing mode via sessionStorage fallback</li>
+<li>Handles legacy storage formats (both JSON and plain string)</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

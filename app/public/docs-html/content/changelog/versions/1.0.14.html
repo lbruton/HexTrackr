@@ -1,0 +1,128 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.14</h1><p><strong>Release Date</strong>: 2025-09-14</p>
+<hr>
+<h2>[1.0.14] - 2025-09-14</h2><h3>Added (13)</h3><h4>Documentation Portal Enhancements</h4><ul>
+<li><strong>AG-Grid Community Integration</strong>: Advanced data tables for interactive documentation<ul>
+<li>Interactive table converter for markdown tables to AG-Grid format</li>
+<li>Roadmap table sorting functionality with real-time filtering</li>
+<li>Responsive AG-Grid tables optimized for mobile devices</li>
+<li>Dark mode AG-Grid theme integration with proper color schemes</li>
+</ul>
+</li>
+<li><strong>Enhanced Navigation System</strong>: Improved user experience and accessibility<ul>
+<li>Back-to-top button with smooth scroll behavior and visual feedback</li>
+<li>Enhanced breadcrumb navigation system with proper spacing</li>
+<li>Loading spinner for content transitions</li>
+<li>Responsive documentation layout with mobile optimization</li>
+</ul>
+</li>
+<li><strong>UI/UX Improvements</strong>: Professional navigation and interaction patterns<ul>
+<li>Enhanced navigation with visual feedback and hover effects</li>
+<li>Improved sub-navigation styling with transform animations</li>
+<li>Avatar styling enhancements in navigation components</li>
+<li>Collapse icon rotation animations for expandable sections</li>
+</ul>
+</li>
+<li><strong>Mermaid Diagram Support</strong>: Interactive diagram rendering for documentation<ul>
+<li>Client-side Mermaid.js integration for rendering diagrams from markdown</li>
+<li>Theme-aware diagram rendering with automatic dark/light mode switching</li>
+<li>Custom CSS styling for consistent diagram appearance across themes</li>
+<li>Support for flowcharts, sequence diagrams, state diagrams, and more</li>
+<li>Foundation for future network topology and vulnerability mapping features</li>
+</ul>
+</li>
+</ul>
+<h4>Architecture Review System</h4><ul>
+<li><strong>Comprehensive Architecture Assessment</strong>: Complete technical review using 5 specialized expert agents<ul>
+<li>Node.js backend architecture analysis (3,809-line monolithic server assessment)</li>
+<li>SQLite database schema and performance evaluation (15 tables, 31 indexes)</li>
+<li>OWASP Top 10 security vulnerability assessment</li>
+<li>JavaScript frontend architecture review (17,951 lines across 46 files)</li>
+<li>WebSocket real-time communication analysis (Socket.io implementation)</li>
+</ul>
+</li>
+<li><strong>Expert Agent System</strong>: 138+ specialized domain expert agents for technical analysis</li>
+<li><strong>Roadmap Management</strong>: Enhanced project planning with semantic versioning and changelog automation</li>
+</ul>
+<h3>Fixed (16)</h3><h4>Vulnerability VPR Aggregation (Totals & Trends)</h4><ul>
+<li>Fixed inflated per‑severity VPR totals caused by multi‑CVE split rows each carrying the full VPR score<ul>
+<li>Root Cause: Daily totals used <code>SUM(vpr_score)</code> over <code>vulnerabilities_current</code>, multiplying VPR when a single plugin row listed multiple CVEs</li>
+<li>Solution: Enhanced daily totals now aggregate VPR by a deduplicated key and sum once per vulnerability entity per host<ul>
+<li>Aggregation key preference: <code>plugin_id + host</code> → fallback <code>plugin_name + host</code> → fallback <code>host + description</code></li>
+<li>Counts remain row-based (each CVE row counts); only VPR totals are deduplicated</li>
+</ul>
+</li>
+<li>Impact: Stat cards and trend chart now align; Medium spike resolved without altering per‑row VPR in tables</li>
+<li>Files: <code>app/public/server.js</code> (calculateAndStoreDailyTotalsEnhanced)</li>
+</ul>
+</li>
+</ul>
+<h4>Trend Badge Wiring and Casing</h4><ul>
+<li>Fixed trend badges (+/−%) stuck at 0% due to trends not being wired and key casing mismatch<ul>
+<li>Wire: Orchestrator now sets trends on <code>VulnerabilityStatisticsManager</code> before UI update</li>
+<li>Casing: Use capitalized severity keys from <code>/recent-trends</code> and robust fallback to data manager trends</li>
+<li>Files: <code>app/public/scripts/shared/vulnerability-core.js</code>, <code>app/public/scripts/shared/vulnerability-statistics.js</code></li>
+</ul>
+</li>
+</ul>
+<h4>Dark Mode Accessibility Critical Fixes (WCAG Compliance)</h4><ul>
+<li><strong>Navigation Contrast Violation Resolution</strong>: Fixed critical WCAG AA compliance issue<ul>
+<li><strong>Root Cause</strong>: Selected navigation items had white text on white background (1:1 contrast ratio)</li>
+<li><strong>Solution</strong>: Implemented proper dark mode color hierarchy using HexTrackr surface variables<ul>
+<li>Active states: <code>#2a3f54</code> background with <code>#e2e8f0</code> text (high contrast)</li>
+<li>Hover states: <code>#1e293b</code> background with consistent readable text</li>
+<li>Sub-navigation: <code>#94a3b8</code> muted text with <code>#243447</code> hover background</li>
+</ul>
+</li>
+<li><strong>Impact</strong>: Ensures accessibility compliance for visually impaired users</li>
+<li><strong>Validation</strong>: Tested across documentation portal, tickets, and vulnerabilities pages</li>
+</ul>
+</li>
+</ul>
+<h4>Documentation Portal Specific Fixes</h4><ul>
+<li><strong>Header Spacing Issue Resolution</strong>: Eliminated unwanted space above documentation portal header<ul>
+<li><strong>Root Cause</strong>: CSS rule <code>.navbar { margin-top: 1rem; }</code> in docs-tabler.css pushing header down</li>
+<li><strong>Solution</strong>: Commented out problematic CSS rule (lines 13-17 in docs-tabler.css)</li>
+<li><strong>Impact</strong>: Documentation portal header now aligns consistently with tickets/vulnerabilities pages</li>
+<li><strong>Method</strong>: Systematic investigation using sequential thinking and user feedback</li>
+</ul>
+</li>
+<li><strong>Breadcrumb and Layout Improvements</strong>: Enhanced documentation page structure<ul>
+<li>Fixed breadcrumb spacing to prevent cramped appearance above menu items</li>
+<li>Resolved page header positioning conflicts</li>
+<li>Enhanced documentation content area scroll behavior</li>
+<li>Improved loading spinner visibility and positioning</li>
+</ul>
+</li>
+</ul>
+<h4>Modal and Component Accessibility Fixes</h4><ul>
+<li><strong>Modal Contrast Improvements</strong>: Enhanced readability across light and dark themes<ul>
+<li>Improved modal contrast and text readability</li>
+<li>Fixed table styling in both light and dark modes with proper variable usage</li>
+<li>Enhanced blockquote styling with theme-aware background colors</li>
+<li>Resolved loading spinner visibility issues in modal contexts</li>
+</ul>
+</li>
+</ul>
+<h3>Changed (6)</h3><h4>CSS Architecture Improvements</h4><ul>
+<li><strong>Modularized Documentation CSS</strong>: Created dedicated docs-tabler.css for portal-specific styling<ul>
+<li>Separated documentation portal styles from main application CSS</li>
+<li>Enhanced table styling with proper Bootstrap variable integration</li>
+<li>Improved dark mode table support with enhanced border and background colors</li>
+<li>Streamlined navigation styling with consistent active states</li>
+</ul>
+</li>
+<li><strong>Theme System Enhancements</strong>: Better CSS variable usage for consistency<ul>
+<li>Standardized HexTrackr surface hierarchy variables across components</li>
+<li>Enhanced CSS custom property usage for maintainable theming</li>
+<li>Improved color consistency between documentation portal and main application</li>
+<li>Better separation of concerns between shared and page-specific styles</li>
+</ul>
+</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

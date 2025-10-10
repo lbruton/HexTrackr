@@ -3,7 +3,6 @@
 
 const sqlite3 = require("sqlite3").verbose();
 const path = require("path");
-const { randomBytes } = require("crypto");
 const argon2 = require("argon2");
 
 const dbPath = path.join(__dirname, "..", "..", "data", "hextrackr.db");
@@ -326,6 +325,28 @@ function createTables(db) {
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
 
+  // 15. User Preferences - Cross-device settings persistence (HEX-138)
+  db.run(`CREATE TABLE IF NOT EXISTS user_preferences (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT NOT NULL,
+    preference_key TEXT NOT NULL,
+    preference_value TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE(user_id, preference_key)
+  )`);
+
+  // Trigger to maintain updated_at timestamp for user_preferences
+  db.run(`CREATE TRIGGER IF NOT EXISTS user_preferences_updated_at
+    AFTER UPDATE ON user_preferences
+    FOR EACH ROW
+  BEGIN
+    UPDATE user_preferences
+    SET updated_at = CURRENT_TIMESTAMP
+    WHERE id = NEW.id;
+  END`);
+
   // Create indexes for performance
   db.run("CREATE INDEX IF NOT EXISTS idx_vulnerabilities_hostname ON vulnerabilities (hostname)");
   db.run("CREATE INDEX IF NOT EXISTS idx_vulnerabilities_severity ON vulnerabilities (severity)");
@@ -370,9 +391,11 @@ function createTables(db) {
   db.run("CREATE INDEX IF NOT EXISTS idx_vulnerability_templates_category ON vulnerability_templates (category)");
   db.run("CREATE INDEX IF NOT EXISTS idx_vulnerability_templates_active ON vulnerability_templates (is_active)");
   db.run("CREATE INDEX IF NOT EXISTS idx_users_username ON users (username)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_users_email ON users (email)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_user_preferences_user_id ON user_preferences (user_id)");
 
   // Wait for the last index creation to complete before resolving
-  db.run("CREATE INDEX IF NOT EXISTS idx_users_email ON users (email)", (err) => {
+  db.run("CREATE INDEX IF NOT EXISTS idx_user_preferences_key ON user_preferences (user_id, preference_key)", (err) => {
     if (err) {
       console.error("Error creating indexes:", err.message);
       reject(err);
@@ -395,7 +418,8 @@ function createTables(db) {
     console.log("  - ticket_templates (ticket templates)");
     console.log("  - vulnerability_templates (vulnerability templates)");
     console.log("  - users (authentication and authorization)");
-    console.log("All 14 tables and 35 indexes created successfully!");
+    console.log("  - user_preferences (cross-device settings - HEX-138)");
+    console.log("All 15 tables and 37 indexes created successfully!");
 
     resolve();
   });
@@ -420,8 +444,8 @@ async function seedInitialData(db) {
       // Only seed admin if it doesn't exist
       if (!row || row.count === 0) {
         try {
-          // Generate cryptographically secure initial password
-          const initialPassword = randomBytes(16).toString("hex");
+          // Default initial password (MUST be changed after first login)
+          const initialPassword = "admin123!";
 
           // Hash password with Argon2id
           const passwordHash = await argon2.hash(initialPassword, {

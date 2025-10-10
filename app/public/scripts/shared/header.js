@@ -31,6 +31,14 @@ export class HeaderThemeManager {
     
     // Expose theme controller globally for cross-module access - T028
     window.themeController = this.themeController;
+
+    // HEX-138: Add database sync listener for theme changes
+    this.themeController.addThemeChangeListener((newTheme, source) => {
+      // Sync to database in background (debounced)
+      if (window.preferencesSync && source === "user") {
+        window.preferencesSync.syncTheme(newTheme);
+      }
+    });
   }
 
   /**
