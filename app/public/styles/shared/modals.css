@@ -260,6 +260,22 @@
 }
 
 /* ===========================
+   KEV Modal Light Mode Fix - HEX-172
+   =========================== */
+
+/* Light mode only - make header readable with warning color */
+[data-bs-theme="light"] #kevDetailsModal .modal-header {
+    background: linear-gradient(135deg, #fecaca 0%, #fca5a5 100%) !important;
+    color: #000000 !important;
+    border-bottom: 1px solid #dc2626 !important;
+}
+
+/* Make close button black for readability */
+[data-bs-theme="light"] #kevDetailsModal .modal-header .btn-close {
+    filter: brightness(0);
+}
+
+/* ===========================
    Modal Animations
    =========================== */
 
