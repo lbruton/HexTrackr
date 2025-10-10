@@ -4,46 +4,13 @@
 
 ## Reference Documentation
 
-### [Security Implementation](./security.md)
+- **[Security Implementation](./security.md)**: Comprehensive security documentation covering authentication & authorization architecture, security middleware configuration, path validation, rate limiting, DDoS protection, and security best practices
 
-Comprehensive security documentation covering:
+- **[WebSocket Protocol](./websocket.md)**: Real-time communication specifications including WebSocket event definitions, progress tracking protocol, import status notifications, connection management, and fallback mechanisms
 
-- Authentication & authorization architecture
-- Security middleware configuration
-- Path validation and input sanitization
-- Rate limiting and DDoS protection
-- Security best practices
+- **[System Requirements](./system-requirements.md)**: Verified deployment specifications based on production hardware (Intel N100), minimum and recommended requirements, Docker resource allocation, Proxmox VE configuration, and browser compatibility
 
-### [WebSocket Protocol](./websocket.md)
-
-Real-time communication specifications:
-
-- WebSocket event definitions
-- Progress tracking protocol
-- Import status notifications
-- Connection management
-- Fallback mechanisms
-
-### [Performance Guidelines](./performance.md)
-
-Performance requirements and optimization:
-
-- Constitutional performance benchmarks
-- Response time standards
-- Resource constraints
-- Optimization techniques
-- Monitoring and metrics
-
-### [Troubleshooting Guide](./troubleshooting.md)
-
-Common issues and solutions:
-
-- Docker & environment issues
-- Database troubleshooting
-- Import/export problems
-- Frontend issues
-- API & WebSocket debugging
-- Performance diagnostics
+- **[Troubleshooting Guide](./troubleshooting.md)**: Common issues and solutions for Docker & environment issues, database troubleshooting, import/export problems, frontend issues, API & WebSocket debugging, and performance diagnostics
 
 ## Quick Reference
 
@@ -78,5 +45,3 @@ location.reload();
 - [User Guides](../guides/index.md) - End-user documentation
 
 ---
-
-*All performance requirements are defined in the [HexTrackr Constitution](../../.specify/memory/constitution.md)*

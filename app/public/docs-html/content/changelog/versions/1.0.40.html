@@ -1,0 +1,28 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.40</h1><p><strong>Release Date</strong>: 2025-09-30</p>
+<hr>
+<h2>[1.0.40] - 2025-09-30</h2><h3>Added (4)</h3><h4>HEX-100: Resolved CVEs Tracking in Import Summaries</h4><p><strong>Feature</strong>: Import summaries now show <strong>both</strong> new CVEs discovered AND CVEs resolved/removed between scans, providing complete vulnerability lifecycle visibility.</p>
+<p><strong>Problem</strong>: Previous versions only tracked NEW CVEs, making it impossible to see remediation progress or validate patching efforts.</p>
+<p><strong>Solution Implemented</strong>:</p>
+<ul>
+<li>Backend: New SQL query identifies CVEs present in previous snapshots but missing from current scan</li>
+<li>Frontend: Green &quot;✅ Resolved CVEs&quot; section showing resolved count, affected hosts, VPR reduction, and last seen date</li>
+<li>Reports: Included in both modal display and downloadable HTML exports</li>
+</ul>
+<p><strong>Benefits for Security Teams</strong>:</p>
+<ul>
+<li>Track remediation progress: &quot;3 CVEs resolved this week&quot;</li>
+<li>Validate patching efforts: &quot;CVE-2024-12345 patched across 50 hosts&quot;</li>
+<li>Complete picture: Risk increases (new) + Risk reductions (resolved) = Net impact</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/services/importService.js</code> - Added resolved CVE query and summary data</li>
+<li><code>app/public/scripts/shared/progress-modal.js</code> - Added resolved CVEs UI section</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

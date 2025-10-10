@@ -1,0 +1,38 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.50</h1><p><strong>Release Date</strong>: 2025-10-05</p>
+<hr>
+<h2>[1.0.50] - 2025-10-05</h2><h3>Fixed</h3><h4>Documentation Portal Authentication Menu (HEX-137)</h4><p><strong>Issue</strong>: Documentation portal user menu displayed static placeholder values (&quot;HexTrackr User&quot; / &quot;Manager&quot;) instead of authenticated user information. Missing &quot;Change Password&quot; and &quot;Sign Out&quot; options when logged in.</p>
+<p><strong>Root Cause</strong>: Documentation portal (<code>app/public/docs-html/index.html</code>) loaded <code>auth-state.js</code> but never called initialization code. Unlike protected pages (vulnerabilities.html, tickets.html), the docs portal had no <code>DOMContentLoaded</code> listener to invoke <code>authState.init()</code> and <code>authState.updateUserMenu()</code>.</p>
+<p><strong>Resolution</strong>: Added authentication initialization script to docs portal HTML (lines 131-149):</p>
+<ul>
+<li>Calls <code>authState.init()</code> on page load</li>
+<li>Calls <code>authState.updateUserMenu()</code> when authenticated</li>
+<li>Maintains public access (no redirect when unauthenticated)</li>
+<li>Updates user menu to show authenticated username and options</li>
+</ul>
+<p><strong>Result</strong>: Documentation portal now displays:</p>
+<ul>
+<li>Authenticated username (&quot;admin&quot;) instead of placeholder (&quot;HexTrackr User&quot;)</li>
+<li>Authentication status (&quot;Logged in&quot;) instead of role (&quot;Manager&quot;)</li>
+<li>&quot;Change Password&quot; menu option with functional modal</li>
+<li>&quot;Sign Out&quot; menu option with logout functionality</li>
+<li>Identical user menu behavior across all pages (vulnerabilities, tickets, docs)</li>
+</ul>
+<p><strong>Testing</strong>: Verified via Chrome DevTools:</p>
+<ul>
+<li>User menu displays &quot;admin&quot; / &quot;Logged in&quot; when authenticated</li>
+<li>Dropdown includes static menu items + &quot;Change Password&quot; + &quot;Sign Out&quot;</li>
+<li>Change Password modal loads correctly</li>
+<li>Preserves public access for unauthenticated users</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/docs-html/index.html</code> - Lines 131-149 (Authentication initialization script)</li>
+</ul>
+<hr>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

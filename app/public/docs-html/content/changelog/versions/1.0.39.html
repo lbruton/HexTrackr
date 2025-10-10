@@ -1,0 +1,40 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.39</h1><p><strong>Release Date</strong>: 2025-09-30</p>
+<hr>
+<h2>[1.0.39] - 2025-09-30</h2><h3>Fixed (4)</h3><h4>HEX-99: Clear Vulnerabilities Showing Stale Cached Data</h4><p><strong>Issue</strong>: After clicking &quot;Clear Vulnerabilities&quot;, the UI continued showing old data despite empty database. Required Docker restart to see empty state.</p>
+<p><strong>Root Cause</strong>: Two-layer caching problem:</p>
+<ol>
+<li>Server correctly cleared application cache ✅</li>
+<li>Browser cached responses (60s TTL) served old data ❌</li>
+<li>Frontend didn&#39;t use cache-busting parameters when reloading</li>
+</ol>
+<p><strong>Solution</strong>:</p>
+<ul>
+<li>Added <code>bustCache=true</code> parameter to <code>clearAllData()</code> operation</li>
+<li>Enhanced <code>refreshData()</code> to support optional cache busting</li>
+<li>Cache-busting appends timestamps to API URLs forcing fresh requests</li>
+</ul>
+<p><strong>Impact</strong>: &quot;Clear Vulnerabilities&quot; now immediately shows empty state without page refresh.</p>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/vulnerability-data.js</code></li>
+</ul>
+<h4>HEX-99 Enhancement: VACUUM After Clear Operations</h4><p><strong>Issue</strong>: Database file showed 140.6 MB despite 0 records. SQLite DELETE operations don&#39;t shrink files - they mark pages as &quot;free&quot; for reuse.</p>
+<p><strong>Analysis</strong>:</p>
+<ul>
+<li>Total pages: 35,990 (141 MB)</li>
+<li>Free pages: 28,754 (112 MB wasted space - 80%!)</li>
+<li>Actual data: ~29 MB</li>
+</ul>
+<p><strong>Solution</strong>: Added SQLite VACUUM command after clearing vulnerability data to rebuild database file and reclaim disk space.</p>
+<p><strong>Impact</strong>: Database shrinks from ~141 MB to ~30 MB after clear operation.</p>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/services/vulnerabilityService.js</code></li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

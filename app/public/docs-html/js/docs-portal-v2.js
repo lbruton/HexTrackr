@@ -25,20 +25,8 @@
                 "vulnerability-scanning", "backup-restore"
             ];
 
-            // Special case: For development section, include CHANGELOG
-            if (section === "development") {
-                try {
-                    const changelogResponse = await fetch(this.getContentUrl("CHANGELOG.html"));
-                    if (changelogResponse.ok) {
-                        children["changelog"] = {
-                            title: "Changelog",
-                            file: "CHANGELOG"
-                        };
-                    }
-                } catch (_error) {
-                    // CHANGELOG doesn't exist, skip it
-                }
-            }
+            // Note: CHANGELOG is now a folder (changelog/) with individual version files
+            // It will be auto-discovered like other folders - no special handling needed
  * - Mobile responsive
  * 
  * Framework: Enhanced Tabler.io with custom navigation components
@@ -222,7 +210,25 @@ class DocumentationPortalV2 {
                 // Handle Developer API specially (external link)
                 if (specialKey === "developer-api") {
                     // Get current theme to pass to popup
-                    const currentTheme = localStorage.getItem("hextrackr-theme") || "dark";
+                    // FIX (HEX-140): Parse JSON format from preferences-sync
+                    let currentTheme = "dark";
+                    try {
+                        const stored = localStorage.getItem("hextrackr-theme");
+                        if (stored) {
+                            // Try parsing as JSON first (new format)
+                            try {
+                                const parsed = JSON.parse(stored);
+                                currentTheme = parsed.theme || parsed;
+                            } catch {
+                                // Simple string format (backward compatibility)
+                                currentTheme = stored;
+                            }
+                        }
+                    } catch (e) {
+                        // Fallback to dark if any error
+                        currentTheme = "dark";
+                    }
+
                     this.navigationStructure["developer-api"] = {
                         title: "Dev Docs",
                         icon: "fas fa-code",
@@ -1432,10 +1438,22 @@ class DocumentationPortalV2 {
      * Update active navigation state
      */
     updateActiveNavigation(section) {
-        // First, collapse navigation menus only (not content accordions like changelog)
+        // Find which menu should stay open FIRST (before collapsing anything)
+        const activeLink = document.querySelector(`[data-section="${section}"]`);
+        let parentCollapseToKeep = null;
+
+        if (activeLink) {
+            // Check if this is a child section (inside a collapse)
+            parentCollapseToKeep = activeLink.closest(".collapse");
+        }
+
+        // Now collapse all menus EXCEPT the one that should stay open
         document.querySelectorAll(".list-group .collapse.show").forEach(collapse => {
-            const bsCollapse = new bootstrap.Collapse(collapse, { toggle: false });
-            bsCollapse.hide();
+            // Don't collapse the menu that should stay open
+            if (collapse !== parentCollapseToKeep) {
+                const bsCollapse = new bootstrap.Collapse(collapse, { toggle: false });
+                bsCollapse.hide();
+            }
         });
 
         // Remove all active states from list-group items
@@ -1449,19 +1467,17 @@ class DocumentationPortalV2 {
         });
 
         // Add active state to current section
-        const activeLink = document.querySelector(`[data-section="${section}"]`);
         if (activeLink) {
             activeLink.classList.add("active");
 
             // Check if this is a child section (inside a collapse)
-            const parentCollapse = activeLink.closest(".collapse");
-            if (parentCollapse) {
+            if (parentCollapseToKeep) {
                 // This is a child section, ensure its parent is expanded
-                const bsCollapse = new bootstrap.Collapse(parentCollapse, { toggle: false });
+                const bsCollapse = new bootstrap.Collapse(parentCollapseToKeep, { toggle: false });
                 bsCollapse.show();
 
                 // Also mark the parent menu item as active/expanded
-                const parentLink = document.querySelector(`[data-bs-target="#${parentCollapse.id}"]`);
+                const parentLink = document.querySelector(`[data-bs-target="#${parentCollapseToKeep.id}"]`);
                 if (parentLink) {
                     parentLink.setAttribute("aria-expanded", "true");
                     parentLink.classList.remove("collapsed");

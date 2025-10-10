@@ -1,0 +1,69 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.34</h1><p><strong>Release Date</strong>: 2025-09-29</p>
+<hr>
+<h2>[1.0.34] - 2025-09-29</h2><h3>Fixed (7)</h3><h4>HEX-88: WebSocket Connection Fails in HTTPS Mode - CSV Import Progress Not Working</h4><p><strong>Issue</strong>: WebSocket connections failed when running HexTrackr in HTTPS mode, preventing CSV import progress tracking from working. The import would complete but users saw no progress updates and the UI didn&#39;t refresh.</p>
+<p><strong>Root Cause</strong>: CORS (Cross-Origin Resource Sharing) configuration in <code>/app/utils/constants.js</code> only allowed HTTP origins:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// ❌ BEFORE - Only HTTP origins</span>
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">CORS_ORIGINS</span> = [<span class="hljs-string">&quot;http://localhost:8080&quot;</span>, <span class="hljs-string">&quot;http://127.0.0.1:8080&quot;</span>];</code></pre><p>When running in HTTPS mode (enabled in v1.0.33), the browser connected via <code>https://localhost:8989</code>, but Socket.io&#39;s CORS configuration rejected this origin because it wasn&#39;t in the allowed list.</p>
+<p><strong>Solution</strong>: Implemented dynamic CORS function that detects environment and restricts to HTTPS-only in production:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// ✅ AFTER - Dynamic HTTPS-only CORS</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">getCorsOrigins</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-keyword">const</span> protocol = process.<span class="hljs-property">env</span>.<span class="hljs-property">USE_HTTPS</span> === <span class="hljs-string">&quot;true&quot;</span> ? <span class="hljs-string">&quot;https:&quot;</span> : <span class="hljs-string">&quot;http:&quot;</span>;
+    <span class="hljs-keyword">const</span> ports = [<span class="hljs-string">&quot;8080&quot;</span>, <span class="hljs-string">&quot;8989&quot;</span>, <span class="hljs-string">&quot;8443&quot;</span>];
+    <span class="hljs-keyword">const</span> hosts = [<span class="hljs-string">&quot;localhost&quot;</span>, <span class="hljs-string">&quot;127.0.0.1&quot;</span>];
+
+    <span class="hljs-keyword">const</span> origins = [];
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> host <span class="hljs-keyword">of</span> hosts) {
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> port <span class="hljs-keyword">of</span> ports) {
+            origins.<span class="hljs-title function_">push</span>(<span class="hljs-string">`<span class="hljs-subst">${protocol}</span>//<span class="hljs-subst">${host}</span>:<span class="hljs-subst">${port}</span>`</span>);
+        }
+    }
+    <span class="hljs-keyword">return</span> origins;
+}
+
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">CORS_ORIGINS</span> = <span class="hljs-title function_">getCorsOrigins</span>();</code></pre><p><strong>Why Dynamic Instead of Static</strong>:</p>
+<ol>
+<li><strong>Security</strong>: HTTPS-only in production (no HTTP fallback)</li>
+<li><strong>Flexibility</strong>: Adapts to USE_HTTPS environment variable</li>
+<li><strong>Port Coverage</strong>: Supports development (8080), Docker (8989), and HTTPS (8443)</li>
+<li><strong>DHCP Resilience</strong>: Works across environments without hardcoded IPs</li>
+</ol>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/utils/constants.js</code> - Replaced static CORS_ORIGINS array with getCorsOrigins() function</li>
+<li><code>app/public/scripts/shared/websocket-client.js</code> - Enhanced protocol detection with file:// handling</li>
+<li>Documentation updated to explain dynamic CORS strategy</li>
+</ul>
+<p><strong>Additional Fixes</strong>:</p>
+<ul>
+<li>Fixed ticket status update 500 errors (proper error handling)</li>
+<li>Removed temporary documentation files from repository</li>
+<li>Enhanced WebSocket client to handle file:// protocol for local testing</li>
+</ul>
+<p><strong>Technical Details</strong>:</p>
+<ul>
+<li>WebSocket client correctly detects HTTPS and tries to connect via <code>https://</code></li>
+<li>Server creates HTTPS server when <code>USE_HTTPS=true</code></li>
+<li>WebSocket inherits CORS origins that now include HTTPS URLs</li>
+<li>Mixed content errors eliminated with protocol-aware connection</li>
+</ul>
+<p><strong>Testing</strong>:</p>
+<ul>
+<li>Verified CSV import progress tracking works in HTTPS mode</li>
+<li>Confirmed WebSocket connections establish successfully</li>
+<li>Tested across Mac development (port 8989) and Ubuntu production environments</li>
+</ul>
+<p><strong>Security Impact</strong>:</p>
+<ul>
+<li>Production environments use HTTPS-only WebSocket connections</li>
+<li>No HTTP fallback in HTTPS mode (prevents downgrade attacks)</li>
+<li>CORS properly restricts origins to known safe hosts</li>
+</ul>
+<p><strong>Linear Issue</strong>: <a href="https://linear.app/hextrackr/issue/HEX-88">HEX-88</a></p>
+<hr>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

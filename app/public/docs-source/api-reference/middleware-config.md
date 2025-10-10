@@ -4,248 +4,656 @@
 
 ## Overview
 
-HexTrackr's middleware layer provides security, logging, and request processing capabilities. Configuration modules handle environment settings, database connections, and WebSocket setup.
+HexTrackr's middleware layer provides authentication, security, logging, and request processing capabilities. The middleware stack enforces authentication on all protected routes, applies CSRF protection, implements rate limiting, and provides comprehensive error handling.
+
+**Critical Architecture Note**: HexTrackr **ALWAYS** runs behind an nginx reverse proxy with SSL/TLS termination. The `trust proxy` setting is always enabled to support secure sessions and proper IP detection.
 
 ---
 
-## Middleware Components {#middleware}
+## Middleware Execution Order {#execution-order}
 
-### Security Middleware
+Understanding middleware order is critical - middleware executes top-to-bottom, and authentication/security depend on correct ordering.
 
-**Location:** `app/middleware/security.js`
+**Complete Middleware Stack** (from `app/public/server.js`):
 
-Comprehensive security middleware implementing defense-in-depth strategies.
+1. **Trust Proxy** - Enable Express to read nginx headers (`X-Forwarded-Proto`, `X-Forwarded-For`)
+2. **CORS** - Cross-origin resource sharing for API access
+3. **Session Management** - SQLite session store with secure cookies
+4. **Body Parsing** - JSON and URL-encoded request bodies (50MB limit)
+5. **CSRF Protection** - Double-submit cookie pattern (excludes login/status/csrf endpoints)
+6. **Rate Limiting** - `/api/*` routes only (100 requests per 15 minutes)
+7. **Compression** - Gzip/deflate (only if NOT behind nginx)
+8. **Security Headers** - Custom headers (X-Content-Type-Options, X-Frame-Options, X-XSS-Protection)
+9. **Static File Serving** - Documentation portal, JSDoc, public assets (**blocks `/data` directory**)
+10. **Route Handlers** - API endpoints with authentication middleware
+11. **Global Error Handler** - Catches all unhandled errors
 
-**Features:**
+---
 
-- **Helmet.js Integration**: Sets security headers (CSP, HSTS, X-Frame-Options)
-- **CORS Management**: Configurable cross-origin resource sharing
-- **Rate Limiting**: Prevents abuse and DDoS attacks
-- **Input Sanitization**: XSS and SQL injection protection
-- **Path Validation**: Prevents directory traversal attacks
+## Authentication & Security Middleware {#authentication}
+
+### Session Management (`sessionMiddleware`)
+
+**Location:** `app/middleware/auth.js` (lines 18-44)
+**Since:** v1.0.46 (HEX-133, HEX-128)
+
+SQLite-backed session management with secure cookies requiring HTTPS.
 
 **Configuration:**
 
 ```javascript
-const securityMiddleware = require('./middleware/security');
-
-// Apply to Express app
-app.use(securityMiddleware.helmet());
-app.use(securityMiddleware.cors({
-    origin: process.env.ALLOWED_ORIGINS?.split(','),
-    credentials: true
-}));
-app.use(securityMiddleware.rateLimiter({
-    windowMs: 15 * 60 * 1000,  // 15 minutes
-    max: 100                    // limit each IP to 100 requests
-}));
+const sessionMiddleware = session({
+    store: new SqliteStore({
+        client: db,              // better-sqlite3 connection
+        tableName: "sessions",   // Session table name
+        ttl: 86400000           // 24 hours in milliseconds
+    }),
+    secret: process.env.SESSION_SECRET,  // REQUIRED: 32+ characters
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: true,            // HTTPS REQUIRED (HEX-128)
+        httpOnly: true,          // Prevents XSS access
+        sameSite: "lax",         // CSRF protection
+        maxAge: 24 * 60 * 60 * 1000  // 24 hours
+    },
+    name: "hextrackr.sid",
+    proxy: true                  // ALWAYS true (nginx reverse proxy)
+});
 ```
 
-**Security Headers Applied:**
-| Header | Purpose |
-|--------|---------|
-| `Content-Security-Policy` | Prevents XSS attacks |
-| `X-Frame-Options` | Prevents clickjacking |
-| `X-Content-Type-Options` | Prevents MIME sniffing |
-| `Strict-Transport-Security` | Forces HTTPS |
-| `X-XSS-Protection` | Legacy XSS protection |
+**Critical Requirements:**
 
-### Logging Middleware
+1. **SESSION_SECRET** environment variable:
+   - **Minimum length**: 32 characters (server validates on startup)
+   - **Generation**: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
+   - **Security**: Never commit to version control
+   - **Server behavior**: Refuses to start if missing or too short
 
-**Location:** `app/middleware/logging.js`
+2. **HTTPS Requirement** (HEX-128 Fix):
+   - `secure: true` means cookies ONLY sent over HTTPS
+   - Sessions will NOT work over HTTP (browsers reject cookies)
+   - Development access: `https://localhost` or `https://dev.hextrackr.com`
+   - Production access: `https://hextrackr.com`
+   - **Never use HTTP** - authentication will silently fail
 
-Request/response logging with performance monitoring.
+3. **Trust Proxy** (always enabled):
+   - `proxy: true` tells Express to trust nginx reverse proxy
+   - Required for Express to read `X-Forwarded-Proto: https` header
+   - Without this, Express thinks connection is HTTP (breaks secure cookies)
+   - See [Trust Proxy Configuration](#trust-proxy) section
+
+**Session Store:**
+
+- **Database**: SQLite at `app/data/sessions.db`
+- **Table**: `sessions` (auto-created)
+- **Cleanup**: Every 15 minutes (900000ms)
+- **Structure**: Session ID (primary key), data (JSON), expiry (timestamp)
+
+### Authentication Protection (`requireAuth`)
+
+**Location:** `app/middleware/auth.js` (lines 52-68)
+**Since:** v1.0.46
+
+Route protection middleware that enforces authentication on protected endpoints.
+
+**Behavior:**
+
+```javascript
+const requireAuth = (req, res, next) => {
+    // Check for active session
+    if (!req.session || !req.session.userId) {
+        return res.status(401).json({
+            success: false,
+            error: "Authentication required"
+        });
+    }
+
+    // Attach user object to request
+    req.user = {
+        id: req.session.userId,
+        username: req.session.username,
+        role: req.session.role || "user"
+    };
+
+    next();
+};
+```
+
+**Usage Pattern:**
+
+```javascript
+// Protect API routes with requireAuth
+router.post("/logout", requireAuth, AuthController.logout);
+router.post("/change-password", requireAuth, AuthController.changePassword);
+router.get("/profile", requireAuth, AuthController.getProfile);
+router.get("/preferences", requireAuth, PreferencesController.getAll);
+```
+
+**Protected Endpoint Categories:**
+
+- All `/api/vulnerabilities/*` endpoints
+- All `/api/tickets/*` endpoints
+- All `/api/preferences/*` endpoints
+- All `/api/templates/*` endpoints
+- All `/api/backup/*` endpoints
+- All `/api/kev/*` endpoints (sync, status)
+- All `/api/devices/*` endpoints
+
+**Public Endpoints** (no authentication required):
+
+- `POST /api/auth/login` - User login
+- `GET /api/auth/status` - Check authentication status
+- `GET /api/auth/csrf` - Get CSRF token
+
+### Extended Session ("Remember Me")
+
+**Location:** `app/middleware/auth.js` (lines 75-79)
+**Since:** v1.0.46
+
+Extends session duration to 30 days when user checks "Remember Me" on login.
+
+**Usage:**
+
+```javascript
+// In login controller after successful authentication
+if (req.body.rememberMe) {
+    extendSession(req);  // Sets maxAge to 30 days
+}
+```
+
+---
+
+## CSRF Protection {#csrf}
+
+**Library:** `csrf-sync`
+**Implementation:** `app/public/server.js` (lines 195-219)
+**Since:** v1.0.46
+
+Double-submit cookie pattern for CSRF protection on all state-changing requests.
+
+**Configuration:**
+
+```javascript
+const { csrfSynchronisedProtection, generateToken } = csrfSync({
+    getTokenFromRequest: (req) => {
+        return req.headers["x-csrf-token"] ||
+               req.body?._csrf ||
+               req.query?._csrf;
+    },
+    ignoredMethods: ["GET", "HEAD", "OPTIONS"],
+    getTokenFromState: (req) => req.session.csrfToken,
+    storeTokenInState: (req, token) => {
+        req.session.csrfToken = token;
+    },
+    size: 128  // Token size in bits
+});
+```
+
+**Token Generation Endpoint:**
+
+```javascript
+// GET /api/auth/csrf
+{
+    "success": true,
+    "csrfToken": "abc123..."  // 128-bit token
+}
+```
+
+**Client Integration:**
+
+**Step 1**: Get CSRF token before state-changing requests:
+
+```javascript
+const response = await fetch("/api/auth/csrf");
+const { csrfToken } = await response.json();
+```
+
+**Step 2**: Include token in subsequent requests:
+
+```javascript
+// Option 1: HTTP Header (recommended)
+await fetch("/api/vulnerabilities", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": csrfToken
+    },
+    body: JSON.stringify(data)
+});
+
+// Option 2: Request body
+await fetch("/api/vulnerabilities", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ...data, _csrf: csrfToken })
+});
+
+// Option 3: Query parameter
+await fetch(`/api/vulnerabilities?_csrf=${csrfToken}`, {
+    method: "POST",
+    body: JSON.stringify(data)
+});
+```
+
+**Exempted Endpoints** (no CSRF token required):
+
+- `POST /api/auth/login` - Initial login (token retrieved after)
+- `GET /api/auth/csrf` - Token generation endpoint
+- `GET /api/auth/status` - Status check
+
+**All other POST/PUT/DELETE requests require valid CSRF token.**
+
+---
+
+## Trust Proxy Configuration {#trust-proxy}
+
+**Setting:** `app.set("trust proxy", true)`
+**Location:** `app/public/server.js` (line 73)
+**Since:** v1.0.46 (HEX-128 Fix)
+
+**Critical Importance**: HexTrackr **ALWAYS** runs behind nginx reverse proxy. Trust proxy is **ALWAYS** enabled.
+
+**Why This Matters:**
+
+1. **HTTPS Detection**:
+   - nginx terminates SSL/TLS on port 443
+   - nginx forwards HTTP to Express on port 8080
+   - nginx sets `X-Forwarded-Proto: https` header
+   - Express needs `trust proxy: true` to read this header
+   - Without this, Express thinks connection is HTTP → secure cookies fail
+
+2. **Session Security** (HEX-128):
+   - Session cookies have `secure: true` flag (HTTPS only)
+   - If Express doesn't detect HTTPS, cookies aren't set
+   - User appears logged in (frontend) but session doesn't work (backend)
+   - **Result**: Silent authentication failure
+
+3. **Rate Limiting**:
+   - Rate limiting needs real client IP (not nginx IP)
+   - nginx sets `X-Forwarded-For` header with client IP
+   - Express needs `trust proxy: true` to read this header
+   - Without this, all requests appear from nginx's IP → rate limit breaks
+
+**Network Flow:**
+
+```text
+Client (192.168.1.100)
+    ↓ HTTPS (443)
+nginx (reverse proxy)
+    ↓ Sets headers:
+    ↓   X-Forwarded-Proto: https
+    ↓   X-Forwarded-For: 192.168.1.100
+    ↓ HTTP (8080)
+Express (with trust proxy: true)
+    ↓ Reads headers
+    ↓ req.protocol = "https"
+    ↓ req.ip = "192.168.1.100"
+Session cookies work ✅
+Rate limiting works ✅
+```
+
+**Related Settings:**
+
+```javascript
+// Session middleware (app/middleware/auth.js:43)
+proxy: true  // Trust proxy for session security
+
+// Rate limiting (app/middleware/security.js:161)
+trust: () => true  // Trust proxy for IP detection
+```
+
+---
+
+## Security Middleware {#security}
+
+### PathValidator Class
+
+**Location:** `app/middleware/security.js` (lines 36-131)
+**Since:** v1.0.22
+
+Prevents path traversal attacks in file operations.
+
+**Safe File Operation Methods:**
+
+```javascript
+const { PathValidator } = require("../middleware/security");
+
+// Safe file read (throws on path traversal)
+try {
+    const content = PathValidator.safeReadFileSync(userProvidedPath);
+} catch (error) {
+    // error.message: "Path traversal detected" or "Invalid file path"
+}
+
+// Other safe methods:
+PathValidator.safeWriteFileSync(filePath, data, options)
+PathValidator.safeReaddirSync(dirPath, options)
+PathValidator.safeStatSync(filePath)
+PathValidator.safeExistsSync(filePath)
+PathValidator.safeUnlinkSync(filePath)
+```
+
+**Security Features:**
+
+- Checks for `../` and `..\\` patterns
+- Validates all path components
+- Throws errors on path traversal attempts
+- Normalizes paths before operations
+
+### Security Headers Middleware
+
+**Location:** `app/middleware/security.js` (lines 172-185)
+**Applied:** All responses
+
+**Headers Set:**
+
+```javascript
+{
+    "X-Content-Type-Options": "nosniff",      // Prevent MIME sniffing
+    "X-Frame-Options": "DENY",                // Prevent clickjacking
+    "X-XSS-Protection": "1; mode=block"       // Legacy XSS protection
+}
+```
+
+**Note**: HexTrackr does **NOT** use Helmet.js (custom headers instead).
+
+### Rate Limiting
+
+**Location:** `app/middleware/security.js` (lines 152-163)
+**Applied:** `/api/*` routes only
+
+**Configuration:**
+
+```javascript
+{
+    windowMs: 15 * 60 * 1000,  // 15 minutes
+    max: 100,                  // 100 requests per window
+    standardHeaders: true,      // Send rate limit info in headers
+    legacyHeaders: false,
+    trust: () => true          // Trust proxy for client IP
+}
+```
+
+### CORS Middleware
+
+**Location:** `app/middleware/security.js` (lines 138-145)
+**Configuration Source:** `utils/constants.js`
+
+**Settings:**
+
+```javascript
+{
+    origin: CORS_ORIGINS,      // Allowed origins
+    methods: CORS_METHODS,     // Allowed HTTP methods
+    allowedHeaders: CORS_HEADERS,  // Allowed headers
+    credentials: true          // Allow cookies
+}
+```
+
+### Input Validation Middleware
+
+**Location:** `app/middleware/security.js` (lines 282-304)
+
+Validates query parameters for injection attacks.
+
+**Checks:**
+
+- SQL injection patterns: `['";<>]`
+- XSS patterns: `<script|javascript:|vbscript:|onload=|onerror=`
+
+---
+
+## Validation Middleware {#validation}
+
+**Location:** `app/middleware/validation.js`
+
+### Generic Validation Factory
+
+**Function:** `createValidationMiddleware(validatorFn, sourceProperty)`
+**Lines:** 23-53
+
+Creates custom validation middleware for any request property.
+
+**Usage:**
+
+```javascript
+const { createValidationMiddleware } = require("../middleware/validation");
+
+// Create custom validator
+const validateCustomInput = createValidationMiddleware(
+    (data) => {
+        const errors = [];
+        if (!data.field1) errors.push("field1 is required");
+        return { success: errors.length === 0, errors };
+    },
+    "body"  // Validate req.body
+);
+
+// Use in route
+router.post("/custom", validateCustomInput, customController);
+```
+
+### File Upload Middleware
+
+**CSV Upload** (`csvUpload`):
+
+```javascript
+// Lines 63-87
+{
+    destination: "uploads/",
+    fileSize: 100 * 1024 * 1024,  // 100MB
+    allowedTypes: ["text/csv", "application/csv", "text/plain", "application/vnd.ms-excel"],
+    allowedExtensions: [".csv", ".txt"]
+}
+```
+
+**JSON Upload** (`jsonUpload`):
+
+```javascript
+// Lines 92-114
+{
+    destination: "uploads/",
+    fileSize: 100 * 1024 * 1024,  // 100MB
+    allowedTypes: ["application/json", "text/json", "text/plain"],
+    allowedExtensions: [".json"]
+}
+```
+
+### Request Body Validators
+
+- **`validateTicketInput`** (lines 157-160) - Ticket creation/update
+- **`validateVulnerabilityInput`** (lines 165-168) - Vulnerability creation/update
+- **`validateCSVImportData(type)`** (lines 173-219) - CSV import validation
+
+### Query Parameter Validators
+
+- **`validatePaginationParams`** (lines 228-247) - Sanitizes `page` and `limit`
+- **`validateDateRangeParams`** (lines 252-295) - Validates date ranges
+- **`validateSearchQuery`** (lines 414-440) - Sanitizes search queries (200 char max)
+- **`validateFilterParams`** (lines 445-481) - Validates severity/status/vendor filters
+- **`validateVendorParam`** (lines 383-405) - Sanitizes vendor parameter
+
+### ID Parameter Validators
+
+- **`validateNumericId(paramName)`** (lines 304-339) - Validates positive integer IDs
+
+---
+
+## Error Handling Middleware {#error-handling}
+
+**Location:** `app/middleware/errorHandler.js`
+
+### Global Error Handler
+
+**Function:** `globalErrorHandler(err, req, res, next)`
+**Lines:** 14-78
+
+Centralized error handler for all uncaught errors.
 
 **Features:**
 
-- **Morgan Integration**: HTTP request logging
-- **Custom Formatters**: Structured log output
-- **Performance Metrics**: Response time tracking
-- **Error Logging**: Detailed error capture
-- **Log Rotation**: Automatic file management
+- Error context logging (method, URL, userAgent, timestamp, sessionId)
+- Error type detection (ValidationError, CastError, SQLITE_ errors, path traversal)
+- Environment-aware error details (verbose in development)
+- Prevents double response if headers already sent
+
+**Error Type Mapping:**
+
+```javascript
+ValidationError → 400 Bad Request
+CastError → 400 Bad Request
+SQLITE_CONSTRAINT → 400 Bad Request
+SQLITE_BUSY → 503 Service Unavailable
+SQLITE_CORRUPT → 500 Internal Server Error
+Path traversal → 403 Forbidden
+Custom err.statusCode → Uses provided code
+Default → 500 Internal Server Error
+```
+
+### 404 Handler
+
+**Function:** `notFoundHandler(req, res)`
+**Lines:** 85-108
+
+**Development Mode**: Includes list of available routes for debugging
+
+### Error Formatters
+
+**Database Errors** (`formatDatabaseError`):
+
+```javascript
+// Lines 115-135
+SQLITE_CONSTRAINT → "Database constraint violation"
+SQLITE_BUSY → "Database is busy"
+SQLITE_LOCKED → "Database is locked"
+SQLITE_CORRUPT → "Database corruption detected"
+"no such table" → "Database may need initialization"
+"no such column" → "Database may need migration"
+```
+
+**Validation Errors** (`formatValidationError`):
+- Lines 142-160
+- Supports multiple validation errors, Joi-style errors, single errors
+
+### Specialized Error Handlers
+
+- **`asyncErrorHandler(fn)`** (lines 167-171) - Wrapper for async route handlers
+- **`handleDatabaseError(err, res, operation, context)`** (lines 181-202)
+- **`handleFileError(err, res, operation)`** (lines 211-240)
+- **`handleCSVError(err, res)`** (lines 247-263)
+- **`handleValidationError(message, res, details)`** (lines 271-285)
+
+**Async Error Handler Usage:**
+
+```javascript
+const { asyncErrorHandler } = require("../middleware/errorHandler");
+
+router.get("/async-route", asyncErrorHandler(async (req, res) => {
+    const data = await someAsyncOperation();
+    res.json({ success: true, data });
+    // Errors automatically caught and passed to global error handler
+}));
+```
+
+---
+
+## Logging Middleware {#logging}
+
+**Location:** `app/middleware/logging.js`
+
+### LoggingManager Class
+
+**Lines:** 18-203
+
+Structured logging with environment-aware log levels and performance monitoring.
 
 **Log Levels:**
 
 ```javascript
-// Development
-app.use(morgan('dev'));
-
-// Production with custom format
-app.use(morgan(':method :url :status :response-time ms - :res[content-length]', {
-    stream: logStream,
-    skip: (req, res) => res.statusCode < 400  // Only log errors in production
-}));
+ERROR (0): Always logged
+WARN  (1): Production default
+INFO  (2): Informational
+DEBUG (3): Development default
 ```
 
-**Log Output Format:**
+**Core Methods:**
+
+```javascript
+// Basic logging
+LoggingManager.error(message, data, requestId)
+LoggingManager.warn(message, data, requestId)
+LoggingManager.info(message, data, requestId)
+LoggingManager.debug(message, data, requestId)
+
+// Performance timing
+const timerId = LoggingManager.startTimer("operation", requestId);
+LoggingManager.endTimer(timerId, additionalData);  // Warns if >1000ms
+
+// Database operation logging
+LoggingManager.logDatabaseOperation(operation, query, duration, error, requestId);
+// Warns if duration > 500ms
+
+// Batch progress logging
+LoggingManager.logBatchProgress(operation, current, total, stats, requestId);
+// Logs every 10% or 1000 items
+
+// Import/export logging
+LoggingManager.logImportProgress(phase, stats, requestId);
+LoggingManager.logImportCompletion(operation, finalStats, duration, requestId);
+
+// Memory monitoring
+LoggingManager.logMemoryUsage(operation, requestId);
+
+// Performance summary
+LoggingManager.logPerformanceSummary(operation, stats, requestId);
+```
+
+### Request Logging Middleware
+
+**Function:** `requestLoggingMiddleware(req, res, next)`
+**Lines:** 212-251
+
+**Features:**
+
+- Generates unique requestId (16-char hex)
+- Logs incoming request with IP and User-Agent
+- Logs response with statusCode, duration, contentLength
+- Warns on 4xx/5xx responses or slow requests (>2000ms)
+
+**Log Format:**
 
 ```text
-[2024-01-15 10:30:45] INFO: GET /api/vulnerabilities 200 45ms - 2048
-[2024-01-15 10:30:46] ERROR: POST /api/import 500 1523ms - Error: File too large
+[2025-10-09 15:15:00] INFO [abc123def4567890] GET /api/vulnerabilities 200 45ms 2048 bytes
+[2025-10-09 15:15:01] WARN [fedcba0987654321] POST /api/import 500 1523ms - Error: File too large
 ```
+
+### Error Logging Middleware
+
+**Function:** `errorLoggingMiddleware(err, req, res, next)`
+**Lines:** 257-276
+
+Logs all errors with request context before passing to global error handler.
+
+**Note**: HexTrackr does **NOT** use Morgan (custom LoggingManager instead).
 
 ---
 
 ## Configuration Modules {#configuration}
 
-### Database Configuration
-
-**Location:** `app/config/database.js`
-
-SQLite database initialization and connection management.
-
-**Features:**
-
-- **Connection Pooling**: Efficient connection reuse
-- **Schema Migration**: Automatic database updates
-- **Transaction Support**: ACID compliance
-- **Backup Integration**: Scheduled backup support
-
-**Initialization:**
-
-```javascript
-const dbConfig = require('./config/database');
-
-// Initialize database
-const db = await dbConfig.initialize({
-    path: process.env.DATABASE_PATH || 'data/hextrackr.db',
-    verbose: process.env.NODE_ENV === 'development'
-});
-```
-
-**Schema Management:**
-
-```javascript
-// Automatic schema creation/update
-await dbConfig.runMigrations(db);
-
-// Manual schema operations
-await dbConfig.createTable(db, 'table_name', schema);
-await dbConfig.addIndex(db, 'table_name', 'column_name');
-```
-
 ### Middleware Configuration
 
 **Location:** `app/config/middleware.js`
 
-Central middleware configuration and ordering.
+**Exported Configurations:**
 
-**Middleware Stack (in order):**
-
-1. **Compression**: gzip/deflate for responses
-2. **Body Parsing**: JSON and URL-encoded
-3. **Cookie Parser**: Session management
-4. **Security Headers**: Helmet.js
-5. **CORS**: Cross-origin configuration
-6. **Rate Limiting**: Request throttling
-7. **Logging**: Morgan integration
-8. **Static Files**: Public directory serving
-9. **Session**: Express-session
-10. **Custom Middleware**: Application-specific
-
-**Configuration Example:**
-
-```javascript
-const middlewareConfig = require('./config/middleware');
-
-// Apply all middleware
-middlewareConfig.setupMiddleware(app, {
-    compression: true,
-    bodyLimit: '50mb',
-    sessionSecret: process.env.SESSION_SECRET,
-    corsOrigins: ['http://localhost:8080'],
-    rateLimit: {
-        windowMs: 15 * 60 * 1000,
-        max: 100
-    }
-});
-```
-
-### WebSocket Configuration
-
-**Location:** `app/config/websocket.js`
-
-Socket.io configuration for real-time features.
-
-**Features:**
-
-- **Connection Management**: Auto-reconnection
-- **Room Support**: Channel-based messaging
-- **Authentication**: Session-based auth
-- **Event Namespacing**: Organized event structure
-
-**Setup:**
-
-```javascript
-const websocketConfig = require('./config/websocket');
-
-const io = websocketConfig.initialize(server, {
-    cors: {
-        origin: process.env.ALLOWED_ORIGINS?.split(','),
-        credentials: true
-    }
-});
-
-// Event handlers
-websocketConfig.setupEventHandlers(io);
-```
-
-**Event Structure:**
-
-```javascript
-// Namespaced events
-io.of('/vulnerabilities').on('connection', socket => {
-    socket.on('import-start', data => {...});
-    socket.on('filter-change', data => {...});
-});
-
-io.of('/tickets').on('connection', socket => {
-    socket.on('ticket-update', data => {...});
-    socket.on('device-change', data => {...});
-});
-```
-
-### Server Configuration
-
-**Location:** `app/config/server.js`
-
-Express server setup and initialization.
-
-**Configuration Options:**
-
-```javascript
-{
-    port: process.env.PORT || 8080,
-    host: process.env.HOST || '0.0.0.0',
-    env: process.env.NODE_ENV || 'production',
-    trustProxy: true,
-
-    // Performance
-    compression: {
-        level: 6,
-        threshold: 1024
-    },
-
-    // Security
-    helmet: {
-        contentSecurityPolicy: {
-            directives: {
-                defaultSrc: ["'self'"],
-                scriptSrc: ["'self'", "'unsafe-inline'"],
-                styleSrc: ["'self'", "'unsafe-inline'"],
-                imgSrc: ["'self'", "data:", "https:"]
-            }
-        }
-    },
-
-    // File handling
-    upload: {
-        maxFileSize: 100 * 1024 * 1024,  // 100MB
-        allowedTypes: ['text/csv', 'application/json'],
-        tempDir: 'uploads/temp'
-    }
-}
-```
+1. **`cors`** (lines 31-36) - CORS settings from constants
+2. **`rateLimit`** (lines 42-48) - Rate limiting settings
+3. **`bodyParser`** (lines 54-62) - JSON/URL-encoded parsing (50MB limit)
+4. **`upload`** (lines 68-80) - Multer file upload settings
+5. **`security`** (lines 86-92) - Security headers
+6. **`compression`** (lines 98-104) - Gzip/deflate settings
+7. **`websocket`** (lines 110-116) - Socket.io CORS
 
 ---
 
@@ -253,204 +661,50 @@ Express server setup and initialization.
 
 ### Required Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `PORT` | Server port | `8080` |
-| `HOST` | Bind address | `0.0.0.0` |
-| `DATABASE_PATH` | SQLite file path | `data/hextrackr.db` |
-| `SESSION_SECRET` | Session encryption key | (must be set) |
+| Variable | Description | Validation |
+|----------|-------------|------------|
+| `SESSION_SECRET` | Session encryption key | **REQUIRED**: 32+ characters, server exits if missing |
+| `PORT` | Server port | Default: `8080` |
+| `DATABASE_PATH` | SQLite file path | Default: `app/data/hextrackr.db` |
 
 ### Optional Variables
 
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `NODE_ENV` | Environment mode | `production` |
+| `TRUST_PROXY` | Trust proxy mode | `true` (ALWAYS in code) |
 | `ALLOWED_ORIGINS` | CORS whitelist (comma-separated) | `http://localhost:8080` |
-| `LOG_LEVEL` | Logging verbosity | `info` |
 | `MAX_FILE_SIZE` | Upload size limit | `100MB` |
-| `RATE_LIMIT_WINDOW` | Rate limit window (ms) | `900000` |
+| `RATE_LIMIT_WINDOW` | Rate limit window (ms) | `900000` (15 min) |
 | `RATE_LIMIT_MAX` | Max requests per window | `100` |
-| `ENABLE_COMPRESSION` | Enable gzip | `true` |
-| `ENABLE_WEBSOCKET` | Enable Socket.io | `true` |
-| `BACKUP_DIR` | Backup storage path | `backups` |
-| `UPLOAD_DIR` | Upload storage path | `uploads` |
 
 ---
 
-## Request Pipeline {#pipeline}
+## Session Management Details {#sessions}
 
-### Request Flow
+**Store**: SQLite database (`app/data/sessions.db`)
+**Table**: `sessions` (auto-created)
+**Cleanup**: Every 15 minutes (900000ms)
 
-```text
-Client Request
-    ↓
-[Compression Middleware]
-    ↓
-[Security Headers (Helmet)]
-    ↓
-[CORS Check]
-    ↓
-[Rate Limiting]
-    ↓
-[Request Logging]
-    ↓
-[Body Parsing]
-    ↓
-[Session Management]
-    ↓
-[Authentication Check]
-    ↓
-[Route Handler]
-    ↓
-[Business Logic]
-    ↓
-[Response Formatting]
-    ↓
-[Error Handling]
-    ↓
-Client Response
-```
-
-### Error Handling Pipeline
-
-All errors flow through a centralized error handler:
+**Session Object Structure:**
 
 ```javascript
-app.use((err, req, res, next) => {
-    // Log error
-    logger.error({
-        message: err.message,
-        stack: err.stack,
-        url: req.url,
-        method: req.method,
-        ip: req.ip
-    });
-
-    // Determine status code
-    const status = err.status || 500;
-
-    // Send response
-    res.status(status).json({
-        success: false,
-        error: process.env.NODE_ENV === 'production'
-            ? 'An error occurred'
-            : err.message,
-        requestId: req.id
-    });
-});
-```
-
----
-
-## Multer Configuration {#multer}
-
-### File Upload Settings
-
-**Location:** Configured in middleware setup
-
-**Configuration:**
-
-```javascript
-const multer = require('multer');
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/temp');
-    },
-    filename: (req, file, cb) => {
-        const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
-        cb(null, `${uniqueName}-${file.originalname}`);
-    }
-});
-
-const upload = multer({
-    storage: storage,
-    limits: {
-        fileSize: 100 * 1024 * 1024  // 100MB
-    },
-    fileFilter: (req, file, cb) => {
-        const allowedTypes = ['text/csv', 'application/json'];
-        if (allowedTypes.includes(file.mimetype)) {
-            cb(null, true);
-        } else {
-            cb(new Error('Invalid file type'));
-        }
-    }
-});
-```
-
----
-
-## Session Management {#sessions}
-
-### Express-Session Configuration
-
-**Features:**
-
-- **Memory Store**: Development mode
-- **Redis Store**: Production mode (optional)
-- **Cookie Security**: httpOnly, secure, sameSite
-- **Session Rotation**: Prevents fixation attacks
-
-**Configuration:**
-
-```javascript
-const session = require('express-session');
-
-app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
+{
+    userId: 1,
+    username: "admin",
+    role: "user",
+    csrfToken: "abc123...",  // CSRF token stored in session
     cookie: {
-        secure: process.env.NODE_ENV === 'production',
+        originalMaxAge: 86400000,  // 24 hours (or 30 days if Remember Me)
+        expires: "2025-10-10T15:15:00.000Z",
+        secure: true,
         httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000,  // 24 hours
-        sameSite: 'strict'
-    },
-    name: 'hextrackr.sid'
-}));
-```
-
----
-
-## Performance Optimizations {#performance}
-
-### Compression Settings
-
-```javascript
-const compression = require('compression');
-
-app.use(compression({
-    level: 6,  // Compression level (0-9)
-    threshold: 1024,  // Only compress responses > 1KB
-    filter: (req, res) => {
-        // Don't compress EventSource responses
-        if (res.getHeader('Content-Type') === 'text/event-stream') {
-            return false;
-        }
-        return compression.filter(req, res);
+        sameSite: "lax"
     }
-}));
+}
 ```
 
-### Caching Strategy
-
-**Static Assets:**
-
-```javascript
-app.use(express.static('public', {
-    maxAge: '1d',  // Cache static files for 1 day
-    etag: true,
-    lastModified: true
-}));
-```
-
-**API Responses:**
-
-```javascript
-// Cache vulnerability stats for 5 minutes
-res.set('Cache-Control', 'private, max-age=300');
-```
+**Note**: HexTrackr uses **SQLite session store only**. Redis is NOT supported.
 
 ---
 
@@ -458,35 +712,37 @@ res.set('Cache-Control', 'private, max-age=300');
 
 ### Input Validation
 
-All user input is validated using multiple layers:
+All user input validated using multiple layers:
 
 1. **Type Checking**: Ensure correct data types
 2. **Range Validation**: Check numeric ranges
-3. **Pattern Matching**: Regex for formats (email, URL, etc.)
+3. **Pattern Matching**: Regex for formats (email, URL, CVE)
 4. **Sanitization**: Remove/escape dangerous characters
 5. **Length Limits**: Prevent buffer overflows
-
-### Path Traversal Prevention
-
-```javascript
-const path = require('path');
-const PathValidator = require('../utils/PathValidator');
-
-// Always validate file paths
-const safePath = PathValidator.validatePath(userInput, {
-    basePath: '/allowed/directory',
-    allowSymlinks: false
-});
-```
 
 ### SQL Injection Prevention
 
 All database queries use parameterized statements:
 
 ```javascript
-// Safe query
-db.get('SELECT * FROM users WHERE id = ?', [userId]);
+// ✅ Safe query
+db.get("SELECT * FROM users WHERE id = ?", [userId]);
 
-// Never use string concatenation
-// db.get('SELECT * FROM users WHERE id = ' + userId);  // DANGEROUS!
+// ❌ DANGEROUS - never use string concatenation
+// db.get("SELECT * FROM users WHERE id = " + userId);
 ```
+
+### Path Traversal Prevention
+
+```javascript
+const { PathValidator } = require("../middleware/security");
+
+// ✅ Always validate file paths
+const safePath = PathValidator.validatePath(userInput);
+const content = PathValidator.safeReadFileSync(safePath);
+```
+
+---
+
+**Version**: 1.0.54
+**Last Updated**: 2025-10-09

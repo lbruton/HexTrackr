@@ -1,0 +1,10 @@
+{
+  "familyVendorPatterns": [
+    { "pattern": "cisco", "vendor": "CISCO" },
+    { "pattern": "palo\\s*alto", "vendor": "Palo Alto" }
+  ],
+  "hostnameVendorPatterns": [
+    { "pattern": "nfpan", "vendor": "Palo Alto" },
+    { "pattern": "n[rs]wan", "vendor": "CISCO" }
+  ]
+}

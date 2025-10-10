@@ -1,0 +1,73 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.26</h1><p><strong>Release Date</strong>: 2025-09-23</p>
+<hr>
+<h2>[1.0.26] - 2025-09-23</h2><h3>Fixed - Low Severity Vulnerability Visibility</h3><h4>Critical Bug Resolution</h4><ul>
+<li><strong>Complete Visibility Restored</strong>: Fixed critical issue where 3,314 Low severity vulnerabilities were completely hidden from users<ul>
+<li><strong>Root Cause</strong>: VPR-based sorting combined with 10K frontend limit pushed Low severity items (VPR 1.4-5.1) beyond visible range</li>
+<li><strong>Impact</strong>: Users could not filter, view, or access any Low severity vulnerabilities despite their presence in database</li>
+<li><strong>Severity</strong>: Critical - affected core vulnerability management functionality</li>
+</ul>
+</li>
+</ul>
+<h4>Backend Sorting Optimization</h4><ul>
+<li><p><strong>Severity-Balanced Algorithm</strong>: Implemented intelligent sorting to ensure all severity levels remain visible</p>
+<pre><code class="language-sql"><span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> isKev <span class="hljs-keyword">DESC</span>,
+         <span class="hljs-keyword">CASE</span> severity
+           <span class="hljs-keyword">WHEN</span> <span class="hljs-string">&#x27;Critical&#x27;</span> <span class="hljs-keyword">THEN</span> <span class="hljs-number">1</span>
+           <span class="hljs-keyword">WHEN</span> <span class="hljs-string">&#x27;High&#x27;</span> <span class="hljs-keyword">THEN</span> <span class="hljs-number">2</span>
+           <span class="hljs-keyword">WHEN</span> <span class="hljs-string">&#x27;Medium&#x27;</span> <span class="hljs-keyword">THEN</span> <span class="hljs-number">3</span>
+           <span class="hljs-keyword">WHEN</span> <span class="hljs-string">&#x27;Low&#x27;</span> <span class="hljs-keyword">THEN</span> <span class="hljs-number">4</span>
+         <span class="hljs-keyword">END</span> <span class="hljs-keyword">ASC</span>,
+         vpr_score <span class="hljs-keyword">DESC</span>,
+         last_seen <span class="hljs-keyword">DESC</span></code></pre><ul>
+<li><strong>KEV Priority Maintained</strong>: Known Exploited Vulnerabilities still appear first</li>
+<li><strong>VPR Sorting Preserved</strong>: Within each severity level, VPR scores determine order</li>
+<li><strong>Distribution Guarantee</strong>: All severity levels now appear in first 10K-30K results</li>
+</ul>
+</li>
+</ul>
+<h4>Frontend Performance Optimization</h4><ul>
+<li><p><strong>Async Processing Implementation</strong>: Resolved UI freezing when loading large vulnerability datasets</p>
+<ul>
+<li><strong>Chunked Processing</strong>: 24,660 vulnerabilities processed in 1000-item chunks using <code>requestIdleCallback()</code></li>
+<li><strong>Non-Blocking UI</strong>: Browser remains responsive during data processing</li>
+<li><strong>Progress Feedback</strong>: Real-time loading indicators (&quot;Processing vulnerabilities... 5000/24660&quot;)</li>
+<li><strong>Fallback Support</strong>: <code>setTimeout()</code> fallback for browsers without <code>requestIdleCallback()</code></li>
+</ul>
+</li>
+<li><p><strong>Data Capacity Increase</strong>: Frontend limit increased from 10K to 30K to accommodate all vulnerabilities</p>
+<ul>
+<li><strong>Complete Dataset</strong>: All 24,660 current vulnerabilities now loaded for comprehensive filtering</li>
+<li><strong>Compressed Transfer</strong>: GZIP compression maintains efficient 614KB payload (vs 21MB uncompressed)</li>
+<li><strong>Completeness Monitoring</strong>: Added automatic warnings when approaching 90% of data limits</li>
+</ul>
+</li>
+</ul>
+<h4>Technical Performance Metrics</h4><ul>
+<li><strong>Network Efficiency</strong>: 614KB compressed transfer with 97% compression ratio</li>
+<li><strong>Processing Speed</strong>: 1000 items per chunk with idle callback scheduling</li>
+<li><strong>UI Responsiveness</strong>: Sub-2-second load times maintained with progress feedback</li>
+<li><strong>Memory Management</strong>: Incremental processing prevents browser memory spikes</li>
+<li><strong>Data Integrity</strong>: All 3,314 Low severity items now accessible through filtering</li>
+</ul>
+<h4>User Experience Improvements (2)</h4><ul>
+<li><strong>Filtering Functionality</strong>: Low severity filter now returns all 3,314 items (previously 0)</li>
+<li><strong>Complete Visibility</strong>: Users can access full vulnerability dataset across all severity levels</li>
+<li><strong>Loading Feedback</strong>: Progressive loading messages prevent perceived application freezing</li>
+<li><strong>Responsive Interface</strong>: UI remains interactive during background data processing</li>
+</ul>
+<h3>Technical Implementation (3)</h3><ul>
+<li><strong>Files Modified</strong>:<ul>
+<li><code>vulnerabilityService.js</code>: Backend sorting algorithm</li>
+<li><code>vulnerability-data.js</code>: Async processing with chunking and progress events</li>
+</ul>
+</li>
+<li><strong>Commits</strong>: <code>e0538ec</code> (backend sorting), <code>2faa0cb</code> (async processing)</li>
+<li><strong>Performance Strategy</strong>: Balanced approach maintaining filtering capability while optimizing browser performance</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

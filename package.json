@@ -1,6 +1,6 @@
 {
   "name": "hextrackr-server",
-  "version": "1.0.50",
+  "version": "1.0.59",
   "description": "HexTrackr with database backend",
   "main": "app/public/server.js",
   "type": "commonjs",
@@ -17,6 +17,7 @@
     "docs:dev": "jsdoc -c jsdoc.dev.json && bash app/scripts/inject-jsdoc-theme-wrapper.sh",
     "docs:dev:watch": "nodemon --watch app --ext js --exec 'npm run docs:dev'",
     "docs:all": "npm run docs:dev && npm run docs:generate",
+    "release": "node app/public/docs-html/html-content-updater.js",
     "lint:md": "markdownlint --config .markdownlint.json --ignore-path .markdownlintignore '**/*.md'",
     "lint:md:fix": "node app/public/scripts/fix-markdown.js",
     "lint:all": "npm run lint:md && npm run eslint && npm run stylelint",
