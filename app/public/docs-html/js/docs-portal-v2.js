@@ -81,6 +81,7 @@ class DocumentationPortalV2 {
         await this.loadNavigationStructure();
         this.renderNavigation();
         this.setupEventListeners();
+        this.setupThemeListener();
 
         // Check if navigation is from external page (tickets/vulnerabilities)
         const isExternalNavigation = this.isExternalNavigation();
@@ -899,6 +900,90 @@ class DocumentationPortalV2 {
                 e.preventDefault();
                 this.openSearch();
             }
+        });
+    }
+
+    /**
+     * Setup theme change listener to refresh Mermaid diagrams
+     * Fixes issue where Mermaid diagrams don't update when toggling theme
+     */
+    setupThemeListener() {
+        // Wait for theme controller to be available
+        if (window.themeController) {
+            window.themeController.addThemeChangeListener((newTheme) => {
+                console.log(`🎨 Theme changed to '${newTheme}', refreshing Mermaid diagrams`);
+                this.refreshMermaidDiagrams();
+            });
+        } else {
+            // Retry after a short delay if theme controller isn't ready yet
+            setTimeout(() => this.setupThemeListener(), 100);
+        }
+    }
+
+    /**
+     * Refresh all Mermaid diagrams with current theme
+     * Re-initializes Mermaid with new theme and re-renders all diagrams
+     */
+    refreshMermaidDiagrams() {
+        if (!window.mermaid) {
+            return; // Mermaid not loaded
+        }
+
+        const contentArea = document.getElementById("contentArea");
+        if (!contentArea) {
+            return;
+        }
+
+        // Find all existing mermaid diagram containers
+        const mermaidElements = contentArea.querySelectorAll(".mermaid");
+        if (mermaidElements.length === 0) {
+            return; // No diagrams to refresh
+        }
+
+        // Get current theme
+        const isDarkMode = document.documentElement.getAttribute("data-bs-theme") === "dark";
+
+        // Reinitialize Mermaid with new theme
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: isDarkMode ? "dark" : "default",
+            themeVariables: {
+                primaryColor: "#206bc4",
+                primaryTextColor: isDarkMode ? "#e2e8f0" : "#212529",
+                primaryBorderColor: "#206bc4",
+                lineColor: isDarkMode ? "#475569" : "#dee2e6",
+                secondaryColor: isDarkMode ? "#2a3f54" : "#f8f9fa",
+                tertiaryColor: isDarkMode ? "#1e293b" : "#ffffff",
+                background: isDarkMode ? "#1e293b" : "#ffffff",
+                mainBkg: isDarkMode ? "#2a3f54" : "#f8f9fa",
+                secondBkg: isDarkMode ? "#1e293b" : "#ffffff",
+                darkMode: isDarkMode
+            }
+        });
+
+        // For each diagram, store original code, remove rendered SVG, restore code, and re-render
+        mermaidElements.forEach((element, index) => {
+            // Get the original mermaid code (it's stored as data-processed-code after first render)
+            let originalCode = element.getAttribute("data-processed-code");
+
+            if (!originalCode) {
+                // If this is the first render, get the text content
+                originalCode = element.textContent;
+                element.setAttribute("data-processed-code", originalCode);
+            }
+
+            // Clear the element
+            element.innerHTML = originalCode;
+
+            // Remove the data-processed attribute so Mermaid will re-render it
+            element.removeAttribute("data-processed");
+        });
+
+        // Re-render all diagrams
+        mermaid.run({ nodes: Array.from(mermaidElements) }).then(() => {
+            console.log(`✅ Refreshed ${mermaidElements.length} Mermaid diagram(s) with ${isDarkMode ? "dark" : "light"} theme`);
+        }).catch((error) => {
+            console.error("Error refreshing Mermaid diagrams:", error);
         });
     }
 
