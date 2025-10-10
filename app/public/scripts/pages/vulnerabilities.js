@@ -66,8 +66,8 @@ export class ModernVulnManager {
         return this.coreOrchestrator.switchView(view);
     }
 
-    async loadData() {
-        return this.coreOrchestrator.loadData();
+    async loadData(bustCache = false, options = {}) {
+        return this.coreOrchestrator.loadData(bustCache, options);
     }
 
     viewDeviceDetails(hostname) {
@@ -113,6 +113,9 @@ export class ModernVulnManager {
 
 // Page-specific refresh function for Settings modal and Progress modal integration
 window.refreshPageData = function(type, bustCache = false) {
+    if (type === "vulnerabilities" && bustCache === false) {
+        bustCache = true;
+    }
     if (type === "vulnerabilities" && window.modernVulnManager) {
         console.log("Refreshing vulnerability data after import completion");
         window.modernVulnManager.loadData(bustCache);
@@ -126,23 +129,114 @@ document.addEventListener("DOMContentLoaded", () => {
     window.vulnManager = window.modernVulnManager;
 });
 
+/**
+ * Get currently selected vendor from radio buttons
+ * @returns {string} Current vendor ("", "CISCO", "Palo Alto", or "Other")
+ */
+function getCurrentVendor() {
+    const checkedRadio = document.querySelector("input[name=\"vendor-filter\"]:checked");
+    if (!checkedRadio) {return "";} // Default to "All Vendors"
+
+    const label = document.querySelector(`label[for="${checkedRadio.id}"]`);
+    return label ? (label.dataset.vendor || "") : "";
+}
+
 // Add event listener for chart metric toggle
 document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll("input[name=\"chart-metric\"]").forEach(radio => {
         radio.addEventListener("change", () => {
             if (window.modernVulnManager && window.modernVulnManager.chartManager) {
-                window.modernVulnManager.chartManager.update();
+                // Get current vendor selection and pass it to chart update
+                const vendor = getCurrentVendor();
+                window.modernVulnManager.chartManager.update(false, vendor);
             }
         });
     });
+});
+
+/**
+ * Setup vendor toggle event listeners
+ * Updates dashboard stats cards and chart when vendor filter changes
+ * Also syncs with vendor dropdown in search area
+ */
+function setupVendorToggle() {
+    const vendorRadios = document.querySelectorAll("input[name=\"vendor-filter\"]");
+    const vendorDropdown = document.getElementById("vendorFilter");
+
+    vendorRadios.forEach(radio => {
+        radio.addEventListener("change", async (e) => {
+            if (!e.target.checked) {return;}
+
+            const label = document.querySelector(`label[for="${e.target.id}"]`);
+            const vendor = label.dataset.vendor; // "" = All, "CISCO", "Palo Alto", "Other"
+
+            console.log(`Vendor filter changed to: ${vendor || "All Vendors"}`);
+
+            try {
+                // Sync dropdown to match radio button (prevent infinite loop by checking current value)
+                if (vendorDropdown && vendorDropdown.value !== vendor) {
+                    vendorDropdown.value = vendor;
+                    // Trigger change event on dropdown to update table/cards filtering
+                    vendorDropdown.dispatchEvent(new Event("change"));
+                }
+
+                // Update stats cards
+                await window.modernVulnManager.statisticsManager.updateStatisticsDisplay(vendor);
+
+                // Update chart
+                await window.modernVulnManager.chartManager.update(false, vendor);
+
+            } catch (error) {
+                console.error("Failed to update vendor filter:", error);
+                // Error handling enhancement (loading states, toast) comes in Task 3.2
+            }
+        });
+    });
+}
+
+/**
+ * Setup vendor dropdown sync with radio buttons
+ * When dropdown changes, update radio buttons to match
+ */
+function setupVendorDropdownSync() {
+    const vendorDropdown = document.getElementById("vendorFilter");
+    const vendorRadios = document.querySelectorAll("input[name=\"vendor-filter\"]");
+
+    if (!vendorDropdown) {return;}
+
+    vendorDropdown.addEventListener("change", async (e) => {
+        const selectedVendor = e.target.value; // "" = All, "CISCO", "Palo Alto", "Other"
+
+        // Find matching radio button and check it
+        vendorRadios.forEach(radio => {
+            const label = document.querySelector(`label[for="${radio.id}"]`);
+            const radioVendor = label.dataset.vendor;
+
+            if (radioVendor === selectedVendor) {
+                // Only trigger change if not already checked (prevents infinite loop)
+                if (!radio.checked) {
+                    radio.checked = true;
+                    // Trigger change event to update stats/charts
+                    radio.dispatchEvent(new Event("change"));
+                }
+            }
+        });
+    });
+}
+
+// Wire up vendor toggle and dropdown sync on page load
+document.addEventListener("DOMContentLoaded", () => {
+    setupVendorToggle();
+    setupVendorDropdownSync();
 });
 
 // Handle browser back/forward cache (bfcache) restoration
 // When users navigate back, browsers may restore from cache without firing DOMContentLoaded
 window.addEventListener("pageshow", (event) => {
     if (event.persisted && window.modernVulnManager && window.modernVulnManager.chartManager) {
-        // Page was restored from bfcache, reload charts
+        // Page was restored from bfcache, reload charts with current vendor selection
         console.log("Page restored from bfcache, reloading charts");
-        window.modernVulnManager.chartManager.update();
+        const vendor = getCurrentVendor();
+        window.modernVulnManager.chartManager.update(false, vendor);
     }
 });

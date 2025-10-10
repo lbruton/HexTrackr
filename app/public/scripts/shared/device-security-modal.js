@@ -167,6 +167,7 @@ class DeviceSecurityModal {
             {
                 headerName: "First Seen",
                 field: "first_seen",
+                colId: "first_seen",
                 width: 120,
                 cellRenderer: (params) => {
                     return params.value ? new Date(params.value).toLocaleDateString() : "N/A";
@@ -175,6 +176,7 @@ class DeviceSecurityModal {
             {
                 headerName: "Last Seen",
                 field: "last_seen",
+                colId: "last_seen",
                 width: 120,
                 cellRenderer: (params) => {
                     if (params.value && params.value.trim() !== "") {
@@ -186,19 +188,17 @@ class DeviceSecurityModal {
                 }
             },
             {
-                headerName: "VPR",
-                field: "vpr_score",
-                width: 80,
-                cellRenderer: (params) => {
-                    const score = params.value || 0;
-                    const severityClass = this.getVprSeverityClass(score);
-                    return `<span class="severity-badge severity-${severityClass}">${score.toFixed(1)}</span>`;
-                }
-            },
-            {
                 headerName: "Severity",
                 field: "severity",
-                width: 100,
+                colId: "severity",
+                width: 110,
+                comparator: (valueA, valueB) => {
+                    // Custom sort: Critical > High > Medium > Low
+                    const severityOrder = { "Critical": 4, "High": 3, "Medium": 2, "Low": 1 };
+                    const orderA = severityOrder[valueA] || 0;
+                    const orderB = severityOrder[valueB] || 0;
+                    return orderB - orderA; // Descending order (highest first)
+                },
                 cellRenderer: (params) => {
                     const severity = params.value || "Low";
                     const className = `severity-${severity.toLowerCase()}`;
@@ -206,8 +206,41 @@ class DeviceSecurityModal {
                 }
             },
             {
+                headerName: "VPR",
+                field: "vpr_score",
+                colId: "vpr_score",
+                width: 90,
+                cellRenderer: (params) => {
+                    const score = params.value || 0;
+                    const severityClass = this.getVprSeverityClass(score);
+                    return `<span class="severity-badge severity-${severityClass}">${score.toFixed(1)}</span>`;
+                }
+            },
+            {
+                headerName: "KEV",
+                field: "isKev",
+                colId: "isKev",
+                width: 110,
+                comparator: (valueA, valueB) => {
+                    // Custom sort: Yes > No (KEVs first when descending)
+                    const kevOrder = { "Yes": 1, "No": 0 };
+                    return (kevOrder[valueA] || 0) - (kevOrder[valueB] || 0);
+                },
+                cellRenderer: (params) => {
+                    const kevStatus = params.value || "No";
+                    if (kevStatus === "Yes") {
+                        return "<span class=\"badge bg-danger\" style=\"cursor: pointer;\" title=\"Known Exploited Vulnerability\" onclick=\"showKevDetails('" + (params.data.cve || "") + "')\">YES</span>";
+                    }
+                    return "<span class=\"badge bg-primary\">NO</span>";
+                },
+                cellStyle: {
+                    textAlign: "center"
+                }
+            },
+            {
                 headerName: "Vulnerability",
                 field: "cve",
+                colId: "cve",
                 width: 140,
                 cellRenderer: (params) => {
                     const cve = params.value;
@@ -242,7 +275,8 @@ class DeviceSecurityModal {
             },
             { 
                 headerName: "Vulnerability Description", 
-                field: "plugin_name", 
+                field: "plugin_name",
+                colId: "plugin_name",
                 flex: 1,
                 cellRenderer: (params) => {
                     const value = params.value || "-";
@@ -274,12 +308,23 @@ class DeviceSecurityModal {
             defaultColDef: {
                 resizable: true,
                 sortable: true,
-                filter: true
+                filter: true,
+                wrapHeaderText: false,
+                autoHeaderHeight: false
             },
             pagination: true,
             paginationPageSize: 25,
             paginationPageSizeSelector: false, // Remove page size dropdown for fixed-height modal
             animateRows: true,
+            // Default sort: Last Seen descending (most recent first)
+            // AG-Grid will handle secondary sorting naturally
+            initialState: {
+                sort: {
+                    sortModel: [
+                        { colId: "last_seen", sort: "desc" }
+                    ]
+                }
+            },
             onGridReady: (params) => {
                 this.deviceGridApi = params.api;
 

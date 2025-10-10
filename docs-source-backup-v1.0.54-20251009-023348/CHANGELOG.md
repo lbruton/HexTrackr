@@ -5,6 +5,268 @@ All notable changes to HexTrackr will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.54]
+
+### Added
+
+#### Vendor CSV Export Enhancements (HEX-148/149/150) - 2025-10-09
+
+**Enhancement 1: Side-by-Side Vulnerability Count Tables**
+
+Extended the vendor breakdown CSV export (originally added in v1.0.53) to include vulnerability COUNT tables alongside VPR tables for comprehensive weekly reporting.
+
+**CSV Structure** (Enhanced):
+- VPR tables on the left (risk priority metrics)
+- COUNT tables on the right (workload volume metrics)
+- 2-cell spacing between table pairs for clean spreadsheet formatting
+- Four vendor breakdowns: Overall, CISCO, Palo Alto, Other
+
+Each table pair includes both VPR and Count metrics with:
+- PREV WEEK: Historical values (calculated from backend trends API)
+- THIS WEEK: Current period totals by severity
+- CHANGE: Difference between periods
+- TOTAL: Row sum across all severity levels
+
+**Data Source**: Backend API integration via `/api/vulnerabilities/trends?vendor=X` for vendor-specific percentage changes and historical data (replaces DOM scraping for improved accuracy).
+
+**Use Case**: Weekly supervisor meetings requiring both risk assessment (VPR) and resource planning (counts) in a single export.
+
+**Files Modified**:
+- `app/public/scripts/shared/vulnerability-statistics.js`: Added count aggregation, backend API integration, side-by-side table formatting
+
+**Enhancement 2: Vendor Filter UI Synchronization**
+
+Implemented bidirectional synchronization between vendor radio buttons (dashboard stats/charts) and vendor dropdown (search/filter area) to maintain consistent UI state.
+
+**Behavior**:
+- Radio button selection → updates dropdown → filters table/cards → updates stats/charts
+- Dropdown selection → updates radio button → triggers stats/chart refresh → filters data views
+- Infinite loop protection via value checking before event triggering
+- Seamless user experience with single source of truth for vendor filter state
+
+**Technical Implementation**:
+- `setupVendorToggle()`: Radio button listeners with dropdown sync
+- `setupVendorDropdownSync()`: Dropdown listeners with radio button sync
+- Event dispatching with loop prevention (`value !== newValue` check)
+
+**Use Case**: Eliminates user confusion from desynchronized filter controls, ensures stats/charts always match filtered data views.
+
+**Files Modified**:
+- `app/public/scripts/pages/vulnerabilities.js`: Dual event listeners with bidirectional sync logic
+
+**Enhancement 3: KEV Table Cleanup**
+
+Removed KEV summary table from CSV export based on user feedback indicating column structure mismatch with reporting needs.
+
+**Rationale**:
+- KEV columns (vulnerability name, vendor/project, date added, due date, ransomware flag) didn't align with existing reporting workflow
+- Deferred to future feature with dedicated table/card view and similar keyboard shortcut pattern
+- Keeps CSV export focused on VPR and Count metrics for current use case
+
+**Result**: Clean CSV formatting without KEV interference, focused on vendor breakdown metrics.
+
+**Files Modified**:
+- `app/public/scripts/shared/vulnerability-statistics.js`: Removed KEV data fetching and table generation code
+
+**Validation**:
+- ✅ Side-by-side VPR and Count tables export successfully
+- ✅ Vendor filter sync works bidirectionally (tested on dev.hextrackr.com)
+- ✅ No infinite loops or desync issues
+- ✅ Arithmetic validation passes (vendor subtables sum to overall totals)
+- ✅ Clean CSV formatting without KEV table interference
+
+**Issues**:
+- [HEX-148](https://linear.app/hextrackr/issue/HEX-148) - RESEARCH: Vendor Breakdown Enhancements
+- [HEX-149](https://linear.app/hextrackr/issue/HEX-149) - PLAN: Vendor Breakdown Enhancements
+- [HEX-150](https://linear.app/hextrackr/issue/HEX-150) - IMPLEMENT: Vendor Breakdown Enhancements
+
+---
+
+- Introduced `config/import.config.json`, allowing hostname and vendor-family rules to be configured outside the codebase for CSV imports (e.g., mapping `nfpan` to Palo Alto or `n[rs]wan` to Cisco) so each environment can extend device classification without code changes.
+
+### Fixed
+
+- Resolved a race condition in `vulnerability-details-modal.js` that was clearing modal operations during KEV lookups, restoring the CVE handoff used by the Known Exploited Vulnerability modal.
+- Simplified the KEV modal in `vulnerabilities.html` by removing redundant "View CVE Details", "NIST NVD", and footer Close buttons to prevent stacked Bootstrap backdrops and duplicated entry points.
+- Enforced no-wrap styling on AG Grid headers to keep short labels (e.g., KEV) on a single line without expanding the table layout.
+- Added configurable vendor override support (`config/import.config.json`) so hostname/family patterns like `nfpan` or `n[rs]wan` classify Palo Alto and Cisco devices correctly during CSV imports (server + client).
+- Reduced all API cache TTLs to 90 seconds and ensured explicit cache-bust flags (`_t`, `bustCache=true`) create bypass responses across stats, trends, vulnerabilities, and device endpoints.
+- Clearing vulnerability data now invalidates server caches and wipes front-end session caches immediately, keeping dashboards in sync after destructive operations.
+- CSV import UX now polls progress when WebSockets are unavailable, automatically clears stale sessionStorage metadata, and forces a cache-busting refresh when the progress modal completes.
+- Manual refresh button on the Vulnerabilities page and Settings modal clear actions now trigger full cache-busting reloads, eliminating multi-minute staleness after imports or data wipes.
+
+## [1.0.53] - 2025-10-08
+
+### Added
+
+#### Vendor Breakdown CSV Export (HEX-148/149/150)
+
+**Feature**: Extended VPR weekly summary CSV export to include vendor-specific breakdown tables for supervisor meeting presentations.
+
+**Usage**: Cmd+Shift+Click (Mac) or Ctrl+Shift+Click (Windows) on any VPR summary card (same keyboard shortcut as HEX-144).
+
+**CSV Structure**:
+1. **Overall VPR Totals**: All devices (preserves existing HEX-144 format)
+2. **CISCO Devices**: Vulnerabilities on CISCO-classified devices only
+3. **Palo Alto Devices**: Vulnerabilities on Palo Alto-classified devices only
+4. **Other Devices**: Remaining vulnerabilities (unmatched or alternative vendors)
+
+Each table includes:
+- **PREV WEEK**: Previous period VPR totals (calculated from percentage change badges)
+- **THIS WEEK**: Current period VPR totals by severity (Critical, High, Medium, Low)
+- **CHANGE**: Difference between current and previous periods
+- **TOTAL**: Row sum across all severity levels
+
+**Filename**: `vpr-vendor-breakdown-YYYY-MM-DD.csv`
+
+**Validation**: Subtable totals (CISCO + Palo Alto + Other) sum to Overall totals across all severities.
+
+**Use Case**: Weekly supervisor meetings requiring vendor-specific vulnerability metrics for presentation materials. Export CSV, copy vendor-specific tables into slide deck.
+
+**Implementation Highlights**:
+- **Critical Bug Fix**: Implemented deduplication logic to prevent over-counting VPR scores when same CVE appears on multiple devices
+- **Deduplication Strategy**: Uses composite key `severity|hostname|plugin_id` with MAX(vpr_score) aggregation matching backend stats API
+- **Impact**: Fixed potential 15.7x inflation in vendor totals (e.g., CISCO would have shown 88,408.6 instead of correct 5,630.2)
+- **Vendor Classification**: Uses pre-normalized `vendor` field from CSV import (helpers.js:normalizeVendor)
+- **Data Access**: `this.dataManager.vulnerabilities` (in-memory dataset)
+- **Performance**: O(n) aggregation with Map-based deduplication over vulnerability dataset
+
+**Files Modified**:
+- `app/public/scripts/shared/vulnerability-statistics.js`: Added `_aggregateVprByVendor()`, `_formatVendorTable()`, extended `exportVprWeeklySummary()`, enhanced `downloadCSV()` to support string-based CSV content
+
+**Issues**:
+- [HEX-148](https://linear.app/hextrackr/issue/HEX-148) - RESEARCH: Vendor Breakdown CSV Export
+- [HEX-149](https://linear.app/hextrackr/issue/HEX-149) - PLAN: Add Vendor Breakdown to CSV Export
+- [HEX-150](https://linear.app/hextrackr/issue/HEX-150) - IMPLEMENT: Vendor Breakdown CSV Export
+
+## [1.0.52] - 2025-10-07
+
+### Added
+
+#### Hidden Keyboard Shortcut: VPR Weekly Summary CSV Export (HEX-144)
+
+**Feature**: Power user feature for instant CSV export of weekly VPR totals via keyboard shortcut.
+
+**Usage**: Cmd+Shift+Click (Mac) or Ctrl+Shift+Click (Windows) on any of the 4 VPR summary cards (Critical, High, Medium, Low)
+
+**CSV Format**:
+- **Columns**: PERIOD, CRITICAL, HIGH, MEDIUM, LOW, TOTAL
+- **Rows**: PREV WEEK, THIS WEEK, CHANGE
+- **Filename**: `vpr-weekly-summary-YYYY-MM-DD.csv`
+- **Excel Compatible**: UTF-8 BOM encoding for proper character display
+
+**Security**:
+- Authentication required - feature only available to logged-in users
+- Early return with console warning if unauthenticated
+
+**Implementation Details**:
+- Extracts current VPR values from displayed stat cards
+- Reverse-calculates previous week values from percentage change badges
+- Formula: `prevWeek = thisWeek / (1 + percentChange/100)`
+- Automatically calculates TOTAL column across all severity levels
+- Prevents card flip behavior when export modifiers are active
+
+**Files Modified**:
+- `app/public/scripts/shared/vulnerability-statistics.js`: Added `setupVprExportShortcut()`, `exportVprWeeklySummary()`, `_handleCardClick()`, and `downloadCSV()` methods
+
+**Use Case**: Security managers can quickly export weekly VPR summaries for Slack/Teams communications and email reports without manual transcription.
+
+**Issue**: [HEX-144](https://linear.app/hextrackr/issue/HEX-144)
+
+### Changed
+
+#### Extended VPR Trends Chart Timeline (HEX-142)
+
+**Feature**: Expanded Historical VPR Trends chart from 14-day to 30-day view for better long-term trend analysis.
+
+**Changes**:
+- Updated chart default zoom to display 30 days of vulnerability trend data
+- Modified chart header text: "Last 14 Days" → "Last 30 Days"
+- No backend changes required - API already serves unlimited historical data
+
+**Files Modified**:
+- `app/public/scripts/shared/vulnerability-chart-manager.js`: Updated `zoomToRecentData()` default parameter and call site
+- `app/public/vulnerabilities.html`: Updated chart header text
+
+**Technical Notes**:
+- Backend `/api/vulnerabilities/trends` endpoint already supports flexible date ranges
+- Chart zoom was the only constraint limiting visibility to 14 days
+- Full historical dataset now visible by default while maintaining responsive performance
+
+**Issue**: [HEX-142](https://linear.app/hextrackr/issue/HEX-142)
+
+## [1.0.51] - 2025-10-06
+
+### Added
+
+#### Browser Storage → Database Migration (HEX-138)
+
+**Feature**: Hybrid caching architecture combining localStorage (fast synchronous cache) with database-backed persistence for cross-device preferences sync.
+
+**Architecture**:
+- **localStorage**: Remains the fast synchronous cache for immediate UI responsiveness
+- **Database**: Provides persistent storage with cross-device synchronization
+- **Sync Bridge**: `preferences-sync.js` bidirectionally syncs between cache and database
+- **Security**: Sensitive credentials (Cisco API keys) bypass localStorage entirely
+
+**Implementation Phases**:
+
+**Phase 1 - Backend Foundation**:
+- Created `user_preferences` table with foreign key to users table
+- Implemented `preferences-service.js` backend with CRUD operations
+- Added `/api/preferences` endpoints (GET, POST for single/bulk operations)
+- Migration file: `006-user-preferences.sql`
+
+**Phase 2 - Frontend Service**:
+- Created `preferences-service.js` frontend client with fetch API calls
+- Implemented CSRF-protected API communication
+- Added error handling and fallback to localStorage-only mode
+
+**Phase 3 - Preference Migration (6 Tasks)**:
+1. **Theme Preferences**: Dark/light mode synced across all pages
+2. **Markdown Templates**: Ticket and vulnerability templates (persistent editing)
+3. **Pagination Settings**: Enable/disable pagination preference
+4. **Global Settings**: Skipped (incomplete legacy feature)
+5. **KEV Auto-Refresh**: CISA KEV sync preference with debounced updates
+6. **Cisco Credentials** (SECURITY PRIORITY): Client ID + Client Secret stored database-only
+
+**Phase 4 - Testing & Documentation**:
+- Verified theme sync across login, docs portal, and main app pages
+- Confirmed cross-device persistence via database storage
+- Validated security: Cisco credentials never touch localStorage
+
+**Sync Mechanism**:
+- Debounced writes (1-second delay) to prevent API rate limiting
+- Immediate sync for security-critical data (credentials)
+- Auto-load preferences from database on app initialization
+- Fallback to localStorage-only mode if database unavailable
+
+**Files Added/Modified**:
+- `app/public/scripts/init-database.js` - Added user_preferences table
+- `app/services/preferences-service.js` - Backend service layer (NEW)
+- `app/routes/preferences.js` - API endpoints (NEW)
+- `app/public/scripts/shared/preferences-service.js` - Frontend client (NEW)
+- `app/public/scripts/shared/preferences-sync.js` - Sync bridge (NEW)
+- `app/public/scripts/shared/settings-modal.js` - Enhanced with Cisco credential handling
+
+**Database Schema**:
+```sql
+CREATE TABLE user_preferences (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id TEXT NOT NULL,
+  preference_key TEXT NOT NULL,
+  preference_value TEXT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  UNIQUE(user_id, preference_key)
+);
+```
+
+**Result**: Users now enjoy seamless preference synchronization across devices while maintaining fast UI performance through localStorage caching. Sensitive API credentials are securely stored in the database with proper isolation from browser storage.
+
+---
+
 ## [1.0.50] - 2025-10-05
 
 ### Fixed

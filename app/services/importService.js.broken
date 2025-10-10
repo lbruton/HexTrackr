@@ -166,7 +166,7 @@ function mapVulnerabilityRow(row) {
                 return null;
             })(),
             cvssScore: row["cvss_score"] || row["CVSS Score"] ? parseFloat(row["cvss_score"] || row["CVSS Score"]) : null,
-            vendor: helpers.normalizeVendor(row["definition.family"] || row["vendor"] || row["Vendor"] || ""),
+            vendor: helpers.normalizeVendor(row["definition.family"] || row["vendor"] || row["Vendor"] || "", row["asset.name"] || row["hostname"] || ""),
             pluginName: pluginName,
             description: description,
             solution: row["solution"] || row["Solution"] || "",
@@ -201,7 +201,7 @@ function mapVulnerabilityRow(row) {
                 return null;
             })(),
             cvssScore: row["cvss_score"] || row["CVSS Score"] ? parseFloat(row["cvss_score"] || row["CVSS Score"]) : null,
-            vendor: helpers.normalizeVendor(row["definition.family"] || row["vendor"] || row["Vendor"] || ""),
+            vendor: helpers.normalizeVendor(row["definition.family"] || row["vendor"] || row["Vendor"] || "", row["asset.name"] || row["hostname"] || ""),
             pluginName: pluginName,
             description: augmentedDescription,
             solution: row["solution"] || row["Solution"] || "",

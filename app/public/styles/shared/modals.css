@@ -166,6 +166,20 @@
     margin: -0.5rem -0.5rem -0.5rem auto;
 }
 
+/* Disable all focus/active states on close button (HEX-168) */
+.modal .btn-close,
+.modal .btn-close:focus,
+.modal .btn-close:focus-visible,
+.modal .btn-close:active,
+.modal .btn-close:hover,
+.modal .btn-close::before,
+.modal .btn-close::after {
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    transform: none !important;
+}
+
 /* Export buttons in modal footers */
 .modal-footer .btn-outline-primary i,
 .modal-footer .btn-primary i,
@@ -260,15 +274,64 @@
 }
 
 /* ===========================
+   KEV Modal Light Mode Fix - HEX-172
+   =========================== */
+
+/* Light mode only - make header readable with warning color */
+[data-bs-theme="light"] #kevDetailsModal .modal-header {
+    background: linear-gradient(135deg, #fecaca 0%, #fca5a5 100%) !important;
+    color: #000000 !important;
+    border-bottom: 1px solid #dc2626 !important;
+}
+
+/* Make close button black for readability */
+[data-bs-theme="light"] #kevDetailsModal .modal-header .btn-close {
+    filter: brightness(0);
+}
+
+/* ===========================
    Modal Animations
    =========================== */
 
-.modal.fade .modal-dialog {
-    transition: transform 0.3s ease-out;
+/* Disable modal animations to prevent visual artifacts (HEX-168)
+   Instant close provides better UX for utility modals */
+
+/* Disable all transitions, animations, and transforms on modal and children */
+.modal,
+.modal *,
+.modal.fade,
+.modal.fade .modal-dialog,
+.modal.fade .modal-content,
+.modal-backdrop,
+.modal-backdrop.fade,
+.modal-backdrop.show,
+.modal .btn-close,
+.modal-header .btn-close {
+    transition-property: none !important;
+    transition-duration: 0s !important;
+    animation: none !important;
+    animation-duration: 0s !important;
+    transition: none !important;
 }
 
+/* Disable transforms that cause visual artifacts */
+.modal.fade .modal-dialog,
 .modal.show .modal-dialog {
-    transform: none;
+    transform: none !important;
+}
+
+/* Force immediate display changes */
+.modal.show,
+.modal.fade.show {
+    opacity: 1 !important;
+}
+
+.modal-backdrop.show {
+    opacity: 0.5 !important;
+}
+
+[data-bs-theme="dark"] .modal-backdrop.show {
+    opacity: 0.6 !important;
 }
 
 /* ===========================

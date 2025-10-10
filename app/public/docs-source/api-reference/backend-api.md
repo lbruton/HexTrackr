@@ -148,6 +148,212 @@ Manages CISA Known Exploited Vulnerabilities (KEV) integration and synchronizati
 | GET | `/api/kev/status` | Get current sync status and statistics |
 | GET | `/api/kev/vulnerability/:cveId` | Get KEV details for specific CVE |
 
+### AuthController
+
+**Location:** `app/controllers/authController.js`
+**Since:** v1.0.46
+
+Handles user authentication, session management, and security features including CSRF protection and account lockout.
+
+**Key Features:**
+
+- **Argon2id Password Hashing** - Industry-standard secure password storage with timing-safe comparison
+- **Session Management** - SQLite-backed session store with configurable expiration (24h/30d)
+- **Account Lockout Protection** - 5 failed login attempts trigger 15-minute lockout
+- **CSRF Token Generation** - Stateless double-submit cookie pattern for state-changing requests
+- **Profile Management** - User profile retrieval and password change functionality
+
+**Security Architecture:**
+
+- Passwords hashed with Argon2id (time cost: 2, memory cost: 19MB, parallelism: 1)
+- Sessions stored in SQLite with automatic cleanup of expired sessions
+- Failed login attempts tracked per username with automatic expiry
+- Trust proxy enabled for nginx reverse proxy X-Forwarded-Proto headers
+- Secure cookies require HTTPS in production
+
+**Main Endpoints:**
+
+| Method | Endpoint | Auth Required | Description |
+|--------|----------|---------------|-------------|
+| POST | `/api/auth/login` | ❌ Public | Authenticate user with username/password |
+| POST | `/api/auth/logout` | ✅ Protected | End user session and clear cookies |
+| GET | `/api/auth/status` | ❌ Public | Check current authentication status |
+| GET | `/api/auth/csrf` | ❌ Public | Retrieve CSRF token for forms |
+| POST | `/api/auth/change-password` | ✅ Protected | Update user password (requires current password) |
+| GET | `/api/auth/profile` | ✅ Protected | Get current user profile information |
+
+**Login Request Example:**
+
+```javascript
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "secure-password"
+}
+```
+
+**Login Response (Success):**
+
+```javascript
+{
+  "success": true,
+  "user": {
+    "id": 1,
+    "username": "admin",
+    "email": "admin@hextrackr.local",
+    "created_at": "2025-10-04T12:00:00.000Z"
+  },
+  "message": "Login successful"
+}
+```
+
+**Login Response (Account Locked):**
+
+```javascript
+{
+  "success": false,
+  "error": "Account temporarily locked due to too many failed login attempts. Please try again in 15 minutes.",
+  "lockoutRemaining": 892 // seconds
+}
+```
+
+**Status Check Response:**
+
+```javascript
+GET /api/auth/status
+
+{
+  "authenticated": true,
+  "user": {
+    "id": 1,
+    "username": "admin",
+    "email": "admin@hextrackr.local"
+  }
+}
+```
+
+**Change Password Request:**
+
+```javascript
+POST /api/auth/change-password
+Content-Type: application/json
+X-CSRF-Token: <token-from-csrf-endpoint>
+
+{
+  "currentPassword": "old-password",
+  "newPassword": "new-secure-password"
+}
+```
+
+### PreferencesController
+
+**Location:** `app/controllers/preferencesController.js`
+**Since:** v1.0.48
+
+Manages user-specific preferences and application settings with flexible JSON value storage.
+
+**Key Features:**
+
+- User-scoped preference management (isolated per user)
+- Flexible JSON value storage for complex data structures
+- Transaction support for atomic bulk updates
+- Automatic timestamp tracking (created_at, updated_at)
+- Validation for preference key format and value structure
+
+**Main Endpoints:**
+
+| Method | Endpoint | Auth Required | Description |
+|--------|----------|---------------|-------------|
+| GET | `/api/preferences` | ✅ Protected | Get all preferences for current user |
+| GET | `/api/preferences/:key` | ✅ Protected | Get specific preference by key |
+| POST | `/api/preferences` | ✅ Protected | Create new preference |
+| PUT | `/api/preferences/:key` | ✅ Protected | Update existing preference |
+| DELETE | `/api/preferences/:key` | ✅ Protected | Delete specific preference |
+| POST | `/api/preferences/bulk` | ✅ Protected | Bulk update multiple preferences (transaction) |
+| DELETE | `/api/preferences` | ✅ Protected | Delete all user preferences |
+| POST | `/api/preferences/reset` | ✅ Protected | Reset preferences to defaults |
+
+**Preference Object Structure:**
+
+```javascript
+{
+  "id": 1,
+  "user_id": 1,
+  "key": "dashboard.theme",
+  "value": {"mode": "dark", "accent": "blue"},
+  "created_at": "2025-10-04T12:00:00.000Z",
+  "updated_at": "2025-10-04T14:30:00.000Z"
+}
+```
+
+**Common Preference Keys:**
+
+- `dashboard.theme` - UI theme settings
+- `dashboard.defaultView` - Default dashboard view (grid/cards)
+- `vulnerabilities.filters` - Saved filter configurations
+- `notifications.enabled` - Notification preferences
+- `export.defaultFormat` - Default export format
+
+**Bulk Update Example:**
+
+```javascript
+POST /api/preferences/bulk
+Content-Type: application/json
+X-CSRF-Token: <token>
+
+{
+  "preferences": [
+    {"key": "dashboard.theme", "value": {"mode": "dark"}},
+    {"key": "dashboard.defaultView", "value": "grid"},
+    {"key": "notifications.enabled", "value": true}
+  ]
+}
+```
+
+### TemplateController
+
+**Location:** `app/controllers/templateController.js`
+**Since:** v1.0.21
+
+Manages email and ticket templates for consistent communication and ticket creation.
+
+**Key Features:**
+
+- Template CRUD operations for email and ticket templates
+- Variable substitution system for dynamic content
+- Template categories (email, ticket, notification)
+- Version tracking for template changes
+- Default template management
+
+**Main Endpoints:**
+
+| Method | Endpoint | Auth Required | Description |
+|--------|----------|---------------|-------------|
+| GET | `/api/templates` | ✅ Protected | List all templates |
+| GET | `/api/templates/:id` | ✅ Protected | Get specific template |
+| POST | `/api/templates` | ✅ Protected | Create new template |
+| PUT | `/api/templates/:id` | ✅ Protected | Update template |
+| DELETE | `/api/templates/:id` | ✅ Protected | Delete template |
+| GET | `/api/templates/category/:category` | ✅ Protected | Get templates by category |
+| POST | `/api/templates/:id/render` | ✅ Protected | Render template with variables |
+
+**Template Object Structure:**
+
+```javascript
+{
+  "id": 1,
+  "name": "Critical Vulnerability Alert",
+  "category": "email",
+  "subject": "Critical Vulnerability Detected: {{cve_id}}",
+  "body": "A critical vulnerability has been detected...",
+  "variables": ["cve_id", "hostname", "severity"],
+  "created_at": "2025-10-04T12:00:00.000Z",
+  "updated_at": "2025-10-04T14:30:00.000Z"
+}
+```
+
 ---
 
 ## Services {#services}
@@ -373,6 +579,120 @@ CISA Known Exploited Vulnerabilities data management and synchronization.
 - `matchVulnerabilities()` - Update vulnerability KEV flags
 - `scheduleAutoSync()` - Configure automatic sync intervals
 
+### AuthService
+
+**Location:** `app/services/authService.js`
+**Since:** v1.0.46
+
+Core authentication logic including password verification, session management, and account security.
+
+**Key Features:**
+
+- **Argon2id Password Hashing** - Time cost: 2, Memory cost: 19456KB, Parallelism: 1
+- **Timing-Safe Password Comparison** - Prevents timing attacks during verification
+- **Failed Login Tracking** - In-memory store with automatic expiry (15 minutes)
+- **Account Lockout Management** - 5 attempts trigger 15-minute lockout
+- **Session Lifecycle** - Creation, validation, destruction with configurable TTL
+
+**Core Methods:**
+
+- `verifyPassword(username, password)` - Authenticate user credentials with lockout check
+- `hashPassword(password)` - Generate Argon2id hash for new passwords
+- `createSession(userId, username)` - Initialize user session
+- `validateSession(sessionId)` - Verify active session
+- `destroySession(sessionId)` - End user session
+- `checkAccountLockout(username)` - Verify if account is locked
+- `recordFailedLogin(username)` - Increment failed login counter
+- `resetFailedLogins(username)` - Clear failed login tracking on success
+
+**Security Configuration:**
+
+```javascript
+// Argon2id parameters
+{
+  type: argon2.argon2id,
+  timeCost: 2,        // Number of iterations
+  memoryCost: 19456,  // Memory in KB (19MB)
+  parallelism: 1,     // Number of threads
+  hashLength: 32      // Output hash length
+}
+
+// Account lockout policy
+{
+  maxAttempts: 5,
+  lockoutDuration: 900000  // 15 minutes in ms
+}
+```
+
+**Failed Login Tracking:**
+
+```javascript
+{
+  username: {
+    attempts: 3,
+    firstAttempt: 1696435200000,
+    lastAttempt: 1696435260000
+  }
+}
+```
+
+### PreferencesService
+
+**Location:** `app/services/preferencesService.js`
+**Since:** v1.0.48
+
+User preference management with flexible JSON value storage and transaction support.
+
+**Key Features:**
+
+- User-scoped preference isolation (each user has independent preferences)
+- JSON value serialization/deserialization for complex data structures
+- Transaction support for atomic bulk updates
+- Automatic timestamp management (created_at, updated_at)
+- Key validation and sanitization
+
+**Core Methods:**
+
+- `getUserPreferences(userId)` - Retrieve all preferences for user
+- `getPreference(userId, key)` - Get specific preference value
+- `setPreference(userId, key, value)` - Create or update preference
+- `deletePreference(userId, key)` - Remove specific preference
+- `bulkUpdatePreferences(userId, preferences)` - Atomic multi-preference update (transaction)
+- `resetToDefaults(userId)` - Clear all preferences and restore defaults
+- `validatePreferenceKey(key)` - Ensure key follows naming convention
+
+**Transaction Pattern:**
+
+```javascript
+// Bulk update uses SQLite transaction for atomicity
+db.transaction(() => {
+  preferences.forEach(({key, value}) => {
+    db.prepare('INSERT OR REPLACE INTO preferences...').run(userId, key, JSON.stringify(value));
+  });
+});
+```
+
+### DocsService
+
+**Location:** `app/services/docsService.js`
+**Since:** v1.0.38
+
+Documentation statistics and coverage analysis.
+
+**Key Features:**
+
+- JSDoc coverage calculation
+- File type distribution analysis
+- Documentation completeness metrics
+- API endpoint inventory
+
+**Core Methods:**
+
+- `getDocumentationStats()` - Calculate comprehensive documentation metrics
+- `analyzeJSDocCoverage()` - Determine percentage of documented functions
+- `getFileTypeCounts()` - Breakdown of file types in codebase
+- `getEndpointInventory()` - List all API routes with documentation status
+
 ---
 
 ## Routes {#routes}
@@ -385,7 +705,8 @@ Route modules define API endpoints and apply middleware.
 **Base Path:** `/api/vulnerabilities`
 
 ```javascript
-GET    /stats                 // Statistics dashboard data
+GET    /stats                 // Statistics dashboard data (supports vendor filtering)
+GET    /recent-trends         // Historical vulnerability trends (supports vendor filtering)
 GET    /                      // List vulnerabilities
 POST   /                      // Create vulnerability
 PUT    /:id                   // Update vulnerability
@@ -394,6 +715,50 @@ POST   /import                // Import CSV
 POST   /import/staging        // Staged import
 GET    /import/progress/:id   // Import progress
 DELETE /all                   // Clear all data
+```
+
+**Vendor Filtering (Since v1.0.53):**
+
+The `/stats` and `/recent-trends` endpoints support vendor-based filtering via query parameter:
+
+```javascript
+// Get statistics for all vendors (default)
+GET /api/vulnerabilities/stats
+
+// Get statistics for Cisco devices only
+GET /api/vulnerabilities/stats?vendor=CISCO
+
+// Get statistics for Palo Alto devices
+GET /api/vulnerabilities/stats?vendor=Palo%20Alto
+
+// Get statistics for other vendors
+GET /api/vulnerabilities/stats?vendor=Other
+```
+
+**Vendor Values:**
+- `` (empty) - All vendors (default)
+- `CISCO` - Cisco Systems devices
+- `Palo Alto` - Palo Alto Networks devices
+- `Other` - All other vendors
+
+**Response Format (with vendor filter):**
+
+```javascript
+{
+  "success": true,
+  "stats": {
+    "vendor": "CISCO",  // null if no filter applied
+    "total": 1245,
+    "vprTotal": 8934.5,
+    "severityCounts": {
+      "Critical": 45,
+      "High": 234,
+      "Medium": 456,
+      "Low": 510
+    },
+    "hasKev": 12
+  }
+}
 ```
 
 ### Ticket Routes
@@ -443,6 +808,67 @@ POST   /sync                  // Manual KEV synchronization
 GET    /status                // Sync status and statistics
 GET    /vulnerability/:cveId  // KEV details for specific CVE
 ```
+
+### Authentication Routes
+
+**File:** `app/routes/auth.js`
+**Base Path:** `/api/auth`
+**Since:** v1.0.46
+
+```javascript
+// Public endpoints (no authentication required)
+POST   /login                 // User login with username/password
+GET    /status                // Check authentication status
+GET    /csrf                  // Get CSRF token for forms
+
+// Protected endpoints (require authentication)
+POST   /logout                // User logout (clears session)
+POST   /change-password       // Update user password
+GET    /profile               // Get current user profile
+```
+
+**Middleware:**
+- `requireAuth` applied to `/logout`, `/change-password`, `/profile`
+- CSRF validation required for all POST requests except `/login`
+
+### Preferences Routes
+
+**File:** `app/routes/preferences.js`
+**Base Path:** `/api/preferences`
+**Since:** v1.0.48
+**Authentication:** All endpoints require `requireAuth` middleware
+
+```javascript
+GET    /                      // Get all user preferences
+GET    /:key                  // Get specific preference
+POST   /                      // Create new preference
+PUT    /:key                  // Update existing preference
+DELETE /:key                  // Delete specific preference
+POST   /bulk                  // Bulk update preferences (transaction)
+DELETE /                      // Delete all user preferences
+POST   /reset                 // Reset to default preferences
+```
+
+**CSRF Protection:** All state-changing operations (POST, PUT, DELETE) require valid CSRF token
+
+### Template Routes
+
+**File:** `app/routes/templates.js`
+**Base Path:** `/api/templates`
+**Since:** v1.0.21
+**Authentication:** All endpoints require `requireAuth` middleware
+
+```javascript
+GET    /                      // List all templates
+GET    /:id                   // Get specific template
+POST   /                      // Create new template
+PUT    /:id                   // Update template
+DELETE /:id                   // Delete template
+GET    /category/:category    // Get templates by category
+POST   /:id/render            // Render template with variables
+```
+
+**CSRF Protection:** All state-changing operations require valid CSRF token
 
 ### Device Routes
 
@@ -635,20 +1061,90 @@ Consistent error handling across all endpoints:
 
 ## Security
 
-### Authentication
+### Authentication System (Since v1.0.46)
 
-Currently using session-based authentication with planned JWT migration.
+**Architecture:** Session-based authentication with SQLite session store
+
+**Core Components:**
+
+#### Password Security
+- **Hashing Algorithm:** Argon2id (winner of Password Hashing Competition)
+- **Timing-Safe Comparison:** Prevents timing attacks during credential verification
+- **Parameters:**
+  - Time cost: 2 iterations
+  - Memory cost: 19456 KB (19 MB)
+  - Parallelism: 1 thread
+  - Hash length: 32 bytes
+
+#### Session Management
+- **Storage:** SQLite database (`sessions` table)
+- **Expiration:** 24 hours (remember me: 30 days)
+- **Cookie Settings:**
+  - `httpOnly: true` - Prevents XSS access to cookies
+  - `secure: true` - HTTPS only (production)
+  - `sameSite: 'lax'` - CSRF protection
+- **Automatic Cleanup:** Expired sessions removed on startup and periodically
+
+#### Account Lockout Protection
+- **Failed Attempts:** 5 consecutive failures
+- **Lockout Duration:** 15 minutes
+- **Tracking:** In-memory store with automatic expiry
+- **Reset:** Successful login clears failed attempt counter
+
+#### CSRF Protection
+- **Method:** Double-submit cookie pattern
+- **Token Endpoint:** `GET /api/auth/csrf`
+- **Required For:** All state-changing requests (POST, PUT, DELETE)
+- **Validation:** Automatic via `csrf-sync` middleware
+- **Excluded Routes:** `/api/auth/login` (CSRF token needed for form)
+
+#### Protected Endpoints
+
+All API endpoints require authentication (`requireAuth` middleware) **except**:
+- `POST /api/auth/login` - Public (login endpoint)
+- `GET /api/auth/status` - Public (status check)
+- `GET /api/auth/csrf` - Public (token retrieval)
+
+**Protected Endpoint Categories:**
+- All `/api/vulnerabilities/*` endpoints
+- All `/api/tickets/*` endpoints
+- All `/api/preferences/*` endpoints
+- All `/api/templates/*` endpoints
+- All `/api/backup/*` endpoints
+- All `/api/kev/*` endpoints
+- All `/api/devices/*` endpoints
+
+### Trust Proxy Configuration
+
+**Setting:** `app.set('trust proxy', true)`
+
+**Purpose:** Enable Express to trust nginx reverse proxy headers
+
+**Why Critical:**
+- Allows reading `X-Forwarded-Proto` header to detect HTTPS
+- Enables secure cookies with HTTPS termination at nginx
+- Required for authentication system to function correctly
+- Without this, all authentication will fail (cookies not set)
+
+**Network Flow:**
+
+```text
+Client → HTTPS (443) → nginx → HTTP (8080) → Express
+         Sets header:    Reads header:
+         X-Forwarded-Proto: https
+```
 
 ### Input Validation
 
 - All file paths validated with PathValidator
-- SQL queries use parameterized statements
+- SQL queries use parameterized statements (prepared statements)
 - HTML content escaped before storage
 - File uploads restricted by type and size
+- User input sanitized to prevent injection attacks
 
 ### Rate Limiting
 
-Configurable per-endpoint limits to prevent abuse.
+Configurable per-endpoint limits to prevent abuse and brute force attacks.
 
 ### CORS Policy
 
@@ -667,9 +1163,10 @@ NODE_ENV=production
 # Database
 DATABASE_PATH=data/hextrackr.db
 
-# Security
+# Security & Authentication (Since v1.0.46)
+SESSION_SECRET=<your-32-byte-hex-string>  # REQUIRED - Cryptographically secure random string
+TRUST_PROXY=true                          # REQUIRED - Enable for nginx reverse proxy
 ALLOWED_ORIGINS=http://localhost:8080
-SESSION_SECRET=your-secret-key
 
 # File Handling
 MAX_FILE_SIZE=100MB
@@ -679,4 +1176,52 @@ BACKUP_DIR=backups
 # Features
 ENABLE_WEBSOCKET=true
 ENABLE_COMPRESSION=true
+```
+
+**Critical Environment Variables:**
+
+### SESSION_SECRET (Required)
+
+**Purpose:** Cryptographic key for signing session cookies
+
+**Requirements:**
+- **Minimum length:** 32 characters (64 recommended)
+- **Format:** Hexadecimal string or random alphanumeric
+- **Security:** Must be kept secret, never committed to version control
+
+**Generate Secure Secret:**
+
+```bash
+# Using Node.js crypto module (recommended)
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+
+# Using OpenSSL
+openssl rand -hex 32
+```
+
+**Server Behavior:**
+- Server **refuses to start** if SESSION_SECRET is missing
+- Server **refuses to start** if SESSION_SECRET is less than 32 characters
+- Error message: `"CRITICAL: SESSION_SECRET must be at least 32 characters"`
+
+### TRUST_PROXY (Required for HTTPS)
+
+**Purpose:** Enable Express to trust nginx reverse proxy headers
+
+**Value:** `true` or `1`
+
+**Why Required:**
+- Allows Express to read `X-Forwarded-Proto` header from nginx
+- Enables secure cookies to work correctly with HTTPS termination
+- Required for authentication system to detect HTTPS connections
+- Without this, authentication cookies will not be set correctly
+
+**Architecture:**
+
+```text
+Browser (HTTPS 443) → nginx → Express (HTTP 8080)
+                        ↓
+            Sets X-Forwarded-Proto: https
+                        ↓
+        Express reads header via trust proxy
 ```

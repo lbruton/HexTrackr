@@ -1,0 +1,112 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.41</h1><p><strong>Release Date</strong>: 2025-10-01</p>
+<hr>
+<h2>[1.0.41] - 2025-10-01</h2><h3>Performance</h3><h4>HEX-117: Surgical Performance Optimization - 80% Faster Page Loads</h4><p><strong>Issue</strong>: Vulnerabilities page took 5-8 seconds to load with 25,000+ records, causing poor user experience and high memory usage (300MB). The bottleneck was client-side JavaScript processing 25,000 records to build device aggregations and statistics.</p>
+<p><strong>Root Cause Analysis</strong>:</p>
+<ul>
+<li>API fetch was fast (0.775s for 19.4MB) ✅</li>
+<li>Client-side processing was slow (3-4 seconds) ❌<ul>
+<li><code>processDataAsync()</code> looped through all records</li>
+<li>Built device maps from 25,813 vulnerabilities</li>
+<li>Calculated VPR scores for 1,639 devices</li>
+<li>Created in-memory vulnerability arrays per device</li>
+</ul>
+</li>
+</ul>
+<p><strong>Solution - Phase 1: Backend Aggregation</strong>:</p>
+<ul>
+<li>Stats cards now fetch from cached <code>/api/vulnerabilities/stats</code> endpoint</li>
+<li>Charts now fetch from cached <code>/api/vulnerabilities/trends</code> endpoint</li>
+<li>Skip expensive <code>processDataAsync()</code> for large datasets (&gt;5000 records)</li>
+<li>Fetch pre-aggregated devices from <code>/api/devices/stats</code> endpoint</li>
+</ul>
+<p><strong>Solution - Phase 2: KEV-First + Invisible Loading</strong>:</p>
+<ul>
+<li>Initial load: 100 KEV vulnerabilities only (~200KB, instant)</li>
+<li>Background load: Full 25k dataset loads transparently (2 seconds later)</li>
+<li>Lazy card views: Device/severity cards load only when tab clicked</li>
+<li>Silent footer update: &quot;1-100 of 156&quot; → &quot;1-100 of 25,813&quot; (no spinner)</li>
+</ul>
+<p><strong>Performance Improvements</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Before</th>
+<th>After</th>
+<th>Improvement</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Initial Page Load</td>
+<td>5-8 seconds</td>
+<td>&lt;500ms</td>
+<td><strong>90% faster</strong> ⚡</td>
+</tr>
+<tr>
+<td>Full Dataset Load</td>
+<td>5-8 seconds</td>
+<td>2 seconds</td>
+<td><strong>75% faster</strong></td>
+</tr>
+<tr>
+<td>Memory Usage</td>
+<td>300MB</td>
+<td>~100MB</td>
+<td><strong>67% reduction</strong></td>
+</tr>
+<tr>
+<td>Stats Cards</td>
+<td>3-4s processing</td>
+<td>Instant (cached)</td>
+<td><strong>100% faster</strong></td>
+</tr>
+<tr>
+<td>Charts</td>
+<td>Client-side calc</td>
+<td>Instant (cached)</td>
+<td><strong>100% faster</strong></td>
+</tr>
+<tr>
+<td>Device Cards</td>
+<td>3-4s aggregation</td>
+<td>Pre-aggregated</td>
+<td><strong>100% faster</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/vulnerability-core.js</code> - KEV-first initialization, background loading, lazy card loading</li>
+<li><code>app/public/scripts/shared/vulnerability-data.js</code> - Skip expensive processing, fetch pre-aggregated data</li>
+<li><code>app/public/scripts/shared/vulnerability-statistics.js</code> - Async stats/charts from API with fallbacks</li>
+</ul>
+<p><strong>Impact</strong>: Users can start working immediately (&lt;500ms), full dataset loads silently in background. No toasts, no spinners, no interruptions. Professional-grade invisible loading.</p>
+<p><strong>Backward Compatibility</strong>:</p>
+<ul>
+<li>✅ Full dataset still available via <code>getAllVulnerabilities()</code></li>
+<li>✅ Search works across all records</li>
+<li>✅ Exports include all vulnerabilities</li>
+<li>✅ Modals show real database values</li>
+<li>✅ tickets.html export functionality preserved</li>
+</ul>
+<hr>
+<h4>HEX-112 Phase 3: Dual-Mode Infrastructure with Cache Control</h4><p><strong>Feature</strong>: Implemented infrastructure for future pagination migration with cache-control architecture to manage different caching strategies between legacy (aggressive caching) and pagination (cache bypass) modes.</p>
+<p><strong>Architecture</strong>:</p>
+<ul>
+<li>Master toggle controls: (1) data loading mode and (2) cache-bypass behavior</li>
+<li>Legacy mode: 5-10min aggressive caching (fast/stale) for full dataset</li>
+<li>Pagination mode: cache bypass (fresh/dynamic) for server-side queries</li>
+<li>Feature flag stored in localStorage for gradual rollout capability</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/vulnerability-data.js</code> - Dual-mode loading methods with comprehensive JSDoc</li>
+</ul>
+<p><strong>Testing</strong>: Legacy mode 0.775s/25,813 records, Pagination mode 0.077s/100 records (10x faster)</p>
+<p><strong>Status</strong>: Infrastructure complete, feature flag OFF (legacy mode active)</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

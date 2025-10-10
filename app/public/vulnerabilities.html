@@ -11,17 +11,31 @@
         try {
             var stored = localStorage.getItem('hextrackr-theme');
             if (stored) {
-                var data = JSON.parse(stored);
-                if (data && data.theme) {
-                    document.documentElement.setAttribute('data-bs-theme', data.theme);
+                // FIX (HEX-140): Handle both JSON and simple string formats
+                var theme = null;
+                try {
+                    var data = JSON.parse(stored);
+                    theme = data.theme || data; // Handle {"theme":"dark"} or "dark"
+                } catch (parseError) {
+                    // Simple string format (backward compatibility)
+                    theme = stored;
+                }
+                if (theme === 'dark' || theme === 'light') {
+                    document.documentElement.setAttribute('data-bs-theme', theme);
                 }
             } else {
                 // Fallback to sessionStorage (private browsing)
                 stored = sessionStorage.getItem('hextrackr-theme');
                 if (stored) {
-                    var data = JSON.parse(stored);
-                    if (data && data.theme) {
-                        document.documentElement.setAttribute('data-bs-theme', data.theme);
+                    var theme = null;
+                    try {
+                        var data = JSON.parse(stored);
+                        theme = data.theme || data;
+                    } catch (parseError) {
+                        theme = stored;
+                    }
+                    if (theme === 'dark' || theme === 'light') {
+                        document.documentElement.setAttribute('data-bs-theme', theme);
                     }
                 }
             }
@@ -83,7 +97,31 @@
                                 Modern security vulnerability tracking and analysis
                             </div>
                         </div>
-                        <!-- Header actions removed - functionality moved to user dropdown menu -->
+
+                        <!-- NEW: Vendor Toggle (Right Side of Header) -->
+                        <div class="col-auto">
+                            <div class="btn-group" role="group" aria-label="Vendor filter">
+                                <input type="radio" class="btn-check" name="vendor-filter" id="vendor-all" autocomplete="off" checked>
+                                <label class="btn btn-outline-primary" for="vendor-all" data-vendor="">
+                                    <i class="fas fa-globe me-1"></i>All Vendors
+                                </label>
+
+                                <input type="radio" class="btn-check" name="vendor-filter" id="vendor-cisco" autocomplete="off">
+                                <label class="btn btn-outline-primary" for="vendor-cisco" data-vendor="CISCO">
+                                    <i class="fas fa-network-wired me-1"></i>CISCO
+                                </label>
+
+                                <input type="radio" class="btn-check" name="vendor-filter" id="vendor-palo" autocomplete="off">
+                                <label class="btn btn-outline-primary" for="vendor-palo" data-vendor="Palo Alto">
+                                    <i class="fas fa-shield-alt me-1"></i>Palo Alto
+                                </label>
+
+                                <input type="radio" class="btn-check" name="vendor-filter" id="vendor-other" autocomplete="off">
+                                <label class="btn btn-outline-primary" for="vendor-other" data-vendor="Other">
+                                    <i class="fas fa-server me-1"></i>Other
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -106,7 +144,7 @@
                                         <div class="col">
                                             <div class="card-back">
                                                 <div class="font-weight-medium h2 mb-1" id="criticalCount">0</div>
-                                                <div class="text-muted small">Critical Vulnerabilities</div>
+                                                <div class="text-muted small">Critical</div>
                                                 <div class="text-vpr-critical small fw-bold mt-1" id="criticalVPR">0.0 VPR</div>
                                             </div>
                                             <div class="card-front">
@@ -141,7 +179,7 @@
                                         <div class="col">
                                             <div class="card-back">
                                                 <div class="font-weight-medium h2 mb-1" id="highCount">0</div>
-                                                <div class="text-muted small">High Vulnerabilities</div>
+                                                <div class="text-muted small">High</div>
                                                 <div class="text-vpr-high small fw-bold mt-1" id="highVPR">0.0 VPR</div>
                                             </div>
                                             <div class="card-front">
@@ -176,7 +214,7 @@
                                         <div class="col">
                                             <div class="card-back">
                                                 <div class="font-weight-medium h2 mb-1" id="mediumCount">0</div>
-                                                <div class="text-muted small">Medium Vulnerabilities</div>
+                                                <div class="text-muted small">Medium</div>
                                                 <div class="text-vpr-medium small fw-bold mt-1" id="mediumVPR">0.0 VPR</div>
                                             </div>
                                             <div class="card-front">
@@ -211,7 +249,7 @@
                                         <div class="col">
                                             <div class="card-back">
                                                 <div class="font-weight-medium h2 mb-1" id="lowCount">0</div>
-                                                <div class="text-muted small">Low Vulnerabilities</div>
+                                                <div class="text-muted small">Low</div>
                                                 <div class="text-vpr-low small fw-bold mt-1" id="lowVPR">0.0 VPR</div>
                                             </div>
                                             <div class="card-front">
@@ -242,7 +280,7 @@
                         <div class="card-header">
                             <h3 class="card-title">
                                 <i class="fas fa-chart-line me-2 text-primary"></i>
-                                Historical VPR Trends (Last 14 Days)
+                                Historical VPR Trends (Last 30 Days)
                             </h3>
                             <div class="card-actions">
                                 <div class="d-flex gap-2 align-items-center">
@@ -325,19 +363,19 @@
                             </h3>
                             <div class="card-actions">
                                 <div class="btn-group" role="group" aria-label="View switcher">
-                                    <input type="radio" class="btn-check" name="view-options" id="view-table" autocomplete="off" checked>
-                                    <label class="btn btn-outline-primary" for="view-table" data-view="table">
-                                        <i class="fas fa-table me-1"></i>Table
-                                    </label>
-                                    
-                                    <input type="radio" class="btn-check" name="view-options" id="view-devices" autocomplete="off">
+                                    <input type="radio" class="btn-check" name="view-options" id="view-devices" autocomplete="off" checked>
                                     <label class="btn btn-outline-primary" for="view-devices" data-view="devices">
                                         <i class="fas fa-server me-1"></i>Devices
                                     </label>
-                                    
+
                                     <input type="radio" class="btn-check" name="view-options" id="view-vulnerabilities" autocomplete="off">
                                     <label class="btn btn-outline-primary" for="view-vulnerabilities" data-view="vulnerabilities">
                                         <i class="fas fa-bug me-1"></i>Vulnerabilities
+                                    </label>
+
+                                    <input type="radio" class="btn-check" name="view-options" id="view-table" autocomplete="off">
+                                    <label class="btn btn-outline-primary" for="view-table" data-view="table">
+                                        <i class="fas fa-table me-1"></i>Table
                                     </label>
                                 </div>
                             </div>
@@ -362,6 +400,9 @@
                                     <div id="devicePaginationControls" class="d-flex justify-content-center mt-4">
                                         <!-- Device pagination controls will be populated here -->
                                     </div>
+                                    <div id="devicePaginationInfo" class="mt-2 text-center">
+                                        <span class="text-muted">Loading vulnerabilities...</span>
+                                    </div>
                                 </div>
                             </div>
                             
@@ -373,6 +414,9 @@
                                     </div>
                                     <div id="vulnerabilityPaginationControls" class="d-flex justify-content-center mt-4">
                                         <!-- Vulnerability pagination controls will be populated here -->
+                                    </div>
+                                    <div id="vulnerabilityPaginationInfo" class="mt-2 text-center">
+                                        <span class="text-muted">Loading vulnerabilities...</span>
                                     </div>
                                 </div>
                             </div>
@@ -438,9 +482,6 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        Close
-                    </button>
                     <button type="button" class="btn btn-outline-primary" id="exportDeviceData">
                         <i class="fas fa-file-csv me-2"></i>
                         Export CSV
@@ -448,6 +489,9 @@
                     <button type="button" class="btn btn-primary" id="generateDeviceReport">
                         <i class="ti ti-file-text me-2"></i>
                         Generate Report
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Close
                     </button>
                 </div>
             </div>
@@ -512,9 +556,6 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        Close
-                    </button>
                     <button type="button" class="btn btn-outline-primary" id="exportVulnCSV">
                         <i class="fas fa-file-csv me-2"></i>
                         Export CSV
@@ -522,6 +563,9 @@
                     <button type="button" class="btn btn-primary" id="generateVulnReport">
                         <i class="ti ti-file-text me-2"></i>
                         Generate Report
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Close
                     </button>
                 </div>
             </div>
@@ -780,6 +824,11 @@
 
     <!-- Authentication State Manager (HEX-128 Task 3.5) -->
     <script src="scripts/shared/auth-state.js?v=1.0.48-session-fix"></script>
+
+    <!-- User Preferences Service (HEX-138) -->
+    <script src="scripts/shared/preferences-service.js"></script>
+    <script src="scripts/shared/preferences-sync.js"></script>
+
     <script src="scripts/shared/crypto-utils.js"></script>
     <script src="scripts/shared/websocket-client.js"></script>
     <script src="scripts/shared/progress-modal.js"></script>
@@ -875,25 +924,16 @@
 
                                     ${kevData.notes ? `
                                     <h6 class="fw-bold">Additional Notes</h6>
-                                    <p>${kevData.notes.replace(
+                                    <div>${kevData.notes.replace(
                                         /(https?:\/\/[^\s]+)/g,
-                                        '<a href="$1" onclick="window.open(\'$1\', \'kev_popup\', \'width=1200,height=1200,scrollbars=yes,resizable=yes\'); return false;" style="color: #007bff; text-decoration: underline;">$1</a>'
-                                    )}</p>
+                                        '<div class="mb-2"><a href="$1" onclick="window.open(\'$1\', \'kev_popup\', \'width=1200,height=1200,scrollbars=yes,resizable=yes\'); return false;" style="color: #007bff; text-decoration: underline;">$1</a></div>'
+                                    )}</div>
                                     ` : ''}
 
                                     <div class="text-muted small">
                                         <i class="fas fa-info-circle me-1"></i>
                                         Data source: CISA Known Exploited Vulnerabilities Catalog
                                     </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-primary" onclick="showVulnerabilityDetailsByCVE('${cveId}')">
-                                        <i class="fas fa-info-circle me-2"></i>View CVE Details
-                                    </button>
-                                    <a href="https://nvd.nist.gov/vuln/detail/${cveId}" target="_blank" class="btn btn-primary">
-                                        <i class="fas fa-external-link-alt me-2"></i>NIST NVD
-                                    </a>
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                 </div>
                             </div>
                         </div>
@@ -924,7 +964,7 @@
             }
         }
 
-        // Make function globally available
+        // Make KEV helper globally available
         window.showKevDetails = showKevDetails;
 
         // HEX-120 Fix: Wrapper function for device modal that works before vulnManager is ready
@@ -973,6 +1013,11 @@
                 authState.updateUserMenu();
 
                 console.log('✅ Authenticated as:', authState.getUser().username);
+
+                // HEX-138: Load user preferences from database
+                if (window.preferencesSync) {
+                    await window.preferencesSync.initialize();
+                }
             }
             // If not authenticated, authState.init() will auto-redirect to login.html
         });
@@ -980,3 +1025,4 @@
 
 </body>
 </html>
+

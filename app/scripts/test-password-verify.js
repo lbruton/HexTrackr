@@ -9,7 +9,7 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
 const DB_PATH = path.join(__dirname, '../../app/data/hextrackr.db');
-const TEST_PASSWORD = 'Magellan123!';
+const TEST_PASSWORD = '***REMOVED***';
 
 async function testPasswordVerify() {
     console.log('🔍 Testing password verification...\n');
@@ -37,10 +37,10 @@ async function testPasswordVerify() {
 
             if (isValid) {
                 console.log('✅ PASSWORD VERIFICATION SUCCESSFUL!');
-                console.log('   The password "Magellan123!" is correct\n');
+                console.log('   The password "***REMOVED***" is correct\n');
             } else {
                 console.log('❌ PASSWORD VERIFICATION FAILED');
-                console.log('   The password "Magellan123!" does not match\n');
+                console.log('   The password "***REMOVED***" does not match\n');
             }
 
         } catch (error) {

@@ -49,7 +49,7 @@
     "CSRF: Automatic token handling in authenticatedFetch()",
     "SESSION_SECRET: 32+ char requirement, fail-fast validation",
     "Init database: Path fix with additional .. for /app/data/",
-    "Admin password: Magellan123! (testing convenience)",
+    "Admin password: ***REMOVED*** (testing convenience)",
     "Checkpoint: Single commit after all 7 tasks"
   ],
 
@@ -78,7 +78,7 @@
     "database_path": "/app/data/hextrackr.db",
     "sessions_path": "/app/data/sessions.db",
     "admin_username": "admin",
-    "admin_password": "Magellan123!"
+    "admin_password": "***REMOVED***"
   },
 
   "notes": "All changes tested via Docker nginx. HTTPS is REQUIRED for authentication (secure cookies). Database files now inaccessible at /data/ URL path. CSRF protection blocks requests without valid token. Admin password changed for easier testing. Ready for final Task 2.1 and checkpoint."

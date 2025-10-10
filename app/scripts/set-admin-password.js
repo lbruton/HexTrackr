@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Set Admin Password to Magellan123!
+ * Set Admin Password to ***REMOVED***
  *
  * Updates the admin user password with Argon2id hashing
  */
@@ -11,10 +11,10 @@ const sqlite3 = require("sqlite3").verbose();
 const path = require("path");
 
 const DB_PATH = path.join(__dirname, "../../app/data/hextrackr.db");
-const NEW_PASSWORD = "Magellan123!";
+const NEW_PASSWORD = "***REMOVED***";
 
 async function setAdminPassword() {
-    console.log("🔐 Setting admin password to Magellan123!...\n");
+    console.log("🔐 Setting admin password to ***REMOVED***...\n");
 
     // Open database
     const db = new sqlite3.Database(DB_PATH);
@@ -74,7 +74,7 @@ async function setAdminPassword() {
                         console.log("🔑 NEW ADMIN CREDENTIALS");
                         console.log("═══════════════════════════════════════════════════════");
                         console.log("Username: admin");
-                        console.log("Password: Magellan123!");
+                        console.log("Password: ***REMOVED***");
                         console.log("═══════════════════════════════════════════════════════\n");
 
                         db.close();

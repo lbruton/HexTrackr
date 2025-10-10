@@ -1,0 +1,45 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.18</h1><p><strong>Release Date</strong>: 2025-09-20</p>
+<hr>
+<h2>[1.0.18] - 2025-09-20</h2><h3>Added (10)</h3><h4>UI/UX Enhancements</h4><ul>
+<li><strong>Attachment Visibility for Tickets</strong>: Added comprehensive tooltip functionality for &quot;Attach Documentation&quot; button on tickets2.html<ul>
+<li>Displays list of currently attached files with sizes on hover</li>
+<li>Shows file count badge when documents are attached (e.g., &quot;(3)&quot;)</li>
+<li>Button changes from gray outline to blue when files are present</li>
+<li>Tooltips persist across page refreshes using localStorage</li>
+<li>Added Shift+Click and Right-Click functionality to clear all attachments with confirmation</li>
+<li>Smooth animations and visual feedback for improved user experience</li>
+<li>Resolves issue where users had no visibility of attached files until downloading bundles</li>
+</ul>
+</li>
+</ul>
+<h3>Fixed (12)</h3><h4>Bug Fixes</h4><ul>
+<li><p><strong>Attachment Tooltip Navigation Bug</strong>: Fixed issue where tooltip displayed empty content after navigating between pages</p>
+<ul>
+<li>Root cause: Bootstrap tooltip wasn&#39;t properly reinitializing when returning to tickets page</li>
+<li>Solution: Dispose old tooltip instances and create fresh ones with proper data on page load</li>
+<li>Added 100ms delay to ensure DOM readiness when navigating between pages</li>
+</ul>
+</li>
+<li><p><strong>Version Display in Health Endpoint</strong>: Fixed incorrect version reporting in <code>/health</code> API endpoint</p>
+<ul>
+<li>Corrected package.json path in server.js from <code>./package.json</code> to <code>../package.json</code> for Docker container</li>
+<li>Updated docker-compose.yml HEXTRACKR_VERSION environment variable to match package.json</li>
+<li>Health endpoint now correctly reports version 1.0.18 instead of falling back to old versions</li>
+</ul>
+</li>
+</ul>
+<h4>Documentation (3)</h4><ul>
+<li><strong>JSDoc Dark Mode Restoration</strong>: Fixed missing dark mode support in developer documentation<ul>
+<li>Ran <code>inject-jsdoc-theme.js</code> script to inject theme synchronization into 96 JSDoc HTML files</li>
+<li>Dark mode now properly syncs with main application theme preference</li>
+<li>Restored proper styling with dark backgrounds (#0f172a) and light text in dark mode</li>
+</ul>
+</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

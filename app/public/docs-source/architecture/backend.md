@@ -31,11 +31,11 @@ The backend is a modular Node.js/Express application providing REST endpoints, r
 
 | Directory | Contents | Pattern |
 | --------- | -------- | ------- |
-| `/app/controllers/` | 5 controller modules | Mixed (3 singleton, 2 functional) |
-| `/app/services/` | 10 service modules | Functional exports |
-| `/app/routes/` | 5 route definition files | Express router pattern |
-| `/app/config/` | 4 configuration modules | Module exports |
-| `/app/middleware/` | 4 middleware modules | Express middleware pattern |
+| `/app/controllers/` | 9 controller modules | Singleton pattern (8), Functional (1) |
+| `/app/services/` | 15 service modules | Functional exports with dependency injection |
+| `/app/routes/` | 10 route definition files | Express router pattern |
+| `/app/config/` | 5 configuration modules | Module exports |
+| `/app/middleware/` | 5 middleware modules | Express middleware pattern |
 | `/app/utils/` | 4 utility modules | Static class methods |
 
 ### Controller Files
@@ -45,24 +45,32 @@ The backend is a modular Node.js/Express application providing REST endpoints, r
 | `vulnerabilityController.js` | Singleton | 14 static methods | `initialize(db, progressTracker)` |
 | `ticketController.js` | Singleton | 7 static methods | `initialize(db)` |
 | `backupController.js` | Singleton | 6 static methods | `initialize(db)` |
+| `templateController.js` | Singleton | 7 static methods | `initialize(db)` |
+| `authController.js` | Singleton | 5 static methods | `initialize(db)` |
+| `preferencesController.js` | Singleton | 7 static methods | `initialize(db)` |
+| `kevController.js` | Singleton | 7 static methods | `initialize(db)` |
+| `docsController.js` | Singleton | 2 static methods | Direct instantiation |
 | `importController.js` | Functional | 6 exported functions | `setProgressTracker(tracker)` |
-| `docsController.js` | Instance | 2 wrapped methods | Direct instantiation |
 
 ### Service Files
 
 | Service | Purpose | Key Methods |
 | ------- | ------- | ----------- |
 | `databaseService.js` | Core database operations | `getDb()`, `runQuery()`, `transaction()` |
-| `vulnerabilityService.js` | Vulnerability CRUD operations | `getVulnerabilities()`, `createVulnerability()` |
-| `vulnerabilityStatsService.js` | Statistics and aggregations | `getStats()`, `getTrends()` |
-| `ticketService.js` | Ticket CRUD operations | `getTickets()`, `createTicket()` |
-| `importService.js` | Import business logic | `processVulnerabilitiesWithLifecycle()`, `bulkLoadToStagingTable()` |
-| `backupService.js` | Backup/restore operations | `getBackupStats()`, `restoreBackup()` |
-| `docsService.js` | Documentation statistics | `computeStats()`, `computeApiEndpoints()` |
-| `fileService.js` | File system operations | `readFile()`, `writeFile()` |
-| `progressService.js` | WebSocket progress tracking | `createSession()`, `updateProgress()` |
-| `validationService.js` | Input validation and sanitization | `validateVulnerability()`, `sanitizeInput()` |
+| `authService.js` *(v1.0.46+)* | Authentication and session management | `authenticateUser()`, `validateSession()`, `changePassword()` |
+| `vulnerabilityService.js` | Vulnerability CRUD operations | `getVulnerabilities()`, `createVulnerability()`, `streamExport()` |
+| `vulnerabilityStatsService.js` | Statistics and aggregations | `getStats()`, `getTrends()`, `getVendorStats()` |
+| `ticketService.js` | Ticket CRUD operations | `getTickets()`, `createTicket()`, `updateTicket()` |
+| `templateService.js` *(v1.0.46+)* | Email template management | `getTemplates()`, `createTemplate()`, `updateTemplate()` |
+| `preferencesService.js` *(v1.0.46+)* | User preferences CRUD | `getPreferences()`, `updatePreferences()` |
 | `kevService.js` *(v1.0.22+)* | CISA KEV integration | `syncKevData()`, `getSyncStatus()`, `getKevByCve()` |
+| `importService.js` | Import business logic | `processVulnerabilitiesWithLifecycle()`, `bulkLoadToStagingTable()` |
+| `backupService.js` | Backup/restore operations | `getBackupStats()`, `restoreBackup()`, `exportData()` |
+| `docsService.js` | Documentation statistics | `computeStats()`, `computeApiEndpoints()` |
+| `fileService.js` | File system operations | `readFile()`, `writeFile()`, `validatePath()` |
+| `progressService.js` | WebSocket progress tracking | `createSession()`, `updateProgress()`, `completeSession()` |
+| `validationService.js` | Input validation and sanitization | `validateVulnerability()`, `sanitizeInput()`, `validateTicket()` |
+| `cacheService.js` *(v1.0.46+)* | Server-side caching with TTL | `withCaching()`, `invalidateCache()`, `getCacheStats()` |
 
 ---
 
@@ -72,7 +80,7 @@ The backend uses two distinct controller patterns, with ongoing migration toward
 
 ### Singleton Pattern Controllers
 
-Three controllers (`VulnerabilityController`, `TicketController`, `BackupController`) implement the singleton pattern:
+Eight controllers implement the singleton pattern (`VulnerabilityController`, `TicketController`, `BackupController`, `TemplateController`, `AuthController`, `PreferencesController`, `KevController`, `DocsController`):
 
 ```javascript
 class VulnerabilityController {
@@ -156,10 +164,9 @@ module.exports = {
 
 ### Migration Status
 
-| Controller | Current Pattern | Target Pattern | Priority |
-| ---------- | -------------- | -------------- | -------- |
-| ImportController | Functional | Singleton | High - Complex dependencies |
-| DocsController | Instance | Singleton | Low - Simple controller |
+| Controller | Current Pattern | Target Pattern | Priority | Status |
+| ---------- | -------------- | -------------- | -------- | ------ |
+| ImportController | Functional | Singleton | Low | Legacy pattern retained for compatibility |
 
 ---
 
@@ -168,10 +175,11 @@ module.exports = {
 **CRITICAL**: The initialization order is crucial for proper dependency injection. Controllers must be initialized BEFORE routes are imported.
 
 ```javascript
-async function startServer() {
+async function initializeApplication() {
     // 1. Initialize database FIRST
-    await initDb();
-    const db = getDatabase();
+    await databaseService.initialize();
+    const db = databaseService.db;
+    global.db = db;  // Maintain compatibility
 
     // 2. Initialize utilities
     const progressTracker = new ProgressTracker(io);
@@ -181,25 +189,42 @@ async function startServer() {
     VulnerabilityController.initialize(db, progressTracker);
     TicketController.initialize(db);
     BackupController.initialize(db);
+    TemplateController.initialize(db);
+    AuthController.initialize(db);
+    PreferencesController.initialize(db);
+    KevController.initialize(db);
 
     // For functional controllers
     ImportController.setProgressTracker(progressTracker);
 
-    // 4. NOW import routes (after controllers are ready)
+    // 4. Seed data (if needed)
+    await seedAllTemplates(db);
+
+    // 5. NOW import routes (after controllers are ready)
     const vulnerabilityRoutes = require("../routes/vulnerabilities");
     const ticketRoutes = require("../routes/tickets");
     const backupRoutes = require("../routes/backup");
+    const templateRoutes = require("../routes/templates");
+    const authRoutes = require("../routes/auth");
+    const preferencesRoutes = require("../routes/preferences");
+    const kevRoutes = require("../routes/kev");
     const importRoutes = require("../routes/imports");
     const docsRoutes = require("../routes/docs");
+    const devicesRoutes = require("../routes/devices");
 
-    // 5. Mount routes on Express app
+    // 6. Mount routes on Express app
     app.use("/api/vulnerabilities", vulnerabilityRoutes);
     app.use("/api/tickets", ticketRoutes);
     app.use("/api/backup", backupRoutes);
+    app.use("/api/templates", templateRoutes);
+    app.use("/api/auth", authRoutes);
+    app.use("/api/preferences", preferencesRoutes);
+    app.use("/api/kev", kevRoutes);
     app.use("/api", importRoutes);  // Import routes at root API level
     app.use("/api/docs", docsRoutes);
+    app.use("/api/devices", devicesRoutes);
 
-    // 6. Start server
+    // 7. Start server
     server.listen(PORT, () => {
         console.log(`Server running on port ${PORT}`);
     });
@@ -253,14 +278,185 @@ class PathValidator {
 
 ## Middleware & Infrastructure
 
-| Concern | Implementation |
-| ------- | -------------- |
-| CORS | `cors()` (open by default) |
-| Compression | `compression()` |
-| Parsing | `express.json` & `express.urlencoded` (100MB limit) |
-| Uploads | `multer` (CSV import; 100 MB cap) |
-| Security Headers | `X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection` |
-| Static Assets | `express.static` (root + `docs-html/`) |
+| Concern | Implementation | Details |
+| ------- | -------------- | ------- |
+| **Trust Proxy** *(CRITICAL)* | `app.set("trust proxy", true)` | **ALWAYS enabled** - Required for nginx reverse proxy, enables HTTPS detection |
+| **Session Management** *(v1.0.46+)* | `express-session` + SQLite store | 24-hour expiry (30 days with Remember Me), HTTPS-only cookies |
+| **Authentication** *(v1.0.46+)* | Argon2id + `requireAuth` middleware | 46 protected endpoints, account lockout after 5 failed attempts |
+| **CSRF Protection** *(v1.0.46+)* | `csrf-sync` (Synchronizer Token Pattern) | Token-based protection for all state-changing requests |
+| **CORS** | `cors()` with credentials | Configured for cross-origin requests with cookies |
+| **Rate Limiting** | `express-rate-limit` | 1,000 req/15min per IP (increased for single-user use) |
+| **Compression** | `compression()` | **Conditional**: Only if `TRUST_PROXY !== "true"` (avoids double compression with nginx) |
+| **Parsing** | `express.json` & `express.urlencoded` | 100MB limit for large CSV uploads |
+| **Uploads** | `multer` | CSV import only, 100MB cap, MIME type validation |
+| **Security Headers** | Custom middleware | `X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection` |
+| **Static Assets** | `express.static` | Serves root + `docs-html/` directories |
+| **Error Handling** | Global error handler | Catches unhandled errors, formats responses, logs details |
+
+---
+
+## Authentication & Security *(v1.0.46+)*
+
+### Authentication System
+
+HexTrackr implements enterprise-grade authentication with Argon2id password hashing and SQLite session storage.
+
+**Key Features**:
+- **Password Hashing**: Argon2id (timing-safe comparison) - industry standard for password security
+- **Session Storage**: SQLite-backed sessions with 24-hour expiry (30 days with Remember Me)
+- **Account Lockout**: 5 failed attempts triggers 15-minute lockout
+- **Secure Cookies**: HTTPS-only, HttpOnly, SameSite=lax
+- **Session Validation**: Every protected request validates session
+
+**Authentication Flow**:
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant S as Server
+    participant A as AuthService
+    participant D as Database
+
+    C->>S: POST /api/auth/login {username, password, rememberMe}
+    S->>A: authenticateUser(username, password)
+    A->>D: SELECT user WHERE username = ?
+    D-->>A: User record
+    A->>A: Check account lockout status
+    A->>A: Verify password with Argon2id
+    alt Password valid
+        A->>D: Reset failed attempts
+        A->>D: Update last login
+        A-->>S: User (without password hash)
+        S->>S: Create session (req.session.userId)
+        S-->>C: 200 OK {success: true, user: {...}}
+    else Password invalid
+        A->>D: Increment failed attempts
+        A-->>S: null
+        S-->>C: 401 Unauthorized
+    end
+```
+
+**Protected Routes**:
+
+```javascript
+// Middleware protects 46 endpoints
+router.get("/stats", requireAuth, VulnerabilityController.getStats);
+router.post("/import", requireAuth, upload.single("csvFile"), VulnerabilityController.importCSV);
+```
+
+**requireAuth Middleware**:
+
+```javascript
+function requireAuth(req, res, next) {
+    if (!req.session || !req.session.userId) {
+        return res.status(401).json({
+            error: "Authentication required",
+            authenticated: false
+        });
+    }
+    req.user = {
+        id: req.session.userId,
+        username: req.session.username,
+        role: req.session.role
+    };
+    next();
+}
+```
+
+### CSRF Protection
+
+HexTrackr implements CSRF protection using the Synchronizer Token Pattern via `csrf-sync`.
+
+**Configuration**:
+```javascript
+const { csrfSynchronisedProtection, generateToken } = csrfSync({
+    getTokenFromRequest: (req) => {
+        return req.headers["x-csrf-token"] ||
+               req.body?._csrf ||
+               req.query?._csrf;
+    },
+    ignoredMethods: ["GET", "HEAD", "OPTIONS"],
+    getTokenFromState: (req) => req.session.csrfToken,
+    storeTokenInState: (req, token) => { req.session.csrfToken = token; },
+    size: 128  // Token size in bits
+});
+```
+
+**Public Endpoints** (Excluded from CSRF):
+- `/api/auth/login` - Login endpoint (needs token before auth)
+- `/api/auth/csrf` - Token retrieval endpoint
+- `/api/auth/status` - Status check endpoint
+
+**Client-Side Usage**:
+
+```javascript
+// 1. Fetch CSRF token
+const response = await fetch("/api/auth/csrf", { credentials: "include" });
+const { csrfToken } = await response.json();
+
+// 2. Include in request headers
+fetch("/api/vulnerabilities", {
+    method: "POST",
+    headers: { "X-CSRF-Token": csrfToken },
+    credentials: "include",
+    body: JSON.stringify(data)
+});
+```
+
+### Trust Proxy Configuration
+
+**Setting**: `app.set("trust proxy", true)` - **ALWAYS ENABLED**
+
+**Critical Importance**:
+- Allows Express to read `X-Forwarded-Proto` header from nginx
+- Enables secure cookies with HTTPS termination at nginx
+- Required for authentication system to function correctly
+- **WITHOUT THIS**: Authentication will fail (cookies not set over HTTP)
+
+**Network Flow**:
+```
+Client → HTTPS (443) → nginx → HTTP (8080) → Express
+         Sets header:    Reads header:
+         X-Forwarded-Proto: https
+```
+
+### Session Configuration
+
+**Backend** (`app/middleware/auth.js`):
+
+```javascript
+session({
+    store: new SQLiteStore({
+        client: new Database("app/data/sessions.db"),
+        expired: { clear: true, intervalMs: 900000 }  // 15-min cleanup
+    }),
+    secret: process.env.SESSION_SECRET,  // REQUIRED (32+ chars)
+    name: "hextrackr.sid",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: true,        // HTTPS only (browsers enforce)
+        httpOnly: true,      // No JavaScript access
+        sameSite: "lax",     // Allow top-level navigation
+        maxAge: 24 * 60 * 60 * 1000  // 24 hours (30 days with Remember Me)
+    },
+    proxy: true  // ALWAYS true - required for nginx reverse proxy
+})
+```
+
+**Environment Variable Validation** (`app/middleware/auth.js:13-22`):
+
+```javascript
+if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) {
+    console.error("❌ CRITICAL: SESSION_SECRET is missing or too short!");
+    process.exit(1);  // Server refuses to start
+}
+```
+
+**Generate SESSION_SECRET**:
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
 
 ---
 
@@ -358,22 +554,28 @@ return `desc:${descriptionHash}|host:${hostIdentifier}`;
 
 ## API Surface (High-Level)
 
-| Domain | Endpoints | Documentation |
-| ------ | --------- | ------------- |
-| Health | `GET /health` | System health check |
-| Vulnerabilities | 14 endpoints for CRUD, stats, trends | [Backend API](../api-reference/backend-api.md#vulnerabilities) |
-| Imports | 6 endpoints for CSV/JSON imports | [Backend API](../api-reference/backend-api.md#imports) |
-| Tickets | 7 endpoints for CRUD and migration | [Backend API](../api-reference/backend-api.md#tickets) |
-| Backup/Restore | 6 endpoints for backup operations | [Backend API](../api-reference/backend-api.md#backup) |
-| Documentation | Stats and portal delivery | [Docs API](../api-reference/complete-reference.md#documentation) |
-| Reference | Sites and locations lookup | [Reference Data](../api-reference/complete-reference.md#reference-data) |
+| Domain | Endpoints | Authentication | Documentation |
+| ------ | --------- | -------------- | ------------- |
+| Health | 1 endpoint | Public | System health check |
+| Authentication *(v1.0.46+)* | 6 endpoints | Mixed | Login, logout, status, CSRF, profile, password change |
+| Vulnerabilities | 18 endpoints | `requireAuth` | CRUD, stats, trends, import/export, vendor stats |
+| Imports | 13 endpoints | `requireAuth` | CSV/JSON imports, progress tracking |
+| Tickets | 5 endpoints | `requireAuth` | Ticket CRUD operations |
+| Backup/Restore | 9 endpoints | `requireAuth` | Backup, restore, JSON/ZIP exports |
+| KEV *(v1.0.22+)* | 7 endpoints | `requireAuth` | CISA KEV sync, status, lookup |
+| Templates *(v1.0.46+)* | 7 endpoints | `requireAuth` | Email template management |
+| Preferences *(v1.0.46+)* | 7 endpoints | `requireAuth` | User preferences CRUD |
+| Devices *(HEX-101)* | 1 endpoint | `requireAuth` | Device statistics with vendor breakdown |
+| Documentation | 2 endpoints | Public | Stats and portal delivery |
 
 ### API Endpoint Summary
 
-- **Total Endpoints**: ~45 REST endpoints
-- **Import System**: 6 dedicated import endpoints (see [Backend API](../api-reference/backend-api.md#imports))
+- **Total Endpoints**: 75 REST endpoints across 10 route modules
+- **Protected Endpoints**: 46 endpoints with `requireAuth` middleware
+- **Public Endpoints**: 9 endpoints (health, auth, docs)
+- **Import System**: 13 dedicated import endpoints with progress tracking
 - **WebSocket**: Separate progress tracking on port 8988
-- **Rate Limited**: 100 requests per 15 minutes per IP
+- **Rate Limited**: 1,000 requests per 15 minutes per IP (increased for single-user use)
 
 ---
 

@@ -69,27 +69,27 @@
 </thead>
 <tbody><tr>
 <td><code>/app/controllers/</code></td>
-<td>5 controller modules</td>
-<td>Mixed (3 singleton, 2 functional)</td>
+<td>9 controller modules</td>
+<td>Singleton pattern (8), Functional (1)</td>
 </tr>
 <tr>
 <td><code>/app/services/</code></td>
-<td>10 service modules</td>
-<td>Functional exports</td>
+<td>15 service modules</td>
+<td>Functional exports with dependency injection</td>
 </tr>
 <tr>
 <td><code>/app/routes/</code></td>
-<td>5 route definition files</td>
+<td>10 route definition files</td>
 <td>Express router pattern</td>
 </tr>
 <tr>
 <td><code>/app/config/</code></td>
-<td>4 configuration modules</td>
+<td>5 configuration modules</td>
 <td>Module exports</td>
 </tr>
 <tr>
 <td><code>/app/middleware/</code></td>
-<td>4 middleware modules</td>
+<td>5 middleware modules</td>
 <td>Express middleware pattern</td>
 </tr>
 <tr>
@@ -126,16 +126,40 @@
 <td><code>initialize(db)</code></td>
 </tr>
 <tr>
+<td><code>templateController.js</code></td>
+<td>Singleton</td>
+<td>7 static methods</td>
+<td><code>initialize(db)</code></td>
+</tr>
+<tr>
+<td><code>authController.js</code></td>
+<td>Singleton</td>
+<td>5 static methods</td>
+<td><code>initialize(db)</code></td>
+</tr>
+<tr>
+<td><code>preferencesController.js</code></td>
+<td>Singleton</td>
+<td>7 static methods</td>
+<td><code>initialize(db)</code></td>
+</tr>
+<tr>
+<td><code>kevController.js</code></td>
+<td>Singleton</td>
+<td>7 static methods</td>
+<td><code>initialize(db)</code></td>
+</tr>
+<tr>
+<td><code>docsController.js</code></td>
+<td>Singleton</td>
+<td>2 static methods</td>
+<td>Direct instantiation</td>
+</tr>
+<tr>
 <td><code>importController.js</code></td>
 <td>Functional</td>
 <td>6 exported functions</td>
 <td><code>setProgressTracker(tracker)</code></td>
-</tr>
-<tr>
-<td><code>docsController.js</code></td>
-<td>Instance</td>
-<td>2 wrapped methods</td>
-<td>Direct instantiation</td>
 </tr>
 </tbody></table>
 <h3>Service Files</h3><table>
@@ -152,19 +176,39 @@
 <td><code>getDb()</code>, <code>runQuery()</code>, <code>transaction()</code></td>
 </tr>
 <tr>
+<td><code>authService.js</code> <em>(v1.0.46+)</em></td>
+<td>Authentication and session management</td>
+<td><code>authenticateUser()</code>, <code>validateSession()</code>, <code>changePassword()</code></td>
+</tr>
+<tr>
 <td><code>vulnerabilityService.js</code></td>
 <td>Vulnerability CRUD operations</td>
-<td><code>getVulnerabilities()</code>, <code>createVulnerability()</code></td>
+<td><code>getVulnerabilities()</code>, <code>createVulnerability()</code>, <code>streamExport()</code></td>
 </tr>
 <tr>
 <td><code>vulnerabilityStatsService.js</code></td>
 <td>Statistics and aggregations</td>
-<td><code>getStats()</code>, <code>getTrends()</code></td>
+<td><code>getStats()</code>, <code>getTrends()</code>, <code>getVendorStats()</code></td>
 </tr>
 <tr>
 <td><code>ticketService.js</code></td>
 <td>Ticket CRUD operations</td>
-<td><code>getTickets()</code>, <code>createTicket()</code></td>
+<td><code>getTickets()</code>, <code>createTicket()</code>, <code>updateTicket()</code></td>
+</tr>
+<tr>
+<td><code>templateService.js</code> <em>(v1.0.46+)</em></td>
+<td>Email template management</td>
+<td><code>getTemplates()</code>, <code>createTemplate()</code>, <code>updateTemplate()</code></td>
+</tr>
+<tr>
+<td><code>preferencesService.js</code> <em>(v1.0.46+)</em></td>
+<td>User preferences CRUD</td>
+<td><code>getPreferences()</code>, <code>updatePreferences()</code></td>
+</tr>
+<tr>
+<td><code>kevService.js</code> <em>(v1.0.22+)</em></td>
+<td>CISA KEV integration</td>
+<td><code>syncKevData()</code>, <code>getSyncStatus()</code>, <code>getKevByCve()</code></td>
 </tr>
 <tr>
 <td><code>importService.js</code></td>
@@ -174,7 +218,7 @@
 <tr>
 <td><code>backupService.js</code></td>
 <td>Backup/restore operations</td>
-<td><code>getBackupStats()</code>, <code>restoreBackup()</code></td>
+<td><code>getBackupStats()</code>, <code>restoreBackup()</code>, <code>exportData()</code></td>
 </tr>
 <tr>
 <td><code>docsService.js</code></td>
@@ -184,27 +228,27 @@
 <tr>
 <td><code>fileService.js</code></td>
 <td>File system operations</td>
-<td><code>readFile()</code>, <code>writeFile()</code></td>
+<td><code>readFile()</code>, <code>writeFile()</code>, <code>validatePath()</code></td>
 </tr>
 <tr>
 <td><code>progressService.js</code></td>
 <td>WebSocket progress tracking</td>
-<td><code>createSession()</code>, <code>updateProgress()</code></td>
+<td><code>createSession()</code>, <code>updateProgress()</code>, <code>completeSession()</code></td>
 </tr>
 <tr>
 <td><code>validationService.js</code></td>
 <td>Input validation and sanitization</td>
-<td><code>validateVulnerability()</code>, <code>sanitizeInput()</code></td>
+<td><code>validateVulnerability()</code>, <code>sanitizeInput()</code>, <code>validateTicket()</code></td>
 </tr>
 <tr>
-<td><code>kevService.js</code> <em>(v1.0.22+)</em></td>
-<td>CISA KEV integration</td>
-<td><code>syncKevData()</code>, <code>getSyncStatus()</code>, <code>getKevByCve()</code></td>
+<td><code>cacheService.js</code> <em>(v1.0.46+)</em></td>
+<td>Server-side caching with TTL</td>
+<td><code>withCaching()</code>, <code>invalidateCache()</code>, <code>getCacheStats()</code></td>
 </tr>
 </tbody></table>
 <hr>
 <h2>Controller Patterns</h2><p>The backend uses two distinct controller patterns, with ongoing migration toward singleton pattern for consistency:</p>
-<h3>Singleton Pattern Controllers</h3><p>Three controllers (<code>VulnerabilityController</code>, <code>TicketController</code>, <code>BackupController</code>) implement the singleton pattern:</p>
+<h3>Singleton Pattern Controllers</h3><p>Eight controllers implement the singleton pattern (<code>VulnerabilityController</code>, <code>TicketController</code>, <code>BackupController</code>, <code>TemplateController</code>, <code>AuthController</code>, <code>PreferencesController</code>, <code>KevController</code>, <code>DocsController</code>):</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">VulnerabilityController</span> {
     <span class="hljs-keyword">static</span> instance = <span class="hljs-literal">null</span>;
 
@@ -275,27 +319,24 @@
 <th>Current Pattern</th>
 <th>Target Pattern</th>
 <th>Priority</th>
+<th>Status</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>ImportController</td>
 <td>Functional</td>
 <td>Singleton</td>
-<td>High - Complex dependencies</td>
-</tr>
-<tr>
-<td>DocsController</td>
-<td>Instance</td>
-<td>Singleton</td>
-<td>Low - Simple controller</td>
+<td>Low</td>
+<td>Legacy pattern retained for compatibility</td>
 </tr>
 </tbody></table>
 <hr>
 <h2>Initialization Sequence</h2><p><strong>CRITICAL</strong>: The initialization order is crucial for proper dependency injection. Controllers must be initialized BEFORE routes are imported.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">startServer</span>(<span class="hljs-params"></span>) {
+<pre><code class="language-javascript"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">initializeApplication</span>(<span class="hljs-params"></span>) {
     <span class="hljs-comment">// 1. Initialize database FIRST</span>
-    <span class="hljs-keyword">await</span> <span class="hljs-title function_">initDb</span>();
-    <span class="hljs-keyword">const</span> db = <span class="hljs-title function_">getDatabase</span>();
+    <span class="hljs-keyword">await</span> databaseService.<span class="hljs-title function_">initialize</span>();
+    <span class="hljs-keyword">const</span> db = databaseService.<span class="hljs-property">db</span>;
+    <span class="hljs-variable language_">global</span>.<span class="hljs-property">db</span> = db;  <span class="hljs-comment">// Maintain compatibility</span>
 
     <span class="hljs-comment">// 2. Initialize utilities</span>
     <span class="hljs-keyword">const</span> progressTracker = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ProgressTracker</span>(io);
@@ -305,25 +346,42 @@
     <span class="hljs-title class_">VulnerabilityController</span>.<span class="hljs-title function_">initialize</span>(db, progressTracker);
     <span class="hljs-title class_">TicketController</span>.<span class="hljs-title function_">initialize</span>(db);
     <span class="hljs-title class_">BackupController</span>.<span class="hljs-title function_">initialize</span>(db);
+    <span class="hljs-title class_">TemplateController</span>.<span class="hljs-title function_">initialize</span>(db);
+    <span class="hljs-title class_">AuthController</span>.<span class="hljs-title function_">initialize</span>(db);
+    <span class="hljs-title class_">PreferencesController</span>.<span class="hljs-title function_">initialize</span>(db);
+    <span class="hljs-title class_">KevController</span>.<span class="hljs-title function_">initialize</span>(db);
 
     <span class="hljs-comment">// For functional controllers</span>
     <span class="hljs-title class_">ImportController</span>.<span class="hljs-title function_">setProgressTracker</span>(progressTracker);
 
-    <span class="hljs-comment">// 4. NOW import routes (after controllers are ready)</span>
+    <span class="hljs-comment">// 4. Seed data (if needed)</span>
+    <span class="hljs-keyword">await</span> <span class="hljs-title function_">seedAllTemplates</span>(db);
+
+    <span class="hljs-comment">// 5. NOW import routes (after controllers are ready)</span>
     <span class="hljs-keyword">const</span> vulnerabilityRoutes = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;../routes/vulnerabilities&quot;</span>);
     <span class="hljs-keyword">const</span> ticketRoutes = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;../routes/tickets&quot;</span>);
     <span class="hljs-keyword">const</span> backupRoutes = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;../routes/backup&quot;</span>);
+    <span class="hljs-keyword">const</span> templateRoutes = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;../routes/templates&quot;</span>);
+    <span class="hljs-keyword">const</span> authRoutes = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;../routes/auth&quot;</span>);
+    <span class="hljs-keyword">const</span> preferencesRoutes = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;../routes/preferences&quot;</span>);
+    <span class="hljs-keyword">const</span> kevRoutes = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;../routes/kev&quot;</span>);
     <span class="hljs-keyword">const</span> importRoutes = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;../routes/imports&quot;</span>);
     <span class="hljs-keyword">const</span> docsRoutes = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;../routes/docs&quot;</span>);
+    <span class="hljs-keyword">const</span> devicesRoutes = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;../routes/devices&quot;</span>);
 
-    <span class="hljs-comment">// 5. Mount routes on Express app</span>
+    <span class="hljs-comment">// 6. Mount routes on Express app</span>
     app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/vulnerabilities&quot;</span>, vulnerabilityRoutes);
     app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/tickets&quot;</span>, ticketRoutes);
     app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/backup&quot;</span>, backupRoutes);
+    app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/templates&quot;</span>, templateRoutes);
+    app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/auth&quot;</span>, authRoutes);
+    app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/preferences&quot;</span>, preferencesRoutes);
+    app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/kev&quot;</span>, kevRoutes);
     app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api&quot;</span>, importRoutes);  <span class="hljs-comment">// Import routes at root API level</span>
     app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/docs&quot;</span>, docsRoutes);
+    app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/devices&quot;</span>, devicesRoutes);
 
-    <span class="hljs-comment">// 6. Start server</span>
+    <span class="hljs-comment">// 7. Start server</span>
     server.<span class="hljs-title function_">listen</span>(<span class="hljs-variable constant_">PORT</span>, <span class="hljs-function">() =&gt;</span> {
         <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Server running on port <span class="hljs-subst">${PORT}</span>`</span>);
     });
@@ -390,34 +448,183 @@
 <tr>
 <th>Concern</th>
 <th>Implementation</th>
+<th>Details</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>CORS</td>
-<td><code>cors()</code> (open by default)</td>
+<td><strong>Trust Proxy</strong> <em>(CRITICAL)</em></td>
+<td><code>app.set(&quot;trust proxy&quot;, true)</code></td>
+<td><strong>ALWAYS enabled</strong> - Required for nginx reverse proxy, enables HTTPS detection</td>
 </tr>
 <tr>
-<td>Compression</td>
+<td><strong>Session Management</strong> <em>(v1.0.46+)</em></td>
+<td><code>express-session</code> + SQLite store</td>
+<td>24-hour expiry (30 days with Remember Me), HTTPS-only cookies</td>
+</tr>
+<tr>
+<td><strong>Authentication</strong> <em>(v1.0.46+)</em></td>
+<td>Argon2id + <code>requireAuth</code> middleware</td>
+<td>46 protected endpoints, account lockout after 5 failed attempts</td>
+</tr>
+<tr>
+<td><strong>CSRF Protection</strong> <em>(v1.0.46+)</em></td>
+<td><code>csrf-sync</code> (Synchronizer Token Pattern)</td>
+<td>Token-based protection for all state-changing requests</td>
+</tr>
+<tr>
+<td><strong>CORS</strong></td>
+<td><code>cors()</code> with credentials</td>
+<td>Configured for cross-origin requests with cookies</td>
+</tr>
+<tr>
+<td><strong>Rate Limiting</strong></td>
+<td><code>express-rate-limit</code></td>
+<td>1,000 req/15min per IP (increased for single-user use)</td>
+</tr>
+<tr>
+<td><strong>Compression</strong></td>
 <td><code>compression()</code></td>
+<td><strong>Conditional</strong>: Only if <code>TRUST_PROXY !== &quot;true&quot;</code> (avoids double compression with nginx)</td>
 </tr>
 <tr>
-<td>Parsing</td>
-<td><code>express.json</code> &amp; <code>express.urlencoded</code> (100MB limit)</td>
+<td><strong>Parsing</strong></td>
+<td><code>express.json</code> &amp; <code>express.urlencoded</code></td>
+<td>100MB limit for large CSV uploads</td>
 </tr>
 <tr>
-<td>Uploads</td>
-<td><code>multer</code> (CSV import; 100 MB cap)</td>
+<td><strong>Uploads</strong></td>
+<td><code>multer</code></td>
+<td>CSV import only, 100MB cap, MIME type validation</td>
 </tr>
 <tr>
-<td>Security Headers</td>
+<td><strong>Security Headers</strong></td>
+<td>Custom middleware</td>
 <td><code>X-Content-Type-Options</code>, <code>X-Frame-Options</code>, <code>X-XSS-Protection</code></td>
 </tr>
 <tr>
-<td>Static Assets</td>
-<td><code>express.static</code> (root + <code>docs-html/</code>)</td>
+<td><strong>Static Assets</strong></td>
+<td><code>express.static</code></td>
+<td>Serves root + <code>docs-html/</code> directories</td>
+</tr>
+<tr>
+<td><strong>Error Handling</strong></td>
+<td>Global error handler</td>
+<td>Catches unhandled errors, formats responses, logs details</td>
 </tr>
 </tbody></table>
 <hr>
+<h2>Authentication & Security *(v1.0.46+)*</h2><h3>Authentication System</h3><p>HexTrackr implements enterprise-grade authentication with Argon2id password hashing and SQLite session storage.</p>
+<p><strong>Key Features</strong>:</p>
+<ul>
+<li><strong>Password Hashing</strong>: Argon2id (timing-safe comparison) - industry standard for password security</li>
+<li><strong>Session Storage</strong>: SQLite-backed sessions with 24-hour expiry (30 days with Remember Me)</li>
+<li><strong>Account Lockout</strong>: 5 failed attempts triggers 15-minute lockout</li>
+<li><strong>Secure Cookies</strong>: HTTPS-only, HttpOnly, SameSite=lax</li>
+<li><strong>Session Validation</strong>: Every protected request validates session</li>
+</ul>
+<p><strong>Authentication Flow</strong>:</p>
+<div class="mermaid">sequenceDiagram
+    participant C as Client
+    participant S as Server
+    participant A as AuthService
+    participant D as Database
+
+    C-&gt;&gt;S: POST /api/auth/login {username, password, rememberMe}
+    S-&gt;&gt;A: authenticateUser(username, password)
+    A-&gt;&gt;D: SELECT user WHERE username = ?
+    D--&gt;&gt;A: User record
+    A-&gt;&gt;A: Check account lockout status
+    A-&gt;&gt;A: Verify password with Argon2id
+    alt Password valid
+        A-&gt;&gt;D: Reset failed attempts
+        A-&gt;&gt;D: Update last login
+        A--&gt;&gt;S: User (without password hash)
+        S-&gt;&gt;S: Create session (req.session.userId)
+        S--&gt;&gt;C: 200 OK {success: true, user: {...}}
+    else Password invalid
+        A-&gt;&gt;D: Increment failed attempts
+        A--&gt;&gt;S: null
+        S--&gt;&gt;C: 401 Unauthorized
+    end</div><p><strong>Protected Routes</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Middleware protects 46 endpoints</span>
+router.<span class="hljs-title function_">get</span>(<span class="hljs-string">&quot;/stats&quot;</span>, requireAuth, <span class="hljs-title class_">VulnerabilityController</span>.<span class="hljs-property">getStats</span>);
+router.<span class="hljs-title function_">post</span>(<span class="hljs-string">&quot;/import&quot;</span>, requireAuth, upload.<span class="hljs-title function_">single</span>(<span class="hljs-string">&quot;csvFile&quot;</span>), <span class="hljs-title class_">VulnerabilityController</span>.<span class="hljs-property">importCSV</span>);</code></pre><p><strong>requireAuth Middleware</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">requireAuth</span>(<span class="hljs-params">req, res, next</span>) {
+    <span class="hljs-keyword">if</span> (!req.<span class="hljs-property">session</span> || !req.<span class="hljs-property">session</span>.<span class="hljs-property">userId</span>) {
+        <span class="hljs-keyword">return</span> res.<span class="hljs-title function_">status</span>(<span class="hljs-number">401</span>).<span class="hljs-title function_">json</span>({
+            <span class="hljs-attr">error</span>: <span class="hljs-string">&quot;Authentication required&quot;</span>,
+            <span class="hljs-attr">authenticated</span>: <span class="hljs-literal">false</span>
+        });
+    }
+    req.<span class="hljs-property">user</span> = {
+        <span class="hljs-attr">id</span>: req.<span class="hljs-property">session</span>.<span class="hljs-property">userId</span>,
+        <span class="hljs-attr">username</span>: req.<span class="hljs-property">session</span>.<span class="hljs-property">username</span>,
+        <span class="hljs-attr">role</span>: req.<span class="hljs-property">session</span>.<span class="hljs-property">role</span>
+    };
+    <span class="hljs-title function_">next</span>();
+}</code></pre><h3>CSRF Protection</h3><p>HexTrackr implements CSRF protection using the Synchronizer Token Pattern via <code>csrf-sync</code>.</p>
+<p><strong>Configuration</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> { csrfSynchronisedProtection, generateToken } = <span class="hljs-title function_">csrfSync</span>({
+    <span class="hljs-attr">getTokenFromRequest</span>: <span class="hljs-function">(<span class="hljs-params">req</span>) =&gt;</span> {
+        <span class="hljs-keyword">return</span> req.<span class="hljs-property">headers</span>[<span class="hljs-string">&quot;x-csrf-token&quot;</span>] ||
+               req.<span class="hljs-property">body</span>?.<span class="hljs-property">_csrf</span> ||
+               req.<span class="hljs-property">query</span>?.<span class="hljs-property">_csrf</span>;
+    },
+    <span class="hljs-attr">ignoredMethods</span>: [<span class="hljs-string">&quot;GET&quot;</span>, <span class="hljs-string">&quot;HEAD&quot;</span>, <span class="hljs-string">&quot;OPTIONS&quot;</span>],
+    <span class="hljs-attr">getTokenFromState</span>: <span class="hljs-function">(<span class="hljs-params">req</span>) =&gt;</span> req.<span class="hljs-property">session</span>.<span class="hljs-property">csrfToken</span>,
+    <span class="hljs-attr">storeTokenInState</span>: <span class="hljs-function">(<span class="hljs-params">req, token</span>) =&gt;</span> { req.<span class="hljs-property">session</span>.<span class="hljs-property">csrfToken</span> = token; },
+    <span class="hljs-attr">size</span>: <span class="hljs-number">128</span>  <span class="hljs-comment">// Token size in bits</span>
+});</code></pre><p><strong>Public Endpoints</strong> (Excluded from CSRF):</p>
+<ul>
+<li><code>/api/auth/login</code> - Login endpoint (needs token before auth)</li>
+<li><code>/api/auth/csrf</code> - Token retrieval endpoint</li>
+<li><code>/api/auth/status</code> - Status check endpoint</li>
+</ul>
+<p><strong>Client-Side Usage</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// 1. Fetch CSRF token</span>
+<span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string">&quot;/api/auth/csrf&quot;</span>, { <span class="hljs-attr">credentials</span>: <span class="hljs-string">&quot;include&quot;</span> });
+<span class="hljs-keyword">const</span> { csrfToken } = <span class="hljs-keyword">await</span> response.<span class="hljs-title function_">json</span>();
+
+<span class="hljs-comment">// 2. Include in request headers</span>
+<span class="hljs-title function_">fetch</span>(<span class="hljs-string">&quot;/api/vulnerabilities&quot;</span>, {
+    <span class="hljs-attr">method</span>: <span class="hljs-string">&quot;POST&quot;</span>,
+    <span class="hljs-attr">headers</span>: { <span class="hljs-string">&quot;X-CSRF-Token&quot;</span>: csrfToken },
+    <span class="hljs-attr">credentials</span>: <span class="hljs-string">&quot;include&quot;</span>,
+    <span class="hljs-attr">body</span>: <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(data)
+});</code></pre><h3>Trust Proxy Configuration</h3><p><strong>Setting</strong>: <code>app.set(&quot;trust proxy&quot;, true)</code> - <strong>ALWAYS ENABLED</strong></p>
+<p><strong>Critical Importance</strong>:</p>
+<ul>
+<li>Allows Express to read <code>X-Forwarded-Proto</code> header from nginx</li>
+<li>Enables secure cookies with HTTPS termination at nginx</li>
+<li>Required for authentication system to function correctly</li>
+<li><strong>WITHOUT THIS</strong>: Authentication will fail (cookies not set over HTTP)</li>
+</ul>
+<p><strong>Network Flow</strong>:</p>
+<pre><code class="language-">Client → HTTPS (443) → nginx → HTTP (8080) → Express
+         Sets header:    Reads header:
+         X-Forwarded-Proto: https</code></pre><h3>Session Configuration</h3><p><strong>Backend</strong> (<code>app/middleware/auth.js</code>):</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">session</span>({
+    <span class="hljs-attr">store</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">SQLiteStore</span>({
+        <span class="hljs-attr">client</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">Database</span>(<span class="hljs-string">&quot;app/data/sessions.db&quot;</span>),
+        <span class="hljs-attr">expired</span>: { <span class="hljs-attr">clear</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">intervalMs</span>: <span class="hljs-number">900000</span> }  <span class="hljs-comment">// 15-min cleanup</span>
+    }),
+    <span class="hljs-attr">secret</span>: process.<span class="hljs-property">env</span>.<span class="hljs-property">SESSION_SECRET</span>,  <span class="hljs-comment">// REQUIRED (32+ chars)</span>
+    <span class="hljs-attr">name</span>: <span class="hljs-string">&quot;hextrackr.sid&quot;</span>,
+    <span class="hljs-attr">resave</span>: <span class="hljs-literal">false</span>,
+    <span class="hljs-attr">saveUninitialized</span>: <span class="hljs-literal">false</span>,
+    <span class="hljs-attr">cookie</span>: {
+        <span class="hljs-attr">secure</span>: <span class="hljs-literal">true</span>,        <span class="hljs-comment">// HTTPS only (browsers enforce)</span>
+        <span class="hljs-attr">httpOnly</span>: <span class="hljs-literal">true</span>,      <span class="hljs-comment">// No JavaScript access</span>
+        <span class="hljs-attr">sameSite</span>: <span class="hljs-string">&quot;lax&quot;</span>,     <span class="hljs-comment">// Allow top-level navigation</span>
+        <span class="hljs-attr">maxAge</span>: <span class="hljs-number">24</span> * <span class="hljs-number">60</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>  <span class="hljs-comment">// 24 hours (30 days with Remember Me)</span>
+    },
+    <span class="hljs-attr">proxy</span>: <span class="hljs-literal">true</span>  <span class="hljs-comment">// ALWAYS true - required for nginx reverse proxy</span>
+})</code></pre><p><strong>Environment Variable Validation</strong> (<code>app/middleware/auth.js:13-22</code>):</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">if</span> (!process.<span class="hljs-property">env</span>.<span class="hljs-property">SESSION_SECRET</span> || process.<span class="hljs-property">env</span>.<span class="hljs-property">SESSION_SECRET</span>.<span class="hljs-property">length</span> &lt; <span class="hljs-number">32</span>) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&quot;❌ CRITICAL: SESSION_SECRET is missing or too short!&quot;</span>);
+    process.<span class="hljs-title function_">exit</span>(<span class="hljs-number">1</span>);  <span class="hljs-comment">// Server refuses to start</span>
+}</code></pre><p><strong>Generate SESSION_SECRET</strong>:</p>
+<pre><code class="language-bash">node -e <span class="hljs-string">&quot;console.log(require(&#x27;crypto&#x27;).randomBytes(32).toString(&#x27;hex&#x27;))&quot;</span></code></pre><hr>
 <h2>Persistence & Schema Evolution</h2><ul>
 <li><strong>Initialization</strong>: If DB missing, runs <code>scripts/init-database.js</code>.</li>
 <li><strong>Runtime Evolution</strong>: Idempotent <code>ALTER TABLE</code> adds new columns (<code>vendor</code>, <code>vulnerability_date</code>, <code>state</code>, <code>import_date</code>, etc.) to legacy tables for backward compatibility.</li>
@@ -507,50 +714,84 @@
 <tr>
 <th>Domain</th>
 <th>Endpoints</th>
+<th>Authentication</th>
 <th>Documentation</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>Health</td>
-<td><code>GET /health</code></td>
+<td>1 endpoint</td>
+<td>Public</td>
 <td>System health check</td>
 </tr>
 <tr>
+<td>Authentication <em>(v1.0.46+)</em></td>
+<td>6 endpoints</td>
+<td>Mixed</td>
+<td>Login, logout, status, CSRF, profile, password change</td>
+</tr>
+<tr>
 <td>Vulnerabilities</td>
-<td>14 endpoints for CRUD, stats, trends</td>
-<td><a href="../api-reference/backend-api.md#vulnerabilities">Backend API</a></td>
+<td>18 endpoints</td>
+<td><code>requireAuth</code></td>
+<td>CRUD, stats, trends, import/export, vendor stats</td>
 </tr>
 <tr>
 <td>Imports</td>
-<td>6 endpoints for CSV/JSON imports</td>
-<td><a href="../api-reference/backend-api.md#imports">Backend API</a></td>
+<td>13 endpoints</td>
+<td><code>requireAuth</code></td>
+<td>CSV/JSON imports, progress tracking</td>
 </tr>
 <tr>
 <td>Tickets</td>
-<td>7 endpoints for CRUD and migration</td>
-<td><a href="../api-reference/backend-api.md#tickets">Backend API</a></td>
+<td>5 endpoints</td>
+<td><code>requireAuth</code></td>
+<td>Ticket CRUD operations</td>
 </tr>
 <tr>
 <td>Backup/Restore</td>
-<td>6 endpoints for backup operations</td>
-<td><a href="../api-reference/backend-api.md#backup">Backend API</a></td>
+<td>9 endpoints</td>
+<td><code>requireAuth</code></td>
+<td>Backup, restore, JSON/ZIP exports</td>
+</tr>
+<tr>
+<td>KEV <em>(v1.0.22+)</em></td>
+<td>7 endpoints</td>
+<td><code>requireAuth</code></td>
+<td>CISA KEV sync, status, lookup</td>
+</tr>
+<tr>
+<td>Templates <em>(v1.0.46+)</em></td>
+<td>7 endpoints</td>
+<td><code>requireAuth</code></td>
+<td>Email template management</td>
+</tr>
+<tr>
+<td>Preferences <em>(v1.0.46+)</em></td>
+<td>7 endpoints</td>
+<td><code>requireAuth</code></td>
+<td>User preferences CRUD</td>
+</tr>
+<tr>
+<td>Devices <em>(HEX-101)</em></td>
+<td>1 endpoint</td>
+<td><code>requireAuth</code></td>
+<td>Device statistics with vendor breakdown</td>
 </tr>
 <tr>
 <td>Documentation</td>
+<td>2 endpoints</td>
+<td>Public</td>
 <td>Stats and portal delivery</td>
-<td><a href="../api-reference/complete-reference.md#documentation">Docs API</a></td>
-</tr>
-<tr>
-<td>Reference</td>
-<td>Sites and locations lookup</td>
-<td><a href="../api-reference/complete-reference.md#reference-data">Reference Data</a></td>
 </tr>
 </tbody></table>
 <h3>API Endpoint Summary</h3><ul>
-<li><strong>Total Endpoints</strong>: ~45 REST endpoints</li>
-<li><strong>Import System</strong>: 6 dedicated import endpoints (see <a href="../api-reference/backend-api.md#imports">Backend API</a>)</li>
+<li><strong>Total Endpoints</strong>: 75 REST endpoints across 10 route modules</li>
+<li><strong>Protected Endpoints</strong>: 46 endpoints with <code>requireAuth</code> middleware</li>
+<li><strong>Public Endpoints</strong>: 9 endpoints (health, auth, docs)</li>
+<li><strong>Import System</strong>: 13 dedicated import endpoints with progress tracking</li>
 <li><strong>WebSocket</strong>: Separate progress tracking on port 8988</li>
-<li><strong>Rate Limited</strong>: 100 requests per 15 minutes per IP</li>
+<li><strong>Rate Limited</strong>: 1,000 requests per 15 minutes per IP (increased for single-user use)</li>
 </ul>
 <hr>
 <h2>Real-time Communication (WebSocket)</h2><h3>ProgressTracker Architecture</h3><p>HexTrackr implements a sophisticated WebSocket-based progress tracking system through the <code>ProgressTracker</code> class:</p>
