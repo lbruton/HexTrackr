@@ -363,6 +363,14 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
                 updateColumnVisibility(params.api);
                 // Ensure columns fill available width when data is first rendered
                 params.api.sizeColumnsToFit();
+
+                // HEX-170: Initialize footer with database metadata on first data render
+                if (typeof componentContext.updatePaginationInfo === "function") {
+                    const totalRows = params.api.getDisplayedRowCount();
+                    const currentPage = params.api.paginationGetCurrentPage();
+                    const pageSize = params.api.paginationGetPageSize();
+                    componentContext.updatePaginationInfo(totalRows, currentPage, pageSize);
+                }
             }
         },
 
