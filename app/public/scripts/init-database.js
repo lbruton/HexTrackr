@@ -3,7 +3,6 @@
 
 const sqlite3 = require("sqlite3").verbose();
 const path = require("path");
-const { randomBytes } = require("crypto");
 const argon2 = require("argon2");
 
 const dbPath = path.join(__dirname, "..", "..", "data", "hextrackr.db");
@@ -445,8 +444,8 @@ async function seedInitialData(db) {
       // Only seed admin if it doesn't exist
       if (!row || row.count === 0) {
         try {
-          // Generate cryptographically secure initial password
-          const initialPassword = randomBytes(16).toString("hex");
+          // Default initial password (MUST be changed after first login)
+          const initialPassword = "admin123!";
 
           // Hash password with Argon2id
           const passwordHash = await argon2.hash(initialPassword, {

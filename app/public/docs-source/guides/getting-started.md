@@ -218,6 +218,19 @@ For developers working directly on the HexTrackr codebase without Docker.
     npm run init-db
     ```
 
+    **Initial Admin Credentials**:
+
+    After database initialization, the console will display your admin credentials:
+
+    ```
+    🔐 INITIAL ADMIN CREDENTIALS (SAVE THESE!)
+    Username: admin
+    Password: admin123!
+    ⚠️  CHANGE THIS PASSWORD IMMEDIATELY AFTER FIRST LOGIN!
+    ```
+
+    **Security Note**: The default password `admin123!` is a convenience for first-time setup. You **must** change it immediately after logging in for the first time.
+
 4. **Configure Environment**
 
     Create a `.env` file in the project root:
