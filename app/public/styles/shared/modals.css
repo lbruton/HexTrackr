@@ -279,12 +279,18 @@
    Modal Animations
    =========================== */
 
+/* Disable modal animations to prevent visual artifacts (HEX-168)
+   Instant close provides better UX for utility modals */
 .modal.fade .modal-dialog {
-    transition: transform 0.3s ease-out;
+    transition: none !important;
 }
 
-.modal.show .modal-dialog {
-    transform: none;
+.modal.fade {
+    transition: none !important;
+}
+
+.modal-backdrop.fade {
+    transition: none !important;
 }
 
 /* ===========================
