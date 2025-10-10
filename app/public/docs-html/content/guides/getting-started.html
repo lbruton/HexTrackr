@@ -120,7 +120,13 @@ docker-compose restart</code></pre><p><strong>Note</strong>: Use either <code>do
 <li>Fresh installations (no existing <code>app/data/hextrackr.db</code> file)</li>
 <li>Development environments where schema recreation is acceptable</li>
 </ul>
-<pre><code class="language-bash">npm run init-db</code></pre></li>
+<pre><code class="language-bash">npm run init-db</code></pre><p> <strong>Initial Admin Credentials</strong>:</p>
+<p> After database initialization, the console will display your admin credentials:</p>
+<pre><code class="language-">🔐 INITIAL ADMIN CREDENTIALS (SAVE THESE!)
+Username: admin
+Password: admin123!
+⚠️  CHANGE THIS PASSWORD IMMEDIATELY AFTER FIRST LOGIN!</code></pre><p> <strong>Security Note</strong>: The default password <code>admin123!</code> is a convenience for first-time setup. You <strong>must</strong> change it immediately after logging in for the first time.</p>
+</li>
 <li><p><strong>Configure Environment</strong></p>
 <p> Create a <code>.env</code> file in the project root:</p>
 <pre><code class="language-bash">SESSION_SECRET=your-secure-random-string-here

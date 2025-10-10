@@ -1,0 +1,93 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.57</h1><hr>
+<h2>[1.0.57] - 2025-10-10</h2><h3>Fixed</h3><h4>AG-Grid Table Height Synchronization (HEX-169)</h4><p><strong>Overview</strong>: Fixed visual gap between AG-Grid table bottom and Tabler card container by removing conflicting height constraints that prevented AG-Grid&#39;s auto-height feature from working.</p>
+<p><strong>Problem</strong>:</p>
+<ul>
+<li>AG-Grid vulnerability table displayed large visual gaps in empty states and small filtered result sets</li>
+<li>Gap most noticeable when: no data loaded, 10 items per page, or vendor filters applied</li>
+<li>Card maintained fixed height regardless of table content size</li>
+<li>Reduced UI polish and professional appearance</li>
+</ul>
+<p><strong>Root Cause</strong>: Triple-layer height conflict</p>
+<ol>
+<li>✅ AG-Grid correctly configured with <code>domLayout: &quot;autoHeight&quot;</code> (line 309 in ag-grid-responsive-config.js)</li>
+<li>❌ <code>#vulnGrid</code> had fixed heights (500px desktop, 400px mobile) in responsive.css overriding auto-height</li>
+<li>❌ Parent <code>.card-body.p-2</code> enforced <code>min-height: 600px</code> creating excessive whitespace</li>
+</ol>
+<p><strong>Solution Implemented</strong>:</p>
+<p><strong>Part 1 - Remove Fixed Grid Heights</strong>:</p>
+<ul>
+<li><strong>File</strong>: <code>app/public/styles/utils/responsive.css</code></li>
+<li><strong>Changes</strong>:<ul>
+<li>Line 7: Removed <code>height: 500px</code> from <code>#vulnGrid</code> (@media max-width: 768px)</li>
+<li>Line 66: Removed <code>height: 400px</code> from <code>#vulnGrid</code> (@media max-width: 576px)</li>
+</ul>
+</li>
+<li><strong>Effect</strong>: Allows AG-Grid&#39;s <code>domLayout: &quot;autoHeight&quot;</code> to control sizing</li>
+</ul>
+<p><strong>Part 2 - Reduce Card Minimum Height</strong>:</p>
+<ul>
+<li><strong>File</strong>: <code>app/public/styles/pages/vulnerabilities.css</code></li>
+<li><strong>Change</strong>: Line 229: Reduced <code>.card-body.p-2</code> min-height from <code>600px</code> → <code>300px</code> (50% reduction)</li>
+<li><strong>Effect</strong>: Prevents excessive whitespace while maintaining reasonable minimum size</li>
+</ul>
+<p><strong>Technical Details</strong>:</p>
+<p><strong>Flexbox Parent Structure</strong> (verified correct from v1.0.13):</p>
+<pre><code class="language-css"><span class="hljs-selector-class">.card-body</span><span class="hljs-selector-class">.p-2</span> {
+    <span class="hljs-attribute">display</span>: flex;
+    <span class="hljs-attribute">flex-direction</span>: column;
+    <span class="hljs-attribute">min-height</span>: <span class="hljs-number">300px</span>; <span class="hljs-comment">/* Now 300px instead of 600px */</span>
+}
+
+<span class="hljs-selector-class">.view-content</span> {
+    <span class="hljs-attribute">flex-grow</span>: <span class="hljs-number">1</span>;
+    <span class="hljs-attribute">display</span>: flex;
+    <span class="hljs-attribute">flex-direction</span>: column;
+}
+
+<span class="hljs-selector-id">#tableView</span> {
+    <span class="hljs-attribute">height</span>: <span class="hljs-number">100%</span>;
+}
+
+<span class="hljs-selector-id">#vulnGrid</span> {
+    <span class="hljs-attribute">width</span>: <span class="hljs-number">100%</span>;
+    <span class="hljs-comment">/* No fixed height - AG-Grid autoHeight controls this */</span>
+}</code></pre><p><strong>AG-Grid Configuration</strong> (already correct):</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> gridOptions = {
+    <span class="hljs-attr">domLayout</span>: <span class="hljs-string">&quot;autoHeight&quot;</span>,  <span class="hljs-comment">// Auto-sizes to content</span>
+    <span class="hljs-attr">pagination</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attr">paginationPageSize</span>: <span class="hljs-number">10</span>,
+    <span class="hljs-comment">// ... other options</span>
+};</code></pre><p><strong>Testing Completed</strong>:</p>
+<ul>
+<li>✅ Empty state: KEV + Other filters (0 results) - no gap verified</li>
+<li>✅ Visual regression: Dark and light themes confirmed working</li>
+<li>✅ Responsive: Card shrinks appropriately on all viewport sizes</li>
+</ul>
+<p><strong>Historical Context</strong>:<br>This was a <strong>regression</strong> from v1.0.13 which originally solved this with flexbox. Subsequent CSS changes re-introduced fixed heights that overrode the working solution.</p>
+<p><strong>Result</strong>:</p>
+<ul>
+<li>Table seamlessly fits content height in all states</li>
+<li>No visual gap between table and card bottom</li>
+<li>Professional, polished appearance maintained</li>
+<li>AG-Grid auto-height feature now works as designed</li>
+</ul>
+<hr>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>package.json</code> - Version bumped to 1.0.57</li>
+<li><code>app/public/styles/utils/responsive.css</code> - Removed fixed heights from #vulnGrid</li>
+<li><code>app/public/styles/pages/vulnerabilities.css</code> - Reduced .card-body.p-2 min-height</li>
+</ul>
+<p><strong>Issues</strong>:</p>
+<ul>
+<li><a href="https://linear.app/hextrackr/issue/HEX-169">HEX-169</a> - AG-Grid table height doesn&#39;t synchronize with Tabler card container</li>
+</ul>
+<hr>
+<p><strong>Version</strong>: 1.0.57<br><strong>Last Updated</strong>: 2025-10-10</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
