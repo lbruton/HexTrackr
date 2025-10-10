@@ -323,6 +323,24 @@ class HtmlContentUpdater {
                 console.warn(`  ⚠️  Could not update server.js: ${error.message}`);
             }
 
+            // 6. Update login.html version footer
+            try {
+                const loginPath = path.join(process.cwd(), "app", "public", "login.html");
+                const loginContent = await fs.readFile(loginPath, "utf8");
+                const updatedLogin = loginContent.replace(
+                    /HexTrackr v[\d.]+/g,
+                    `HexTrackr v${currentVersion}`
+                );
+
+                if (loginContent !== updatedLogin) {
+                    await fs.writeFile(loginPath, updatedLogin);
+                    console.log("  ✅ Updated login.html version footer");
+                    updatesApplied++;
+                }
+            } catch (error) {
+                console.warn(`  ⚠️  Could not update login.html: ${error.message}`);
+            }
+
             if (updatesApplied > 0) {
                 console.log(`✨ Version sync complete: ${updatesApplied} files updated to v${currentVersion}`);
             } else {
