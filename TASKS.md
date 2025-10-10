@@ -332,9 +332,8 @@ Good luck, Clone 3! Document everything you find! 🧪🔬
 
 | Commit Hash | Tasks | Notes |
 |-------------|-------|-------|
-| (empty pre-work) | Pre-work safety | Empty commit before starting |
-|  | 1.1, 1.2 | Keyboard shortcuts + sessionStorage |
-|  | 1.3, 1.4 | Modal pre-population + autofill fix |
+| 608c94d | Pre-work safety | Empty commit before starting |
+| e007372 | 1.1, 1.2, 1.3, 1.4 | All tasks committed together (pre-commit hook auto-staged all files) |
 
 ---
 
