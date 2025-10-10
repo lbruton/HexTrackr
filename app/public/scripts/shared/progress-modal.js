@@ -670,60 +670,6 @@ class ProgressModal {
             }
         }
 
-        // Resolved CVEs Section
-        if (cveDiscovery && cveDiscovery.totalResolvedCves > 0) {
-            html += `
-                <div class="row mb-3">
-                    <div class="col-12">
-                        <h6 class="text-success">✅ Resolved CVEs</h6>
-                        <div class="alert alert-success">
-                            <strong>${cveDiscovery.totalResolvedCves} CVE${cveDiscovery.totalResolvedCves !== 1 ? "s" : ""} resolved</strong>
-                            (previously affected <strong>${cveDiscovery.totalResolvedVulnerabilities.toLocaleString()} vulnerabilities</strong>)
-                            <small class="d-block mt-1">Total VPR Reduction: -${cveDiscovery.totalResolvedVpr.toLocaleString()}</small>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            // Show top resolved CVEs (limit to 5)
-            if (cveDiscovery.resolvedCves && cveDiscovery.resolvedCves.length > 0) {
-                const topResolved = cveDiscovery.resolvedCves.slice(0, 5);
-                html += `
-                    <div class="row mb-3">
-                        <div class="col-12">
-                            <h6 class="mb-2">Top Resolved CVEs:</h6>
-                            <div class="table-responsive">
-                                <table class="table table-sm">
-                                    <thead>
-                                        <tr><th>CVE</th><th>Severity</th><th>Hosts</th><th>VPR Total</th><th>Last Seen</th></tr>
-                                    </thead>
-                                    <tbody>
-                `;
-
-                topResolved.forEach(cve => {
-                    const severityClass = cve.severity.toLowerCase();
-                    const lastSeenDate = new Date(cve.lastSeen).toLocaleDateString();
-                    html += `
-                        <tr>
-                            <td><code>${cve.cve}</code></td>
-                            <td><span class="badge severity-${severityClass}">${cve.severity}</span></td>
-                            <td>${cve.hostCount.toLocaleString()}</td>
-                            <td>${cve.totalVpr.toLocaleString()}</td>
-                            <td><small>${lastSeenDate}</small></td>
-                        </tr>
-                    `;
-                });
-
-                html += `
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-        }
-
         // Severity Impact Section
         if (severityImpact) {
             html += `
