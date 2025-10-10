@@ -2,7 +2,7 @@
 
 Welcome to the HexTrackr changelog! This page tracks all notable changes, features, and fixes across all versions of HexTrackr.
 
-**Current Version**: [v1.0.59](#changelog/versions/1.0.59)
+**Current Version**: [v1.0.60](#changelog/versions/1.0.60)
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### Latest Releases
 
+- [**v1.0.60**](#changelog/versions/1.0.60) - 2025-10-10 - Vendor Filter Trend Percentage Fix & Documentation Portal Dark Mode Fixes
 - [**v1.0.59**](#changelog/versions/1.0.59) - 2025-10-09 - Documentation Portal Settings Modal Transparency Fix
 - [**v1.0.58**](#changelog/versions/1.0.58) - 2025-10-10 - KEV Modal Light Mode Readability Fix
 - [**v1.0.57**](#changelog/versions/1.0.57) - 2025-10-10 - AG-Grid Height Synchronization Fix
@@ -59,7 +60,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 | Version | Release Date | Highlights |
 |---------|--------------|------------|
-| [1.0.59](#changelog/versions/1.0.59) | Latest | Documentation Portal Modal Transparency |
+| [1.0.60](#changelog/versions/1.0.60) | 2025-10-10 | Vendor Trend Fix & Dark Mode Improvements |
+| [1.0.59](#changelog/versions/1.0.59) | 2025-10-09 | Documentation Portal Modal Transparency |
 | [1.0.58](#changelog/versions/1.0.58) | 2025-10-10 | KEV Modal Light Mode Readability |
 | [1.0.57](#changelog/versions/1.0.57) | 2025-10-10 | AG-Grid Height Synchronization |
 | [1.0.56](#changelog/versions/1.0.56) | 2025-10-09 | Automated Version Propagation |
@@ -119,7 +121,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Navigation
 
-- **[Latest Version (1.0.59)](#changelog/versions/1.0.59)** - Most recent changes
+- **[Latest Version (1.0.60)](#changelog/versions/1.0.60)** - Most recent changes
 - **[Version 1.0.50](#changelog/versions/1.0.50)** - Authentication system milestone
 - **[Version 1.0.0](#changelog/versions/1.0.0)** - Initial release
 
