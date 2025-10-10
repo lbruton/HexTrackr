@@ -26,25 +26,6 @@
     margin: 0 auto;
 }
 
-/* Progressive width constraints for different screen sizes */
-@media (min-width: 1600px) {
-    .page-wrapper {
-        max-width: 1300px;
-    }
-}
-
-@media (min-width: 2000px) {
-    .page-wrapper {
-        max-width: 1200px;
-    }
-}
-
-@media (min-width: 2560px) {
-    .page-wrapper {
-        max-width: 1400px; /* Allow a bit more room on very large displays */
-    }
-}
-
 /* ===========================
    Empty States
    =========================== */

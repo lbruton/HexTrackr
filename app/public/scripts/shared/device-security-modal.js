@@ -165,6 +165,15 @@ class DeviceSecurityModal {
 
         const deviceColumnDefs = [
             {
+                headerName: "First Seen",
+                field: "first_seen",
+                colId: "first_seen",
+                width: 120,
+                cellRenderer: (params) => {
+                    return params.value ? new Date(params.value).toLocaleDateString() : "N/A";
+                }
+            },
+            {
                 headerName: "Last Seen",
                 field: "last_seen",
                 colId: "last_seen",
@@ -226,15 +235,6 @@ class DeviceSecurityModal {
                 },
                 cellStyle: {
                     textAlign: "center"
-                }
-            },
-            {
-                headerName: "First Seen",
-                field: "first_seen",
-                colId: "first_seen",
-                width: 120,
-                cellRenderer: (params) => {
-                    return params.value ? new Date(params.value).toLocaleDateString() : "N/A";
                 }
             },
             {
