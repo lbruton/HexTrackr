@@ -82,6 +82,14 @@ class DeviceSecurityModal {
             </div>
             <div class="mb-3">
                 <div class="row">
+                    <div class="col-sm-4 text-muted">IP Address:</div>
+                    <div class="col-sm-8">
+                        <span class="font-monospace text-primary">${device.ipAddress || "N/A"}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="row">
                     <div class="col-sm-4 text-muted">Total Risks:</div>
                     <div class="col-sm-8">
                         <span class="badge bg-secondary">${device.totalCount} vulnerabilities</span>
