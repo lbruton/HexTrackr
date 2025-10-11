@@ -211,24 +211,30 @@ git reset --hard HEAD
 
 *(Update this section as we work)*
 
-### Discovery 1:
--
+### Discovery 1: XT# Generation Already Correct!
+- generateNextXTNumber() at line 488 already queries ALL tickets (no filter)
+- This means XT# uniqueness was already working correctly!
+- Added comment to prevent future regression
 
-### Discovery 2:
--
+### Discovery 2: All Backend Queries Updated
+- getAllTickets() - Added WHERE deleted = 0
+- exportTickets() - Added WHERE deleted = 0
+- getTicketById() - Added WHERE deleted = 0 AND
+- deleteTicket() - Changed DELETE to UPDATE (soft delete)
+- generateNextXTNumber() - Left unchanged (correct behavior)
 
 ### Issues Encountered:
--
+- None! Migration and backend updates went smoothly
 
 ### Time Tracking:
-- Start:
-- Migration:
-- Backend:
-- Frontend:
-- Testing:
-- Commit:
-- End:
-- **Total**:
+- Start: 23:00
+- Migration: 23:15 (15 min)
+- Backend: 23:35 (20 min)
+- Frontend: SKIPPED (backend handles it!)
+- Testing: NEXT
+- Commit: TBD
+- End: TBD
+- **Total**: 35 min so far
 
 ---
 

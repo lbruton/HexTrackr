@@ -26,6 +26,7 @@ router.delete("/:id", requireAuth, TicketController.deleteTicket);
 
 // Special operations
 router.post("/migrate", requireAuth, TicketController.migrateTickets);
+router.get("/next-xt-number", requireAuth, TicketController.getNextXTNumber);
 
 /**
  * T053 INTEGRATION NOTES:
