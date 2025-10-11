@@ -1175,12 +1175,16 @@
                     // Clear caches and reload templates to ensure correct content is displayed
                     console.log('[UnifiedEdit] Clearing template caches and reloading...');
 
-                    // Clear all template caches to force fresh reload
-                    if (window.ticketMarkdownEditor) {
-                        window.ticketMarkdownEditor.clearTemplateCache('default_ticket');
+                    // Clear all template caches to force fresh reload (use variant names)
+                    if (window.ticketMarkdownEditor && window.ticketMarkdownEditor.currentVariant) {
+                        const ticketTemplateName = `markdown_${window.ticketMarkdownEditor.currentVariant}`;
+                        window.ticketMarkdownEditor.clearTemplateCache(ticketTemplateName);
+                        console.log(`[UnifiedEdit] Cleared ticket template cache: ${ticketTemplateName}`);
                     }
-                    if (window.templateEditor) {
-                        window.templateEditor.clearTemplateCache('default_email');
+                    if (window.templateEditor && window.templateEditor.currentVariant) {
+                        const emailTemplateName = `email_${window.templateEditor.currentVariant}`;
+                        window.templateEditor.clearTemplateCache(emailTemplateName);
+                        console.log(`[UnifiedEdit] Cleared email template cache: ${emailTemplateName}`);
                     }
                     if (window.vulnerabilityMarkdownEditor) {
                         window.vulnerabilityMarkdownEditor.clearTemplateCache('default_vulnerability');
