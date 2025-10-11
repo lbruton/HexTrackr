@@ -206,13 +206,20 @@ class CiscoAdvisoryService {
     }
 
     /**
-     * Fetch all CVE IDs from vulnerabilities table for advisory lookup
+     * Fetch all CVE IDs from vulnerabilities_current table for advisory lookup
+     * Only queries active and reopened vulnerabilities (not resolved)
      * @async
      * @returns {Promise<Array<string>>} Array of CVE identifiers
      */
     async getAllCveIds() {
         return await new Promise((resolve, reject) => {
-            this.db.all("SELECT DISTINCT cve FROM vulnerabilities WHERE cve IS NOT NULL AND cve LIKE 'CVE-%'", (err, rows) => {
+            this.db.all(`
+                SELECT DISTINCT cve
+                FROM vulnerabilities_current
+                WHERE cve IS NOT NULL
+                  AND cve LIKE 'CVE-%'
+                  AND lifecycle_state IN ('active', 'reopened')
+            `, (err, rows) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -383,19 +390,16 @@ class CiscoAdvisoryService {
                                     });
                                 });
 
-                                // Update vulnerabilities table with denormalized display columns
+                                // Update vulnerabilities_current with vendor-neutral fix flag
                                 const firstFixedArray = JSON.parse(parsed.first_fixed);
-                                const displayVersions = firstFixedArray.join(", ");
+                                const hasFixAvailable = firstFixedArray.length > 0 ? 1 : 0;
 
                                 await new Promise((resolve, reject) => {
                                     this.db.run(`
-                                        UPDATE vulnerabilities
-                                        SET is_fixed = 1,
-                                            fixed_cisco_versions = ?,
-                                            fixed_cisco_url = ?,
-                                            cisco_synced_at = CURRENT_TIMESTAMP
+                                        UPDATE vulnerabilities_current
+                                        SET is_fix_available = ?
                                         WHERE cve = ?
-                                    `, [displayVersions, parsed.publication_url, cveId], (err) => {
+                                    `, [hasFixAvailable, cveId], (err) => {
                                         if (err) {
                                             console.error(`❌ Update failed for ${cveId}:`, err);
                                             reject(err);
