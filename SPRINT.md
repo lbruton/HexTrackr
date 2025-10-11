@@ -16,27 +16,31 @@
 - [x] Return: XT number, job_type, status, date_submitted, devices array
 - [x] Committed: 0059f32
 
-### Phase 2: Frontend Button Logic
-- [ ] Update vulnerability card rendering in vulnerabilities.js
-- [ ] Add button state detection on card load
-- [ ] Implement button color mapping from ticket status
-- [ ] Update button text based on ticket count (0/1/2+)
-- [ ] Add click handler to replace "Create Ticket" behavior
+### Phase 2: Frontend Button Logic ✅
+- [x] Update vulnerability card rendering in vulnerabilities.js
+- [x] Add button state detection on card load
+- [x] Implement button color mapping from ticket status
+- [x] Update button text based on ticket count (0/1/2+)
+- [x] Add click handler to replace "Create Ticket" behavior
+- [x] Committed: 68cbbb7
 
-### Phase 3: Multi-Ticket Picker Modal
-- [ ] Create HTML modal structure in vulnerabilities.html
-- [ ] Add table showing: XT#, Job Type, Status, Date Submitted
-- [ ] Wire up row click → open existing ticket modal
-- [ ] Add "Create New Ticket Anyway" button at bottom
-- [ ] Handle escape key and backdrop click to dismiss
+### Phase 3: Multi-Ticket Picker Modal ✅
+- [x] Create HTML modal structure in vulnerabilities.html
+- [x] Add table showing: XT#, Job Type, Status, Date Submitted
+- [x] Wire up row click → open existing ticket modal
+- [x] Add "Create New Ticket Anyway" button at bottom
+- [x] Handle escape key and backdrop click to dismiss
+- [x] Committed: 68cbbb7
 
-### Phase 4: Integration & Edge Cases
-- [ ] 0 tickets → Show create ticket modal (existing behavior)
-- [ ] 1 ticket → Directly open edit ticket modal
-- [ ] 2+ tickets → Show picker modal
-- [ ] Handle case-insensitive hostname matching
-- [ ] Handle IP addresses (already clean, same logic)
-- [ ] Test with multiple tabs open (state refresh)
+### Phase 4: Integration & Edge Cases ✅
+- [x] 0 tickets → Show create ticket modal (existing behavior)
+- [x] 1 ticket → Directly open edit ticket modal (via URL navigation)
+- [x] 2+ tickets → Show picker modal
+- [x] Handle case-insensitive hostname matching
+- [x] Handle IP addresses (already clean, same logic)
+- [x] Test with multiple tabs open (state refresh)
+- [x] URL parameter handling in tickets.html (?openTicket=ID)
+- [x] Auto-open ticket edit modal from URL parameter
 
 ### Phase 5: Testing & Polish
 - [ ] Test with device that has no tickets

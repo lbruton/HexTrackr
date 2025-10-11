@@ -3705,6 +3705,22 @@ document.addEventListener("DOMContentLoaded", function() {
     // Initialize the ticket manager and explicitly set it as a global variable
     window.ticketManager = new HexagonTicketsManager();
 
+    // HEX-203: Check if we're navigating with ?openTicket=ID parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const openTicketId = urlParams.get("openTicket");
+
+    if (openTicketId) {
+        // Wait for grid initialization, then open the edit modal
+        setTimeout(() => {
+            console.log(`[Ticket Navigation] Auto-opening ticket ${openTicketId} from URL parameter`);
+            window.ticketManager.editTicket(openTicketId);
+
+            // Clean up URL without page reload
+            const cleanUrl = window.location.pathname;
+            window.history.replaceState({}, document.title, cleanUrl);
+        }, 500);
+    }
+
     // Check if we're coming from vulnerability page with a device to create a ticket for
     const autoOpen = sessionStorage.getItem("autoOpenModal");
     const ticketDataRaw = sessionStorage.getItem("createTicketData");  // NEW: JSON format
