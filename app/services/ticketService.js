@@ -205,6 +205,7 @@ class TicketService {
                 supervisor: ticket.supervisor ?? existingTicket.supervisor,
                 tech: ticket.tech ?? existingTicket.tech,
                 status: ticket.status ?? existingTicket.status,
+                jobType: ticket.jobType ?? ticket.job_type ?? existingTicket.job_type ?? "Upgrade",
                 notes: ticket.notes ?? existingTicket.notes,
                 site: ticket.site ?? existingTicket.site,
                 site_id: ticket.site_id ?? existingTicket.site_id,
