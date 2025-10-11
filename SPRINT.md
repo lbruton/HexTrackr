@@ -325,9 +325,39 @@ const replacements = {
 ### Phase 2 Complete When:
 - ✅ 3 template variants exist (upgrade, replacement, mitigate)
 - ✅ Template selection automatically picks correct variant
-- ✅ KEV status displays in vulnerability summary
-- ✅ PDF bundle includes Job Type metadata
-- ✅ All 5 job types tested end-to-end
+- ⏳ Smart Context Selector UI (Switch button + variant badge)
+- ⏳ KEV status displays in vulnerability summary
+- ⏳ PDF bundle includes Job Type metadata
+- ⏳ All 5 job types tested end-to-end
+
+### Phase 2 Progress (2025-10-10):
+**Completed Tasks**:
+- ✅ Task 5: Database migration 008 created 6 template variants (3 email, 3 markdown)
+  - Migration preserves user customizations in email_upgrade
+  - Uses SQL REPLACE() to create variant content modifications
+  - Template sizes: email (1039-1176 bytes), markdown (937-1085 bytes)
+- ✅ Task 6: Template selection logic implemented in tickets.js
+  - Added getTemplateVariant() helper method
+  - Updated generateEmailMarkdown() → loads email_{variant}
+  - Updated generateMarkdown() → loads markdown_{variant}
+  - Consolidation: Replace + Refresh → 'replacement' (same workflow)
+
+**Remaining Tasks**:
+- ⏳ Task 6 (UI): Smart Context Selector (badge + Switch dropdown)
+- ⏳ Task 7: KEV status integration
+- ⏳ Task 8: PDF bundle Job Type metadata
+- ⏳ Task 9: QA testing all 5 job types
+
+**Commits**:
+- `998f89a` - Phase 1 complete (color-coding, markdown header, 4hr window, content audit)
+- `9e81708` - Template variants + selection logic
+- `418eccc` - Checkpoint with UX design doc
+
+**Memento Insights Saved**:
+- HEXTRACKR-INSIGHT-20251010-050000 (Migration pattern preserves customizations)
+- HEXTRACKR-INSIGHT-20251010-050001 (Smart Context Selector UI pattern)
+- HEXTRACKR-INSIGHT-20251010-050002 (SQLite UPDATE+INSERT SELECT pattern)
+- HEXTRACKR-INSIGHT-20251010-050003 (Template consolidation strategy)
 
 ---
 
