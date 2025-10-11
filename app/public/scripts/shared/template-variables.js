@@ -28,6 +28,8 @@ window.HexTrackrTemplateVariables = {
         // Location Information
         { name: "[SITE_NAME]", description: "Site name", required: true, category: "location" },
         { name: "[LOCATION]", description: "Location name", required: true, category: "location" },
+        { name: "[SITE_ADDRESS]", description: "Physical site address (shipping destination)", required: false, category: "location" },
+        { name: "[RETURN_ADDRESS]", description: "Return shipping address for old equipment", required: false, category: "location" },
 
         // Date Information
         { name: "[DATE_SUBMITTED]", description: "Date submitted (formatted)", required: true, category: "dates" },
@@ -47,6 +49,8 @@ window.HexTrackrTemplateVariables = {
         { name: "[NOTES]", description: "Additional notes", required: false, category: "content" },
         { name: "[VULNERABILITY_SUMMARY]", description: "Vulnerability assessment summary", required: false, category: "content" },
         { name: "[VULNERABILITY_DETAILS]", description: "Dynamic vulnerability data per device", required: false, category: "content" },
+        { name: "[TRACKING_NUMBER]", description: "Shipping tracking number", required: false, category: "content" },
+        { name: "[MITIGATION_DETAILS]", description: "Details of mitigation applied", required: false, category: "content" },
 
         // Vulnerability Counts
         { name: "[TOTAL_VULNERABILITIES]", description: "Total vulnerability count", required: false, category: "counts" },
