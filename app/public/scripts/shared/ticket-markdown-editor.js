@@ -386,7 +386,11 @@ Generated: [GENERATED_TIME]`;
             "[JOB_TYPE]": ticket.jobType || ticket.job_type || "Upgrade",
             "[NOTES]": ticket.notes || ticket.additional_notes || "N/A",
             "[GENERATED_TIME]": new Date().toLocaleString(),
-            "[VULNERABILITY_SUMMARY]": this.generateVulnerabilitySummary(ticket)
+            "[VULNERABILITY_SUMMARY]": this.generateVulnerabilitySummary(ticket),
+            "[SITE_ADDRESS]": ticket.site_address || "[SITE ADDRESS - TBD]",
+            "[RETURN_ADDRESS]": ticket.return_address || "[RETURN ADDRESS - TBD]",
+            "[TRACKING_NUMBER]": ticket.tracking_number || "[TRACKING NUMBER - TBD]",
+            "[MITIGATION_DETAILS]": ticket.mitigation_details || "[MITIGATION DETAILS - TBD]"
         };
 
         Object.keys(replacements).forEach(variable => {
