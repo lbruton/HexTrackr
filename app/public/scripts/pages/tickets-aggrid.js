@@ -430,9 +430,19 @@
                 },
                 cellRenderer: (params) => {
                     const jobTypeValue = params.value || "Upgrade";
-                    const slug = jobTypeValue.toLowerCase().replace(/\s+/g, "-");
+                    const slug = jobTypeValue.toLowerCase();
                     const label = document.createElement("span");
-                    label.className = "status-label status-generic";
+
+                    // Map job types to existing status classes for color-coding
+                    const classMap = {
+                        "upgrade": "status-open",         // Blue (patch-only)
+                        "replace": "status-overdue",      // Orange (equipment swap)
+                        "refresh": "status-pending",      // Purple (new model)
+                        "mitigate": "status-failed",      // Red (urgent KEV)
+                        "other": "status-generic"         // Gray (fallback)
+                    };
+
+                    label.className = `status-label ${classMap[slug] || "status-generic"}`;
 
                     const strong = document.createElement("strong");
                     strong.textContent = jobTypeValue.toUpperCase();
