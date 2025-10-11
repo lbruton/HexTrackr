@@ -258,14 +258,19 @@ class CiscoAdvisoryService {
     /**
      * Parse Cisco advisory response and extract relevant fields
      * @param {Object} advisoryData - Raw advisory data from Cisco API
-     * @returns {Object} Parsed advisory object
+     * @param {string} queriedCveId - The CVE ID we queried for
+     * @returns {Object} Parsed advisory object for the specific CVE
      */
-    parseAdvisoryData(advisoryData) {
+    parseAdvisoryData(advisoryData, queriedCveId) {
         if (!advisoryData || !advisoryData.advisories || advisoryData.advisories.length === 0) {
+            console.log(`⚠️ No advisories found in response for ${queriedCveId}`);
             return null;
         }
 
         const advisory = advisoryData.advisories[0]; // Use first advisory
+
+        console.log(`📋 Processing advisory: ${advisory.advisoryId} for CVE ${queriedCveId}`);
+        console.log(`   CVEs in advisory: ${advisory.cves ? advisory.cves.join(', ') : 'none'}`);
 
         // Extract first fixed versions from all products
         const firstFixedVersions = new Set();
@@ -282,7 +287,7 @@ class CiscoAdvisoryService {
         }
 
         return {
-            cve_id: advisory.cveId || null,
+            cve_id: queriedCveId, // Use the CVE we queried for, not advisory.cveId
             advisory_id: advisory.advisoryId || null,
             advisory_title: advisory.advisoryTitle || null,
             severity: advisory.sir || null, // Security Impact Rating
@@ -342,12 +347,15 @@ class CiscoAdvisoryService {
                     const batch = cveIds.slice(i, i + batchSize);
 
                     await Promise.all(batch.map(async (cveId) => {
+                        console.log(`🔍 Querying Cisco PSIRT for ${cveId}...`);
                         const advisoryData = await this.fetchCiscoAdvisoryForCve(cveId, accessToken);
 
                         if (advisoryData) {
-                            const parsed = this.parseAdvisoryData(advisoryData);
+                            console.log(`✅ Advisory data received for ${cveId}`);
+                            const parsed = this.parseAdvisoryData(advisoryData, cveId);
 
                             if (parsed) {
+                                console.log(`✅ Parsed advisory for ${cveId}: ${parsed.advisory_id}`);
                                 // Insert or replace advisory data
                                 await new Promise((resolve, reject) => {
                                     this.db.run(`
@@ -399,7 +407,12 @@ class CiscoAdvisoryService {
 
                                 advisoryCount++;
                                 matchedCount++;
+                                console.log(`✅ Saved advisory for ${cveId} (total: ${advisoryCount})`);
+                            } else {
+                                console.log(`⚠️ Failed to parse advisory for ${cveId}`);
                             }
+                        } else {
+                            console.log(`ℹ️ No advisory found for ${cveId} (404 or error)`);
                         }
                     }));
 
