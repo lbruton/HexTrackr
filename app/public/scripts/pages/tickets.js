@@ -447,13 +447,19 @@ class HexagonTicketsManager {
         const container = document.getElementById("devicesContainer");
         
         container.addEventListener("click", (e) => {
-            if (e.target.classList.contains("add-device-btn") || e.target.parentElement.classList.contains("add-device-btn")) {
+            // Use closest() to find the button even if clicking on nested elements (icon)
+            const addBtn = e.target.closest(".add-device-btn");
+            const removeBtn = e.target.closest(".remove-device-btn");
+            const moveUpBtn = e.target.closest(".move-up-btn");
+            const moveDownBtn = e.target.closest(".move-down-btn");
+
+            if (addBtn) {
                 this.addDeviceField();
-            } else if (e.target.classList.contains("remove-device-btn") || e.target.parentElement.classList.contains("remove-device-btn")) {
+            } else if (removeBtn) {
                 this.removeDeviceField(e.target.closest(".device-entry"));
-            } else if (e.target.classList.contains("move-up-btn") || e.target.parentElement.classList.contains("move-up-btn")) {
+            } else if (moveUpBtn) {
                 this.moveDeviceUp(e.target.closest(".device-entry"));
-            } else if (e.target.classList.contains("move-down-btn") || e.target.parentElement.classList.contains("move-down-btn")) {
+            } else if (moveDownBtn) {
                 this.moveDeviceDown(e.target.closest(".device-entry"));
             }
         });
@@ -492,10 +498,10 @@ class HexagonTicketsManager {
                     <i class="fas fa-grip-vertical"></i>
                 </span>
                 <div class="input-group-text border-0 p-1" style="flex-direction: column; background: var(--tblr-bg-surface-secondary);">
-                    <button type="button" class="btn btn-sm move-up-btn" style="padding: 2px 8px; margin-bottom: 1px; border-radius: 3px; font-size: 11px; background: var(--tblr-bg-surface); border: 1px solid var(--tblr-border-color);" title="Move Up">
+                    <button type="button" class="btn btn-sm move-up-btn" title="Move Up">
                         <i class="ti ti-arrow-up"></i>
                     </button>
-                    <button type="button" class="btn btn-sm move-down-btn" style="padding: 2px 8px; border-radius: 3px; font-size: 11px; background: var(--tblr-bg-surface); border: 1px solid var(--tblr-border-color);" title="Move Down">
+                    <button type="button" class="btn btn-sm move-down-btn" title="Move Down">
                         <i class="ti ti-arrow-down"></i>
                     </button>
                 </div>
@@ -870,11 +876,11 @@ class HexagonTicketsManager {
                         <i class="fas fa-grip-vertical"></i>
                     </span>
                     <div class="input-group-text border-0 p-1" style="flex-direction: column; background: var(--tblr-bg-surface-secondary);">
-                        <button type="button" class="btn btn-primary btn-sm move-up-btn" style="padding: 2px 8px; margin-bottom: 1px; border-radius: 3px; font-size: 11px;" title="Move Up">
-                            <i class="fas fa-chevron-up"></i>
+                        <button type="button" class="btn btn-sm move-up-btn" title="Move Up">
+                            <i class="ti ti-arrow-up"></i>
                         </button>
-                        <button type="button" class="btn btn-primary btn-sm move-down-btn" style="padding: 2px 8px; border-radius: 3px; font-size: 11px;" title="Move Down">
-                            <i class="fas fa-chevron-down"></i>
+                        <button type="button" class="btn btn-sm move-down-btn" title="Move Down">
+                            <i class="ti ti-arrow-down"></i>
                         </button>
                     </div>
                     <input type="text" class="form-control device-input" placeholder="Enter device name (e.g., host01)" value="${device}">
