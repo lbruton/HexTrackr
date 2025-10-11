@@ -20,6 +20,7 @@ class TicketMarkdownEditor {
         this.isEditMode = false;
         this.currentTemplate = null;
         this.currentTicketData = null;
+        this.currentVariant = 'upgrade';  // Default variant
         this.validationTimeout = null;
         this.isRestoring = false;
 
@@ -27,6 +28,29 @@ class TicketMarkdownEditor {
         this.variables = window.HexTrackrTemplateVariables?.getRecommendedVariables("ticket") || [];
 
         this.init();
+    }
+
+    /**
+     * Get template variant name based on job type
+     * @param {string} jobType - Job type value (Upgrade, Replace, Refresh, Mitigate, Other)
+     * @returns {string} Template variant name ('upgrade', 'replacement', or 'mitigate')
+     */
+    getTemplateVariant(jobType) {
+        if (!jobType) {
+            return 'upgrade';  // Default fallback
+        }
+
+        switch (jobType.toLowerCase()) {
+            case 'replace':
+            case 'refresh':
+                return 'replacement';  // Both use same template (equipment swap workflow)
+            case 'mitigate':
+                return 'mitigate';     // KEV emergency patching
+            case 'upgrade':
+            case 'other':
+            default:
+                return 'upgrade';      // Default for Upgrade and Other job types
+        }
     }
 
     /**
@@ -89,10 +113,14 @@ class TicketMarkdownEditor {
      */
     async loadTemplateForEditing(forceRefresh = false) {
         try {
+            // Determine template name based on current variant
+            const templateName = `markdown_${this.currentVariant}`;
+            console.log(`[TicketMarkdownEditor] Loading template: ${templateName}`);
+
             // If forceRefresh is true, always fetch from API
             if (forceRefresh) {
                 console.log("[TicketMarkdownEditor] Force refresh requested, fetching from API");
-                const response = await authState.authenticatedFetch("/api/templates/by-name/default_ticket");
+                const response = await authState.authenticatedFetch(`/api/templates/by-name/${templateName}`);
                 if (response.ok) {
                     const result = await response.json();
                     if (result.success) {
@@ -103,12 +131,12 @@ class TicketMarkdownEditor {
                 }
             } else {
                 // Try cache first, then API if no cache
-                const cached = this.getCachedTemplate("default_ticket");
+                const cached = this.getCachedTemplate(templateName);
                 if (cached) {
                     this.currentTemplate = cached;
                     console.log("[TicketMarkdownEditor] Using cached template");
                 } else if (!this.currentTemplate) {
-                    const response = await authState.authenticatedFetch("/api/templates/by-name/default_ticket");
+                    const response = await authState.authenticatedFetch(`/api/templates/by-name/${templateName}`);
                     if (response.ok) {
                         const result = await response.json();
                         if (result.success) {
@@ -924,6 +952,11 @@ Generated: [GENERATED_TIME]`;
      */
     setTicketData(ticketData) {
         this.currentTicketData = ticketData;
+        // Determine variant based on job type
+        if (ticketData && ticketData.jobType) {
+            this.currentVariant = this.getTemplateVariant(ticketData.jobType);
+            console.log(`[TicketMarkdownEditor] Set variant to '${this.currentVariant}' based on job type '${ticketData.jobType}'`);
+        }
     }
 
     /**
