@@ -27,9 +27,9 @@ class CiscoAdvisoryService {
         this.db = db;
         this.preferencesService = preferencesService;
 
-        // Cisco PSIRT API endpoints
+        // Cisco PSIRT API endpoints (API Console v2)
         this.ciscoTokenUrl = "https://id.cisco.com/oauth2/default/v1/token";
-        this.ciscoPsirtBaseUrl = "https://api.cisco.com/security/advisories";
+        this.ciscoPsirtBaseUrl = "https://apix.cisco.com/security/advisories/v2";
 
         this.lastSyncTime = null;
         this.syncInProgress = false;
@@ -231,7 +231,7 @@ class CiscoAdvisoryService {
      */
     async fetchCiscoAdvisoryForCve(cveId, accessToken) {
         try {
-            const response = await this.fetch(`${this.ciscoPsirtBaseUrl}/cve/${cveId}`, {
+            const response = await this.fetch(`${this.ciscoPsirtBaseUrl}/cve/${cveId}.json`, {
                 headers: {
                     "Authorization": `Bearer ${accessToken}`,
                     "Accept": "application/json"
