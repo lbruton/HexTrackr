@@ -740,7 +740,18 @@
                                     <input type="text" class="form-control" id="location" placeholder="Enter location (e.g., Building A)">
                                 </div>
                             </div>
-                            <!-- Third col-md-4 reserved for Job Type field (HEX-203) -->
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="jobType" class="form-label">Job Type</label>
+                                    <select class="form-select" id="jobType">
+                                        <option value="Upgrade" selected>Upgrade</option>
+                                        <option value="Replace">Replace</option>
+                                        <option value="Refresh">Refresh</option>
+                                        <option value="Mitigate">Mitigate</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Devices Section -->
