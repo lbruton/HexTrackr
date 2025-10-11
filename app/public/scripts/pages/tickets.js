@@ -588,6 +588,12 @@ class HexagonTicketsManager {
             return;
         }
 
+        // Skip autofill if power tool was used (devices already populated)
+        const locationField = document.getElementById("location");
+        if (locationField && locationField.dataset.powerToolPopulated === "true") {
+            return;
+        }
+
         // Get the first device input field
         const firstDeviceInput = document.querySelector("#devicesContainer .device-input");
         if (firstDeviceInput) {
@@ -3539,54 +3545,109 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Check if we're coming from vulnerability page with a device to create a ticket for
     const autoOpen = sessionStorage.getItem("autoOpenModal");
-    const deviceHostname = sessionStorage.getItem("createTicketDevice");
+    const ticketDataRaw = sessionStorage.getItem("createTicketData");  // NEW: JSON format
+    const deviceHostname = sessionStorage.getItem("createTicketDevice"); // OLD: String format (kept for backward compat)
 
-    if (autoOpen === "true" && deviceHostname) {
-        // Clear the flags immediately to prevent issues with multiple tabs
+    if (autoOpen === "true") {
+        // Clear flags immediately
         sessionStorage.removeItem("autoOpenModal");
-        sessionStorage.removeItem("createTicketDevice");
+        sessionStorage.removeItem("createTicketData");   // NEW
+        sessionStorage.removeItem("createTicketDevice"); // EXISTING
 
-        // Wait a moment for everything to initialize, then open modal
+        // Attempt to parse JSON format first
+        let ticketData = null;
+        if (ticketDataRaw) {
+            try {
+                ticketData = JSON.parse(ticketDataRaw);
+            } catch (e) {
+                console.error("[Power Tool] Failed to parse createTicketData JSON:", e);
+                ticketData = null;
+            }
+        }
+
+        // If JSON parsing failed or no JSON, fall back to old format
+        if (!ticketData && deviceHostname) {
+            ticketData = {
+                devices: [deviceHostname],
+                site: deviceHostname.substring(0, 4),
+                location: deviceHostname.substring(0, 5),
+                mode: "single"
+            };
+        }
+
+        // If we have no data at all, abort
+        if (!ticketData) {
+            return;
+        }
+
+        // Wait for everything to initialize, then open modal
         setTimeout(() => {
-            // Open the ticket modal using Bootstrap
             const ticketModal = document.getElementById("ticketModal");
             if (ticketModal) {
                 const modal = new bootstrap.Modal(ticketModal);
                 modal.show();
 
-                // Wait for modal to be fully shown, then populate the device
+                // Wait for modal to be fully shown
                 ticketModal.addEventListener("shown.bs.modal", function onModalShown() {
-                    // Remove the event listener to avoid multiple calls
                     ticketModal.removeEventListener("shown.bs.modal", onModalShown);
 
-                    // Populate the device field
                     setTimeout(() => {
-                        // Find the first device input field (there's usually one by default)
-                        const firstDeviceInput = document.querySelector("#devicesContainer .device-input");
+                        // --- NEW: Populate SITE field ---
+                        const siteField = document.getElementById("site");
+                        if (siteField && ticketData.site) {
+                            siteField.value = ticketData.site;
+                        }
 
-                        if (firstDeviceInput) {
-                            // If first device field is empty, use it
-                            if (!firstDeviceInput.value || firstDeviceInput.value.trim() === "") {
-                                firstDeviceInput.value = deviceHostname;
-                                firstDeviceInput.focus();
-                            } else {
-                                // Otherwise, add a new device field
-                                window.ticketManager.addDeviceField();
+                        // --- NEW: Populate Location field ---
+                        const locationField = document.getElementById("location");
+                        if (locationField && ticketData.location) {
+                            locationField.value = ticketData.location;
 
-                                // Then find the newly added input
-                                setTimeout(() => {
-                                    const deviceInputs = document.querySelectorAll("#devicesContainer .device-input");
-                                    if (deviceInputs.length > 0) {
-                                        const lastInput = deviceInputs[deviceInputs.length - 1];
-                                        lastInput.value = deviceHostname;
-                                        lastInput.focus();
-                                    }
-                                }, 50);
+                            // Set flag to disable location-to-device autofill (for Task 1.4)
+                            locationField.dataset.powerToolPopulated = "true";
+                        }
+
+                        // --- ENHANCED: Populate multiple devices ---
+                        const devices = ticketData.devices || [];
+                        if (devices.length > 0) {
+                            // Find first device input
+                            const firstDeviceInput = document.querySelector("#devicesContainer .device-input");
+
+                            if (firstDeviceInput) {
+                                // Populate first device in existing field
+                                firstDeviceInput.value = devices[0];
+
+                                // Add remaining devices (if any)
+                                for (let i = 1; i < devices.length; i++) {
+                                    // Add new device field
+                                    window.ticketManager.addDeviceField();
+
+                                    // Use setTimeout to ensure field is fully created before populating
+                                    ((deviceIndex) => {
+                                        setTimeout(() => {
+                                            const deviceInputs = document.querySelectorAll("#devicesContainer .device-input");
+                                            if (deviceInputs[deviceIndex]) {
+                                                deviceInputs[deviceIndex].value = devices[deviceIndex];
+                                            }
+                                        }, 50 * deviceIndex); // Stagger timeouts
+                                    })(i);
+                                }
                             }
                         }
 
-                        // Show a helpful message
-                        window.ticketManager.showToast(`Creating ticket for ${deviceHostname}`, "info");
+                        // --- ENHANCED: Toast message with device count and mode ---
+                        const deviceCount = devices.length;
+                        const modeLabels = {
+                            "single": "device",
+                            "bulk-all": `devices at ${ticketData.location}`,
+                            "bulk-kev": `KEV devices at ${ticketData.location}`
+                        };
+                        const modeLabel = modeLabels[ticketData.mode] || "device";
+
+                        window.ticketManager.showToast(
+                            `Ticket form pre-populated with ${deviceCount} ${modeLabel}`,
+                            "info"
+                        );
                     }, 100);
                 }, { once: true });
             }

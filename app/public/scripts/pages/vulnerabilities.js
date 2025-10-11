@@ -98,8 +98,8 @@ export class ModernVulnManager {
         return this.coreOrchestrator.generateVulnerabilityPDF();
     }
 
-    createTicketFromDevice(hostname) {
-        return this.coreOrchestrator.createTicketFromDevice(hostname);
+    createTicketFromDevice(hostname, options = null) {
+        return this.coreOrchestrator.createTicketFromDevice(hostname, options);
     }
 
     showToast(message, type) {
