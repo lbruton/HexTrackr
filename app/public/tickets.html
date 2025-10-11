@@ -572,11 +572,16 @@
 
         <!-- Search and Filter -->
         <div class="row mb-4">
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-search"></i></span>
                     <input type="text" class="form-control" id="searchInput" placeholder="Search tickets...">
                 </div>
+            </div>
+            <div class="col-md-2">
+                <select class="form-select" id="locationFilter">
+                    <option value="">All Locations</option>
+                </select>
             </div>
             <div class="col-md-2">
                 <select class="form-select" id="statusFilter">
@@ -598,11 +603,6 @@
                     <option value="Refresh">Refresh</option>
                     <option value="Mitigate">Mitigate</option>
                     <option value="Other">Other</option>
-                </select>
-            </div>
-            <div class="col-md-4">
-                <select class="form-select" id="locationFilter">
-                    <option value="">All Locations</option>
                 </select>
             </div>
         </div>
@@ -1163,6 +1163,8 @@
     <script src="scripts/utils/purify.min.js"></script>
     
     <!-- HexTrackr Modular JavaScript Architecture -->
+    <!-- Logger Utility (loaded first for zero-cost production logging) -->
+    <script src="scripts/shared/logger.js"></script>
     <script src="scripts/shared/config-loader.js"></script>
     <script src="scripts/shared/header-loader.js"></script>
     <script src="scripts/shared/footer-loader.js"></script>

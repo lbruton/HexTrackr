@@ -486,10 +486,8 @@
                         <i class="fas fa-file-csv me-2"></i>
                         Export CSV
                     </button>
-                    <button type="button" class="btn btn-primary" id="generateDeviceReport">
-                        <i class="ti ti-file-text me-2"></i>
-                        Generate Report
-                    </button>
+                    <!-- Smart ticket button will be inserted here dynamically -->
+                    <div id="deviceModalTicketButton" class="d-inline-block"></div>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         Close
                     </button>
@@ -816,7 +814,10 @@
     <script src="/vendor/socket.io/socket.io.min.js"></script>
 
     <!-- HexTrackr Modular JavaScript Architecture -->
-    <!-- Core Utilities (loaded first) -->
+    <!-- Logger Utility (loaded first for zero-cost production logging) -->
+    <script src="scripts/shared/logger.js"></script>
+
+    <!-- Core Utilities -->
     <script src="scripts/shared/config-loader.js"></script>
     <script src="scripts/shared/header-loader.js"></script>
     <script src="scripts/shared/footer-loader.js"></script>
