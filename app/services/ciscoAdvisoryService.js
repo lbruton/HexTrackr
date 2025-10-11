@@ -359,7 +359,7 @@ class CiscoAdvisoryService {
      */
     async fetchFixedVersions(osType, version, accessToken) {
         try {
-            const url = `${this.ciscoApiBase}/OSType/${osType}?version=${encodeURIComponent(version)}`;
+            const url = `${this.ciscoPsirtBaseUrl}/OSType/${osType}?version=${encodeURIComponent(version)}`;
             console.log(`🔍 Querying Software Checker: ${osType} ${version}`);
 
             const response = await this.fetch(url, {
