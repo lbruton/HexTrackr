@@ -26,6 +26,10 @@ data/*.sqlite
 app/public/data/
 !app/public/data/.gitkeep
 
+# Database backups (should never be committed - too large)
+app/data/*.backup*
+app/data/*.bak
+
 # Log files
 logs/
 *.log
