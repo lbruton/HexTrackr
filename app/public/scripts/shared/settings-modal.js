@@ -142,6 +142,7 @@ console.log("✅ HexTrackr Settings Modal (shared) loaded successfully");
         // Cisco credential management
         document.getElementById("manageCiscoCredentials")?.addEventListener("click", openCiscoCredentialsModal);
         document.getElementById("saveCiscoCredentialsBtn")?.addEventListener("click", saveCiscoCredentials);
+        document.getElementById("clearCiscoCredentialsBtn")?.addEventListener("click", clearCiscoCredentials);
         document.getElementById("syncCiscoNow")?.addEventListener("click", syncCiscoNow);
         document.getElementById("ciscoAutoSync")?.addEventListener("change", toggleCiscoAutoSync);
 
@@ -600,25 +601,15 @@ function showClearConfirmationModal(type, confirmText) {
  */
 async function openCiscoCredentialsModal() {
     try {
-        // Load existing credentials if they exist
-        if (window.preferencesService) {
-            const result = await window.preferencesService.getPreference("cisco_api_key");
+        // Clear form fields (both are masked, so user must enter fresh)
+        const clientIdInput = document.getElementById("ciscoClientIdInput");
+        const clientSecretInput = document.getElementById("ciscoClientSecretInput");
 
-            if (result.success && result.data && result.data.value) {
-                const [clientId, _clientSecret] = result.data.value.split(":");
-
-                // Show Client ID (not secret)
-                const clientIdInput = document.getElementById("ciscoClientIdInput");
-                if (clientIdInput && clientId) {
-                    clientIdInput.value = clientId;
-                }
-
-                // Secret field stays empty (user must re-enter to change)
-                const clientSecretInput = document.getElementById("ciscoClientSecretInput");
-                if (clientSecretInput) {
-                    clientSecretInput.placeholder = "••••••••  (leave blank to keep existing)";
-                }
-            }
+        if (clientIdInput) {
+            clientIdInput.value = "";
+        }
+        if (clientSecretInput) {
+            clientSecretInput.value = "";
         }
 
         // Show the modal
@@ -644,28 +635,14 @@ async function saveCiscoCredentials() {
     const clientId = clientIdInput?.value?.trim() || "";
     const clientSecret = clientSecretInput?.value?.trim() || "";
 
-    // Validation
+    // Validation - both fields required
     if (!clientId) {
         showNotification("Please enter a Client ID", "warning");
         clientIdInput?.focus();
         return;
     }
 
-    // If secret is empty and placeholder indicates existing, fetch existing secret
-    let finalClientSecret = clientSecret;
-    if (!clientSecret && clientSecretInput?.placeholder?.includes("leave blank")) {
-        try {
-            const result = await window.preferencesService.getPreference("cisco_api_key");
-            if (result.success && result.data && result.data.value) {
-                const [_existingId, existingSecret] = result.data.value.split(":");
-                finalClientSecret = existingSecret;
-            }
-        } catch (error) {
-            console.error("Error fetching existing secret:", error);
-        }
-    }
-
-    if (!finalClientSecret) {
+    if (!clientSecret) {
         showNotification("Please enter a Client Secret", "warning");
         clientSecretInput?.focus();
         return;
@@ -678,7 +655,7 @@ async function saveCiscoCredentials() {
     }
 
     try {
-        const ciscoApiKey = `${clientId}:${finalClientSecret}`;
+        const ciscoApiKey = `${clientId}:${clientSecret}`;
 
         if (window.preferencesSync) {
             await window.preferencesSync.syncCiscoCredentials(ciscoApiKey);
@@ -719,6 +696,70 @@ async function saveCiscoCredentials() {
         if (saveButton) {
             saveButton.disabled = false;
             saveButton.innerHTML = "<i class=\"fas fa-save me-2\"></i>Save Credentials";
+        }
+    }
+}
+
+/**
+ * Clear Cisco PSIRT credentials from database
+ * @async
+ * @function clearCiscoCredentials
+ * @returns {Promise<void>}
+ */
+async function clearCiscoCredentials() {
+    if (!confirm("Are you sure you want to delete your Cisco PSIRT API credentials? This action cannot be undone.")) {
+        return;
+    }
+
+    const clearButton = document.getElementById("clearCiscoCredentialsBtn");
+
+    // Disable button during clear
+    if (clearButton) {
+        clearButton.disabled = true;
+        clearButton.innerHTML = "<i class=\"fas fa-spinner fa-spin me-2\"></i>Clearing...";
+    }
+
+    try {
+        if (window.preferencesSync && window.preferencesSync.prefsService) {
+            const result = await window.preferencesSync.prefsService.deletePreference("cisco_api_key");
+
+            if (result.success) {
+                console.log("🗑️ Cisco credentials deleted from database");
+
+                // Update status in main settings card
+                const credentialStatus = document.getElementById("ciscoCredentialStatus");
+                if (credentialStatus) {
+                    credentialStatus.textContent = "Not Configured";
+                    credentialStatus.className = "badge bg-secondary";
+                }
+
+                // Disable sync button
+                const syncButton = document.getElementById("syncCiscoNow");
+                if (syncButton) {
+                    syncButton.disabled = true;
+                }
+
+                showNotification("Cisco credentials cleared", "info");
+
+                // Close modal
+                const credentialsModal = bootstrap.Modal.getInstance(document.getElementById("ciscoCredentialsModal"));
+                if (credentialsModal) {
+                    credentialsModal.hide();
+                }
+            } else {
+                throw new Error(result.error || "Failed to delete credentials");
+            }
+        } else {
+            throw new Error("PreferencesSync not available");
+        }
+    } catch (error) {
+        console.error("Failed to clear Cisco credentials:", error);
+        showNotification("Failed to clear credentials: " + error.message, "error");
+    } finally {
+        // Re-enable button
+        if (clearButton) {
+            clearButton.disabled = false;
+            clearButton.innerHTML = "<i class=\"fas fa-trash me-2\"></i>Clear Credentials";
         }
     }
 }
@@ -1591,6 +1632,7 @@ if (typeof module !== "undefined" && module.exports) {
         // HEX-141: Cisco PSIRT functions
         openCiscoCredentialsModal,
         saveCiscoCredentials,
+        clearCiscoCredentials,
         loadCiscoSyncStatus,
         syncCiscoNow,
         toggleCiscoAutoSync,
