@@ -2778,8 +2778,12 @@ class HexagonTicketsManager {
     // Generate markdown format for ticket using database template
     async generateMarkdown(ticket) {
         try {
+            // Determine template variant based on job type
+            const variant = this.getTemplateVariant(ticket.jobType || ticket.job_type);
+            const templateName = `markdown_${variant}`;
+
             // Try to fetch template from database
-            const template = await this.fetchTemplateFromDB("default_ticket");
+            const template = await this.fetchTemplateFromDB(templateName);
 
             if (template) {
                 // Use template system
@@ -2932,11 +2936,44 @@ class HexagonTicketsManager {
         return trimmed;
     }
 
+    /**
+     * Get template variant name based on job type
+     * @description Maps job types to template variant names for dynamic template selection
+     * @param {string} jobType - Job type value (Upgrade, Replace, Refresh, Mitigate, Other)
+     * @returns {string} Template variant name ('upgrade', 'replacement', or 'mitigate')
+     * @example
+     * const variant = this.getTemplateVariant('Replace');  // Returns 'replacement'
+     * const templateName = `email_${variant}`;  // 'email_replacement'
+     * @since 1.0.57
+     * @module TicketsManager
+     */
+    getTemplateVariant(jobType) {
+        if (!jobType) {
+            return 'upgrade';  // Default fallback
+        }
+
+        switch (jobType.toLowerCase()) {
+            case 'replace':
+            case 'refresh':
+                return 'replacement';  // Both use same template (equipment swap workflow)
+            case 'mitigate':
+                return 'mitigate';     // KEV emergency patching
+            case 'upgrade':
+            case 'other':
+            default:
+                return 'upgrade';      // Default for Upgrade and Other job types
+        }
+    }
+
     // Generate email template markdown for ticket
     async generateEmailMarkdown(ticket) {
         try {
+            // Determine template variant based on job type
+            const variant = this.getTemplateVariant(ticket.jobType || ticket.job_type);
+            const templateName = `email_${variant}`;
+
             // Try to fetch template from database first
-            const template = await this.fetchTemplateFromDB("default_email");
+            const template = await this.fetchTemplateFromDB(templateName);
 
             if (template) {
                 // Use database template with variable substitution
