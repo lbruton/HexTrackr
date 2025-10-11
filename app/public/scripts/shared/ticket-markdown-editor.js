@@ -380,7 +380,7 @@ Generated: [GENERATED_TIME]`;
             "[DEVICE_LIST]": this.formatDeviceList(ticket.devices),
             "[DATE_DUE]": this.formatDate(ticket.date_due || ticket.dateDue),
             "[DATE_SUBMITTED]": this.formatDate(ticket.date_submitted || ticket.dateSubmitted),
-            "[SUPERVISOR]": ticket.supervisor || "N/A",
+            "[SUPERVISOR]": this.normalizeSupervisorNames(ticket.supervisor) || "N/A",
             "[TECHNICIAN]": ticket.technician || ticket.tech || "N/A",
             "[NOTES]": ticket.notes || ticket.additional_notes || "N/A",
             "[GENERATED_TIME]": new Date().toLocaleString(),
@@ -455,6 +455,54 @@ Generated: [GENERATED_TIME]`;
         // For other formats, try to extract first word
         const firstWord = trimmed.split(" ")[0];
         return firstWord || "[Supervisor First Name]";
+    }
+
+    /**
+     * Helper: Normalize supervisor names from "LAST, FIRST ; LAST2, FIRST2" to "First Last, First2 Last2"
+     * @param {string} supervisorField - Supervisor field value in EAM format
+     * @returns {string} Normalized supervisor names in proper case
+     */
+    normalizeSupervisorNames(supervisorField) {
+        if (!supervisorField || supervisorField === "N/A") {
+            return supervisorField;
+        }
+
+        const trimmed = supervisorField.trim();
+
+        // Split on semicolon (EAM delimiter for multiple supervisors)
+        const supervisors = trimmed.split(";").map(s => s.trim()).filter(s => s.length > 0);
+
+        // Transform each supervisor from "LAST, FIRST" to "First Last"
+        const normalized = supervisors.map(supervisor => {
+            // If no comma, pass through as-is (edge case)
+            if (!supervisor.includes(",")) {
+                return this.toProperCase(supervisor);
+            }
+
+            // Split on comma to get [LAST, FIRST]
+            const parts = supervisor.split(",").map(p => p.trim());
+            if (parts.length < 2) {
+                return this.toProperCase(supervisor);
+            }
+
+            // Reverse to "First Last" and convert to proper case
+            const firstName = this.toProperCase(parts[1]);
+            const lastName = this.toProperCase(parts[0]);
+            return `${firstName} ${lastName}`;
+        });
+
+        // Join multiple supervisors with comma-space
+        return normalized.join(", ");
+    }
+
+    /**
+     * Helper: Convert string to proper case (SMITH → Smith)
+     * @param {string} str - String to convert
+     * @returns {string} Proper case string
+     */
+    toProperCase(str) {
+        if (!str) {return str;}
+        return str.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
     }
 
     /**
