@@ -416,6 +416,27 @@
                 }
             },
             {
+                headerName: "Job Type",
+                field: "jobType",
+                colId: "jobType",
+                width: 120,
+                minWidth: 100,
+                maxWidth: 140,
+                cellClass: "ticket-jobtype-cell",
+                filter: "agTextColumnFilter",
+                valueGetter: (params) => {
+                    // Support both camelCase and snake_case
+                    return params.data.jobType || params.data.job_type || "Upgrade";
+                },
+                cellRenderer: (params) => {
+                    const jobTypeValue = params.value || "Upgrade";
+                    const label = document.createElement("span");
+                    label.className = "badge bg-secondary";
+                    label.textContent = jobTypeValue;
+                    return label;
+                }
+            },
+            {
                 headerName: "Actions",
                 field: "actions",
                 colId: "actions",
