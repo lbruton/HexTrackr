@@ -23,7 +23,7 @@ function createCiscoRouter(db, preferencesService) {
     // Rate limiting for sync operations
     const syncLimiter = rateLimit({
         windowMs: 10 * 60 * 1000, // 10 minutes
-        max: 2, // Max 2 sync requests per 10 minutes per IP (Cisco API is slower)
+        max: 10, // Max 10 sync requests per 10 minutes per IP (increased for testing)
         message: {
             error: "Too many sync requests",
             message: "Please wait before requesting another Cisco advisory sync"
