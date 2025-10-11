@@ -144,6 +144,9 @@ class CiscoAdvisoryService {
      */
     async getCiscoAccessToken(clientId, clientSecret) {
         try {
+            console.log(`🔐 OAuth2 request to ${this.ciscoTokenUrl}`);
+            console.log(`🔑 Client ID: ${clientId.substring(0, 8)}...`);
+
             const tokenResponse = await this.fetch(this.ciscoTokenUrl, {
                 method: "POST",
                 headers: {
@@ -154,10 +157,20 @@ class CiscoAdvisoryService {
             });
 
             if (!tokenResponse.ok) {
-                throw new Error(`Cisco OAuth2 failed with status ${tokenResponse.status}`);
+                // Try to get error details from response
+                let errorDetails = `status ${tokenResponse.status}`;
+                try {
+                    const errorBody = await tokenResponse.text();
+                    console.error(`❌ Cisco OAuth2 error response: ${errorBody}`);
+                    errorDetails = `${errorDetails}: ${errorBody}`;
+                } catch (e) {
+                    // Ignore JSON parse errors
+                }
+                throw new Error(`Cisco OAuth2 failed with ${errorDetails}`);
             }
 
             const tokenData = await tokenResponse.json();
+            console.log("✅ OAuth2 token acquired successfully");
             return tokenData.access_token;
         } catch (error) {
             console.error("❌ Failed to get Cisco access token:", error);
