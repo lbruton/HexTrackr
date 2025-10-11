@@ -33,7 +33,42 @@
 <li>Enhanced toast messages show device count and mode</li>
 </ul>
 <hr>
-<h2>🐛 Bug Fixes</h2><h3>Clone 3 Testing Phase Fixes</h3><p>During comprehensive testing, Clone 3 (Testing Specialist) identified and fixed 5 bugs:</p>
+<h2>🐛 Bug Fixes</h2><h3>Soft Delete + XT# Uniqueness (HEX-196)</h3><p><strong>Critical data integrity fix preventing duplicate ticket numbers and lost audit trail:</strong></p>
+<p><strong>Root Causes:</strong></p>
+<ol>
+<li>Hard <code>DELETE</code> operations destroyed ticket records, losing audit trail</li>
+<li>Deleted XT# numbers were reused, creating duplicate ticket IDs in history</li>
+<li>Frontend calculated XT# client-side using only active tickets (excluded deleted)</li>
+<li>Database UNIQUE constraint on <code>xt_number</code> column blocked soft delete functionality</li>
+</ol>
+<p><strong>Solution Implemented:</strong></p>
+<ul>
+<li><strong>Soft Delete Pattern</strong>: Changed <code>DELETE FROM tickets</code> to <code>UPDATE SET deleted=1, deleted_at=now()</code></li>
+<li><strong>Database Migration 004</strong>: Added <code>deleted</code> (INTEGER) and <code>deleted_at</code> (TEXT) columns with index</li>
+<li><strong>Database Migration 005</strong>: Rebuilt table to remove column-level UNIQUE constraint, added partial UNIQUE index (<code>WHERE deleted = 0</code>)</li>
+<li><strong>Backend API</strong>: Created <code>GET /api/tickets/next-xt-number</code> endpoint (includes ALL tickets in max calculation)</li>
+<li><strong>Frontend Refactor</strong>: Modified <code>generateNextXtNumber()</code> to call backend API, removed fallback logic</li>
+<li><strong>Application Validation</strong>: Added duplicate XT# check before INSERT with detailed error message</li>
+<li><strong>Query Filters</strong>: Added <code>WHERE deleted = 0</code> to getAllTickets, exportTickets, getTicketById</li>
+</ul>
+<p><strong>Impact:</strong></p>
+<ul>
+<li>✅ Audit trail preserved for compliance (tickets never truly deleted)</li>
+<li>✅ XT# uniqueness guaranteed for database lifetime (no number reuse)</li>
+<li>✅ Accidental deletes recoverable (future admin UI can restore)</li>
+<li>✅ ServiceNow references remain valid (foreign key integrity)</li>
+</ul>
+<p><strong>Files Modified:</strong></p>
+<ul>
+<li><code>app/public/scripts/migrations/004-soft-delete-tickets.sql</code> (new)</li>
+<li><code>app/public/scripts/migrations/005-remove-xt-unique-constraint.sql</code> (new)</li>
+<li><code>app/services/ticketService.js</code> (soft delete + validation)</li>
+<li><code>app/routes/tickets.js</code> (new endpoint)</li>
+<li><code>app/controllers/ticketController.js</code> (new method)</li>
+<li><code>app/public/scripts/pages/tickets.js</code> (async API call, no fallback)</li>
+</ul>
+<hr>
+<h3>Clone 3 Testing Phase Fixes (HEX-190)</h3><p>During comprehensive testing, Clone 3 (Testing Specialist) identified and fixed 5 bugs:</p>
 <ol>
 <li><p><strong>Event Bubbling</strong>: Create Ticket button click was propagating to parent card&#39;s onclick handler</p>
 <ul>
@@ -93,11 +128,14 @@
 <li><strong>Lonnie B.</strong> (Planning &amp; Review): SRPI workflow coordination, changelog documentation</li>
 </ul>
 <hr>
-<h2>🔗 Related Issues</h2><ul>
+<h2>🔗 Related Issues</h2><h3>Device Ticket Power Tool (HEX-190)</h3><ul>
 <li><strong>Parent</strong>: <a href="https://linear.app/hextrackr/issue/HEX-190">HEX-190</a> - SPECIFICATION: Device Ticket Power Tool</li>
 <li><strong>Research</strong>: <a href="https://linear.app/hextrackr/issue/HEX-191">HEX-191</a> - RESEARCH: Device Ticket Power Tool</li>
 <li><strong>Planning</strong>: <a href="https://linear.app/hextrackr/issue/HEX-192">HEX-192</a> - PLAN: Device Ticket Power Tool</li>
 <li><strong>Implementation</strong>: <a href="https://linear.app/hextrackr/issue/HEX-193">HEX-193</a> - IMPLEMENT: Device Ticket Power Tool</li>
+</ul>
+<h3>Soft Delete + XT# Uniqueness Fix</h3><ul>
+<li><strong>Bug Fix</strong>: <a href="https://linear.app/hextrackr/issue/HEX-196">HEX-196</a> - Soft Delete + XT# Duplicate Bug Fix</li>
 </ul>
 <hr>
 <h2>📚 Documentation</h2><p>See <a href="#guides/power-tools">User Guide: Power Tools</a> for detailed keyboard shortcut reference and usage examples.</p>

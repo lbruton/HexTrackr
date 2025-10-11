@@ -1,0 +1,108 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.62</h1><p><strong>Release Date</strong>: October 11, 2025<br><strong>Type</strong>: Feature Release<br><strong>Linear Issue</strong>: HEX-203</p>
+<hr>
+<h2>🎯 Bidirectional Device-to-Ticket Navigation</h2><p>This release implements comprehensive bidirectional navigation between vulnerability device cards and their associated tickets, making it effortless to track which devices already have open tickets.</p>
+<h3>✨ New Features</h3><h4>Smart Ticket Buttons on Device Cards</h4><ul>
+<li><strong>Dynamic Button States</strong>: Vulnerability device cards now display intelligent buttons based on ticket status:<ul>
+<li><strong>&quot;Create Ticket&quot;</strong> (green) - Device has no open tickets</li>
+<li><strong>&quot;Open Ticket&quot;</strong> (status-colored) - Device has exactly 1 open ticket</li>
+<li><strong>&quot;View Tickets (N)&quot;</strong> (status-colored) - Device has 2+ open tickets</li>
+</ul>
+</li>
+<li><strong>Status-Aware Coloring</strong>: Button borders reflect ticket status (Pending=amber, Open=blue, Overdue=red, etc.)</li>
+<li><strong>Job Type Text Coloring</strong>: Button text color matches job type (Upgrade=blue, Replace=orange, Refresh=purple, etc.)</li>
+</ul>
+<h4>Multi-Ticket Picker Modal</h4><ul>
+<li><strong>Clean Selection UI</strong>: When a device has multiple open tickets, a modal displays all tickets with:<ul>
+<li>XT ticket numbers</li>
+<li>Job types with color coding</li>
+<li>Status badges</li>
+<li>Submission dates</li>
+</ul>
+</li>
+<li><strong>Direct Navigation</strong>: Click any ticket to open the edit modal on tickets.html</li>
+<li><strong>Create Anyway Option</strong>: Bottom button allows creating a new ticket even when tickets exist</li>
+</ul>
+<h4>Backend API Enhancement</h4><ul>
+<li><strong>New Endpoint</strong>: <code>GET /api/tickets/by-device/:hostname</code></li>
+<li><strong>Efficient Querying</strong>: Uses SQLite&#39;s <code>json_each()</code> for fast device matching within JSON arrays</li>
+<li><strong>Case-Insensitive</strong>: Handles mixed-case hostnames and IP addresses</li>
+<li><strong>Filtered Results</strong>: Excludes deleted tickets and Completed/Cancelled statuses</li>
+</ul>
+<h4>Seamless Navigation Flow</h4><ul>
+<li><strong>URL Parameters</strong>: Uses <code>?openTicket=ID</code> for cross-page modal opening</li>
+<li><strong>Auto-Open Modals</strong>: Tickets page detects URL parameter and automatically opens the edit modal</li>
+<li><strong>Clean URLs</strong>: Parameter is removed after modal opens (no polluted browser history)</li>
+</ul>
+<h3>🎨 UI/UX Improvements</h3><h4>Device Reorder Controls (Ticket Modal)</h4><ul>
+<li><strong>Tabler Icons Integration</strong>: Added Tabler Icons webfont CDN for consistent icon usage</li>
+<li><strong>Clear Visual Indicators</strong>: Up/down caret icons (▲▼) for device reordering</li>
+<li><strong>Theme-Aware Styling</strong>: Icons and buttons adapt to light/dark modes using CSS custom properties</li>
+<li><strong>Interactive Feedback</strong>:<ul>
+<li>Hover: Blue highlight with subtle lift animation</li>
+<li>Active: Press-down effect</li>
+<li>Disabled: 30% opacity with not-allowed cursor on first/last items</li>
+</ul>
+</li>
+<li><strong>Improved Click Handling</strong>: Using <code>Element.closest()</code> for reliable event delegation with nested icons</li>
+</ul>
+<h3>🔧 Technical Details</h3><h4>Files Modified</h4><ul>
+<li><p><strong>Backend</strong>:</p>
+<ul>
+<li><code>app/routes/tickets.js</code> - New route definition</li>
+<li><code>app/controllers/ticketController.js</code> - Request handling</li>
+<li><code>app/services/ticketService.js</code> - Database query logic</li>
+</ul>
+</li>
+<li><p><strong>Frontend</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/vulnerability-cards.js</code> - Button state logic, modal implementation</li>
+<li><code>app/public/scripts/pages/tickets.js</code> - URL parameter handling, device reorder improvements</li>
+<li><code>app/public/vulnerabilities.html</code> - Multi-ticket picker modal HTML</li>
+<li><code>app/public/tickets.html</code> - Tabler Icons CDN, device reorder template updates</li>
+<li><code>app/public/styles/pages/tickets.css</code> - Device reorder button styling with hover states</li>
+</ul>
+</li>
+</ul>
+<h4>Status Color Mapping</h4><p>Corrected to match actual ticket system values:</p>
+<ul>
+<li><strong>Pending</strong>: Amber yellow (#ffc107)</li>
+<li><strong>Staged</strong>: Purple/Info (#17a2b8)</li>
+<li><strong>Open</strong>: Blue (#0d6efd)</li>
+<li><strong>Overdue</strong>: Red (#dc3545)</li>
+<li><strong>Completed</strong>: Green (#28a745)</li>
+<li><strong>Failed</strong>: Orange-red (#fd7e14)</li>
+<li><strong>Closed</strong>: Gray (#6c757d)</li>
+</ul>
+<h4>Performance Optimizations</h4><ul>
+<li><strong>Parallel API Calls</strong>: Uses <code>Promise.all()</code> to check ticket state for all visible devices concurrently</li>
+<li><strong>No Extra Round-Trips</strong>: Passes full ticket objects instead of fetching individually</li>
+<li><strong>Respects Pagination</strong>: Only checks ticket state for currently displayed device cards</li>
+</ul>
+<h3>🐛 Bug Fixes</h3><ul>
+<li>Fixed missing API endpoint issue by passing complete ticket objects from initial lookup</li>
+<li>Fixed click handlers failing on nested icon elements using <code>Element.closest()</code></li>
+<li>Fixed device reorder arrows not displaying due to missing Tabler Icons webfont</li>
+<li>Fixed inconsistent status values between vulnerability cards and tickets system</li>
+</ul>
+<h3>📝 Related Issues</h3><ul>
+<li><strong>HEX-203</strong>: Bidirectional Device-to-Ticket Navigation (Parent)</li>
+<li><strong>HEX-174</strong>: Device Modal IP Display (Related work)</li>
+<li><strong>HEX-190</strong>: Device Ticket Power Tool (Foundation)</li>
+</ul>
+<h3>🎓 Development Notes</h3><p>This feature demonstrates several advanced patterns:</p>
+<ul>
+<li><strong>SQLite JSON Functions</strong>: Efficient searching within JSON array columns</li>
+<li><strong>Event Delegation</strong>: Robust click handling for dynamically generated content</li>
+<li><strong>URL-based Navigation</strong>: Cross-page modal opening without session storage</li>
+<li><strong>Theme-Aware Design</strong>: Consistent appearance across light/dark modes</li>
+<li><strong>Parallel Data Fetching</strong>: Optimal performance with concurrent API calls</li>
+</ul>
+<hr>
+<p><strong>Breaking Changes</strong>: None<br><strong>Migration Required</strong>: No<br><strong>Database Changes</strong>: No schema modifications</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
