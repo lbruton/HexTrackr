@@ -21,6 +21,7 @@ class TemplateEditor {
         this.isEditMode = false;
         this.currentTemplate = null;
         this.currentTicketData = null;
+        this.currentVariant = 'upgrade';  // Default variant
         this.validationTimeout = null;
         this.isRestoring = false;
 
@@ -28,6 +29,29 @@ class TemplateEditor {
         this.variables = window.HexTrackrTemplateVariables?.getRecommendedVariables("email") || [];
 
         this.init();
+    }
+
+    /**
+     * Get template variant name based on job type
+     * @param {string} jobType - Job type value (Upgrade, Replace, Refresh, Mitigate, Other)
+     * @returns {string} Template variant name ('upgrade', 'replacement', or 'mitigate')
+     */
+    getTemplateVariant(jobType) {
+        if (!jobType) {
+            return 'upgrade';  // Default fallback
+        }
+
+        switch (jobType.toLowerCase()) {
+            case 'replace':
+            case 'refresh':
+                return 'replacement';  // Both use same template (equipment swap workflow)
+            case 'mitigate':
+                return 'mitigate';     // KEV emergency patching
+            case 'upgrade':
+            case 'other':
+            default:
+                return 'upgrade';      // Default for Upgrade and Other job types
+        }
     }
 
     /**
@@ -91,10 +115,14 @@ class TemplateEditor {
      */
     async loadTemplateForEditing(forceRefresh = false) {
         try {
+            // Determine template name based on current variant
+            const templateName = `email_${this.currentVariant}`;
+            console.log(`[TemplateEditor] Loading template: ${templateName}`);
+
             // If forceRefresh is true, always fetch from API
             if (forceRefresh) {
                 console.log("[TemplateEditor] Force refresh requested, fetching from API");
-                const response = await authState.authenticatedFetch("/api/templates/by-name/default_email");
+                const response = await authState.authenticatedFetch(`/api/templates/by-name/${templateName}`);
 
                 if (!response.ok) {
                     if (response.status === 404) {
@@ -115,12 +143,12 @@ class TemplateEditor {
                 }
             } else {
                 // Try cache first, then API if no cache
-                const cachedTemplate = this.getCachedTemplate("default_email");
+                const cachedTemplate = this.getCachedTemplate(templateName);
                 if (cachedTemplate) {
                     this.currentTemplate = cachedTemplate;
                     console.log("[TemplateEditor] Using cached template");
                 } else if (!this.currentTemplate) {
-                    const response = await authState.authenticatedFetch("/api/templates/by-name/default_email");
+                    const response = await authState.authenticatedFetch(`/api/templates/by-name/${templateName}`);
 
                     if (!response.ok) {
                         if (response.status === 404) {
@@ -598,6 +626,11 @@ class TemplateEditor {
      */
     setTicketData(ticketData) {
         this.currentTicketData = ticketData;
+        // Determine variant based on job type
+        if (ticketData && ticketData.jobType) {
+            this.currentVariant = this.getTemplateVariant(ticketData.jobType);
+            console.log(`[TemplateEditor] Set variant to '${this.currentVariant}' based on job type '${ticketData.jobType}'`);
+        }
     }
 
     /**
