@@ -630,6 +630,7 @@ class TemplateEditor {
             "[SITE]": ticket.site || "N/A",
             "[LOCATION]": ticket.location || "N/A",
             "[STATUS]": ticket.status || "N/A",
+            "[JOB_TYPE]": ticket.jobType || ticket.job_type || "Upgrade",
             "[HEXAGON_NUM]": ticket.hexagon_ticket || ticket.hexagonTicket || "N/A",
             "[HEXAGON_TICKET]": ticket.hexagon_ticket || ticket.hexagonTicket || "N/A",
             "[SERVICENOW_NUM]": ticket.servicenow_ticket || ticket.serviceNowTicket || "N/A",

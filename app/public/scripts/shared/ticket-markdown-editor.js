@@ -156,6 +156,7 @@ class TicketMarkdownEditor {
 - Site: [SITE_NAME]
 - Location: [LOCATION]
 - Status: [STATUS]
+- Job Type: [JOB_TYPE]
 
 **Timeline:**
 - Date Submitted: [DATE_SUBMITTED]
@@ -382,6 +383,7 @@ Generated: [GENERATED_TIME]`;
             "[DATE_SUBMITTED]": this.formatDate(ticket.date_submitted || ticket.dateSubmitted),
             "[SUPERVISOR]": this.normalizeSupervisorNames(ticket.supervisor) || "N/A",
             "[TECHNICIAN]": ticket.technician || ticket.tech || "N/A",
+            "[JOB_TYPE]": ticket.jobType || ticket.job_type || "Upgrade",
             "[NOTES]": ticket.notes || ticket.additional_notes || "N/A",
             "[GENERATED_TIME]": new Date().toLocaleString(),
             "[VULNERABILITY_SUMMARY]": this.generateVulnerabilitySummary(ticket)

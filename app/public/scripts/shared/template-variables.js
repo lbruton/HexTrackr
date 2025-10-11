@@ -23,6 +23,7 @@ window.HexTrackrTemplateVariables = {
         { name: "[HEXAGON_TICKET]", description: "Hexagon ticket number", required: false, category: "ticket" },
         { name: "[SERVICENOW_TICKET]", description: "ServiceNow ticket number", required: false, category: "ticket" },
         { name: "[STATUS]", description: "Ticket status", required: false, category: "ticket" },
+        { name: "[JOB_TYPE]", description: "Job type (Upgrade/Replace/Refresh/Mitigate/Other)", required: false, category: "ticket" },
 
         // Location Information
         { name: "[SITE_NAME]", description: "Site name", required: true, category: "location" },
