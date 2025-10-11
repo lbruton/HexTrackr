@@ -168,15 +168,16 @@ class CiscoAdvisoryService {
     /**
      * Fetch Cisco API credentials from preferences
      * @async
+     * @param {number} userId - User ID from session
      * @returns {Promise<{clientId: string, clientSecret: string}>} Credentials object
      * @throws {Error} If credentials not found
      */
-    async getCiscoCredentials() {
+    async getCiscoCredentials(userId) {
         if (!this.preferencesService) {
             throw new Error("PreferencesService not available");
         }
 
-        const result = await this.preferencesService.getPreference("cisco_api_key");
+        const result = await this.preferencesService.getPreference(userId, "cisco_api_key");
 
         if (!result.success || !result.data || !result.data.value) {
             throw new Error("Cisco API credentials not configured. Please add credentials in Settings.");
@@ -283,10 +284,11 @@ class CiscoAdvisoryService {
     /**
      * Sync Cisco PSIRT advisory data for all CVEs in database
      * @async
+     * @param {number} userId - User ID from session for credential fetch
      * @returns {Promise<Object>} Sync result with statistics
      * @throws {Error} If sync fails
      */
-    async syncCiscoAdvisories() {
+    async syncCiscoAdvisories(userId) {
         if (this.syncInProgress) {
             throw new Error("Sync already in progress");
         }
@@ -296,7 +298,7 @@ class CiscoAdvisoryService {
 
         try {
             // Get credentials from preferences
-            const { clientId, clientSecret } = await this.getCiscoCredentials();
+            const { clientId, clientSecret } = await this.getCiscoCredentials(userId);
 
             // Get OAuth2 access token
             console.log("🔐 Authenticating with Cisco Identity Services...");
