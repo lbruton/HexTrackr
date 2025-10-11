@@ -42,14 +42,17 @@
 - [x] URL parameter handling in tickets.html (?openTicket=ID)
 - [x] Auto-open ticket edit modal from URL parameter
 
-### Phase 5: Testing & Polish
-- [ ] Test with device that has no tickets
-- [ ] Test with device that has 1 open ticket
-- [ ] Test with device that has 2+ open tickets
-- [ ] Test with mixed case hostnames
-- [ ] Test with IP address devices
-- [ ] Verify status colors match tickets.html table
-- [ ] Test modal dismissal edge cases
+### Phase 5: Testing & Polish ✅
+- [x] Test with device that has no tickets
+- [x] Test with device that has 1 open ticket
+- [x] Test with device that has 2+ open tickets
+- [x] Test with mixed case hostnames
+- [x] Test with IP address devices
+- [x] Verify status colors match tickets.html table
+- [x] Test modal dismissal edge cases
+- [x] Fix missing API endpoint (pass ticket objects instead of IDs)
+- [x] Fix device reorder arrow buttons (theme-consistent Tabler icons)
+- [x] Committed: 4d7a27e
 
 ---
 
