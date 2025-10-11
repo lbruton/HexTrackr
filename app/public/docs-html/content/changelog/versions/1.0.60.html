@@ -121,6 +121,51 @@
 <li><a href="https://linear.app/hextrackr/issue/HEX-185">HEX-185</a> - BUG: Vulnerability Dashboard Resets to Table View on Browser Resize</li>
 </ul>
 <hr>
+<h4>Device Modal IP Address Display (HEX-174)</h4><p><strong>Overview</strong>: Fixed device security modal to display IP addresses from vulnerability records instead of showing &quot;N/A&quot;.</p>
+<p><strong>Problem</strong>:</p>
+<ul>
+<li>Device modal IP Address field always displayed &quot;N/A&quot;</li>
+<li>IP addresses were available in vulnerability data but not shown</li>
+<li>Device aggregation only captured first vulnerability&#39;s IP, which could be empty</li>
+</ul>
+<p><strong>Root Cause</strong>:</p>
+<ul>
+<li>Device aggregation in <code>vulnerability-data.js</code> set <code>ipAddress: vuln.ip_address || &quot;&quot;</code> from only the <strong>first</strong> vulnerability during grouping</li>
+<li>If first vulnerability had empty IP but later vulnerabilities had IPs, they were ignored</li>
+<li>Modal displayed pre-aggregated <code>device.ipAddress</code> which could be empty string</li>
+</ul>
+<p><strong>Solution</strong>:</p>
+<ul>
+<li>Added logic to search through all vulnerability records for device at display time</li>
+<li>Uses <code>.find(v =&gt; v.ip_address)</code> to locate first vulnerability with non-empty IP</li>
+<li>Mirrors AG-Grid table behavior which directly displays <code>vuln.ip_address</code> from each record</li>
+<li>Falls back to <code>device.ipAddress</code> → <code>&quot;N/A&quot;</code> if no vulnerabilities have IP addresses</li>
+</ul>
+<p><strong>Implementation</strong> (<code>/app/public/scripts/shared/device-security-modal.js:76-78</code>):</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// HEX-174: Get IP from first vulnerability that has one (mirrors AG-Grid table behavior)</span>
+<span class="hljs-comment">// This is a short-term fix until database-first device endpoint is implemented</span>
+<span class="hljs-keyword">const</span> ipAddress = device.<span class="hljs-property">vulnerabilities</span>?.<span class="hljs-title function_">find</span>(<span class="hljs-function"><span class="hljs-params">v</span> =&gt;</span> v.<span class="hljs-property">ip_address</span>)?.<span class="hljs-property">ip_address</span> || device.<span class="hljs-property">ipAddress</span> || <span class="hljs-string">&quot;N/A&quot;</span>;</code></pre><p><strong>Result</strong>:</p>
+<ul>
+<li>Device modal now displays IP addresses when available in vulnerability data</li>
+<li>More robust than original approach (checks ALL vulnerabilities, not just first)</li>
+<li>Consistent with how AG-Grid table shows IP addresses</li>
+<li>Gracefully handles empty/missing data with &quot;N/A&quot; fallback</li>
+</ul>
+<p><strong>Future Enhancement</strong>:</p>
+<ul>
+<li>This is a short-term fix using client-side data already in memory</li>
+<li>Backend refactor to database-first device queries will provide more efficient IP retrieval</li>
+<li>Related to ongoing performance optimization research</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/device-security-modal.js</code> - Added IP extraction from vulnerability records</li>
+</ul>
+<p><strong>Issue</strong>:</p>
+<ul>
+<li><a href="https://linear.app/hextrackr/issue/HEX-174">HEX-174</a> - Device modal IP address field shows &quot;N/A&quot;</li>
+</ul>
+<hr>
 <h4>Documentation Portal Dark Mode Issues (HEX-166, HEX-167, HEX-177)</h4><p><strong>Overview</strong>: Resolved three critical dark mode issues in the Documentation Portal affecting diagram rendering, code syntax highlighting, and navigation visibility. All fixes improve the documentation reading experience in dark mode without breaking light mode functionality.</p>
 <hr>
 <h3>HEX-166: Mermaid Diagram Syntax Error</h3><p><strong>Problem</strong>:</p>
