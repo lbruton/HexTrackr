@@ -765,21 +765,47 @@ async function loadCiscoSyncStatus() {
             }
         }
 
-        // TODO: Fetch sync status from /api/cisco/status when backend is ready
-        // For now, show placeholder data
-        const lastSyncElement = document.getElementById("ciscoLastSync");
-        if (lastSyncElement) {
-            lastSyncElement.textContent = "Never synced";
-        }
+        // Fetch sync status from API (HEX-141 Phase 2)
+        const statusResponse = await fetch("/api/cisco/status");
+        if (statusResponse.ok) {
+            const statusData = await statusResponse.json();
 
-        const syncedCountElement = document.getElementById("ciscoSyncedCount");
-        if (syncedCountElement) {
-            syncedCountElement.textContent = "0";
-        }
+            // Update last sync time
+            const lastSyncElement = document.getElementById("ciscoLastSync");
+            if (lastSyncElement) {
+                if (statusData.lastSync) {
+                    const syncDate = new Date(statusData.lastSync);
+                    lastSyncElement.textContent = syncDate.toLocaleString();
+                } else {
+                    lastSyncElement.textContent = "Never synced";
+                }
+            }
 
-        const matchedCountElement = document.getElementById("ciscoMatchedCount");
-        if (matchedCountElement) {
-            matchedCountElement.textContent = "0";
+            // Update statistics
+            const syncedCountElement = document.getElementById("ciscoSyncedCount");
+            if (syncedCountElement) {
+                syncedCountElement.textContent = statusData.totalAdvisories || 0;
+            }
+
+            const matchedCountElement = document.getElementById("ciscoMatchedCount");
+            if (matchedCountElement) {
+                matchedCountElement.textContent = statusData.matchedCount || 0;
+            }
+
+            // Update status badge
+            const statusBadge = document.getElementById("ciscoStatus");
+            if (statusBadge) {
+                if (statusData.syncInProgress) {
+                    statusBadge.textContent = "Syncing";
+                    statusBadge.className = "badge bg-warning";
+                } else if (statusData.lastSync) {
+                    statusBadge.textContent = "Synced";
+                    statusBadge.className = "badge bg-success";
+                } else {
+                    statusBadge.textContent = "Not Synced";
+                    statusBadge.className = "badge bg-secondary";
+                }
+            }
         }
     } catch (error) {
         console.error("Error loading Cisco sync status:", error);
@@ -808,15 +834,44 @@ async function syncCiscoNow() {
     }
 
     try {
-        // TODO: Call /api/cisco/sync when backend is ready
-        showNotification("Cisco advisory sync - backend not yet implemented (Phase 2)", "info");
+        // Call Cisco advisory sync API (HEX-141 Phase 2)
+        const response = await fetch("/api/cisco/sync", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
 
-        // Simulate sync delay
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        const result = await response.json();
 
-        if (statusBadge) {
-            statusBadge.textContent = "Not Synced";
-            statusBadge.className = "badge bg-secondary";
+        if (response.ok && result.success) {
+            // Update status badge
+            if (statusBadge) {
+                statusBadge.textContent = "Synced";
+                statusBadge.className = "badge bg-success";
+            }
+
+            // Update statistics
+            const syncedCountElement = document.getElementById("ciscoSyncedCount");
+            if (syncedCountElement && result.totalAdvisories !== undefined) {
+                syncedCountElement.textContent = result.totalAdvisories;
+            }
+
+            const matchedCountElement = document.getElementById("ciscoMatchedCount");
+            if (matchedCountElement && result.matchedCount !== undefined) {
+                matchedCountElement.textContent = result.matchedCount;
+            }
+
+            // Update last sync time
+            const lastSyncElement = document.getElementById("ciscoLastSync");
+            if (lastSyncElement && result.lastSync) {
+                const syncDate = new Date(result.lastSync);
+                lastSyncElement.textContent = syncDate.toLocaleString();
+            }
+
+            showNotification(`Cisco advisory sync completed: ${result.totalAdvisories} advisories, ${result.matchedCount} matched in your environment`, "success");
+        } else {
+            throw new Error(result.message || result.error || "Unknown sync error");
         }
     } catch (error) {
         console.error("Cisco sync error:", error);
