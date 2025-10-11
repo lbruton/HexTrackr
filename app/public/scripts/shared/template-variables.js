@@ -21,7 +21,9 @@ window.HexTrackrTemplateVariables = {
         // Core Ticket Information
         { name: "[XT_NUMBER]", description: "Internal XT number", required: true, category: "ticket" },
         { name: "[HEXAGON_TICKET]", description: "Hexagon ticket number", required: false, category: "ticket" },
+        { name: "[HEXAGON_NUM]", description: "Hexagon ticket number (alias for HEXAGON_TICKET)", required: false, category: "ticket" },
         { name: "[SERVICENOW_TICKET]", description: "ServiceNow ticket number", required: false, category: "ticket" },
+        { name: "[SERVICENOW_NUM]", description: "ServiceNow ticket number (alias for SERVICENOW_TICKET)", required: false, category: "ticket" },
         { name: "[STATUS]", description: "Ticket status", required: false, category: "ticket" },
         { name: "[JOB_TYPE]", description: "Job type (Upgrade/Replace/Refresh/Mitigate/Other)", required: false, category: "ticket" },
 
