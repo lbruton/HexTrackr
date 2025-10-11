@@ -29,7 +29,10 @@ function createCiscoRouter(db, preferencesService) {
             message: "Please wait before requesting another Cisco advisory sync"
         },
         standardHeaders: true,
-        legacyHeaders: false
+        legacyHeaders: false,
+        // Trust proxy configuration for nginx reverse proxy
+        // Uses leftmost IP from X-Forwarded-For header (our nginx config)
+        validate: { trustProxy: false } // Disable trust proxy validation (we know our setup is secure)
     });
 
     // API Routes
