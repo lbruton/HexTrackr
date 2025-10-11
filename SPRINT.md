@@ -9,12 +9,12 @@
 
 ## Implementation Checklist
 
-### Phase 1: Backend API Endpoint
-- [ ] Create `/api/tickets/by-device/:hostname` endpoint in routes/tickets.js
-- [ ] Implement SQL query with json_each for device matching
-- [ ] Filter: deleted=0, exclude Completed/Cancelled statuses
-- [ ] Return: XT number, job_type, status, date_submitted, devices array
-- [ ] Test with curl/postman for existing hostnames
+### Phase 1: Backend API Endpoint ✅
+- [x] Create `/api/tickets/by-device/:hostname` endpoint in routes/tickets.js
+- [x] Implement SQL query with json_each for device matching
+- [x] Filter: deleted=0, exclude Completed/Cancelled statuses
+- [x] Return: XT number, job_type, status, date_submitted, devices array
+- [x] Committed: 0059f32
 
 ### Phase 2: Frontend Button Logic
 - [ ] Update vulnerability card rendering in vulnerabilities.js
@@ -99,9 +99,17 @@ if (tickets.length === 0) {
 - [x] Improved arrow button styling with Tabler icons
 
 **In Progress**:
-- [ ] Bidirectional device-to-ticket navigation
+- [x] Backend API complete (commit 0059f32)
+- [ ] Frontend button state detection (started)
+- [ ] Multi-ticket picker modal
 
 **Blocked**: None
+
+**Discovery Notes**:
+- Button is rendered in vulnerability-cards.js line 258-261
+- handleCreateTicketClick() supports bulk ticket creation with keyboard modifiers
+- Need to make button rendering async to check ticket state before display
+- Button ID pattern: No IDs currently, uses inline onclick
 
 ---
 
