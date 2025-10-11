@@ -467,14 +467,14 @@
                 </div>
                 <div class="mb-3">
                     <label for="ciscoClientIdInput" class="form-label">Client ID</label>
-                    <input type="text" class="form-control" id="ciscoClientIdInput"
+                    <input type="password" class="form-control" id="ciscoClientIdInput"
                            name="cisco-api-client-id"
                            placeholder="Enter Cisco PSIRT Client ID"
                            autocomplete="off"
                            data-lpignore="true"
                            data-form-type="other">
                     <div class="form-text">
-                        Your Cisco PSIRT OAuth2 Client ID
+                        Your Cisco PSIRT OAuth2 Client ID (masked for security)
                     </div>
                 </div>
                 <div class="mb-3">
@@ -486,12 +486,15 @@
                            data-lpignore="true"
                            data-form-type="other">
                     <div class="form-text">
-                        Your Cisco PSIRT OAuth2 Client Secret (will be masked)
+                        Your Cisco PSIRT OAuth2 Client Secret (masked for security)
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-outline-danger" id="clearCiscoCredentialsBtn">
+                    <i class="fas fa-trash me-2"></i>Clear Credentials
+                </button>
                 <button type="button" class="btn btn-primary" id="saveCiscoCredentialsBtn">
                     <i class="fas fa-save me-2"></i>Save Credentials
                 </button>
