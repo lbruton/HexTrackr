@@ -95,15 +95,16 @@ class HexagonTicketsManager {
         let status = rawTicket.status || "";
         
         // Auto-update status to "Overdue" if conditions are met
-        if (isOverdue && status !== "Completed" && status !== "Closed" && status !== "Overdue") {
+        // Priority: Failed > Overdue (Failed tickets need re-queuing, not just follow-up)
+        if (isOverdue && status !== "Completed" && status !== "Closed" && status !== "Failed" && status !== "Overdue") {
             // PMD-disable-next-line GlobalVariable
             status = "Overdue";
             // Update the status in the database asynchronously
             this.updateTicketStatusToOverdue(rawTicket.id);
         }
-        
-        // Don't mark completed or closed tickets as overdue
-        const isActiveOverdue = isOverdue && status !== "Completed" && status !== "Closed";
+
+        // Don't mark completed, closed, or failed tickets as overdue
+        const isActiveOverdue = isOverdue && status !== "Completed" && status !== "Closed" && status !== "Failed";
         
         const normalizedXtNumber = this.normalizeXtNumber(rawTicket.xt_number || rawTicket.xtNumber);
 
