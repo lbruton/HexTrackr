@@ -1054,7 +1054,7 @@ class HexagonTicketsManager {
             jobType: document.getElementById("jobType").value,
             notes: document.getElementById("notes").value,
             // Conditional fields
-            trackingNumber: document.getElementById("trackingNumber").value,
+            trackingNumber: document.getElementById("outboundTracking").value + (document.getElementById("returnTracking").value ? " | " + document.getElementById("returnTracking").value : ""),
             shippingAddress: document.getElementById("shippingAddress").value,
             returnAddress: document.getElementById("returnAddress").value,
             softwareVersions: document.getElementById("softwareVersions").value,
@@ -1105,7 +1105,10 @@ class HexagonTicketsManager {
         document.getElementById("notes").value = ticket.notes || "";
 
         // Populate conditional fields
-        document.getElementById("trackingNumber").value = ticket.tracking_number || ticket.trackingNumber || "";
+        // Parse tracking numbers (stored as "outbound | return")
+        const trackingNumbers = (ticket.tracking_number || ticket.trackingNumber || "").split(" | ");
+        document.getElementById("outboundTracking").value = trackingNumbers[0] || "";
+        document.getElementById("returnTracking").value = trackingNumbers[1] || "";
         document.getElementById("shippingAddress").value = ticket.shipping_address || ticket.shippingAddress || "";
         document.getElementById("returnAddress").value = ticket.return_address || ticket.returnAddress || "";
         document.getElementById("softwareVersions").value = ticket.software_versions || ticket.softwareVersions || "";
