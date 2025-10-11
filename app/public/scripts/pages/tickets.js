@@ -336,6 +336,11 @@ class HexagonTicketsManager {
             this.renderTickets();
         });
 
+        document.getElementById("jobTypeFilter").addEventListener("change", () => {
+            this.currentPage = 1; // Reset to first page when filtering
+            this.renderTickets();
+        });
+
         // Pagination controls
         document.getElementById("rowsPerPage").addEventListener("change", (e) => {
             this.rowsPerPage = parseInt(e.target.value, 10);
@@ -1549,7 +1554,7 @@ class HexagonTicketsManager {
     }
 
     /**
-     * Get tickets filtered by search term, status, location, and supervisor.
+     * Get tickets filtered by search term, status, job type, location, and supervisor.
      * Applies all active filters and returns matching tickets for display.
      *
      * @returns {Array} Array of filtered ticket objects
@@ -1557,6 +1562,7 @@ class HexagonTicketsManager {
     getFilteredTickets() {
         const searchTerm = document.getElementById("searchInput").value.toLowerCase();
         const statusFilter = document.getElementById("statusFilter").value;
+        const jobTypeFilter = document.getElementById("jobTypeFilter").value;
         const locationFilter = document.getElementById("locationFilter").value;
 
         return this.tickets.filter(ticket => {
@@ -1577,10 +1583,13 @@ class HexagonTicketsManager {
             // 3. Status dropdown (only if no card filter active)
             const matchesStatus = this.activeCardFilter ? true : (!statusFilter || ticket.status === statusFilter);
 
-            // 4. Location filter
+            // 4. Job Type filter
+            const matchesJobType = !jobTypeFilter || (ticket.jobType === jobTypeFilter || ticket.job_type === jobTypeFilter);
+
+            // 5. Location filter
             const matchesLocation = !locationFilter || ticket.location === locationFilter;
 
-            return matchesSearch && matchesCardFilter && matchesStatus && matchesLocation;
+            return matchesSearch && matchesCardFilter && matchesStatus && matchesJobType && matchesLocation;
         });
     }
 
