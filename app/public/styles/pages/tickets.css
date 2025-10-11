@@ -236,3 +236,46 @@
 }
 
 /* Print styles moved to shared/tables.css */
+
+/* Device Reorder Buttons (HEX-203) */
+.move-up-btn,
+.move-down-btn {
+    padding: 2px 8px !important;
+    border-radius: 3px !important;
+    font-size: 14px !important;
+    background: var(--tblr-bg-surface) !important;
+    border: 1px solid var(--tblr-border-color) !important;
+    color: var(--tblr-body-color) !important;
+    transition: all 0.15s ease-in-out !important;
+    cursor: pointer !important;
+}
+
+.move-up-btn:hover:not(:disabled),
+.move-down-btn:hover:not(:disabled) {
+    background: var(--tblr-primary) !important;
+    border-color: var(--tblr-primary) !important;
+    color: white !important;
+    transform: translateY(-1px);
+}
+
+.move-up-btn:active:not(:disabled),
+.move-down-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.move-up-btn:disabled,
+.move-down-btn:disabled {
+    opacity: 0.3 !important;
+    cursor: not-allowed !important;
+}
+
+.move-up-btn {
+    margin-bottom: 1px !important;
+}
+
+/* Make icons more visible */
+.move-up-btn i,
+.move-down-btn i {
+    font-size: 16px;
+    line-height: 1;
+}
