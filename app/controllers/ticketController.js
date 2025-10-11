@@ -238,6 +238,41 @@ class TicketController {
             });
         }
     }
+
+    /**
+     * Get all tickets containing a specific device hostname
+     * HEX-203: Bidirectional device-to-ticket navigation
+     * Enables vulnerability cards to link to existing tickets
+     * @param {string} req.params.hostname - Device hostname or IP address
+     * @returns {Array} List of tickets containing the device (excludes completed/cancelled)
+     */
+    static async getTicketsByDevice(req, res) {
+        try {
+            const controller = TicketController.getInstance();
+            const { hostname } = req.params;
+
+            if (!hostname) {
+                return res.status(400).json({
+                    success: false,
+                    error: "Hostname parameter is required"
+                });
+            }
+
+            const tickets = await controller.ticketService.getTicketsByDevice(hostname);
+            res.json({
+                success: true,
+                count: tickets.length,
+                tickets: tickets
+            });
+        } catch (error) {
+            console.error(`Error fetching tickets for device ${req.params.hostname}:`, error);
+            res.status(500).json({
+                success: false,
+                error: "Failed to fetch tickets for device",
+                details: error.message
+            });
+        }
+    }
 }
 
 module.exports = TicketController;
