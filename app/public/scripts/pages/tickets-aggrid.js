@@ -430,9 +430,14 @@
                 },
                 cellRenderer: (params) => {
                     const jobTypeValue = params.value || "Upgrade";
+                    const slug = jobTypeValue.toLowerCase().replace(/\s+/g, "-");
                     const label = document.createElement("span");
-                    label.className = "badge bg-secondary";
-                    label.textContent = jobTypeValue;
+                    label.className = "status-label status-generic";
+
+                    const strong = document.createElement("strong");
+                    strong.textContent = jobTypeValue.toUpperCase();
+                    label.appendChild(strong);
+
                     return label;
                 }
             },
