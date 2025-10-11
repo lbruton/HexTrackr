@@ -38,7 +38,7 @@ class TicketService {
      */
     async getAllTickets() {
         return new Promise((resolve, reject) => {
-            this.db.all("SELECT * FROM tickets ORDER BY created_at DESC", (err, rows) => {
+            this.db.all("SELECT * FROM tickets WHERE deleted = 0 ORDER BY created_at DESC", (err, rows) => {
                 if (err) {
                     return reject(new Error("Failed to fetch tickets: " + err.message));
                 }
@@ -97,6 +97,7 @@ class TicketService {
     /**
      * Create new ticket
      * Extracted from server.js line 3369-3394
+     * HEX-196: Added XT# uniqueness validation to prevent duplicates
      */
     async createTicket(ticket) {
         const normalizedXt = normalizeXtNumber(ticket.xt_number || ticket.xtNumber) || null;
@@ -105,6 +106,29 @@ class TicketService {
             xt_number: normalizedXt,
             xtNumber: normalizedXt
         };
+
+        // HEX-196: Validate XT# uniqueness across ALL tickets (active + deleted)
+        // This should NEVER happen if frontend calls generateNextXTNumber() correctly
+        if (normalizedXt) {
+            const existingTicket = await new Promise((resolve, reject) => {
+                this.db.get(
+                    "SELECT id, xt_number, deleted FROM tickets WHERE xt_number = ? LIMIT 1",
+                    [normalizedXt],
+                    (err, row) => {
+                        if (err) {return reject(err);}
+                        resolve(row);
+                    }
+                );
+            });
+
+            if (existingTicket) {
+                const status = existingTicket.deleted ? "deleted" : "active";
+                throw new Error(
+                    `CRITICAL: XT# ${normalizedXt} already exists (${status} ticket ${existingTicket.id}). ` +
+                    `This indicates frontend failed to call /api/tickets/next-xt-number correctly.`
+                );
+            }
+        }
 
         return new Promise((resolve, reject) => {
             const sql = `INSERT INTO tickets (
@@ -225,17 +249,22 @@ class TicketService {
     }
 
     /**
-     * Delete ticket by ID
+     * Delete ticket by ID (soft delete - sets deleted=1, deleted_at=now)
      * Extracted from server.js line 3424-3435
+     * Updated: HEX-196 - Soft delete for audit trail and XT# uniqueness
      */
     async deleteTicket(ticketId) {
         return new Promise((resolve, reject) => {
-            this.db.run("DELETE FROM tickets WHERE id = ?", [ticketId], function(err) {
-                if (err) {
-                    return reject(new Error("Failed to delete ticket: " + err.message));
+            this.db.run(
+                "UPDATE tickets SET deleted = 1, deleted_at = datetime('now') WHERE id = ?",
+                [ticketId],
+                function(err) {
+                    if (err) {
+                        return reject(new Error("Failed to delete ticket: " + err.message));
+                    }
+                    resolve(this.changes);
                 }
-                resolve(this.changes);
-            });
+            );
         });
     }
 
@@ -459,7 +488,7 @@ class TicketService {
      */
     async exportTickets() {
         return new Promise((resolve, reject) => {
-            this.db.all("SELECT * FROM tickets ORDER BY created_at DESC", (err, rows) => {
+            this.db.all("SELECT * FROM tickets WHERE deleted = 0 ORDER BY created_at DESC", (err, rows) => {
                 if (err) {
                     return reject(new Error("Failed to fetch tickets for backup: " + err.message));
                 }
@@ -479,6 +508,8 @@ class TicketService {
      */
     async generateNextXTNumber() {
         return new Promise((resolve, reject) => {
+            // IMPORTANT: NO deleted=0 filter here - must include ALL tickets (deleted + active)
+            // to guarantee XT# uniqueness across entire database lifetime (HEX-196)
             this.db.all(
                 "SELECT xt_number FROM tickets WHERE xt_number IS NOT NULL",
                 (err, rows) => {
@@ -525,7 +556,7 @@ class TicketService {
      */
     async getTicketById(ticketId) {
         return new Promise((resolve, reject) => {
-            this.db.get("SELECT * FROM tickets WHERE id = ?", [ticketId], (err, row) => {
+            this.db.get("SELECT * FROM tickets WHERE id = ? AND deleted = 0", [ticketId], (err, row) => {
                 if (err) {
                     return reject(new Error("Failed to fetch ticket: " + err.message));
                 }

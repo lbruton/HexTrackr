@@ -215,6 +215,29 @@ class TicketController {
             });
         }
     }
+
+    /**
+     * Generate next XT# for new tickets
+     * HEX-196: Soft delete implementation requires backend XT# generation
+     * Includes deleted tickets to prevent number reuse
+     */
+    static async getNextXTNumber(req, res) {
+        try {
+            const controller = TicketController.getInstance();
+            const nextXtNumber = await controller.ticketService.generateNextXTNumber();
+            res.json({
+                success: true,
+                nextXtNumber: nextXtNumber
+            });
+        } catch (error) {
+            console.error("Error generating next XT#:", error);
+            res.status(500).json({
+                success: false,
+                error: "Failed to generate next XT#",
+                details: error.message
+            });
+        }
+    }
 }
 
 module.exports = TicketController;

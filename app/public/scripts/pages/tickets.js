@@ -539,30 +539,32 @@ class HexagonTicketsManager {
 
     /**
      * Generate the next ticket number for new records.
-     * @returns {string} Next ticket number (e.g., "0001")
+     * IMPORTANT: Must check ALL tickets including deleted ones to prevent XT# reuse.
+     * HEX-196: Soft delete implementation requires XT# uniqueness across lifetime.
+     * @returns {Promise<string>} Next ticket number (e.g., "0001")
      */
-    generateNextXtNumber() {
-        // Get all existing XT numbers
-        const xtNumbers = this.tickets
-            .map(ticket => ticket.xtNumber || ticket.xt_number)
-            .map(xt => {
-                const match = typeof xt === "string" ? xt.match(/\d+/) : null;
-                return match ? parseInt(match[0], 10) : NaN;
-            })
-            .filter(num => !isNaN(num));
+    async generateNextXtNumber() {
+        // Call backend API to generate next XT# (includes deleted tickets)
+        // HEX-196: No fallback - if API fails, the error should bubble up
+        console.log("[HEX-196] Calling /api/tickets/next-xt-number...");
+        const response = await fetch("/api/tickets/next-xt-number");
+        console.log("[HEX-196] Response status:", response.status, response.statusText);
 
-        // Find the highest number
-        const maxNumber = xtNumbers.length > 0 ? Math.max(...xtNumbers) : 0;
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("[HEX-196] API error response:", errorText);
+            throw new Error(`Failed to generate XT#: ${response.statusText} - ${errorText}`);
+        }
 
-        // Generate next number with zero padding (4 digits)
-        const nextNumber = maxNumber + 1;
-        return nextNumber.toString().padStart(4, "0");
+        const data = await response.json();
+        console.log("[HEX-196] Backend returned:", data.nextXtNumber);
+        return data.nextXtNumber;
     }
 
     /**
      * Update the XT number display in the modal
      */
-    updateXtNumberDisplay() {
+    async updateXtNumberDisplay() {
         const xtDisplayElement = document.getElementById("xtNumberDisplay");
         if (xtDisplayElement) {
             if (this.currentEditingId) {
@@ -572,7 +574,7 @@ class HexagonTicketsManager {
                 xtDisplayElement.textContent = xtValue || "N/A";
             } else {
                 // Show next available XT number for new tickets
-                const nextXt = this.generateNextXtNumber();
+                const nextXt = await this.generateNextXtNumber();
                 xtDisplayElement.textContent = nextXt;
             }
         }
@@ -1021,11 +1023,14 @@ class HexagonTicketsManager {
             return;
         }
 
+        // Generate XT# for new tickets (await backend API call)
+        const xtNumber = this.currentEditingId ?
+            this.getTicketById(this.currentEditingId).xtNumber || this.getTicketById(this.currentEditingId).xt_number :
+            await this.generateNextXtNumber();
+
         const ticket = {
             id: this.currentEditingId || Date.now().toString(),
-            xtNumber: this.currentEditingId ? 
-                this.getTicketById(this.currentEditingId).xtNumber || this.getTicketById(this.currentEditingId).xt_number :
-                this.generateNextXtNumber(),
+            xtNumber: xtNumber,
             dateSubmitted: document.getElementById("dateSubmitted").value,
             dateDue: document.getElementById("dateDue").value,
             hexagonTicket: document.getElementById("hexagonTicket").value,
@@ -3156,7 +3161,7 @@ class HexagonTicketsManager {
 
         try {
             const text = await file.text();
-            const tickets = this.parseCsvToTickets(text);
+            const tickets = await this.parseCsvToTickets(text);
             
             if (tickets.length === 0) {
                 this.showToast("No valid tickets found in CSV file", "warning");
@@ -3271,14 +3276,14 @@ class HexagonTicketsManager {
     }
 
     // Parse CSV text to tickets array
-    parseCsvToTickets(csvText) {
+    async parseCsvToTickets(csvText) {
         const lines = csvText.split("\n").filter(line => line.trim());
         if (lines.length < 2) {return [];}
 
         const headers = lines[0].split(",").map(h => h.trim().replace(/"/g, ""));
         const tickets = [];
 
-        let nextImportNumber = parseInt(this.generateNextXtNumber(), 10);
+        let nextImportNumber = parseInt(await this.generateNextXtNumber(), 10);
         if (isNaN(nextImportNumber)) {
             nextImportNumber = this.tickets.length + 1;
         }
