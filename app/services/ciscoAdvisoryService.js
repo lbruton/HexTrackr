@@ -208,17 +208,20 @@ class CiscoAdvisoryService {
     /**
      * Fetch all CVE IDs from vulnerabilities_current table for advisory lookup
      * Only queries active and reopened vulnerabilities (not resolved)
+     * Excludes CVEs already in cisco_advisories table (cache exclusion)
      * @async
      * @returns {Promise<Array<string>>} Array of CVE identifiers
      */
     async getAllCveIds() {
         return await new Promise((resolve, reject) => {
             this.db.all(`
-                SELECT DISTINCT cve
-                FROM vulnerabilities_current
-                WHERE cve IS NOT NULL
-                  AND cve LIKE 'CVE-%'
-                  AND lifecycle_state IN ('active', 'reopened')
+                SELECT DISTINCT vc.cve
+                FROM vulnerabilities_current vc
+                LEFT JOIN cisco_advisories ca ON vc.cve = ca.cve_id
+                WHERE vc.cve IS NOT NULL
+                  AND vc.cve LIKE 'CVE-%'
+                  AND vc.lifecycle_state IN ('active', 'reopened')
+                  AND ca.cve_id IS NULL  -- Exclude already-synced CVEs
             `, (err, rows) => {
                 if (err) {
                     reject(err);
@@ -278,20 +281,18 @@ class CiscoAdvisoryService {
 
         console.log(`📋 Processing advisory: ${advisory.advisoryId} for CVE ${queriedCveId}`);
         console.log(`   CVEs in advisory: ${advisory.cves ? advisory.cves.join(', ') : 'none'}`);
+        console.log(`   CSAF URL: ${advisory.csafUrl || 'none'}`);
+        console.log(`   Publication URL: ${advisory.publicationUrl || 'none'}`);
 
-        // Extract first fixed versions from all products
-        const firstFixedVersions = new Set();
-        if (advisory.productNames && Array.isArray(advisory.productNames)) {
-            advisory.productNames.forEach(product => {
-                if (product.firstFixed && Array.isArray(product.firstFixed)) {
-                    product.firstFixed.forEach(version => {
-                        if (version) {
-                            firstFixedVersions.add(version);
-                        }
-                    });
-                }
-            });
-        }
+        // NOTE: Cisco PSIRT API v2 does not include fixed version data in the lightweight CVE endpoint.
+        // Fixed versions are in the CSAF JSON (advisory.csafUrl), which can be parsed if needed.
+        // For now, if Cisco has an advisory, we mark is_fix_available=1 and link to publicationUrl.
+
+        // Extract product count for metadata
+        const productCount = (advisory.productNames && Array.isArray(advisory.productNames))
+            ? advisory.productNames.length
+            : 0;
+        console.log(`   Affected products: ${productCount}`);
 
         return {
             cve_id: queriedCveId, // Use the CVE we queried for, not advisory.cveId
@@ -299,11 +300,107 @@ class CiscoAdvisoryService {
             advisory_title: advisory.advisoryTitle || null,
             severity: advisory.sir || null, // Security Impact Rating
             cvss_score: advisory.cvssBaseScore || null,
-            first_fixed: JSON.stringify(Array.from(firstFixedVersions)), // JSON array
+            first_fixed: JSON.stringify([]), // Empty - use csafUrl or publicationUrl for fix details
             affected_releases: JSON.stringify(advisory.iosRelease || []), // JSON array
-            product_names: JSON.stringify((advisory.productNames || []).map(p => p.name || p)), // JSON array
-            publication_url: advisory.publicationUrl || null
+            product_names: JSON.stringify(advisory.productNames || []), // Array of strings
+            publication_url: advisory.publicationUrl || advisory.csafUrl || null // Link to full advisory
         };
+    }
+
+    /**
+     * Parse OS type from Cisco product names array
+     * @param {Array<string>} productNames - Array of product version strings
+     * @returns {Object|null} { osType, version } or null if cannot parse
+     */
+    parseOSTypeFromProducts(productNames) {
+        if (!productNames || !Array.isArray(productNames) || productNames.length === 0) {
+            return null;
+        }
+
+        // Try to extract OS type and version from first product name
+        // Examples:
+        // "Cisco IOS 15.2(4)M11" → { osType: "ios", version: "15.2(4)M11" }
+        // "Cisco IOS XE 17.3.1" → { osType: "iosxe", version: "17.3.1" }
+        // "Cisco NX-OS 9.3(5)" → { osType: "nxos", version: "9.3(5)" }
+        // "Cisco ASA 9.16.1" → { osType: "asa", version: "9.16.1" }
+
+        const osTypePatterns = [
+            { pattern: /Cisco IOS XE\s+([\d.()]+\S*)/i, osType: "iosxe" },
+            { pattern: /Cisco IOS\s+([\d.()]+\S*)/i, osType: "ios" },
+            { pattern: /Cisco NX-OS\s+([\d.()]+\S*)/i, osType: "nxos" },
+            { pattern: /Cisco ASA\s+([\d.()]+\S*)/i, osType: "asa" },
+            { pattern: /Cisco FTD\s+([\d.()]+\S*)/i, osType: "ftd" },
+            { pattern: /Cisco FXOS\s+([\d.()]+\S*)/i, osType: "fxos" }
+        ];
+
+        for (const productName of productNames) {
+            for (const { pattern, osType } of osTypePatterns) {
+                const match = productName.match(pattern);
+                if (match) {
+                    return {
+                        osType,
+                        version: match[1]
+                    };
+                }
+            }
+        }
+
+        console.log(`⚠️ Could not parse OS type from products: ${productNames.slice(0, 3).join(', ')}...`);
+        return null;
+    }
+
+    /**
+     * Fetch fixed versions from Cisco Software Checker endpoint
+     * @async
+     * @param {string} osType - OS type (ios, iosxe, nxos, etc.)
+     * @param {string} version - Software version
+     * @param {string} accessToken - OAuth2 access token
+     * @returns {Promise<Array<string>>} Array of fixed versions
+     */
+    async fetchFixedVersions(osType, version, accessToken) {
+        try {
+            const url = `${this.ciscoApiBase}/OSType/${osType}?version=${encodeURIComponent(version)}`;
+            console.log(`🔍 Querying Software Checker: ${osType} ${version}`);
+
+            const response = await this.fetch(url, {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": `Bearer ${accessToken}`
+                }
+            });
+
+            if (!response.ok) {
+                console.log(`⚠️ Software Checker returned ${response.status} for ${osType} ${version}`);
+                return [];
+            }
+
+            const data = await response.json();
+
+            // Response format: { advisories: [{ firstFixed: ["17.3.1", "17.3.2"], ... }] }
+            if (data.advisories && Array.isArray(data.advisories) && data.advisories.length > 0) {
+                const allFixedVersions = new Set();
+
+                for (const advisory of data.advisories) {
+                    if (advisory.firstFixed && Array.isArray(advisory.firstFixed)) {
+                        advisory.firstFixed.forEach(version => {
+                            if (version) {
+                                allFixedVersions.add(version);
+                            }
+                        });
+                    }
+                }
+
+                const fixedArray = Array.from(allFixedVersions);
+                console.log(`   ✅ Found ${fixedArray.length} fixed versions: ${fixedArray.slice(0, 3).join(', ')}${fixedArray.length > 3 ? '...' : ''}`);
+                return fixedArray;
+            }
+
+            return [];
+        } catch (error) {
+            console.error(`⚠️ Failed to fetch fixed versions for ${osType} ${version}:`, error.message);
+            return [];
+        }
     }
 
     /**
@@ -347,7 +444,7 @@ class CiscoAdvisoryService {
             try {
                 let advisoryCount = 0;
                 let matchedCount = 0;
-                const batchSize = 10;
+                const batchSize = 5; // Reduced from 10 due to two-stage API calls (Stage 1 + Stage 2)
 
                 // Process CVEs in batches to avoid rate limiting
                 for (let i = 0; i < cveIds.length; i += batchSize) {
@@ -363,6 +460,29 @@ class CiscoAdvisoryService {
 
                             if (parsed) {
                                 console.log(`✅ Parsed advisory for ${cveId}: ${parsed.advisory_id}`);
+
+                                // Stage 2: Fetch fixed versions from Software Checker endpoint
+                                const productNames = JSON.parse(parsed.product_names);
+                                const osInfo = this.parseOSTypeFromProducts(productNames);
+
+                                if (osInfo) {
+                                    console.log(`   🔍 Detected ${osInfo.osType} ${osInfo.version}, querying Software Checker...`);
+                                    const fixedVersions = await this.fetchFixedVersions(
+                                        osInfo.osType,
+                                        osInfo.version,
+                                        accessToken
+                                    );
+
+                                    if (fixedVersions.length > 0) {
+                                        parsed.first_fixed = JSON.stringify(fixedVersions);
+                                        console.log(`   ✅ Found ${fixedVersions.length} fixed versions for ${cveId}`);
+                                    } else {
+                                        console.log(`   ℹ️ No fixed versions found for ${osInfo.osType} ${osInfo.version}`);
+                                    }
+                                } else {
+                                    console.log(`   ⚠️ Could not determine OS type from product names`);
+                                }
+
                                 // Insert or replace advisory data
                                 await new Promise((resolve, reject) => {
                                     this.db.run(`
@@ -391,8 +511,9 @@ class CiscoAdvisoryService {
                                 });
 
                                 // Update vulnerabilities_current with vendor-neutral fix flag
-                                const firstFixedArray = JSON.parse(parsed.first_fixed);
-                                const hasFixAvailable = firstFixedArray.length > 0 ? 1 : 0;
+                                // Mark as fix available if we have actual fixed versions (not just advisory URL)
+                                const fixedVersionsArray = JSON.parse(parsed.first_fixed);
+                                const hasFixAvailable = (fixedVersionsArray.length > 0) ? 1 : 0;
 
                                 await new Promise((resolve, reject) => {
                                     this.db.run(`
@@ -404,6 +525,7 @@ class CiscoAdvisoryService {
                                             console.error(`❌ Update failed for ${cveId}:`, err);
                                             reject(err);
                                         } else {
+                                            console.log(`   ✅ Set is_fix_available=${hasFixAvailable} for ${cveId}`);
                                             resolve();
                                         }
                                     });
@@ -425,9 +547,9 @@ class CiscoAdvisoryService {
                         console.log(`📊 Processed ${Math.min(i + batchSize, cveIds.length)} / ${cveIds.length} CVEs (${advisoryCount} advisories found)`);
                     }
 
-                    // Rate limiting: wait 1 second between batches
+                    // Rate limiting: wait 2 seconds between batches (two-stage API calls)
                     if (i + batchSize < cveIds.length) {
-                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        await new Promise(resolve => setTimeout(resolve, 2000));
                     }
                 }
 
