@@ -32,6 +32,7 @@
 </ul>
 <h4>Seamless Navigation Flow</h4><ul>
 <li><strong>URL Parameters</strong>: Uses <code>?openTicket=ID</code> for cross-page modal opening</li>
+<li><strong>SessionStorage Pattern</strong>: Uses sessionStorage for ticket creation (cleaner than URL params)</li>
 <li><strong>Auto-Open Modals</strong>: Tickets page detects URL parameter and automatically opens the edit modal</li>
 <li><strong>Clean URLs</strong>: Parameter is removed after modal opens (no polluted browser history)</li>
 </ul>
@@ -58,8 +59,9 @@
 <li><p><strong>Frontend</strong>:</p>
 <ul>
 <li><code>app/public/scripts/shared/vulnerability-cards.js</code> - Button state logic, modal implementation</li>
+<li><code>app/public/scripts/shared/device-security-modal.js</code> - Smart ticket button, power tools integration</li>
 <li><code>app/public/scripts/pages/tickets.js</code> - URL parameter handling, device reorder improvements</li>
-<li><code>app/public/vulnerabilities.html</code> - Multi-ticket picker modal HTML</li>
+<li><code>app/public/vulnerabilities.html</code> - Multi-ticket picker modal HTML, device modal button placeholder</li>
 <li><code>app/public/tickets.html</code> - Tabler Icons CDN, device reorder template updates</li>
 <li><code>app/public/styles/pages/tickets.css</code> - Device reorder button styling with hover states</li>
 </ul>
@@ -80,11 +82,30 @@
 <li><strong>No Extra Round-Trips</strong>: Passes full ticket objects instead of fetching individually</li>
 <li><strong>Respects Pagination</strong>: Only checks ticket state for currently displayed device cards</li>
 </ul>
+<h4>Device Security Modal Enhancements</h4><ul>
+<li><strong>Generate Report Removal</strong>: Removed non-functional HTML report generation (wasn&#39;t print-friendly or properly themed)</li>
+<li><strong>Smart Ticket Button</strong>: Device security modal now has the same intelligent ticket button as device cards:<ul>
+<li>Dynamically checks ticket state when modal opens</li>
+<li>Shows &quot;Create Ticket&quot;, &quot;Open Ticket&quot;, or &quot;View Tickets (N)&quot; based on existing tickets</li>
+<li>Status-aware coloring and job type text styling</li>
+<li>Reuses existing ticketPickerModal structure for multi-ticket scenarios</li>
+</ul>
+</li>
+<li><strong>Power Tools Integration</strong>: Device modal supports keyboard shortcuts for bulk ticket creation:<ul>
+<li><strong>Shift+Cmd/Ctrl+Click</strong>: Create ticket for all KEV devices at location</li>
+<li><strong>Shift+Alt+Click</strong>: Create ticket for all devices at location</li>
+<li><strong>Single Click</strong>: Create ticket for one device</li>
+</ul>
+</li>
+<li><strong>Consistent UX</strong>: Modal now provides identical ticket management experience as device cards</li>
+</ul>
 <h3>🐛 Bug Fixes</h3><ul>
 <li>Fixed missing API endpoint issue by passing complete ticket objects from initial lookup</li>
 <li>Fixed click handlers failing on nested icon elements using <code>Element.closest()</code></li>
 <li>Fixed device reorder arrows not displaying due to missing Tabler Icons webfont</li>
 <li>Fixed inconsistent status values between vulnerability cards and tickets system</li>
+<li>Fixed device modal API response parsing (was treating wrapped response as raw array)</li>
+<li>Fixed multi-ticket picker modal not appearing (now uses existing modal structure instead of dynamic creation)</li>
 </ul>
 <h3>📝 Related Issues</h3><ul>
 <li><strong>HEX-203</strong>: Bidirectional Device-to-Ticket Navigation (Parent)</li>
@@ -95,9 +116,11 @@
 <ul>
 <li><strong>SQLite JSON Functions</strong>: Efficient searching within JSON array columns</li>
 <li><strong>Event Delegation</strong>: Robust click handling for dynamically generated content</li>
-<li><strong>URL-based Navigation</strong>: Cross-page modal opening without session storage</li>
+<li><strong>SessionStorage Pattern</strong>: Cross-page data passing for ticket creation (cleaner than URL params)</li>
+<li><strong>URL-based Navigation</strong>: Cross-page modal opening for existing tickets</li>
 <li><strong>Theme-Aware Design</strong>: Consistent appearance across light/dark modes</li>
 <li><strong>Parallel Data Fetching</strong>: Optimal performance with concurrent API calls</li>
+<li><strong>Code Reuse</strong>: Device modal duplicates exact patterns from device cards for consistency</li>
 </ul>
 <hr>
 <p><strong>Breaking Changes</strong>: None<br><strong>Migration Required</strong>: No<br><strong>Database Changes</strong>: No schema modifications</p>

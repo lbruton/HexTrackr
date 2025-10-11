@@ -21,7 +21,7 @@
  *     const isAuth = await authState.init();
  *     if (isAuth) {
  *       authState.updateUserMenu();
- *       console.log('Authenticated as:', authState.getUser().username);
+ *       logger.debug('Authenticated as:', authState.getUser().username);
  *     }
  *   });
  * </script>
@@ -71,7 +71,7 @@ class AuthState {
          */
         this.sessionCheckInterval = null;
 
-        console.log("✅ AuthState initialized");
+        logger.debug("✅ AuthState initialized");
     }
 
     /**
@@ -88,7 +88,7 @@ class AuthState {
      * @example
      * const isAuth = await authState.init();
      * if (isAuth) {
-     *   console.log('User is authenticated');
+     *   logger.debug('User is authenticated');
      * }
      */
     async init() {
@@ -99,7 +99,7 @@ class AuthState {
             });
 
             if (!response.ok) {
-                console.error("Failed to check authentication status:", response.status);
+                logger.error("Failed to check authentication status:", response.status);
                 this.authenticated = false;
                 this.user = null;
                 this.handleUnauthenticated();
@@ -118,11 +118,11 @@ class AuthState {
             // Start periodic session validation
             this.startSessionCheck();
 
-            console.log(`✅ Authenticated as: ${this.user?.username || "Unknown"}`);
+            logger.debug(`✅ Authenticated as: ${this.user?.username || "Unknown"}`);
             return true;
 
         } catch (error) {
-            console.error("Error checking authentication status:", error);
+            logger.error("Error checking authentication status:", error);
             this.authenticated = false;
             this.user = null;
             this.handleUnauthenticated();
@@ -180,7 +180,7 @@ class AuthState {
      *
      * @example
      * const user = authState.getUser();
-     * console.log(user.username); // "admin"
+     * logger.debug(user.username); // "admin"
      */
     getUser() {
         return this.user;
@@ -193,7 +193,7 @@ class AuthState {
      *
      * @example
      * if (authState.isAuthenticated()) {
-     *   console.log('User is logged in');
+     *   logger.debug('User is logged in');
      * }
      */
     isAuthenticated() {
@@ -222,7 +222,7 @@ class AuthState {
             });
 
             if (!response.ok) {
-                console.error("Logout request failed:", response.status);
+                logger.error("Logout request failed:", response.status);
             }
 
             // Clear state regardless of response
@@ -230,15 +230,25 @@ class AuthState {
             this.user = null;
             this.stopSessionCheck();
 
+            // Clear sessionStorage cache to force fresh data on next login
+            sessionStorage.removeItem("hextrackr_cache_metadata");
+            sessionStorage.removeItem("hextrackr_last_load");
+            logger.debug("🗑️  Cleared vulnerability cache on logout");
+
             // Redirect to login
             window.location.href = "/login.html";
 
         } catch (error) {
-            console.error("Error during logout:", error);
+            logger.error("Error during logout:", error);
             // Clear state and redirect anyway
             this.authenticated = false;
             this.user = null;
             this.stopSessionCheck();
+
+            // Clear sessionStorage cache even on error
+            sessionStorage.removeItem("hextrackr_cache_metadata");
+            sessionStorage.removeItem("hextrackr_last_load");
+
             window.location.href = "/login.html";
         }
     }
@@ -268,24 +278,24 @@ class AuthState {
                 });
 
                 if (!response.ok) {
-                    console.warn("Session check failed:", response.status);
+                    logger.warn("Session check failed:", response.status);
                     this.showSessionExpiredModal();
                     return;
                 }
 
                 const result = await response.json();
                 if (!result.data?.authenticated) {
-                    console.warn("Session expired");
+                    logger.warn("Session expired");
                     this.showSessionExpiredModal();
                 }
 
             } catch (error) {
-                console.error("Error checking session:", error);
+                logger.error("Error checking session:", error);
                 // Don't show modal for network errors - may be temporary
             }
         }, 300000); // 5 minutes
 
-        console.log("✅ Session validation started (5 minute interval)");
+        logger.debug("✅ Session validation started (5 minute interval)");
     }
 
     /**
@@ -302,7 +312,7 @@ class AuthState {
         if (this.sessionCheckInterval) {
             clearInterval(this.sessionCheckInterval);
             this.sessionCheckInterval = null;
-            console.log("Session validation stopped");
+            logger.debug("Session validation stopped");
         }
     }
 
@@ -400,7 +410,7 @@ class AuthState {
      */
     updateUserMenu(retryCount = 0) {
         if (!this.user) {
-            console.warn("Cannot update user menu: no user data");
+            logger.warn("Cannot update user menu: no user data");
             return;
         }
 
@@ -411,11 +421,11 @@ class AuthState {
             if (retryCount < 50) {
                 setTimeout(() => this.updateUserMenu(retryCount + 1), 100);
                 if (retryCount === 0) {
-                    console.log("⏳ Waiting for header to load before updating user menu...");
+                    logger.debug("⏳ Waiting for header to load before updating user menu...");
                 }
                 return;
             } else {
-                console.error("❌ User dropdown not found after 5 seconds - header may have failed to load");
+                logger.error("❌ User dropdown not found after 5 seconds - header may have failed to load");
                 return;
             }
         }
@@ -423,7 +433,7 @@ class AuthState {
         // Find the dropdown trigger link (avatar + username)
         const dropdownTrigger = userDropdown.querySelector("a[data-bs-toggle='dropdown']");
         if (!dropdownTrigger) {
-            console.warn("Dropdown trigger not found");
+            logger.warn("Dropdown trigger not found");
             return;
         }
 
@@ -447,7 +457,7 @@ class AuthState {
         // Find the dropdown menu container
         const dropdownMenu = userDropdown.querySelector(".dropdown-menu");
         if (!dropdownMenu) {
-            console.warn("Dropdown menu not found");
+            logger.warn("Dropdown menu not found");
             return;
         }
 
@@ -455,7 +465,7 @@ class AuthState {
         if (document.getElementById("changePasswordLink")) {
             // Already added, just update event listeners
             this.attachMenuEventListeners();
-            console.log("✅ User menu updated (auth items already present)");
+            logger.debug("✅ User menu updated (auth items already present)");
             return;
         }
 
@@ -477,7 +487,7 @@ class AuthState {
         // Attach event listeners
         this.attachMenuEventListeners();
 
-        console.log("✅ User menu updated (settings preserved)");
+        logger.debug("✅ User menu updated (settings preserved)");
     }
 
     /**
@@ -670,7 +680,7 @@ class AuthState {
         const icon = document.getElementById(`${fieldId}-toggle-icon`);
 
         if (!passwordField || !icon) {
-            console.warn(`Password field or icon not found for ID: ${fieldId}`);
+            logger.warn(`Password field or icon not found for ID: ${fieldId}`);
             return;
         }
 
@@ -759,7 +769,7 @@ class AuthState {
             }
         } catch (error) {
             // Handle network or other errors
-            console.error("Password change error:", error);
+            logger.error("Password change error:", error);
             errorAlert.textContent = error.message || "An error occurred while changing password";
             errorAlert.style.display = "block";
         } finally {
@@ -803,7 +813,7 @@ class AuthState {
                         };
                     }
                 } catch (csrfError) {
-                    console.warn("Failed to fetch CSRF token:", csrfError);
+                    logger.warn("Failed to fetch CSRF token:", csrfError);
                     // Continue without CSRF token - let server reject if needed
                 }
             }
@@ -818,14 +828,14 @@ class AuthState {
 
             // Handle 401 Unauthorized
             if (response.status === 401) {
-                console.warn("Received 401 Unauthorized, redirecting to login");
+                logger.warn("Received 401 Unauthorized, redirecting to login");
                 this.handleUnauthenticated();
                 throw new Error("Unauthorized - redirecting to login");
             }
 
             // Handle 5xx server errors
             if (response.status >= 500) {
-                console.error(`Server error: ${response.status} ${response.statusText}`);
+                logger.error(`Server error: ${response.status} ${response.statusText}`);
                 throw new Error(`Server error: ${response.status} ${response.statusText}`);
             }
 
@@ -833,7 +843,7 @@ class AuthState {
 
         } catch (error) {
             // Re-throw error after logging
-            console.error("Authenticated fetch error:", error);
+            logger.error("Authenticated fetch error:", error);
             throw error;
         }
     }
@@ -847,5 +857,5 @@ if (typeof window !== "undefined") {
      * @global
      */
     window.authState = new AuthState();
-    console.log("✅ Global authState instance created");
+    logger.debug("✅ Global authState instance created");
 }

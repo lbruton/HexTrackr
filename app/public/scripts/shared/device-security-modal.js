@@ -25,7 +25,7 @@ class DeviceSecurityModal {
      */
     init() {
         this.bindEventListeners();
-        console.log("DeviceSecurityModal initialized");
+        logger.debug("DeviceSecurityModal initialized");
     }
 
     /**
@@ -40,13 +40,7 @@ class DeviceSecurityModal {
             });
         }
 
-        // Generate device report button
-        const generateDeviceReport = document.getElementById("generateDeviceReport");
-        if (generateDeviceReport) {
-            generateDeviceReport.addEventListener("click", () => {
-                this.generateDeviceReport();
-            });
-        }
+        // Smart ticket button will be dynamically populated in showDeviceDetails()
     }
 
     /**
@@ -57,15 +51,19 @@ class DeviceSecurityModal {
     showDeviceDetails(hostname, dataManager) {
         const device = dataManager.getDeviceByHostname(hostname);
         if (!device) {
-            console.error("Device not found:", hostname);
+            logger.error("Device not found:", hostname);
             return;
         }
 
         this.currentDevice = device;
+        this.dataManager = dataManager; // HEX-203: Store for power tools access
         this.populateDeviceInfo(device);
         this.populateVprSummary(device);
         this.createDeviceVulnerabilityGrid(device);
         this.showModal();
+
+        // HEX-203: Update smart ticket button after modal is shown
+        this.updateTicketButton(hostname);
     }
 
     /**
@@ -486,239 +484,338 @@ class DeviceSecurityModal {
     }
 
     /**
-     * Generate device report in a popup window with print capabilities
+     * Check ticket state for a device (HEX-203)
+     * @param {string} hostname - Device hostname
+     * @returns {Promise<Object>} Ticket state with count and tickets array
      */
-    generateDeviceReport() {
-        const modal = document.getElementById("deviceModal");
-        if (!modal.classList.contains("show")) {
-            this.showToast("No device modal is currently open", "warning");
-            return;
+    async checkTicketState(hostname) {
+        try {
+            const response = await fetch(`/api/tickets/by-device/${encodeURIComponent(hostname)}`);
+            if (!response.ok) {
+                logger.warn(`[Device Modal] No tickets found for ${hostname}`);
+                return { count: 0, tickets: [] };
+            }
+
+            const data = await response.json();
+            logger.debug(`[Device Modal] Found ${data.count} tickets for ${hostname}:`, data);
+
+            // API returns {success: true, count: N, tickets: [...]}
+            const tickets = data.tickets || [];
+            const count = data.count || 0;
+
+            return {
+                count: count,
+                tickets: tickets,
+                status: tickets[0]?.status,
+                jobType: tickets[0]?.job_type
+            };
+        } catch (error) {
+            logger.error(`[Device Modal] Error checking ticket state for ${hostname}:`, error);
+            return { count: 0, tickets: [] };
         }
-
-        if (!this.currentDevice) {
-            this.showToast("No device data available for report generation", "warning");
-            return;
-        }
-
-        const device = this.currentDevice;
-        const reportWindow = window.open("", "_blank", "width=1200,height=800,scrollbars=yes,resizable=yes");
-        
-        if (!reportWindow) {
-            this.showToast("Popup blocked. Please allow popups for this site.", "error");
-            return;
-        }
-
-        const reportContent = this.generateReportHTML(device);
-        reportWindow.document.write(reportContent);
-        reportWindow.document.close();
-        
-        // Add event listeners after content is loaded
-        reportWindow.addEventListener("load", () => {
-            this.setupReportWindowControls(reportWindow);
-        });
-
-        this.showToast("Device security report generated successfully", "success");
     }
 
     /**
-     * Generate HTML content for the device report
-     * @param {Object} device - The device data object
-     * @returns {string} HTML content for the report
+     * Get button configuration based on ticket state (HEX-203)
+     * @param {number} count - Number of tickets
+     * @param {string} status - Ticket status
+     * @param {string} jobType - Job type
+     * @returns {Object} Button configuration
+     */
+    getButtonConfig(count, status, jobType) {
+        // Status to Bootstrap color mapping (matches tickets.css actual statuses)
+        const statusColors = {
+            "Pending": "warning",      // Amber yellow
+            "Staged": "info",          // Purple (using info as closest Bootstrap match)
+            "Open": "primary",         // Blue
+            "Overdue": "danger",       // Red
+            "Completed": "success",    // Green
+            "Failed": "danger",        // Orange-red
+            "Closed": "secondary"      // Gray
+        };
+
+        // Job type to status-label class mapping (for text color)
+        const jobTypeTextColors = {
+            "Upgrade": "status-open",      // Blue
+            "Replace": "status-overdue",   // Orange/red
+            "Refresh": "status-pending",   // Purple
+            "Mitigate": "status-failed",   // Red
+            "Other": "status-generic"      // Gray
+        };
+
+        if (count === 0) {
+            return {
+                text: "Create Ticket",
+                colorClass: "btn-outline-success",
+                icon: "fas fa-ticket-alt",
+                textColorClass: ""
+            };
+        } else if (count === 1) {
+            const colorClass = `btn-outline-${statusColors[status] || "primary"}`;
+            const textColorClass = jobType ? `status-label ${jobTypeTextColors[jobType] || "status-generic"}` : "";
+            return {
+                text: "Open Ticket",
+                colorClass: colorClass,
+                icon: "fas fa-folder-open",
+                textColorClass: textColorClass
+            };
+        } else {
+            const colorClass = `btn-outline-${statusColors[status] || "primary"}`;
+            const textColorClass = jobType ? `status-label ${jobTypeTextColors[jobType] || "status-generic"}` : "";
+            return {
+                text: `View Tickets (${count})`,
+                colorClass: colorClass,
+                icon: "fas fa-layer-group",
+                textColorClass: textColorClass
+            };
+        }
+    }
+
+    /**
+     * Handle create/open ticket button click from device modal (HEX-203)
+     * Supports power tools: Shift+Cmd/Ctrl (KEV only) or Shift+Alt (all devices)
+     * @param {MouseEvent} event - Click event with keyboard modifiers
+     * @param {HTMLButtonElement} button - Button element with data attributes
+     */
+    handleCreateTicketClick(event, button) {
+        event.stopPropagation();
+
+        // Read data from button attributes
+        const hostname = button.dataset.hostname;
+        const ticketCount = parseInt(button.dataset.ticketCount) || 0;
+        const tickets = button.dataset.tickets ? JSON.parse(button.dataset.tickets) : [];
+
+        logger.debug(`[Device Modal] Ticket button clicked - Hostname: ${hostname}, Count: ${ticketCount}`);
+
+        // HEX-203: Handle existing tickets first
+        if (ticketCount === 1) {
+            const ticketId = tickets[0].id;
+            logger.debug(`[Device Modal] Single ticket - navigating to ticket ${ticketId}`);
+            window.location.href = `/tickets.html?openTicket=${ticketId}`;
+            return;
+        } else if (ticketCount > 1) {
+            logger.debug(`[Device Modal] Multiple tickets - showing picker modal`);
+            this.showTicketPickerModal(hostname, tickets);
+            return;
+        }
+
+        // Original behavior: Create new ticket (ticketCount === 0)
+
+        // Parse hostname to extract SITE and Location (ALL CAPS)
+        const site = hostname.substring(0, 4).toUpperCase();
+        const location = hostname.substring(0, 5).toUpperCase();
+
+        // Detect keyboard modifiers to determine mode
+        let mode = "single";
+        let deviceList = [hostname.toUpperCase()];
+
+        // Mode 2: KEV devices at location (Cmd/Ctrl + Shift)
+        if ((event.metaKey || event.ctrlKey) && event.shiftKey) {
+            mode = "bulk-kev";
+
+            if (!this.dataManager) {
+                logger.error("[Device Modal] Power Tool: dataManager not available");
+                return;
+            }
+
+            // Get all filtered devices
+            const allDevices = this.dataManager.getFilteredDevices();
+
+            // Filter for KEV devices at same location
+            deviceList = allDevices
+                .filter(device => device.hostname.toLowerCase().startsWith(location.toLowerCase()) && device.hasKev === true)
+                .map(device => device.hostname.toUpperCase());
+        }
+        // Mode 3: All devices at location (Alt + Shift)
+        else if (event.altKey && event.shiftKey) {
+            mode = "bulk-all";
+
+            if (!this.dataManager) {
+                logger.error("[Device Modal] Power Tool: dataManager not available");
+                return;
+            }
+
+            // Get all filtered devices
+            const allDevices = this.dataManager.getFilteredDevices();
+
+            // Filter for all devices at same location
+            deviceList = allDevices
+                .filter(device => device.hostname.toLowerCase().startsWith(location.toLowerCase()))
+                .map(device => device.hostname.toUpperCase());
+        }
+
+        // Console logging for debugging
+        logger.debug("[Device Modal Power Tool] Mode:", mode);
+        logger.debug("[Device Modal Power Tool] Site:", site);
+        logger.debug("[Device Modal Power Tool] Location:", location);
+        logger.debug("[Device Modal Power Tool] Devices:", deviceList);
+        logger.debug("[Device Modal Power Tool] Total Count:", deviceList.length);
+
+        // Use sessionStorage pattern (matches device cards createTicketFromDevice)
+        const ticketData = {
+            devices: deviceList,
+            site: site,
+            location: location,
+            mode: mode,
+            timestamp: Date.now()
+        };
+
+        // Set new JSON format
+        sessionStorage.setItem("createTicketData", JSON.stringify(ticketData));
+
+        // Backward compatibility: also set old format (first device)
+        sessionStorage.setItem("createTicketDevice", deviceList[0]);
+        sessionStorage.setItem("autoOpenModal", "true");
+
+        // Enhanced toast message showing device count and mode
+        const deviceCount = deviceList.length;
+        const modeLabel = {
+            "single": "device",
+            "bulk-all": `devices at ${location}`,
+            "bulk-kev": `KEV devices at ${location}`
+        }[mode] || "device";
+
+        logger.debug(`[Device Modal] Creating ticket for ${deviceCount} ${modeLabel}...`);
+
+        // Navigate to tickets page - will auto-open modal via sessionStorage
+        setTimeout(() => {
+            window.location.href = "/tickets.html";
+        }, 300);
+    }
+
+    /**
+     * Show ticket picker modal for devices with multiple tickets (HEX-203)
+     * Reuses existing modal structure from vulnerabilities.html
+     * @param {string} hostname - Device hostname
+     * @param {Array} tickets - Array of ticket objects
+     */
+    showTicketPickerModal(hostname, tickets) {
+        logger.debug(`[Device Modal] Opening picker for ${hostname} with ${tickets.length} tickets:`, tickets);
+
+        const validTickets = tickets.filter(t => t !== null && t.id);
+        logger.debug(`[Device Modal] Valid tickets: ${validTickets.length}`, validTickets);
+
+        if (validTickets.length === 0) {
+            logger.error(`[Device Modal] No valid tickets found for ${hostname}`);
+            return;
+        }
+
+        // Build modal content - reuses existing modal structure
+        const modalBody = document.getElementById("ticketPickerModalBody");
+        if (!modalBody) {
+            logger.error(`[Device Modal] Modal body element not found!`);
+            return;
+        }
+
+        modalBody.innerHTML = `
+            <p class="mb-3">
+                <strong>${hostname}</strong> has <strong>${validTickets.length}</strong> open tickets. Which would you like to view?
+            </p>
+            <div class="list-group">
+                ${validTickets.map(ticket => `
+                    <button type="button" class="list-group-item list-group-item-action"
+                            onclick="window.location.href='/tickets.html?openTicket=${ticket.id}';">
+                        <div class="d-flex w-100 justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">XT-${ticket.xt_number}</h6>
+                                <small class="text-muted">${ticket.job_type || "Unknown"} • ${new Date(ticket.created_at).toLocaleDateString()}</small>
+                            </div>
+                            <span class="badge bg-${this.getStatusBadgeColor(ticket.status)}">${ticket.status}</span>
+                        </div>
+                    </button>
+                `).join("")}
+            </div>
+            <hr>
+            <button type="button" class="btn btn-success w-100"
+                    onclick="window.location.href='/tickets.html?createForDevice=${encodeURIComponent(hostname)}'; bootstrap.Modal.getInstance(document.getElementById('ticketPickerModal')).hide();">
+                <i class="fas fa-plus me-1"></i>Create New Ticket Anyway
+            </button>
+        `;
+
+        // Show the modal
+        const modalElement = document.getElementById("ticketPickerModal");
+        if (!modalElement) {
+            logger.error(`[Device Modal] Modal element not found!`);
+            return;
+        }
+
+        logger.debug(`[Device Modal] Showing modal...`);
+        if (typeof bootstrap === "undefined") {
+            logger.error(`[Device Modal] Bootstrap is not loaded!`);
+            return;
+        }
+
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+        logger.debug(`[Device Modal] Modal shown successfully`);
+    }
+
+    /**
+     * Get Bootstrap badge color for ticket status
+     * @param {string} status - Ticket status
+     * @returns {string} Bootstrap color class
+     */
+    getStatusBadgeColor(status) {
+        const colorMap = {
+            "Pending": "warning",
+            "Staged": "info",
+            "Open": "primary",
+            "Overdue": "danger",
+            "Completed": "success",
+            "Failed": "danger",
+            "Closed": "secondary"
+        };
+        return colorMap[status] || "primary";
+    }
+
+    /**
+     * Update the ticket button in the device modal (HEX-203)
+     * Called when modal is shown to dynamically populate button
+     * @param {string} hostname - Device hostname
+     */
+    async updateTicketButton(hostname) {
+        const buttonContainer = document.getElementById("deviceModalTicketButton");
+        if (!buttonContainer) {
+            logger.warn("[Device Modal] Ticket button container not found");
+            return;
+        }
+
+        // Check ticket state
+        const ticketState = await this.checkTicketState(hostname);
+        const buttonConfig = this.getButtonConfig(
+            ticketState.count,
+            ticketState.status,
+            ticketState.jobType
+        );
+
+        // Generate button HTML
+        buttonContainer.innerHTML = `
+            <button class="btn ${buttonConfig.colorClass} me-2"
+                    data-hostname="${hostname}"
+                    data-ticket-count="${ticketState.count}"
+                    data-tickets='${JSON.stringify(ticketState.tickets)}'
+                    onclick="event.stopPropagation(); window.deviceSecurityModal.handleCreateTicketClick(event, this)">
+                <i class="${buttonConfig.icon} me-1"></i><span class="${buttonConfig.textColorClass}">${buttonConfig.text}</span>
+            </button>
+        `;
+
+        logger.debug(`[Device Modal] Updated ticket button for ${hostname}:`, buttonConfig);
+    }
+
+    /**
+     * Legacy method stub - removed HTML report generation (HEX-203)
+     * Report feature removed in favor of CSV export and smart ticket buttons
      */
     generateReportHTML(device) {
-        const timestamp = new Date().toLocaleString();
-        
-        return `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Device Security Report - ${device.hostname}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/@tabler/icons@1.119.0/icons-sprite.svg" rel="stylesheet">
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-        .severity-badge { padding: 0.25rem 0.5rem; border-radius: 0.375rem; font-weight: 500; font-size: 0.75rem; }
-        .severity-critical { background-color: #dc3545; color: white; }
-        .severity-high { background-color: #fd7e14; color: white; }
-        .severity-medium { background-color: #ffc107; color: #000; }
-        .severity-low { background-color: #198754; color: white; }
-        .no-print { display: block; }
-        @media print {
-            .no-print { display: none !important; }
-            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .page-break { page-break-before: always; }
-        }
-        .report-header { border-bottom: 3px solid #0054a6; padding-bottom: 1rem; margin-bottom: 2rem; }
-        .summary-card { border-left: 4px solid #0054a6; }
-        .vpr-card { margin-bottom: 1rem; }
-        .table-responsive { max-height: 600px; overflow-y: auto; }
-    </style>
-</head>
-<body>
-    <div class="container-fluid">
-        <div class="no-print sticky-top bg-white border-bottom p-3 mb-3">
-            <div class="d-flex justify-content-between align-items-center">
-                <h1 class="h4 mb-0">Device Security Report - ${device.hostname}</h1>
-                <div>
-                    <button type="button" class="btn btn-outline-primary me-2" onclick="window.print()">
-                        <i class="ti ti-printer me-1"></i>Print Report
-                    </button>
-                    <button type="button" class="btn btn-outline-success me-2" onclick="savePDF()">
-                        <i class="ti ti-file-text me-1"></i>Save as PDF
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary" onclick="window.close()">
-                        <i class="ti ti-x me-1"></i>Close
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div class="report-header">
-            <div class="row">
-                <div class="col-md-8">
-                    <h1 class="display-6 text-primary">Device Security Report</h1>
-                    <h2 class="h4 text-muted">${device.hostname}</h2>
-                </div>
-                <div class="col-md-4 text-end">
-                    <p class="mb-0"><strong>Generated:</strong> ${timestamp}</p>
-                    <p class="mb-0"><strong>Report Type:</strong> Comprehensive Security Analysis</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <div class="card summary-card h-100">
-                    <div class="card-header">
-                        <h3 class="card-title">Device Summary</h3>
-                    </div>
-                    <div class="card-body">
-                        <table class="table table-borderless">
-                            <tr><th width="40%">Hostname:</th><td>${device.hostname}</td></tr>
-                            <tr><th>Total Vulnerabilities:</th><td><span class="badge bg-secondary">${device.totalCount}</span></td></tr>
-                            <tr><th>Total VPR Score:</th><td><span class="severity-badge severity-${this.getVprSeverityClass(device.totalVPR || 0)}">${(device.totalVPR || 0).toFixed(1)}</span></td></tr>
-                            <tr><th>Risk Level:</th><td>
-                                ${device.criticalCount > 0 ? "<span class=\"badge bg-danger\">Critical Risk</span>" :
-                                  device.highCount > 5 ? "<span class=\"badge bg-warning\">High Risk</span>" :
-                                  device.mediumCount > 10 ? "<span class=\"badge bg-info\">Medium Risk</span>" :
-                                  "<span class=\"badge bg-success\">Low Risk</span>"}
-                            </td></tr>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-header">
-                        <h3 class="card-title">VPR Risk Breakdown</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="row g-2">
-                            <div class="col-6">
-                                <div class="card vpr-card bg-danger bg-opacity-10">
-                                    <div class="card-body text-center">
-                                        <div class="text-danger h3 mb-1">${device.criticalCount}</div>
-                                        <div class="text-muted small">Critical</div>
-                                        <div class="text-danger fw-bold">${(device.criticalVPR || 0).toFixed(1)}</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="card vpr-card bg-warning bg-opacity-10">
-                                    <div class="card-body text-center">
-                                        <div class="text-warning h3 mb-1">${device.highCount}</div>
-                                        <div class="text-muted small">High</div>
-                                        <div class="text-warning fw-bold">${(device.highVPR || 0).toFixed(1)}</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="card vpr-card bg-info bg-opacity-10">
-                                    <div class="card-body text-center">
-                                        <div class="text-info h3 mb-1">${device.mediumCount}</div>
-                                        <div class="text-muted small">Medium</div>
-                                        <div class="text-info fw-bold">${(device.mediumVPR || 0).toFixed(1)}</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="card vpr-card bg-success bg-opacity-10">
-                                    <div class="card-body text-center">
-                                        <div class="text-success h3 mb-1">${device.lowCount}</div>
-                                        <div class="text-muted small">Low</div>
-                                        <div class="text-success fw-bold">${(device.lowVPR || 0).toFixed(1)}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card page-break">
-            <div class="card-header">
-                <h3 class="card-title">Vulnerability Details</h3>
-                <div class="card-subtitle">Complete list of vulnerabilities detected on this device</div>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>First Seen</th>
-                                <th>VPR</th>
-                                <th>Severity</th>
-                                <th>Vulnerability</th>
-                                <th>Name</th>
-                                <th>Port</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${device.vulnerabilities.map(vuln => `
-                                <tr>
-                                    <td>${vuln.first_seen ? new Date(vuln.first_seen).toLocaleDateString() : "N/A"}</td>
-                                    <td><span class="severity-badge severity-${this.getVprSeverityClass(vuln.vpr_score || 0)}">${(vuln.vpr_score || 0).toFixed(1)}</span></td>
-                                    <td><span class="severity-badge severity-${(vuln.severity || "Low").toLowerCase()}">${vuln.severity || "Low"}</span></td>
-                                    <td>${vuln.cve && (vuln.cve.includes("CVE-") || vuln.cve.includes("cisco-sa-")) && typeof CVEUtilities !== "undefined" ? CVEUtilities.createMultipleCVELinks(vuln.cve, {cssClass: "vulnerability-cve text-decoration-none"}) : (vuln.cve || `Plugin ${vuln.plugin_id}`)}</td>
-                                    <td>${vuln.plugin_name || "N/A"}</td>
-                                    <td>${vuln.port || "N/A"}</td>
-                                </tr>
-                            `).join("")}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <footer class="mt-4 pt-3 border-top text-muted text-center">
-            <p>Generated by HexTrackr Security Management Platform</p>
-        </footer>
-    </div>
-
-    <script>
-        function savePDF() {
-            alert('To save as PDF:\\n\\n1. Click Print Report\\n2. Choose "Save as PDF" as destination\\n3. Configure page settings as needed\\n4. Save to your desired location');
-            window.print();
-        }
-    </script>
-</body>
-</html>
-        `;
+        logger.warn("[Device Modal] generateReportHTML() has been deprecated - use CSV export instead");
+        return "";
     }
 
     /**
-     * Setup controls for the report window
-     * @param {Window} reportWindow - The popup report window
+     * Legacy method stub - removed report window controls (HEX-203)
      */
     setupReportWindowControls(reportWindow) {
-        // Focus the window
-        reportWindow.focus();
-        
-        // Set window title
-        reportWindow.document.title = `Device Security Report - ${this.currentDevice.hostname}`;
+        logger.warn("[Device Modal] setupReportWindowControls() has been deprecated");
     }
 
     /**
@@ -731,7 +828,7 @@ class DeviceSecurityModal {
         if (window.vulnManager && typeof window.vulnManager.showToast === "function") {
             window.vulnManager.showToast(message, type);
         } else {
-            console.log(`${type.toUpperCase()}: ${message}`);
+            logger.debug(`${type.toUpperCase()}: ${message}`);
         }
     }
 }
