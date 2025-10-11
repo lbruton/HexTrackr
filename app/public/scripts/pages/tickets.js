@@ -499,10 +499,10 @@ class HexagonTicketsManager {
                 </span>
                 <div class="input-group-text border-0 p-1" style="flex-direction: column; background: var(--tblr-bg-surface-secondary);">
                     <button type="button" class="btn btn-sm move-up-btn" title="Move Up">
-                        <i class="fas fa-caret-up"></i>
+                        <i class="ti ti-caret-up"></i>
                     </button>
                     <button type="button" class="btn btn-sm move-down-btn" title="Move Down">
-                        <i class="fas fa-caret-down"></i>
+                        <i class="ti ti-caret-down"></i>
                     </button>
                 </div>
                 <input type="text" class="form-control device-input" placeholder="Enter device name (e.g., host01)" value="${escapedValue}">
