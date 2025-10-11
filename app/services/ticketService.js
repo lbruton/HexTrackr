@@ -133,9 +133,9 @@ class TicketService {
         return new Promise((resolve, reject) => {
             const sql = `INSERT INTO tickets (
                 id, date_submitted, date_due, hexagon_ticket, service_now_ticket, location,
-                devices, supervisor, tech, status, notes, attachments,
+                devices, supervisor, tech, status, job_type, notes, attachments,
                 created_at, updated_at, site, xt_number, site_id, location_id
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
             const params = [
                 payload.id,
@@ -148,6 +148,7 @@ class TicketService {
                 payload.supervisor,
                 payload.tech,
                 payload.status,
+                payload.jobType || payload.job_type || "Upgrade",
                 payload.notes,
                 JSON.stringify(payload.attachments || []),
                 payload.createdAt,
@@ -213,7 +214,7 @@ class TicketService {
             return new Promise((resolve, reject) => {
                 const sql = `UPDATE tickets SET
                     date_submitted = ?, date_due = ?, hexagon_ticket = ?, service_now_ticket = ?,
-                    location = ?, devices = ?, supervisor = ?, tech = ?, status = ?, notes = ?,
+                    location = ?, devices = ?, supervisor = ?, tech = ?, status = ?, job_type = ?, notes = ?,
                     attachments = ?, updated_at = ?, site = ?, xt_number = ?, site_id = ?, location_id = ?
                     WHERE id = ?`;
                 const params = [
@@ -226,6 +227,7 @@ class TicketService {
                     payload.supervisor,
                     payload.tech,
                     payload.status,
+                    payload.jobType || payload.job_type || "Upgrade",
                     payload.notes,
                     typeof payload.attachments === "string" ? payload.attachments : JSON.stringify(payload.attachments || []),
                     payload.updatedAt,
