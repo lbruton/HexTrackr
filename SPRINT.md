@@ -98,18 +98,22 @@ if (tickets.length === 0) {
 - [x] formatAddress() JavaScript method
 - [x] Improved arrow button styling with Tabler icons
 
-**In Progress**:
+**Completed** ✅:
 - [x] Backend API complete (commit 0059f32)
-- [ ] Frontend button state detection (started)
-- [ ] Multi-ticket picker modal
+- [x] Frontend button state detection (commit 68cbbb7)
+- [x] Multi-ticket picker modal (commit 68cbbb7)
+- [x] Correct status/job type color mapping (commit 68cbbb7)
+- [x] Bonus: Job type text coloring matching AG Grid
 
 **Blocked**: None
 
-**Discovery Notes**:
-- Button is rendered in vulnerability-cards.js line 258-261
-- handleCreateTicketClick() supports bulk ticket creation with keyboard modifiers
-- Need to make button rendering async to check ticket state before display
-- Button ID pattern: No IDs currently, uses inline onclick
+**Implementation Summary**:
+- Async ticket state checking for all device cards (parallel API calls)
+- Three button states: Create (green) / Open (status-colored) / View Tickets (N)
+- Button border reflects ticket status, text color reflects job type
+- Modal picker for 2+ tickets with proper status badges
+- Keyboard modifiers preserved for bulk ticket creation
+- All status values corrected to match tickets.html system
 
 ---
 
