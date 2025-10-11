@@ -1,0 +1,108 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.61</h1><p><strong>Release Date</strong>: 2025-10-10<br><strong>Type</strong>: Feature Release<br><strong>Linear Issue</strong>: <a href="https://linear.app/hextrackr/issue/HEX-190">HEX-190</a> - Device Ticket Power Tool</p>
+<hr>
+<h2>🎯 New Features</h2><h3>Device Ticket Auto-Population Power Tool</h3><p><strong>Three keyboard shortcut modes for rapid ticket creation from vulnerability cards:</strong></p>
+<ul>
+<li><p><strong>Mode 1 (Single Device)</strong>: Regular click</p>
+<ul>
+<li>Auto-populates SITE (4 chars), Location (5 chars), and hostname</li>
+<li>All fields formatted in <strong>ALL CAPS</strong> for consistency</li>
+</ul>
+</li>
+<li><p><strong>Mode 2 (KEV Devices)</strong>: Cmd+Shift+Click (Mac) or Ctrl+Shift+Click (Windows)</p>
+<ul>
+<li>Auto-populates <strong>all KEV devices</strong> at the same location (first 5 characters match)</li>
+<li>Filters by <code>device.hasKev === true</code> property</li>
+<li>Perfect for prioritizing Known Exploited Vulnerabilities</li>
+</ul>
+</li>
+<li><p><strong>Mode 3 (All Devices)</strong>: Alt+Shift+Click</p>
+<ul>
+<li>Auto-populates <strong>all devices</strong> at the same location (first 5 characters match)</li>
+<li>Ideal for site-wide maintenance tickets</li>
+</ul>
+</li>
+</ul>
+<p><strong>Key Enhancements:</strong></p>
+<ul>
+<li>JSON sessionStorage structure with device arrays, site, location, and mode metadata</li>
+<li>Case-insensitive hostname comparison (works with lowercase, uppercase, or mixed case)</li>
+<li>Autofill conflict resolution prevents power tool data from triggering location-to-device autofill</li>
+<li>Backward compatibility maintained for existing single-device workflow</li>
+<li>Enhanced toast messages show device count and mode</li>
+</ul>
+<hr>
+<h2>🐛 Bug Fixes</h2><h3>Clone 3 Testing Phase Fixes</h3><p>During comprehensive testing, Clone 3 (Testing Specialist) identified and fixed 5 bugs:</p>
+<ol>
+<li><p><strong>Event Bubbling</strong>: Create Ticket button click was propagating to parent card&#39;s onclick handler</p>
+<ul>
+<li><strong>Fix</strong>: Added <code>event.stopPropagation()</code> before method call in onclick attribute</li>
+<li><strong>File</strong>: <code>vulnerability-cards.js:259</code></li>
+</ul>
+</li>
+<li><p><strong>Method Path Error</strong>: <code>vulnManager.handleCreateTicketClick is not a function</code></p>
+<ul>
+<li><strong>Fix</strong>: Corrected path to <code>vulnManager.cardsManager.handleCreateTicketClick()</code></li>
+<li><strong>File</strong>: <code>vulnerability-cards.js:259</code></li>
+</ul>
+</li>
+<li><p><strong>Parameter Forwarding</strong>: Delegation wrapper in <code>vulnerabilities.js</code> dropped options parameter</p>
+<ul>
+<li><strong>Fix</strong>: Updated <code>createTicketFromDevice(hostname, options = null)</code> to forward both parameters</li>
+<li><strong>File</strong>: <code>vulnerabilities.js:101-102</code></li>
+</ul>
+</li>
+<li><p><strong>Case Sensitivity</strong>: Hostname comparison failed when device data case didn&#39;t match</p>
+<ul>
+<li><strong>Fix</strong>: Implemented case-insensitive comparison using <code>.toLowerCase()</code> in filters</li>
+<li><strong>File</strong>: <code>vulnerability-cards.js:83, 95</code></li>
+</ul>
+</li>
+<li><p><strong>Wrong Property</strong>: Used non-existent <code>device.kevCount</code> instead of <code>device.hasKev</code></p>
+<ul>
+<li><strong>Fix</strong>: Changed filter to <code>device.hasKev === true</code></li>
+<li><strong>File</strong>: <code>vulnerability-cards.js:83</code></li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2>📝 Implementation Details</h2><h3>Modified Files</h3><ul>
+<li><code>app/public/scripts/shared/vulnerability-cards.js</code> - Keyboard modifier detection and filtering</li>
+<li><code>app/public/scripts/shared/vulnerability-core.js</code> - JSON sessionStorage creation</li>
+<li><code>app/public/scripts/pages/vulnerabilities.js</code> - Parameter forwarding fix</li>
+<li><code>app/public/scripts/pages/tickets.js</code> - JSON parsing and multi-device population</li>
+</ul>
+<h3>Technical Architecture</h3><ul>
+<li><strong>Delegation Chain</strong>: <code>cardsManager.handleCreateTicketClick()</code> → <code>componentContext.createTicketFromDevice()</code> → <code>coreOrchestrator.createTicketFromDevice()</code></li>
+<li><strong>sessionStorage Format</strong>: JSON object with <code>{devices: [], site: &quot;&quot;, location: &quot;&quot;, mode: &quot;&quot;, timestamp: number}</code></li>
+<li><strong>Fallback Support</strong>: Old format (<code>createTicketDevice</code> string) maintained for backward compatibility</li>
+</ul>
+<hr>
+<h2>🧪 Testing</h2><p><strong>Test Environment</strong>: dev.hextrackr.com (Mac M4 Docker)<br><strong>Test Site</strong>: GRIMES location (5 KEV devices, 1 non-KEV device)<br><strong>Test Results</strong>: All three modes validated and working correctly</p>
+<p><strong>Keyboard Shortcuts Tested:</strong></p>
+<ul>
+<li>✅ Single click → Populates 1 device with SITE/Location</li>
+<li>✅ Cmd+Shift+Click → Populates 5 KEV devices at GRIMES</li>
+<li>✅ Alt+Shift+Click → Populates all 6 devices at GRIMES</li>
+</ul>
+<hr>
+<h2>👥 Contributors</h2><ul>
+<li><strong>Clone 2</strong> (Implementation): Delegated to <code>hextrackr-fullstack-dev</code> agent for code implementation</li>
+<li><strong>Clone 3</strong> (Testing &amp; Bug Fixes): Comprehensive testing and 5 bug fixes via iterative debugging</li>
+<li><strong>Lonnie B.</strong> (Planning &amp; Review): SRPI workflow coordination, changelog documentation</li>
+</ul>
+<hr>
+<h2>🔗 Related Issues</h2><ul>
+<li><strong>Parent</strong>: <a href="https://linear.app/hextrackr/issue/HEX-190">HEX-190</a> - SPECIFICATION: Device Ticket Power Tool</li>
+<li><strong>Research</strong>: <a href="https://linear.app/hextrackr/issue/HEX-191">HEX-191</a> - RESEARCH: Device Ticket Power Tool</li>
+<li><strong>Planning</strong>: <a href="https://linear.app/hextrackr/issue/HEX-192">HEX-192</a> - PLAN: Device Ticket Power Tool</li>
+<li><strong>Implementation</strong>: <a href="https://linear.app/hextrackr/issue/HEX-193">HEX-193</a> - IMPLEMENT: Device Ticket Power Tool</li>
+</ul>
+<hr>
+<h2>📚 Documentation</h2><p>See <a href="#guides/power-tools">User Guide: Power Tools</a> for detailed keyboard shortcut reference and usage examples.</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
