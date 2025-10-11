@@ -1041,6 +1041,7 @@ class HexagonTicketsManager {
             supervisor: document.getElementById("supervisor").value,
             tech: document.getElementById("tech").value,
             status: document.getElementById("status").value,
+            jobType: document.getElementById("jobType").value,
             notes: document.getElementById("notes").value,
             attachments: [], // No more attachments since we removed the file input
             createdAt: this.currentEditingId ? this.getTicketById(this.currentEditingId).createdAt : new Date().toISOString(),
@@ -1084,8 +1085,9 @@ class HexagonTicketsManager {
         document.getElementById("supervisor").value = ticket.supervisor;
         document.getElementById("tech").value = ticket.tech;
         document.getElementById("status").value = ticket.status;
+        document.getElementById("jobType").value = ticket.jobType || ticket.job_type || "Upgrade";
         document.getElementById("notes").value = ticket.notes || "";
-        
+
         this.setDevices(ticket.devices || []);
         
         // Update XT# display for editing
