@@ -816,6 +816,47 @@
                             </div>
                         </div>
 
+                        <!-- Conditional fields based on Job Type -->
+                        <!-- Replace/Refresh: Shipping fields -->
+                        <div id="shippingFields" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="trackingNumber" class="form-label">Tracking Number</label>
+                                        <input type="text" class="form-control" id="trackingNumber" placeholder="Enter tracking number">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="shippingAddress" class="form-label">Shipping Address</label>
+                                        <input type="text" class="form-control" id="shippingAddress" placeholder="Where equipment is being shipped">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="returnAddress" class="form-label">Return Address</label>
+                                        <input type="text" class="form-control" id="returnAddress" placeholder="Where old equipment returns">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Upgrade: Software versions -->
+                        <div id="softwareVersionsField" style="display: none;">
+                            <div class="mb-3">
+                                <label for="softwareVersions" class="form-label">Software Versions</label>
+                                <textarea class="form-control" id="softwareVersions" rows="3" placeholder="Document software versions for each host (e.g., host01: v1.2.3 -> v1.2.4)"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Mitigate: Mitigation details -->
+                        <div id="mitigationDetailsField" style="display: none;">
+                            <div class="mb-3">
+                                <label for="mitigationDetailsInput" class="form-label">Mitigation Details</label>
+                                <textarea class="form-control" id="mitigationDetailsInput" rows="3" placeholder="Explain the mitigation that was applied"></textarea>
+                            </div>
+                        </div>
+
                         <div class="mb-3">
                             <label for="notes" class="form-label">Notes (Optional)</label>
                             <textarea class="form-control" id="notes" rows="3" placeholder="Additional notes or comments"></textarea>

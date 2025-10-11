@@ -341,6 +341,11 @@ class HexagonTicketsManager {
             this.renderTickets();
         });
 
+        // Job Type dropdown in modal - show/hide conditional fields
+        document.getElementById("jobType").addEventListener("change", () => {
+            this.updateConditionalFields();
+        });
+
         // Pagination controls
         document.getElementById("rowsPerPage").addEventListener("change", (e) => {
             this.rowsPerPage = parseInt(e.target.value, 10);
@@ -1048,6 +1053,12 @@ class HexagonTicketsManager {
             status: document.getElementById("status").value,
             jobType: document.getElementById("jobType").value,
             notes: document.getElementById("notes").value,
+            // Conditional fields
+            trackingNumber: document.getElementById("trackingNumber").value,
+            shippingAddress: document.getElementById("shippingAddress").value,
+            returnAddress: document.getElementById("returnAddress").value,
+            softwareVersions: document.getElementById("softwareVersions").value,
+            mitigationDetails: document.getElementById("mitigationDetailsInput").value,
             attachments: [], // No more attachments since we removed the file input
             createdAt: this.currentEditingId ? this.getTicketById(this.currentEditingId).createdAt : new Date().toISOString(),
             updatedAt: new Date().toISOString()
@@ -1093,15 +1104,58 @@ class HexagonTicketsManager {
         document.getElementById("jobType").value = ticket.jobType || ticket.job_type || "Upgrade";
         document.getElementById("notes").value = ticket.notes || "";
 
+        // Populate conditional fields
+        document.getElementById("trackingNumber").value = ticket.tracking_number || ticket.trackingNumber || "";
+        document.getElementById("shippingAddress").value = ticket.shipping_address || ticket.shippingAddress || "";
+        document.getElementById("returnAddress").value = ticket.return_address || ticket.returnAddress || "";
+        document.getElementById("softwareVersions").value = ticket.software_versions || ticket.softwareVersions || "";
+        document.getElementById("mitigationDetailsInput").value = ticket.mitigation_details || ticket.mitigationDetails || "";
+
         this.setDevices(ticket.devices || []);
-        
+
         // Update XT# display for editing
         this.updateXtNumberDisplay();
-        
+
+        // Show/hide conditional fields based on job type
+        this.updateConditionalFields();
+
         document.getElementById("ticketModalLabel").innerHTML = "<i class=\"fas fa-edit me-2\"></i>Edit Ticket";
-        
+
         const modal = new bootstrap.Modal(document.getElementById("ticketModal"));
         modal.show();
+    }
+
+    /**
+     * Show/hide conditional fields based on selected job type
+     * @description Displays job type-specific fields: shipping (Replace/Refresh), software versions (Upgrade), or mitigation details (Mitigate)
+     * @since 1.0.57
+     * @module TicketsManager
+     */
+    updateConditionalFields() {
+        const jobType = document.getElementById("jobType").value;
+        const shippingFields = document.getElementById("shippingFields");
+        const softwareVersionsField = document.getElementById("softwareVersionsField");
+        const mitigationDetailsField = document.getElementById("mitigationDetailsField");
+
+        // Hide all conditional fields first
+        shippingFields.style.display = "none";
+        softwareVersionsField.style.display = "none";
+        mitigationDetailsField.style.display = "none";
+
+        // Show appropriate fields based on job type
+        switch (jobType) {
+            case "Replace":
+            case "Refresh":
+                shippingFields.style.display = "block";
+                break;
+            case "Upgrade":
+                softwareVersionsField.style.display = "block";
+                break;
+            case "Mitigate":
+                mitigationDetailsField.style.display = "block";
+                break;
+            // "Other" shows no additional fields
+        }
     }
 
     async deleteTicket(id) {
@@ -1784,6 +1838,9 @@ class HexagonTicketsManager {
         this.setDevices([""]);
         // Update device numbers to show proper numbering (fixes #0 display issue)
         setTimeout(() => this.updateDeviceNumbers(), 50);
+
+        // Show/hide conditional fields for default job type (Upgrade)
+        this.updateConditionalFields();
     }
 
     formatDate(dateString) {
