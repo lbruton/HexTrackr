@@ -121,6 +121,17 @@ if (tickets.length === 0) {
 - Modal picker for 2+ tickets with proper status badges
 - Keyboard modifiers preserved for bulk ticket creation
 - All status values corrected to match tickets.html system
+- Device reorder arrows: Tabler Icons carets with proper CDN loading
+- Complete click handling with Element.closest() for nested icons
+- Theme-consistent styling with hover states
+
+**Final Commits**:
+- 0059f32: Backend API endpoint
+- 68cbbb7: Frontend button logic + multi-ticket picker
+- b95ed1e: URL parameter navigation handling
+- 4d7a27e: Multi-ticket picker fix + arrow button theme consistency
+- 32ea127: Click handler improvements + CSS hover states
+- 8dacada: Tabler Icons webfont CDN (FINAL FIX)
 
 ---
 
