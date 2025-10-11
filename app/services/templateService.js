@@ -34,7 +34,7 @@ class TemplateService {
     getTemplateTable(templateName) {
         if (templateName.includes("_email") || templateName === "default_email") {
             return "email_templates";
-        } else if (templateName.includes("_ticket") || templateName === "default_ticket") {
+        } else if (templateName.includes("_ticket") || templateName === "default_ticket" || templateName.startsWith("markdown_")) {
             return "ticket_templates";
         } else if (templateName.includes("_vulnerability") || templateName === "default_vulnerability") {
             return "vulnerability_templates";
