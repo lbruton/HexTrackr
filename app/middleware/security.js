@@ -147,6 +147,7 @@ function createCorsMiddleware() {
 /**
  * Rate Limiting Middleware
  * DoS protection by limiting requests per IP address within a time window
+ * Cache-aware: Cache HITs don't count toward rate limit (zero server load)
  * @returns {Function} - Rate limiting middleware function
  */
 function createRateLimitMiddleware() {
@@ -158,7 +159,25 @@ function createRateLimitMiddleware() {
         legacyHeaders: false,
         // Trust proxy configuration for nginx reverse proxy
         // Uses the rightmost IP from X-Forwarded-For header
-        trust: () => true
+        trust: () => true,
+        // Custom rate limit handler with logging
+        handler: (req, res) => {
+            console.warn(`⚠️ Rate limit exceeded: ${req.ip} → ${req.method} ${req.path}`);
+            res.status(429).json({
+                error: "Too many requests from this IP, please try again later",
+                retryAfter: Math.ceil(RATE_LIMIT_WINDOW_MS / 1000)
+            });
+        },
+        // Skip rate limiting for cache HITs (no server load, unlimited OK)
+        skip: (req, res) => {
+            // Check if response has X-Cache header indicating cache hit
+            const cacheHeader = res.getHeader("X-Cache");
+            if (cacheHeader && (cacheHeader.includes("HIT") || cacheHeader.includes("HIT-LARGE-QUERY"))) {
+                console.log(`✅ Cache HIT - skipping rate limit: ${req.method} ${req.path}`);
+                return true;  // Don't count this request toward limit
+            }
+            return false;  // Count this request (cache MISS or uncached endpoint)
+        }
     });
 }
 
