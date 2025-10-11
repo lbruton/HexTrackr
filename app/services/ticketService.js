@@ -572,6 +572,45 @@ class TicketService {
             });
         });
     }
+
+    /**
+     * Get all tickets containing a specific device hostname
+     * HEX-203: Bidirectional device-to-ticket navigation
+     * Uses SQLite's json_each to search within the devices JSON array
+     * @param {string} hostname - Device hostname or IP address (case-insensitive)
+     * @returns {Promise<Array>} List of tickets containing the device, sorted by creation date (newest first)
+     */
+    async getTicketsByDevice(hostname) {
+        return new Promise((resolve, reject) => {
+            const query = `
+                SELECT DISTINCT t.*
+                FROM tickets t, json_each(t.devices) AS device
+                WHERE lower(device.value) = lower(?)
+                  AND t.deleted = 0
+                  AND t.status NOT IN ('Completed', 'Cancelled')
+                ORDER BY t.created_at DESC
+            `;
+
+            this.db.all(query, [hostname], (err, rows) => {
+                if (err) {
+                    return reject(new Error(`Failed to fetch tickets for device ${hostname}: ${err.message}`));
+                }
+
+                // Parse devices JSON for each ticket
+                const tickets = rows.map(row => {
+                    try {
+                        row.devices = JSON.parse(row.devices);
+                    } catch (parseError) {
+                        console.error(`Failed to parse devices for ticket ${row.id}:`, parseError);
+                        row.devices = [];
+                    }
+                    return row;
+                });
+
+                resolve(tickets);
+            });
+        });
+    }
 }
 
 module.exports = TicketService;
