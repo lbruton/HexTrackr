@@ -33,10 +33,10 @@
    ```
 
 2. **Access Application**
-   - **Main Application**: http://localhost:8989
-   - **Tickets**: http://localhost:8989/tickets.html
-   - **Vulnerabilities**: http://localhost:8989/vulnerabilities.html
-   - **Documentation**: http://localhost:8989/docs-html/
+   - **Main Application**: https://localhost
+   - **Tickets**: https://localhost/tickets.html
+   - **Vulnerabilities**: https://localhost/vulnerabilities.html
+   - **Documentation**: https://localhost/docs-html/
 
 ### HTTPS Configuration (Optional)
 
@@ -52,7 +52,7 @@ https://localhost:8989
 
 ## Documentation
 
-- **📚 Complete Documentation**: [docs-html/](http://localhost:8989/docs-html/) (after installation)
+- **📚 Complete Documentation**: [docs-html/](https://localhost:/docs-html/) (after installation)
 - **🚀 Getting Started**: [docs-source/guides/getting-started.md](app/public/docs-source/guides/getting-started.md)
 - **🔒 HTTPS Setup**: [docs-source/guides/https-setup.md](app/public/docs-source/guides/https-setup.md)
 - **👤 User Guide**: [docs-source/guides/user-guide.md](app/public/docs-source/guides/user-guide.md)

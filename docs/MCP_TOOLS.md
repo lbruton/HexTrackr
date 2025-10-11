@@ -174,6 +174,84 @@ take_screenshot({
 
 ---
 
+### playwright (Browser Automation)
+
+**Purpose**: Modern browser automation with WebSocket support, dialogs, file uploads
+**Status**: Disabled by default (enable on demand)
+**Use Case**: Alternative to chrome-devtools with additional capabilities
+
+**Key Tools**:
+
+- **Page Navigation**:
+  - `browser_navigate` - Navigate to URL
+  - `browser_navigate_back` - Go back to previous page
+  - `browser_close` - Close browser page
+
+- **Interaction**:
+  - `browser_click` - Click elements (supports double-click, modifiers)
+  - `browser_type` - Type text into editable elements
+  - `browser_press_key` - Press keyboard keys
+  - `browser_hover` - Hover over elements
+  - `browser_drag` - Drag and drop between elements
+  - `browser_select_option` - Select dropdown options
+  - `browser_file_upload` - Upload files
+  - `browser_fill_form` - Fill multiple form fields at once
+
+- **Inspection**:
+  - `browser_snapshot` - Capture accessibility snapshot (better than screenshot)
+  - `browser_take_screenshot` - Take PNG/JPEG screenshots (full page or element)
+  - `browser_console_messages` - Retrieve console logs
+  - `browser_network_requests` - Get all network requests
+
+- **Advanced**:
+  - `browser_evaluate` - Execute JavaScript on page or element
+  - `browser_handle_dialog` - Accept/dismiss dialogs (alerts, confirms, prompts)
+  - `browser_wait_for` - Wait for text to appear/disappear or time to pass
+  - `browser_tabs` - Manage tabs (list, new, close, select)
+  - `browser_resize` - Resize browser window
+  - `browser_install` - Install browser if not present
+
+**Common Patterns**:
+
+```javascript
+// Form automation with file upload
+mcp__playwright__browser_navigate({
+  url: "https://dev.hextrackr.com/import.html"
+})
+
+mcp__playwright__browser_file_upload({
+  paths: ["/path/to/vulnerabilities.csv"]
+})
+
+mcp__playwright__browser_fill_form({
+  fields: [
+    { name: "Import Type", type: "combobox", ref: "#import-type", value: "Vulnerabilities" },
+    { name: "Auto-process", type: "checkbox", ref: "#auto-process", value: "true" }
+  ]
+})
+
+// Handle confirmation dialog
+mcp__playwright__browser_handle_dialog({
+  accept: true,
+  promptText: "Confirm import"  // For prompt dialogs
+})
+
+// Wait for processing to complete
+mcp__playwright__browser_wait_for({
+  text: "Import completed successfully",
+  time: 30  // Max wait time in seconds
+})
+
+// Capture accessibility snapshot (better than screenshot for actions)
+mcp__playwright__browser_snapshot()
+```
+
+**When to Use Playwright vs chrome-devtools**:
+- **Playwright**: File uploads, form filling, dialog handling, tab management
+- **chrome-devtools**: Network inspection, performance profiling, console debugging
+
+---
+
 ### brave-search (Web Research)
 
 **Purpose**: Web, news, video, image, local search + AI summarization

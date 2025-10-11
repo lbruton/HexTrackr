@@ -139,18 +139,21 @@ console.log("✅ HexTrackr Settings Modal (shared) loaded successfully");
             refreshStats();
         });
         
-        // API test buttons
-        document.getElementById("testCiscoConnection")?.addEventListener("click", testCiscoConnection);
+        // Cisco credential management
+        document.getElementById("manageCiscoCredentials")?.addEventListener("click", openCiscoCredentialsModal);
+        document.getElementById("saveCiscoCredentialsBtn")?.addEventListener("click", saveCiscoCredentials);
+        document.getElementById("syncCiscoNow")?.addEventListener("click", syncCiscoNow);
+        document.getElementById("ciscoAutoSync")?.addEventListener("change", toggleCiscoAutoSync);
 
         // KEV sync button
         document.getElementById("syncKevNow")?.addEventListener("click", syncKevData);
         document.getElementById("kevAutoSync")?.addEventListener("change", toggleKevAutoSync);
 
-        // Load KEV status when modal opens
+        // Load status when modal opens
         const settingsModalElement = document.getElementById("settingsModal");
         if (settingsModalElement) {
             settingsModalElement.addEventListener("shown.bs.modal", loadKevSyncStatus);
-            settingsModalElement.addEventListener("shown.bs.modal", loadCiscoCredentials); // HEX-138
+            settingsModalElement.addEventListener("shown.bs.modal", loadCiscoSyncStatus);
         }
         
         // Settings save button
@@ -585,77 +588,272 @@ function showClearConfirmationModal(type, confirmText) {
     });
 }
 
+// ========================================
+// HEX-141: Cisco PSIRT Advisory Sync Functions
+// ========================================
+
 /**
- * Load Cisco credentials from database (HEX-138)
- * Populates form fields with masked credentials if they exist
- *
+ * Open the Cisco credentials management modal
  * @async
- * @function loadCiscoCredentials
+ * @function openCiscoCredentialsModal
  * @returns {Promise<void>}
  */
-async function loadCiscoCredentials() {
-    if (!window.preferencesService) {
-        console.warn("PreferencesService not available - cannot load Cisco credentials");
-        return;
-    }
-
+async function openCiscoCredentialsModal() {
     try {
-        const result = await window.preferencesService.getPreference("cisco_api_key");
+        // Load existing credentials if they exist
+        if (window.preferencesService) {
+            const result = await window.preferencesService.getPreference("cisco_api_key");
 
-        if (result.success && result.data && result.data.value) {
-            // Split combined credential string
-            const [clientId, clientSecret] = result.data.value.split(":");
+            if (result.success && result.data && result.data.value) {
+                const [clientId, _clientSecret] = result.data.value.split(":");
 
-            // Populate form fields (masked for security)
-            const clientIdField = document.getElementById("ciscoClientId");
-            const clientSecretField = document.getElementById("ciscoClientSecret");
-            const statusBadge = document.getElementById("ciscoStatus");
+                // Show Client ID (not secret)
+                const clientIdInput = document.getElementById("ciscoClientIdInput");
+                if (clientIdInput && clientId) {
+                    clientIdInput.value = clientId;
+                }
 
-            if (clientIdField && clientId) {
-                clientIdField.value = clientId;
-                clientIdField.placeholder = "••••••••"; // Masked display
-            }
-
-            if (clientSecretField && clientSecret) {
-                clientSecretField.value = clientSecret;
-                clientSecretField.placeholder = "••••••••"; // Masked display
-            }
-
-            // Update status badge
-            if (statusBadge) {
-                statusBadge.textContent = "Configured";
-                statusBadge.className = "badge bg-success";
-            }
-
-            console.log("✅ Cisco credentials loaded from database");
-        } else {
-            // No credentials configured
-            const statusBadge = document.getElementById("ciscoStatus");
-            if (statusBadge) {
-                statusBadge.textContent = "Not Configured";
-                statusBadge.className = "badge bg-secondary";
+                // Secret field stays empty (user must re-enter to change)
+                const clientSecretInput = document.getElementById("ciscoClientSecretInput");
+                if (clientSecretInput) {
+                    clientSecretInput.placeholder = "••••••••  (leave blank to keep existing)";
+                }
             }
         }
+
+        // Show the modal
+        const credentialsModal = new bootstrap.Modal(document.getElementById("ciscoCredentialsModal"));
+        credentialsModal.show();
     } catch (error) {
-        console.error("Error loading Cisco credentials:", error);
+        console.error("Error opening Cisco credentials modal:", error);
+        showNotification("Failed to open credentials modal", "error");
     }
 }
 
-// API Test Functions (stubs for now)
 /**
- * Test Cisco PSIRT API connection
+ * Save Cisco PSIRT credentials to database
+ * @async
+ * @function saveCiscoCredentials
  * @returns {Promise<void>}
  */
-async function testCiscoConnection() {
-    showNotification("Cisco API connectivity test - feature coming soon", "info");
-    // TODO: Implement actual Cisco PSIRT API test
-    document.getElementById("ciscoStatus").textContent = "Testing...";
-    document.getElementById("ciscoStatus").className = "badge bg-warning";
-    
-    setTimeout(() => {
-        document.getElementById("ciscoStatus").textContent = "Not Configured";
-        document.getElementById("ciscoStatus").className = "badge bg-secondary";
-    }, 2000);
+async function saveCiscoCredentials() {
+    const clientIdInput = document.getElementById("ciscoClientIdInput");
+    const clientSecretInput = document.getElementById("ciscoClientSecretInput");
+    const saveButton = document.getElementById("saveCiscoCredentialsBtn");
+
+    const clientId = clientIdInput?.value?.trim() || "";
+    const clientSecret = clientSecretInput?.value?.trim() || "";
+
+    // Validation
+    if (!clientId) {
+        showNotification("Please enter a Client ID", "warning");
+        clientIdInput?.focus();
+        return;
+    }
+
+    // If secret is empty and placeholder indicates existing, fetch existing secret
+    let finalClientSecret = clientSecret;
+    if (!clientSecret && clientSecretInput?.placeholder?.includes("leave blank")) {
+        try {
+            const result = await window.preferencesService.getPreference("cisco_api_key");
+            if (result.success && result.data && result.data.value) {
+                const [_existingId, existingSecret] = result.data.value.split(":");
+                finalClientSecret = existingSecret;
+            }
+        } catch (error) {
+            console.error("Error fetching existing secret:", error);
+        }
+    }
+
+    if (!finalClientSecret) {
+        showNotification("Please enter a Client Secret", "warning");
+        clientSecretInput?.focus();
+        return;
+    }
+
+    // Disable save button during save
+    if (saveButton) {
+        saveButton.disabled = true;
+        saveButton.innerHTML = "<i class=\"fas fa-spinner fa-spin me-2\"></i>Saving...";
+    }
+
+    try {
+        const ciscoApiKey = `${clientId}:${finalClientSecret}`;
+
+        if (window.preferencesSync) {
+            await window.preferencesSync.syncCiscoCredentials(ciscoApiKey);
+            console.log("🔒 Cisco credentials saved to database");
+
+            // Update status in main settings card
+            const credentialStatus = document.getElementById("ciscoCredentialStatus");
+            if (credentialStatus) {
+                credentialStatus.textContent = "Configured ✓";
+                credentialStatus.className = "badge bg-success";
+            }
+
+            // Enable sync button
+            const syncButton = document.getElementById("syncCiscoNow");
+            if (syncButton) {
+                syncButton.disabled = false;
+            }
+
+            showNotification("Cisco credentials saved securely", "success");
+
+            // Close modal
+            const credentialsModal = bootstrap.Modal.getInstance(document.getElementById("ciscoCredentialsModal"));
+            if (credentialsModal) {
+                credentialsModal.hide();
+            }
+
+            // Clear form
+            if (clientIdInput) {clientIdInput.value = "";}
+            if (clientSecretInput) {clientSecretInput.value = "";}
+        } else {
+            throw new Error("PreferencesSync not available");
+        }
+    } catch (error) {
+        console.error("Failed to save Cisco credentials:", error);
+        showNotification("Failed to save credentials: " + error.message, "error");
+    } finally {
+        // Re-enable save button
+        if (saveButton) {
+            saveButton.disabled = false;
+            saveButton.innerHTML = "<i class=\"fas fa-save me-2\"></i>Save Credentials";
+        }
+    }
+}
+
+/**
+ * Load Cisco sync status from API
+ * @async
+ * @function loadCiscoSyncStatus
+ * @returns {Promise<void>}
+ */
+async function loadCiscoSyncStatus() {
+    try {
+        // Load auto-sync setting from localStorage
+        const autoSyncEnabled = localStorage.getItem("ciscoAutoSyncEnabled") !== "false";
+        const autoSyncCheckbox = document.getElementById("ciscoAutoSync");
+        if (autoSyncCheckbox) {
+            autoSyncCheckbox.checked = autoSyncEnabled;
+        }
+
+        // Check if credentials are configured
+        if (window.preferencesService) {
+            const result = await window.preferencesService.getPreference("cisco_api_key");
+            const credentialStatus = document.getElementById("ciscoCredentialStatus");
+            const syncButton = document.getElementById("syncCiscoNow");
+
+            if (result.success && result.data && result.data.value) {
+                // Credentials exist
+                if (credentialStatus) {
+                    credentialStatus.textContent = "Configured ✓";
+                    credentialStatus.className = "badge bg-success";
+                }
+                if (syncButton) {
+                    syncButton.disabled = false;
+                }
+            } else {
+                // No credentials
+                if (credentialStatus) {
+                    credentialStatus.textContent = "Not Configured";
+                    credentialStatus.className = "badge bg-secondary";
+                }
+                if (syncButton) {
+                    syncButton.disabled = true;
+                }
+            }
+        }
+
+        // TODO: Fetch sync status from /api/cisco/status when backend is ready
+        // For now, show placeholder data
+        const lastSyncElement = document.getElementById("ciscoLastSync");
+        if (lastSyncElement) {
+            lastSyncElement.textContent = "Never synced";
+        }
+
+        const syncedCountElement = document.getElementById("ciscoSyncedCount");
+        if (syncedCountElement) {
+            syncedCountElement.textContent = "0";
+        }
+
+        const matchedCountElement = document.getElementById("ciscoMatchedCount");
+        if (matchedCountElement) {
+            matchedCountElement.textContent = "0";
+        }
+    } catch (error) {
+        console.error("Error loading Cisco sync status:", error);
+    }
+}
+
+/**
+ * Sync Cisco PSIRT advisories manually
+ * @async
+ * @function syncCiscoNow
+ * @returns {Promise<void>}
+ */
+async function syncCiscoNow() {
+    const syncButton = document.getElementById("syncCiscoNow");
+    const statusBadge = document.getElementById("ciscoStatus");
+
+    // Disable button and show loading state
+    if (syncButton) {
+        syncButton.disabled = true;
+        syncButton.innerHTML = "<i class=\"fas fa-spinner fa-spin me-2\"></i>Syncing...";
+    }
+
+    if (statusBadge) {
+        statusBadge.textContent = "Syncing";
+        statusBadge.className = "badge bg-warning";
+    }
+
+    try {
+        // TODO: Call /api/cisco/sync when backend is ready
+        showNotification("Cisco advisory sync - backend not yet implemented (Phase 2)", "info");
+
+        // Simulate sync delay
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        if (statusBadge) {
+            statusBadge.textContent = "Not Synced";
+            statusBadge.className = "badge bg-secondary";
+        }
+    } catch (error) {
+        console.error("Cisco sync error:", error);
+        showNotification("Failed to sync Cisco advisories: " + error.message, "error");
+
+        if (statusBadge) {
+            statusBadge.textContent = "Sync Failed";
+            statusBadge.className = "badge bg-danger";
+        }
+    } finally {
+        // Re-enable button
+        if (syncButton) {
+            syncButton.disabled = false;
+            syncButton.innerHTML = "<i class=\"fas fa-sync me-2\"></i>Sync Now";
+        }
+    }
+}
+
+/**
+ * Toggle Cisco auto-sync setting
+ * @async
+ * @function toggleCiscoAutoSync
+ * @returns {Promise<void>}
+ */
+async function toggleCiscoAutoSync() {
+    const autoSyncCheckbox = document.getElementById("ciscoAutoSync");
+    if (autoSyncCheckbox) {
+        // Save to localStorage
+        localStorage.setItem("ciscoAutoSyncEnabled", autoSyncCheckbox.checked);
+
+        // TODO: Sync to database via preferencesSync when ready
+        // if (window.preferencesSync) {
+        //     await window.preferencesSync.syncCiscoAutoRefresh(autoSyncCheckbox.checked);
+        // }
+
+        showNotification(`Cisco auto-sync ${autoSyncCheckbox.checked ? "enabled" : "disabled"}`, "info");
+    }
 }
 
 /**
@@ -813,21 +1011,7 @@ async function loadKevSyncStatus() {
  */
 async function saveSettings() {
     try {
-        // HEX-138 SECURITY: Handle Cisco credentials FIRST (database-only, never localStorage)
-        const ciscoClientId = document.getElementById("ciscoClientId")?.value?.trim() || "";
-        const ciscoClientSecret = document.getElementById("ciscoClientSecret")?.value?.trim() || "";
-
-        if (ciscoClientId && ciscoClientSecret) {
-            // Combine credentials into single secure string for database storage
-            const ciscoApiKey = `${ciscoClientId}:${ciscoClientSecret}`;
-
-            if (window.preferencesSync) {
-                await window.preferencesSync.syncCiscoCredentials(ciscoApiKey);
-                console.log("🔒 Cisco credentials securely saved to database (removed from localStorage)");
-            } else {
-                console.warn("⚠️ PreferencesSync not available - Cisco credentials NOT saved");
-            }
-        }
+        // HEX-141: Cisco credentials now managed via separate modal (see openCiscoCredentialsModal)
 
         // Collect all settings from the modal
         const settings = {
@@ -1348,11 +1532,18 @@ if (typeof module !== "undefined" && module.exports) {
         backupData,
         importData,
         clearData,
-        testCiscoConnection,
+        // HEX-141: Cisco PSIRT functions
+        openCiscoCredentialsModal,
+        saveCiscoCredentials,
+        loadCiscoSyncStatus,
+        syncCiscoNow,
+        toggleCiscoAutoSync,
+        // KEV functions
         syncKevData,
         toggleKevAutoSync,
         updateKevSyncStatus,
         loadKevSyncStatus,
+        // General settings
         saveSettings,
         initServiceNowSettings,
         loadServiceNowSettings,
