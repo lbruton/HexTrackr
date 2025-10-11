@@ -835,7 +835,8 @@ async function syncCiscoNow() {
 
     try {
         // Call Cisco advisory sync API (HEX-141 Phase 2)
-        const response = await fetch("/api/cisco/sync", {
+        // Use authState.authenticatedFetch to include CSRF token
+        const response = await authState.authenticatedFetch("/api/cisco/sync", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
