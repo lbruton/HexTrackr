@@ -492,11 +492,11 @@ class HexagonTicketsManager {
                     <i class="fas fa-grip-vertical"></i>
                 </span>
                 <div class="input-group-text border-0 p-1" style="flex-direction: column; background: var(--tblr-bg-surface-secondary);">
-                    <button type="button" class="btn btn-primary btn-sm move-up-btn" style="padding: 2px 8px; margin-bottom: 1px; border-radius: 3px; font-size: 11px;" title="Move Up">
-                        <i class="fas fa-chevron-up"></i>
+                    <button type="button" class="btn btn-sm move-up-btn" style="padding: 2px 8px; margin-bottom: 1px; border-radius: 3px; font-size: 11px; background: var(--tblr-bg-surface); border: 1px solid var(--tblr-border-color);" title="Move Up">
+                        <i class="ti ti-arrow-up"></i>
                     </button>
-                    <button type="button" class="btn btn-primary btn-sm move-down-btn" style="padding: 2px 8px; border-radius: 3px; font-size: 11px;" title="Move Down">
-                        <i class="fas fa-chevron-down"></i>
+                    <button type="button" class="btn btn-sm move-down-btn" style="padding: 2px 8px; border-radius: 3px; font-size: 11px; background: var(--tblr-bg-surface); border: 1px solid var(--tblr-border-color);" title="Move Down">
+                        <i class="ti ti-arrow-down"></i>
                     </button>
                 </div>
                 <input type="text" class="form-control device-input" placeholder="Enter device name (e.g., host01)" value="${escapedValue}">
