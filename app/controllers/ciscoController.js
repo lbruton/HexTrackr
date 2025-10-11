@@ -46,8 +46,8 @@ class CiscoController {
                 });
             }
 
-            // Perform sync
-            const result = await this.ciscoAdvisoryService.syncCiscoAdvisories();
+            // Perform sync (pass userId from session for credential fetch)
+            const result = await this.ciscoAdvisoryService.syncCiscoAdvisories(req.session.userId);
 
             console.log(`✅ Cisco advisory sync completed: ${result.totalAdvisories} advisories, ${result.matchedCount} matched`);
 
