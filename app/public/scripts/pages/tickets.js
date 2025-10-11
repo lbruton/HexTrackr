@@ -1053,10 +1053,23 @@ class HexagonTicketsManager {
             status: document.getElementById("status").value,
             jobType: document.getElementById("jobType").value,
             notes: document.getElementById("notes").value,
-            // Conditional fields
+            // Conditional fields - structured addresses
+            shippingLine1: document.getElementById("shippingLine1").value,
+            shippingLine2: document.getElementById("shippingLine2").value,
+            shippingCity: document.getElementById("shippingCity").value,
+            shippingState: document.getElementById("shippingState").value,
+            shippingZip: document.getElementById("shippingZip").value,
+            returnLine1: document.getElementById("returnLine1").value,
+            returnLine2: document.getElementById("returnLine2").value,
+            returnCity: document.getElementById("returnCity").value,
+            returnState: document.getElementById("returnState").value,
+            returnZip: document.getElementById("returnZip").value,
+            outboundTracking: document.getElementById("outboundTracking").value,
+            returnTracking: document.getElementById("returnTracking").value,
+            // Legacy/computed fields for template compatibility
             trackingNumber: document.getElementById("outboundTracking").value + (document.getElementById("returnTracking").value ? " | " + document.getElementById("returnTracking").value : ""),
-            shippingAddress: document.getElementById("shippingAddress").value,
-            returnAddress: document.getElementById("returnAddress").value,
+            shippingAddress: this.formatAddress("shipping"),
+            returnAddress: this.formatAddress("return"),
             softwareVersions: document.getElementById("softwareVersions").value,
             mitigationDetails: document.getElementById("mitigationDetailsInput").value,
             attachments: [], // No more attachments since we removed the file input
@@ -1104,13 +1117,19 @@ class HexagonTicketsManager {
         document.getElementById("jobType").value = ticket.jobType || ticket.job_type || "Upgrade";
         document.getElementById("notes").value = ticket.notes || "";
 
-        // Populate conditional fields
-        // Parse tracking numbers (stored as "outbound | return")
-        const trackingNumbers = (ticket.tracking_number || ticket.trackingNumber || "").split(" | ");
-        document.getElementById("outboundTracking").value = trackingNumbers[0] || "";
-        document.getElementById("returnTracking").value = trackingNumbers[1] || "";
-        document.getElementById("shippingAddress").value = ticket.shipping_address || ticket.shippingAddress || "";
-        document.getElementById("returnAddress").value = ticket.return_address || ticket.returnAddress || "";
+        // Populate conditional fields - structured addresses
+        document.getElementById("shippingLine1").value = ticket.shipping_line1 || ticket.shippingLine1 || "";
+        document.getElementById("shippingLine2").value = ticket.shipping_line2 || ticket.shippingLine2 || "";
+        document.getElementById("shippingCity").value = ticket.shipping_city || ticket.shippingCity || "";
+        document.getElementById("shippingState").value = ticket.shipping_state || ticket.shippingState || "";
+        document.getElementById("shippingZip").value = ticket.shipping_zip || ticket.shippingZip || "";
+        document.getElementById("returnLine1").value = ticket.return_line1 || ticket.returnLine1 || "";
+        document.getElementById("returnLine2").value = ticket.return_line2 || ticket.returnLine2 || "";
+        document.getElementById("returnCity").value = ticket.return_city || ticket.returnCity || "";
+        document.getElementById("returnState").value = ticket.return_state || ticket.returnState || "";
+        document.getElementById("returnZip").value = ticket.return_zip || ticket.returnZip || "";
+        document.getElementById("outboundTracking").value = ticket.outbound_tracking || ticket.outboundTracking || "";
+        document.getElementById("returnTracking").value = ticket.return_tracking || ticket.returnTracking || "";
         document.getElementById("softwareVersions").value = ticket.software_versions || ticket.softwareVersions || "";
         document.getElementById("mitigationDetailsInput").value = ticket.mitigation_details || ticket.mitigationDetails || "";
 
@@ -1126,6 +1145,35 @@ class HexagonTicketsManager {
 
         const modal = new bootstrap.Modal(document.getElementById("ticketModal"));
         modal.show();
+    }
+
+    /**
+     * Format structured address fields into multi-line address string
+     * @param {string} type - Address type: "shipping" or "return"
+     * @returns {string} Formatted multi-line address
+     * @since 1.0.57
+     * @module TicketsManager
+     */
+    formatAddress(type) {
+        const line1 = document.getElementById(`${type}Line1`).value.trim();
+        const line2 = document.getElementById(`${type}Line2`).value.trim();
+        const city = document.getElementById(`${type}City`).value.trim();
+        const state = document.getElementById(`${type}State`).value;
+        const zip = document.getElementById(`${type}Zip`).value.trim();
+
+        if (!line1 && !city && !state && !zip) {
+            return ""; // No address entered
+        }
+
+        const parts = [];
+        if (line1) parts.push(line1);
+        if (line2) parts.push(line2);
+        if (city || state || zip) {
+            const cityStateZip = [city, state, zip].filter(Boolean).join(" ");
+            parts.push(cityStateZip);
+        }
+
+        return parts.join("\n");
     }
 
     /**
