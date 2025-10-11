@@ -58,6 +58,7 @@ const backupRoutes = require("../routes/backup");
 const docsRoutes = require("../routes/docs");
 const templateRoutes = require("../routes/templates");
 const kevRoutes = require("../routes/kev");
+const ciscoRoutes = require("../routes/cisco"); // HEX-141: Cisco PSIRT advisory sync
 const deviceRoutes = require("../routes/devices"); // HEX-101: Device statistics endpoint
 const authRoutes = require("../routes/auth");
 const preferencesRoutes = require("../routes/preferences"); // HEX-138: User preferences API
@@ -265,6 +266,7 @@ async function initializeApplication() {
     app.use("/api/tickets", ticketRoutes);
     app.use("/api/templates", templateRoutes);
     app.use("/api/kev", kevRoutes(db));
+    app.use("/api/cisco", ciscoRoutes(db, PreferencesController.getInstance().preferencesService)); // HEX-141: Cisco PSIRT advisory sync
     app.use("/api/devices", deviceRoutes); // HEX-101: Device statistics endpoint
     app.use("/api/auth", authRoutes);
     app.use("/api/preferences", preferencesRoutes); // HEX-138: User preferences
