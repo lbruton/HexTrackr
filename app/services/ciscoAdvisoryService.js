@@ -208,11 +208,13 @@ class CiscoAdvisoryService {
     /**
      * Fetch all CVE IDs from vulnerabilities_current table for advisory lookup
      * Only queries active and reopened vulnerabilities (not resolved)
-     * Excludes CVEs already in cisco_advisories table (cache exclusion)
+     * Excludes CVEs with fresh advisory data (synced within TTL window)
+     * Includes CVEs with stale data (>90 days old) for refresh
      * @async
-     * @returns {Promise<Array<string>>} Array of CVE identifiers
+     * @param {number} ttlDays - Time-to-live in days (default: 90)
+     * @returns {Promise<Array<string>>} Array of CVE identifiers needing sync
      */
-    async getAllCveIds() {
+    async getAllCveIds(ttlDays = 90) {
         return await new Promise((resolve, reject) => {
             this.db.all(`
                 SELECT DISTINCT vc.cve
@@ -221,8 +223,11 @@ class CiscoAdvisoryService {
                 WHERE vc.cve IS NOT NULL
                   AND vc.cve LIKE 'CVE-%'
                   AND vc.lifecycle_state IN ('active', 'reopened')
-                  AND ca.cve_id IS NULL  -- Exclude already-synced CVEs
-            `, (err, rows) => {
+                  AND (
+                      ca.cve_id IS NULL  -- Never synced
+                      OR julianday('now') - julianday(ca.last_synced) > ?  -- Stale (>TTL days)
+                  )
+            `, [ttlDays], (err, rows) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -426,25 +431,15 @@ class CiscoAdvisoryService {
             console.log("🔐 Authenticating with Cisco Identity Services...");
             const accessToken = await this.getCiscoAccessToken(clientId, clientSecret);
 
-            // Get all CVE IDs from vulnerabilities table
+            // Get all CVE IDs from vulnerabilities table (excluding already-synced)
             const cveIds = await this.getAllCveIds();
-            console.log(`📊 Found ${cveIds.length} unique CVEs in database`);
+            console.log(`📊 Found ${cveIds.length} unique CVEs to sync (cache excluded)`);
 
-            // Begin transaction
-            await new Promise((resolve, reject) => {
-                this.db.run("BEGIN TRANSACTION", (err) => {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve();
-                    }
-                });
-            });
-
-            try {
-                let advisoryCount = 0;
-                let matchedCount = 0;
-                const delayBetweenCalls = 3000; // 3 seconds between each CVE (conservative for two-stage calls)
+            // No transaction wrapper - each CVE commits individually for resilience
+            // This allows progress to persist even if the sync is interrupted
+            let advisoryCount = 0;
+            let matchedCount = 0;
+            const delayBetweenCalls = 3000; // 3 seconds between each CVE (conservative for two-stage calls)
 
                 // Process CVEs sequentially with delays to honor Cisco rate limits
                 for (let i = 0; i < cveIds.length; i++) {
@@ -550,50 +545,26 @@ class CiscoAdvisoryService {
                     }
                 }
 
-                // Commit transaction
-                await new Promise((resolve, reject) => {
-                    this.db.run("COMMIT", (err) => {
-                        if (err) {
-                            reject(err);
-                        } else {
-                            resolve();
-                        }
-                    });
-                });
+            // Update sync metadata
+            this.lastSyncTime = new Date().toISOString();
+            await this.updateSyncMetadata(advisoryCount);
 
-                // Update sync metadata
-                this.lastSyncTime = new Date().toISOString();
-                await this.updateSyncMetadata(advisoryCount);
+            console.log(`✅ Cisco advisory sync completed: ${advisoryCount} advisories imported, ${matchedCount} CVEs matched`);
 
-                console.log(`✅ Cisco advisory sync completed: ${advisoryCount} advisories imported, ${matchedCount} CVEs matched`);
+            this.syncInProgress = false;
 
-                return {
-                    success: true,
-                    totalAdvisories: advisoryCount,
-                    matchedCount: matchedCount,
-                    totalCvesChecked: cveIds.length,
-                    lastSync: this.lastSyncTime
-                };
-
-            } catch (dbError) {
-                // Rollback on error
-                await new Promise((resolve, reject) => {
-                    this.db.run("ROLLBACK", (err) => {
-                        if (err) {
-                            reject(err);
-                        } else {
-                            resolve();
-                        }
-                    });
-                });
-                throw dbError;
-            }
+            return {
+                success: true,
+                totalAdvisories: advisoryCount,
+                matchedCount: matchedCount,
+                totalCvesChecked: cveIds.length,
+                lastSync: this.lastSyncTime
+            };
 
         } catch (error) {
             console.error("❌ Cisco advisory sync failed:", error);
-            throw error;
-        } finally {
             this.syncInProgress = false;
+            throw error;
         }
     }
 
