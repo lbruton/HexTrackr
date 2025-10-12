@@ -4,13 +4,125 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## MANDATORY RULES
 
-These rulese are mandatory and must be followed every session
+These rules are mandatory and must be followed every session
 
 1. ALWAYS use **Sequential Thinking** if enabled
-2. ALWAYS use **Claude Context** to search the codebase, this is our single source of truth when it comes to the code. 
+2. ALWAYS use **Claude Context** to search the codebase, this is our single source of truth when it comes to the code.
 3. ALWAYS ensure **Claude Context** index is fresh
 4. NEVER make assumptions, always check **Claude Context** and verify against the files
 5. DO NOT waste time searching the files until you have first searched **Claude Context**
+
+## MANDATORY INVESTIGATION WORKFLOW
+
+**CRITICAL**: Before building ANY new feature, endpoint, or fix, you MUST complete this investigation workflow. No exceptions.
+
+### Step 1: Check Index Status (30 seconds)
+
+```javascript
+// ALWAYS start here - ensure fresh index
+mcp__claude-context__get_indexing_status({
+  path: "/Volumes/DATA/GitHub/HexTrackr"
+})
+
+// If stale (>1 hour), re-index before searching
+mcp__claude-context__index_codebase({
+  path: "/Volumes/DATA/GitHub/HexTrackr",
+  splitter: "ast",
+  force: false
+})
+```
+
+### Step 2: Search Existing Endpoints (1-2 minutes)
+
+```javascript
+// Search for existing endpoints that might already solve the problem
+mcp__claude-context__search_code({
+  path: "/Volumes/DATA/GitHub/HexTrackr",
+  query: "API endpoint [describe what you need] controller method",
+  limit: 15,
+  extensionFilter: [".js"]
+})
+```
+
+**Example**: Need affected devices? Search "GET /api/vulnerabilities filter search CVE" - don't create new endpoint.
+
+### Step 3: Check Memento for Patterns (1-2 minutes)
+
+```javascript
+// Search for architectural patterns and similar work
+mcp__memento__semantic_search({
+  query: "[describe feature/problem] architecture pattern existing implementation",
+  limit: 10,
+  min_similarity: 0.5,
+  entity_types: ["HEXTRACKR:DEVELOPMENT:SESSION", "HEXTRACKR:ARCHITECTURE:PATTERN"]
+})
+```
+
+### Step 4: Read Route Files (1 minute)
+
+```javascript
+// Check what endpoints exist in relevant route files
+Read({file_path: "/Volumes/DATA/GitHub/HexTrackr/app/routes/[relevant].js"})
+```
+
+### Step 5: Understand Data Flow (2-3 minutes)
+
+- Where does the data come from? (Database, memory, API)
+- Is it already loaded somewhere? (dataManager, cache, in-memory)
+- What fields exist? (Read service files)
+- What's missing? (Compare to what you need)
+
+### Step 6: Identify Simplest Fix
+
+**Ask yourself**:
+- Can existing endpoint + query params solve this? ✅ USE IT
+- Is data already in memory but not mapped? ✅ FIX MAPPING
+- Do I need to transform existing data? ✅ ADD HELPER FUNCTION
+- Is this truly a new capability? ⚠️ THEN build new endpoint
+
+### ANTI-PATTERNS TO AVOID
+
+❌ **Creating database endpoints for data mapping problems**
+- Symptom: "Let me create GET /api/[resource]/:id/[related]"
+- Reality: Data often already in memory, just missing fields
+- Example: HEX-204 - needed vendor/cve fields, not new endpoint
+
+❌ **Building before investigating**
+- Symptom: Immediately writing code after user describes problem
+- Reality: Similar feature usually exists, just needs discovery
+- Fix: Complete investigation workflow FIRST
+
+❌ **Asking user about architecture**
+- Symptom: "What endpoint should I use?" "Does this exist?"
+- Reality: claude-context and memento have the answers
+- Fix: Search tools first, only ask if truly ambiguous
+
+❌ **Trusting memory over search**
+- Symptom: "I remember there's a method that..."
+- Reality: Code changes, memory is stale
+- Fix: Always verify with claude-context
+
+### CORRECT PATTERNS TO USE
+
+✅ **Frontend data already loaded**
+- Check: dataManager.currentData, cached data, in-memory arrays
+- Fix: Add missing fields to data mapping/aggregation
+- Example: Modal using getAffectedAssets() - just needed vendor/cve fields
+
+✅ **Existing endpoint + query params**
+- Check: Does /api/[resource] support search/filter params?
+- Fix: Use existing endpoint with proper parameters
+- Example: GET /api/vulnerabilities?search=[CVE] instead of new endpoint
+
+✅ **Service method exists**
+- Check: Service layer already has the logic
+- Fix: Call existing service method from controller
+- Example: vulnerabilityService.getVulnerabilities() with filters
+
+✅ **Helper function for transformation**
+- Check: Need to transform/aggregate existing data?
+- Fix: Create pure helper function, don't add backend complexity
+- Example: cisco-advisory-helper for version matching
 
 ## Working Principles
 
