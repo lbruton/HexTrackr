@@ -35,6 +35,8 @@ const fs = require("fs");
 const middlewareConfig = require("../config/middleware");
 const ProgressTracker = require("../utils/ProgressTracker");
 const DatabaseService = require("../services/databaseService");
+const CiscoAdvisoryService = require("../services/ciscoAdvisoryService");
+const PreferencesService = require("../services/preferencesService");
 
 // Authentication middleware
 const { sessionMiddleware } = require("../middleware/auth");
@@ -389,7 +391,57 @@ async function initializeApplication() {
             console.log("   Access via https://localhost or https://dev.hextrackr.com");
             console.log("   (Type 'thisisunsafe' to bypass self-signed cert warning)\n");
         }
+
+        // HEX-141: Start Cisco advisory background sync worker
+        startCiscoBackgroundSync(db);
     });
+}
+
+/**
+ * Background worker for Cisco PSIRT advisory sync (HEX-141)
+ * Runs on startup and repeats every 24 hours
+ * Automatically syncs stale advisories (>90 days) and new CVEs
+ * @param {Object} db - Database instance
+ */
+function startCiscoBackgroundSync(db) {
+    const SYNC_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+    const ADMIN_USER_ID = 1; // Default admin user
+
+    const preferencesService = new PreferencesService(db);
+    const ciscoService = new CiscoAdvisoryService(db, preferencesService);
+
+    /**
+     * Execute Cisco advisory sync if credentials are configured
+     */
+    async function runSync() {
+        try {
+            // Check if Cisco API credentials exist
+            const { clientId } = await ciscoService.getCiscoCredentials(ADMIN_USER_ID);
+
+            if (!clientId) {
+                console.log("ℹ️  Cisco background sync skipped: No API credentials configured");
+                return;
+            }
+
+            console.log("🔄 Starting Cisco advisory background sync...");
+            const result = await ciscoService.syncCiscoAdvisories(ADMIN_USER_ID);
+
+            console.log(`✅ Cisco background sync completed: ${result.matchedCount}/${result.totalCvesChecked} CVEs synced`);
+
+        } catch (error) {
+            console.error("❌ Cisco background sync failed:", error.message);
+            // Don't crash the server on sync failure - just log and continue
+        }
+    }
+
+    // Run initial sync on startup (after 10 second delay to let server fully initialize)
+    console.log("⏰ Cisco advisory background sync scheduled (runs on startup + every 24 hours)");
+    setTimeout(() => {
+        runSync();
+    }, 10000);
+
+    // Schedule recurring sync every 24 hours
+    setInterval(runSync, SYNC_INTERVAL);
 }
 
 initializeApplication().catch(error => {
