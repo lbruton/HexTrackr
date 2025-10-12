@@ -206,15 +206,106 @@ class CiscoAdvisoryService {
     }
 
     /**
+     * Get unique (CVE, OS version) pairs from vulnerabilities table for Software Checker queries
+     * Uses installed OS versions from our devices, not vulnerable versions from advisories
+     * Excludes CVEs with fresh advisory data (synced within TTL window)
+     * @async
+     * @param {number} ttlDays - Time-to-live in days (default: 30)
+     * @returns {Promise<Array<{cve: string, operating_system: string}>>} Array of CVE+version pairs
+     */
+    async getDeviceCveVersionPairs(ttlDays = 30) {
+        return await new Promise((resolve, reject) => {
+            this.db.all(`
+                SELECT DISTINCT
+                    vc.cve,
+                    vc.operating_system
+                FROM vulnerabilities_current vc
+                LEFT JOIN cisco_advisories ca ON vc.cve = ca.cve_id
+                WHERE vc.cve IS NOT NULL
+                  AND vc.cve LIKE 'CVE-%'
+                  AND vc.vendor LIKE '%Cisco%'
+                  AND vc.operating_system IS NOT NULL
+                  AND vc.lifecycle_state IN ('active', 'reopened')
+                  AND (
+                      ca.cve_id IS NULL  -- Never synced
+                      OR julianday('now') - julianday(ca.last_synced) > ?  -- Stale (>TTL days)
+                  )
+            `, [ttlDays], (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(rows);
+                }
+            });
+        });
+    }
+
+    /**
+     * Get unique OS versions from device inventory that need advisory sync
+     * Returns distinct operating_system values for Cisco devices with CVEs
+     * This enables batch querying - one Software Checker call per version returns ALL CVEs
+     *
+     * @async
+     * @param {number} ttlDays - Time-to-live in days (default: 30)
+     * @returns {Promise<Array<string>>} Array of unique OS version strings
+     */
+    async getUniqueDeviceVersions(ttlDays = 30) {
+        return await new Promise((resolve, reject) => {
+            this.db.all(`
+                SELECT DISTINCT
+                    vc.operating_system
+                FROM vulnerabilities_current vc
+                WHERE vc.cve IS NOT NULL
+                  AND vc.cve LIKE 'CVE-%'
+                  AND vc.vendor LIKE '%Cisco%'
+                  AND vc.operating_system IS NOT NULL
+                  AND vc.lifecycle_state IN ('active', 'reopened')
+            `, [], (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(rows.map(row => row.operating_system));
+                }
+            });
+        });
+    }
+
+    /**
+     * Get all CVE IDs present in vulnerabilities_current for a specific vendor
+     * Used to filter Software Checker results - only save advisories for CVEs we actually have
+     *
+     * @async
+     * @returns {Promise<Set<string>>} Set of CVE IDs in our database
+     */
+    async getAllCiscoCveIds() {
+        return await new Promise((resolve, reject) => {
+            this.db.all(`
+                SELECT DISTINCT cve
+                FROM vulnerabilities_current
+                WHERE cve IS NOT NULL
+                  AND cve LIKE 'CVE-%'
+                  AND vendor LIKE '%Cisco%'
+                  AND lifecycle_state IN ('active', 'reopened')
+            `, [], (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(new Set(rows.map(row => row.cve)));
+                }
+            });
+        });
+    }
+
+    /**
      * Fetch all CVE IDs from vulnerabilities_current table for advisory lookup
      * Only queries active and reopened vulnerabilities (not resolved)
      * Excludes CVEs with fresh advisory data (synced within TTL window)
-     * Includes CVEs with stale data (>90 days old) for refresh
+     * Includes CVEs with stale data (>30 days old) for refresh
      * @async
-     * @param {number} ttlDays - Time-to-live in days (default: 90)
+     * @param {number} ttlDays - Time-to-live in days (default: 30)
      * @returns {Promise<Array<string>>} Array of CVE identifiers needing sync
      */
-    async getAllCveIds(ttlDays = 90) {
+    async getAllCveIds(ttlDays = 30) {
         return await new Promise((resolve, reject) => {
             this.db.all(`
                 SELECT DISTINCT vc.cve
@@ -355,6 +446,48 @@ class CiscoAdvisoryService {
     }
 
     /**
+     * Parse installed OS version string to extract OS type and version for Software Checker
+     * @param {string} installedVersion - Installed OS version (e.g., "CISCO IOS XE 16.9.2", "Cisco IOS 15.2(4)E")
+     * @returns {Object|null} { osType, version } or null if cannot parse
+     */
+    parseInstalledVersion(installedVersion) {
+        if (!installedVersion || typeof installedVersion !== 'string') {
+            return null;
+        }
+
+        const versionUpper = installedVersion.toUpperCase();
+
+        // Pattern matching for OS type and version extraction
+        const patterns = [
+            { pattern: /IOS\s+XE\s+(?:SOFTWARE\s+)?([\d.()]+\S*)/i, osType: 'iosxe' },
+            { pattern: /IOS-XE\s+([\d.()]+\S*)/i, osType: 'iosxe' },
+            { pattern: /IOSXE\s+([\d.()]+\S*)/i, osType: 'iosxe' },
+            { pattern: /IOS\s+XR\s+(?:SOFTWARE\s+)?([\d.()]+\S*)/i, osType: 'iosxr' },
+            { pattern: /IOS-XR\s+([\d.()]+\S*)/i, osType: 'iosxr' },
+            { pattern: /NX-OS\s+(?:SOFTWARE\s+)?([\d.()]+\S*)/i, osType: 'nxos' },
+            { pattern: /NXOS\s+([\d.()]+\S*)/i, osType: 'nxos' },
+            { pattern: /ASA\s+(?:SOFTWARE\s+)?([\d.()]+\S*)/i, osType: 'asa' },
+            { pattern: /FTD\s+(?:SOFTWARE\s+)?([\d.()]+\S*)/i, osType: 'ftd' },
+            { pattern: /FXOS\s+(?:SOFTWARE\s+)?([\d.()]+\S*)/i, osType: 'fxos' },
+            // Generic IOS (must come after IOS XE/XR checks)
+            { pattern: /IOS\s+(?:SOFTWARE\s+)?([\d.()]+\S*)/i, osType: 'ios' }
+        ];
+
+        for (const { pattern, osType } of patterns) {
+            const match = installedVersion.match(pattern);
+            if (match) {
+                return {
+                    osType,
+                    version: match[1]
+                };
+            }
+        }
+
+        console.log(`⚠️ Could not parse installed version: ${installedVersion}`);
+        return null;
+    }
+
+    /**
      * Fetch fixed versions from Cisco Software Checker endpoint
      * @async
      * @param {string} osType - OS type (ios, iosxe, nxos, etc.)
@@ -431,125 +564,164 @@ class CiscoAdvisoryService {
             console.log("🔐 Authenticating with Cisco Identity Services...");
             const accessToken = await this.getCiscoAccessToken(clientId, clientSecret);
 
-            // Get all CVE IDs from vulnerabilities table (excluding already-synced)
-            const cveIds = await this.getAllCveIds();
-            console.log(`📊 Found ${cveIds.length} unique CVEs to sync (cache excluded)`);
+            // Get unique OS versions from our device inventory (batch optimization)
+            const uniqueVersions = await this.getUniqueDeviceVersions();
+            console.log(`📊 Found ${uniqueVersions.length} unique OS versions to query (batch mode)`);
 
-            // No transaction wrapper - each CVE commits individually for resilience
-            // This allows progress to persist even if the sync is interrupted
+            // Get all Cisco CVE IDs in our database (for filtering responses)
+            const allCiscoCveIds = await this.getAllCiscoCveIds();
+            console.log(`📋 Database contains ${allCiscoCveIds.size} unique Cisco CVEs`);
+
+            // No transaction wrapper - each advisory commits individually for resilience
             let advisoryCount = 0;
             let matchedCount = 0;
-            const delayBetweenCalls = 3000; // 3 seconds between each CVE (conservative for two-stage calls)
+            let queriesExecuted = 0;
+            const delayBetweenCalls = 3000; // 3 seconds between each query
 
-                // Process CVEs sequentially with delays to honor Cisco rate limits
-                for (let i = 0; i < cveIds.length; i++) {
-                    const cveId = cveIds[i];
-                        console.log(`🔍 Querying Cisco PSIRT for ${cveId}...`);
-                        const advisoryData = await this.fetchCiscoAdvisoryForCve(cveId, accessToken);
+            // Process unique versions sequentially with delays to honor Cisco rate limits
+            for (let i = 0; i < uniqueVersions.length; i++) {
+                const installedVersion = uniqueVersions[i];
+                queriesExecuted++;
 
-                        if (advisoryData) {
-                            console.log(`✅ Advisory data received for ${cveId}`);
-                            const parsed = this.parseAdvisoryData(advisoryData, cveId);
+                console.log(`🔍 [${i + 1}/${uniqueVersions.length}] Querying version: ${installedVersion}`);
 
-                            if (parsed) {
-                                console.log(`✅ Parsed advisory for ${cveId}: ${parsed.advisory_id}`);
+                // Parse installed version to get OS type and version for Software Checker
+                const osInfo = this.parseInstalledVersion(installedVersion);
 
-                                // Stage 2: Fetch fixed versions from Software Checker endpoint
-                                const productNames = JSON.parse(parsed.product_names);
-                                const osInfo = this.parseOSTypeFromProducts(productNames);
+                if (!osInfo) {
+                    console.log(`   ⚠️ Could not parse installed version: ${installedVersion}`);
+                    continue;
+                }
 
-                                if (osInfo) {
-                                    console.log(`   🔍 Detected ${osInfo.osType} ${osInfo.version}, querying Software Checker...`);
-                                    const fixedVersions = await this.fetchFixedVersions(
-                                        osInfo.osType,
-                                        osInfo.version,
-                                        accessToken
-                                    );
+                // Query Software Checker - returns ALL CVEs affecting this version
+                console.log(`   🔍 Software Checker: ${osInfo.osType} ${osInfo.version}`);
+                const response = await this.fetch(
+                    `${this.ciscoPsirtBaseUrl}/OSType/${osInfo.osType}?version=${encodeURIComponent(osInfo.version)}`,
+                    {
+                        headers: {
+                            "Accept": "application/json",
+                            "Authorization": `Bearer ${accessToken}`
+                        }
+                    }
+                );
 
-                                    if (fixedVersions.length > 0) {
-                                        parsed.first_fixed = JSON.stringify(fixedVersions);
-                                        console.log(`   ✅ Found ${fixedVersions.length} fixed versions for ${cveId}`);
-                                    } else {
-                                        console.log(`   ℹ️ No fixed versions found for ${osInfo.osType} ${osInfo.version}`);
-                                    }
-                                } else {
-                                    console.log(`   ⚠️ Could not determine OS type from product names`);
-                                }
+                if (!response.ok) {
+                    console.log(`   ⚠️ Software Checker returned ${response.status}`);
+                    continue;
+                }
 
-                                // Insert or replace advisory data
-                                await new Promise((resolve, reject) => {
-                                    this.db.run(`
-                                        INSERT OR REPLACE INTO cisco_advisories (
-                                            cve_id, advisory_id, advisory_title, severity, cvss_score,
-                                            first_fixed, affected_releases, product_names, publication_url, last_synced
-                                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-                                    `, [
-                                        parsed.cve_id,
-                                        parsed.advisory_id,
-                                        parsed.advisory_title,
-                                        parsed.severity,
-                                        parsed.cvss_score,
-                                        parsed.first_fixed,
-                                        parsed.affected_releases,
-                                        parsed.product_names,
-                                        parsed.publication_url
-                                    ], (err) => {
-                                        if (err) {
-                                            console.error(`❌ Insert failed for ${cveId}:`, err);
-                                            reject(err);
-                                        } else {
-                                            resolve();
-                                        }
-                                    });
-                                });
+                const data = await response.json();
+                const advisories = data.advisories || [];
+                console.log(`   📋 Received ${advisories.length} advisories for this version`);
 
-                                // Update vulnerabilities_current with vendor-neutral fix flag
-                                // Mark as fix available if we have actual fixed versions (not just advisory URL)
-                                const fixedVersionsArray = JSON.parse(parsed.first_fixed);
-                                const hasFixAvailable = (fixedVersionsArray.length > 0) ? 1 : 0;
+                // Process ALL advisories from this response (batch optimization!)
+                let cvesProcessedFromThisVersion = 0;
+                for (const advisory of advisories) {
+                    if (!advisory.cves || advisory.cves.length === 0) {
+                        continue;
+                    }
 
-                                await new Promise((resolve, reject) => {
-                                    this.db.run(`
-                                        UPDATE vulnerabilities_current
-                                        SET is_fix_available = ?
-                                        WHERE cve = ?
-                                    `, [hasFixAvailable, cveId], (err) => {
-                                        if (err) {
-                                            console.error(`❌ Update failed for ${cveId}:`, err);
-                                            reject(err);
-                                        } else {
-                                            console.log(`   ✅ Set is_fix_available=${hasFixAvailable} for ${cveId}`);
-                                            resolve();
-                                        }
-                                    });
-                                });
-
-                                advisoryCount++;
-                                matchedCount++;
-                                console.log(`✅ Saved advisory for ${cveId} (total: ${advisoryCount})`);
-                            } else {
-                                console.log(`⚠️ Failed to parse advisory for ${cveId}`);
-                            }
-                        } else {
-                            console.log(`ℹ️ No advisory found for ${cveId} (404 or error)`);
+                    // Process each CVE in this advisory
+                    for (const cveId of advisory.cves) {
+                        // Only process CVEs that exist in our database
+                        if (!allCiscoCveIds.has(cveId)) {
+                            continue;
                         }
 
-                    // Progress logging every 10 CVEs
-                    if ((i + 1) % 10 === 0) {
-                        console.log(`📊 Progress: ${i + 1} / ${cveIds.length} CVEs processed (${advisoryCount} advisories found)`);
-                    }
+                        const fixedVersions = advisory.firstFixed || [];
 
-                    // Rate limiting: wait between each CVE to honor Cisco API limits
-                    if (i < cveIds.length - 1) {
-                        await new Promise(resolve => setTimeout(resolve, delayBetweenCalls));
+                        // Fetch advisory metadata for completeness
+                        const advisoryData = await this.fetchCiscoAdvisoryForCve(cveId, accessToken);
+                        const parsed = advisoryData ? this.parseAdvisoryData(advisoryData, cveId) : null;
+
+                        if (parsed) {
+                            // Override empty first_fixed with actual fixed versions from Software Checker
+                            parsed.first_fixed = JSON.stringify(fixedVersions);
+
+                            // Insert or replace advisory data
+                            await new Promise((resolve, reject) => {
+                                this.db.run(`
+                                    INSERT OR REPLACE INTO cisco_advisories (
+                                        cve_id, advisory_id, advisory_title, severity, cvss_score,
+                                        first_fixed, affected_releases, product_names, publication_url, last_synced
+                                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                                `, [
+                                    parsed.cve_id,
+                                    parsed.advisory_id,
+                                    parsed.advisory_title,
+                                    parsed.severity,
+                                    parsed.cvss_score,
+                                    parsed.first_fixed,
+                                    parsed.affected_releases,
+                                    parsed.product_names,
+                                    parsed.publication_url
+                                ], (err) => {
+                                    if (err) {
+                                        console.error(`❌ Insert failed for ${cveId}:`, err);
+                                        reject(err);
+                                    } else {
+                                        resolve();
+                                    }
+                                });
+                            });
+
+                            // Update vulnerabilities_current with vendor-neutral fix flag
+                            const hasFixAvailable = (fixedVersions.length > 0) ? 1 : 0;
+                            await new Promise((resolve, reject) => {
+                                this.db.run(`
+                                    UPDATE vulnerabilities_current
+                                    SET is_fix_available = ?
+                                    WHERE cve = ?
+                                `, [hasFixAvailable, cveId], (err) => {
+                                    if (err) {
+                                        console.error(`❌ Update failed for ${cveId}:`, err);
+                                        reject(err);
+                                    } else {
+                                        resolve();
+                                    }
+                                });
+                            });
+
+                            advisoryCount++;
+                            matchedCount++;
+                            cvesProcessedFromThisVersion++;
+                        } else if (fixedVersions.length > 0) {
+                            // Even without full advisory metadata, store the fixed versions
+                            await new Promise((resolve, reject) => {
+                                this.db.run(`
+                                    INSERT OR REPLACE INTO cisco_advisories (
+                                        cve_id, first_fixed, last_synced
+                                    ) VALUES (?, ?, CURRENT_TIMESTAMP)
+                                `, [cveId, JSON.stringify(fixedVersions)], (err) => {
+                                    if (err) {
+                                        console.error(`❌ Insert failed for ${cveId}:`, err);
+                                        reject(err);
+                                    } else {
+                                        resolve();
+                                    }
+                                });
+                            });
+
+                            advisoryCount++;
+                            matchedCount++;
+                            cvesProcessedFromThisVersion++;
+                        }
                     }
                 }
+
+                console.log(`   ✅ Processed ${cvesProcessedFromThisVersion} CVEs from this version (total: ${advisoryCount})`);
+
+                // Rate limiting: wait between each query to honor Cisco API limits
+                if (i < uniqueVersions.length - 1) {
+                    await new Promise(resolve => setTimeout(resolve, delayBetweenCalls));
+                }
+            }
 
             // Update sync metadata
             this.lastSyncTime = new Date().toISOString();
             await this.updateSyncMetadata(advisoryCount);
 
-            console.log(`✅ Cisco advisory sync completed: ${advisoryCount} advisories imported, ${matchedCount} CVEs matched`);
+            console.log(`✅ Cisco advisory sync completed: ${queriesExecuted} versions queried, ${advisoryCount} advisories saved, ${matchedCount} CVEs matched`);
 
             this.syncInProgress = false;
 
@@ -557,7 +729,8 @@ class CiscoAdvisoryService {
                 success: true,
                 totalAdvisories: advisoryCount,
                 matchedCount: matchedCount,
-                totalCvesChecked: cveIds.length,
+                totalCvesChecked: allCiscoCveIds.size,
+                versionsQueried: queriesExecuted,
                 lastSync: this.lastSyncTime
             };
 

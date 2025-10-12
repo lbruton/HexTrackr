@@ -47,7 +47,7 @@ Core approach:
 
 **HexTrackr** is an enterprise vulnerability management system built with Node.js/Express backend and vanilla JavaScript frontend. The application tracks security vulnerabilities, maintenance tickets, and CISA KEV (Known Exploited Vulnerabilities) data with real-time WebSocket updates.
 
-**Current Version**: 1.0.62 (auto-synced from root `package.json`)
+**Current Version**: See root `package.json` (auto-synced to 5 files via `npm run release`)
 
 ## Architecture
 
@@ -355,7 +355,6 @@ app.set("trust proxy", true);  // REQUIRED for nginx reverse proxy
 - ✅ **Production**: `https://hextrackr.com` (Ubuntu server 192.168.1.80:8443)
 - ✅ **Legacy Localhost**: `https://localhost` (same as dev)
 - ❌ **NEVER use HTTP**: `http://localhost` returns empty API responses
-- 🔒 **SSL Bypass**: Type `thisisunsafe` on self-signed certificate warning
 
 ## Version Automation
 
