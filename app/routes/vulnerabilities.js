@@ -65,6 +65,7 @@ router.get("/export", requireAuth, VulnerabilityController.exportVulnerabilities
 // Core CRUD Operations
 router.get("/", requireAuth, VulnerabilityController.getVulnerabilities); // Main listing with pagination/filters
 router.get("/resolved", requireAuth, VulnerabilityController.getResolvedVulnerabilities);
+router.get("/:cveId/affected-devices", requireAuth, VulnerabilityController.getAffectedDevices); // HEX-204: Database-first modal
 router.get("/:id", requireAuth, VulnerabilityController.getVulnerabilityById); // Individual vulnerability fetch
 
 // Import Operations - REMOVED: These are now handled in imports.js
