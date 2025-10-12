@@ -363,7 +363,7 @@
                             </h3>
                             <div class="card-actions">
                                 <div class="btn-group" role="group" aria-label="View switcher">
-                                    <input type="radio" class="btn-check" name="view-options" id="view-devices" autocomplete="off" checked>
+                                    <input type="radio" class="btn-check" name="view-options" id="view-devices" autocomplete="off">
                                     <label class="btn btn-outline-primary" for="view-devices" data-view="devices">
                                         <i class="fas fa-server me-1"></i>Devices
                                     </label>
@@ -373,7 +373,7 @@
                                         <i class="fas fa-bug me-1"></i>Vulnerabilities
                                     </label>
 
-                                    <input type="radio" class="btn-check" name="view-options" id="view-table" autocomplete="off">
+                                    <input type="radio" class="btn-check" name="view-options" id="view-table" autocomplete="off" checked>
                                     <label class="btn btn-outline-primary" for="view-table" data-view="table">
                                         <i class="fas fa-table me-1"></i>Table
                                     </label>
@@ -474,22 +474,7 @@
                         <!-- Right Column: Vulnerabilities Table + VPR Breakdown -->
                         <div class="col-lg-8">
                             <div class="row g-3">
-                                <!-- Vulnerabilities Grid (Top Right) -->
-                                <div class="col-12">
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <h3 class="card-title">
-                                                <i class="fas fa-bug me-2"></i>
-                                                Active Vulnerabilities
-                                            </h3>
-                                        </div>
-                                        <div class="card-body p-3">
-                                            <div id="device-vuln-grid" class="ag-theme-quartz modal-grid-lg"></div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- VPR Risk Breakdown (Bottom Right) -->
+                                <!-- VPR Risk Breakdown (Now at top for better visibility and filtering) -->
                                 <div class="col-12">
                                     <div class="card">
                                         <div class="card-header">
@@ -502,6 +487,21 @@
                                             <div class="row g-3" id="deviceVprSummary">
                                                 <!-- VPR cards will be populated here -->
                                             </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Vulnerabilities Grid (Below VPR cards) -->
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h3 class="card-title">
+                                                <i class="fas fa-bug me-2"></i>
+                                                Active Vulnerabilities
+                                            </h3>
+                                        </div>
+                                        <div class="card-body p-3">
+                                            <div id="device-vuln-grid" class="ag-theme-quartz modal-grid-lg"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -554,10 +554,27 @@
                             </div>
                         </div>
 
-                        <!-- Right Column: Affected Assets Table + Risk Summary -->
+                        <!-- Right Column: Risk Summary + Affected Assets Table -->
                         <div class="col-lg-8">
                             <div class="row g-3">
-                                <!-- Affected Assets Grid (Top Right) -->
+                                <!-- Risk Summary (Top Right) - Informational tiles -->
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h3 class="card-title">
+                                                <i class="fas fa-chart-bar me-2"></i>
+                                                Risk Summary
+                                            </h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row g-3" id="vulnRiskSummary">
+                                                <!-- Risk cards will be populated here - all 4 tiles equal size -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Affected Assets Grid (Below Risk Summary) -->
                                 <div class="col-12">
                                     <div class="card">
                                         <div class="card-header">
@@ -571,23 +588,6 @@
                                         </div>
                                         <div class="card-body p-3">
                                             <div id="vuln-affected-assets-grid" class="ag-theme-quartz modal-grid-lg"></div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Risk Summary (Bottom Right) -->
-                                <div class="col-12">
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <h3 class="card-title">
-                                                <i class="fas fa-chart-bar me-2"></i>
-                                                Risk Summary
-                                            </h3>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="row g-3" id="vulnRiskSummary">
-                                                <!-- Risk cards will be populated here -->
-                                            </div>
                                         </div>
                                     </div>
                                 </div>

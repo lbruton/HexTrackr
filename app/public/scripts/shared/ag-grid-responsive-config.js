@@ -45,8 +45,8 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
     
     const columnDefs = [
         {
-            headerName: "Last Seen",
-            field: "last_seen",
+            headerName: "First Seen",
+            field: "first_seen",
             sortable: true,
             filter: "agDateColumnFilter",
             width: 120,
@@ -54,71 +54,29 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
             maxWidth: 150,
             resizable: true,
             cellRenderer: (params) => {
-                // Priority: last_seen date (if available) → scan_date (fallback)
-                const lastSeen = params.data.last_seen;
-                const scanDate = params.data.scan_date;
-                
-                if (lastSeen && lastSeen.trim() !== "") {
-                    return new Date(lastSeen).toLocaleDateString();
-                } else if (scanDate && scanDate.trim() !== "") {
-                    return new Date(scanDate).toLocaleDateString();
-                }
-                return "-";
+                return params.value ? new Date(params.value).toLocaleDateString() : "-";
             },
             hide: isMobile,
         },
         {
-            headerName: "Severity",
-            field: "severity",
+            headerName: "Vendor",
+            field: "vendor",
             sortable: true,
             filter: true,
-            width: 110,
-            minWidth: 90,
-            maxWidth: 140,
-            resizable: true,
-            cellRenderer: (params) => {
-                const severity = params.value || "Low";
-                const className = `severity-${severity.toLowerCase()}`;
-                return `<span class="severity-badge ${className}">${severity}</span>`;
-            }
-        },
-        {
-            headerName: "VPR",
-            field: "vpr_score",
-            sortable: true,
-            filter: "agNumberColumnFilter",
             width: 90,
-            minWidth: 70,
+            minWidth: 80,
             maxWidth: 120,
             resizable: true,
+            hide: !isDesktop,
             cellRenderer: (params) => {
-                const score = parseFloat(params.value) || 0;
-                let className = "severity-low";
-                if (score >= 9.0) {
-                    className = "severity-critical";
-                } else if (score >= 7.0) {
-                    className = "severity-high";
-                } else if (score >= 4.0) {
-                    className = "severity-medium";
-                }
-                return `<span class="severity-badge ${className}">${score.toFixed(1)}</span>`;
-            }
-        },
-        {
-            headerName: "KEV",
-            field: "isKev",
-            sortable: true,
-            filter: true,
-            width: 110,
-            minWidth: 110,
-            maxWidth: 140,
-            resizable: true,
-            cellRenderer: (params) => {
-                const kevStatus = params.value || "No";
-                if (kevStatus === "Yes") {
-                    return "<span class=\"badge bg-danger\" style=\"cursor: pointer;\" title=\"Known Exploited Vulnerability\" onclick=\"showKevDetails('" + (params.data.cve || "") + "')\">YES</span>";
-                }
-                return "<span class=\"badge bg-primary\">NO</span>";
+                const vendor = params.value || "Other";
+                const badgeColors = {
+                    "CISCO": "primary",      // Blue
+                    "Palo Alto": "warning",  // Orange
+                    "Other": "secondary"     // Gray
+                };
+                const color = badgeColors[vendor] || "secondary";
+                return `<span class="badge bg-${color}">${vendor}</span>`;
             },
             cellStyle: {
                 textAlign: "center"
@@ -154,55 +112,136 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
             }
         },
         {
-            headerName: "Vendor",
-            field: "vendor",
+            headerName: "Installed",
+            field: "operating_system",
             sortable: true,
             filter: true,
             width: 120,
             minWidth: 100,
-            maxWidth: 160,
+            maxWidth: 150,
             resizable: true,
-            hide: !isDesktop,
+            hide: isMobile,
+            cellRenderer: (params) => {
+                const os = params.value || "N/A";
+                const className = os !== "N/A" ? "text-info" : "text-muted";
+
+                // Extract version number from OS string (remove prefixes like "Cisco IOS", "IOS XE", etc.)
+                let displayVersion = os;
+                if (os !== "N/A") {
+                    // Match version patterns like: 15.2(7)E, 16.9(4), 17.3.1
+                    const versionMatch = os.match(/(\d+\.\d+(?:\.\d+)?(?:\(\d+\))?[A-Z]*)/);
+                    if (versionMatch) {
+                        displayVersion = versionMatch[1];
+                    }
+                }
+
+                return `<span class="font-monospace ${className} small">${displayVersion}</span>`;
+            }
+        },
+        {
+            headerName: "Fixed",
+            field: "fixed_version",
+            sortable: true,
+            filter: true,
+            width: 150,
+            minWidth: 120,
+            maxWidth: 180,
+            resizable: true,
+            hide: isMobile,
+            cellRenderer: (params) => {
+                const cveId = params.data.cve;
+                const vendor = params.data.vendor;
+                const cellId = `fixed-ver-${params.node.id}`;
+
+                // Async lookup in setTimeout (non-blocking)
+                setTimeout(async () => {
+                    const cell = document.getElementById(cellId);
+                    if (!cell) return;
+
+                    // Only Cisco devices get fixed version lookup
+                    if (!vendor || !vendor.toLowerCase().includes('cisco')) {
+                        cell.innerHTML = `<span class="font-monospace text-muted small">N/A</span>`;
+                        params.node.setDataValue('fixed_version', 'N/A');  // Update AG-Grid data model for search
+                        return;
+                    }
+
+                    if (!window.ciscoAdvisoryHelper) {
+                        cell.innerHTML = `<span class="font-monospace text-muted small">N/A</span>`;
+                        params.node.setDataValue('fixed_version', 'N/A');
+                        return;
+                    }
+
+                    try {
+                        const installedVersion = params.data.operating_system;
+                        const fixedVersion = await window.ciscoAdvisoryHelper.getFixedVersion(
+                            cveId, vendor, installedVersion
+                        );
+
+                        if (fixedVersion) {
+                            cell.innerHTML = `<span class="font-monospace text-success small">${DOMPurify.sanitize(fixedVersion)}+</span>`;
+                            params.node.setDataValue('fixed_version', fixedVersion);  // Update AG-Grid data model
+                        } else {
+                            cell.innerHTML = `<span class="font-monospace text-muted small">No Fix</span>`;
+                            params.node.setDataValue('fixed_version', 'No Fix');
+                        }
+                    } catch (error) {
+                        cell.innerHTML = `<span class="font-monospace text-muted small">Error</span>`;
+                        params.node.setDataValue('fixed_version', 'Error');
+                    }
+                }, 0);
+
+                // Return placeholder while async lookup runs
+                return `<span id="${cellId}" class="font-monospace text-muted small">...</span>`;
+            }
         },
         {
             headerName: "Vulnerability",
             field: "cve",
             sortable: true,
             filter: true,
-            width: 150,
-            minWidth: 140,
-            maxWidth: 200,
+            width: 160,
+            minWidth: 150,
+            maxWidth: 220,
             resizable: true,
             hide: isMobile,
             cellRenderer: (params) => {
                 const cve = params.value;
                 const pluginName = params.data.plugin_name;
+                const isKev = params.data.isKev === "Yes";
 
-                // Simple single CVE handling - open external CVE link in popup
+                // KEV indicator via red text color (no badge)
+                const kevClass = isKev ? "text-danger fw-bold" : "link-primary";
+                const kevTitle = isKev ? "Known Exploited Vulnerability - " : "";
+
+                // Create unique ID for vulnerability modal data storage
+                const vulnDataId = `vuln_${params.data.hostname}_${cve || params.data.plugin_id}_${Date.now()}`;
+                if (!window.vulnModalData) {
+                    window.vulnModalData = {};
+                }
+                window.vulnModalData[vulnDataId] = params.data;
+
+                // Single CVE handling - open vulnerability details modal
                 if (cve && cve.startsWith("CVE-")) {
-                    const cveUrl = `https://cve.mitre.org/cgi-bin/cvename.cgi?name=${cve}`;
-                    return `<a href="#" class="link-primary"
-                               onclick="window.open('${cveUrl}', 'cve_popup', 'width=1200,height=1200,scrollbars=yes,resizable=yes'); return false;"
-                               title="View CVE details on MITRE">${cve}</a>`;
+                    return `<a href="#" class="${kevClass}"
+                               onclick="vulnManager.viewVulnerabilityDetails('${vulnDataId}'); return false;"
+                               title="${kevTitle}View vulnerability details">${cve}</a>`;
                 }
 
-                // Check for Cisco SA ID - open external Cisco Security Advisory in popup
+                // Cisco SA ID - open vulnerability details modal
                 if (cve && cve.startsWith("cisco-sa-")) {
-                    const ciscoUrl = `https://sec.cloudapps.cisco.com/security/center/content/CiscoSecurityAdvisory/${cve}`;
-                    return `<a href="#" class="link-primary text-warning"
-                               onclick="window.open('${ciscoUrl}', 'cisco_popup', 'width=1200,height=1200,scrollbars=yes,resizable=yes'); return false;"
-                               title="View Cisco Security Advisory">${cve}</a>`;
+                    return `<a href="#" class="${kevClass}"
+                               onclick="vulnManager.viewVulnerabilityDetails('${vulnDataId}'); return false;"
+                               title="${kevTitle}View Cisco Security Advisory details">${cve}</a>`;
                 }
 
-                // Check for Cisco SA ID in plugin name (fallback) - open external link in popup
+                // Cisco SA ID in plugin name (fallback) - open vulnerability details modal
                 if (pluginName && typeof pluginName === "string") {
                     const ciscoSaMatch = pluginName.match(/cisco-sa-([a-zA-Z0-9-]+)/i);
                     if (ciscoSaMatch) {
                         const ciscoId = `cisco-sa-${ciscoSaMatch[1]}`;
-                        const ciscoUrl = `https://sec.cloudapps.cisco.com/security/center/content/CiscoSecurityAdvisory/${ciscoId}`;
-                        return `<a href="#" class="link-primary text-warning"
-                                   onclick="window.open('${ciscoUrl}', 'cisco_popup', 'width=1200,height=1200,scrollbars=yes,resizable=yes'); return false;"
-                                   title="View Cisco Security Advisory">${ciscoId}</a>`;
+                        return `<a href="#" class="${kevClass}"
+                                   onclick="vulnManager.viewVulnerabilityDetails('${vulnDataId}'); return false;"
+                                   title="${kevTitle}View Cisco Security Advisory details">${ciscoId}</a>`;
                     }
                 }
 
@@ -215,81 +254,85 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
             }
         },
         {
-            headerName: "Vulnerability Description",
-            field: "plugin_name",
+            headerName: "VPR",
+            field: "vpr_score",
+            sortable: true,
+            filter: "agNumberColumnFilter",
+            width: 90,
+            minWidth: 70,
+            maxWidth: 120,
+            resizable: true,
+            cellRenderer: (params) => {
+                const score = parseFloat(params.value) || 0;
+                let className = "severity-low";
+                if (score >= 9.0) {
+                    className = "severity-critical";
+                } else if (score >= 7.0) {
+                    className = "severity-high";
+                } else if (score >= 4.0) {
+                    className = "severity-medium";
+                }
+                return `<span class="severity-badge ${className}">${score.toFixed(1)}</span>`;
+            }
+        },
+        {
+            headerName: "Severity",
+            field: "severity",
             sortable: true,
             filter: true,
-            flex: 1, // Allow this column to grow to fill available space
-            minWidth: 250,
+            width: 110,
+            minWidth: 90,
+            maxWidth: 140,
             resizable: true,
-            wrapText: true, // Enable text wrapping
-            autoHeight: true, // Allow row height to adjust to content
-            cellClass: "ag-cell-wrap-text",
             cellRenderer: (params) => {
-                const value = params.value || "-";
-                
-                // Create a clickable link that opens the vulnerability details modal for this specific vulnerability
-                if (value !== "-") {
-                    // Create a unique ID for this vulnerability row to store in vulnModalData
-                    const vulnDataId = `vuln_${params.data.hostname}_${params.data.cve || params.data.plugin_id}_${Date.now()}`;
-                    
-                    // Store the vulnerability data for modal access
-                    if (!window.vulnModalData) {
-                        window.vulnModalData = {};
-                    }
-                    window.vulnModalData[vulnDataId] = params.data;
-                    
-                    return `<a href="#" class="ag-grid-link" title="${value}" onclick="vulnManager.viewVulnerabilityDetails('${vulnDataId}'); return false;">${value}</a>`;
-                }
-                return `<span title="${value}">${value}</span>`;
+                const severity = params.value || "Low";
+                const className = `severity-${severity.toLowerCase()}`;
+                return `<span class="severity-badge ${className}">${severity}</span>`;
+            }
+        },
+        {
+            headerName: "Info",
+            field: "info_icon",
+            sortable: false,
+            filter: false,
+            width: 60,
+            minWidth: 50,
+            maxWidth: 80,
+            resizable: false,
+            suppressHeaderMenuButton: true,  // Remove filter icon from header
+            cellStyle: {
+                textAlign: "center"
             },
+            cellRenderer: (params) => {
+                const cve = params.data.cve;
+                const pluginName = params.data.plugin_name || "Vulnerability details";
+
+                // If CVE exists, open external CVE.org link in popup
+                if (cve && cve.startsWith("CVE-")) {
+                    const cveUrl = `https://cve.mitre.org/cgi-bin/cvename.cgi?name=${cve}`;
+                    return `<a href="#" class="text-primary" title="View ${cve} on CVE.org" onclick="window.open('${cveUrl}', 'cve_popup', 'width=1200,height=1200,scrollbars=yes,resizable=yes'); return false;">
+                        <i class="fas fa-external-link-alt"></i>
+                    </a>`;
+                }
+
+                // If Cisco SA ID, open external Cisco Security Advisory in popup
+                if (cve && cve.startsWith("cisco-sa-")) {
+                    const ciscoUrl = `https://sec.cloudapps.cisco.com/security/center/content/CiscoSecurityAdvisory/${cve}`;
+                    return `<a href="#" class="text-warning" title="View ${cve} on Cisco Security" onclick="window.open('${ciscoUrl}', 'cisco_popup', 'width=1200,height=1200,scrollbars=yes,resizable=yes'); return false;">
+                        <i class="fas fa-external-link-alt"></i>
+                    </a>`;
+                }
+
+                // For non-CVE/non-Cisco entries, show disabled info icon
+                return `<i class="fas fa-info-circle text-muted" title="No external reference available"></i>`;
+            }
         }
     ];
 
-    // Create proper AG-Grid v33 Quartz theme configuration based on dark mode
-    let quartzTheme = null;
-    if (typeof window.agGrid !== "undefined" && window.agGrid.themeQuartz) {
-        if (isDarkMode) {
-            // Updated dark theme with EXACT colors from AG-Grid Theme Builder
-            quartzTheme = window.agGrid.themeQuartz.withParams({
-                backgroundColor: "#0F1C31", // Dark navy background - EXACT
-                foregroundColor: "#FFF", // Pure white text for better contrast
-                browserColorScheme: "dark",
-                chromeBackgroundColor: "#202c3f", // EXACT header color (no mixing function)
-                headerBackgroundColor: "#202c3f", // EXACT header color #202c3f as specified
-                headerTextColor: "#FFF",
-                headerFontSize: 14,
-                oddRowBackgroundColor: "rgba(255, 255, 255, 0.02)",
-                rowBorder: false,
-                headerRowBorder: false,
-                columnBorder: false,
-                borderColor: "#2a3f5f", // Subtle navy border
-                selectedRowBackgroundColor: "#2563eb", // Bright blue for selection
-                rowHoverColor: "rgba(37, 99, 235, 0.15)", // Blue hover effect
-                rangeSelectionBackgroundColor: "rgba(37, 99, 235, 0.2)"
-            });
-        } else {
-            // Light mode Quartz theme - matching AG-Grid Theme Builder  
-            quartzTheme = window.agGrid.themeQuartz.withParams({
-                backgroundColor: "#ffffff",
-                foregroundColor: "#2d3748",
-                chromeBackgroundColor: "#f7fafc",
-                headerBackgroundColor: "#edf2f7",
-                headerTextColor: "#2d3748",
-                oddRowBackgroundColor: "rgba(0, 0, 0, 0.02)",
-                rowBorder: false,
-                headerRowBorder: false,
-                columnBorder: false,
-                borderColor: "#e2e8f0",
-                selectedRowBackgroundColor: "#3182ce",
-                rowHoverColor: "rgba(49, 130, 206, 0.1)",
-                rangeSelectionBackgroundColor: "rgba(49, 130, 206, 0.2)"
-            });
-        }
-    }
-
+    // Use centralized AGGridThemeManager for consistent theming across all grids
+    // This is the single source of truth - edit ag-grid-theme-manager.js for theme changes
     const gridOptions = {
-        theme: quartzTheme, // AG-Grid v33 proper Quartz theme configuration
+        theme: window.agGridThemeManager ? window.agGridThemeManager.getCurrentTheme() : null, // AG-Grid v33 centralized theme
         columnDefs: columnDefs,
         rowData: [],
         defaultColDef: {
