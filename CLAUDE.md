@@ -93,6 +93,139 @@ app/public/
 - **Socket.io**: Real-time progress tracking
 - **Marked + DOMPurify**: Safe markdown rendering
 
+### CSS Architecture & Theme System
+
+**CRITICAL**: Always check CSS cascade and specificity before making changes. The Tabler framework CSS can override custom styles.
+
+#### CSS Load Order (Highest to Lowest Priority)
+
+```
+app/public/
+├── vendor/tabler/css/tabler.min.css    # ⚠️ BASE FRAMEWORK (loaded first)
+├── styles/
+│   ├── css-variables.css               # Theme variables (light/dark)
+│   ├── shared/
+│   │   ├── base.css                    # Base element styles
+│   │   ├── cards.css                   # Card component styles
+│   │   ├── badges.css                  # Badge styles
+│   │   ├── tables.css                  # Table styles
+│   │   ├── modals.css                  # Modal dialogs
+│   │   ├── animations.css              # Transitions/animations
+│   │   ├── header.css                  # Navigation header
+│   │   ├── layouts.css                 # Grid layouts
+│   │   ├── light-theme.css             # Light theme overrides
+│   │   └── dark-theme.css              # Dark theme overrides
+│   ├── pages/
+│   │   ├── vulnerabilities.css         # Vulnerabilities page specific
+│   │   └── tickets.css                 # Tickets page specific
+│   ├── utils/
+│   │   └── responsive.css              # Media queries
+│   └── ag-grid-overrides.css           # AG-Grid customization
+```
+
+#### Tabler Framework Conflicts
+
+**Common Override Patterns:**
+
+```css
+/* ❌ WRONG - Tabler will override */
+.card-actions {
+    margin-left: 0;
+}
+
+/* ✅ RIGHT - Higher specificity or !important */
+.device-card .card-actions {
+    margin-left: 0 !important;
+}
+```
+
+**Known Tabler Rules That Need Overriding:**
+- `.card-actions` has `margin: -0.5rem -0.5rem -0.5rem auto` (pushes content right)
+- `.card-actions` has `padding-left: 0.5rem` (adds unwanted spacing)
+- `.card-actions .btn` has `width: 100%` (makes buttons full-width)
+
+#### Theme System
+
+**Variable Structure:**
+```css
+/* css-variables.css defines base colors */
+:root {
+    --hextrackr-primary: #0066cc;
+    --hextrackr-danger: #dc3545;
+    /* ... */
+}
+
+/* light-theme.css overrides for light mode */
+[data-bs-theme="light"] {
+    --hextrackr-surface-base: #ffffff;
+    --hextrackr-text-primary: #1e293b;
+}
+
+/* dark-theme.css overrides for dark mode */
+[data-bs-theme="dark"] {
+    --hextrackr-surface-base: #1e293b;
+    --hextrackr-text-primary: #f8fafc;
+}
+```
+
+**Theme Toggle:**
+- User preference stored in `preferences` database table
+- Applied via `data-bs-theme` attribute on `<html>` element
+- JavaScript: `preferences-service.js` manages theme switching
+- All components should use CSS variables, never hardcoded colors
+
+#### CSS Debugging Workflow
+
+**ALWAYS follow this pattern when CSS changes aren't working:**
+
+1. **Use Chrome DevTools to inspect computed styles:**
+   ```javascript
+   // Get all CSS rules for a selector
+   const allRules = [];
+   for (let sheet of document.styleSheets) {
+       for (let rule of sheet.cssRules) {
+           if (rule.selectorText && rule.selectorText.includes('card-actions')) {
+               allRules.push({
+                   selector: rule.selectorText,
+                   cssText: rule.style.cssText,
+                   href: sheet.href || 'inline'
+               });
+           }
+       }
+   }
+   ```
+
+2. **Check cascade order:**
+   - Identify which stylesheet is applying each property
+   - Note the file path and specificity
+   - If Tabler CSS is winning, use higher specificity or `!important`
+
+3. **Verify cache is cleared:**
+   - Docker restart: `docker-compose restart`
+   - Browser hard refresh: `Cmd+Shift+R` (Mac) or `Ctrl+Shift+R` (Windows/Linux)
+   - Check DevTools Network tab to confirm CSS reload (status 200, not 304)
+
+4. **Test with inline styles first:**
+   - Add `style="property: value !important"` directly to element
+   - If inline works, problem is CSS specificity
+   - If inline fails, problem is JavaScript or DOM structure
+
+#### Component-Specific CSS Notes
+
+**Device Cards** (cards.css):
+- Use `.device-card` prefix for device-specific overrides
+- Card actions need `margin-left: 0 !important` to override Tabler
+- Hostname has `margin-bottom: 0.25rem` (reduced from 1rem in HEX-204)
+
+**Badges** (badges.css):
+- KEV badge: `.kev-badge` (red, animated pulse)
+- Vendor badges: `.badge.bg-primary` (Cisco=blue), `.badge.bg-warning` (Palo Alto=orange)
+- Status badges: `.status-pending`, `.status-open`, `.status-completed`
+
+**VPR Mini Cards** (cards.css):
+- Severity colors: `.text-red`, `.text-orange`, `.text-yellow`, `.text-green`
+- Always use these classes, never hardcode severity colors
+
 ### Database Schema
 
 SQLite database with tables:
