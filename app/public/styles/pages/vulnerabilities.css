@@ -357,6 +357,22 @@
     line-height: normal !important;
     padding-top: 0.5rem !important;
     padding-bottom: 0.5rem !important;
+    font-size: 13px !important;  /* Compact font for more data visibility */
+}
+
+/* Compact header font */
+#vulnGrid .ag-header-cell-text {
+    font-size: 12px !important;
+}
+
+/* Keep badges readable despite compact sizing */
+#vulnGrid .badge {
+    font-size: 11px !important;
+}
+
+/* Monospace fields slightly smaller */
+#vulnGrid .font-monospace {
+    font-size: 12px !important;
 }
 
 /* Ensure vulnerability descriptions don't wrap */
@@ -594,7 +610,7 @@
 .device-card .kev-indicator {
     position: absolute;
     top: 0.75rem;
-    right: 0.75rem;
+    left: 0.75rem;
     z-index: 2;
     cursor: pointer;
 }
