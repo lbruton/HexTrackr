@@ -717,20 +717,29 @@ class CiscoAdvisoryService {
                 }
             }
 
-            // Update sync metadata
+            // Update sync metadata (using counter for progress tracking)
             this.lastSyncTime = new Date().toISOString();
             await this.updateSyncMetadata(advisoryCount);
 
-            console.log(`✅ Cisco advisory sync completed: ${queriesExecuted} versions queried, ${advisoryCount} advisories saved, ${matchedCount} CVEs matched`);
+            // Get ACTUAL database count (not the counter - same CVE may be processed multiple times)
+            const actualDbCount = await new Promise((resolve, reject) => {
+                this.db.get("SELECT COUNT(*) as count FROM cisco_advisories", (err, row) => {
+                    if (err) reject(err);
+                    else resolve(row?.count || 0);
+                });
+            });
+
+            console.log(`✅ Cisco advisory sync completed: ${queriesExecuted} versions queried, ${advisoryCount} advisories processed (${actualDbCount} unique CVEs in DB), ${matchedCount} CVEs matched`);
 
             this.syncInProgress = false;
 
             return {
                 success: true,
-                totalAdvisories: advisoryCount,
+                totalAdvisories: actualDbCount,  // Return actual DB count, not counter
                 matchedCount: matchedCount,
                 totalCvesChecked: allCiscoCveIds.size,
                 versionsQueried: queriesExecuted,
+                advisoriesProcessed: advisoryCount,  // Keep counter for metrics
                 lastSync: this.lastSyncTime
             };
 
