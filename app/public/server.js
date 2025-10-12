@@ -412,10 +412,21 @@ function startCiscoBackgroundSync(db) {
     const ciscoService = new CiscoAdvisoryService(db, preferencesService);
 
     /**
-     * Execute Cisco advisory sync if credentials are configured
+     * Execute Cisco advisory sync if enabled and credentials are configured
      */
     async function runSync() {
         try {
+            // Check if background sync is enabled (default: true)
+            const bgSyncPref = await preferencesService.getPreference(ADMIN_USER_ID, "cisco_background_sync_enabled");
+            const isEnabled = bgSyncPref.success && bgSyncPref.data && bgSyncPref.data.value
+                ? bgSyncPref.data.value === "true"
+                : true; // Default enabled if preference doesn't exist
+
+            if (!isEnabled) {
+                console.log("ℹ️  Cisco background sync skipped: Disabled by user preference");
+                return;
+            }
+
             // Check if Cisco API credentials exist
             const { clientId } = await ciscoService.getCiscoCredentials(ADMIN_USER_ID);
 
