@@ -829,6 +829,11 @@ async function loadCiscoSyncStatus() {
             }
 
             // Update statistics
+            const totalCvesElement = document.getElementById("ciscoTotalCves");
+            if (totalCvesElement) {
+                totalCvesElement.textContent = statusData.totalCiscoCves || 0;
+            }
+
             const syncedCountElement = document.getElementById("ciscoSyncedCount");
             if (syncedCountElement) {
                 syncedCountElement.textContent = statusData.totalAdvisories || 0;
@@ -900,6 +905,11 @@ async function syncCiscoNow() {
             }
 
             // Update statistics
+            const totalCvesElement = document.getElementById("ciscoTotalCves");
+            if (totalCvesElement && result.totalCiscoCves !== undefined) {
+                totalCvesElement.textContent = result.totalCiscoCves;
+            }
+
             const syncedCountElement = document.getElementById("ciscoSyncedCount");
             if (syncedCountElement && result.totalAdvisories !== undefined) {
                 syncedCountElement.textContent = result.totalAdvisories;
