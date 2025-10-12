@@ -573,6 +573,41 @@ helmet({
 
 **Choose the right process based on task scope:**
 
+### Phase 0: Brainstorming (Optional Exploratory Phase)
+**Use for**: Feature ideas needing exploration, unclear requirements, multi-session planning
+- **When**: User presents idea without clear requirements, or needs help exploring options
+- **Output**: Brainstorm markdown file + Linear issue
+- **Location**: `/docs/brainstorming/BRAINSTORM-<feature-name>.md`
+- **Template**: `/docs/brainstorming/BRAINSTORM-TEMPLATE.md`
+
+**Workflow:**
+1. Create brainstorm markdown file with YAML frontmatter
+2. Conduct exploratory discussion (can span multiple sessions):
+   - Problem statement and goals
+   - Approach options (compare trade-offs)
+   - UI/UX considerations
+   - Technical feasibility
+   - Edge cases and constraints
+3. Update markdown throughout conversations
+4. Create Linear issue: `BRAINSTORM: <Feature Name>`
+5. Update markdown frontmatter with Linear issue link
+6. Create Memento memory with brainstorm tags
+7. Decide next steps:
+   - Complex → SRPI workflow
+   - Medium → Sprint file + Linear
+   - Simple → Direct implementation
+
+**Key Benefits:**
+- Searchable via claude-context (markdown files are indexed)
+- Context persistence across multiple sessions
+- Prevents premature commitment to approach
+
+**Examples:**
+- Palo Alto Advisory Integration (HEX-205): 1,736-line brainstorm exploring API integration, architecture, UI changes
+- Settings Modal Redesign (HEX-206): 2,020-line brainstorm comparing UI patterns, migration strategies
+
+---
+
 ### SRPI (Specification → Research → Plan → Implement)
 **Use for**: New features, user-facing enhancements, cross-system changes
 - Start with SPECIFICATION (the WHY) - user requirements and business value
@@ -594,7 +629,8 @@ helmet({
 - Delete sprint file after Linear is updated
 
 **Decision Tree**:
-- New feature with user requirements → **SRPI**
+- Feature idea needs exploration → **Phase 0: Brainstorm** → then choose below
+- New feature with clear requirements → **SRPI**
 - Bug fix or refactor → **RPI**
 - Quick fix (<1 hour) → **Sprint File**
 
