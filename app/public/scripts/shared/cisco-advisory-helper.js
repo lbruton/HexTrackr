@@ -152,8 +152,10 @@ class CiscoAdvisoryHelper {
         try {
             const response = await fetch(`/api/cisco/advisory/${cveId}`);
 
-            // 404 means no advisory exists (not an error)
-            if (response.status === 404) {
+            // Check for HTTP errors
+            if (!response.ok) {
+                console.warn(`API error for ${cveId}: ${response.status} ${response.statusText}`);
+                // Cache empty result to prevent repeated failures
                 this.advisoryCache.set(cveId, {
                     fixedVersionsArray: [],
                     timestamp: Date.now()
@@ -161,13 +163,17 @@ class CiscoAdvisoryHelper {
                 return null;
             }
 
-            // Other errors
-            if (!response.ok) {
-                console.warn(`API error for ${cveId}: ${response.status} ${response.statusText}`);
+            const advisory = await response.json();
+
+            // Handle null responses (no advisory exists for this CVE)
+            // Backend caching returns null instead of 404 status
+            if (!advisory) {
+                this.advisoryCache.set(cveId, {
+                    fixedVersionsArray: [],
+                    timestamp: Date.now()
+                });
                 return null;
             }
-
-            const advisory = await response.json();
 
             // Parse first_fixed JSON array
             let firstFixed = [];
