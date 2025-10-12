@@ -591,17 +591,17 @@ class CiscoAdvisoryService {
     }
 
     /**
-     * Get count of matched vulnerabilities with Cisco advisories
+     * Get count of advisories with fixed versions available
      * @async
-     * @returns {Promise<number>} Count of matched vulnerabilities
+     * @returns {Promise<number>} Count of advisories with fixes
      */
     async getMatchedVulnerabilitiesCount() {
         const result = await new Promise((resolve, reject) => {
             this.db.get(`
-                SELECT COUNT(DISTINCT v.cve) as count
-                FROM vulnerabilities v
-                INNER JOIN cisco_advisories c ON v.cve = c.cve_id
-                WHERE v.state IN ('ACTIVE', 'NEW', 'RESURFACED')
+                SELECT COUNT(*) as count
+                FROM cisco_advisories
+                WHERE first_fixed IS NOT NULL
+                  AND first_fixed != '[]'
             `, (err, row) => {
                 if (err) {
                     reject(err);

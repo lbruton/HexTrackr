@@ -411,6 +411,21 @@ function startCiscoBackgroundSync(db) {
     preferencesService.initialize(db);
     const ciscoService = new CiscoAdvisoryService(db, preferencesService);
 
+    // Initialize preference with default value if it doesn't exist (HEX-141)
+    preferencesService.getPreference(ADMIN_USER_ID, "cisco_background_sync_enabled")
+        .then(result => {
+            if (!result.success) {
+                // Preference doesn't exist - create it with default value "true"
+                return preferencesService.setPreference(ADMIN_USER_ID, "cisco_background_sync_enabled", "true");
+            }
+        })
+        .then(() => {
+            console.log("✅ Cisco background sync preference initialized");
+        })
+        .catch(err => {
+            console.warn("⚠️  Failed to initialize Cisco background sync preference:", err.message);
+        });
+
     /**
      * Execute Cisco advisory sync if enabled and credentials are configured
      */
@@ -418,8 +433,8 @@ function startCiscoBackgroundSync(db) {
         try {
             // Check if background sync is enabled (default: true)
             const bgSyncPref = await preferencesService.getPreference(ADMIN_USER_ID, "cisco_background_sync_enabled");
-            const isEnabled = bgSyncPref.success && bgSyncPref.data && bgSyncPref.data.value
-                ? bgSyncPref.data.value === "true"
+            const isEnabled = bgSyncPref.success && bgSyncPref.data
+                ? (bgSyncPref.data.value === "true" || bgSyncPref.data.value === true)
                 : true; // Default enabled if preference doesn't exist
 
             if (!isEnabled) {
