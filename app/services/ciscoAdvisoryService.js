@@ -320,17 +320,17 @@ class CiscoAdvisoryService {
         // Try to extract OS type and version from first product name
         // Examples:
         // "Cisco IOS 15.2(4)M11" → { osType: "ios", version: "15.2(4)M11" }
-        // "Cisco IOS XE 17.3.1" → { osType: "iosxe", version: "17.3.1" }
-        // "Cisco NX-OS 9.3(5)" → { osType: "nxos", version: "9.3(5)" }
-        // "Cisco ASA 9.16.1" → { osType: "asa", version: "9.16.1" }
+        // "Cisco IOS XE Software 17.3.1" → { osType: "iosxe", version: "17.3.1" }
+        // "Cisco NX-OS Software 9.3(5)" → { osType: "nxos", version: "9.3(5)" }
+        // "Cisco ASA Software 9.16.1" → { osType: "asa", version: "9.16.1" }
 
         const osTypePatterns = [
-            { pattern: /Cisco IOS XE\s+([\d.()]+\S*)/i, osType: "iosxe" },
-            { pattern: /Cisco IOS\s+([\d.()]+\S*)/i, osType: "ios" },
-            { pattern: /Cisco NX-OS\s+([\d.()]+\S*)/i, osType: "nxos" },
-            { pattern: /Cisco ASA\s+([\d.()]+\S*)/i, osType: "asa" },
-            { pattern: /Cisco FTD\s+([\d.()]+\S*)/i, osType: "ftd" },
-            { pattern: /Cisco FXOS\s+([\d.()]+\S*)/i, osType: "fxos" }
+            { pattern: /Cisco IOS XE(?:\s+Software)?\s+([\d.()]+\S*)/i, osType: "iosxe" },
+            { pattern: /Cisco IOS(?:\s+Software)?\s+([\d.()]+\S*)/i, osType: "ios" },
+            { pattern: /Cisco NX-OS(?:\s+Software)?\s+([\d.()]+\S*)/i, osType: "nxos" },
+            { pattern: /Cisco ASA(?:\s+Software)?\s+([\d.()]+\S*)/i, osType: "asa" },
+            { pattern: /Cisco FTD(?:\s+Software)?\s+([\d.()]+\S*)/i, osType: "ftd" },
+            { pattern: /Cisco FXOS(?:\s+Software)?\s+([\d.()]+\S*)/i, osType: "fxos" }
         ];
 
         for (const productName of productNames) {
