@@ -772,11 +772,15 @@ async function clearCiscoCredentials() {
  */
 async function loadCiscoSyncStatus() {
     try {
-        // Load auto-sync setting from localStorage
-        const autoSyncEnabled = localStorage.getItem("ciscoAutoSyncEnabled") !== "false";
+        // Load background sync setting from database (HEX-141)
         const autoSyncCheckbox = document.getElementById("ciscoAutoSync");
-        if (autoSyncCheckbox) {
-            autoSyncCheckbox.checked = autoSyncEnabled;
+        if (window.preferencesService && autoSyncCheckbox) {
+            const bgSyncResult = await window.preferencesService.getPreference("cisco_background_sync_enabled");
+            // Default to enabled (true) if preference doesn't exist yet
+            const isEnabled = bgSyncResult.success && bgSyncResult.data && bgSyncResult.data.value
+                ? bgSyncResult.data.value === "true"
+                : true; // Default enabled
+            autoSyncCheckbox.checked = isEnabled;
         }
 
         // Check if credentials are configured
@@ -933,23 +937,42 @@ async function syncCiscoNow() {
 }
 
 /**
- * Toggle Cisco auto-sync setting
+ * Toggle Cisco background sync setting (HEX-141)
+ * Saves preference to database for server-side background worker
  * @async
  * @function toggleCiscoAutoSync
  * @returns {Promise<void>}
  */
 async function toggleCiscoAutoSync() {
     const autoSyncCheckbox = document.getElementById("ciscoAutoSync");
-    if (autoSyncCheckbox) {
-        // Save to localStorage
-        localStorage.setItem("ciscoAutoSyncEnabled", autoSyncCheckbox.checked);
+    if (!autoSyncCheckbox) {return;}
 
-        // TODO: Sync to database via preferencesSync when ready
-        // if (window.preferencesSync) {
-        //     await window.preferencesSync.syncCiscoAutoRefresh(autoSyncCheckbox.checked);
-        // }
+    try {
+        const isEnabled = autoSyncCheckbox.checked;
 
-        showNotification(`Cisco auto-sync ${autoSyncCheckbox.checked ? "enabled" : "disabled"}`, "info");
+        // Save to database for server-side background worker
+        if (window.preferencesSync && window.preferencesSync.prefsService) {
+            const result = await window.preferencesSync.prefsService.setPreference(
+                "cisco_background_sync_enabled",
+                isEnabled.toString() // Store as string "true"/"false"
+            );
+
+            if (result.success) {
+                console.log(`✅ Cisco background sync ${isEnabled ? "enabled" : "disabled"}`);
+                showNotification(`Background sync ${isEnabled ? "enabled" : "disabled"}`, "success");
+            } else {
+                throw new Error(result.error || "Failed to save preference");
+            }
+        } else {
+            throw new Error("PreferencesService not available");
+        }
+    } catch (error) {
+        console.error("Failed to toggle Cisco background sync:", error);
+        showNotification("Failed to update background sync setting: " + error.message, "error");
+        // Revert checkbox on error
+        if (autoSyncCheckbox) {
+            autoSyncCheckbox.checked = !autoSyncCheckbox.checked;
+        }
     }
 }
 
