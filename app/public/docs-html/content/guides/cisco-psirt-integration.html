@@ -1,0 +1,295 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Cisco PSIRT Advisory Integration</h1><blockquote>
+<p>Comprehensive vendor-specific patch intelligence for Cisco IOS vulnerabilities with automatic background synchronization</p>
+</blockquote>
+<h2>Overview</h2><p>HexTrackr&#39;s Cisco PSIRT (Product Security Incident Response Team) integration provides actionable patch guidance by automatically fetching fixed software versions for Cisco IOS/IOS XE vulnerabilities in your environment. This feature transforms generic CVE descriptions into concrete upgrade paths, answering the critical question: <strong>&quot;What version do I need to upgrade to?&quot;</strong></p>
+<hr>
+<h2>What is Cisco PSIRT?</h2><p>The Cisco Product Security Incident Response Team (PSIRT) manages security vulnerability information for Cisco products. Their API provides:</p>
+<ul>
+<li><strong>Advisory metadata</strong> for each CVE affecting Cisco products</li>
+<li><strong>Fixed software versions</strong> - specific IOS/IOS XE versions that patch the vulnerability</li>
+<li><strong>Product information</strong> - which Cisco devices/platforms are affected</li>
+<li><strong>Security Impact Ratings</strong> - Cisco&#39;s severity assessment</li>
+<li><strong>Publication dates</strong> and advisory URLs</li>
+</ul>
+<hr>
+<h2>Key Features</h2><h3>🎯 Automatic Patch Intelligence</h3><ul>
+<li><strong>Background Synchronization</strong>: Automatic sync on server startup + every 24 hours</li>
+<li><strong>Two-Stage API Lookup</strong>: Intelligent OS type detection → fixed version retrieval</li>
+<li><strong>Zero-Click Operation</strong>: Sync happens automatically after credentials configured</li>
+<li><strong>Resilient Processing</strong>: Per-CVE commits survive container restarts</li>
+<li><strong>Rate-Limit Compliant</strong>: Conservative 3-second delays prevent API throttling</li>
+</ul>
+<h3>🔍 Actionable Upgrade Guidance</h3><ul>
+<li><strong>Minimum Fixed Version</strong>: See &quot;Upgrade to 12.2(22)S1 or later&quot; at a glance</li>
+<li><strong>Complete Version List</strong>: Access all 20-30 patched versions for flexibility</li>
+<li><strong>Advisory Links</strong>: Direct access to official Cisco security advisories</li>
+<li><strong>Database Storage</strong>: Fast lookups without API calls during vulnerability analysis</li>
+</ul>
+<h3>📊 Comprehensive Architecture</h3><ul>
+<li><strong>90-Day TTL</strong>: Automatic refresh of stale advisory data</li>
+<li><strong>Vendor-Neutral Design</strong>: <code>is_fix_available</code> flag works across all vendors</li>
+<li><strong>User-Controllable</strong>: Toggle background sync on/off via Settings</li>
+<li><strong>Extended Timeouts</strong>: Nginx configured for 10-minute sync operations</li>
+<li><strong>Progress Tracking</strong>: Real-time sync progress every 10 CVEs</li>
+</ul>
+<hr>
+<h2>Setup Guide</h2><h3>Prerequisites</h3><ol>
+<li><strong>Cisco API Credentials</strong> (Required)<ul>
+<li>Sign up at: <a href="https://apiconsole.cisco.com">https://apiconsole.cisco.com</a></li>
+<li>Create an application in &quot;My Apps &amp; Keys&quot;</li>
+<li>Copy your <strong>Client ID</strong> and <strong>Client Secret</strong></li>
+<li>Credentials use OAuth2 authentication (no IP restrictions)</li>
+</ul>
+</li>
+</ol>
+<h3>Configuration Steps</h3><h4>Step 1: Configure Credentials</h4><ol>
+<li>Navigate to <strong>Settings → API Configuration</strong></li>
+<li>Locate the <strong>Cisco PSIRT</strong> card</li>
+<li>Click <strong>&quot;Manage Credentials&quot;</strong> button</li>
+<li>Enter your <strong>Client ID</strong> and <strong>Client Secret</strong></li>
+<li>Click <strong>&quot;Save Credentials&quot;</strong></li>
+</ol>
+<p>✅ Status badge changes to <strong>&quot;Configured ✓&quot;</strong></p>
+<h4>Step 2: Enable Background Sync (Optional)</h4><p>By default, background sync is <strong>enabled</strong>. To control it:</p>
+<ol>
+<li>In the Cisco PSIRT card, find the <strong>&quot;Enable background sync&quot;</strong> toggle</li>
+<li>Check = Enabled (default), Uncheck = Disabled</li>
+<li>Setting is stored in database (survives server restarts)</li>
+</ol>
+<p><strong>When Enabled</strong>:</p>
+<ul>
+<li>Sync runs on server startup (after 10-second initialization delay)</li>
+<li>Sync repeats every 24 hours automatically</li>
+<li>Automatically refreshes advisories older than 90 days</li>
+</ul>
+<p><strong>When Disabled</strong>:</p>
+<ul>
+<li>Background worker skips Cisco sync (no errors logged)</li>
+<li>Manual sync still available via &quot;Sync Now&quot; button</li>
+</ul>
+<h4>Step 3: Initial Sync</h4><p><strong>Option A: Automatic</strong> (Recommended)</p>
+<ul>
+<li>Restart Docker container: <code>docker-compose restart</code></li>
+<li>Background worker runs within 10 seconds</li>
+<li>Check logs: <code>docker-compose logs -f hextrackr-app</code></li>
+</ul>
+<p><strong>Option B: Manual</strong></p>
+<ul>
+<li>Click <strong>&quot;Sync Now&quot;</strong> button in Settings</li>
+<li>Wait ~6 minutes for 126 CVEs to process</li>
+<li>Statistics update automatically when complete</li>
+</ul>
+<hr>
+<h2>How It Works</h2><h3>Two-Stage API Integration</h3><p>Cisco&#39;s API requires a two-stage lookup pattern:</p>
+<h4>Stage 1: CVE Endpoint → Parse OS Context</h4><pre><code class="language-">GET /v2/security/advisories/cve/{cveId}
+
+Returns: Advisory data with productNames array
+Example: [&quot;Cisco IOS 12.2(20)S6a&quot;, &quot;Cisco IOS XE 16.3.1&quot;, ...]
+
+Parse: Extract OS type and version
+  &quot;Cisco IOS 12.2(20)S6a&quot; → os_type=&quot;ios&quot;, version=&quot;12.2(20)S6a&quot;</code></pre><h4>Stage 2: Software Checker → Fetch Fixed Versions</h4><pre><code class="language-">GET /v2/security/advisories/OSType/{osType}?version={version}
+
+Returns: Array of fixed software versions
+Example: [&quot;12.2(22)S1&quot;, &quot;12.2(30)S&quot;, &quot;15.3(3)S8&quot;, ...]</code></pre><p><strong>Why Two Stages?</strong></p>
+<ul>
+<li>CVE endpoint doesn&#39;t include fixed versions directly</li>
+<li>Software Checker requires OS type + version as input</li>
+<li>Parsing product names provides the context needed for Stage 2</li>
+</ul>
+<h3>Rate Limiting Strategy</h3><p><strong>Sequential Processing</strong>:</p>
+<ul>
+<li>Processes CVEs one at a time (no parallel batching)</li>
+<li>3-second delay between each CVE</li>
+<li>Each CVE requires 2 API calls (6 seconds total per CVE)</li>
+<li>126 CVEs × 3s = ~6 minutes total sync time</li>
+</ul>
+<p><strong>Why Not Parallel?</strong></p>
+<ul>
+<li>Parallel batch processing triggered 429 errors after ~19 CVEs</li>
+<li>Two-stage pattern amplifies API call volume (2x)</li>
+<li>Conservative delay ensures reliability over speed</li>
+</ul>
+<h3>Resilience Pattern</h3><p><strong>Per-CVE Auto-Commits</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> cveId <span class="hljs-keyword">of</span> cveIds) {
+    <span class="hljs-comment">// Fetch advisory from Cisco API</span>
+    <span class="hljs-comment">// Parse OS type and fixed versions</span>
+    db.<span class="hljs-title function_">prepare</span>(<span class="hljs-string">&quot;INSERT OR REPLACE INTO cisco_advisories ...&quot;</span>).<span class="hljs-title function_">run</span>();
+    <span class="hljs-comment">// ✅ Auto-commits here - progress persists</span>
+    <span class="hljs-keyword">await</span> <span class="hljs-title function_">delay</span>(<span class="hljs-number">3000</span>); <span class="hljs-comment">// Rate limiting</span>
+}</code></pre><p><strong>Benefits</strong>:</p>
+<ul>
+<li>Container restarts don&#39;t lose progress</li>
+<li>Network failures only affect current CVE</li>
+<li>Database always reflects latest successful sync</li>
+<li>No &quot;all or nothing&quot; transaction risk</li>
+</ul>
+<h3>90-Day TTL (Time-To-Live)</h3><p>The background worker automatically refreshes stale advisory data:</p>
+<pre><code class="language-sql"><span class="hljs-comment">-- Query finds CVEs needing sync:</span>
+<span class="hljs-keyword">SELECT</span> <span class="hljs-keyword">DISTINCT</span> vc.cve
+<span class="hljs-keyword">FROM</span> vulnerabilities_current vc
+<span class="hljs-keyword">LEFT</span> <span class="hljs-keyword">JOIN</span> cisco_advisories ca <span class="hljs-keyword">ON</span> vc.cve <span class="hljs-operator">=</span> ca.cve_id
+<span class="hljs-keyword">WHERE</span> vc.lifecycle_state <span class="hljs-keyword">IN</span> (<span class="hljs-string">&#x27;active&#x27;</span>, <span class="hljs-string">&#x27;reopened&#x27;</span>)
+  <span class="hljs-keyword">AND</span> (
+      ca.cve_id <span class="hljs-keyword">IS</span> <span class="hljs-keyword">NULL</span>  <span class="hljs-comment">-- Never synced</span>
+      <span class="hljs-keyword">OR</span> julianday(<span class="hljs-string">&#x27;now&#x27;</span>) <span class="hljs-operator">-</span> julianday(ca.last_synced) <span class="hljs-operator">&gt;</span> <span class="hljs-number">90</span>  <span class="hljs-comment">-- Stale</span>
+  )</code></pre><p><strong>Why 90 Days?</strong></p>
+<ul>
+<li>Cisco advisories can be updated with new fixed versions</li>
+<li>Balances freshness with API usage</li>
+<li>Automatic refresh requires zero user intervention</li>
+</ul>
+<hr>
+<h2>Database Schema</h2><h3>cisco_advisories Table</h3><pre><code class="language-sql"><span class="hljs-keyword">CREATE TABLE</span> cisco_advisories (
+    id <span class="hljs-type">INTEGER</span> <span class="hljs-keyword">PRIMARY KEY</span> AUTOINCREMENT,
+    cve_id TEXT <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">UNIQUE</span>,
+    advisory_id TEXT <span class="hljs-keyword">NOT NULL</span>,
+    advisory_title TEXT,
+    advisory_url TEXT,
+    first_fixed TEXT,           <span class="hljs-comment">-- JSON array: [&quot;12.2(22)S1&quot;, &quot;12.2(30)S&quot;, ...]</span>
+    product_names TEXT,         <span class="hljs-comment">-- JSON array: [&quot;Cisco IOS 12.2(20)S6a&quot;, ...]</span>
+    last_synced <span class="hljs-type">TIMESTAMP</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-built_in">CURRENT_TIMESTAMP</span>,
+    <span class="hljs-keyword">UNIQUE</span>(cve_id)
+);</code></pre><h3>vulnerabilities_current Table (Extended)</h3><pre><code class="language-sql"><span class="hljs-keyword">ALTER TABLE</span> vulnerabilities_current
+<span class="hljs-keyword">ADD</span> <span class="hljs-keyword">COLUMN</span> is_fix_available <span class="hljs-type">INTEGER</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-number">0</span>;
+
+<span class="hljs-keyword">CREATE</span> INDEX idx_vulnerabilities_is_fix_available
+<span class="hljs-keyword">ON</span> vulnerabilities_current(is_fix_available);</code></pre><p><strong>Vendor-Neutral Flag</strong>:</p>
+<ul>
+<li><code>is_fix_available</code>: Boolean (0/1) for fast filtering</li>
+<li>Set to <code>1</code> when ANY vendor (Cisco, Microsoft, etc.) has a fix</li>
+<li>Allows queries like: <code>WHERE is_fix_available = 1</code> (instant, indexed)</li>
+</ul>
+<hr>
+<h2>UI Integration (Phase 3 - Coming Soon)</h2><h3>Vulnerability Details Modal</h3><p>When viewing a vulnerability with Cisco advisory data:</p>
+<pre><code class="language-">┌─────────────────────────────────────┐
+│ 📦 Cisco Advisory Info              │
+│ ✅ Fix Available                    │
+│ Minimum Fixed: 12.2(22)S1           │
+│                (or any later version)│
+│ All Fixed Versions: 20 available    │
+│ Advisory: cisco-sa-20170317-cmp     │
+│ [View Full Advisory →]              │
+└─────────────────────────────────────┘</code></pre><p><strong>Query Pattern</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> advisory = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string">`/api/cisco/advisory/<span class="hljs-subst">${cveId}</span>`</span>);
+
+<span class="hljs-comment">// Returns:</span>
+{
+    <span class="hljs-string">&quot;advisory_id&quot;</span>: <span class="hljs-string">&quot;cisco-sa-20170317-cmp&quot;</span>,
+    <span class="hljs-string">&quot;minimum_fixed_version&quot;</span>: <span class="hljs-string">&quot;12.2(22)S1&quot;</span>,  <span class="hljs-comment">// first_fixed[0]</span>
+    <span class="hljs-string">&quot;total_fixed_versions&quot;</span>: <span class="hljs-number">20</span>,
+    <span class="hljs-string">&quot;has_fix&quot;</span>: <span class="hljs-number">1</span>,
+    <span class="hljs-string">&quot;advisory_url&quot;</span>: <span class="hljs-string">&quot;https://sec.cloudapps.cisco.com/...&quot;</span>,
+    <span class="hljs-string">&quot;last_synced&quot;</span>: <span class="hljs-string">&quot;2025-10-12 00:49:53&quot;</span>
+}</code></pre><hr>
+<h2>Troubleshooting</h2><h3>Sync Not Running</h3><p><strong>Check 1: Credentials Configured?</strong></p>
+<pre><code class="language-bash">sqlite3 app/data/hextrackr.db <span class="hljs-string">&quot;SELECT * FROM user_preferences WHERE preference_key = &#x27;cisco_api_key&#x27;;&quot;</span></code></pre><p><strong>Check 2: Background Sync Enabled?</strong></p>
+<pre><code class="language-bash">sqlite3 app/data/hextrackr.db <span class="hljs-string">&quot;SELECT * FROM user_preferences WHERE preference_key = &#x27;cisco_background_sync_enabled&#x27;;&quot;</span>
+<span class="hljs-comment"># Should return: &quot;true&quot; or no row (defaults to enabled)</span></code></pre><p><strong>Check 3: Check Logs</strong></p>
+<pre><code class="language-bash">docker-compose logs -f hextrackr-app | grep -i cisco</code></pre><h3>429 Rate Limiting Errors</h3><p>If you see &quot;429 Too Many Requests&quot; in logs:</p>
+<ul>
+<li>This is expected if you manually trigger sync multiple times rapidly</li>
+<li>Background worker is configured conservatively (3s delays) to avoid this</li>
+<li>Wait 10 minutes before trying again (rate limit window)</li>
+</ul>
+<h3>504 Gateway Timeout</h3><p>If sync times out in browser but continues in background:</p>
+<ul>
+<li>This is normal for the first sync (~6 minutes for 126 CVEs)</li>
+<li>Nginx configured for 10-minute timeout</li>
+<li>Check logs to see sync completion: <code>docker-compose logs hextrackr-app</code></li>
+</ul>
+<h3>No Fixed Versions Found</h3><p><strong>13.4% of CVEs don&#39;t have fixed versions</strong> (by design):</p>
+<ul>
+<li>Some vulnerabilities are configuration issues (no software patch)</li>
+<li>Some affect end-of-life products (no fix available)</li>
+<li>Cisco&#39;s Software Checker API returns empty array</li>
+</ul>
+<hr>
+<h2>Statistics (As of v1.0.63)</h2><p><strong>Current Sync Results</strong> (126 CVEs tested):</p>
+<ul>
+<li>Total Advisories Synced: 82</li>
+<li>With Fixed Versions: 71 (86.6%)</li>
+<li>Without Fixed Versions: 11 (13.4%)</li>
+<li>Average Fixed Versions per CVE: 28.3</li>
+<li>Top CVE: CVE-2021-1392 with 65 fixed versions</li>
+</ul>
+<p><strong>Sample Advisory</strong>:</p>
+<pre><code class="language-">CVE-2017-3881: Cisco IOS Cluster Management Protocol RCE
+├── Advisory: cisco-sa-20170317-cmp
+├── Fixed Versions: 20 total
+│   ├── Minimum: 12.2(22)S1
+│   ├── Also: 12.2(30)S, 15.3(3)S8, 12.2(31)SB13, ...
+└── UI Display: &quot;Fixed in: 12.2(22)S1 or later&quot;</code></pre><hr>
+<h2>Technical Details</h2><h3>OAuth2 Authentication Flow</h3><ol>
+<li>User configures credentials in Settings modal</li>
+<li>Credentials stored in <code>user_preferences</code> table as <code>cisco_api_key</code></li>
+<li>On sync, service fetches credentials from database</li>
+<li>Service requests OAuth2 token from Cisco Identity Services:<pre><code class="language-">POST https://id.cisco.com/oauth2/default/v1/token
+Headers: Authorization: Basic {base64(clientId:clientSecret)}
+Body: grant_type=client_credentials</code></pre></li>
+<li>Token used for all PSIRT API requests in sync batch</li>
+<li>Token discarded after sync completes (not cached for security)</li>
+</ol>
+<h3>Nginx Configuration</h3><p>Extended timeout for long-running syncs:</p>
+<pre><code class="language-nginx"><span class="hljs-section">location</span> <span class="hljs-regexp">~ ^/api/(cisco|kev)/sync$</span> {
+    <span class="hljs-attribute">proxy_pass</span> http://hextrackr_backend;
+
+    <span class="hljs-comment"># Extended timeouts for rate-limited API syncs (10 minutes)</span>
+    <span class="hljs-attribute">proxy_connect_timeout</span> <span class="hljs-number">60s</span>;
+    <span class="hljs-attribute">proxy_send_timeout</span> <span class="hljs-number">600s</span>;    <span class="hljs-comment"># 2min → 10min</span>
+    <span class="hljs-attribute">proxy_read_timeout</span> <span class="hljs-number">600s</span>;    <span class="hljs-comment"># 2min → 10min</span>
+}</code></pre><h3>Background Worker Architecture</h3><pre><code class="language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">startCiscoBackgroundSync</span>(<span class="hljs-params">db</span>) {
+    <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">SYNC_INTERVAL</span> = <span class="hljs-number">24</span> * <span class="hljs-number">60</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>; <span class="hljs-comment">// 24 hours</span>
+    <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">ADMIN_USER_ID</span> = <span class="hljs-string">&quot;00000000-0000-0000-0000-000000000001&quot;</span>;
+
+    <span class="hljs-comment">// Run on startup (10s delay for initialization)</span>
+    <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-title function_">runSync</span>(), <span class="hljs-number">10000</span>);
+
+    <span class="hljs-comment">// Repeat every 24 hours</span>
+    <span class="hljs-built_in">setInterval</span>(runSync, <span class="hljs-variable constant_">SYNC_INTERVAL</span>);
+}</code></pre><hr>
+<h2>Future Enhancements</h2><h3>Phase 3: API Endpoint (Next Release)</h3><ul>
+<li>Create <code>/api/cisco/advisory/:cveId</code> endpoint</li>
+<li>Test manual sync flow from Settings</li>
+<li>Verify background worker runs on container restart</li>
+</ul>
+<h3>Phase 4: UI Display</h3><ul>
+<li>Update Vulnerability Details Modal with Cisco fix info</li>
+<li>Add &quot;Fixed in: X.X.X or later&quot; display</li>
+<li>Link to Cisco advisory URL</li>
+<li>Test responsive layout</li>
+</ul>
+<h3>Multi-Vendor Expansion</h3><ul>
+<li>Microsoft Update Catalog integration</li>
+<li>Juniper SIRT advisories</li>
+<li>Fortinet PSIRT</li>
+<li>Palo Alto security advisories</li>
+</ul>
+<p><strong>Vendor-Neutral Design</strong>: Adding new vendors requires no schema redesign - just create new advisory table and service class following the same pattern.</p>
+<hr>
+<h2>Related Documentation</h2><ul>
+<li><a href="#guides/kev-integration">KEV Integration Guide</a> - Similar auto-sync pattern</li>
+<li><a href="#guides/getting-started">Getting Started Guide</a> - Initial HexTrackr setup</li>
+<li><a href="#guides/user-guide">User Guide</a> - General HexTrackr usage</li>
+<li><a href="#api-reference/index">API Reference</a> - Backend API documentation</li>
+</ul>
+<hr>
+<h2>Support</h2><h3>Linear Issue</h3><ul>
+<li><a href="https://linear.app/hextrackr/issue/HEX-141">HEX-141: Cisco PSIRT Advisory Sync</a></li>
+</ul>
+<h3>Changelog</h3><ul>
+<li><a href="#changelog/versions/1.0.63">v1.0.63 Release Notes</a> - Complete implementation details</li>
+</ul>
+<h3>Memento Insight</h3><ul>
+<li>Insight ID: <code>HEXTRACKR-INSIGHT-20251012-010900</code></li>
+<li>Recall: <code>/recall-insight id:HEXTRACKR-INSIGHT-20251012-010900</code></li>
+<li>Tags: <code>two-stage-api</code>, <code>rate-limiting</code>, <code>resilience</code>, <code>background-worker</code></li>
+</ul>
+<hr>
+<p><strong>Version</strong>: 1.0.63<br><strong>Last Updated</strong>: 2025-10-11<br><strong>Status</strong>: Phase 2 Complete - Backend Architecture Implemented and Working</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

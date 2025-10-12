@@ -2,6 +2,16 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## MANDATORY RULES
+
+These rulese are mandatory and must be followed every session
+
+1. ALWAYS use **Sequential Thinking** if enabled
+2. ALWAYS use **Claude Context** to search the codebase, this is our single source of truth when it comes to the code. 
+3. ALWAYS ensure **Claude Context** index is fresh
+4. NEVER make assumptions, always check **Claude Context** and verify against the files
+5. DO NOT waste time searching the files until you have first searched **Claude Context**
+
 ## Working Principles
 
 **You are a world-class JavaScript and full-stack developer AI partnered with Lonnie (network engineer).**

@@ -1,0 +1,307 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <hr>
+<h2>title: "Version 1.0.64 - UI Polish & Search Enhancement"
+date: "2025-10-12"
+version: "1.0.64"
+status: "Released"
+category: "UI/UX Improvement"</h2><h1>Version 1.0.64 - UI Polish & Search Enhancement</h1><p><strong>Release Status</strong>: ✅ Released<br><strong>Release Date</strong>: 2025-10-12<br><strong>Linear Issue</strong>: <a href="https://linear.app/hextrackr/issue/HEX-204">HEX-204</a></p>
+<hr>
+<h2>Overview</h2><p>Major UI polish pass focusing on device card enhancements, comprehensive search expansion, and CSS architecture documentation. This release improves data visibility, search capabilities, and provides critical CSS debugging documentation for future development.</p>
+<hr>
+<h2>Features Added</h2><h3>🔍 Comprehensive Search Expansion</h3><p><strong>Problem</strong>: Search was limited to hostname, CVE, plugin name, and vendor reference (4 fields). Users couldn&#39;t find devices by OS version, IP address, or search solution text.</p>
+<p><strong>Solution</strong>: Expanded search to 9 fields across three layers.</p>
+<h4>Backend SQL Search (vulnerabilityService.js)</h4><ul>
+<li>Added <code>operating_system</code> field search</li>
+<li>Added <code>solution_text</code> field search</li>
+<li>Added <code>description</code> field search</li>
+<li>Search now covers: hostname, IP, CVE, plugin name, description, solution, OS, vendor, vendor reference</li>
+</ul>
+<h4>Frontend In-Memory Filter (vulnerability-data.js)</h4><ul>
+<li>Added matching 9-field search to JavaScript filter</li>
+<li>Ensures consistency between backend and frontend filtering</li>
+<li>Null-safe checks prevent errors on empty fields</li>
+</ul>
+<h4>Device Cards View Filter (vulnerability-cards.js)</h4><ul>
+<li><strong>Third Filter Layer Discovery</strong>: Found independent filter in device cards rendering</li>
+<li>Added device-level fields: hostname, vendor, OS, IP address</li>
+<li>Added Array.some() pattern to search ALL vulnerabilities on each device</li>
+<li><strong>Triple Filter Problem</strong>: All three layers (backend SQL, frontend JS, cards JS) now synchronized</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/services/vulnerabilityService.js</code> (lines 583-599)</li>
+<li><code>app/public/scripts/shared/vulnerability-data.js</code> (lines 631-642)</li>
+<li><code>app/public/scripts/shared/vulnerability-cards.js</code> (lines 432-447)</li>
+</ul>
+<hr>
+<h3>📍 IP Address Display on Device Cards</h3><p><strong>Feature</strong>: Device cards now display IP addresses on the lower left corner, opposite the ticket buttons.</p>
+<h4>Implementation Details</h4><p><strong>Data Aggregation</strong> (vulnerability-data.js):</p>
+<ul>
+<li>Added <code>ip_address</code> field to device object initialization</li>
+<li>Tracks most recent non-null IP from vulnerabilities array</li>
+<li>Same pattern as <code>operating_system</code> tracking</li>
+</ul>
+<p><strong>UI Display</strong> (vulnerability-cards.js):</p>
+<ul>
+<li>IP displays in cyan/blue color (<code>text-info</code>)</li>
+<li>Monospace font for technical readability</li>
+<li>Font size matches button text (0.875rem)</li>
+<li>Conditional rendering (only shows if IP exists)</li>
+</ul>
+<p><strong>CSS Architecture</strong> (cards.css):</p>
+<ul>
+<li>Discovered Tabler framework conflict: <code>margin-left: auto</code> on <code>.card-actions</code></li>
+<li>Required <code>!important</code> overrides for <code>.device-card .card-actions</code></li>
+<li>Flexbox layout: IP left, button right with <code>margin-left: auto</code></li>
+</ul>
+<p><strong>Search Integration</strong>:</p>
+<ul>
+<li>IP addresses fully searchable in both table and card views</li>
+<li>Added to device-level search filter</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/vulnerability-data.js</code> (lines 823, 845-848)</li>
+<li><code>app/public/scripts/shared/vulnerability-cards.js</code> (lines 623-634)</li>
+<li><code>app/public/styles/shared/cards.css</code> (lines 84-89)</li>
+</ul>
+<hr>
+<h3>🎯 Tickets First Sort Mode</h3><p><strong>Feature</strong>: New sort option that prioritizes devices with open tickets.</p>
+<h4>Sort Logic</h4><ul>
+<li>Open ticket statuses: &quot;Pending&quot;, &quot;Staged&quot;, &quot;Open&quot;, &quot;Overdue&quot;</li>
+<li>Sort hierarchy: Open tickets → Ticket count → VPR score</li>
+<li>Uses conditional async loading (only fetches ticket data when sort selected)</li>
+</ul>
+<h4>Performance Optimization</h4><ul>
+<li><code>Promise.all()</code> parallelizes ticket state fetches for all visible devices</li>
+<li>Attaches ticket metadata to device objects for sorting</li>
+<li>User sees brief lag (~1-2s) while tickets are fetched</li>
+<li>Acceptable tradeoff for on-demand data loading</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/vulnerability-cards.js</code> (lines 327-387, 449-460)</li>
+</ul>
+<hr>
+<h3>🎨 UI Polish & Consistency</h3><h4>Vendor Badge Color Standardization</h4><p><strong>Problem</strong>: Cisco badges were orange, Palo Alto badges were purple (inconsistent with rest of UI).</p>
+<p><strong>Solution</strong>: Standardized color scheme:</p>
+<ul>
+<li><strong>Cisco</strong>: Blue (<code>bg-primary</code>) - matches primary UI theme</li>
+<li><strong>Palo Alto</strong>: Orange (<code>bg-warning</code>) - consistent with high severity</li>
+<li><strong>Other</strong>: Gray (<code>bg-secondary</code>) - neutral for unknown vendors</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/vulnerability-cards.js</code> (lines 556-562)</li>
+<li><code>app/public/scripts/shared/device-security-modal.js</code> (line 83)</li>
+</ul>
+<h4>Version Display Layout</h4><ul>
+<li><strong>Version text on TOP</strong>, label below</li>
+<li>Changed &quot;Phase 2&quot; placeholder to &quot;Undetermined&quot;</li>
+<li>Monospace font for version numbers</li>
+</ul>
+<h4>Vertical Spacing Reduction</h4><p><strong>Problem</strong>: Excessive gap between hostname and version info sections.</p>
+<p><strong>Solution</strong>: Reduced hostname <code>margin-bottom</code> from 1rem (16px) → 0.25rem (4px)</p>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/styles/shared/cards.css</code> (line 117)</li>
+</ul>
+<hr>
+<h3>🗂️ Pagination Controls Reorganization</h3><p><strong>Problem</strong>: Sort dropdown and items-per-page selector were at bottom, requiring scrolling.</p>
+<p><strong>Solution</strong>: Split pagination into two sections:</p>
+<ul>
+<li><strong>Top Controls</strong>: Sort dropdown (left) + Items per page (right)</li>
+<li><strong>Bottom Navigation</strong>: Previous/Next arrows + Page numbers + &quot;Showing X to Y of Z&quot;</li>
+</ul>
+<p><strong>Implementation</strong>:</p>
+<ul>
+<li>New method: <code>renderTopControls()</code> in pagination-controller.js</li>
+<li>Updated method: <code>renderPaginationControls()</code> now only renders bottom section</li>
+<li>Applied to both Devices and Vulnerabilities views</li>
+</ul>
+<p><strong>Sort Options</strong>:</p>
+<ul>
+<li><strong>Devices</strong>: KEV First, VPR First, Tickets First, A-Z, Z-A</li>
+<li><strong>Vulnerabilities</strong>: KEV First, VPR First, Devices First, A-Z, Z-A</li>
+<li>Default: VPR First (highest risk priority)</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/pagination-controller.js</code> (lines 89-230)</li>
+<li><code>app/public/vulnerabilities.html</code> (lines 397-434)</li>
+</ul>
+<hr>
+<h3>📚 CSS Architecture Documentation</h3><p><strong>CRITICAL</strong>: Added comprehensive CSS section to CLAUDE.md to prevent future CSS debugging sessions.</p>
+<h4>Documentation Sections</h4><p><strong>1. CSS Load Order</strong></p>
+<ul>
+<li>Complete stylesheet hierarchy with file paths</li>
+<li>Annotated with <code>⚠️ BASE FRAMEWORK</code> warning for Tabler</li>
+<li>Shows precedence order (loaded first → lowest priority)</li>
+</ul>
+<p><strong>2. Tabler Framework Conflicts</strong></p>
+<ul>
+<li>Documents known problematic rules:<ul>
+<li><code>.card-actions { margin-left: auto }</code> pushes content right</li>
+<li><code>.card-actions { padding-left: 0.5rem }</code> adds unwanted spacing</li>
+<li><code>.card-actions .btn { width: 100% }</code> makes buttons full-width</li>
+</ul>
+</li>
+<li>Correct override patterns with higher specificity</li>
+</ul>
+<p><strong>3. CSS Debugging Workflow</strong></p>
+<ul>
+<li>Step-by-step Chrome DevTools inspection process</li>
+<li>JavaScript snippet to enumerate all CSS rules for selector</li>
+<li>Cache verification checklist</li>
+<li>Inline style testing methodology</li>
+</ul>
+<p><strong>4. Theme System Architecture</strong></p>
+<ul>
+<li>CSS variable structure (<code>:root</code>, <code>[data-bs-theme=&quot;light&quot;]</code>, <code>[data-bs-theme=&quot;dark&quot;]</code>)</li>
+<li>Theme toggle mechanism (preferences database + data attribute)</li>
+<li>Guidance: Always use variables, never hardcode colors</li>
+</ul>
+<p><strong>5. Component-Specific Notes</strong></p>
+<ul>
+<li>Device cards: <code>.device-card</code> prefix for overrides</li>
+<li>Badge classes: KEV, vendor, status</li>
+<li>VPR colors: <code>.text-red</code>, <code>.text-orange</code>, <code>.text-yellow</code>, <code>.text-green</code></li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>CLAUDE.md</code> (lines 96-227) - Added 130+ lines of CSS documentation</li>
+</ul>
+<hr>
+<h2>Technical Improvements</h2><h3>CSS Specificity Management</h3><p><strong>Root Cause</strong>: Tabler framework CSS loaded first with aggressive default styles (margin-left: auto, padding, width rules).</p>
+<p><strong>Solution Pattern</strong>:</p>
+<pre><code class="language-css"><span class="hljs-comment">/* ❌ WRONG - Tabler will override */</span>
+<span class="hljs-selector-class">.card-actions</span> {
+    <span class="hljs-attribute">margin-left</span>: <span class="hljs-number">0</span>;
+}
+
+<span class="hljs-comment">/* ✅ RIGHT - Higher specificity or !important */</span>
+<span class="hljs-selector-class">.device-card</span> <span class="hljs-selector-class">.card-actions</span> {
+    <span class="hljs-attribute">margin-left</span>: <span class="hljs-number">0</span> <span class="hljs-meta">!important</span>;
+}</code></pre><h3>Vendor Detection Consistency</h3><p><strong>Problem</strong>: Frontend was recalculating vendor with naive string matching, overriding sophisticated backend pattern matching.</p>
+<p><strong>Solution</strong>: Always use vendor values set during CSV import:</p>
+<ul>
+<li><code>device.vendor</code> from aggregation (not <code>normalizeVendor()</code> recalculation)</li>
+<li><code>vuln.vendor</code> from database (not client-side heuristics)</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/vulnerability-data.js</code> (line 828)</li>
+<li><code>app/public/scripts/shared/device-security-modal.js</code> (line 83)</li>
+</ul>
+<h3>Data Limit Fixes</h3><p><strong>Problem</strong>: System hardcoded 50,000 record limit, but database contains 91,625 vulnerabilities.</p>
+<p><strong>Solution</strong>: Updated 8 locations from 50k → 100k:</p>
+<ul>
+<li>5 locations in <code>vulnerability-data.js</code></li>
+<li>3 locations in <code>vulnerability-core.js</code> (parameter override fix)</li>
+</ul>
+<p><strong>Parameter Shadowing Bug</strong>: <code>vulnerability-core.js</code> was explicitly passing <code>{ limit: 50000 }</code> which overrode service defaults. Required tracing full call chain to discover.</p>
+<hr>
+<h2>Bug Fixes</h2><h3>Search Not Finding Version Numbers</h3><p><strong>Cause</strong>: Frontend in-memory filter only searched 3 fields (hostname, CVE, plugin).<br><strong>Fix</strong>: Expanded to 9 fields matching backend SQL query.</p>
+<h3>IP Search Not Working in Cards View</h3><p><strong>Cause</strong>: Third independent filter layer in device cards rendering.<br><strong>Fix</strong>: Added ip_address to device aggregation and card-level search.</p>
+<h3>Pagination Limit Not Applied</h3><p><strong>Cause</strong>: Parameter override in <code>vulnerability-core.js</code> shadowed service defaults.<br><strong>Fix</strong>: Updated explicit limit parameters in 3 locations.</p>
+<h3>Vendor Badge Colors Inconsistent</h3><p><strong>Cause</strong>: Frontend using different color mapping than modals.<br><strong>Fix</strong>: Standardized across all views (Cisco=blue, Palo Alto=orange).</p>
+<hr>
+<h2>Files Modified</h2><h3>Backend</h3><ul>
+<li><code>app/services/vulnerabilityService.js</code> - Expanded SQL search to 9 fields</li>
+</ul>
+<h3>Frontend JavaScript</h3><ul>
+<li><code>app/public/scripts/shared/vulnerability-data.js</code> - IP aggregation, search expansion, 100k limits</li>
+<li><code>app/public/scripts/shared/vulnerability-cards.js</code> - IP display, search filter, tickets-first sort</li>
+<li><code>app/public/scripts/shared/vulnerability-core.js</code> - 100k limit fixes</li>
+<li><code>app/public/scripts/shared/pagination-controller.js</code> - Split top/bottom controls</li>
+<li><code>app/public/scripts/shared/device-security-modal.js</code> - Vendor badge fix</li>
+</ul>
+<h3>HTML</h3><ul>
+<li><code>app/public/vulnerabilities.html</code> - Top control divs for pagination</li>
+</ul>
+<h3>CSS</h3><ul>
+<li><code>app/public/styles/shared/cards.css</code> - Tabler overrides, spacing fixes</li>
+</ul>
+<h3>Documentation</h3><ul>
+<li><code>CLAUDE.md</code> - CSS Architecture &amp; Theme System section (130+ lines)</li>
+</ul>
+<hr>
+<h2>Known Limitations</h2><h3>CSS Debugging Dependency</h3><ul>
+<li>Future CSS changes require Chrome DevTools <code>evaluate_script</code> to trace all stylesheets</li>
+<li>Inline styles may not work if <code>!important</code> flags exist in framework CSS</li>
+<li>Always check Tabler framework rules before custom CSS</li>
+</ul>
+<h3>Search Performance</h3><ul>
+<li>9-field search may be slower on extremely large datasets (100k+ records)</li>
+<li>Frontend filter runs on every keystroke (debouncing not implemented)</li>
+</ul>
+<hr>
+<h2>Breaking Changes</h2><p>None. All changes are additive or fix existing functionality.</p>
+<hr>
+<h2>Upgrade Notes</h2><ol>
+<li><p><strong>Docker Restart Required</strong>: CSS and JavaScript changes require container restart</p>
+<pre><code class="language-bash">docker-compose restart</code></pre></li>
+<li><p><strong>Hard Browser Refresh Required</strong>: Clear CSS cache after upgrade</p>
+<ul>
+<li>Mac: <code>Cmd + Shift + R</code></li>
+<li>Windows/Linux: <code>Ctrl + Shift + R</code></li>
+</ul>
+</li>
+<li><p><strong>No Database Migration</strong>: All changes are frontend/backend code, no schema changes</p>
+</li>
+</ol>
+<hr>
+<h2>Developer Notes</h2><h3>Debugging CSS Issues - Mandatory Process</h3><p><strong>ALWAYS use this workflow when CSS changes don&#39;t work:</strong></p>
+<ol>
+<li><p><strong>Use Chrome DevTools to enumerate all CSS rules:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> allRules = [];
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> sheet <span class="hljs-keyword">of</span> <span class="hljs-variable language_">document</span>.<span class="hljs-property">styleSheets</span>) {
+    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> rule <span class="hljs-keyword">of</span> sheet.<span class="hljs-property">cssRules</span>) {
+        <span class="hljs-keyword">if</span> (rule.<span class="hljs-property">selectorText</span> &amp;&amp; rule.<span class="hljs-property">selectorText</span>.<span class="hljs-title function_">includes</span>(<span class="hljs-string">&#x27;card-actions&#x27;</span>)) {
+            allRules.<span class="hljs-title function_">push</span>({
+                <span class="hljs-attr">selector</span>: rule.<span class="hljs-property">selectorText</span>,
+                <span class="hljs-attr">cssText</span>: rule.<span class="hljs-property">style</span>.<span class="hljs-property">cssText</span>,
+                <span class="hljs-attr">href</span>: sheet.<span class="hljs-property">href</span> || <span class="hljs-string">&#x27;inline&#x27;</span>
+            });
+        }
+    }
+}</code></pre></li>
+<li><p><strong>Identify which stylesheet is winning</strong> (check href field)</p>
+</li>
+<li><p><strong>If Tabler CSS is winning</strong>, use higher specificity or <code>!important</code></p>
+</li>
+<li><p><strong>Verify cache cleared</strong> - Check DevTools Network tab (200 status, not 304)</p>
+</li>
+</ol>
+<h3>Search Architecture - Three Independent Layers</h3><ol>
+<li><strong>Backend SQL</strong> (vulnerabilityService.js) - LIKE queries with search pattern</li>
+<li><strong>Frontend JS</strong> (vulnerability-data.js) - In-memory filter with includes()</li>
+<li><strong>Cards View</strong> (vulnerability-cards.js) - Device-level + Array.some() for vulns</li>
+</ol>
+<p><strong>Critical</strong>: All three must stay synchronized. Changes to one require changes to all three.</p>
+<hr>
+<h2>Performance Impact</h2><h3>Positive</h3><ul>
+<li>IP address display: Minimal (already aggregating device data)</li>
+<li>Search expansion: Negligible (indexes on all searched columns)</li>
+<li>Tickets First sort: Conditional (only when user selects that mode)</li>
+</ul>
+<h3>Neutral</h3><ul>
+<li>CSS overrides: No runtime cost (browser parses at page load)</li>
+<li>Pagination reorganization: Same data, different layout</li>
+</ul>
+<hr>
+<h2>Related Linear Issues</h2><ul>
+<li><strong>HEX-203</strong>: Ticket state awareness on device cards (prerequisite for Tickets First sort)</li>
+<li><strong>HEX-141</strong>: Cisco PSIRT advisory sync (provides fixed version data for future display)</li>
+</ul>
+<hr>
+<h2>Timeline</h2><ul>
+<li><strong>2025-10-12</strong>: Version 1.0.64 released</li>
+</ul>
+<hr>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

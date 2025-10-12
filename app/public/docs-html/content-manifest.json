@@ -1,5 +1,5 @@
 {
-  "generated": "2025-10-11T07:45:41.871Z",
+  "generated": "2025-10-12T06:06:08.609Z",
   "sections": {
     "api-reference": {
       "title": "Api Reference",
@@ -70,6 +70,16 @@
       "icon": "fas fa-list",
       "indexFile": "changelog/index",
       "children": {
+        "1.0.64": {
+          "file": "changelog/versions/1.0.64",
+          "title": "1.0.64",
+          "path": "changelog/versions/1.0.64.html"
+        },
+        "1.0.63": {
+          "file": "changelog/versions/1.0.63",
+          "title": "1.0.63",
+          "path": "changelog/versions/1.0.63.html"
+        },
         "1.0.62": {
           "file": "changelog/versions/1.0.62",
           "title": "1.0.62",
@@ -367,6 +377,11 @@
       "icon": "fas fa-file-alt",
       "indexFile": "guides/index",
       "children": {
+        "cisco-psirt-integration": {
+          "file": "guides/cisco-psirt-integration",
+          "title": "Cisco Psirt Integration",
+          "path": "guides/cisco-psirt-integration.html"
+        },
         "css-customization": {
           "file": "guides/css-customization",
           "title": "Css Customization",
@@ -436,5 +451,5 @@
       "path": "overview.html"
     }
   },
-  "totalFiles": 85
+  "totalFiles": 88
 }
