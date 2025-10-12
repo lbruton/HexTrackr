@@ -78,8 +78,9 @@ class DeviceSecurityModal {
         // This is a short-term fix until database-first device endpoint is implemented
         const ipAddress = device.vulnerabilities?.find(v => v.ip_address)?.ip_address || device.ipAddress || "N/A";
 
-        // HEX-204: Get vendor classification using existing normalization logic
-        const vendor = this.dataManager?.normalizeVendor(device.vulnerabilities?.[0]?.plugin_name || "", device.hostname) || "Other";
+        // HEX-204: Use vendor from device object (already set during aggregation from database)
+        // This preserves the sophisticated hostname+plugin pattern matching from CSV import
+        const vendor = device.vendor || "Other";
 
         // HEX-204: Get installed software/OS from vulnerability data (use first non-null value)
         const installedSoftware = device.vulnerabilities?.find(v => v.operating_system)?.operating_system || "N/A";
