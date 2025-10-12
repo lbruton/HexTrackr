@@ -444,13 +444,11 @@ class CiscoAdvisoryService {
             try {
                 let advisoryCount = 0;
                 let matchedCount = 0;
-                const batchSize = 5; // Reduced from 10 due to two-stage API calls (Stage 1 + Stage 2)
+                const delayBetweenCalls = 3000; // 3 seconds between each CVE (conservative for two-stage calls)
 
-                // Process CVEs in batches to avoid rate limiting
-                for (let i = 0; i < cveIds.length; i += batchSize) {
-                    const batch = cveIds.slice(i, i + batchSize);
-
-                    await Promise.all(batch.map(async (cveId) => {
+                // Process CVEs sequentially with delays to honor Cisco rate limits
+                for (let i = 0; i < cveIds.length; i++) {
+                    const cveId = cveIds[i];
                         console.log(`🔍 Querying Cisco PSIRT for ${cveId}...`);
                         const advisoryData = await this.fetchCiscoAdvisoryForCve(cveId, accessToken);
 
@@ -540,16 +538,15 @@ class CiscoAdvisoryService {
                         } else {
                             console.log(`ℹ️ No advisory found for ${cveId} (404 or error)`);
                         }
-                    }));
 
-                    // Progress logging every batch
-                    if ((i + batchSize) % 50 === 0) {
-                        console.log(`📊 Processed ${Math.min(i + batchSize, cveIds.length)} / ${cveIds.length} CVEs (${advisoryCount} advisories found)`);
+                    // Progress logging every 10 CVEs
+                    if ((i + 1) % 10 === 0) {
+                        console.log(`📊 Progress: ${i + 1} / ${cveIds.length} CVEs processed (${advisoryCount} advisories found)`);
                     }
 
-                    // Rate limiting: wait 2 seconds between batches (two-stage API calls)
-                    if (i + batchSize < cveIds.length) {
-                        await new Promise(resolve => setTimeout(resolve, 2000));
+                    // Rate limiting: wait between each CVE to honor Cisco API limits
+                    if (i < cveIds.length - 1) {
+                        await new Promise(resolve => setTimeout(resolve, delayBetweenCalls));
                     }
                 }
 
