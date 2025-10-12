@@ -16,7 +16,8 @@ class DeviceSecurityModal {
         this.currentDevice = null;
         this.deviceGrid = null;
         this.deviceGridApi = null;
-        
+        this.activeFilter = null; // Track active severity filter for toggle behavior
+
         this.init();
     }
 
@@ -80,14 +81,17 @@ class DeviceSecurityModal {
 
         // HEX-204: Use vendor from device object (already set during aggregation from database)
         // This preserves the sophisticated hostname+plugin pattern matching from CSV import
-        const vendor = device.vendor || "Other";
+        // Fallback to checking vulnerabilities array if device.vendor is missing
+        const vendor = device.vendor ||
+                       device.vulnerabilities?.find(v => v.vendor)?.vendor ||
+                       "Other";
 
         // HEX-204: Get installed software/OS from vulnerability data (use first non-null value)
         const installedSoftware = device.vulnerabilities?.find(v => v.operating_system)?.operating_system || "N/A";
 
-        // Vendor badge color logic
-        const vendorBadgeClass = vendor === "CISCO" ? "bg-blue" :
-                                 vendor === "Palo Alto" ? "bg-orange" :
+        // Vendor badge color logic (matches card view styling)
+        const vendorBadgeClass = vendor === "CISCO" ? "bg-primary" :
+                                 vendor === "Palo Alto" ? "bg-warning" :
                                  "bg-secondary";
 
         document.getElementById("deviceInfo").innerHTML = `
@@ -123,6 +127,14 @@ class DeviceSecurityModal {
             </div>
             <div class="mb-3">
                 <div class="row">
+                    <div class="col-sm-4 text-muted">Fixed Version(s):</div>
+                    <div class="col-sm-8">
+                        <span id="deviceFixedVersion" class="font-monospace text-muted">Loading...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="row">
                     <div class="col-sm-4 text-muted">Total Risks:</div>
                     <div class="col-sm-8">
                         <span class="badge bg-secondary">${device.totalCount} vulnerabilities</span>
@@ -149,6 +161,109 @@ class DeviceSecurityModal {
                 </div>
             </div>
         `;
+
+        // Asynchronously load and display the device's fixed version
+        this.loadDeviceFixedVersion(device);
+    }
+
+    /**
+     * Load and display the most recent fixed version for this device
+     * Queries all CVEs in parallel and displays the highest fixed version available
+     * @param {Object} device - The device data object
+     */
+    /**
+     * Compare two Cisco IOS version strings for sorting (descending order)
+     * @param {string} a - First version string (e.g., "16.9(4)")
+     * @param {string} b - Second version string (e.g., "15.2(7)E")
+     * @returns {number} - Negative if a > b, positive if a < b, 0 if equal
+     */
+    compareVersions(a, b) {
+        // Extract version components: major.minor(maintenance)train
+        const parseVersion = (ver) => {
+            const match = ver.match(/^(\d+)\.(\d+)\((\d+)\)([A-Z]*)/);
+            if (!match) return { major: 0, minor: 0, maint: 0, train: '' };
+            return {
+                major: parseInt(match[1], 10),
+                minor: parseInt(match[2], 10),
+                maint: parseInt(match[3], 10),
+                train: match[4] || ''
+            };
+        };
+
+        const vA = parseVersion(a);
+        const vB = parseVersion(b);
+
+        // Compare major, minor, maintenance in order
+        if (vA.major !== vB.major) return vB.major - vA.major;
+        if (vA.minor !== vB.minor) return vB.minor - vA.minor;
+        if (vA.maint !== vB.maint) return vB.maint - vA.maint;
+
+        // Train identifiers compared alphabetically (descending)
+        return vB.train.localeCompare(vA.train);
+    }
+
+    async loadDeviceFixedVersion(device) {
+        const fixedVersionElement = document.getElementById('deviceFixedVersion');
+        if (!fixedVersionElement) return;
+
+        // Use same vendor detection as populateDeviceInfo (with fallback to vulnerabilities)
+        const vendor = device.vendor ||
+                       device.vulnerabilities?.find(v => v.vendor)?.vendor ||
+                       "Other";
+
+        // Only lookup for Cisco devices
+        if (!vendor || !vendor.toLowerCase().includes('cisco')) {
+            fixedVersionElement.innerHTML = `<span class="font-monospace text-muted">N/A</span>`;
+            return;
+        }
+
+        if (!window.ciscoAdvisoryHelper) {
+            fixedVersionElement.innerHTML = `<span class="font-monospace text-muted">N/A</span>`;
+            return;
+        }
+
+        try {
+            // Get unique CVEs from device vulnerabilities
+            const uniqueCves = [...new Set(device.vulnerabilities
+                .filter(v => v.cve && v.cve.startsWith('CVE-'))
+                .map(v => v.cve))];
+
+            if (uniqueCves.length === 0) {
+                fixedVersionElement.innerHTML = `<span class="font-monospace text-muted">No CVEs</span>`;
+                return;
+            }
+
+            // Get installed version for OS-aware matching
+            const installedVersion = device.vulnerabilities?.find(v => v.operating_system)?.operating_system || null;
+
+            // Query all CVEs in parallel
+            const fixedVersionPromises = uniqueCves.map(cve =>
+                window.ciscoAdvisoryHelper.getFixedVersion(cve, vendor, installedVersion)
+                    .catch(err => {
+                        logger.warn(`Failed to get fixed version for ${cve}:`, err);
+                        return null;
+                    })
+            );
+
+            const fixedVersions = await Promise.all(fixedVersionPromises);
+
+            // Filter out nulls and deduplicate
+            const validVersions = [...new Set(fixedVersions.filter(v => v !== null && v !== 'No Fix'))];
+
+            if (validVersions.length > 0) {
+                // Sort versions (highest/most recent first)
+                validVersions.sort((a, b) => this.compareVersions(a, b));
+
+                // Display all unique versions, comma-separated
+                const versionList = validVersions.map(v => DOMPurify.sanitize(v) + '+').join(', ');
+                fixedVersionElement.innerHTML = `<span class="font-monospace text-success">${versionList}</span>`;
+            } else {
+                fixedVersionElement.innerHTML = `<span class="font-monospace text-muted">No Fix</span>`;
+            }
+        } catch (error) {
+            logger.error('Failed to load device fixed version:', error);
+            fixedVersionElement.innerHTML = `<span class="font-monospace text-danger">Error</span>`;
+        }
     }
 
     /**
@@ -202,14 +317,15 @@ class DeviceSecurityModal {
     }
 
     /**
-     * Populate VPR summary cards with enhanced Tabler.io styling
+     * Populate VPR summary cards with enhanced Tabler.io styling and interactive filtering
      * HEX-204: Updated to col-3 for full-width layout (4 cards side-by-side)
+     * Cards are now clickable to filter the vulnerability table by severity
      * @param {Object} device - The device data object
      */
     populateVprSummary(device) {
         document.getElementById("deviceVprSummary").innerHTML = `
             <div class="col-lg-3 col-6">
-                <div class="card card-sm bg-red-lt">
+                <div class="card card-sm bg-red-lt vpr-filter-card" style="cursor: pointer;" data-severity="Critical" onclick="window.deviceSecurityModal.filterBySeverity('Critical')">
                     <div class="card-body text-center">
                         <div class="text-red h3 mb-1">${device.criticalCount}</div>
                         <div class="text-muted small">Critical</div>
@@ -218,7 +334,7 @@ class DeviceSecurityModal {
                 </div>
             </div>
             <div class="col-lg-3 col-6">
-                <div class="card card-sm bg-orange-lt">
+                <div class="card card-sm bg-orange-lt vpr-filter-card" style="cursor: pointer;" data-severity="High" onclick="window.deviceSecurityModal.filterBySeverity('High')">
                     <div class="card-body text-center">
                         <div class="text-orange h3 mb-1">${device.highCount}</div>
                         <div class="text-muted small">High</div>
@@ -227,7 +343,7 @@ class DeviceSecurityModal {
                 </div>
             </div>
             <div class="col-lg-3 col-6">
-                <div class="card card-sm bg-yellow-lt">
+                <div class="card card-sm bg-yellow-lt vpr-filter-card" style="cursor: pointer;" data-severity="Medium" onclick="window.deviceSecurityModal.filterBySeverity('Medium')">
                     <div class="card-body text-center">
                         <div class="text-yellow h3 mb-1">${device.mediumCount}</div>
                         <div class="text-muted small">Medium</div>
@@ -236,7 +352,7 @@ class DeviceSecurityModal {
                 </div>
             </div>
             <div class="col-lg-3 col-6">
-                <div class="card card-sm bg-green-lt">
+                <div class="card card-sm bg-green-lt vpr-filter-card" style="cursor: pointer;" data-severity="Low" onclick="window.deviceSecurityModal.filterBySeverity('Low')">
                     <div class="card-body text-center">
                         <div class="text-green h3 mb-1">${device.lowCount}</div>
                         <div class="text-muted small">Low</div>
@@ -248,12 +364,79 @@ class DeviceSecurityModal {
     }
 
     /**
+     * Filter vulnerability table by severity with toggle behavior
+     * Clicking an active filter clears it; clicking a new severity applies that filter
+     * @param {string} severity - Severity level to filter by (Critical, High, Medium, Low)
+     */
+    filterBySeverity(severity) {
+        if (!this.deviceGridApi) {
+            logger.warn('Grid API not available for filtering');
+            return;
+        }
+
+        // Toggle behavior: if clicking the same severity, clear the filter
+        if (this.activeFilter === severity) {
+            // Clear filter
+            this.deviceGridApi.setFilterModel(null);
+            this.activeFilter = null;
+
+            // Reset all card styles
+            document.querySelectorAll('.vpr-filter-card').forEach(card => {
+                card.style.opacity = '1';
+                card.style.border = '';
+                card.style.transform = '';
+            });
+
+            logger.debug('Filter cleared');
+        } else {
+            // Apply new filter
+            this.activeFilter = severity;
+
+            // Set AG-Grid filter
+            this.deviceGridApi.setFilterModel({
+                severity: {
+                    filterType: 'text',
+                    type: 'equals',
+                    filter: severity
+                }
+            });
+
+            // Update card visual states
+            document.querySelectorAll('.vpr-filter-card').forEach(card => {
+                const cardSeverity = card.getAttribute('data-severity');
+                if (cardSeverity === severity) {
+                    // Highlight active card
+                    card.style.opacity = '1';
+                    card.style.border = '2px solid var(--hextrackr-primary)';
+                    card.style.transform = 'translateY(-2px)';
+                } else {
+                    // Dim inactive cards
+                    card.style.opacity = '0.5';
+                    card.style.border = '';
+                    card.style.transform = '';
+                }
+            });
+
+            logger.debug(`Filtered by ${severity} severity`);
+        }
+    }
+
+    /**
      * Create and configure the device vulnerability grid with enhanced column order and styling
      * @param {Object} device - The device data object
      */
     createDeviceVulnerabilityGrid(device) {
         const deviceGridDiv = document.getElementById("device-vuln-grid");
         deviceGridDiv.innerHTML = "";
+
+        // Unregister and destroy existing grid before creating new one (proper lifecycle)
+        if (this.deviceGrid && window.agGridThemeManager) {
+            window.agGridThemeManager.unregisterGrid("deviceSecurityModal");
+        }
+        if (this.deviceGrid) {
+            this.deviceGrid.destroy();
+            this.deviceGrid = null;
+        }
 
         const deviceColumnDefs = [
             {
@@ -266,17 +449,114 @@ class DeviceSecurityModal {
                 }
             },
             {
-                headerName: "Last Seen",
-                field: "last_seen",
-                colId: "last_seen",
-                width: 120,
+                headerName: "Fixed Version",
+                field: "fixed_version",
+                colId: "fixed_version",
+                width: 150,
                 cellRenderer: (params) => {
-                    if (params.value && params.value.trim() !== "") {
-                        return new Date(params.value).toLocaleDateString();
-                    } else if (params.data.scan_date && params.data.scan_date.trim() !== "") {
-                        return new Date(params.data.scan_date).toLocaleDateString();
+                    const cveId = params.data.cve;
+                    const vendor = params.data.vendor || this.currentDevice?.vendor;
+                    const cellId = `fixed-version-cell-${params.node.id}`;
+
+                    // Return placeholder with unique ID for async update
+                    setTimeout(async () => {
+                        const cell = document.getElementById(cellId);
+                        if (!cell) return;
+
+                        // Only lookup for Cisco devices
+                        if (!vendor || !vendor.toLowerCase().includes('cisco')) {
+                            cell.innerHTML = `<span class="font-monospace text-muted">N/A</span>`;
+                            params.node.setDataValue('fixed_version', 'N/A');
+                            return;
+                        }
+
+                        if (!window.ciscoAdvisoryHelper) {
+                            cell.innerHTML = `<span class="font-monospace text-muted">N/A</span>`;
+                            params.node.setDataValue('fixed_version', 'N/A');
+                            return;
+                        }
+
+                        try {
+                            const installedVersion = params.data.operating_system;
+                            const fixedVersion = await window.ciscoAdvisoryHelper.getFixedVersion(
+                                cveId, vendor, installedVersion
+                            );
+
+                            if (fixedVersion) {
+                                cell.innerHTML = `<span class="font-monospace text-success">${DOMPurify.sanitize(fixedVersion)}+</span>`;
+                                params.node.setDataValue('fixed_version', fixedVersion);
+                            } else {
+                                cell.innerHTML = `<span class="font-monospace text-muted">No Fix</span>`;
+                                params.node.setDataValue('fixed_version', 'No Fix');
+                            }
+                        } catch (error) {
+                            logger.error('Fixed version lookup failed:', error);
+                            cell.innerHTML = `<span class="font-monospace text-muted">Error</span>`;
+                            params.node.setDataValue('fixed_version', 'Error');
+                        }
+                    }, 0);
+
+                    return `<span id="${cellId}" class="font-monospace text-muted">Loading...</span>`;
+                }
+            },
+            {
+                headerName: "Vulnerability",
+                field: "cve",
+                colId: "cve",
+                width: 140,
+                cellRenderer: (params) => {
+                    const cve = params.value;
+                    const pluginName = params.data.plugin_name;
+                    const isKev = params.data.isKev === "Yes";
+
+                    // KEV indicator with inline styles to override AG-Grid defaults
+                    // Must use inline styles because AG-Grid applies its own styling that overrides Bootstrap classes
+                    const linkColor = isKev ? '#dc3545' : '#3b82f6'; // Red for KEV, blue for normal
+                    const fontWeight = isKev ? '700' : '400';
+                    const kevTitle = isKev ? "Known Exploited Vulnerability - " : "";
+
+                    // Create unique ID for vulnerability modal data storage
+                    const vulnDataId = `device_vuln_${params.data.hostname}_${cve || params.data.plugin_id}_${Date.now()}`;
+                    if (!window.vulnModalData) {
+                        window.vulnModalData = {};
                     }
-                    return "N/A";
+                    window.vulnModalData[vulnDataId] = params.data;
+
+                    // Single CVE handling - open vulnerability details modal
+                    if (cve && cve.startsWith("CVE-")) {
+                        return `<a href="#" style="color: ${linkColor} !important; font-weight: ${fontWeight} !important; text-decoration: none;"
+                                   onclick="vulnManager.viewVulnerabilityDetails('${vulnDataId}'); return false;"
+                                   title="${kevTitle}View vulnerability details">${cve}</a>`;
+                    }
+
+                    // Check for Cisco SA ID in plugin name - open vulnerability details modal
+                    if (pluginName && typeof pluginName === "string") {
+                        const ciscoSaMatch = pluginName.match(/cisco-sa-([a-zA-Z0-9-]+)/i);
+                        if (ciscoSaMatch) {
+                            const ciscoId = `cisco-sa-${ciscoSaMatch[1]}`;
+                            return `<a href="#" style="color: ${linkColor} !important; font-weight: ${fontWeight} !important; text-decoration: none;"
+                                       onclick="vulnManager.viewVulnerabilityDetails('${vulnDataId}'); return false;"
+                                       title="${kevTitle}View vulnerability details">${ciscoId}</a>`;
+                        }
+                    }
+
+                    // Fall back to Plugin ID (muted gray text, not clickable - same as main table)
+                    if (params.data.plugin_id) {
+                        return `<span style="color: #6b7280 !important;">Plugin ${params.data.plugin_id}</span>`;
+                    }
+
+                    return "-";
+                }
+            },
+            {
+                headerName: "VPR",
+                field: "vpr_score",
+                colId: "vpr_score",
+                width: 90,
+                cellRenderer: (params) => {
+                    const score = params.value || 0;
+                    const severityClass = this.getVprSeverityClass(score);
+                    return `<span class="severity-badge severity-${severityClass}">${score.toFixed(1)}</span>`;
                 }
             },
             {
@@ -298,103 +578,94 @@ class DeviceSecurityModal {
                 }
             },
             {
-                headerName: "VPR",
-                field: "vpr_score",
-                colId: "vpr_score",
-                width: 90,
-                cellRenderer: (params) => {
-                    const score = params.value || 0;
-                    const severityClass = this.getVprSeverityClass(score);
-                    return `<span class="severity-badge severity-${severityClass}">${score.toFixed(1)}</span>`;
-                }
-            },
-            {
-                headerName: "KEV",
-                field: "isKev",
-                colId: "isKev",
-                width: 110,
-                comparator: (valueA, valueB) => {
-                    // Custom sort: Yes > No (KEVs first when descending)
-                    const kevOrder = { "Yes": 1, "No": 0 };
-                    return (kevOrder[valueA] || 0) - (kevOrder[valueB] || 0);
-                },
-                cellRenderer: (params) => {
-                    const kevStatus = params.value || "No";
-                    if (kevStatus === "Yes") {
-                        return "<span class=\"badge bg-danger\" style=\"cursor: pointer;\" title=\"Known Exploited Vulnerability\" onclick=\"showKevDetails('" + (params.data.cve || "") + "')\">YES</span>";
-                    }
-                    return "<span class=\"badge bg-primary\">NO</span>";
-                },
+                headerName: "Info",
+                field: "info_icon",
+                colId: "info_icon",
+                width: 60,
+                minWidth: 50,
+                maxWidth: 80,
+                sortable: false,
+                filter: false,
+                resizable: false,
+                suppressHeaderMenuButton: true,
                 cellStyle: {
                     textAlign: "center"
-                }
-            },
-            {
-                headerName: "Vulnerability",
-                field: "cve",
-                colId: "cve",
-                width: 140,
+                },
                 cellRenderer: (params) => {
-                    const cve = params.value;
-                    const pluginName = params.data.plugin_name;
-                    
+                    const cve = params.data.cve;
+                    const pluginName = params.data.plugin_name || "Vulnerability details";
+
+                    // If CVE exists, open external CVE.org link in popup
                     if (cve && cve.startsWith("CVE-")) {
                         const cveUrl = `https://cve.mitre.org/cgi-bin/cvename.cgi?name=${cve}`;
-                        return `<a href="#" class="text-primary text-decoration-none"
-                                   onclick="window.open('${cveUrl}', 'cve_popup', 'width=1200,height=1200,scrollbars=yes,resizable=yes'); return false;"
-                                   title="View CVE details on MITRE">${cve}</a>`;
+                        return `<a href="#" class="text-primary" title="View ${cve} on CVE.org" onclick="window.open('${cveUrl}', 'cve_popup', 'width=1200,height=1200,scrollbars=yes,resizable=yes'); return false;">
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>`;
                     }
-                    
-                    // Check for Cisco SA ID in plugin name
-                    if (pluginName && typeof pluginName === "string") {
-                        const ciscoSaMatch = pluginName.match(/cisco-sa-([a-zA-Z0-9-]+)/i);
-                        if (ciscoSaMatch) {
-                            const ciscoId = `cisco-sa-${ciscoSaMatch[1]}`;
-                            const ciscoUrl = `https://sec.cloudapps.cisco.com/security/center/content/CiscoSecurityAdvisory/${ciscoId}`;
-                            return `<a href="#" class="text-warning text-decoration-none"
-                                       onclick="window.open('${ciscoUrl}', 'cisco_popup', 'width=1200,height=1200,scrollbars=yes,resizable=yes'); return false;"
-                                       title="View Cisco Security Advisory">${ciscoId}</a>`;
-                        }
+
+                    // If Cisco SA ID, open external Cisco Security Advisory in popup
+                    if (cve && cve.startsWith("cisco-sa-")) {
+                        const ciscoUrl = `https://sec.cloudapps.cisco.com/security/center/content/CiscoSecurityAdvisory/${cve}`;
+                        return `<a href="#" class="text-warning" title="View ${cve} on Cisco Security" onclick="window.open('${ciscoUrl}', 'cisco_popup', 'width=1200,height=1200,scrollbars=yes,resizable=yes'); return false;">
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>`;
                     }
-                    
-                    // Fall back to Plugin ID
-                    if (params.data.plugin_id) {
-                        return `<span class="text-muted">Plugin ${params.data.plugin_id}</span>`;
-                    }
-                    
-                    return "N/A";
-                }
-            },
-            { 
-                headerName: "Vulnerability Description", 
-                field: "plugin_name",
-                colId: "plugin_name",
-                flex: 1,
-                cellRenderer: (params) => {
-                    const value = params.value || "-";
-                    
-                    // Make description clickable to open vulnerability details modal
-                    if (value !== "-") {
-                        // Create unique ID for this vulnerability and store data for modal access
-                        const vulnDataId = `device_desc_${params.data.hostname}_${params.data.cve || params.data.plugin_id}_${Date.now()}`;
-                        if (!window.vulnModalData) {
-                            window.vulnModalData = {};
-                        }
-                        window.vulnModalData[vulnDataId] = params.data;
-                        
-                        return `<a href="#" class="ag-grid-link" title="${value}" onclick="vulnManager.viewVulnerabilityDetails('${vulnDataId}')">${value}</a>`;
-                    }
-                    return `<span title="${value}">${value}</span>`;
+
+                    // For non-CVE/non-Cisco entries, show disabled info icon
+                    return `<i class="fas fa-info-circle text-muted" title="No external reference available"></i>`;
                 }
             }
         ];
 
         // Detect current theme for v33 theming
         const currentTheme = this.detectCurrentTheme();
-        const _isDarkMode = currentTheme === "dark";  // Prefixed with _ to indicate intentionally unused
+        const isDarkMode = currentTheme === "dark";
+
+        // Use same theme configuration as main table for consistency
+        let quartzTheme = null;
+        if (window.agGrid && window.agGrid.themeQuartz) {
+            if (isDarkMode) {
+                quartzTheme = window.agGrid.themeQuartz.withParams({
+                    backgroundColor: "#0F1C31",
+                    foregroundColor: "#FFF",
+                    browserColorScheme: "dark",
+                    chromeBackgroundColor: "#202c3f",
+                    headerBackgroundColor: "#202c3f",
+                    headerTextColor: "#FFF",
+                    fontSize: 13,
+                    headerFontSize: 13,
+                    oddRowBackgroundColor: "rgba(255, 255, 255, 0.02)",
+                    rowBorder: false,
+                    headerRowBorder: false,
+                    columnBorder: false,
+                    borderColor: "#2a3f5f",
+                    selectedRowBackgroundColor: "#2563eb",
+                    rowHoverColor: "rgba(37, 99, 235, 0.15)",
+                    rangeSelectionBackgroundColor: "rgba(37, 99, 235, 0.2)"
+                });
+            } else {
+                quartzTheme = window.agGrid.themeQuartz.withParams({
+                    backgroundColor: "#ffffff",
+                    foregroundColor: "#2d3748",
+                    chromeBackgroundColor: "#f7fafc",
+                    headerBackgroundColor: "#edf2f7",
+                    headerTextColor: "#2d3748",
+                    fontSize: 13,
+                    headerFontSize: 13,
+                    oddRowBackgroundColor: "rgba(0, 0, 0, 0.02)",
+                    rowBorder: false,
+                    headerRowBorder: false,
+                    columnBorder: false,
+                    borderColor: "#e2e8f0",
+                    selectedRowBackgroundColor: "#3182ce",
+                    rowHoverColor: "rgba(49, 130, 206, 0.1)",
+                    rangeSelectionBackgroundColor: "rgba(49, 130, 206, 0.2)"
+                });
+            }
+        }
 
         const deviceGridOptions = {
-            theme: window.agGridThemeManager ? window.agGridThemeManager.getCurrentTheme() : null, // AG-Grid v33 theme configuration
+            theme: quartzTheme, // Use same theme configuration as main table
             columnDefs: deviceColumnDefs,
             rowData: device.vulnerabilities,
             defaultColDef: {
@@ -404,16 +675,13 @@ class DeviceSecurityModal {
                 wrapHeaderText: false,
                 autoHeaderHeight: false
             },
-            pagination: true,
-            paginationPageSize: 25,
-            paginationPageSizeSelector: false, // Remove page size dropdown for fixed-height modal
+            domLayout: 'normal', // Enable vertical scrolling for all rows
             animateRows: true,
-            // Default sort: Last Seen descending (most recent first)
-            // AG-Grid will handle secondary sorting naturally
+            // Default sort: VPR Score descending (highest risk first)
             initialState: {
                 sort: {
                     sortModel: [
-                        { colId: "last_seen", sort: "desc" }
+                        { colId: "vpr_score", sort: "desc" }
                     ]
                 }
             },
