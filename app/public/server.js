@@ -408,7 +408,7 @@ function startCiscoBackgroundSync(db) {
     const ADMIN_USER_ID = 1; // Default admin user
 
     const preferencesService = new PreferencesService();
-    preferencesService.setDatabase(db);
+    preferencesService.initialize(db);
     const ciscoService = new CiscoAdvisoryService(db, preferencesService);
 
     /**
