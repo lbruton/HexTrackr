@@ -109,15 +109,17 @@ class CiscoController {
                 });
             }
 
-            const advisoryData = await this.ciscoAdvisoryService.getCiscoAdvisory(cveId);
+            // Use caching for advisory lookups (5 minute server TTL, 1 minute browser TTL)
+            // Advisory data is static (syncs every 24 hours), so 5-minute cache is conservative
+            // Note: 404s (null responses) are also cached to reduce database load
+            const cacheKey = `cisco-advisory:${cveId}`;
+            await cacheService.withCaching(res, "stats", cacheKey, 300, async () => {
+                const advisoryData = await this.ciscoAdvisoryService.getCiscoAdvisory(cveId);
 
-            if (!advisoryData) {
-                return res.status(404).json({
-                    error: "CVE not found in Cisco advisories"
-                });
-            }
-
-            res.json(advisoryData);
+                // Return null for 404s (frontend handles this gracefully)
+                // Both null and valid data are cached for 5 minutes
+                return advisoryData || null;
+            }, 60);
 
         } catch (error) {
             console.error(`❌ Failed to get Cisco advisory for CVE ${req.params.cveId}:`, error);
