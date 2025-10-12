@@ -4,9 +4,76 @@
 
 **This workflow is REQUIRED for all development work. Follow it systematically to ensure quality, traceability, and knowledge capture.**
 
-### High-Level Pattern: Research → PRD → Sprint → Task → Pause
+### High-Level Pattern: Brainstorm → Research → PRD → Sprint → Task → Pause
 
 ```text
+┌─────────────────────────────────────────────────────────────┐
+│  PHASE 0: BRAINSTORMING (Exploratory - Optional)            │
+│  **When to use**: Feature ideas that need exploration       │
+│  **Output**: Brainstorm markdown file + Linear issue        │
+│                                                             │
+│  1. Create brainstorm markdown file:                        │
+│     • Location: /docs/brainstorming/                        │
+│     • Naming: BRAINSTORM-<feature-name>.md                  │
+│     • Use template: BRAINSTORM-TEMPLATE.md                  │
+│                                                             │
+│  2. Exploratory discussion (multi-session capable):         │
+│     • Problem statement and goals                           │
+│     • Approach options (compare trade-offs)                 │
+│     • UI/UX considerations and mockups                      │
+│     • Technical feasibility checks                          │
+│     • Edge cases and constraints                            │
+│     • Implementation strategy decisions                     │
+│                                                             │
+│  3. Update markdown throughout conversations:               │
+│     • Document decisions made                               │
+│     • Capture research findings                             │
+│     • Note open questions                                   │
+│     • Add session timestamps for multi-session work         │
+│                                                             │
+│  4. Create Linear issue when ready:                         │
+│     • Title: "BRAINSTORM: <Feature Name>"                   │
+│     • Description: Summary from markdown file               │
+│     • Labels: brainstorm, domain tags                       │
+│     • Status: Backlog                                       │
+│                                                             │
+│  5. Link brainstorm to Linear:                              │
+│     • Update markdown frontmatter with Linear issue         │
+│     • Add Linear URL to YAML frontmatter                    │
+│     • Link to Linear in Document Information section        │
+│                                                             │
+│  6. Create Memento memory:                                  │
+│     • Entity type: HEXTRACKR:DEVELOPMENT:SESSION            │
+│     • Include BRAINSTORM_FILE, LINEAR_ISSUE tags            │
+│     • Create relations to related brainstorms               │
+│     • Tag with phase-0, brainstorm                          │
+│                                                             │
+│  7. Transition decision:                                    │
+│     • Complex features → SRPI workflow (Phase 1+)           │
+│     • Medium features → Sprint file + Linear                │
+│     • Simple tasks → Direct to Phase 1                      │
+│                                                             │
+│  **Key Benefits**:                                          │
+│  • Searchable via claude-context (markdown indexed)         │
+│  • Context persistence across sessions                      │
+│  • Collaborative decision-making record                     │
+│  • Prevents premature commitment to approach                │
+│                                                             │
+│  **Brainstorm File Structure**:                             │
+│  • YAML frontmatter (linear_issue, tags, status)            │
+│  • Problem Statement                                        │
+│  • Goals                                                    │
+│  • Approach Options                                         │
+│  • UI/UX Considerations                                     │
+│  • Technical Implementation Notes                           │
+│  • Edge Cases & Questions                                   │
+│  • Implementation Strategy                                  │
+│  • Timeline & Phases                                        │
+│  • Notes & Discussion (timestamped sessions)                │
+│  • Next Steps                                               │
+└────────────────┬────────────────────────────────────────────┘
+                 │
+                 ▼
 ┌─────────────────────────────────────────────────────────────┐
 │  PHASE 1: INITIAL PLANNING ISSUE                            │
 │  - Create Linear issue outlining:                           │
