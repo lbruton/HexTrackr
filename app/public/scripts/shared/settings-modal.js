@@ -150,9 +150,10 @@ console.log("✅ HexTrackr Settings Modal (shared) loaded successfully");
         document.getElementById("syncKevNow")?.addEventListener("click", syncKevData);
         document.getElementById("kevAutoSync")?.addEventListener("change", toggleKevAutoSync);
 
-        // Load status when modal opens
+        // Load status and settings when modal opens
         const settingsModalElement = document.getElementById("settingsModal");
         if (settingsModalElement) {
+            settingsModalElement.addEventListener("shown.bs.modal", loadSettings);
             settingsModalElement.addEventListener("shown.bs.modal", loadKevSyncStatus);
             settingsModalElement.addEventListener("shown.bs.modal", loadCiscoSyncStatus);
         }
@@ -777,8 +778,9 @@ async function loadCiscoSyncStatus() {
         if (window.preferencesService && autoSyncCheckbox) {
             const bgSyncResult = await window.preferencesService.getPreference("cisco_background_sync_enabled");
             // Default to enabled (true) if preference doesn't exist yet
-            const isEnabled = bgSyncResult.success && bgSyncResult.data && bgSyncResult.data.value
-                ? bgSyncResult.data.value === "true"
+            // Handle both string "true" and boolean true (JSON parsing converts string to boolean)
+            const isEnabled = bgSyncResult.success && bgSyncResult.data
+                ? (bgSyncResult.data.value === "true" || bgSyncResult.data.value === true)
                 : true; // Default enabled
             autoSyncCheckbox.checked = isEnabled;
         }
@@ -915,7 +917,7 @@ async function syncCiscoNow() {
                 lastSyncElement.textContent = syncDate.toLocaleString();
             }
 
-            showNotification(`Cisco advisory sync completed: ${result.totalAdvisories} advisories, ${result.matchedCount} matched in your environment`, "success");
+            showNotification(`Cisco advisory sync completed: ${result.totalAdvisories} CVEs matched, ${result.matchedCount} with fixed versions`, "success");
         } else {
             throw new Error(result.message || result.error || "Unknown sync error");
         }
@@ -1040,16 +1042,29 @@ async function syncKevData() {
  */
 async function toggleKevAutoSync() {
     const autoSyncCheckbox = document.getElementById("kevAutoSync");
-    if (autoSyncCheckbox) {
-        // Write to localStorage for immediate UI consistency
-        localStorage.setItem("kevAutoSyncEnabled", autoSyncCheckbox.checked);
+    if (!autoSyncCheckbox) {return;}
 
-        // HEX-138: Sync to database for cross-device persistence
-        if (window.preferencesSync) {
-            await window.preferencesSync.syncKevAutoRefresh(autoSyncCheckbox.checked);
+    try {
+        // Save to Preferences API (removed localStorage)
+        if (window.preferencesService) {
+            const result = await window.preferencesService.setPreference(
+                "kev_auto_sync_enabled",
+                autoSyncCheckbox.checked.toString()
+            );
+
+            if (result.success) {
+                showNotification(`KEV auto-sync ${autoSyncCheckbox.checked ? "enabled" : "disabled"}`, "info");
+            } else {
+                throw new Error(result.error || "Failed to save preference");
+            }
+        } else {
+            throw new Error("PreferencesService not available");
         }
-
-        showNotification(`KEV auto-sync ${autoSyncCheckbox.checked ? "enabled" : "disabled"}`, "info");
+    } catch (error) {
+        console.error("Failed to toggle KEV auto-sync:", error);
+        showNotification("Failed to update KEV auto-sync setting", "error");
+        // Revert checkbox on error
+        autoSyncCheckbox.checked = !autoSyncCheckbox.checked;
     }
 }
 
@@ -1085,8 +1100,11 @@ function updateKevSyncStatus(status) {
         statusBadge.className = "badge bg-success";
     }
 
-    // Store last sync time
-    localStorage.setItem("kevLastSync", status.lastSync || new Date().toISOString());
+    // Store last sync time to preferences API (removed localStorage)
+    if (window.preferencesService && status.lastSync) {
+        window.preferencesService.setPreference("kev_last_sync", status.lastSync)
+            .catch(err => console.warn("Failed to save KEV last sync time:", err));
+    }
 }
 
 /**
@@ -1097,20 +1115,34 @@ function updateKevSyncStatus(status) {
  */
 async function loadKevSyncStatus() {
     try {
-        // Load auto-sync setting
-        const autoSyncEnabled = localStorage.getItem("kevAutoSyncEnabled") !== "false";
-        const autoSyncCheckbox = document.getElementById("kevAutoSync");
-        if (autoSyncCheckbox) {
-            autoSyncCheckbox.checked = autoSyncEnabled;
-        }
+        // Load settings from Preferences API (migrated from localStorage)
+        if (window.preferencesService) {
+            const result = await window.preferencesService.getAllPreferences();
 
-        // Load last sync time from localStorage first (faster)
-        const lastSync = localStorage.getItem("kevLastSync");
-        if (lastSync) {
-            const lastSyncElement = document.getElementById("kevLastSync");
-            if (lastSyncElement) {
-                const syncDate = new Date(lastSync);
-                lastSyncElement.textContent = syncDate.toLocaleString();
+            if (result.success && result.data) {
+                const prefsMap = {};
+                result.data.preferences.forEach(pref => {
+                    prefsMap[pref.key] = pref.value;
+                });
+
+                // Load auto-sync setting (default to true if not set)
+                const autoSyncCheckbox = document.getElementById("kevAutoSync");
+                if (autoSyncCheckbox) {
+                    const autoSyncEnabled = prefsMap.kev_auto_sync_enabled === "true" ||
+                                          prefsMap.kev_auto_sync_enabled === true ||
+                                          prefsMap.kev_auto_sync_enabled === undefined; // Default true
+                    autoSyncCheckbox.checked = autoSyncEnabled;
+                }
+
+                // Load last sync time
+                const lastSync = prefsMap.kev_last_sync;
+                if (lastSync) {
+                    const lastSyncElement = document.getElementById("kevLastSync");
+                    if (lastSyncElement) {
+                        const syncDate = new Date(lastSync);
+                        lastSyncElement.textContent = syncDate.toLocaleString();
+                    }
+                }
             }
         }
 
@@ -1126,7 +1158,61 @@ async function loadKevSyncStatus() {
 }
 
 /**
+ * Load Settings modal configuration from Preferences API
+ * Migrated from localStorage (HEX-138)
+ * @returns {Promise<void>}
+ */
+async function loadSettings() {
+    try {
+        if (!window.preferencesService) {
+            console.warn("PreferencesService not available, using defaults");
+            return;
+        }
+
+        // Get all preferences
+        const result = await window.preferencesService.getAllPreferences();
+
+        if (result.success && result.data && result.data.preferences) {
+            const prefs = result.data.preferences;
+
+            // Convert array to object for easier lookup
+            const prefsMap = {};
+            prefs.forEach(pref => {
+                prefsMap[pref.key] = pref.value;
+            });
+
+            // Load API Configuration
+            const apiEndpoint = document.getElementById("apiEndpoint");
+            if (apiEndpoint && prefsMap.api_endpoint) {
+                apiEndpoint.value = prefsMap.api_endpoint;
+            }
+
+            const refreshInterval = document.getElementById("refreshInterval");
+            if (refreshInterval && prefsMap.api_refresh_interval) {
+                refreshInterval.value = prefsMap.api_refresh_interval;
+            }
+
+            const apiKey = document.getElementById("apiKey");
+            if (apiKey && prefsMap.api_key) {
+                apiKey.value = prefsMap.api_key;
+            }
+
+            const enableApiAuth = document.getElementById("enableApiAuth");
+            if (enableApiAuth && prefsMap.api_auth_enabled !== undefined) {
+                enableApiAuth.checked = prefsMap.api_auth_enabled === true || prefsMap.api_auth_enabled === "true";
+            }
+
+            console.log("✅ Settings loaded from preferences API");
+        }
+    } catch (error) {
+        console.error("Error loading settings:", error);
+        // Fail silently - use default values
+    }
+}
+
+/**
  * Save Settings modal configuration
+ * Migrated to Preferences API for cross-device sync (HEX-138)
  * @returns {Promise<void>}
  */
 async function saveSettings() {
@@ -1135,45 +1221,36 @@ async function saveSettings() {
 
         // Collect all settings from the modal
         const settings = {
-            // API Configuration
-            apiEndpoint: document.getElementById("apiEndpoint")?.value || "",
-            refreshInterval: parseInt(document.getElementById("refreshInterval")?.value, 10) || 30,
-            apiKey: document.getElementById("apiKey")?.value || "",
-            enableApiAuth: document.getElementById("enableApiAuth")?.checked || false,
+            // API Configuration (prefixed for clarity)
+            api_endpoint: document.getElementById("apiEndpoint")?.value || "",
+            api_refresh_interval: parseInt(document.getElementById("refreshInterval")?.value, 10) || 30,
+            api_key: document.getElementById("apiKey")?.value || "",
+            api_auth_enabled: document.getElementById("enableApiAuth")?.checked || false,
 
-            // ServiceNow Configuration
-            enableServiceNow: document.getElementById("serviceNowEnabled")?.checked || false,
-            serviceNowUrl: document.getElementById("serviceNowInstance")?.value || "",
+            // ServiceNow Configuration (handled separately - kept for backward compat)
+            servicenow_enabled: document.getElementById("serviceNowEnabled")?.checked || false,
+            servicenow_instance_url: document.getElementById("serviceNowInstance")?.value || "",
 
-            // Save timestamp
-            lastSaved: new Date().toISOString()
+            // Metadata
+            settings_last_saved: new Date().toISOString()
         };
 
-        // Save to localStorage (NEVER includes Cisco credentials - security)
-        localStorage.setItem("hextrackr-settings", JSON.stringify(settings));
-        
-        // Try to save to server as well (if API is available)
-        try {
-            const response = await authState.authenticatedFetch("/api/settings", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(settings)
-            });
-            
-            if (response.ok) {
-                console.log("✅ Settings saved to server successfully");
+        // Save to Preferences API (replaces localStorage + broken /api/settings POST)
+        if (window.preferencesService) {
+            const result = await window.preferencesService.setMultiplePreferences(settings);
+
+            if (result.success) {
+                console.log("✅ Settings saved to database successfully");
             } else {
-                console.log("⚠️ Server save failed, using localStorage only");
+                throw new Error(result.error || "Failed to save settings");
             }
-        } catch (_apiError) {
-            console.log("⚠️ Server not available, using localStorage only");
+        } else {
+            throw new Error("PreferencesService not available");
         }
-        
+
         // Update ServiceNow integration status
         updateServiceNowStatus();
-        
+
         // Show success notification
         showNotification("Settings saved successfully!", "success");
         
@@ -1250,28 +1327,46 @@ function initServiceNowSettings() {
     updateUrlPreview();
 }
 
-function loadServiceNowSettings() {
+async function loadServiceNowSettings() {
     try {
-        const settings = JSON.parse(localStorage.getItem("serviceNowSettings") || "{}");
-        const enabledToggle = document.getElementById("serviceNowEnabled");
-        const instanceInput = document.getElementById("serviceNowInstance");
-        const configDiv = document.getElementById("serviceNowConfig");
+        if (!window.preferencesService) {
+            console.warn("PreferencesService not available for ServiceNow settings");
+            return;
+        }
 
-        if (enabledToggle) {
-            enabledToggle.checked = settings.enabled || false;
-        }
-        if (instanceInput) {
-            instanceInput.value = settings.instanceUrl || "";
-        }
-        if (configDiv) {
-            configDiv.style.display = settings.enabled ? "block" : "none";
+        // Get all preferences (more efficient than two separate calls)
+        const result = await window.preferencesService.getAllPreferences();
+
+        if (result.success && result.data && result.data.preferences) {
+            const prefsMap = {};
+            result.data.preferences.forEach(pref => {
+                prefsMap[pref.key] = pref.value;
+            });
+
+            const enabledToggle = document.getElementById("serviceNowEnabled");
+            const instanceInput = document.getElementById("serviceNowInstance");
+            const configDiv = document.getElementById("serviceNowConfig");
+
+            // Load from preferences API (migrated from localStorage)
+            const enabled = prefsMap.servicenow_enabled === true || prefsMap.servicenow_enabled === "true";
+            const instanceUrl = prefsMap.servicenow_instance_url || "";
+
+            if (enabledToggle) {
+                enabledToggle.checked = enabled;
+            }
+            if (instanceInput) {
+                instanceInput.value = instanceUrl;
+            }
+            if (configDiv) {
+                configDiv.style.display = enabled ? "block" : "none";
+            }
         }
     } catch (error) {
         console.error("Error loading ServiceNow settings:", error);
     }
 }
 
-function saveServiceNowSettings() {
+async function saveServiceNowSettings() {
     try {
         const enabledToggle = document.getElementById("serviceNowEnabled");
         const instanceInput = document.getElementById("serviceNowInstance");
@@ -1291,12 +1386,20 @@ function saveServiceNowSettings() {
             }
         }
 
-        const settings = {
-            enabled: enabledToggle.checked,
-            instanceUrl: instanceInput.value.trim()
-        };
+        // Save to Preferences API (migrated from localStorage)
+        if (!window.preferencesService) {
+            throw new Error("PreferencesService not available");
+        }
 
-        localStorage.setItem("serviceNowSettings", JSON.stringify(settings));
+        const result = await window.preferencesService.setMultiplePreferences({
+            servicenow_enabled: enabledToggle.checked,
+            servicenow_instance_url: instanceInput.value.trim()
+        });
+
+        if (!result.success) {
+            throw new Error(result.error || "Failed to save preferences");
+        }
+
         updateServiceNowStatus();
         showNotification("ServiceNow settings saved successfully", "success");
 
@@ -1391,15 +1494,31 @@ function testServiceNowConnection() {
     showNotification("Test link opened in new tab", "info");
 }
 
-function generateServiceNowUrl(ticketNumber) {
+async function generateServiceNowUrl(ticketNumber) {
     try {
-        const settings = JSON.parse(localStorage.getItem("serviceNowSettings") || "{}");
-        
-        if (!settings.enabled || !settings.instanceUrl) {
+        if (!window.preferencesService) {
             return null;
         }
 
-        const baseUrl = settings.instanceUrl.replace(/\/$/, "");
+        // Get ServiceNow settings from preferences API
+        const result = await window.preferencesService.getAllPreferences();
+        if (!result.success || !result.data) {
+            return null;
+        }
+
+        const prefsMap = {};
+        result.data.preferences.forEach(pref => {
+            prefsMap[pref.key] = pref.value;
+        });
+
+        const enabled = prefsMap.servicenow_enabled === true || prefsMap.servicenow_enabled === "true";
+        const instanceUrl = prefsMap.servicenow_instance_url;
+
+        if (!enabled || !instanceUrl) {
+            return null;
+        }
+
+        const baseUrl = instanceUrl.replace(/\/$/, "");
         
         // Detect ticket type based on prefix
         const ticketUpper = ticketNumber.toUpperCase();
@@ -1432,15 +1551,32 @@ function generateServiceNowUrl(ticketNumber) {
     }
 }
 
-function isServiceNowEnabled() {
+async function isServiceNowEnabled() {
     try {
-        const settings = JSON.parse(localStorage.getItem("serviceNowSettings") || "{}");
-        return settings.enabled && settings.instanceUrl;
+        if (!window.preferencesService) {
+            return false;
+        }
+
+        // Get ServiceNow settings from preferences API
+        const result = await window.preferencesService.getAllPreferences();
+        if (!result.success || !result.data) {
+            return false;
+        }
+
+        const prefsMap = {};
+        result.data.preferences.forEach(pref => {
+            prefsMap[pref.key] = pref.value;
+        });
+
+        const enabled = prefsMap.servicenow_enabled === true || prefsMap.servicenow_enabled === "true";
+        const instanceUrl = prefsMap.servicenow_instance_url;
+
+        return enabled && instanceUrl;
     } catch (error) {
         console.error("Error checking ServiceNow status:", error);
         return false;
     }
-};
+}
 
 /**
  * Convert tickets data to CSV format
