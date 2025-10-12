@@ -816,6 +816,22 @@ class CiscoAdvisoryService {
         // Get matched count
         const matchedCount = await this.getMatchedVulnerabilitiesCount();
 
+        // Get total Cisco CVEs count from vulnerabilities table
+        const totalCiscoCvesResult = await new Promise((resolve, reject) => {
+            this.db.get(`
+                SELECT COUNT(DISTINCT cve) as count
+                FROM vulnerabilities_current
+                WHERE vendor LIKE '%Cisco%'
+                  AND lifecycle_state IN ('active', 'reopened')
+            `, (err, row) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row);
+                }
+            });
+        });
+
         // Get sync metadata
         const metadata = await new Promise((resolve, reject) => {
             this.db.get("SELECT * FROM sync_metadata WHERE sync_type = 'cisco' ORDER BY sync_time DESC LIMIT 1", (err, row) => {
@@ -828,6 +844,7 @@ class CiscoAdvisoryService {
         });
 
         return {
+            totalCiscoCves: totalCiscoCvesResult?.count || 0,
             totalAdvisories: advisoryCountResult?.count || 0,
             matchedCount: matchedCount,
             lastSync: metadata?.sync_time || null,
