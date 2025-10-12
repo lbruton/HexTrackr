@@ -405,7 +405,7 @@ async function initializeApplication() {
  */
 function startCiscoBackgroundSync(db) {
     const SYNC_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-    const ADMIN_USER_ID = 1; // Default admin user
+    const ADMIN_USER_ID = "00000000-0000-0000-0000-000000000001"; // Default admin user UUID
 
     const preferencesService = new PreferencesService();
     preferencesService.initialize(db);
