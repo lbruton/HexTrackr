@@ -212,12 +212,13 @@ async function processVulnerabilitiesWithLifecycle(rows, importId, filePath, sca
                     const tier = helpers.getDeduplicationTier(enhancedKey);
 
                     // Insert to vulnerabilities table (snapshot)
+                    // NEW (Migration 006): Added operating_system and solution_text
                     const snapshotQuery = `
                         INSERT INTO vulnerabilities
                         (import_id, hostname, ip_address, cve, severity, vpr_score, cvss_score,
                          first_seen, last_seen, plugin_id, plugin_name, description, solution,
-                         vendor, vulnerability_date, state, import_date)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                         vendor, vulnerability_date, state, import_date, operating_system, solution_text)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     `;
 
                     db.run(snapshotQuery, [
@@ -237,7 +238,9 @@ async function processVulnerabilitiesWithLifecycle(rows, importId, filePath, sca
                         mapped.vendor,
                         mapped.pluginPublished,
                         mapped.state,
-                        currentDate
+                        currentDate,
+                        mapped.operatingSystem,  // NEW (Migration 006)
+                        mapped.solutionText      // NEW (Migration 006)
                     ], function(snapshotErr) {
                         if (snapshotErr) {
                             console.error("Error inserting to vulnerabilities:", snapshotErr);
@@ -250,6 +253,8 @@ async function processVulnerabilitiesWithLifecycle(rows, importId, filePath, sca
                                 console.error("Error checking current vulnerability:", currentErr);
                             } else if (existing) {
                                 // Update existing vulnerability
+                                // NEW (Migration 006): Added COALESCE for operating_system and solution_text
+                                // to preserve "last known good value" when CSV is missing these fields
                                 db.run(`
                                     UPDATE vulnerabilities_current
                                     SET lifecycle_state = 'active',
@@ -270,7 +275,9 @@ async function processVulnerabilitiesWithLifecycle(rows, importId, filePath, sca
                                         solution = ?,
                                         state = ?,
                                         plugin_id = ?,
-                                        ip_address = ?
+                                        ip_address = ?,
+                                        operating_system = COALESCE(?, operating_system),
+                                        solution_text = COALESCE(?, solution_text)
                                     WHERE id = ?
                                 `, [
                                     importId,
@@ -291,12 +298,15 @@ async function processVulnerabilitiesWithLifecycle(rows, importId, filePath, sca
                                     mapped.state || "ACTIVE",
                                     mapped.pluginId,
                                     mapped.ipAddress,
+                                    mapped.operatingSystem,  // NEW (Migration 006) - COALESCE preserves existing if NULL
+                                    mapped.solutionText,     // NEW (Migration 006) - COALESCE preserves existing if NULL
                                     existing.id
                                 ], (updateErr) => {
                                     if (!updateErr) {stats.updated++;}
                                 });
                             } else {
                                 // Insert new vulnerability to current table
+                                // NEW (Migration 006): Added operating_system and solution_text
                                 db.run(`
                                     INSERT INTO vulnerabilities_current (
                                         import_id,
@@ -321,8 +331,10 @@ async function processVulnerabilitiesWithLifecycle(rows, importId, filePath, sca
                                         state,
                                         lifecycle_state,
                                         confidence_score,
-                                        dedup_tier
-                                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                        dedup_tier,
+                                        operating_system,
+                                        solution_text
+                                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                                 `, [
                                     importId,
                                     currentDate,
@@ -346,7 +358,9 @@ async function processVulnerabilitiesWithLifecycle(rows, importId, filePath, sca
                                     mapped.state || "ACTIVE",
                                     "active",
                                     confidence,
-                                    tier
+                                    tier,
+                                    mapped.operatingSystem,  // NEW (Migration 006)
+                                    mapped.solutionText      // NEW (Migration 006)
                                 ], (insertErr) => {
                                     if (!insertErr) {stats.inserted++;}
                                 });
@@ -415,12 +429,13 @@ async function bulkLoadToStagingTable(rows, importId, scanDate, filePath, respon
         const db = global.db;
 
         // Prepare batch INSERT statement for staging table
+        // NEW (Migration 006): Added operating_system and solution_text
         const stagingInsertSQL = `
             INSERT INTO vulnerability_staging (
                 import_id, hostname, ip_address, cve, severity, vpr_score, cvss_score,
                 plugin_id, plugin_name, description, solution, vendor_reference, vendor,
-                vulnerability_date, state, raw_csv_row
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                vulnerability_date, state, raw_csv_row, operating_system, solution_text
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
         // Transaction wrapping for performance
@@ -475,6 +490,7 @@ async function bulkLoadToStagingTable(rows, importId, scanDate, filePath, respon
                 allMappedRecords.forEach((record, recordIndex) => {
                     const { mapped, rawRow } = record;
 
+                    // NEW (Migration 006): Added operating_system and solution_text to parameter array
                     stmt.run([
                         importId,
                         mapped.hostname,
@@ -491,7 +507,9 @@ async function bulkLoadToStagingTable(rows, importId, scanDate, filePath, respon
                         mapped.vendor,
                         mapped.pluginPublished,
                         mapped.state,
-                        JSON.stringify(rawRow) // Store raw CSV row for flexibility
+                        JSON.stringify(rawRow), // Store raw CSV row for flexibility
+                        mapped.operatingSystem,
+                        mapped.solutionText
                     ], function(err) {
                         if (err) {
                             console.error(`Record ${recordIndex + 1} insert error:`, err);
@@ -723,6 +741,7 @@ function processNextBatch(importId, currentDate, batchSize, batchStats, response
 
                 batchRows.forEach((row) => {
                     // Generate ENHANCED unique keys using existing helper functions
+                    // NEW (Migration 006): Added operatingSystem and solutionText
                     const mapped = {
                         assetId: row.asset_id,
                         hostname: row.hostname,
@@ -737,7 +756,9 @@ function processNextBatch(importId, currentDate, batchSize, batchStats, response
                         solution: row.solution,
                         vendor: row.vendor,
                         pluginPublished: row.vulnerability_date,
-                        state: row.state
+                        state: row.state,
+                        operatingSystem: row.operating_system,
+                        solutionText: row.solution_text
                     };
 
                     const enhancedKey = helpers.generateEnhancedUniqueKey(mapped);
@@ -746,14 +767,15 @@ function processNextBatch(importId, currentDate, batchSize, batchStats, response
                     const tier = helpers.getDeduplicationTier(enhancedKey);
 
                     // Insert to snapshots first
+                    // NEW (Migration 006): Added operating_system and solution_text
                     const snapshotInsert = `
                         INSERT INTO vulnerability_snapshots (
                             import_id, scan_date, hostname, ip_address, cve, severity,
                             vpr_score, cvss_score, first_seen, last_seen, plugin_id,
                             plugin_name, description, solution, vendor_reference, vendor,
                             vulnerability_date, state, unique_key, enhanced_unique_key,
-                            confidence_score, dedup_tier
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            confidence_score, dedup_tier, operating_system, solution_text
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     `;
 
                     db.run(snapshotInsert, [
@@ -761,7 +783,8 @@ function processNextBatch(importId, currentDate, batchSize, batchStats, response
                         row.severity, row.vpr_score, row.cvss_score, row.vulnerability_date || currentDate,
                         currentDate, row.plugin_id, row.plugin_name, row.description,
                         row.solution, row.vendor_reference, row.vendor, row.vulnerability_date,
-                        row.state, legacyKey, enhancedKey, confidence, tier
+                        row.state, legacyKey, enhancedKey, confidence, tier,
+                        row.operating_system, row.solution_text
                     ], function(snapErr) {
                         if (snapErr) {
                             console.error(`Snapshot insert error for row ${row.id}:`, snapErr);
@@ -782,6 +805,8 @@ function processNextBatch(importId, currentDate, batchSize, batchStats, response
                                 batchStats.errors++;
                             } else if (existing) {
                                 // Update existing
+                                // NEW (Migration 006): Added COALESCE for operating_system and solution_text
+                                // to preserve "last known good value" when CSV is missing these fields
                                 const updateCurrent = `
                                     UPDATE vulnerabilities_current SET
                                         import_id = ?, scan_date = ?, hostname = ?, ip_address = ?,
@@ -790,7 +815,9 @@ function processNextBatch(importId, currentDate, batchSize, batchStats, response
                                         description = ?, solution = ?, vendor_reference = ?,
                                         vendor = ?, vulnerability_date = ?, state = ?,
                                         lifecycle_state = 'active', enhanced_unique_key = ?,
-                                        confidence_score = ?, dedup_tier = ?
+                                        confidence_score = ?, dedup_tier = ?,
+                                        operating_system = COALESCE(?, operating_system),
+                                        solution_text = COALESCE(?, solution_text)
                                     WHERE id = ?
                                 `;
 
@@ -799,7 +826,8 @@ function processNextBatch(importId, currentDate, batchSize, batchStats, response
                                     row.severity, row.vpr_score, row.cvss_score, currentDate,
                                     row.plugin_id, row.plugin_name, row.description, row.solution,
                                     row.vendor_reference, row.vendor, row.vulnerability_date,
-                                    row.state, enhancedKey, confidence, tier, existing.id
+                                    row.state, enhancedKey, confidence, tier,
+                                    row.operating_system, row.solution_text, existing.id
                                 ], (updateErr) => {
                                     if (updateErr) {
                                         console.error(`Current update error for row ${row.id}:`, updateErr);
@@ -811,14 +839,16 @@ function processNextBatch(importId, currentDate, batchSize, batchStats, response
                                 });
                             } else {
                                 // Insert new
+                                // NEW (Migration 006): Added operating_system and solution_text
                                 const insertCurrent = `
                                     INSERT INTO vulnerabilities_current (
                                         import_id, scan_date, hostname, ip_address, cve, severity,
                                         vpr_score, cvss_score, first_seen, last_seen, plugin_id,
                                         plugin_name, description, solution, vendor_reference, vendor,
                                         vulnerability_date, state, unique_key, lifecycle_state,
-                                        enhanced_unique_key, confidence_score, dedup_tier
-                                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?)
+                                        enhanced_unique_key, confidence_score, dedup_tier,
+                                        operating_system, solution_text
+                                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?, ?)
                                 `;
 
                                 db.run(insertCurrent, [
@@ -827,7 +857,8 @@ function processNextBatch(importId, currentDate, batchSize, batchStats, response
                                     row.vulnerability_date || currentDate, currentDate, row.plugin_id,
                                     row.plugin_name, row.description, row.solution, row.vendor_reference,
                                     row.vendor, row.vulnerability_date, row.state, legacyKey,
-                                    enhancedKey, confidence, tier
+                                    enhancedKey, confidence, tier,
+                                    row.operating_system, row.solution_text
                                 ], (insertErr) => {
                                     if (insertErr) {
                                         console.error(`Current insert error for row ${row.id}:`, insertErr);
