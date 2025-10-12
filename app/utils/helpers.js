@@ -347,6 +347,13 @@ function mapVulnerabilityRow(row) {
     const pluginPublished = row["definition.plugin_published"] || row["definition.plugin_updated"] || row["definition.vulnerability_published"] || row["vulnerability_date"] || row["plugin_published"] || "";
     const firstSeen = row["first_seen"] || row["First Seen"] || "";
     const lastSeen = row["last_seen"] || row["Last Seen"] || "";
+
+    // NEW (Migration 006): Extract operating system and solution text
+    // These fields are optional - NULL if not present in CSV
+    const operatingSystem = row["asset.operating_systems"] || null;
+    const solutionText = row["definition.solution"] || row["solution"] || row["Solution"] || null;
+
+    // Legacy solution field for backward compatibility
     const solution = row["solution"] || row["Solution"] || "";
 
     const baseRecord = {
@@ -365,7 +372,10 @@ function mapVulnerabilityRow(row) {
         firstSeen,
         lastSeen,
         pluginId,
-        pluginPublished
+        pluginPublished,
+        // NEW (Migration 006): Operating system and solution text
+        operatingSystem,
+        solutionText
     };
 
     // Parse multiple CVEs and create separate records for each

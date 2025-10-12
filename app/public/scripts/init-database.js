@@ -95,6 +95,7 @@ function createTables(db) {
   )`);
 
   // 3. Main vulnerabilities table - legacy/normalized data
+  // NEW (Migration 006): Added operating_system and solution_text columns
   db.run(`CREATE TABLE IF NOT EXISTS vulnerabilities (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     import_id INTEGER NOT NULL,
@@ -116,6 +117,8 @@ function createTables(db) {
     vulnerability_date TEXT DEFAULT '',
     state TEXT DEFAULT 'open',
     import_date TEXT DEFAULT '',
+    operating_system TEXT,
+    solution_text TEXT,
     FOREIGN KEY (import_id) REFERENCES vulnerability_imports (id)
   )`);
 
@@ -132,6 +135,7 @@ function createTables(db) {
   )`);
 
   // 5. Vulnerability snapshots - historical data
+  // NEW (Migration 006): Added operating_system and solution_text columns
   db.run(`CREATE TABLE IF NOT EXISTS vulnerability_snapshots (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     import_id INTEGER NOT NULL,
@@ -157,10 +161,13 @@ function createTables(db) {
     confidence_score INTEGER DEFAULT 50,
     dedup_tier INTEGER DEFAULT 4,
     enhanced_unique_key TEXT,
+    operating_system TEXT,
+    solution_text TEXT,
     FOREIGN KEY (import_id) REFERENCES vulnerability_imports (id)
   )`);
 
   // 6. Current vulnerabilities - active data
+  // NEW (Migration 006): Added operating_system and solution_text columns
   db.run(`CREATE TABLE IF NOT EXISTS vulnerabilities_current (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     import_id INTEGER NOT NULL,
@@ -189,6 +196,8 @@ function createTables(db) {
     confidence_score INTEGER DEFAULT 50,
     dedup_tier INTEGER DEFAULT 4,
     enhanced_unique_key TEXT,
+    operating_system TEXT,
+    solution_text TEXT,
     FOREIGN KEY (import_id) REFERENCES vulnerability_imports (id)
   )`);
 
@@ -212,6 +221,7 @@ function createTables(db) {
   )`);
 
   // 8. Vulnerability staging - import staging area
+  // NEW (Migration 006): Added operating_system and solution_text columns
   db.run(`CREATE TABLE IF NOT EXISTS vulnerability_staging (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     import_id INTEGER NOT NULL,
@@ -239,6 +249,8 @@ function createTables(db) {
     processing_error TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     processed_at DATETIME,
+    operating_system TEXT,
+    solution_text TEXT,
     FOREIGN KEY (import_id) REFERENCES vulnerability_imports (id)
   )`);
 

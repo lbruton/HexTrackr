@@ -62,6 +62,9 @@ class DeviceSecurityModal {
         this.createDeviceVulnerabilityGrid(device);
         this.showModal();
 
+        // HEX-204: Add KEV badge to Device Information card header if device has KEV vulnerabilities
+        this.updateDeviceInfoKevBadge(device);
+
         // HEX-203: Update smart ticket button after modal is shown
         this.updateTicketButton(hostname);
     }
@@ -75,6 +78,17 @@ class DeviceSecurityModal {
         // This is a short-term fix until database-first device endpoint is implemented
         const ipAddress = device.vulnerabilities?.find(v => v.ip_address)?.ip_address || device.ipAddress || "N/A";
 
+        // HEX-204: Get vendor classification using existing normalization logic
+        const vendor = this.dataManager?.normalizeVendor(device.vulnerabilities?.[0]?.plugin_name || "", device.hostname) || "Other";
+
+        // HEX-204: Get installed software/OS from vulnerability data (use first non-null value)
+        const installedSoftware = device.vulnerabilities?.find(v => v.operating_system)?.operating_system || "N/A";
+
+        // Vendor badge color logic
+        const vendorBadgeClass = vendor === "CISCO" ? "bg-blue" :
+                                 vendor === "Palo Alto" ? "bg-orange" :
+                                 "bg-secondary";
+
         document.getElementById("deviceInfo").innerHTML = `
             <div class="mb-3">
                 <div class="row">
@@ -87,6 +101,22 @@ class DeviceSecurityModal {
                     <div class="col-sm-4 text-muted">IP Address:</div>
                     <div class="col-sm-8">
                         <span class="font-monospace text-primary">${ipAddress}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="row">
+                    <div class="col-sm-4 text-muted">Vendor:</div>
+                    <div class="col-sm-8">
+                        <span class="badge ${vendorBadgeClass}">${vendor}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="row">
+                    <div class="col-sm-4 text-muted">Installed Software:</div>
+                    <div class="col-sm-8">
+                        <span class="font-monospace text-info">${installedSoftware}</span>
                     </div>
                 </div>
             </div>
@@ -121,12 +151,63 @@ class DeviceSecurityModal {
     }
 
     /**
+     * Add KEV badge to Device Information card header if device has KEV vulnerabilities
+     * HEX-204: Visual indicator for high-risk devices with known exploited vulnerabilities
+     * @param {Object} device - The device data object
+     */
+    updateDeviceInfoKevBadge(device) {
+        // Find the Device Information card header
+        const deviceInfoCard = document.querySelector("#deviceModal .card-header h3.card-title");
+        if (!deviceInfoCard) {
+            return;
+        }
+
+        // Remove any existing KEV badge
+        const existingBadge = deviceInfoCard.parentElement.querySelector(".kev-badge");
+        if (existingBadge) {
+            existingBadge.remove();
+        }
+
+        // Check if device has any KEV vulnerabilities
+        const hasKev = device.hasKev === true;
+        if (!hasKev) {
+            // Reset header styling if no KEV
+            deviceInfoCard.parentElement.style.display = "";
+            deviceInfoCard.parentElement.style.justifyContent = "";
+            deviceInfoCard.parentElement.style.alignItems = "";
+            return;
+        }
+
+        // Find first KEV vulnerability to get CVE for modal link
+        const kevVuln = device.vulnerabilities?.find(v => v.isKev === "Yes");
+        const kevCve = kevVuln?.cve || "";
+
+        // Make the card-header a flex container for badge positioning
+        deviceInfoCard.parentElement.style.display = "flex";
+        deviceInfoCard.parentElement.style.justifyContent = "space-between";
+        deviceInfoCard.parentElement.style.alignItems = "center";
+
+        // Add KEV badge matching the exact structure from device cards
+        const kevBadgeHtml = `
+            <span class="badge kev-badge" role="button" tabindex="0"
+                  onclick="event.stopPropagation(); showKevDetails('${kevCve}')"
+                  onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); event.stopPropagation(); showKevDetails('${kevCve}'); }">
+                <i class="fas fa-shield-halved me-1"></i>
+                KEV
+            </span>
+        `;
+
+        deviceInfoCard.parentElement.insertAdjacentHTML("beforeend", kevBadgeHtml);
+    }
+
+    /**
      * Populate VPR summary cards with enhanced Tabler.io styling
+     * HEX-204: Updated to col-3 for full-width layout (4 cards side-by-side)
      * @param {Object} device - The device data object
      */
     populateVprSummary(device) {
         document.getElementById("deviceVprSummary").innerHTML = `
-            <div class="col-6">
+            <div class="col-lg-3 col-6">
                 <div class="card card-sm bg-red-lt">
                     <div class="card-body text-center">
                         <div class="text-red h3 mb-1">${device.criticalCount}</div>
@@ -135,7 +216,7 @@ class DeviceSecurityModal {
                     </div>
                 </div>
             </div>
-            <div class="col-6">
+            <div class="col-lg-3 col-6">
                 <div class="card card-sm bg-orange-lt">
                     <div class="card-body text-center">
                         <div class="text-orange h3 mb-1">${device.highCount}</div>
@@ -144,7 +225,7 @@ class DeviceSecurityModal {
                     </div>
                 </div>
             </div>
-            <div class="col-6">
+            <div class="col-lg-3 col-6">
                 <div class="card card-sm bg-yellow-lt">
                     <div class="card-body text-center">
                         <div class="text-yellow h3 mb-1">${device.mediumCount}</div>
@@ -153,7 +234,7 @@ class DeviceSecurityModal {
                     </div>
                 </div>
             </div>
-            <div class="col-6">
+            <div class="col-lg-3 col-6">
                 <div class="card card-sm bg-green-lt">
                     <div class="card-body text-center">
                         <div class="text-green h3 mb-1">${device.lowCount}</div>
