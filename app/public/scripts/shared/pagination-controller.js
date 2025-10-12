@@ -74,7 +74,7 @@ class PaginationController {
     getPageInfo() {
         const startItem = this.totalItems === 0 ? 0 : (this.currentPage - 1) * this.pageSize + 1;
         const endItem = Math.min(this.currentPage * this.pageSize, this.totalItems);
-        
+
         return {
             currentPage: this.currentPage,
             totalPages: this.getTotalPages(),
@@ -86,80 +86,53 @@ class PaginationController {
         };
     }
 
-    renderPaginationControls(containerId, onPageChange, onPageSizeChange) {
+    /**
+     * Render top controls (sort dropdown + items per page) above the cards
+     * HEX-204: Separated from bottom pagination for cleaner layout
+     * @param {string} containerId - ID of the container element
+     * @param {Function} onPageSizeChange - Callback when page size changes
+     * @param {Object} options - Optional sort configuration
+     */
+    renderTopControls(containerId, onPageSizeChange, options = {}) {
         const container = document.getElementById(containerId);
         if (!container) {
             return;
         }
 
         const info = this.getPageInfo();
-        
+
         if (info.totalItems === 0) {
             container.innerHTML = "";
             return;
         }
 
-        const prevDisabled = info.currentPage === 1 ? "disabled" : "";
-        const nextDisabled = info.currentPage === info.totalPages ? "disabled" : "";
+        // Sort dropdown options
+        const sortOptions = options.sortOptions || [];
+        const currentSort = options.currentSort || "";
+        const onSortChange = options.onSortChange || (() => {});
 
-        container.innerHTML = `
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                <div class="pagination-info">
-                    <span class="text-muted">
-                        Showing ${info.startItem} to ${info.endItem} of ${info.totalItems} items
-                    </span>
-                </div>
-                
-                <div class="d-flex align-items-center gap-3 flex-wrap">
-                    <div class="d-flex align-items-center gap-2">
-                        <label for="${containerId}PageSize" class="form-label mb-0 text-muted small">Items per page:</label>
-                        <select id="${containerId}PageSize" class="form-select form-select-sm" style="width: auto;">
-                            ${info.availableSizes.map(size => 
-                                `<option value="${size}" ${size === info.pageSize ? "selected" : ""}>${size}</option>`
-                            ).join("")}
-                        </select>
-                    </div>
-                    
-                    <nav aria-label="Card pagination">
-                        <ul class="pagination pagination-sm mb-0">
-                            <li class="page-item ${prevDisabled}">
-                                <button class="page-link" data-page="1" ${prevDisabled ? "disabled" : ""}>
-                                    <i class="fas fa-angle-double-left"></i>
-                                </button>
-                            </li>
-                            <li class="page-item ${prevDisabled}">
-                                <button class="page-link" data-page="${info.currentPage - 1}" ${prevDisabled ? "disabled" : ""}>
-                                    <i class="fas fa-angle-left"></i>
-                                </button>
-                            </li>
-                            
-                            ${this.generatePageNumbers(info).map(page => {
-                                if (page === "...") {
-                                    return "<li class=\"page-item disabled\"><span class=\"page-link\">...</span></li>";
-                                }
-                                const isActive = page === info.currentPage ? "active" : "";
-                                return `<li class="page-item ${isActive}">
-                                    <button class="page-link" data-page="${page}">${page}</button>
-                                </li>`;
-                            }).join("")}
-                            
-                            <li class="page-item ${nextDisabled}">
-                                <button class="page-link" data-page="${info.currentPage + 1}" ${nextDisabled ? "disabled" : ""}>
-                                    <i class="fas fa-angle-right"></i>
-                                </button>
-                            </li>
-                            <li class="page-item ${nextDisabled}">
-                                <button class="page-link" data-page="${info.totalPages}" ${nextDisabled ? "disabled" : ""}>
-                                    <i class="fas fa-angle-double-right"></i>
-                                </button>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
-            </div>
+        const sortDropdownHTML = sortOptions.length > 0 ? `
+            <select id="${containerId}SortBy" class="form-select form-select-sm" style="width: auto;">
+                ${sortOptions.map(opt =>
+                    `<option value="${opt.value}" ${opt.value === currentSort ? "selected" : ""}>${opt.label}</option>`
+                ).join("")}
+            </select>
+        ` : "";
+
+        const itemsDropdownHTML = `
+            <select id="${containerId}PageSize" class="form-select form-select-sm" style="width: auto;">
+                ${info.availableSizes.map(size =>
+                    `<option value="${size}" ${size === info.pageSize ? "selected" : ""}>${size} Items</option>`
+                ).join("")}
+            </select>
         `;
 
-        // Add event listeners
+        container.innerHTML = `
+            ${sortDropdownHTML}
+            ${itemsDropdownHTML}
+        `;
+
+        // Add event listeners for page size
         const pageSizeSelect = container.querySelector(`#${containerId}PageSize`);
         if (pageSizeSelect) {
             pageSizeSelect.addEventListener("change", (e) => {
@@ -168,6 +141,83 @@ class PaginationController {
             });
         }
 
+        // Add event listeners for sort dropdown
+        if (sortOptions.length > 0) {
+            const sortSelect = container.querySelector(`#${containerId}SortBy`);
+            if (sortSelect) {
+                sortSelect.addEventListener("change", (e) => {
+                    onSortChange(e.target.value);
+                });
+            }
+        }
+    }
+
+    renderPaginationControls(containerId, onPageChange) {
+        const container = document.getElementById(containerId);
+        if (!container) {
+            return;
+        }
+
+        const info = this.getPageInfo();
+
+        if (info.totalItems === 0) {
+            container.innerHTML = "";
+            return;
+        }
+
+        const prevDisabled = info.currentPage === 1 ? "disabled" : "";
+        const nextDisabled = info.currentPage === info.totalPages ? "disabled" : "";
+
+        // HEX-204: Bottom pagination only (arrows/numbers + showing text)
+        container.innerHTML = `
+            <!-- Center Row: Pagination Controls -->
+            <div class="d-flex justify-content-center mb-2">
+                <nav aria-label="Card pagination">
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item ${prevDisabled}">
+                            <button class="page-link" data-page="1" ${prevDisabled ? "disabled" : ""}>
+                                <i class="fas fa-angle-double-left"></i>
+                            </button>
+                        </li>
+                        <li class="page-item ${prevDisabled}">
+                            <button class="page-link" data-page="${info.currentPage - 1}" ${prevDisabled ? "disabled" : ""}>
+                                <i class="fas fa-angle-left"></i>
+                            </button>
+                        </li>
+
+                        ${this.generatePageNumbers(info).map(page => {
+                            if (page === "...") {
+                                return "<li class=\"page-item disabled\"><span class=\"page-link\">...</span></li>";
+                            }
+                            const isActive = page === info.currentPage ? "active" : "";
+                            return `<li class="page-item ${isActive}">
+                                <button class="page-link" data-page="${page}">${page}</button>
+                            </li>`;
+                        }).join("")}
+
+                        <li class="page-item ${nextDisabled}">
+                            <button class="page-link" data-page="${info.currentPage + 1}" ${nextDisabled ? "disabled" : ""}>
+                                <i class="fas fa-angle-right"></i>
+                            </button>
+                        </li>
+                        <li class="page-item ${nextDisabled}">
+                            <button class="page-link" data-page="${info.totalPages}" ${nextDisabled ? "disabled" : ""}>
+                                <i class="fas fa-angle-double-right"></i>
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+            <!-- Bottom Row: Showing X of Y items -->
+            <div class="d-flex justify-content-center">
+                <span class="text-muted small">
+                    Showing ${info.startItem} to ${info.endItem} of ${info.totalItems} items
+                </span>
+            </div>
+        `;
+
+        // Add event listeners for pagination buttons
         container.querySelectorAll(".page-link[data-page]").forEach(btn => {
             btn.addEventListener("click", (e) => {
                 e.preventDefault();
