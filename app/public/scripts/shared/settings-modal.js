@@ -172,36 +172,81 @@ console.log("✅ HexTrackr Settings Modal (shared) loaded successfully");
         
         // Initialize ServiceNow settings when modal is shown
         this.modal.addEventListener("shown.bs.modal", initServiceNowSettings);
-        
+
+        // Third Party Integration button filtering
+        document.querySelectorAll('#thirdPartyButtons .btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const filter = this.getAttribute('data-filter');
+
+                // Update active button styling
+                document.querySelectorAll('#thirdPartyButtons .btn').forEach(btn => {
+                    btn.classList.remove('active', 'btn-primary');
+                    btn.classList.add('btn-outline-primary');
+                });
+                this.classList.remove('btn-outline-primary');
+                this.classList.add('active', 'btn-primary');
+
+                // Show/hide cards based on filter
+                const cards = document.querySelectorAll('[data-integration]');
+                cards.forEach(card => {
+                    if (filter === 'all') {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = card.getAttribute('data-integration') === filter ? '' : 'none';
+                    }
+                });
+            });
+        });
+
         console.log("Settings modal event listeners configured");
     },
     
     /**
-     * Switch to a specific tab in the settings modal
-     * @param {string} tabId - The ID of the tab to switch to
+     * Switch to a specific section in the settings modal
+     * @param {string} sectionId - The ID of the section to switch to (third-party, data-mgmt, system-config)
      */
-    switchToTab(tabId) {
-        // Deactivate all tabs
-        document.querySelectorAll("#settingsModal .nav-link").forEach(tab => {
-            tab.classList.remove("active");
-            tab.setAttribute("aria-selected", "false");
+    switchToTab(sectionId) {
+        // Hide all sections
+        const sections = ['thirdPartyContent', 'dataManagementContent', 'systemConfigContent'];
+        sections.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.style.display = 'none';
+            }
         });
-        
-        document.querySelectorAll("#settingsModal .tab-pane").forEach(pane => {
-            pane.classList.remove("show", "active");
-        });
-        
-        // Activate the target tab
-        const targetTab = document.getElementById(tabId + "-tab");
-        const targetPane = document.getElementById(tabId);
-        
-        if (targetTab && targetPane) {
-            targetTab.classList.add("active");
-            targetTab.setAttribute("aria-selected", "true");
-            targetPane.classList.add("show", "active");
-            console.log(`✅ Switched to ${tabId} tab`);
+
+        // Hide button navigation
+        const buttons = document.getElementById('thirdPartyButtons');
+        if (buttons) {
+            buttons.style.display = 'none';
+        }
+
+        // Show requested section
+        const sectionMap = {
+            'third-party': 'thirdPartyContent',
+            'api-config': 'thirdPartyContent', // Legacy support
+            'data-mgmt': 'dataManagementContent',
+            'data-management': 'dataManagementContent', // Legacy support
+            'system-config': 'systemConfigContent'
+        };
+
+        const targetSectionId = sectionMap[sectionId];
+        if (targetSectionId) {
+            const targetSection = document.getElementById(targetSectionId);
+            if (targetSection) {
+                targetSection.style.display = 'block';
+
+                // Show button navigation for Third Party section
+                if (targetSectionId === 'thirdPartyContent' && buttons) {
+                    buttons.style.display = 'block';
+                }
+
+                console.log(`✅ Switched to ${sectionId} section`);
+            } else {
+                console.warn(`❌ Section ${targetSectionId} not found`);
+            }
         } else {
-            console.warn(`❌ Tab ${tabId} not found`);
+            console.warn(`❌ Unknown section ID: ${sectionId}`);
         }
     }
 };
