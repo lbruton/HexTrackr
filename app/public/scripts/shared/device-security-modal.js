@@ -909,7 +909,7 @@ class DeviceSecurityModal {
             const colorClass = `btn-outline-${statusColors[status] || "primary"}`;
             const textColorClass = jobType ? `status-label ${jobTypeTextColors[jobType] || "status-generic"}` : "";
             return {
-                text: "Open Ticket",
+                text: "View Ticket",
                 colorClass: colorClass,
                 icon: "fas fa-folder-open",
                 textColorClass: textColorClass
