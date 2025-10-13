@@ -1532,6 +1532,13 @@ function showNotification(message, type) {
 }
 
 // ServiceNow Integration Functions
+
+// Global cache for ServiceNow settings (synchronous access)
+window.serviceNowSettingsCache = {
+    enabled: false,
+    instanceUrl: null
+};
+
 function initServiceNowSettings() {
     const enabledToggle = document.getElementById("serviceNowEnabled");
     const instanceInput = document.getElementById("serviceNowInstance");
@@ -1599,6 +1606,10 @@ async function loadServiceNowSettings() {
             if (configDiv) {
                 configDiv.style.display = enabled ? "block" : "none";
             }
+
+            // Update global cache for synchronous access
+            window.serviceNowSettingsCache.enabled = enabled;
+            window.serviceNowSettingsCache.instanceUrl = instanceUrl;
         }
     } catch (error) {
         console.error("Error loading ServiceNow settings:", error);
@@ -1638,6 +1649,10 @@ async function saveServiceNowSettings() {
         if (!result.success) {
             throw new Error(result.error || "Failed to save preferences");
         }
+
+        // Update global cache for synchronous access
+        window.serviceNowSettingsCache.enabled = enabledToggle.checked;
+        window.serviceNowSettingsCache.instanceUrl = instanceInput.value.trim();
 
         updateServiceNowStatus();
         showNotification("ServiceNow settings saved successfully", "success");
@@ -1786,6 +1801,54 @@ async function generateServiceNowUrl(ticketNumber) {
         return `${baseUrl}/nav_to.do?uri=${encodeURIComponent(tableUrl)}`;
     } catch (error) {
         console.error("Error generating ServiceNow URL:", error);
+        return null;
+    }
+}
+
+/**
+ * Synchronous version of generateServiceNowUrl using cached settings
+ * @param {string} ticketNumber - The ServiceNow ticket number
+ * @returns {string|null} The ServiceNow URL or null if not configured
+ */
+function generateServiceNowUrlSync(ticketNumber) {
+    try {
+        // Use cached settings for synchronous access
+        const enabled = window.serviceNowSettingsCache.enabled;
+        const instanceUrl = window.serviceNowSettingsCache.instanceUrl;
+
+        if (!enabled || !instanceUrl) {
+            return null;
+        }
+
+        const baseUrl = instanceUrl.replace(/\/$/, "");
+
+        // Detect ticket type based on prefix
+        const ticketUpper = ticketNumber.toUpperCase();
+        let tableUrl = "";
+
+        if (ticketUpper.startsWith("CHG")) {
+            // Change Request
+            tableUrl = `change_request.do?sysparm_query=number=${ticketNumber}`;
+        } else if (ticketUpper.startsWith("INC")) {
+            // Incident
+            tableUrl = `incident.do?sysparm_query=number=${ticketNumber}`;
+        } else if (ticketUpper.startsWith("REQ")) {
+            // Request
+            tableUrl = `sc_request.do?sysparm_query=number=${ticketNumber}`;
+        } else if (ticketUpper.startsWith("PRB")) {
+            // Problem
+            tableUrl = `problem.do?sysparm_query=number=${ticketNumber}`;
+        } else if (ticketUpper.startsWith("TASK")) {
+            // Task
+            tableUrl = `sc_task.do?sysparm_query=number=${ticketNumber}`;
+        } else {
+            // Default fallback - try to search across all tables
+            tableUrl = `text_search_exact_match.do?sysparm_search=${ticketNumber}`;
+        }
+
+        return `${baseUrl}/nav_to.do?uri=${encodeURIComponent(tableUrl)}`;
+    } catch (error) {
+        console.error("Error generating ServiceNow URL (sync):", error);
         return null;
     }
 }
@@ -2207,7 +2270,8 @@ async function restoreData(type) {
 }
 
 // Expose ServiceNow functions globally for use by other pages
-window.generateServiceNowUrl = generateServiceNowUrl;
-window.isServiceNowEnabled = isServiceNowEnabled;
+// Using synchronous versions for immediate access (no Promise handling needed)
+window.generateServiceNowUrl = generateServiceNowUrlSync;
+window.isServiceNowEnabled = () => window.serviceNowSettingsCache.enabled;
 
 })();
