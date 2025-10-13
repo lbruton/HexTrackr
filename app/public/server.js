@@ -36,6 +36,7 @@ const middlewareConfig = require("../config/middleware");
 const ProgressTracker = require("../utils/ProgressTracker");
 const DatabaseService = require("../services/databaseService");
 const CiscoAdvisoryService = require("../services/ciscoAdvisoryService");
+const PaloAltoService = require("../services/paloAltoService"); // HEX-209: Palo Alto advisory sync
 const PreferencesService = require("../services/preferencesService");
 
 // Authentication middleware
@@ -61,6 +62,7 @@ const docsRoutes = require("../routes/docs");
 const templateRoutes = require("../routes/templates");
 const kevRoutes = require("../routes/kev");
 const ciscoRoutes = require("../routes/cisco"); // HEX-141: Cisco PSIRT advisory sync
+const paloRoutes = require("../routes/palo-alto"); // HEX-209: Palo Alto advisory sync
 const deviceRoutes = require("../routes/devices"); // HEX-101: Device statistics endpoint
 const authRoutes = require("../routes/auth");
 const preferencesRoutes = require("../routes/preferences"); // HEX-138: User preferences API
@@ -269,6 +271,7 @@ async function initializeApplication() {
     app.use("/api/templates", templateRoutes);
     app.use("/api/kev", kevRoutes(db));
     app.use("/api/cisco", ciscoRoutes(db, PreferencesController.getInstance().preferencesService)); // HEX-141: Cisco PSIRT advisory sync
+    app.use("/api/palo", paloRoutes(db, PreferencesController.getInstance().preferencesService)); // HEX-209: Palo Alto advisory sync
     app.use("/api/devices", deviceRoutes); // HEX-101: Device statistics endpoint
     app.use("/api/auth", authRoutes);
     app.use("/api/preferences", preferencesRoutes); // HEX-138: User preferences
