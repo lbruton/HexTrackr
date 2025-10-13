@@ -4,7 +4,7 @@
     { "pattern": "palo\\s*alto", "vendor": "Palo Alto" }
   ],
   "hostnameVendorPatterns": [
-    { "pattern": "nfpan", "vendor": "Palo Alto" },
-    { "pattern": "n[rs]wan", "vendor": "CISCO" }
+    { "pattern": "n[rs]wan", "vendor": "CISCO" },
+    { "pattern": "pan", "vendor": "Palo Alto" }
   ]
 }

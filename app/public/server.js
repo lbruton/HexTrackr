@@ -413,6 +413,7 @@ function startCiscoBackgroundSync(db) {
     const preferencesService = new PreferencesService();
     preferencesService.initialize(db);
     const ciscoService = new CiscoAdvisoryService(db, preferencesService);
+    const paloService = new PaloAltoService(db, preferencesService); // HEX-209: Palo Alto background sync
 
     // Initialize preference with default value if it doesn't exist (HEX-141)
     preferencesService.getPreference(ADMIN_USER_ID, "cisco_background_sync_enabled")
@@ -472,6 +473,62 @@ function startCiscoBackgroundSync(db) {
 
     // Schedule recurring sync every 24 hours
     setInterval(runSync, SYNC_INTERVAL);
+
+    // ========================================
+    // HEX-209: Palo Alto Advisory Background Sync
+    // ========================================
+
+    // Initialize Palo Alto background sync preference (default: true)
+    preferencesService.getPreference(ADMIN_USER_ID, "palo_background_sync_enabled")
+        .then(result => {
+            if (!result.success) {
+                // Preference doesn't exist - create it with default value "true"
+                return preferencesService.setPreference(ADMIN_USER_ID, "palo_background_sync_enabled", "true");
+            }
+        })
+        .then(() => {
+            console.log("✅ Palo Alto background sync preference initialized");
+        })
+        .catch(err => {
+            console.warn("⚠️  Failed to initialize Palo Alto background sync preference:", err.message);
+        });
+
+    /**
+     * Execute Palo Alto advisory sync if enabled
+     * Note: No credentials check needed - Palo Alto API is public
+     */
+    async function runPaloSync() {
+        try {
+            // Check if background sync is enabled (default: true)
+            const bgSyncPref = await preferencesService.getPreference(ADMIN_USER_ID, "palo_background_sync_enabled");
+            const isEnabled = bgSyncPref.success && bgSyncPref.data
+                ? (bgSyncPref.data.value === "true" || bgSyncPref.data.value === true)
+                : true; // Default enabled if preference doesn't exist
+
+            if (!isEnabled) {
+                console.log("ℹ️  Palo Alto background sync skipped: Disabled by user preference");
+                return;
+            }
+
+            console.log("🔄 Starting Palo Alto advisory background sync...");
+            const result = await paloService.syncPaloAdvisories(ADMIN_USER_ID);
+
+            console.log(`✅ Palo Alto background sync completed: ${result.matchedCount}/${result.totalCvesChecked} CVEs synced`);
+
+        } catch (error) {
+            console.error("❌ Palo Alto background sync failed:", error.message);
+            // Don't crash the server on sync failure - just log and continue
+        }
+    }
+
+    // Run initial sync on startup (after 20 second delay, staggered from Cisco)
+    console.log("⏰ Palo Alto advisory background sync scheduled (runs on startup + every 24 hours)");
+    setTimeout(() => {
+        runPaloSync();
+    }, 20000); // 20s delay (staggered after Cisco's 10s)
+
+    // Schedule recurring sync every 24 hours
+    setInterval(runPaloSync, SYNC_INTERVAL);
 }
 
 initializeApplication().catch(error => {
