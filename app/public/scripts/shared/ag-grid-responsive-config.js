@@ -59,30 +59,6 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
             hide: isMobile,
         },
         {
-            headerName: "Vendor",
-            field: "vendor",
-            sortable: true,
-            filter: true,
-            width: 90,
-            minWidth: 80,
-            maxWidth: 120,
-            resizable: true,
-            hide: !isDesktop,
-            cellRenderer: (params) => {
-                const vendor = params.value || "Other";
-                const badgeColors = {
-                    "CISCO": "primary",      // Blue
-                    "Palo Alto": "warning",  // Orange
-                    "Other": "secondary"     // Gray
-                };
-                const color = badgeColors[vendor] || "secondary";
-                return `<span class="badge bg-${color}">${vendor}</span>`;
-            },
-            cellStyle: {
-                textAlign: "center"
-            }
-        },
-        {
             headerName: "Hostname",
             field: "hostname",
             sortable: true,
@@ -109,6 +85,28 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
             cellRenderer: (params) => {
                 const ip = params.value || "N/A";
                 return ip !== "N/A" ? `<code class="text-muted-var small">${ip}</code>` : "<span class=\"text-muted-var\">N/A</span>";
+            }
+        },
+        {
+            headerName: "Vendor",
+            field: "vendor",
+            sortable: true,
+            filter: true,
+            width: 90,
+            minWidth: 80,
+            maxWidth: 120,
+            resizable: true,
+            hide: !isDesktop,
+            cellRenderer: (params) => {
+                const vendor = params.value || "Other";
+                // Colored text instead of badges - cleaner table design
+                let colorClass = "text-secondary";  // Gray for Other
+                if (vendor === "CISCO") {
+                    colorClass = "text-primary";     // Blue for Cisco
+                } else if (vendor === "Palo Alto") {
+                    colorClass = "text-warning";     // Orange for Palo Alto
+                }
+                return `<span class="${colorClass} fw-bold">${vendor}</span>`;
             }
         },
         {
@@ -266,15 +264,16 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
             resizable: true,
             cellRenderer: (params) => {
                 const score = parseFloat(params.value) || 0;
-                let className = "severity-low";
+                // Colored text based on score - cleaner table design
+                let colorClass = "text-success";  // Green for low (0-3.9)
                 if (score >= 9.0) {
-                    className = "severity-critical";
+                    colorClass = "text-danger";   // Red for critical (9-10)
                 } else if (score >= 7.0) {
-                    className = "severity-high";
+                    colorClass = "text-orange";   // Orange for high (7-8.9)
                 } else if (score >= 4.0) {
-                    className = "severity-medium";
+                    colorClass = "text-warning";  // Yellow for medium (4-6.9)
                 }
-                return `<span class="severity-badge ${className}">${score.toFixed(1)}</span>`;
+                return `<span class="${colorClass} fw-bold">${score.toFixed(1)}</span>`;
             }
         },
         {
@@ -288,45 +287,79 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
             resizable: true,
             cellRenderer: (params) => {
                 const severity = params.value || "Low";
-                const className = `severity-${severity.toLowerCase()}`;
-                return `<span class="severity-badge ${className}">${severity}</span>`;
+                // Colored text based on severity - cleaner table design
+                let colorClass = "text-success";  // Green for Low
+                if (severity.toUpperCase() === "CRITICAL") {
+                    colorClass = "text-danger";   // Red for Critical
+                } else if (severity.toUpperCase() === "HIGH") {
+                    colorClass = "text-orange";   // Orange for High
+                } else if (severity.toUpperCase() === "MEDIUM") {
+                    colorClass = "text-warning";  // Yellow for Medium
+                }
+                return `<span class="${colorClass} fw-bold text-uppercase">${severity}</span>`;
             }
         },
         {
-            headerName: "Info",
-            field: "info_icon",
-            sortable: false,
-            filter: false,
-            width: 60,
-            minWidth: 50,
-            maxWidth: 80,
-            resizable: false,
-            suppressHeaderMenuButton: true,  // Remove filter icon from header
+            headerName: "",  // Empty - will show icon via CSS
+            headerClass: "ticket-header-icon",  // Custom class for icon styling
+            field: "ticket_status",
+            sortable: true,
+            filter: false,  // No filter icon, just sorting
+            width: 80,
+            minWidth: 70,
+            maxWidth: 100,
+            resizable: true,
             cellStyle: {
                 textAlign: "center"
             },
             cellRenderer: (params) => {
-                const cve = params.data.cve;
-                const pluginName = params.data.plugin_name || "Vulnerability details";
+                const ticketStatus = params.value;
+                const ticketCount = params.data.ticket_count || 0;
+                const ticketIds = params.data.ticket_ids || [];
+                const hostname = params.data.hostname;
+                const isKev = params.data.is_kev === 1 || params.data.is_kev === true;
 
-                // If CVE exists, open external CVE.org link in popup
-                if (cve && cve.startsWith("CVE-")) {
-                    const cveUrl = `https://cve.mitre.org/cgi-bin/cvename.cgi?name=${cve}`;
-                    return `<a href="#" class="text-primary" title="View ${cve} on CVE.org" onclick="window.open('${cveUrl}', 'cve_popup', 'width=1200,height=1200,scrollbars=yes,resizable=yes'); return false;">
-                        <i class="fas fa-external-link-alt"></i>
-                    </a>`;
+                // No tickets - show muted ticket icon with keyboard shortcuts
+                if (!ticketStatus || ticketCount === 0) {
+                    return `<a href="#" class="text-muted create-ticket-link"
+                               data-hostname="${hostname}"
+                               data-is-kev="${isKev}"
+                               onclick="handleGridCreateTicket(event, this); return false;"
+                               title="Create ticket for ${hostname}&#13;&#10;Cmd+Shift: KEV devices at location&#13;&#10;Alt+Shift: All devices at location">
+                               <i class="fas fa-ticket-alt" style="opacity: 0.6;"></i>
+                            </a>`;
                 }
 
-                // If Cisco SA ID, open external Cisco Security Advisory in popup
-                if (cve && cve.startsWith("cisco-sa-")) {
-                    const ciscoUrl = `https://sec.cloudapps.cisco.com/security/center/content/CiscoSecurityAdvisory/${cve}`;
-                    return `<a href="#" class="text-warning" title="View ${cve} on Cisco Security" onclick="window.open('${ciscoUrl}', 'cisco_popup', 'width=1200,height=1200,scrollbars=yes,resizable=yes'); return false;">
-                        <i class="fas fa-external-link-alt"></i>
-                    </a>`;
+                // Has tickets - show colored indicator based on status
+                let colorClass = "text-secondary";  // Gray for unknown
+                let icon = "fas fa-ticket-alt";
+
+                if (ticketStatus === "Overdue") {
+                    colorClass = "text-danger";     // Red
+                } else if (ticketStatus === "Pending") {
+                    colorClass = "text-warning";    // Yellow
+                } else if (ticketStatus === "Open") {
+                    colorClass = "text-primary";    // Blue
                 }
 
-                // For non-CVE/non-Cisco entries, show disabled info icon
-                return `<i class="fas fa-info-circle text-muted" title="No external reference available"></i>`;
+                // Single ticket - navigate directly
+                if (ticketCount === 1) {
+                    const ticketId = ticketIds[0];
+                    const href = ticketId ? `/tickets.html?openTicket=${ticketId}` : "#";
+                    return `<a href="${href}" class="${colorClass}"
+                               title="View ${ticketStatus} ticket for ${hostname}">
+                               <i class="${icon}"></i>
+                            </a>`;
+                }
+
+                // Multiple tickets - show picker modal
+                return `<a href="#" class="${colorClass}"
+                           data-hostname="${hostname}"
+                           data-ticket-count="${ticketCount}"
+                           onclick="handleGridViewTickets(event, this); return false;"
+                           title="${ticketCount} ${ticketStatus} tickets for ${hostname} - click to choose">
+                           <i class="${icon}"></i>
+                        </a>`;
             }
         }
     ];
@@ -478,6 +511,236 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
     return gridOptions;
 }
 
+/**
+ * Handle create ticket click from AG-Grid table view with keyboard shortcuts
+ * Matches card view power tool functionality:
+ * - Single click: Create ticket for one device
+ * - Cmd+Shift (Mac) or Ctrl+Shift (Windows): KEV devices at location
+ * - Alt+Shift: All devices at location
+ *
+ * @param {MouseEvent} event - Click event with keyboard modifiers
+ * @param {HTMLElement} link - The link element that was clicked
+ * @global
+ */
+function handleGridCreateTicket(event, link) {
+    // Stop event propagation
+    event.preventDefault();
+    event.stopPropagation();
+
+    // Read data from link attributes
+    const hostname = link.dataset.hostname;
+    const isKev = link.dataset.isKev === "true";
+
+    console.log(`[Grid Create Ticket] hostname=${hostname}, isKev=${isKev}`);
+
+    // Parse hostname to extract SITE and Location (ALL CAPS)
+    const site = hostname.substring(0, 4).toUpperCase();
+    const location = hostname.substring(0, 5).toUpperCase();
+
+    // Detect keyboard modifiers to determine mode
+    let mode = "single";
+    let deviceList = [hostname.toUpperCase()];
+
+    // Mode 2: KEV devices at location (Cmd/Ctrl + Shift)
+    if ((event.metaKey || event.ctrlKey) && event.shiftKey) {
+        mode = "bulk-kev";
+
+        // Access dataManager from global vulnManager
+        if (window.vulnManager && window.vulnManager.dataManager) {
+            const allDevices = window.vulnManager.dataManager.getFilteredDevices();
+
+            // Filter for KEV devices at same location
+            deviceList = allDevices
+                .filter(device => device.hostname.toLowerCase().startsWith(location.toLowerCase()) && device.hasKev === true)
+                .map(device => device.hostname.toUpperCase());
+
+            console.log(`[Grid Power Tool] KEV mode - found ${deviceList.length} KEV devices at ${location}`);
+        } else {
+            console.error("[Grid Power Tool] vulnManager.dataManager not available");
+        }
+    }
+    // Mode 3: All devices at location (Alt + Shift)
+    else if (event.altKey && event.shiftKey) {
+        mode = "bulk-all";
+
+        // Access dataManager from global vulnManager
+        if (window.vulnManager && window.vulnManager.dataManager) {
+            const allDevices = window.vulnManager.dataManager.getFilteredDevices();
+
+            // Filter for all devices at same location
+            deviceList = allDevices
+                .filter(device => device.hostname.toLowerCase().startsWith(location.toLowerCase()))
+                .map(device => device.hostname.toUpperCase());
+
+            console.log(`[Grid Power Tool] All devices mode - found ${deviceList.length} devices at ${location}`);
+        } else {
+            console.error("[Grid Power Tool] vulnManager.dataManager not available");
+        }
+    }
+    // Mode 1: Single device (default - no modifiers)
+
+    console.log("[Grid Power Tool] Mode:", mode);
+    console.log("[Grid Power Tool] Site:", site);
+    console.log("[Grid Power Tool] Location:", location);
+    console.log("[Grid Power Tool] Devices:", deviceList);
+    console.log("[Grid Power Tool] Total Count:", deviceList.length);
+
+    // Build ticket data object
+    const ticketData = {
+        devices: deviceList,
+        site: site,
+        location: location,
+        mode: mode,
+        timestamp: Date.now()
+    };
+
+    // Set sessionStorage for tickets.html to read
+    sessionStorage.setItem("createTicketData", JSON.stringify(ticketData));
+    sessionStorage.setItem("createTicketDevice", deviceList[0]);  // Backward compatibility
+    sessionStorage.setItem("autoOpenModal", "true");
+
+    // Show toast message
+    const deviceCount = deviceList.length;
+    const modeLabel = {
+        "single": "device",
+        "bulk-all": `devices at ${location}`,
+        "bulk-kev": `KEV devices at ${location}`
+    }[mode] || "device";
+
+    if (window.vulnManager && typeof window.vulnManager.showToast === "function") {
+        window.vulnManager.showToast(`Creating ticket for ${deviceCount} ${modeLabel}...`, "info");
+    }
+
+    // Navigate to tickets page
+    setTimeout(() => {
+        window.location.href = "/tickets.html";
+    }, 300);
+}
+
+/**
+ * Handle view tickets click from AG-Grid for devices with multiple tickets
+ * Shows picker modal like card view
+ *
+ * @param {MouseEvent} event - Click event
+ * @param {HTMLElement} link - The link element that was clicked
+ * @global
+ */
+async function handleGridViewTickets(event, link) {
+    // Stop event propagation
+    event.preventDefault();
+    event.stopPropagation();
+
+    // Read data from link attributes
+    const hostname = link.dataset.hostname;
+    const ticketCount = parseInt(link.dataset.ticketCount) || 0;
+
+    console.log(`[Grid View Tickets] hostname=${hostname}, count=${ticketCount}`);
+
+    // Fetch tickets for this device
+    try {
+        const response = await fetch(`/api/tickets/by-device/${encodeURIComponent(hostname)}`, {
+            credentials: "include"
+        });
+
+        if (!response.ok) {
+            console.error("[Grid View Tickets] Failed to fetch tickets:", response.statusText);
+            return;
+        }
+
+        const result = await response.json();
+        const tickets = result.tickets || [];
+
+        console.log(`[Grid View Tickets] Fetched ${tickets.length} tickets:`, tickets);
+
+        if (tickets.length === 0) {
+            console.warn(`[Grid View Tickets] No tickets found for ${hostname}`);
+            return;
+        }
+
+        // Show the picker modal
+        showGridTicketPickerModal(hostname, tickets);
+
+    } catch (error) {
+        console.error("[Grid View Tickets] Error fetching tickets:", error);
+    }
+}
+
+/**
+ * Show ticket picker modal for devices with multiple tickets (grid view)
+ * Reuses existing modal from vulnerabilities.html
+ *
+ * @param {string} hostname - Device hostname
+ * @param {Array<Object>} tickets - Array of ticket objects
+ * @global
+ */
+function showGridTicketPickerModal(hostname, tickets) {
+    console.log(`[Grid Ticket Picker] Opening picker for ${hostname} with ${tickets.length} tickets`);
+
+    const validTickets = tickets.filter(t => t !== null && t.id);
+    console.log(`[Grid Ticket Picker] Valid tickets: ${validTickets.length}`, validTickets);
+
+    if (validTickets.length === 0) {
+        console.error(`[Grid Ticket Picker] No valid tickets found for ${hostname}`);
+        return;
+    }
+
+    // Build modal content - reuses existing modal structure
+    const modalBody = document.getElementById("ticketPickerModalBody");
+    if (!modalBody) {
+        console.error(`[Grid Ticket Picker] Modal body element not found!`);
+        return;
+    }
+
+    // Helper function to get status badge color
+    const getStatusBadgeColor = (status) => {
+        const colorMap = {
+            "Open": "primary",
+            "Pending": "warning",
+            "Overdue": "danger",
+            "Completed": "success",
+            "Cancelled": "secondary"
+        };
+        return colorMap[status] || "secondary";
+    };
+
+    modalBody.innerHTML = `
+        <p class="mb-3">
+            <strong>${hostname}</strong> has <strong>${validTickets.length}</strong> open tickets. Which would you like to view?
+        </p>
+        <div class="list-group">
+            ${validTickets.map(ticket => `
+                <button type="button" class="list-group-item list-group-item-action"
+                        onclick="window.location.href='/tickets.html?openTicket=${ticket.id}';">
+                    <div class="d-flex w-100 justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">XT-${ticket.xt_number}</h6>
+                            <small class="text-muted">${ticket.job_type || "Unknown"} • ${new Date(ticket.created_at).toLocaleDateString()}</small>
+                        </div>
+                        <span class="badge bg-${getStatusBadgeColor(ticket.status)}">${ticket.status}</span>
+                    </div>
+                </button>
+            `).join("")}
+        </div>
+    `;
+
+    // Show the modal
+    const modalElement = document.getElementById("ticketPickerModal");
+    if (!modalElement) {
+        console.error(`[Grid Ticket Picker] Modal element not found!`);
+        return;
+    }
+
+    console.log(`[Grid Ticket Picker] Showing modal...`);
+    if (typeof bootstrap === "undefined") {
+        console.error(`[Grid Ticket Picker] Bootstrap is not loaded!`);
+        return;
+    }
+
+    const modal = new bootstrap.Modal(modalElement);
+    modal.show();
+    console.log(`[Grid Ticket Picker] Modal shown successfully`);
+}
+
 // Export functions for module usage
 if (typeof module !== "undefined" && module.exports) {
     module.exports = {
@@ -489,3 +752,6 @@ if (typeof module !== "undefined" && module.exports) {
 // Global exposure for legacy usage
 window.debounce = debounce;
 window.createVulnerabilityGridOptions = createVulnerabilityGridOptions;
+window.handleGridCreateTicket = handleGridCreateTicket;
+window.handleGridViewTickets = handleGridViewTickets;
+window.showGridTicketPickerModal = showGridTicketPickerModal;

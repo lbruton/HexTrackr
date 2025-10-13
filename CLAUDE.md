@@ -537,6 +537,37 @@ helmet({
 })
 ```
 
+### CSRF Protection Pattern
+
+**When writing frontend code that calls POST/PUT/DELETE/PATCH endpoints:**
+
+1. **Use existing wrappers** (handles CSRF automatically):
+   - `authState.authenticatedFetch(url, options)` - For authenticated pages
+   - `preferencesService.authenticatedFetch(url, options)` - For preferences
+
+2. **Manual implementation** (if wrappers unavailable):
+   ```javascript
+   // Fetch token
+   const res = await fetch("/api/auth/csrf", { credentials: "include" });
+   const { csrfToken } = await res.json();
+
+   // Use in request
+   fetch(url, {
+       method: "POST",
+       headers: { "X-CSRF-Token": csrfToken },
+       credentials: "include",  // REQUIRED
+       body: JSON.stringify(data)
+   });
+   ```
+
+**Key facts:**
+- Token endpoint: `GET /api/auth/csrf` (public, no auth needed)
+- Token storage: Session-based (`req.session.csrfToken`)
+- Required header: `X-CSRF-Token`
+- GET requests: No CSRF needed
+- Excluded paths: `/api/auth/login`, `/api/auth/csrf`, `/api/auth/status`
+- Implementation: `csrf-sync` package, configured in `server.js:187-220`
+
 ## Code Style
 
 - **Module System**: CommonJS (`require`/`module.exports`)

@@ -6,6 +6,11 @@ body {
     /* Removed font-family override - use Tabler's default */
 }
 
+/* Custom text color utility - Orange for High severity/VPR scores */
+.text-orange {
+    color: #f76707 !important;  /* Tabler orange */
+}
+
 /* HexTrackr brand colors that work with Tabler */
 :root {
     --hextrackr-primary: #206bc4;

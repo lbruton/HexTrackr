@@ -674,12 +674,13 @@ class TicketService {
                     return resolve(result);
                 }
 
-                // Query for most recent ticket details (status, job_type) for devices with tickets
+                // Query for most recent ticket details (status, job_type, id) for devices with tickets
                 // devicesWithTickets already contains lowercase hostnames from first query
                 const detailPlaceholders = devicesWithTickets.map(() => "?").join(", ");
                 const detailQuery = `
                     SELECT DISTINCT
                         lower(device.value) as hostname,
+                        t.id,
                         t.status,
                         t.job_type,
                         t.created_at
@@ -704,7 +705,8 @@ class TicketService {
                         result[normalizedHostname] = {
                             count: 0,
                             status: null,
-                            jobType: null
+                            jobType: null,
+                            tickets: []  // Array of ticket IDs
                         };
                     });
 
@@ -715,23 +717,26 @@ class TicketService {
                         }
                     });
 
-                    // Add most recent status and job type for each device
-                    // Group by hostname and take the first (most recent) entry
-                    const statusMap = {};
+                    // Add ticket details (status, job type, IDs) for each device
+                    // Group by hostname and collect all ticket IDs
+                    const ticketMap = {};
                     detailRows.forEach(row => {
-                        if (!statusMap[row.hostname]) {
-                            statusMap[row.hostname] = {
+                        if (!ticketMap[row.hostname]) {
+                            ticketMap[row.hostname] = {
                                 status: row.status,
-                                jobType: row.job_type
+                                jobType: row.job_type,
+                                tickets: []
                             };
                         }
+                        ticketMap[row.hostname].tickets.push(row.id);
                     });
 
-                    // Merge status data into result
-                    Object.keys(statusMap).forEach(hostname => {
+                    // Merge ticket data into result
+                    Object.keys(ticketMap).forEach(hostname => {
                         if (result[hostname]) {
-                            result[hostname].status = statusMap[hostname].status;
-                            result[hostname].jobType = statusMap[hostname].jobType;
+                            result[hostname].status = ticketMap[hostname].status;
+                            result[hostname].jobType = ticketMap[hostname].jobType;
+                            result[hostname].tickets = ticketMap[hostname].tickets;
                         }
                     });
 

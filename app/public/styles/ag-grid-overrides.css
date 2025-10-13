@@ -91,3 +91,27 @@
 .ag-theme-quartz-dark .text-muted-var {
     color: var(--hextrackr-text-muted);
 }
+
+/* ===========================
+   Custom Header Icons
+   =========================== */
+
+/* Ticket column header icon */
+.ag-header-cell.ticket-header-icon .ag-header-cell-label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.ag-header-cell.ticket-header-icon .ag-header-cell-label::before {
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    content: "\f3ff";  /* fa-ticket-alt Unicode */
+    font-size: 14px;
+    color: var(--hextrackr-text-primary, #2d3748);
+}
+
+/* Dark mode ticket header icon */
+[data-bs-theme="dark"] .ag-header-cell.ticket-header-icon .ag-header-cell-label::before {
+    color: #ffffff;
+}
