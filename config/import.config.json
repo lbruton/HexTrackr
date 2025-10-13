@@ -5,6 +5,6 @@
   ],
   "hostnameVendorPatterns": [
     { "pattern": "n[rs]wan", "vendor": "CISCO" },
-    { "pattern": "pan", "vendor": "Palo Alto" }
+    { "pattern": "nfpan", "vendor": "Palo Alto" }
   ]
 }
