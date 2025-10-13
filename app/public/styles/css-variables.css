@@ -66,6 +66,14 @@
     --hextrackr-text-disabled: #a0aec0;
     --hextrackr-text-inverse: #ffffff;
 
+    /* Tooltip Colors (Light Mode) */
+    --hextrackr-tooltip-bg: #ffffff;
+    --hextrackr-tooltip-border: #e2e8f0;
+    --hextrackr-tooltip-text-primary: #1f2937;
+    --hextrackr-tooltip-text-secondary: #4b5563;
+    --hextrackr-tooltip-divider: #f3f4f6;
+    --hextrackr-tooltip-indicator-border: #ffffff;
+
     /* Link Colors */
     --hextrackr-link-color: #2563eb;
     --hextrackr-link-hover: #1d4ed8;
@@ -335,6 +343,14 @@
     --hextrackr-text-muted: #94a3b8;
     --hextrackr-text-disabled: #64748b;
     --hextrackr-text-inverse: #0F1C31;
+
+    /* Tooltip Colors (Dark Mode) */
+    --hextrackr-tooltip-bg: #1a2234;
+    --hextrackr-tooltip-border: rgb(255, 255, 255, 0.1);
+    --hextrackr-tooltip-text-primary: #f8fafc;
+    --hextrackr-tooltip-text-secondary: #cbd5e1;
+    --hextrackr-tooltip-divider: rgb(255, 255, 255, 0.1);
+    --hextrackr-tooltip-indicator-border: #1a2234;
 
     /* Link Colors */
     --hextrackr-link-color: #60a5fa;
