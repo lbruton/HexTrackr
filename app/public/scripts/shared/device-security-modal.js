@@ -211,13 +211,16 @@ class DeviceSecurityModal {
                        device.vulnerabilities?.find(v => v.vendor)?.vendor ||
                        "Other";
 
-        // Only lookup for Cisco devices
-        if (!vendor || !vendor.toLowerCase().includes('cisco')) {
-            fixedVersionElement.innerHTML = `<span class="font-monospace text-muted">N/A</span>`;
-            return;
+        // Determine which advisory helper to use based on vendor
+        let advisoryHelper = null;
+        if (vendor?.toLowerCase().includes('cisco')) {
+            advisoryHelper = window.ciscoAdvisoryHelper;
+        } else if (vendor?.toLowerCase().includes('palo')) {
+            advisoryHelper = window.paloAdvisoryHelper;
         }
 
-        if (!window.ciscoAdvisoryHelper) {
+        // Unsupported vendor or helper not loaded
+        if (!advisoryHelper) {
             fixedVersionElement.innerHTML = `<span class="font-monospace text-muted">N/A</span>`;
             return;
         }
@@ -238,7 +241,7 @@ class DeviceSecurityModal {
 
             // Query all CVEs in parallel
             const fixedVersionPromises = uniqueCves.map(cve =>
-                window.ciscoAdvisoryHelper.getFixedVersion(cve, vendor, installedVersion)
+                advisoryHelper.getFixedVersion(cve, vendor, installedVersion)
                     .catch(err => {
                         logger.warn(`Failed to get fixed version for ${cve}:`, err);
                         return null;
@@ -463,14 +466,16 @@ class DeviceSecurityModal {
                         const cell = document.getElementById(cellId);
                         if (!cell) return;
 
-                        // Only lookup for Cisco devices
-                        if (!vendor || !vendor.toLowerCase().includes('cisco')) {
-                            cell.innerHTML = `<span class="font-monospace text-muted">N/A</span>`;
-                            params.node.setDataValue('fixed_version', 'N/A');
-                            return;
+                        // Determine which advisory helper to use based on vendor
+                        let advisoryHelper = null;
+                        if (vendor?.toLowerCase().includes('cisco')) {
+                            advisoryHelper = window.ciscoAdvisoryHelper;
+                        } else if (vendor?.toLowerCase().includes('palo')) {
+                            advisoryHelper = window.paloAdvisoryHelper;
                         }
 
-                        if (!window.ciscoAdvisoryHelper) {
+                        // Unsupported vendor or helper not loaded
+                        if (!advisoryHelper) {
                             cell.innerHTML = `<span class="font-monospace text-muted">N/A</span>`;
                             params.node.setDataValue('fixed_version', 'N/A');
                             return;
@@ -478,7 +483,7 @@ class DeviceSecurityModal {
 
                         try {
                             const installedVersion = params.data.operating_system;
-                            const fixedVersion = await window.ciscoAdvisoryHelper.getFixedVersion(
+                            const fixedVersion = await advisoryHelper.getFixedVersion(
                                 cveId, vendor, installedVersion
                             );
 
