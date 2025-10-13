@@ -92,6 +92,7 @@ class PaginationController {
      * @param {string} containerId - ID of the container element
      * @param {Function} onPageSizeChange - Callback when page size changes
      * @param {Object} options - Optional sort configuration
+     * @param {string} options.itemType - Label for items (e.g., "Devices", "Vulnerabilities") - defaults to "Items"
      */
     renderTopControls(containerId, onPageSizeChange, options = {}) {
         const container = document.getElementById(containerId);
@@ -110,21 +111,42 @@ class PaginationController {
         const sortOptions = options.sortOptions || [];
         const currentSort = options.currentSort || "";
         const onSortChange = options.onSortChange || (() => {});
+        const itemType = options.itemType || "Items";
 
+        // Find current sort label
+        const currentSortObj = sortOptions.find(opt => opt.value === currentSort);
+        const currentSortLabel = currentSortObj ? currentSortObj.label : "Sort by";
+
+        // Tabler.io dropdown for sort options
         const sortDropdownHTML = sortOptions.length > 0 ? `
-            <select id="${containerId}SortBy" class="form-select form-select-sm" style="width: auto;">
-                ${sortOptions.map(opt =>
-                    `<option value="${opt.value}" ${opt.value === currentSort ? "selected" : ""}>${opt.label}</option>`
-                ).join("")}
-            </select>
+            <div class="dropdown">
+                <button class="btn btn-sm dropdown-toggle" type="button" id="${containerId}SortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    ${currentSortLabel}
+                </button>
+                <div class="dropdown-menu" aria-labelledby="${containerId}SortDropdown">
+                    ${sortOptions.map(opt =>
+                        `<a class="dropdown-item ${opt.value === currentSort ? "active" : ""}" href="#" data-sort-value="${opt.value}">
+                            ${opt.label}
+                        </a>`
+                    ).join("")}
+                </div>
+            </div>
         ` : "";
 
+        // Tabler.io dropdown for items per page
         const itemsDropdownHTML = `
-            <select id="${containerId}PageSize" class="form-select form-select-sm" style="width: auto;">
-                ${info.availableSizes.map(size =>
-                    `<option value="${size}" ${size === info.pageSize ? "selected" : ""}>${size} Items</option>`
-                ).join("")}
-            </select>
+            <div class="dropdown">
+                <button class="btn btn-sm dropdown-toggle" type="button" id="${containerId}PageSizeDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    ${info.pageSize} ${itemType}
+                </button>
+                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="${containerId}PageSizeDropdown">
+                    ${info.availableSizes.map(size =>
+                        `<a class="dropdown-item ${size === info.pageSize ? "active" : ""}" href="#" data-page-size="${size}">
+                            ${size} ${itemType}
+                        </a>`
+                    ).join("")}
+                </div>
+            </div>
         `;
 
         container.innerHTML = `
@@ -132,23 +154,27 @@ class PaginationController {
             ${itemsDropdownHTML}
         `;
 
-        // Add event listeners for page size
-        const pageSizeSelect = container.querySelector(`#${containerId}PageSize`);
-        if (pageSizeSelect) {
-            pageSizeSelect.addEventListener("change", (e) => {
-                this.setPageSize(e.target.value);
+        // Add event listeners for page size dropdown items
+        const pageSizeItems = container.querySelectorAll(`[data-page-size]`);
+        pageSizeItems.forEach(item => {
+            item.addEventListener("click", (e) => {
+                e.preventDefault();
+                const size = e.target.getAttribute("data-page-size");
+                this.setPageSize(size);
                 onPageSizeChange();
             });
-        }
+        });
 
-        // Add event listeners for sort dropdown
+        // Add event listeners for sort dropdown items
         if (sortOptions.length > 0) {
-            const sortSelect = container.querySelector(`#${containerId}SortBy`);
-            if (sortSelect) {
-                sortSelect.addEventListener("change", (e) => {
-                    onSortChange(e.target.value);
+            const sortItems = container.querySelectorAll(`[data-sort-value]`);
+            sortItems.forEach(item => {
+                item.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    const sortValue = e.target.getAttribute("data-sort-value");
+                    onSortChange(sortValue);
                 });
-            }
+            });
         }
     }
 
