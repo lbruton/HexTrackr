@@ -10,23 +10,17 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <!-- Third Party Integrations Button Navigation -->
-                <div id="thirdPartyButtons" class="mb-3" style="display: none;">
-                    <div class="btn-group" role="group" aria-label="Third Party Integration Filters">
-                        <button type="button" class="btn btn-primary active" data-filter="all">
-                            <i class="fas fa-globe me-2"></i>All Vendors
+                <!-- Settings Section Navigation Buttons -->
+                <div class="d-flex justify-content-end mb-3">
+                    <div id="settingsSectionButtons" class="btn-group" role="group" aria-label="Settings Section Navigation">
+                        <button type="button" class="btn btn-primary active" data-section="third-party">
+                            <i class="fas fa-plug me-2"></i>Third Party Integrations
                         </button>
-                        <button type="button" class="btn btn-outline-primary" data-filter="cisco">
-                            <i class="fas fa-network-wired me-2"></i>Cisco
+                        <button type="button" class="btn btn-outline-primary" data-section="data-mgmt">
+                            <i class="fas fa-database me-2"></i>Data Management
                         </button>
-                        <button type="button" class="btn btn-outline-primary" data-filter="palo">
-                            <i class="fas fa-shield-alt me-2"></i>Palo Alto
-                        </button>
-                        <button type="button" class="btn btn-outline-primary" data-filter="kev">
-                            <i class="fas fa-exclamation-triangle me-2"></i>CISA KEV
-                        </button>
-                        <button type="button" class="btn btn-outline-primary" data-filter="servicenow">
-                            <i class="fas fa-cloud me-2"></i>ServiceNow
+                        <button type="button" class="btn btn-outline-primary" data-section="system-config">
+                            <i class="fas fa-cogs me-2"></i>System Configuration
                         </button>
                     </div>
                 </div>
@@ -402,9 +396,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>

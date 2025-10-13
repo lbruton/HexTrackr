@@ -173,28 +173,22 @@ console.log("✅ HexTrackr Settings Modal (shared) loaded successfully");
         // Initialize ServiceNow settings when modal is shown
         this.modal.addEventListener("shown.bs.modal", initServiceNowSettings);
 
-        // Third Party Integration button filtering
-        document.querySelectorAll('#thirdPartyButtons .btn').forEach(button => {
+        // Settings section navigation buttons
+        const self = this;
+        document.querySelectorAll('#settingsSectionButtons .btn').forEach(button => {
             button.addEventListener('click', function() {
-                const filter = this.getAttribute('data-filter');
+                const section = this.getAttribute('data-section');
 
                 // Update active button styling
-                document.querySelectorAll('#thirdPartyButtons .btn').forEach(btn => {
+                document.querySelectorAll('#settingsSectionButtons .btn').forEach(btn => {
                     btn.classList.remove('active', 'btn-primary');
                     btn.classList.add('btn-outline-primary');
                 });
                 this.classList.remove('btn-outline-primary');
                 this.classList.add('active', 'btn-primary');
 
-                // Show/hide cards based on filter
-                const cards = document.querySelectorAll('[data-integration]');
-                cards.forEach(card => {
-                    if (filter === 'all') {
-                        card.style.display = '';
-                    } else {
-                        card.style.display = card.getAttribute('data-integration') === filter ? '' : 'none';
-                    }
-                });
+                // Switch to the selected section
+                self.switchToTab(section);
             });
         });
 
@@ -215,12 +209,6 @@ console.log("✅ HexTrackr Settings Modal (shared) loaded successfully");
             }
         });
 
-        // Hide button navigation
-        const buttons = document.getElementById('thirdPartyButtons');
-        if (buttons) {
-            buttons.style.display = 'none';
-        }
-
         // Show requested section
         const sectionMap = {
             'third-party': 'thirdPartyContent',
@@ -236,10 +224,17 @@ console.log("✅ HexTrackr Settings Modal (shared) loaded successfully");
             if (targetSection) {
                 targetSection.style.display = 'block';
 
-                // Show button navigation for Third Party section
-                if (targetSectionId === 'thirdPartyContent' && buttons) {
-                    buttons.style.display = 'block';
-                }
+                // Update button active state to match section
+                document.querySelectorAll('#settingsSectionButtons .btn').forEach(btn => {
+                    const btnSection = btn.getAttribute('data-section');
+                    if (btnSection === sectionId || sectionMap[btnSection] === targetSectionId) {
+                        btn.classList.remove('btn-outline-primary');
+                        btn.classList.add('active', 'btn-primary');
+                    } else {
+                        btn.classList.remove('active', 'btn-primary');
+                        btn.classList.add('btn-outline-primary');
+                    }
+                });
 
                 console.log(`✅ Switched to ${sectionId} section`);
             } else {
