@@ -525,7 +525,7 @@ npm run init-db
 - **SQL Injection**: Parameterized queries only (better-sqlite3)
 - **CSV Injection**: `safeCSV()` function prefixes formula characters
 - **XSS**: DOMPurify for markdown rendering
-- **CSRF**: csrf-sync middleware on state-changing routes
+- **CSRF**: csrf-sync middleware with Synchroniser Token Pattern (see dedicated section below)
 
 ### Security Headers (Helmet.js)
 
@@ -777,21 +777,101 @@ mcp__memento__semantic_search({
 - `HexTrackr-Docs` (DOCS-XX) - Documentation
 - `Prime Logs` (PRIME-XX) - Prime intelligence reports
 
+#### Status System
+
+Linear uses a two-tier status system:
+
+**Status Types** (workflow stages):
+- `backlog` - Backlog status
+- `unstarted` - Todo status
+- `started` - In Progress, In Review statuses
+- `completed` - Done status
+- `canceled` - Canceled, Duplicate statuses
+
+**Status Names** (displayed to users):
+- "Backlog", "Todo", "In Progress", "In Review", "Done", "Canceled", "Duplicate"
+
+#### Finding Active Work (Best Practices)
+
+**❌ PROBLEM**: The `state` parameter only accepts ONE status name at a time (not arrays), and old issues may be stuck in "Todo" status creating false positives.
+
+**✅ SOLUTION**: Use temporal filters to find recently updated work, avoiding stale issues.
+
+```javascript
+// ✅ RECOMMENDED: Temporal filter for recent work (last 7 days)
+mcp__linear-server__list_issues({
+  team: "HexTrackr-Dev",
+  updatedAt: "-P7D",  // ISO 8601 duration: -P7D = last 7 days
+  limit: 20,
+  orderBy: "updatedAt",
+  includeArchived: false
+})
+// Returns issues across ALL statuses updated in last week
+// Naturally excludes stale Todo items from months ago
+
+// ✅ GOOD: Check specific active statuses individually
+mcp__linear-server__list_issues({
+  team: "HexTrackr-Dev",
+  state: "Backlog",  // Check one status at a time
+  includeArchived: false,
+  limit: 10,
+  orderBy: "updatedAt"
+})
+
+// Then separately check other statuses
+mcp__linear-server__list_issues({
+  team: "HexTrackr-Dev",
+  state: "In Progress",
+  includeArchived: false,
+  limit: 10
+})
+
+// ✅ GOOD: Get my assigned issues
+mcp__linear-server__list_issues({
+  team: "HexTrackr-Dev",
+  assignee: "me",  // "me" works for current user
+  includeArchived: false,
+  limit: 20,
+  orderBy: "updatedAt"
+})
+
+// ✅ GOOD: Search by content
+mcp__linear-server__list_issues({
+  team: "HexTrackr-Dev",
+  query: "authentication",  // Searches title and description
+  updatedAt: "-P30D",  // Last 30 days
+  limit: 10
+})
+
+// ❌ WRONG: Can't use multiple states (not supported)
+mcp__linear-server__list_issues({
+  state: ["Backlog", "Todo", "In Progress"]  // Does NOT work
+})
+
+// ❌ WRONG: Searching by state="Todo" without temporal filter
+mcp__linear-server__list_issues({
+  state: "Todo"  // Returns ALL Todo issues including stale ones from months ago
+})
+```
+
+**Temporal Filter Examples:**
+- `-P1D` = Last 1 day
+- `-P7D` = Last 7 days (recommended for active work)
+- `-P30D` = Last 30 days
+- `-P1W` = Last 1 week (alternative syntax)
+
+**Workflow for "What should I work on?":**
+1. Check temporal filter first: `updatedAt: "-P7D"`
+2. Review Backlog status: `state: "Backlog"`
+3. Check In Progress: `state: "In Progress"`
+4. Check assigned to me: `assignee: "me"`
+
 #### Efficient Team Navigation
 
 ```javascript
 // Get team ID (do once per session)
 mcp__linear-server__list_teams()
 // → Returns: [{id: "abc123", key: "HEX", name: "HexTrackr-Dev"}, ...]
-
-// List issues for specific team
-mcp__linear-server__list_issues({
-  teamId: "abc123",  // From list_teams above
-  filter: {
-    state: { name: { in: ["In Progress", "Todo"] }},
-    labels: { some: { name: { eq: "backend" }}}
-  }
-})
 
 // Get specific issue
 mcp__linear-server__get_issue({
