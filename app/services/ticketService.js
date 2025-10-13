@@ -611,6 +611,131 @@ class TicketService {
             });
         });
     }
+
+    /**
+     * Get ticket summary for multiple devices in a single query (batch lookup)
+     * HEX-216: Performance optimization to replace N+1 HTTP requests
+     * @param {Array<string>} hostnames - Array of device hostnames
+     * @returns {Promise<Object>} Map of hostname to ticket summary {count, status, jobType}
+     * @example
+     * // Returns: { "router-1": {count: 2, status: "Open", jobType: "Upgrade"}, ... }
+     */
+    async getTicketsByDeviceBatch(hostnames) {
+        if (!hostnames || hostnames.length === 0) {
+            return {};
+        }
+
+        return new Promise((resolve, reject) => {
+            // Build placeholders for IN clause
+            const placeholders = hostnames.map(() => "lower(?)").join(", ");
+
+            const query = `
+                SELECT
+                    lower(device.value) as hostname,
+                    COUNT(DISTINCT t.id) as ticket_count,
+                    MAX(t.created_at) as latest_created
+                FROM tickets t, json_each(t.devices) AS device
+                WHERE lower(device.value) IN (${placeholders})
+                  AND t.deleted = 0
+                  AND t.status NOT IN ('Completed', 'Cancelled')
+                GROUP BY lower(device.value)
+            `;
+
+            // Convert hostnames to lowercase for case-insensitive matching
+            const params = hostnames.map(h => h.toLowerCase());
+
+            this.db.all(query, params, (err, rows) => {
+                if (err) {
+                    return reject(new Error(`Failed to batch fetch tickets for devices: ${err.message}`));
+                }
+
+                // Create map for quick lookup
+                const countMap = {};
+                rows.forEach(row => {
+                    countMap[row.hostname] = {
+                        count: row.ticket_count,
+                        latestCreated: row.latest_created
+                    };
+                });
+
+                // Now fetch status and job type for devices that have tickets
+                // Only query devices with count > 0 to minimize overhead
+                const devicesWithTickets = rows.filter(r => r.ticket_count > 0).map(r => r.hostname);
+
+                if (devicesWithTickets.length === 0) {
+                    // No devices have tickets, return empty data
+                    const result = {};
+                    hostnames.forEach(hostname => {
+                        result[hostname.toLowerCase()] = { count: 0, status: null, jobType: null };
+                    });
+                    return resolve(result);
+                }
+
+                // Query for most recent ticket details (status, job_type) for devices with tickets
+                const detailPlaceholders = devicesWithTickets.map(() => "lower(?)").join(", ");
+                const detailQuery = `
+                    SELECT DISTINCT
+                        lower(device.value) as hostname,
+                        t.status,
+                        t.job_type,
+                        t.created_at
+                    FROM tickets t, json_each(t.devices) AS device
+                    WHERE lower(device.value) IN (${detailPlaceholders})
+                      AND t.deleted = 0
+                      AND t.status NOT IN ('Completed', 'Cancelled')
+                    ORDER BY t.created_at DESC
+                `;
+
+                this.db.all(detailQuery, devicesWithTickets, (detailErr, detailRows) => {
+                    if (detailErr) {
+                        return reject(new Error(`Failed to fetch ticket details: ${detailErr.message}`));
+                    }
+
+                    // Build final result map
+                    const result = {};
+
+                    // Initialize all hostnames with zero counts
+                    hostnames.forEach(hostname => {
+                        const normalizedHostname = hostname.toLowerCase();
+                        result[normalizedHostname] = {
+                            count: 0,
+                            status: null,
+                            jobType: null
+                        };
+                    });
+
+                    // Add ticket counts
+                    Object.keys(countMap).forEach(hostname => {
+                        if (result[hostname]) {
+                            result[hostname].count = countMap[hostname].count;
+                        }
+                    });
+
+                    // Add most recent status and job type for each device
+                    // Group by hostname and take the first (most recent) entry
+                    const statusMap = {};
+                    detailRows.forEach(row => {
+                        if (!statusMap[row.hostname]) {
+                            statusMap[row.hostname] = {
+                                status: row.status,
+                                jobType: row.job_type
+                            };
+                        }
+                    });
+
+                    // Merge status data into result
+                    Object.keys(statusMap).forEach(hostname => {
+                        if (result[hostname]) {
+                            result[hostname].status = statusMap[hostname].status;
+                            result[hostname].jobType = statusMap[hostname].jobType;
+                        }
+                    });
+
+                    resolve(result);
+                });
+            });
+        });
+    }
 }
 
 module.exports = TicketService;
