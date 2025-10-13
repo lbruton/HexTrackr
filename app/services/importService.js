@@ -688,6 +688,8 @@ function processNextBatch(importId, currentDate, batchSize, batchStats, response
 
     const batchStart = Date.now();
     batchStats.currentBatch++;
+    // Track last progress update time for intermediate updates
+    batchStats.lastProgressUpdate = batchStart;
 
     // Update progress for this batch
     const batchProgress = 70 + ((batchStats.currentBatch / batchStats.totalBatches) * 25); // 70-95% range
@@ -697,7 +699,8 @@ function processNextBatch(importId, currentDate, batchSize, batchStats, response
             currentStep: 3,
             currentBatch: batchStats.currentBatch,
             totalBatches: batchStats.totalBatches,
-            processedRows: batchStats.processedRows
+            processedRows: batchStats.processedRows,
+            stage: "Processing"  // Set stage explicitly for frontend display
         });
     }
 
@@ -982,6 +985,7 @@ function finalizeBatchProcessing(importId, currentDate, batchStats, responseData
 
                     // Generate import summary and complete progress tracking
                     if (progressTracker && progressTracker.completeSession) {
+                        console.log(`📊 Generating import summary for session: ${sessionId}`);
                         // Generate comprehensive import summary
                         generateImportSummary(currentDate, responseData, finalStats)
                             .then(summary => {
@@ -990,13 +994,25 @@ function finalizeBatchProcessing(importId, currentDate, batchStats, responseData
                                     ...finalStats,
                                     importSummary: summary
                                 };
+                                console.log(`✅ Import summary generated successfully for session ${sessionId}`);
+                                console.log(`📤 Sending completion event with summary:`, {
+                                    sessionId,
+                                    summarySize: JSON.stringify(summary).length,
+                                    hasNewCves: summary.cveDiscovery?.totalNewCves || 0,
+                                    hasResolvedCves: summary.cveDiscovery?.totalResolvedCves || 0
+                                });
                                 progressTracker.completeSession(sessionId, "Import completed successfully", enhancedStats);
+                                console.log(`✅ Completion event sent to WebSocket for session ${sessionId}`);
                             })
                             .catch(summaryErr => {
-                                console.error("Error generating import summary:", summaryErr);
+                                console.error("❌ Error generating import summary:", summaryErr);
+                                console.error("Stack trace:", summaryErr.stack);
                                 // Complete without summary if generation fails
+                                console.log(`⚠️ Completing session ${sessionId} WITHOUT summary due to error`);
                                 progressTracker.completeSession(sessionId, "Import completed successfully", finalStats);
                             });
+                    } else {
+                        console.warn(`⚠️ No progressTracker available for session ${sessionId}, cannot send completion event`);
                     }
                 });
             });
