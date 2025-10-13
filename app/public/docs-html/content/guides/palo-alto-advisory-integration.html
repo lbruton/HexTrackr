@@ -1,0 +1,357 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Palo Alto Networks Security Advisory Integration</h1><blockquote>
+<p>Comprehensive vendor-specific patch intelligence for PAN-OS vulnerabilities with automatic background synchronization</p>
+</blockquote>
+<h2>Overview</h2><p>HexTrackr&#39;s Palo Alto Networks Security Advisory integration provides actionable patch guidance by automatically fetching fixed software versions for PAN-OS vulnerabilities in your environment. This feature transforms generic CVE descriptions into concrete upgrade paths, answering the critical question: <strong>&quot;What PAN-OS version do I need to upgrade to?&quot;</strong></p>
+<hr>
+<h2>What is Palo Alto Security Advisory API?</h2><p>The Palo Alto Networks Security Advisory API provides public access to security vulnerability information for Palo Alto products. The API offers:</p>
+<ul>
+<li><strong>CVE 5.0 Format</strong> - Industry-standard vulnerability data structure</li>
+<li><strong>Fixed software versions</strong> - Specific PAN-OS versions that patch the vulnerability</li>
+<li><strong>Version ranges</strong> - Affected version families with fix information</li>
+<li><strong>Solutions text</strong> - Human-readable remediation guidance</li>
+<li><strong>No authentication required</strong> - Public API with no rate limits</li>
+</ul>
+<hr>
+<h2>Key Features</h2><h3>🎯 Automatic Patch Intelligence</h3><ul>
+<li><strong>Background Synchronization</strong>: Automatic sync on server startup + every 24 hours</li>
+<li><strong>Single-Stage API Lookup</strong>: Direct CVE-to-fixed-version retrieval (simpler than Cisco)</li>
+<li><strong>Zero-Click Operation</strong>: Sync happens automatically (no credentials needed)</li>
+<li><strong>Resilient Processing</strong>: Per-CVE commits survive container restarts</li>
+<li><strong>Public API</strong>: No authentication, rate limits, or IP restrictions</li>
+</ul>
+<h3>🔍 Actionable Upgrade Guidance</h3><ul>
+<li><strong>Smart Version Matching</strong>: Major.minor family matching (10.2.0 → 10.2.0-h3)</li>
+<li><strong>Azure Marketplace Support</strong>: Automatic normalization (11.1.203 → 11.1.2-h3)</li>
+<li><strong>Minimum Fixed Version</strong>: See &quot;Upgrade to 10.2.0-h3 or later&quot; at a glance</li>
+<li><strong>Advisory Links</strong>: Direct access to Palo Alto security advisories</li>
+<li><strong>Database Storage</strong>: Fast lookups without API calls during vulnerability analysis</li>
+</ul>
+<h3>📊 Comprehensive Architecture</h3><ul>
+<li><strong>Frontend Caching</strong>: 5-minute TTL for optimal performance</li>
+<li><strong>Vendor-Neutral Design</strong>: Shares <code>is_fix_available</code> flag with Cisco integration</li>
+<li><strong>User-Controllable</strong>: Toggle background sync on/off via Settings</li>
+<li><strong>Multi-Vendor UI</strong>: Cisco and Palo Alto fixed versions display side-by-side</li>
+<li><strong>Parallel Loading</strong>: Non-blocking async updates in all AG-Grid tables</li>
+</ul>
+<hr>
+<h2>Setup Guide</h2><h3>Prerequisites</h3><p><strong>No API credentials required!</strong> Palo Alto Security Advisory API is completely public.</p>
+<h3>Configuration Steps</h3><h4>Step 1: Enable Background Sync (Optional)</h4><p>By default, background sync is <strong>enabled</strong>. To control it:</p>
+<ol>
+<li>Navigate to <strong>Settings → Third Party Integrations</strong></li>
+<li>Locate the <strong>Palo Alto Security Advisory</strong> card</li>
+<li>Find the <strong>&quot;Enable background sync&quot;</strong> toggle</li>
+<li>Check = Enabled (default), Uncheck = Disabled</li>
+<li>Setting is stored in database (survives server restarts)</li>
+</ol>
+<p><strong>When Enabled</strong>:</p>
+<ul>
+<li>Sync runs on server startup (after 10-second initialization delay)</li>
+<li>Sync repeats every 24 hours automatically</li>
+<li>Only syncs CVEs from devices with vendor=&quot;Palo Alto&quot;</li>
+</ul>
+<p><strong>When Disabled</strong>:</p>
+<ul>
+<li>Background worker skips Palo Alto sync (no errors logged)</li>
+<li>Manual sync still available via &quot;Sync Now&quot; button</li>
+</ul>
+<h4>Step 2: Initial Sync</h4><p><strong>Option A: Automatic</strong> (Recommended)</p>
+<ul>
+<li>Restart Docker container: <code>docker-compose restart</code></li>
+<li>Background worker runs within 10 seconds</li>
+<li>Check logs: <code>docker-compose logs -f hextrackr-app</code></li>
+</ul>
+<p><strong>Option B: Manual</strong></p>
+<ul>
+<li>Click <strong>&quot;Sync Now&quot;</strong> button in Settings</li>
+<li>Wait ~1-2 minutes for sync to complete</li>
+<li>Statistics update automatically when complete</li>
+</ul>
+<hr>
+<h2>How It Works</h2><h3>Single-Stage API Integration</h3><p>Palo Alto&#39;s API is simpler than Cisco&#39;s two-stage pattern:</p>
+<h4>Direct CVE Lookup</h4><pre><code class="language-">GET https://security.paloaltonetworks.com/json/{cveId}
+
+Returns: Complete CVE 5.0 JSON with fixed versions embedded
+
+Example Response:
+{
+  &quot;cveMetadata&quot;: {
+    &quot;cveId&quot;: &quot;CVE-2024-3400&quot;,
+    &quot;state&quot;: &quot;PUBLISHED&quot;
+  },
+  &quot;containers&quot;: {
+    &quot;cna&quot;: {
+      &quot;affected&quot;: [{
+        &quot;product&quot;: &quot;PAN-OS&quot;,
+        &quot;versions&quot;: [{
+          &quot;version&quot;: &quot;10.2&quot;,
+          &quot;status&quot;: &quot;affected&quot;,
+          &quot;changes&quot;: [
+            { &quot;at&quot;: &quot;10.2.0-h3&quot;, &quot;status&quot;: &quot;unaffected&quot; },
+            { &quot;at&quot;: &quot;10.2.9-h1&quot;, &quot;status&quot;: &quot;unaffected&quot; }
+          ]
+        }]
+      }]
+    }
+  }
+}</code></pre><p><strong>Extraction Logic</strong>:</p>
+<ol>
+<li>Query API with CVE ID</li>
+<li>Navigate to <code>containers.cna.affected[].versions[]</code></li>
+<li>Extract <code>changes[]</code> array where <code>status === &quot;unaffected&quot;</code></li>
+<li>Store all <code>at</code> fields as fixed versions array</li>
+<li>Cache in database for fast lookups</li>
+</ol>
+<hr>
+<h3>Version Matching Strategy</h3><p><strong>PAN-OS Version Format</strong>:</p>
+<ul>
+<li>Standard: <code>10.2.0-h3</code> (major.minor.patch-hotfix)</li>
+<li>Azure Marketplace: <code>11.1.203</code> (major.minor + combined patch/hotfix)</li>
+</ul>
+<p><strong>Smart Matching Logic</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Installed: 10.2.0, Fixed: [&quot;10.2.0-h3&quot;, &quot;10.2.9-h1&quot;, &quot;11.0.0-h1&quot;]</span>
+<span class="hljs-comment">// Returns: &quot;10.2.0-h3&quot; (matches major.minor family)</span>
+
+<span class="hljs-title function_">normalizeVersion</span>(<span class="hljs-string">&quot;11.1.203&quot;</span>)  <span class="hljs-comment">// → &quot;11.1.2-h3&quot;</span>
+<span class="hljs-title function_">matchFixedVersion</span>(<span class="hljs-string">&quot;10.2.0&quot;</span>, fixedVersionsArray)  <span class="hljs-comment">// → &quot;10.2.0-h3&quot;</span></code></pre><p><strong>Major.Minor Family Matching</strong>:</p>
+<ul>
+<li>Extracts major.minor from installed version (10.2.0 → 10.2)</li>
+<li>Filters fixed versions matching same family</li>
+<li>Returns minimum (first) matching version</li>
+<li>Handles Azure format automatically</li>
+</ul>
+<hr>
+<h2>Database Schema</h2><h3>palo_alto_advisories Table</h3><pre><code class="language-sql"><span class="hljs-keyword">CREATE TABLE</span> palo_alto_advisories (
+    cve_id TEXT <span class="hljs-keyword">PRIMARY KEY</span>,
+    advisory_title TEXT,
+    severity TEXT,
+    cvss_score TEXT,
+    first_fixed TEXT,           <span class="hljs-comment">-- JSON array: [&quot;10.2.0-h3&quot;, &quot;10.2.9-h1&quot;, ...]</span>
+    affected_versions TEXT,     <span class="hljs-comment">-- JSON array of version ranges</span>
+    product_names TEXT,         <span class="hljs-comment">-- JSON array: [&quot;PAN-OS&quot;, &quot;Panorama&quot;]</span>
+    publication_url TEXT,
+    date_published <span class="hljs-type">TIMESTAMP</span>,
+    solutions_text TEXT,
+    last_synced <span class="hljs-type">TIMESTAMP</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-built_in">CURRENT_TIMESTAMP</span>
+);
+
+<span class="hljs-keyword">CREATE</span> INDEX idx_palo_advisories_cve
+<span class="hljs-keyword">ON</span> palo_alto_advisories(cve_id);
+
+<span class="hljs-keyword">CREATE</span> INDEX idx_palo_advisories_last_synced
+<span class="hljs-keyword">ON</span> palo_alto_advisories(last_synced);</code></pre><h3>Migration File</h3><p><strong>File</strong>: <code>app/public/scripts/migrations/006-palo-advisories.sql</code></p>
+<p>Adds:</p>
+<ul>
+<li><code>palo_alto_advisories</code> table</li>
+<li>Indexes for performance</li>
+<li><code>last_palo_sync</code> column in <code>daily_totals</code> table</li>
+</ul>
+<hr>
+<h2>UI Integration</h2><h3>Multi-Vendor Display</h3><p>Fixed versions display automatically for both Cisco and Palo Alto devices:</p>
+<p><strong>Device Cards</strong>:</p>
+<ul>
+<li>Green text with &quot;+&quot; suffix: &quot;10.2.0-h3+&quot;</li>
+<li>Searchable in card view search bar</li>
+<li>Cached for filter performance</li>
+</ul>
+<p><strong>Device Security Modal</strong>:</p>
+<ul>
+<li>Info card shows fixed version</li>
+<li>AG-Grid &quot;Fixed&quot; column with async loading</li>
+<li>Searchable, filterable, sortable</li>
+</ul>
+<p><strong>Vulnerability Details Modal</strong>:</p>
+<ul>
+<li>AG-Grid &quot;Fixed&quot; column for all affected devices</li>
+<li>Shows both Cisco and Palo Alto fixes in same table</li>
+<li>Column filters work on both vendors</li>
+</ul>
+<p><strong>Main Vulnerabilities Table</strong>:</p>
+<ul>
+<li>Fixed Version column with async population</li>
+<li>Quick filter searches both vendor types</li>
+<li>Natural version sorting</li>
+</ul>
+<h3>Vendor Routing Logic</h3><pre><code class="language-javascript"><span class="hljs-comment">// Automatic vendor detection</span>
+<span class="hljs-keyword">let</span> advisoryHelper = <span class="hljs-literal">null</span>;
+<span class="hljs-keyword">if</span> (vendor?.<span class="hljs-title function_">toLowerCase</span>().<span class="hljs-title function_">includes</span>(<span class="hljs-string">&#x27;cisco&#x27;</span>)) {
+    advisoryHelper = <span class="hljs-variable language_">window</span>.<span class="hljs-property">ciscoAdvisoryHelper</span>;
+} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (vendor?.<span class="hljs-title function_">toLowerCase</span>().<span class="hljs-title function_">includes</span>(<span class="hljs-string">&#x27;palo&#x27;</span>)) {
+    advisoryHelper = <span class="hljs-variable language_">window</span>.<span class="hljs-property">paloAdvisoryHelper</span>;
+}
+
+<span class="hljs-comment">// Universal API call</span>
+<span class="hljs-keyword">const</span> fixedVersion = <span class="hljs-keyword">await</span> advisoryHelper.<span class="hljs-title function_">getFixedVersion</span>(
+    cveId, vendor, installedVersion
+);</code></pre><p><strong>Supported Vendors</strong>:</p>
+<ul>
+<li>✅ Cisco (IOS, IOS XE, IOS XR, NX-OS)</li>
+<li>✅ Palo Alto (PAN-OS)</li>
+<li>🔄 Future: Microsoft, Juniper, Fortinet</li>
+</ul>
+<hr>
+<h2>Statistics</h2><p><strong>Current Results</strong>:</p>
+<ul>
+<li>Total Palo Alto CVEs: 54</li>
+<li>Advisories Synced: 20</li>
+<li>With Fixed Versions: 19 (95%)</li>
+<li>Without Fixed Versions: 1 (5%)</li>
+</ul>
+<p><strong>Sample Advisory</strong>:</p>
+<pre><code class="language-">CVE-2024-3400: PAN-OS GlobalProtect RCE
+├── Advisory URL: security.paloaltonetworks.com/CVE-2024-3400
+├── Fixed Versions: 5 total
+│   ├── 10.2.0-h3, 10.2.1-h2, 10.2.9-h1
+│   ├── 11.0.0-h3, 11.1.0-h3
+└── UI Display: &quot;Fixed in: 10.2.0-h3 or later&quot;</code></pre><hr>
+<h2>Troubleshooting</h2><h3>Sync Not Running</h3><p><strong>Check 1: Background Sync Enabled?</strong></p>
+<pre><code class="language-bash">sqlite3 app/data/hextrackr.db <span class="hljs-string">&quot;SELECT * FROM user_preferences WHERE preference_key = &#x27;palo_background_sync_enabled&#x27;;&quot;</span>
+<span class="hljs-comment"># Should return: &quot;true&quot; or no row (defaults to enabled)</span></code></pre><p><strong>Check 2: Check Logs</strong></p>
+<pre><code class="language-bash">docker-compose logs -f hextrackr-app | grep -i palo</code></pre><p><strong>Check 3: Verify Palo Alto Devices Exist</strong></p>
+<pre><code class="language-bash">sqlite3 app/data/hextrackr.db <span class="hljs-string">&quot;SELECT COUNT(*) FROM vulnerabilities_current WHERE vendor LIKE &#x27;%Palo%&#x27;;&quot;</span></code></pre><h3>No Fixed Versions Found</h3><p><strong>5% of CVEs don&#39;t have fixed versions</strong> (by design):</p>
+<ul>
+<li>Some vulnerabilities are configuration issues (no software patch)</li>
+<li>Some affect end-of-life versions (no fix available)</li>
+<li>API returns empty <code>changes[]</code> array</li>
+</ul>
+<h3>API Connection Issues</h3><p><strong>The API is public and highly reliable</strong>, but if you encounter issues:</p>
+<ol>
+<li><p>Test direct API access:</p>
+<pre><code class="language-bash">curl https://security.paloaltonetworks.com/json/CVE-2024-3400</code></pre></li>
+<li><p>Check DNS resolution:</p>
+<pre><code class="language-bash">nslookup security.paloaltonetworks.com</code></pre></li>
+<li><p>Verify Docker network connectivity:</p>
+<pre><code class="language-bash">docker-compose <span class="hljs-built_in">exec</span> hextrackr-app curl https://security.paloaltonetworks.com/json/</code></pre></li>
+</ol>
+<hr>
+<h2>Technical Details</h2><h3>API Endpoints</h3><p><strong>Base URL</strong>: <code>https://security.paloaltonetworks.com</code></p>
+<p><strong>Endpoints Used</strong>:</p>
+<ul>
+<li><code>/json/{CVE-ID}</code> - Single CVE lookup</li>
+<li><code>/json/</code> - List all advisories (health check)</li>
+<li><code>/json/?product=PAN-OS&amp;severity=CRITICAL</code> - Filtered queries (future use)</li>
+</ul>
+<p><strong>Response Format</strong>: CVE 5.0 JSON standard</p>
+<p><strong>Rate Limits</strong>: None (public API)</p>
+<p><strong>Authentication</strong>: None required</p>
+<h3>Background Worker Architecture</h3><pre><code class="language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">startPaloBackgroundSync</span>(<span class="hljs-params">db</span>) {
+    <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">SYNC_INTERVAL</span> = <span class="hljs-number">24</span> * <span class="hljs-number">60</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>; <span class="hljs-comment">// 24 hours</span>
+
+    <span class="hljs-comment">// Run on startup (10s delay for initialization)</span>
+    <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-title function_">runSync</span>(), <span class="hljs-number">10000</span>);
+
+    <span class="hljs-comment">// Repeat every 24 hours</span>
+    <span class="hljs-built_in">setInterval</span>(runSync, <span class="hljs-variable constant_">SYNC_INTERVAL</span>);
+}</code></pre><h3>Frontend Caching</h3><pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">PaloAdvisoryHelper</span> {
+    <span class="hljs-title function_">constructor</span>(<span class="hljs-params"></span>) {
+        <span class="hljs-variable language_">this</span>.<span class="hljs-property">advisoryCache</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>();
+        <span class="hljs-variable language_">this</span>.<span class="hljs-property">cacheTTL</span> = <span class="hljs-number">5</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>;  <span class="hljs-comment">// 5 minutes</span>
+    }
+
+    <span class="hljs-keyword">async</span> <span class="hljs-title function_">getFixedVersion</span>(<span class="hljs-params">cveId, vendor, installedVersion</span>) {
+        <span class="hljs-comment">// 1. Check cache (5-min TTL)</span>
+        <span class="hljs-comment">// 2. Fetch from /api/palo/advisory/{cveId}</span>
+        <span class="hljs-comment">// 3. Apply version matching</span>
+        <span class="hljs-comment">// 4. Cache result</span>
+        <span class="hljs-comment">// 5. Return fixed version or null</span>
+    }
+}</code></pre><hr>
+<h2>Comparison: Cisco vs Palo Alto</h2><table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Cisco PSIRT</th>
+<th>Palo Alto Security</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Authentication</td>
+<td>OAuth2 (client credentials)</td>
+<td>None (public)</td>
+</tr>
+<tr>
+<td>API Complexity</td>
+<td>2-stage (advisory → version)</td>
+<td>1-stage (direct lookup)</td>
+</tr>
+<tr>
+<td>Rate Limits</td>
+<td>30 requests/minute</td>
+<td>None</td>
+</tr>
+<tr>
+<td>Version Matching</td>
+<td>OS-type aware (IOS/IOS XE/IOS XR/NX-OS)</td>
+<td>Major.minor family matching</td>
+</tr>
+<tr>
+<td>Special Formats</td>
+<td>Train notation (15.2(7)E8)</td>
+<td>Azure marketplace (11.1.203)</td>
+</tr>
+<tr>
+<td>Response Format</td>
+<td>Custom JSON</td>
+<td>CVE 5.0 standard</td>
+</tr>
+<tr>
+<td>API Stability</td>
+<td>Stable</td>
+<td>BETA (defensive error handling)</td>
+</tr>
+<tr>
+<td>Sync Time</td>
+<td>~3-4 minutes (63 CVEs, rate-limited)</td>
+<td>~1-2 minutes (20 CVEs, no limits)</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Future Enhancements</h2><h3>Additional Palo Alto Products</h3><ul>
+<li>Panorama advisory support</li>
+<li>Cortex XDR integration</li>
+<li>Prisma Access advisories</li>
+</ul>
+<h3>Enhanced UI Features</h3><ul>
+<li>Advisory age indicator (stale data warning)</li>
+<li>&quot;Last Synced&quot; timestamp in modal</li>
+<li>Export advisory data to CSV</li>
+<li>Historical advisory tracking</li>
+</ul>
+<h3>Multi-Product Expansion</h3><ul>
+<li>Fortinet FortiOS advisories</li>
+<li>Juniper SIRT integration</li>
+<li>Microsoft Update Catalog</li>
+<li>VMware security advisories</li>
+</ul>
+<p><strong>Vendor-Neutral Design</strong>: Adding new vendors requires no schema redesign - just create new advisory table and service class following the same pattern.</p>
+<hr>
+<h2>Related Documentation</h2><ul>
+<li><a href="#guides/cisco-psirt-integration">Cisco PSIRT Integration Guide</a> - Similar multi-vendor pattern</li>
+<li><a href="#guides/kev-integration">KEV Integration Guide</a> - Background sync pattern</li>
+<li><a href="#guides/getting-started">Getting Started Guide</a> - Initial HexTrackr setup</li>
+<li><a href="#guides/user-guide">User Guide</a> - General HexTrackr usage</li>
+<li><a href="#api-reference/index">API Reference</a> - Backend API documentation</li>
+</ul>
+<hr>
+<h2>Support</h2><h3>Linear Issues</h3><ul>
+<li><a href="https://linear.app/hextrackr/issue/HEX-205">HEX-205: Palo Alto Advisory Integration (SPECIFICATION)</a></li>
+<li><a href="https://linear.app/hextrackr/issue/HEX-207">HEX-207: Palo Alto Advisory Integration (RESEARCH)</a></li>
+<li><a href="https://linear.app/hextrackr/issue/HEX-208">HEX-208: Palo Alto Advisory Integration (PLAN)</a></li>
+<li><a href="https://linear.app/hextrackr/issue/HEX-209">HEX-209: Palo Alto Advisory Integration (IMPLEMENT - Backend)</a></li>
+<li><a href="https://linear.app/hextrackr/issue/HEX-210">HEX-210: Palo Alto Advisory Integration (IMPLEMENT - Frontend)</a></li>
+</ul>
+<h3>Changelog</h3><ul>
+<li><a href="#changelog/versions/1.0.65">v1.0.65 Release Notes</a> - Complete implementation details</li>
+</ul>
+<h3>Memento Insight</h3><ul>
+<li>Insight ID: <code>HEXTRACKR-PALO-ALTO-INTEGRATION-20251012</code></li>
+<li>Tags: <code>public-api</code>, <code>multi-vendor</code>, <code>frontend-caching</code>, <code>vendor-routing</code></li>
+</ul>
+<hr>
+<p><strong>Version</strong>: 1.0.65<br><strong>Last Updated</strong>: 2025-10-12<br><strong>Status</strong>: Complete - Backend and Frontend Integration Fully Operational</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

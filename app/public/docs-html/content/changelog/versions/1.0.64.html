@@ -1,13 +1,13 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
     <hr>
-<h2>title: "Version 1.0.64 - UI Polish & Search Enhancement"
+<h2>title: "Version 1.0.64 - UI Polish, Search Enhancement & Critical Advisory Sync Fix"
 date: "2025-10-12"
 version: "1.0.64"
 status: "Released"
-category: "UI/UX Improvement"</h2><h1>Version 1.0.64 - UI Polish & Search Enhancement</h1><p><strong>Release Status</strong>: ✅ Released<br><strong>Release Date</strong>: 2025-10-12<br><strong>Linear Issue</strong>: <a href="https://linear.app/hextrackr/issue/HEX-204">HEX-204</a></p>
+category: "Bug Fix + Performance + UI/UX"</h2><h1>Version 1.0.64 - UI Polish, Search Enhancement & Critical Advisory Sync Fix</h1><p><strong>Release Status</strong>: ✅ Released<br><strong>Release Date</strong>: 2025-10-12<br><strong>Linear Issue</strong>: <a href="https://linear.app/hextrackr/issue/HEX-204">HEX-204</a></p>
 <hr>
-<h2>Overview</h2><p>Major UI polish pass focusing on device card enhancements, comprehensive search expansion, and CSS architecture documentation. This release improves data visibility, search capabilities, and provides critical CSS debugging documentation for future development.</p>
+<h2>Overview</h2><p>Major UI polish pass with critical backend fixes. This release includes device card enhancements, comprehensive search expansion, CSS architecture documentation, and a complete rewrite of the Cisco PSIRT advisory sync system. Fixed critical data corruption bug where vulnerable versions were stored as &quot;fixed&quot; versions, then implemented batch optimization reducing sync time from 18 minutes to 3-4 minutes (82% fewer API queries).</p>
 <hr>
 <h2>Features Added</h2><h3>🔍 Comprehensive Search Expansion</h3><p><strong>Problem</strong>: Search was limited to hostname, CVE, plugin name, and vendor reference (4 fields). Users couldn&#39;t find devices by OS version, IP address, or search solution text.</p>
 <p><strong>Solution</strong>: Expanded search to 9 fields across three layers.</p>
@@ -201,18 +201,117 @@ category: "UI/UX Improvement"</h2><h1>Version 1.0.64 - UI Polish & Search Enhanc
 <li>3 locations in <code>vulnerability-core.js</code> (parameter override fix)</li>
 </ul>
 <p><strong>Parameter Shadowing Bug</strong>: <code>vulnerability-core.js</code> was explicitly passing <code>{ limit: 50000 }</code> which overrode service defaults. Required tracing full call chain to discover.</p>
+<h3>Cisco Advisory Sync Batch Optimization</h3><p><strong>Problem</strong>: Initial sync queried Software Checker API for each (CVE, version) pair separately, wasting 99% of each API response.</p>
+<p><strong>Discovery</strong>: Cisco Software Checker <code>/OSType/{osType}?version={version}</code> endpoint returns advisories for ALL CVEs affecting that version, not just one CVE. Original code extracted one CVE per query and threw away the rest.</p>
+<p><strong>Solution Architecture</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// ❌ OLD: Query by (CVE, version) pairs</span>
+<span class="hljs-keyword">for</span> <span class="hljs-title function_">each</span> (<span class="hljs-variable constant_">CVE</span>-<span class="hljs-number">2024</span>-<span class="hljs-number">1234</span>, <span class="hljs-string">&quot;IOS 15.2(2)E7&quot;</span>):
+    <span class="hljs-title function_">query_api</span>()  <span class="hljs-comment">// Returns 50 CVEs</span>
+    extract <span class="hljs-variable constant_">CVE</span>-<span class="hljs-number">2024</span>-<span class="hljs-number">1234</span>  <span class="hljs-comment">// Discard other 49</span>
+
+<span class="hljs-comment">// ✅ NEW: Batch by version</span>
+<span class="hljs-keyword">for</span> each <span class="hljs-string">&quot;IOS 15.2(2)E7&quot;</span>:
+    <span class="hljs-title function_">query_api</span>()  <span class="hljs-comment">// Returns 50 CVEs</span>
+    save <span class="hljs-variable constant_">ALL</span> <span class="hljs-number">50</span> that exist <span class="hljs-keyword">in</span> our database</code></pre><p><strong>Key Optimizations</strong>:</p>
+<ul>
+<li><code>getUniqueDeviceVersions()</code>: Returns distinct OS versions instead of (CVE, version) Cartesian product</li>
+<li><code>getAllCiscoCveIds()</code>: Pre-loads database CVEs into Set for O(1) filtering</li>
+<li>Batch processing: Saves ALL advisories from each API response that match database CVEs</li>
+<li>Vendor filtering: Frontend skips non-Cisco devices entirely (no unnecessary function calls)</li>
+</ul>
+<p><strong>Performance Results</strong>:</p>
+<ul>
+<li>API queries: 351 → 63 (82% reduction)</li>
+<li>Sync time: 18 minutes → 3-4 minutes (78% faster)</li>
+<li>Data efficiency: 1 CVE per query → 10-74 CVEs per query (10-74x improvement)</li>
+</ul>
 <hr>
-<h2>Bug Fixes</h2><h3>Search Not Finding Version Numbers</h3><p><strong>Cause</strong>: Frontend in-memory filter only searched 3 fields (hostname, CVE, plugin).<br><strong>Fix</strong>: Expanded to 9 fields matching backend SQL query.</p>
+<h2>Bug Fixes</h2><h3>Cisco Advisory Sync Data Corruption + Batch Optimization (CRITICAL)</h3><p><strong>Problem</strong>: Device with &quot;CISCO IOS XE 16.9.2&quot; showing &quot;15.2(8)E8&quot; as fixed version (wrong OS type - IOS instead of IOS XE). Database contained vulnerable versions stored as &quot;fixed&quot; versions.</p>
+<p><strong>Root Cause</strong>: Background sync was:</p>
+<ol>
+<li>Querying <code>/cve/CVE-XXXX</code> endpoint → getting <code>productNames</code> array (vulnerable versions)</li>
+<li>Parsing vulnerable version from productNames (e.g., &quot;12.2(20)S6a&quot;)</li>
+<li>Querying Software Checker API with vulnerable version</li>
+<li>Getting fixes for THAT vulnerable version (not the installed version)</li>
+<li>Storing those as &quot;fixes&quot; in database</li>
+</ol>
+<p><strong>Fix Phase 1 - Correct Data Source</strong>:</p>
+<ul>
+<li><strong>Added <code>parseInstalledVersion()</code> method</strong>: Parses device OS strings to extract OS type and version for API queries (supports IOS XE, IOS XR, NX-OS, ASA, FTD, FXOS, IOS)</li>
+<li><strong>Changed query strategy</strong>: Query Software Checker with INSTALLED versions from devices instead of vulnerable versions from advisories</li>
+<li><strong>Used Migration 006 data</strong>: Leveraged <code>operating_system</code> column (98.1% capture rate) for accurate version data</li>
+<li><strong>Updated cache TTL</strong>: Changed from 90 days to 30 days for more frequent accuracy checks</li>
+<li><strong>Database cleanup</strong>: Cleared 82 corrupted advisory entries</li>
+</ul>
+<p><strong>Fix Phase 2 - Batch Optimization</strong>:<br>Initial fix queried Software Checker for each (CVE, version) pair, resulting in 351 queries taking ~18 minutes. Discovered that Software Checker returns advisories for ALL CVEs affecting a version, not just one CVE.</p>
+<p><strong>Batch optimization changes</strong>:</p>
+<ul>
+<li><strong>Added <code>getUniqueDeviceVersions()</code> method</strong>: Queries vulnerabilities table for distinct OS versions (not CVE+version pairs)</li>
+<li><strong>Added <code>getAllCiscoCveIds()</code> method</strong>: Creates Set of all Cisco CVEs in database for filtering API responses</li>
+<li><strong>Rewrote <code>syncCiscoAdvisories()</code> main loop</strong>: Batch by version instead of (CVE, version) pairs</li>
+<li><strong>Process all advisories per response</strong>: Each Software Checker query returns 10-74 advisories, now saves ALL that match our database CVEs</li>
+<li><strong>Filter by database CVEs</strong>: Only save advisories for CVEs we actually have (prevents storing irrelevant data)</li>
+</ul>
+<p><strong>Performance Impact</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Before (Phase 1)</th>
+<th>After (Phase 2)</th>
+<th>Improvement</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Queries executed</td>
+<td>351</td>
+<td>63</td>
+<td>82% reduction</td>
+</tr>
+<tr>
+<td>Sync time</td>
+<td>~18 minutes</td>
+<td>~3-4 minutes</td>
+<td>78% faster</td>
+</tr>
+<tr>
+<td>Data per query</td>
+<td>1 CVE (99% wasted)</td>
+<td>10-74 CVEs</td>
+<td>10-74x efficiency</td>
+</tr>
+<tr>
+<td>Subsequent syncs</td>
+<td>~1 minute</td>
+<td>~30 seconds</td>
+<td>Only stale entries</td>
+</tr>
+</tbody></table>
+<p><strong>User Experience</strong>:</p>
+<ul>
+<li>Frontend now displays correct fixed versions with &quot;+&quot; suffix (e.g., &quot;16.9.4+&quot;, &quot;16.12.5+&quot;)</li>
+<li>OS-aware version matching ensures IOS XE devices see IOS XE fixes (not IOS fixes)</li>
+<li>Batch optimization eliminated 404 flood during page load (only queries Cisco devices)</li>
+<li>Background sync completes in 3-4 minutes instead of 18 minutes</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/services/ciscoAdvisoryService.js</code> - Added 3 new methods, completely rewrote sync logic (lines 243-718)</li>
+<li><code>app/public/scripts/shared/vulnerability-cards.js</code> - Added vendor check before advisory query (lines 678-682)</li>
+</ul>
+<hr>
+<h3>Search Not Finding Version Numbers</h3><p><strong>Cause</strong>: Frontend in-memory filter only searched 3 fields (hostname, CVE, plugin).<br><strong>Fix</strong>: Expanded to 9 fields matching backend SQL query.</p>
 <h3>IP Search Not Working in Cards View</h3><p><strong>Cause</strong>: Third independent filter layer in device cards rendering.<br><strong>Fix</strong>: Added ip_address to device aggregation and card-level search.</p>
 <h3>Pagination Limit Not Applied</h3><p><strong>Cause</strong>: Parameter override in <code>vulnerability-core.js</code> shadowed service defaults.<br><strong>Fix</strong>: Updated explicit limit parameters in 3 locations.</p>
 <h3>Vendor Badge Colors Inconsistent</h3><p><strong>Cause</strong>: Frontend using different color mapping than modals.<br><strong>Fix</strong>: Standardized across all views (Cisco=blue, Palo Alto=orange).</p>
 <hr>
 <h2>Files Modified</h2><h3>Backend</h3><ul>
 <li><code>app/services/vulnerabilityService.js</code> - Expanded SQL search to 9 fields</li>
+<li><code>app/services/ciscoAdvisoryService.js</code> - Fixed data corruption bug, added 3 new methods (getUniqueDeviceVersions, getAllCiscoCveIds, parseInstalledVersion), completely rewrote syncCiscoAdvisories() with batch optimization (lines 243-718)</li>
 </ul>
 <h3>Frontend JavaScript</h3><ul>
 <li><code>app/public/scripts/shared/vulnerability-data.js</code> - IP aggregation, search expansion, 100k limits</li>
-<li><code>app/public/scripts/shared/vulnerability-cards.js</code> - IP display, search filter, tickets-first sort</li>
+<li><code>app/public/scripts/shared/vulnerability-cards.js</code> - IP display, search filter, tickets-first sort, vendor check before advisory query</li>
 <li><code>app/public/scripts/shared/vulnerability-core.js</code> - 100k limit fixes</li>
 <li><code>app/public/scripts/shared/pagination-controller.js</code> - Split top/bottom controls</li>
 <li><code>app/public/scripts/shared/device-security-modal.js</code> - Vendor badge fix</li>
@@ -282,6 +381,7 @@ category: "UI/UX Improvement"</h2><h1>Version 1.0.64 - UI Polish & Search Enhanc
 <p><strong>Critical</strong>: All three must stay synchronized. Changes to one require changes to all three.</p>
 <hr>
 <h2>Performance Impact</h2><h3>Positive</h3><ul>
+<li><strong>Cisco advisory sync batch optimization</strong>: Massive improvement (82% reduction in API queries, 78% faster sync time)</li>
 <li>IP address display: Minimal (already aggregating device data)</li>
 <li>Search expansion: Negligible (indexes on all searched columns)</li>
 <li>Tickets First sort: Conditional (only when user selects that mode)</li>
@@ -293,7 +393,8 @@ category: "UI/UX Improvement"</h2><h1>Version 1.0.64 - UI Polish & Search Enhanc
 <hr>
 <h2>Related Linear Issues</h2><ul>
 <li><strong>HEX-203</strong>: Ticket state awareness on device cards (prerequisite for Tickets First sort)</li>
-<li><strong>HEX-141</strong>: Cisco PSIRT advisory sync (provides fixed version data for future display)</li>
+<li><strong>HEX-141</strong>: Cisco PSIRT advisory sync (FIXED: Critical data corruption bug + batch optimization: 82% fewer queries, 78% faster)</li>
+<li><strong>HEX-204</strong>: UI Polish &amp; Search Enhancement (parent issue for this release)</li>
 </ul>
 <hr>
 <h2>Timeline</h2><ul>
