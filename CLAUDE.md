@@ -151,7 +151,9 @@ Core approach:
 - `chrome-devtools` - Browser testing
 - `context7` - Framework docs
 - `brave-search` - Web research
-- `codacy` - Code quality
+
+**NOT Available in Claude Code** (see Codacy Integration section):
+- `codacy` - Code quality (GitHub-integrated only, available in Cursor IDE)
 
 **If tool is disabled**: Remind user "I need you to enable [tool-name] MCP to continue. Type @ in chat to enable/disable MCPs."
 
@@ -869,7 +871,6 @@ mcp__sequential-thinking__sequentialthinking({
 **chrome-devtools** - Browser automation and UI testing (dev: https://dev.hextrackr.com, prod: https://hextrackr.com)
 **playwright** - Modern browser automation (file uploads, form filling, dialog handling, tab management)
 **brave-search** - Web research and AI summarization
-**codacy** - Automated code quality analysis (via `.cursor/rules/codacy.mdc`)
 
 **Disabled by default** - If needed, remind user to enable via @ in chat.
 
@@ -877,9 +878,27 @@ See `/docs/MCP_TOOLS.md` for complete documentation.
 
 ## Codacy Integration
 
-`.cursor/rules/codacy.mdc` configures automatic code quality checks:
+**Current Status**: GitHub webhook integration only (NOT available as CLI/MCP in Claude Code)
 
+### How Codacy Works
+- **Automatic Analysis**: Runs via GitHub webhook when commits are pushed
+- **Dashboard**: https://app.codacy.com/gh/Lonnie-Bruton/HexTrackr-Dev/dashboard
+- **Timing**: Analysis starts within 1-5 minutes of push
+- **Coverage**: JavaScript, CSS, markdown linting and security checks
+
+### Cursor IDE Integration
+`.cursor/rules/codacy.mdc` enables Codacy MCP in Cursor IDE:
 - **Repository**: `gh/Lonnie-Bruton/HexTrackr-Dev`
 - **Auto-analyze**: After file edits, automatically run `codacy_cli_analyze`
 - **Security**: After dependency changes, automatically run Trivy scan
 - **Guidelines**: See `.github/CODACY_GUIDELINES.md` for false positive handling
+
+### Future Enhancement
+**TODO**: Install Codacy CLI or MCP for local analysis in Claude Code
+```bash
+# Future installation (not yet done)
+brew tap codacy/tap
+brew install codacy/tap/codacy-analysis-cli
+```
+
+**For now**: Codacy analysis happens automatically on GitHub after pushing commits.
