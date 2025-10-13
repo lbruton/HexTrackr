@@ -626,8 +626,10 @@ class TicketService {
         }
 
         return new Promise((resolve, reject) => {
-            // Build placeholders for IN clause
-            const placeholders = hostnames.map(() => "lower(?)").join(", ");
+            // Build placeholders for IN clause - match original getTicketsByDevice() pattern
+            // Original uses: WHERE lower(device.value) = lower(?)
+            // Batch uses: WHERE lower(device.value) IN (?, ?, ?) with pre-lowercased params
+            const placeholders = hostnames.map(() => "?").join(", ");
 
             const query = `
                 SELECT
@@ -641,7 +643,8 @@ class TicketService {
                 GROUP BY lower(device.value)
             `;
 
-            // Convert hostnames to lowercase for case-insensitive matching
+            // Pre-lowercase hostnames for case-insensitive matching
+            // This matches the original lower(?) pattern
             const params = hostnames.map(h => h.toLowerCase());
 
             this.db.all(query, params, (err, rows) => {
@@ -672,7 +675,8 @@ class TicketService {
                 }
 
                 // Query for most recent ticket details (status, job_type) for devices with tickets
-                const detailPlaceholders = devicesWithTickets.map(() => "lower(?)").join(", ");
+                // devicesWithTickets already contains lowercase hostnames from first query
+                const detailPlaceholders = devicesWithTickets.map(() => "?").join(", ");
                 const detailQuery = `
                     SELECT DISTINCT
                         lower(device.value) as hostname,
