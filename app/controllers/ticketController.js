@@ -273,6 +273,47 @@ class TicketController {
             });
         }
     }
+
+    /**
+     * Get ticket summary for multiple devices in a single request (batch lookup)
+     * HEX-216: Performance optimization to replace N+1 HTTP requests
+     * Reduces 100+ individual requests to a single batch query
+     * @param {Array<string>} req.body.hostnames - Array of device hostnames
+     * @returns {Object} Map of hostname to ticket summary {count, status, jobType}
+     */
+    static async getTicketsByDeviceBatch(req, res) {
+        try {
+            const controller = TicketController.getInstance();
+            const { hostnames } = req.body;
+
+            if (!hostnames || !Array.isArray(hostnames)) {
+                return res.status(400).json({
+                    success: false,
+                    error: "hostnames array is required in request body"
+                });
+            }
+
+            if (hostnames.length === 0) {
+                return res.json({
+                    success: true,
+                    data: {}
+                });
+            }
+
+            const ticketMap = await controller.ticketService.getTicketsByDeviceBatch(hostnames);
+            res.json({
+                success: true,
+                data: ticketMap
+            });
+        } catch (error) {
+            console.error("Error fetching tickets for device batch:", error);
+            res.status(500).json({
+                success: false,
+                error: "Failed to fetch tickets for device batch",
+                details: error.message
+            });
+        }
+    }
 }
 
 module.exports = TicketController;
