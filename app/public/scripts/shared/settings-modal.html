@@ -163,11 +163,65 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    <!-- ServiceNow Integration -->
+                                    <div class="col-lg-6 mb-4" data-integration="servicenow">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-cloud me-2 text-primary"></i>
+                                                    ServiceNow Integration
+                                                </h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-3">
+                                                    <div class="form-check form-switch">
+                                                        <input class="form-check-input" type="checkbox" id="serviceNowEnabled">
+                                                        <label class="form-check-label" for="serviceNowEnabled">
+                                                            <strong>Enable ServiceNow Integration</strong>
+                                                        </label>
+                                                    </div>
+                                                    <small class="text-muted">When enabled, Service Now ticket numbers become clickable links</small>
+                                                </div>
+
+                                                <div class="mb-3" id="serviceNowConfig">
+                                                    <label for="serviceNowInstance" class="form-label">ServiceNow Instance URL</label>
+                                                    <input type="url" class="form-control" id="serviceNowInstance"
+                                                           placeholder="https://yourorg.service-now.com"
+                                                           pattern="https://.*\.service-now\.com">
+                                                    <div class="form-text">
+                                                        Enter your organization's ServiceNow instance URL (e.g., https://yourorg.service-now.com)
+                                                    </div>
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label">URL Pattern Preview</label>
+                                                    <div class="p-2 bg-light rounded">
+                                                        <code id="urlPatternPreview">
+                                                            Configure your instance URL to see the link pattern
+                                                        </code>
+                                                    </div>
+                                                    <small class="text-muted">
+                                                        Clicking INC/CHG numbers will open ServiceNow with this pattern
+                                                    </small>
+                                                </div>
+
+                                                <div class="d-flex gap-2">
+                                                    <button type="button" class="btn btn-outline-primary" id="testServiceNowLink">
+                                                        <i class="fas fa-external-link-alt me-2"></i>Test Link
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-success" id="saveServiceNowSettings">
+                                                        <i class="fas fa-save me-2"></i>Save Configuration
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            
-                            <!-- Data Management Tab -->
-                            <div class="tab-pane fade" id="data-management" role="tabpanel">
+
+                            <!-- Data Management Section -->
+                            <div id="dataManagementContent" style="display: none;">
                                 <div class="row">
                                     <!-- Database Statistics -->
                                     <div class="col-12 mb-4">
@@ -303,130 +357,9 @@
                                     </div>
                                 </div>
                             </div>
-                            
-                            <!-- Ticket Systems Tab -->
-                            <div class="tab-pane fade" id="ticket-systems" role="tabpanel">
-                                <div class="row">
-                                    <!-- ServiceNow Integration -->
-                                    <div class="col-lg-8 mb-4">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h6 class="card-title mb-0">
-                                                    <i class="fas fa-snowflake me-2 text-primary"></i>
-                                                    ServiceNow Integration
-                                                </h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="mb-3">
-                                                    <div class="form-check form-switch">
-                                                        <input class="form-check-input" type="checkbox" id="serviceNowEnabled">
-                                                        <label class="form-check-label" for="serviceNowEnabled">
-                                                            <strong>Enable ServiceNow Integration</strong>
-                                                        </label>
-                                                    </div>
-                                                    <small class="text-muted">When enabled, Service Now ticket numbers become clickable links</small>
-                                                </div>
-                                                
-                                                <div class="mb-3" id="serviceNowConfig">
-                                                    <label for="serviceNowInstance" class="form-label">ServiceNow Instance URL</label>
-                                                    <input type="url" class="form-control" id="serviceNowInstance" 
-                                                           placeholder="https://yourorg.service-now.com" 
-                                                           pattern="https://.*\.service-now\.com">
-                                                    <div class="form-text">
-                                                        Enter your organization's ServiceNow instance URL (e.g., https://yourorg.service-now.com)
-                                                    </div>
-                                                </div>
-                                                
-                                                <div class="mb-3">
-                                                    <label class="form-label">URL Pattern Preview</label>
-                                                    <div class="p-2 bg-light rounded">
-                                                        <code id="urlPatternPreview">
-                                                            Configure your instance URL to see the link pattern
-                                                        </code>
-                                                    </div>
-                                                    <small class="text-muted">
-                                                        Clicking INC/CHG numbers will open ServiceNow with this pattern
-                                                    </small>
-                                                </div>
-                                                
-                                                <div class="d-flex gap-2">
-                                                    <button type="button" class="btn btn-outline-primary" id="testServiceNowLink">
-                                                        <i class="fas fa-external-link-alt me-2"></i>Test Link
-                                                    </button>
-                                                    <button type="button" class="btn btn-outline-success" id="saveServiceNowSettings">
-                                                        <i class="fas fa-save me-2"></i>Save Configuration
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Integration Status & Help -->
-                                    <div class="col-lg-4 mb-4">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h6 class="card-title mb-0">
-                                                    <i class="fas fa-info-circle me-2 text-info"></i>
-                                                    Integration Status
-                                                </h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="mb-3">
-                                                    <div class="d-flex align-items-center mb-2">
-                                                        <i class="fas fa-circle text-secondary me-2"></i>
-                                                        <span>ServiceNow</span>
-                                                        <span class="badge bg-secondary ms-auto" id="serviceNowStatus">Disabled</span>
-                                                    </div>
-                                                </div>
-                                                
-                                                <hr>
-                                                
-                                                <h6 class="mb-2">
-                                                    <i class="fas fa-question-circle me-2"></i>How it works
-                                                </h6>
-                                                <ul class="small text-muted mb-0">
-                                                    <li>Configure your ServiceNow instance URL</li>
-                                                    <li>INC/CHG numbers become clickable links</li>
-                                                    <li>Links open ServiceNow incidents directly</li>
-                                                    <li>Works with standard ServiceNow URL patterns</li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- Future Integrations -->
-                                        <div class="card mt-3">
-                                            <div class="card-header">
-                                                <h6 class="card-title mb-0">
-                                                    <i class="fas fa-plus-circle me-2 text-muted"></i>
-                                                    Future Integrations
-                                                </h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="text-muted small">
-                                                    <div class="d-flex align-items-center mb-2">
-                                                        <i class="fas fa-circle text-muted me-2"></i>
-                                                        <span>Jira Integration</span>
-                                                        <span class="badge bg-secondary ms-auto">Coming Soon</span>
-                                                    </div>
-                                                    <div class="d-flex align-items-center mb-2">
-                                                        <i class="fas fa-circle text-muted me-2"></i>
-                                                        <span>Remedy Integration</span>
-                                                        <span class="badge bg-secondary ms-auto">Coming Soon</span>
-                                                    </div>
-                                                    <div class="d-flex align-items-center">
-                                                        <i class="fas fa-circle text-muted me-2"></i>
-                                                        <span>Custom ITSM</span>
-                                                        <span class="badge bg-secondary ms-auto">Coming Soon</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- System Configuration Tab -->
-                            <div class="tab-pane fade" id="system-config" role="tabpanel">
+
+                            <!-- System Configuration Section -->
+                            <div id="systemConfigContent" style="display: none;">
                                 <div class="row">
                                     <!-- Future Features Placeholder -->
                                     <div class="col-12 mb-4">
