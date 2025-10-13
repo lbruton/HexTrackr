@@ -1,6 +1,6 @@
 /* eslint-env browser */
  
-/* global console, document, window, authState, setTimeout, localStorage, Blob, URL, FormData, Papa, JSZip, bootstrap, module, alert */
+/* global console, document, window, authState, Blob, URL, FormData, Papa, JSZip, bootstrap, module, alert */
 
 /**
  * Escape HTML characters to prevent XSS attacks
@@ -150,12 +150,17 @@ console.log("✅ HexTrackr Settings Modal (shared) loaded successfully");
         document.getElementById("syncKevNow")?.addEventListener("click", syncKevData);
         document.getElementById("kevAutoSync")?.addEventListener("change", toggleKevAutoSync);
 
+        // Palo Alto sync button (HEX-209)
+        document.getElementById("syncPaloNow")?.addEventListener("click", syncPaloNow);
+        document.getElementById("paloAutoSync")?.addEventListener("change", togglePaloAutoSync);
+
         // Load status and settings when modal opens
         const settingsModalElement = document.getElementById("settingsModal");
         if (settingsModalElement) {
             settingsModalElement.addEventListener("shown.bs.modal", loadSettings);
             settingsModalElement.addEventListener("shown.bs.modal", loadKevSyncStatus);
             settingsModalElement.addEventListener("shown.bs.modal", loadCiscoSyncStatus);
+            settingsModalElement.addEventListener("shown.bs.modal", loadPaloSyncStatus); // HEX-209
         }
         
         // Settings save button
@@ -1164,6 +1169,190 @@ async function loadKevSyncStatus() {
         }
     } catch (error) {
         console.error("Error loading KEV status:", error);
+    }
+}
+
+/**
+ * Sync Palo Alto Security Advisory data
+ * @async
+ * @function syncPaloNow
+ * @returns {Promise<void>}
+ */
+async function syncPaloNow() {
+    const syncButton = document.getElementById("syncPaloNow");
+    const statusBadge = document.getElementById("paloStatus");
+
+    // Disable button and show loading state
+    if (syncButton) {
+        syncButton.disabled = true;
+        syncButton.innerHTML = "<i class=\"fas fa-spinner fa-spin me-2\"></i>Syncing...";
+    }
+
+    if (statusBadge) {
+        statusBadge.textContent = "Syncing";
+        statusBadge.className = "badge bg-warning";
+    }
+
+    try {
+        const response = await authState.authenticatedFetch("/api/palo/sync", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Sync failed: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+
+        // Update UI with sync results
+        updatePaloSyncStatus(result);
+        showNotification(`Palo Alto sync completed: ${result.totalAdvisories} advisories, ${result.matchedCount} with fixed versions`, "success");
+
+    } catch (error) {
+        console.error("Palo Alto sync error:", error);
+        showNotification("Failed to sync Palo Alto advisories: " + error.message, "error");
+
+        if (statusBadge) {
+            statusBadge.textContent = "Sync Failed";
+            statusBadge.className = "badge bg-danger";
+        }
+    } finally {
+        // Re-enable button
+        if (syncButton) {
+            syncButton.disabled = false;
+            syncButton.innerHTML = "<i class=\"fas fa-sync me-2\"></i>Sync Now";
+        }
+    }
+}
+
+/**
+ * Toggle Palo Alto auto-sync setting
+ * @async
+ * @function togglePaloAutoSync
+ * @returns {Promise<void>}
+ */
+async function togglePaloAutoSync() {
+    const autoSyncCheckbox = document.getElementById("paloAutoSync");
+    if (!autoSyncCheckbox) {return;}
+
+    try {
+        // Save to Preferences API
+        if (window.preferencesService) {
+            const result = await window.preferencesService.setPreference(
+                "palo_background_sync_enabled",
+                autoSyncCheckbox.checked.toString()
+            );
+
+            if (result.success) {
+                showNotification(`Palo Alto auto-sync ${autoSyncCheckbox.checked ? "enabled" : "disabled"}`, "info");
+            } else {
+                throw new Error(result.error || "Failed to save preference");
+            }
+        } else {
+            throw new Error("PreferencesService not available");
+        }
+    } catch (error) {
+        console.error("Failed to toggle Palo Alto auto-sync:", error);
+        showNotification("Failed to update Palo Alto auto-sync setting", "error");
+        // Revert checkbox on error
+        autoSyncCheckbox.checked = !autoSyncCheckbox.checked;
+    }
+}
+
+/**
+ * Update Palo Alto sync status in UI
+ * @function updatePaloSyncStatus
+ * @param {Object} status - Status object from server
+ * @returns {void}
+ */
+function updatePaloSyncStatus(status) {
+    // Update last sync time
+    const lastSyncElement = document.getElementById("paloLastSync");
+    if (lastSyncElement && status.lastSync) {
+        const syncDate = new Date(status.lastSync);
+        lastSyncElement.textContent = syncDate.toLocaleString();
+    }
+
+    // Update statistics
+    const totalCvesElement = document.getElementById("paloTotalCves");
+    if (totalCvesElement && status.totalPaloCves !== undefined) {
+        totalCvesElement.textContent = status.totalPaloCves;
+    }
+
+    const syncedCountElement = document.getElementById("paloSyncedCount");
+    if (syncedCountElement && status.totalAdvisories !== undefined) {
+        syncedCountElement.textContent = status.totalAdvisories;
+    }
+
+    const matchedCountElement = document.getElementById("paloMatchedCount");
+    if (matchedCountElement && status.matchedCount !== undefined) {
+        matchedCountElement.textContent = status.matchedCount;
+    }
+
+    // Update status badge
+    const statusBadge = document.getElementById("paloStatus");
+    if (statusBadge) {
+        statusBadge.textContent = "Synced";
+        statusBadge.className = "badge bg-success";
+    }
+
+    // Store last sync time to preferences API
+    if (window.preferencesService && status.lastSync) {
+        window.preferencesService.setPreference("palo_last_sync", status.lastSync)
+            .catch(err => console.warn("Failed to save Palo Alto last sync time:", err));
+    }
+}
+
+/**
+ * Load Palo Alto sync status on modal open
+ * @async
+ * @function loadPaloSyncStatus
+ * @returns {Promise<void>}
+ */
+async function loadPaloSyncStatus() {
+    try {
+        // Load settings from Preferences API
+        if (window.preferencesService) {
+            const result = await window.preferencesService.getAllPreferences();
+
+            if (result.success && result.data) {
+                const prefsMap = {};
+                result.data.preferences.forEach(pref => {
+                    prefsMap[pref.key] = pref.value;
+                });
+
+                // Load auto-sync setting (default to true if not set)
+                const autoSyncCheckbox = document.getElementById("paloAutoSync");
+                if (autoSyncCheckbox) {
+                    const autoSyncEnabled = prefsMap.palo_background_sync_enabled === "true" ||
+                                          prefsMap.palo_background_sync_enabled === true ||
+                                          prefsMap.palo_background_sync_enabled === undefined; // Default true
+                    autoSyncCheckbox.checked = autoSyncEnabled;
+                }
+
+                // Load last sync time
+                const lastSync = prefsMap.palo_last_sync;
+                if (lastSync) {
+                    const lastSyncElement = document.getElementById("paloLastSync");
+                    if (lastSyncElement) {
+                        const syncDate = new Date(lastSync);
+                        lastSyncElement.textContent = syncDate.toLocaleString();
+                    }
+                }
+            }
+        }
+
+        // Fetch current status from server
+        const response = await authState.authenticatedFetch("/api/palo/status");
+        if (response.ok) {
+            const status = await response.json();
+            updatePaloSyncStatus(status);
+        }
+    } catch (error) {
+        console.error("Error loading Palo Alto status:", error);
     }
 }
 
