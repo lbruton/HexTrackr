@@ -172,11 +172,14 @@
          This has been incorrectly changed multiple times causing import errors -->
     <script type="module" src="../scripts/shared/theme-controller.js"></script>
 
+    <!-- Logger Utility (loaded first for zero-cost production logging) -->
+    <script src="../scripts/shared/logger.js"></script>
+
     <!-- Shared component loaders -->
     <script src="../scripts/shared/config-loader.js"></script>
     <script src="../scripts/shared/header-loader.js"></script>
     <!-- HEX-133 Task 1.5: Authentication state management for user menu -->
-    <script src="../scripts/shared/auth-state.js?v=1.0.48-session-fix"></script>
+    <script src="../scripts/shared/auth-state.js"></script>
 
     <!-- User Preferences Service (HEX-138) -->
     <script src="../scripts/shared/preferences-service.js"></script>
