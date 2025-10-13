@@ -1149,6 +1149,12 @@ class HexagonTicketsManager {
 
         document.getElementById("ticketModalLabel").innerHTML = "<i class=\"fas fa-edit me-2\"></i>Edit Ticket";
 
+        // Show "View Markdown" button when editing existing ticket
+        const viewMarkdownBtn = document.getElementById("viewTicketMarkdownBtn");
+        if (viewMarkdownBtn) {
+            viewMarkdownBtn.style.display = "block";
+        }
+
         const modal = new bootstrap.Modal(document.getElementById("ticketModal"));
         modal.show();
     }
@@ -1334,6 +1340,32 @@ class HexagonTicketsManager {
 
         setTimeout(() => {
             this.editTicket(ticketId);
+        }, 300);
+    }
+
+    /**
+     * Switch from Edit Ticket modal to View Ticket modal
+     * Allows users to preview markdown while editing
+     */
+    switchToViewTicketModal() {
+        // Get current ticket ID from editing session
+        const ticketId = this.currentEditingId;
+
+        if (!ticketId) {
+            console.error("[Modal Switch] No ticket ID available - cannot switch to view modal");
+            this.showToast("Cannot view ticket - no ticket ID found", "error");
+            return;
+        }
+
+        // Close the edit modal
+        const editModal = bootstrap.Modal.getInstance(document.getElementById("ticketModal"));
+        if (editModal) {
+            editModal.hide();
+        }
+
+        // Open view modal after short delay to allow edit modal to close
+        setTimeout(() => {
+            this.viewTicket(ticketId);
         }, 300);
     }
 
@@ -1884,7 +1916,13 @@ class HexagonTicketsManager {
         document.getElementById("ticketForm").reset();
         this.currentEditingId = null;
         document.getElementById("ticketModalLabel").innerHTML = "<i class=\"fas fa-plus me-2\"></i>Add New Ticket";
-        
+
+        // Hide "View Markdown" button for new tickets
+        const viewMarkdownBtn = document.getElementById("viewTicketMarkdownBtn");
+        if (viewMarkdownBtn) {
+            viewMarkdownBtn.style.display = "none";
+        }
+
         // Reset dates
         document.getElementById("dateSubmitted").value = new Date().toISOString().split("T")[0];
         const dueDate = new Date();
@@ -3669,6 +3707,10 @@ window.saveTicket = function() {
 
 window.editTicketFromView = function() {
     if (window.ticketManager) {window.ticketManager.editTicketFromView();}
+};
+
+window.switchToViewTicketModal = function() {
+    if (window.ticketManager) {window.ticketManager.switchToViewTicketModal();}
 };
 
 window.copyMarkdownToClipboard = function() {

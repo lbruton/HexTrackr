@@ -641,3 +641,52 @@
     color: #ffffff;
     box-shadow: 0 4px 12px rgb(239, 68, 68, 0.35);
 }
+
+/* ===========================
+   Back to Top Button
+   =========================== */
+
+button.back-to-top {
+    position: fixed !important;
+    bottom: 1.5rem !important;
+    right: 1.5rem !important;
+    left: auto !important;
+    z-index: 1000 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transform: translateY(1rem) !important;
+    transition: all 0.3s ease !important;
+    border-radius: 50% !important;
+    width: 3rem !important;
+    height: 3rem !important;
+    min-width: 3rem !important;
+    min-height: 3rem !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: var(--hextrackr-shadow-md, 0 4px 12px rgb(0, 0, 0, 0.15)) !important;
+    background-color: var(--bs-primary, #206bc4) !important;
+    border: 1px solid var(--bs-primary, #206bc4) !important;
+}
+
+button.back-to-top.show {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0) !important;
+}
+
+button.back-to-top:hover {
+    transform: translateY(-0.25rem) !important;
+    box-shadow: var(--hextrackr-shadow-lg, 0 8px 24px rgb(0, 0, 0, 0.2)) !important;
+}
+
+button.back-to-top:focus {
+    box-shadow: var(--hextrackr-shadow-md, 0 4px 12px rgb(0, 0, 0, 0.15)) !important,
+                0 0 0 0.25rem rgb(var(--bs-primary-rgb, 32, 107, 196), 0.25) !important;
+}
+
+button.back-to-top .icon {
+    width: 24px !important;
+    height: 24px !important;
+}

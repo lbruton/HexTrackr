@@ -1005,8 +1005,95 @@
             }
         }
 
-        // Make KEV helper globally available
+        /**
+         * Show KEV picker modal when device has multiple KEV vulnerabilities
+         * Pattern inspired by ticket picker modal (HEX-203)
+         * @param {string} hostname - Device hostname
+         * @param {Array<Object>} kevVulns - Array of KEV vulnerability objects
+         */
+        function showKevPickerModal(hostname, kevVulns) {
+            console.log(`[KEV Picker] Opening picker for ${hostname} with ${kevVulns.length} KEVs:`, kevVulns);
+
+            const validKevs = kevVulns.filter(v => v !== null && v.cve);
+            console.log(`[KEV Picker] Valid KEVs: ${validKevs.length}`, validKevs);
+
+            if (validKevs.length === 0) {
+                console.error(`[KEV Picker] No valid KEV vulnerabilities found for ${hostname}`);
+                return;
+            }
+
+            // If only one KEV, show details directly
+            if (validKevs.length === 1) {
+                showKevDetails(validKevs[0].cve);
+                return;
+            }
+
+            // Build modal content
+            const modalBody = document.getElementById("kevPickerModalBody");
+            if (!modalBody) {
+                console.error(`[KEV Picker] Modal body element not found!`);
+                return;
+            }
+
+            modalBody.innerHTML = `
+                <p class="mb-3">
+                    <strong>${hostname}</strong> has <strong>${validKevs.length}</strong> Known Exploited Vulnerabilities. Which would you like to view?
+                </p>
+                <div class="list-group">
+                    ${validKevs.map(vuln => {
+                        const severity = vuln.severity || vuln.vpr_severity || "Unknown";
+                        const severityColors = {
+                            "Critical": "danger",
+                            "High": "warning",
+                            "Medium": "info",
+                            "Low": "success"
+                        };
+                        const badgeColor = severityColors[severity] || "secondary";
+                        const vprScore = vuln.vpr_score || vuln.vprScore || "N/A";
+                        const description = vuln.description || vuln.plugin_name || "No description";
+                        // Truncate description to 100 chars
+                        const shortDesc = description.length > 100 ? description.substring(0, 100) + "..." : description;
+
+                        return `
+                            <button type="button" class="list-group-item list-group-item-action"
+                                    onclick="showKevDetails('${vuln.cve}'); bootstrap.Modal.getInstance(document.getElementById('kevPickerModal')).hide();">
+                                <div class="d-flex w-100 justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex align-items-center mb-1">
+                                            <h6 class="mb-0 me-2">${vuln.cve}</h6>
+                                            <span class="badge bg-${badgeColor}">${severity}</span>
+                                            <span class="badge bg-primary ms-2">VPR: ${vprScore}</span>
+                                        </div>
+                                        <small class="text-muted">${shortDesc}</small>
+                                    </div>
+                                </div>
+                            </button>
+                        `;
+                    }).join("")}
+                </div>
+            `;
+
+            // Show the modal
+            const modalElement = document.getElementById("kevPickerModal");
+            if (!modalElement) {
+                console.error(`[KEV Picker] Modal element not found!`);
+                return;
+            }
+
+            console.log(`[KEV Picker] Showing modal...`);
+            if (typeof bootstrap === "undefined") {
+                console.error(`[KEV Picker] Bootstrap is not loaded!`);
+                return;
+            }
+
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+            console.log(`[KEV Picker] Modal shown successfully`);
+        }
+
+        // Make KEV helpers globally available
         window.showKevDetails = showKevDetails;
+        window.showKevPickerModal = showKevPickerModal;
 
         // HEX-120 Fix: Wrapper function for device modal that works before vulnManager is ready
         window.openDeviceModal = function(hostname) {
@@ -1080,6 +1167,78 @@
             </div>
         </div>
     </div>
+
+    <!-- KEV Picker Modal -->
+    <div class="modal fade" id="kevPickerModal" tabindex="-1" aria-labelledby="kevPickerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="kevPickerModalLabel">
+                        <i class="fas fa-shield-halved me-2"></i>Select KEV Vulnerability
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="kevPickerModalBody">
+                    <!-- Content dynamically generated by showKevPickerModal() -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Top Button -->
+    <button id="backToTop" class="btn btn-primary back-to-top" title="Back to top">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <polyline points="7 11 12 6 17 11"/>
+            <polyline points="7 17 12 12 17 17"/>
+        </svg>
+    </button>
+
+    <!-- Back to Top Button Logic -->
+    <script>
+        /**
+         * Back to top button - shows when page is scrollable and user has scrolled down
+         * Shows only when:
+         * 1. Page has vertical scroll (content taller than viewport)
+         * 2. User has scrolled > 300px
+         */
+        (function() {
+            const backToTop = document.getElementById('backToTop');
+
+            if (!backToTop) {
+                return;
+            }
+
+            /**
+             * Update button visibility based on scroll position and page scrollability
+             */
+            function updateButtonVisibility() {
+                const scrolled = window.scrollY > 300;
+                const isScrollable = document.body.scrollHeight > window.innerHeight;
+
+                if (scrolled && isScrollable) {
+                    backToTop.classList.add('show');
+                } else {
+                    backToTop.classList.remove('show');
+                }
+            }
+
+            // Listen to scroll events
+            window.addEventListener('scroll', updateButtonVisibility);
+
+            // Listen to resize events (viewport size changes)
+            window.addEventListener('resize', updateButtonVisibility);
+
+            // Click handler to scroll to top
+            backToTop.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            // Initial check after page loads
+            window.addEventListener('load', updateButtonVisibility);
+            updateButtonVisibility();
+        })();
+    </script>
 
 </body>
 </html>
