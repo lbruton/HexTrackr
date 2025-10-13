@@ -28,6 +28,7 @@ router.delete("/:id", requireAuth, TicketController.deleteTicket);
 router.post("/migrate", requireAuth, TicketController.migrateTickets);
 router.get("/next-xt-number", requireAuth, TicketController.getNextXTNumber);
 router.get("/by-device/:hostname", requireAuth, TicketController.getTicketsByDevice);
+router.post("/batch-device-lookup", requireAuth, TicketController.getTicketsByDeviceBatch);
 
 /**
  * T053 INTEGRATION NOTES:
