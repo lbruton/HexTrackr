@@ -577,8 +577,16 @@ class DeviceSecurityModal {
                 width: 90,
                 cellRenderer: (params) => {
                     const score = params.value || 0;
-                    const severityClass = this.getVprSeverityClass(score);
-                    return `<span class="severity-badge severity-${severityClass}">${score.toFixed(1)}</span>`;
+                    // Colored text based on score - cleaner table design
+                    let colorClass = "text-success";  // Green for low (0-3.9)
+                    if (score >= 9.0) {
+                        colorClass = "text-danger";   // Red for critical (9-10)
+                    } else if (score >= 7.0) {
+                        colorClass = "text-orange";   // Orange for high (7-8.9)
+                    } else if (score >= 4.0) {
+                        colorClass = "text-warning";  // Yellow for medium (4-6.9)
+                    }
+                    return `<span class="${colorClass} fw-bold">${score.toFixed(1)}</span>`;
                 }
             },
             {
@@ -595,8 +603,16 @@ class DeviceSecurityModal {
                 },
                 cellRenderer: (params) => {
                     const severity = params.value || "Low";
-                    const className = `severity-${severity.toLowerCase()}`;
-                    return `<span class="severity-badge ${className}">${severity}</span>`;
+                    // Colored text based on severity - cleaner table design
+                    let colorClass = "text-success";  // Green for Low
+                    if (severity.toUpperCase() === "CRITICAL") {
+                        colorClass = "text-danger";   // Red for Critical
+                    } else if (severity.toUpperCase() === "HIGH") {
+                        colorClass = "text-orange";   // Orange for High
+                    } else if (severity.toUpperCase() === "MEDIUM") {
+                        colorClass = "text-warning";  // Yellow for Medium
+                    }
+                    return `<span class="${colorClass} fw-bold text-uppercase">${severity}</span>`;
                 }
             },
             {
