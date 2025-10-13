@@ -684,11 +684,17 @@
                             <div class="col-12">
                                 <div class="alert alert-info d-flex align-items-center">
                                     <i class="fas fa-ticket-alt me-3 fs-4"></i>
-                                    <div>
+                                    <div class="flex-grow-1">
                                         <label for="xtNumberDisplay" class="form-label fw-bold mb-1">Ticket Number (XT#)</label>
                                         <div class="fs-5 fw-bold text-primary" id="xtNumberDisplay">Loading...</div>
                                         <small class="text-muted">This number will be assigned automatically when the ticket is saved</small>
                                     </div>
+                                    <button type="button" class="btn btn-primary btn-sm ms-auto" id="viewTicketMarkdownBtn"
+                                            style="display: none;"
+                                            onclick="switchToViewTicketModal()"
+                                            title="View Ticket Markdown">
+                                        <i class="fas fa-eye me-1"></i>View Markdown
+                                    </button>
                                 </div>
                             </div>
                         </div>

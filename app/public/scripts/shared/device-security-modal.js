@@ -272,6 +272,7 @@ class DeviceSecurityModal {
     /**
      * Add KEV badge to Device Information card header if device has KEV vulnerabilities
      * HEX-204: Visual indicator for high-risk devices with known exploited vulnerabilities
+     * Updated to handle multiple KEVs with picker modal pattern
      * @param {Object} device - The device data object
      */
     updateDeviceInfoKevBadge(device) {
@@ -297,22 +298,38 @@ class DeviceSecurityModal {
             return;
         }
 
-        // Find first KEV vulnerability to get CVE for modal link
-        const kevVuln = device.vulnerabilities?.find(v => v.isKev === "Yes");
-        const kevCve = kevVuln?.cve || "";
+        // Get ALL KEV vulnerabilities for this device
+        const kevVulns = device.vulnerabilities?.filter(v => v.isKev === "Yes") || [];
+        const kevCount = kevVulns.length;
+
+        if (kevCount === 0) {
+            return; // No KEVs found
+        }
 
         // Make the card-header a flex container for badge positioning
         deviceInfoCard.parentElement.style.display = "flex";
         deviceInfoCard.parentElement.style.justifyContent = "space-between";
         deviceInfoCard.parentElement.style.alignItems = "center";
 
-        // Add KEV badge matching the exact structure from device cards
+        // Store KEV data in a temporary object for the click handler
+        const kevDataId = `kev-data-${Date.now()}`;
+        if (!window.kevModalData) {
+            window.kevModalData = {};
+        }
+        window.kevModalData[kevDataId] = kevVulns;
+
+        // Determine click handler based on KEV count
+        const clickHandler = kevCount === 1
+            ? `showKevDetails('${kevVulns[0].cve}')`
+            : `showKevPickerModal('${device.hostname}', window.kevModalData['${kevDataId}'])`;
+
+        // Add KEV badge with count indicator if multiple
         const kevBadgeHtml = `
             <span class="badge kev-badge" role="button" tabindex="0"
-                  onclick="event.stopPropagation(); showKevDetails('${kevCve}')"
-                  onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); event.stopPropagation(); showKevDetails('${kevCve}'); }">
+                  onclick="event.stopPropagation(); ${clickHandler}"
+                  onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); event.stopPropagation(); ${clickHandler}; }">
                 <i class="fas fa-shield-halved me-1"></i>
-                KEV
+                KEV${kevCount > 1 ? ` (${kevCount})` : ""}
             </span>
         `;
 
