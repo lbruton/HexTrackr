@@ -1,5 +1,5 @@
 {
-  "generated": "2025-10-12T06:06:08.609Z",
+  "generated": "2025-10-13T05:23:25.695Z",
   "sections": {
     "api-reference": {
       "title": "Api Reference",
@@ -70,6 +70,11 @@
       "icon": "fas fa-list",
       "indexFile": "changelog/index",
       "children": {
+        "1.0.65": {
+          "file": "changelog/versions/1.0.65",
+          "title": "1.0.65",
+          "path": "changelog/versions/1.0.65.html"
+        },
         "1.0.64": {
           "file": "changelog/versions/1.0.64",
           "title": "1.0.64",
@@ -402,6 +407,11 @@
           "title": "Kev Integration",
           "path": "guides/kev-integration.html"
         },
+        "palo-alto-advisory-integration": {
+          "file": "guides/palo-alto-advisory-integration",
+          "title": "Palo Alto Advisory Integration",
+          "path": "guides/palo-alto-advisory-integration.html"
+        },
         "user-guide": {
           "file": "guides/user-guide",
           "title": "User Guide",
@@ -451,5 +461,5 @@
       "path": "overview.html"
     }
   },
-  "totalFiles": 88
+  "totalFiles": 90
 }
