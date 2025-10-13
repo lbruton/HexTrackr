@@ -295,6 +295,7 @@ export default [
         global: "readonly",
         require: "readonly",
         // Project-specific globals (defined in separate script files)
+        logger: "readonly",
         createVulnerabilityGridOptions: "readonly",
         PaginationController: "readonly",
         VulnerabilityDataManager: "readonly",
@@ -579,6 +580,7 @@ export default [
         Papa: "readonly",
         Sortable: "readonly",
         // Project-specific globals
+        logger: "readonly",
         createVulnerabilityGridOptions: "readonly",
         PaginationController: "readonly",
         VulnerabilityDataManager: "readonly",
