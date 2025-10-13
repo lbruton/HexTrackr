@@ -158,22 +158,24 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
                     const cell = document.getElementById(cellId);
                     if (!cell) return;
 
-                    // Only Cisco devices get fixed version lookup
-                    if (!vendor || !vendor.toLowerCase().includes('cisco')) {
+                    // Determine which advisory helper to use based on vendor
+                    let advisoryHelper = null;
+                    if (vendor?.toLowerCase().includes('cisco')) {
+                        advisoryHelper = window.ciscoAdvisoryHelper;
+                    } else if (vendor?.toLowerCase().includes('palo')) {
+                        advisoryHelper = window.paloAdvisoryHelper;
+                    }
+
+                    // Unsupported vendor or helper not loaded
+                    if (!advisoryHelper) {
                         cell.innerHTML = `<span class="font-monospace text-muted small">N/A</span>`;
                         params.node.setDataValue('fixed_version', 'N/A');  // Update AG-Grid data model for search
                         return;
                     }
 
-                    if (!window.ciscoAdvisoryHelper) {
-                        cell.innerHTML = `<span class="font-monospace text-muted small">N/A</span>`;
-                        params.node.setDataValue('fixed_version', 'N/A');
-                        return;
-                    }
-
                     try {
                         const installedVersion = params.data.operating_system;
-                        const fixedVersion = await window.ciscoAdvisoryHelper.getFixedVersion(
+                        const fixedVersion = await advisoryHelper.getFixedVersion(
                             cveId, vendor, installedVersion
                         );
 
