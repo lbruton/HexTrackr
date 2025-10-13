@@ -2077,9 +2077,15 @@ async function importCSV(type) {
 }
 
 // Auto-initialize when DOM is ready
-document.addEventListener("DOMContentLoaded", function() {
+// Check if DOM is already loaded (important for scripts loaded at end of body)
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", function() {
+        SettingsModal.init();
+    });
+} else {
+    // DOM already loaded, init immediately
     SettingsModal.init();
-});
+}
 
 // Export for use in other modules
 if (typeof module !== "undefined" && module.exports) {
