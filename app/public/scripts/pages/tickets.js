@@ -2775,6 +2775,7 @@ class HexagonTicketsManager {
             "[DEVICE_LIST]": deviceList,
             "[SUPERVISOR]": ticket.supervisor || "N/A",
             "[TECHNICIAN]": ticket.technician || "N/A",
+            "[JOB_TYPE]": ticket.jobType || ticket.job_type || "Upgrade",
             "[NOTES]": ticket.notes || "N/A",
             "[GENERATED_TIME]": new Date().toLocaleString(),
             "[GREETING]": this.getSupervisorGreeting(ticket.supervisor)
