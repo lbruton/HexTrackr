@@ -878,27 +878,152 @@ See `/docs/MCP_TOOLS.md` for complete documentation.
 
 ## Codacy Integration
 
-**Current Status**: GitHub webhook integration only (NOT available as CLI/MCP in Claude Code)
+**Current Status**: ✅ Fully integrated via Codacy MCP + GitHub webhook
+
+### Configuration
+- **Repository**: `gh/Lonnie-Bruton/HexTrackr-Dev`
+- **Token**: Stored in macOS Keychain (`security find-generic-password -s HexTrackr -a CODACY_ACCOUNT_TOKEN -w`)
+- **Config Files**:
+  - `.codacy/codacy.yaml` - Exclusions, tools, duplication settings
+  - `.codacy/tools-configs/eslint.config.mjs` - ESLint configuration
+  - `eslint.config.mjs` - Root ESLint config (sync to Codacy)
+- **Dashboard**: https://app.codacy.com/gh/Lonnie-Bruton/HexTrackr-Dev/dashboard
 
 ### How Codacy Works
-- **Automatic Analysis**: Runs via GitHub webhook when commits are pushed
-- **Dashboard**: https://app.codacy.com/gh/Lonnie-Bruton/HexTrackr-Dev/dashboard
-- **Timing**: Analysis starts within 1-5 minutes of push
-- **Coverage**: JavaScript, CSS, markdown linting and security checks
+1. **GitHub Webhook**: Automatic analysis on every push (1-5 minutes)
+2. **Local Analysis**: Use Codacy MCP tools for pre-commit checks
+3. **Tools Enabled**: ESLint 9.32.0, Trivy 0.66.0, Pylint 3.3.7, Lizard 1.17.31
+
+### Common Codacy MCP Commands
+
+**Get Repository Status:**
+```javascript
+mcp__codacy__codacy_get_repository_with_analysis({
+  provider: "gh",
+  organization: "Lonnie-Bruton",
+  repository: "HexTrackr-Dev"
+})
+// Returns: Grade, issues count, duplication %, coverage %, metrics
+```
+
+**Analyze Specific File:**
+```javascript
+mcp__codacy__codacy_cli_analyze({
+  rootPath: "/Volumes/DATA/GitHub/HexTrackr",
+  file: "app/public/scripts/shared/vulnerability-cards.js",
+  provider: "gh",
+  organization: "Lonnie-Bruton",
+  repository: "HexTrackr-Dev"
+})
+// Runs: ESLint, Trivy (security scan), Pylint (false positives expected for JS)
+```
+
+**Analyze Entire Project:**
+```javascript
+mcp__codacy__codacy_cli_analyze({
+  rootPath: "/Volumes/DATA/GitHub/HexTrackr",
+  provider: "gh",
+  organization: "Lonnie-Bruton",
+  repository: "HexTrackr-Dev"
+})
+// Scans all files according to .codacy/codacy.yaml exclusions
+```
+
+**Run Security Scan Only:**
+```javascript
+mcp__codacy__codacy_cli_analyze({
+  rootPath: "/Volumes/DATA/GitHub/HexTrackr",
+  tool: "trivy",  // Only run Trivy vulnerability scanner
+  provider: "gh",
+  organization: "Lonnie-Bruton",
+  repository: "HexTrackr-Dev"
+})
+```
+
+**Search for Code Issues:**
+```javascript
+mcp__codacy__codacy_list_repository_issues({
+  provider: "gh",
+  organization: "Lonnie-Bruton",
+  repository: "HexTrackr-Dev",
+  options: {
+    levels: ["Error", "Warning"],  // Severity filter
+    categories: ["security", "errorprone"],  // Category filter
+    branchName: "dev"  // Branch to analyze
+  }
+})
+```
+
+**Search for Security Items:**
+```javascript
+mcp__codacy__codacy_search_repository_srm_items({
+  provider: "gh",
+  organization: "Lonnie-Bruton",
+  repository: "HexTrackr-Dev",
+  options: {
+    scanTypes: ["SAST", "Secrets", "SCA"],  // Security scan types
+    priorities: ["Critical", "High"],  // Severity filter
+    statuses: ["OnTrack", "DueSoon", "Overdue"]  // Open issues only
+  }
+})
+```
+
+### Workflow Integration
+
+**After File Edits:**
+```javascript
+// 1. Edit code files
+Edit({file_path: "app/public/scripts/shared/example.js", ...})
+
+// 2. Run Codacy analysis on edited file
+mcp__codacy__codacy_cli_analyze({
+  rootPath: "/Volumes/DATA/GitHub/HexTrackr",
+  file: "app/public/scripts/shared/example.js",
+  provider: "gh",
+  organization: "Lonnie-Bruton",
+  repository: "HexTrackr-Dev"
+})
+
+// 3. Fix any issues found
+// 4. Commit and push (triggers full GitHub webhook scan)
+```
+
+**After Dependency Changes:**
+```javascript
+// 1. Install new packages
+Bash({command: "npm install new-package"})
+
+// 2. Run security scan
+mcp__codacy__codacy_cli_analyze({
+  rootPath: "/Volumes/DATA/GitHub/HexTrackr",
+  tool: "trivy",  // Security vulnerability scanner
+  provider: "gh",
+  organization: "Lonnie-Bruton",
+  repository: "HexTrackr-Dev"
+})
+
+// 3. Review security findings before committing
+```
 
 ### Cursor IDE Integration
-`.cursor/rules/codacy.mdc` enables Codacy MCP in Cursor IDE:
-- **Repository**: `gh/Lonnie-Bruton/HexTrackr-Dev`
+`.cursor/rules/codacy.mdc` enables additional Codacy automation in Cursor IDE:
 - **Auto-analyze**: After file edits, automatically run `codacy_cli_analyze`
 - **Security**: After dependency changes, automatically run Trivy scan
 - **Guidelines**: See `.github/CODACY_GUIDELINES.md` for false positive handling
 
-### Future Enhancement
-**TODO**: Install Codacy CLI or MCP for local analysis in Claude Code
-```bash
-# Future installation (not yet done)
-brew tap codacy/tap
-brew install codacy/tap/codacy-analysis-cli
-```
+### Known Issues
 
-**For now**: Codacy analysis happens automatically on GitHub after pushing commits.
+**Pylint False Positives:**
+- Pylint tries to parse JavaScript as Python (expected behavior)
+- Ignore Pylint "syntax-error" findings for `.js` files
+- Example: "leading zeros in decimal integer literals" is JavaScript-specific syntax
+
+**ESLint Configuration:**
+- Codacy CLI uses `.codacy/tools-configs/eslint.config.mjs`
+- Must sync root `eslint.config.mjs` to Codacy config when globals change
+- Pattern: `cp eslint.config.mjs .codacy/tools-configs/eslint.config.mjs`
+
+**Excluded Paths:**
+- Documentation files excluded via `.codacy/codacy.yaml`
+- Vendor libraries excluded
+- If docs show in results, check `exclude_paths` configuration
