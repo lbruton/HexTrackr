@@ -463,28 +463,49 @@
     box-shadow: 0 0 0 0.2rem rgb(32, 107, 196, 0.25);
 }
 
-/* ApexCharts Tooltip Color Indicators */
+/* ApexCharts Tooltip Styling (Theme-Aware) */
+.apexcharts-tooltip-custom {
+    background: var(--hextrackr-tooltip-bg);
+    border: 1px solid var(--hextrackr-tooltip-border);
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    padding: 16px;
+    font-family: Inter, sans-serif;
+    min-width: 280px;
+    max-width: 320px;
+}
+
+.tooltip-date {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--hextrackr-tooltip-text-primary);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--hextrackr-tooltip-divider);
+    text-align: center;
+}
+
 .tooltip-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 4px 0;
-    gap: 8px;
+    padding: 6px 0;
+    gap: 10px;
 }
 
 .color-indicator {
     display: inline-block;
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
-    border: 2px solid white;
+    border: 2px solid var(--hextrackr-tooltip-indicator-border);
     box-shadow: 0 0 0 1px rgb(0, 0, 0, 0.1);
     flex-shrink: 0;
 }
 
 .severity-name {
     font-size: 13px;
-    color: #4b5563;
+    color: var(--hextrackr-tooltip-text-secondary);
     font-weight: 500;
     flex: 1;
 }
@@ -492,7 +513,7 @@
 .severity-value {
     font-size: 14px;
     font-weight: 600;
-    color: #1f2937;
+    color: var(--hextrackr-tooltip-text-primary);
 }
 
 /* ===========================
