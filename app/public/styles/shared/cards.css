@@ -434,6 +434,29 @@
     outline-offset: 2px;
 }
 
+/* ===========================
+   Settings Modal Integration Cards
+   =========================== */
+
+/* Equal height for all Third Party Integration cards */
+#thirdPartyContent [data-integration] .card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Ensure card body grows to fill available space */
+#thirdPartyContent [data-integration] .card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Set minimum height for visual consistency */
+#thirdPartyContent .col-lg-6 {
+    display: flex;
+}
+
 /* Print styles */
 @media print {
     .device-display-enhanced {
