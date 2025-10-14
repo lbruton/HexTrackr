@@ -26,6 +26,7 @@ services:
       - USE_HTTPS=${USE_HTTPS:-false}
       - SSL_KEY_PATH=/app/certs/key.pem
       - SSL_CERT_PATH=/app/certs/cert.pem
+      - NODE_OPTIONS=--max-old-space-size=4096  # HEX-218: 4GB heap for large backup exports (858MB DB, 95K vulnerabilities)
     env_file:
       - .env
     restart: unless-stopped
