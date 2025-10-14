@@ -22,7 +22,9 @@
     "lint:md:fix": "node app/public/scripts/fix-markdown.js",
     "lint:all": "npm run lint:md && npm run eslint && npm run stylelint",
     "fix:all": "npm run lint:md:fix && npm run eslint:fix && npm run stylelint:fix",
-    "test:stagehand": "node tests/stagehand-examples.js"
+    "test:stagehand": "node tests/stagehand-examples.js",
+    "db:cleanup": "node scripts/db-snapshot-cleanup.js",
+    "db:cleanup:execute": "node scripts/db-snapshot-cleanup.js --execute"
   },
   "dependencies": {
     "argon2": "^0.31.2",

@@ -983,6 +983,10 @@ function finalizeBatchProcessing(importId, currentDate, batchStats, responseData
                     // Clear all caches after successful import
                     cacheService.clearAll();
 
+                    // HEX-219: Automatic snapshot retention cleanup
+                    // Keep only the last 3 scan dates to prevent database bloat
+                    cleanupOldSnapshots(3);
+
                     // Generate import summary and complete progress tracking
                     if (progressTracker && progressTracker.completeSession) {
                         console.log(`📊 Generating import summary for session: ${sessionId}`);
@@ -994,8 +998,8 @@ function finalizeBatchProcessing(importId, currentDate, batchStats, responseData
                                     ...finalStats,
                                     importSummary: summary
                                 };
-                                console.log(`✅ Import summary generated successfully for session ${sessionId}`);
-                                console.log(`📤 Sending completion event with summary:`, {
+                                console.log("✅ Import summary generated successfully for session", sessionId);
+                                console.log("📤 Sending completion event with summary:", {
                                     sessionId,
                                     summarySize: JSON.stringify(summary).length,
                                     hasNewCves: summary.cveDiscovery?.totalNewCves || 0,
@@ -1160,10 +1164,141 @@ function calculateAndStoreDailyTotalsEnhanced(scanDate, callback) {
                     (storeErr) => {
                         if (storeErr) {
                             console.error("Error storing enhanced daily totals:", storeErr);
-                        } else {
-                            console.log(`✅ Enhanced daily totals updated for ${scanDate}`);
+                            if (callback) {callback();}
+                            return;
                         }
-                        if (callback) {callback();}
+
+                        console.log(`✅ Enhanced daily totals updated for ${scanDate}`);
+
+                        // ALSO store vendor-specific daily totals (Migration 008)
+                        // Query vendor-specific totals using same deduplication logic
+                        const vendorTotalsQuery = `
+                            SELECT
+                                vendor,
+                                severity,
+                                COUNT(*) as count,
+                                SUM(max_vpr) as total_vpr
+                            FROM (
+                                SELECT
+                                    vendor,
+                                    severity,
+                                    hostname,
+                                    COALESCE(plugin_id, SUBSTR(description, 1, 100)) as dedup_key,
+                                    MAX(vpr_score) as max_vpr
+                                FROM vulnerabilities_current
+                                WHERE scan_date = ? AND lifecycle_state IN ('active', 'reopened')
+                                  AND vendor IS NOT NULL AND vendor != ''
+                                GROUP BY vendor, severity, hostname, dedup_key
+                            ) grouped
+                            GROUP BY vendor, severity
+                        `;
+
+                        db.all(vendorTotalsQuery, [scanDate], (vendorErr, vendorResults = []) => {
+                            if (vendorErr) {
+                                console.error("Error calculating vendor daily totals:", vendorErr);
+                                if (callback) {callback();}
+                                return;
+                            }
+
+                            // Group results by vendor
+                            const vendorData = {};
+                            vendorResults.forEach((row) => {
+                                const vendor = row.vendor;
+                                if (!vendorData[vendor]) {
+                                    vendorData[vendor] = {
+                                        critical_count: 0,
+                                        critical_total_vpr: 0,
+                                        high_count: 0,
+                                        high_total_vpr: 0,
+                                        medium_count: 0,
+                                        medium_total_vpr: 0,
+                                        low_count: 0,
+                                        low_total_vpr: 0,
+                                        total_vulnerabilities: 0,
+                                        total_vpr: 0
+                                    };
+                                }
+
+                                const severity = (row.severity || "").toLowerCase();
+                                const count = Number(row.count) || 0;
+                                const totalVpr = Number(row.total_vpr) || 0;
+
+                                switch (severity) {
+                                    case "critical":
+                                        vendorData[vendor].critical_count = count;
+                                        vendorData[vendor].critical_total_vpr = totalVpr;
+                                        break;
+                                    case "high":
+                                        vendorData[vendor].high_count = count;
+                                        vendorData[vendor].high_total_vpr = totalVpr;
+                                        break;
+                                    case "medium":
+                                        vendorData[vendor].medium_count = count;
+                                        vendorData[vendor].medium_total_vpr = totalVpr;
+                                        break;
+                                    case "low":
+                                        vendorData[vendor].low_count = count;
+                                        vendorData[vendor].low_total_vpr = totalVpr;
+                                        break;
+                                    default:
+                                        break;
+                                }
+
+                                vendorData[vendor].total_vulnerabilities += count;
+                                vendorData[vendor].total_vpr += totalVpr;
+                            });
+
+                            // Insert vendor totals for each vendor
+                            const vendors = Object.keys(vendorData);
+                            if (vendors.length === 0) {
+                                console.log(`⚠️  No vendor data to store for ${scanDate}`);
+                                if (callback) {callback();}
+                                return;
+                            }
+
+                            let vendorInserts = 0;
+                            let vendorErrors = 0;
+
+                            vendors.forEach((vendor, index) => {
+                                const data = vendorData[vendor];
+
+                                db.run(
+                                    `INSERT OR REPLACE INTO vendor_daily_totals (
+                                        scan_date, vendor,
+                                        critical_count, critical_total_vpr,
+                                        high_count, high_total_vpr,
+                                        medium_count, medium_total_vpr,
+                                        low_count, low_total_vpr,
+                                        total_vulnerabilities, total_vpr
+                                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                                    [
+                                        scanDate, vendor,
+                                        data.critical_count, data.critical_total_vpr,
+                                        data.high_count, data.high_total_vpr,
+                                        data.medium_count, data.medium_total_vpr,
+                                        data.low_count, data.low_total_vpr,
+                                        data.total_vulnerabilities, data.total_vpr
+                                    ],
+                                    (insertErr) => {
+                                        if (insertErr) {
+                                            console.error(`Error storing vendor totals for ${vendor}:`, insertErr);
+                                            vendorErrors++;
+                                        } else {
+                                            vendorInserts++;
+                                        }
+
+                                        // Call callback after last vendor insert
+                                        if (index === vendors.length - 1) {
+                                            console.log(`✅ Vendor daily totals updated: ${vendorInserts} vendors for ${scanDate}`);
+                                            if (vendorErrors > 0) {
+                                                console.warn(`⚠️  ${vendorErrors} vendor insert errors`);
+                                            }
+                                            if (callback) {callback();}
+                                        }
+                                    }
+                                );
+                            });
+                        });
                     }
                 );
             }
@@ -1512,6 +1647,58 @@ async function generateImportSummary(scanDate, importMetadata, processingStats) 
             });
         });
     });
+}
+
+/**
+ * HEX-219: Automatic snapshot retention cleanup
+ * Deletes snapshots older than the specified retention count to prevent database bloat
+ * Runs automatically after each successful import
+ *
+ * @param {number} retainCount - Number of most recent scan dates to keep (default: 3)
+ */
+function cleanupOldSnapshots(retainCount = 3) {
+    const db = global.db;
+
+    console.log(`🧹 Starting automatic snapshot cleanup (retain last ${retainCount} scan dates)...`);
+
+    // Get distinct scan dates, ordered newest to oldest
+    db.all(
+        `SELECT DISTINCT scan_date
+         FROM vulnerability_snapshots
+         ORDER BY scan_date DESC`,
+        [],
+        (err, rows) => {
+            if (err) {
+                console.error("❌ Error fetching scan dates for cleanup:", err);
+                return;
+            }
+
+            if (rows.length <= retainCount) {
+                console.log(`✅ Snapshot cleanup: No action needed (${rows.length} scan dates <= ${retainCount} retention policy)`);
+                return;
+            }
+
+            // Dates to delete: everything beyond the retention count
+            const datesToDelete = rows.slice(retainCount).map(r => r.scan_date);
+
+            console.log(`🗑️  Snapshot cleanup: Deleting ${datesToDelete.length} old scan dates...`);
+            console.log(`   Keeping: ${rows.slice(0, retainCount).map(r => r.scan_date).join(", ")}`);
+            console.log(`   Deleting: ${datesToDelete.join(", ")}`);
+
+            // Build DELETE query with parameterized IN clause
+            const placeholders = datesToDelete.map(() => "?").join(",");
+            const deleteQuery = `DELETE FROM vulnerability_snapshots WHERE scan_date IN (${placeholders})`;
+
+            db.run(deleteQuery, datesToDelete, function(deleteErr) {
+                if (deleteErr) {
+                    console.error("❌ Error deleting old snapshots:", deleteErr);
+                } else {
+                    console.log("✅ Snapshot cleanup complete: Deleted", this.changes.toLocaleString(), "rows");
+                    console.log("   Database will reclaim space on next VACUUM operation");
+                }
+            });
+        }
+    );
 }
 
 // Export the service functions
