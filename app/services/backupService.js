@@ -82,13 +82,16 @@ class BackupService {
                     this._fetchData("SELECT * FROM vulnerabilities_current"),
                     this._fetchData("SELECT * FROM vulnerability_snapshots"),
                     this._fetchData("SELECT * FROM vulnerability_daily_totals"),
+                    this._fetchData("SELECT * FROM vendor_daily_totals"),
                     this._fetchData("SELECT * FROM vulnerability_imports"),
                     this._fetchData("SELECT * FROM vulnerability_templates"),
                     this._fetchData("SELECT * FROM kev_status"),
-                    this._fetchData("SELECT * FROM ticket_vulnerabilities")
+                    this._fetchData("SELECT * FROM ticket_vulnerabilities"),
+                    this._fetchData("SELECT * FROM cisco_advisories"),
+                    this._fetchData("SELECT * FROM palo_alto_advisories")
                 ]);
 
-                const [current, snapshots, dailyTotals, imports, templates, kevStatus, ticketVulns] = vulnerabilitiesData;
+                const [current, snapshots, dailyTotals, vendorDailyTotals, imports, templates, kevStatus, ticketVulns, ciscoAdvisories, paloAdvisories] = vulnerabilitiesData;
 
                 resolve({
                     type: "vulnerabilities_complete",
@@ -103,6 +106,10 @@ class BackupService {
                     vulnerability_daily_totals: {
                         count: dailyTotals.length,
                         data: dailyTotals
+                    },
+                    vendor_daily_totals: {
+                        count: vendorDailyTotals.length,
+                        data: vendorDailyTotals
                     },
                     vulnerability_imports: {
                         count: imports.length,
@@ -119,6 +126,14 @@ class BackupService {
                     ticket_vulnerabilities: {
                         count: ticketVulns.length,
                         data: ticketVulns
+                    },
+                    cisco_advisories: {
+                        count: ciscoAdvisories.length,
+                        data: ciscoAdvisories
+                    },
+                    palo_alto_advisories: {
+                        count: paloAdvisories.length,
+                        data: paloAdvisories
                     },
                     exported_at: new Date().toISOString()
                 });
@@ -184,11 +199,15 @@ class BackupService {
         try {
             console.log("🔄 Starting comprehensive database backup...");
 
-            // Get comprehensive data from both export functions
-            const [vulnerabilityData, ticketData] = await Promise.all([
+            // Get comprehensive data from both export functions plus user preferences
+            const [vulnerabilityData, ticketData, preferencesData] = await Promise.all([
                 this.exportVulnerabilities(),
-                this.exportTickets()
+                this.exportTickets(),
+                this._fetchData("SELECT * FROM user_preferences")
             ]);
+
+            // ✅ SECURITY: DO NOT export users table (contains Argon2id password hashes)
+            // User preferences are safe to export (theme, display settings - no security risk)
 
             // Calculate total record counts for logging
             const totalVulnRecords = Object.keys(vulnerabilityData)
@@ -212,6 +231,10 @@ class BackupService {
                 },
                 vulnerability_data: vulnerabilityData,
                 ticket_data: ticketData,
+                user_preferences: {
+                    count: preferencesData.length,
+                    data: preferencesData
+                },
                 exported_at: new Date().toISOString()
             };
 
@@ -228,71 +251,103 @@ class BackupService {
     async clearData(type) {
         return new Promise((resolve, reject) => {
             if (type === "all") {
-                // For 'all', clear all rollover vulnerability tables and tickets
-                this.db.run("DELETE FROM vulnerability_snapshots", (snapErr) => {
-                    if (snapErr) {
-                        return reject(new Error("Failed to clear vulnerability snapshots"));
+                // Clear all tables in parallel (no foreign key dependencies between these groups)
+                // SECURITY: Preserves users, user_preferences, sessions (authentication)
+                const clearPromises = [
+                    new Promise((res, rej) => this.db.run("DELETE FROM cisco_advisories", err => err ? rej(err) : res())),
+                    new Promise((res, rej) => this.db.run("DELETE FROM palo_alto_advisories", err => err ? rej(err) : res())),
+                    new Promise((res, rej) => this.db.run("DELETE FROM vulnerability_imports", err => err ? rej(err) : res())),
+                    new Promise((res, rej) => this.db.run("DELETE FROM kev_status", err => err ? rej(err) : res())),
+                    new Promise((res, rej) => this.db.run("DELETE FROM ticket_templates", err => err ? rej(err) : res())),
+                    new Promise((res, rej) => this.db.run("DELETE FROM email_templates", err => err ? rej(err) : res())),
+                    new Promise((res, rej) => this.db.run("DELETE FROM ticket_vulnerabilities", err => err ? rej(err) : res())),
+                    new Promise((res, rej) => this.db.run("DELETE FROM vulnerability_snapshots", err => err ? rej(err) : res())),
+                    new Promise((res, rej) => this.db.run("DELETE FROM vulnerabilities_current", err => err ? rej(err) : res())),
+                    new Promise((res, rej) => this.db.run("DELETE FROM vulnerability_daily_totals", err => err ? rej(err) : res())),
+                    new Promise((res, rej) => this.db.run("DELETE FROM vendor_daily_totals", err => err ? rej(err) : res())),
+                    new Promise((res, rej) => this.db.run("DELETE FROM tickets", err => err ? rej(err) : res()))
+                ];
+
+                Promise.all(clearPromises)
+                    .then(() => resolve({
+                        message: "All data cleared successfully (authentication preserved)",
+                        clearedCount: "all"
+                    }))
+                    .catch(err => reject(new Error("Failed to clear all data: " + err.message)));
+
+            } else if (type === "vulnerabilities") {
+                // Clear vulnerability tables in dependency order (cascade deletes)
+                this.db.run("DELETE FROM cisco_advisories", (ciscoErr) => {
+                    if (ciscoErr) {
+                        return reject(new Error("Failed to clear Cisco advisories"));
                     }
 
-                    this.db.run("DELETE FROM vulnerabilities_current", (currentErr) => {
-                        if (currentErr) {
-                            return reject(new Error("Failed to clear current vulnerabilities"));
+                    this.db.run("DELETE FROM palo_alto_advisories", (paloErr) => {
+                        if (paloErr) {
+                            return reject(new Error("Failed to clear Palo Alto advisories"));
                         }
 
-                        this.db.run("DELETE FROM vulnerability_daily_totals", (dailyErr) => {
-                            if (dailyErr) {
-                                return reject(new Error("Failed to clear daily totals"));
+                        this.db.run("DELETE FROM vulnerability_imports", (importErr) => {
+                            if (importErr) {
+                                return reject(new Error("Failed to clear vulnerability imports"));
                             }
 
-                            this.db.run("DELETE FROM tickets", (ticketErr) => {
-                                if (ticketErr) {
-                                    return reject(new Error("Failed to clear tickets"));
+                            this.db.run("DELETE FROM kev_status", (kevErr) => {
+                                if (kevErr) {
+                                    return reject(new Error("Failed to clear KEV status"));
                                 }
 
-                                resolve({
-                                    message: "All data cleared successfully",
-                                    clearedCount: "all"
+                                // Then clear core vulnerability tables
+                                this.db.run("DELETE FROM vulnerability_snapshots", (snapErr) => {
+                                    if (snapErr) {
+                                        return reject(new Error("Failed to clear vulnerability snapshots"));
+                                    }
+
+                                    this.db.run("DELETE FROM vulnerabilities_current", (currentErr) => {
+                                        if (currentErr) {
+                                            return reject(new Error("Failed to clear current vulnerabilities"));
+                                        }
+
+                                        this.db.run("DELETE FROM vulnerability_daily_totals", (dailyErr) => {
+                                            if (dailyErr) {
+                                                return reject(new Error("Failed to clear daily totals"));
+                                            }
+
+                                            this.db.run("DELETE FROM vendor_daily_totals", (vendorErr) => {
+                                                if (vendorErr) {
+                                                    return reject(new Error("Failed to clear vendor daily totals"));
+                                                }
+
+                                                resolve({
+                                                    message: "Vulnerability data cleared successfully (including advisories)",
+                                                    clearedCount: "vulnerabilities"
+                                                });
+                                            });
+                                        });
+                                    });
                                 });
                             });
                         });
                     });
                 });
 
-            } else if (type === "vulnerabilities") {
-                // Clear only vulnerability tables
-                this.db.run("DELETE FROM vulnerability_snapshots", (snapErr) => {
-                    if (snapErr) {
-                        return reject(new Error("Failed to clear vulnerability snapshots"));
+            } else if (type === "tickets") {
+                // Clear junction table first (foreign key dependency)
+                this.db.run("DELETE FROM ticket_vulnerabilities", (junctionErr) => {
+                    if (junctionErr) {
+                        return reject(new Error("Failed to clear ticket-vulnerability relationships"));
                     }
 
-                    this.db.run("DELETE FROM vulnerabilities_current", (currentErr) => {
-                        if (currentErr) {
-                            return reject(new Error("Failed to clear current vulnerabilities"));
+                    // Then clear tickets
+                    this.db.run("DELETE FROM tickets", function(err) {
+                        if (err) {
+                            return reject(new Error("Failed to clear tickets"));
                         }
 
-                        this.db.run("DELETE FROM vulnerability_daily_totals", (dailyErr) => {
-                            if (dailyErr) {
-                                return reject(new Error("Failed to clear daily totals"));
-                            }
-
-                            resolve({
-                                message: "Vulnerability data cleared successfully",
-                                clearedCount: "vulnerabilities"
-                            });
+                        resolve({
+                            message: "Tickets cleared successfully (including relationships)",
+                            clearedCount: this.changes
                         });
-                    });
-                });
-
-            } else if (type === "tickets") {
-                // Clear only tickets
-                this.db.run("DELETE FROM tickets", function(err) {
-                    if (err) {
-                        return reject(new Error("Failed to clear tickets"));
-                    }
-
-                    resolve({
-                        message: "Tickets cleared successfully",
-                        clearedCount: this.changes
                     });
                 });
 
@@ -520,18 +575,23 @@ class BackupService {
             // Create ZIP file
             const zip = new JSZip();
 
-            // Add main backup data
-            zip.file("complete_backup.json", JSON.stringify(backupData, null, 2));
-
             // Add individual table exports for easier restoration
+            // NOTE: Skipping combined complete_backup.json to avoid JSON.stringify length limits
+            // with 95K+ vulnerability records. Individual files provide same data without memory issues.
             zip.file("vulnerabilities_current.json", JSON.stringify(backupData.vulnerability_data.vulnerabilities_current, null, 2));
             zip.file("vulnerability_snapshots.json", JSON.stringify(backupData.vulnerability_data.vulnerability_snapshots, null, 2));
             zip.file("vulnerability_daily_totals.json", JSON.stringify(backupData.vulnerability_data.vulnerability_daily_totals, null, 2));
+            zip.file("vendor_daily_totals.json", JSON.stringify(backupData.vulnerability_data.vendor_daily_totals, null, 2));
             zip.file("vulnerability_imports.json", JSON.stringify(backupData.vulnerability_data.vulnerability_imports, null, 2));
             zip.file("tickets.json", JSON.stringify(backupData.ticket_data.tickets, null, 2));
             zip.file("ticket_templates.json", JSON.stringify(backupData.ticket_data.ticket_templates, null, 2));
             zip.file("email_templates.json", JSON.stringify(backupData.ticket_data.email_templates, null, 2));
             zip.file("kev_status.json", JSON.stringify(backupData.vulnerability_data.kev_status, null, 2));
+            zip.file("cisco_advisories.json", JSON.stringify(backupData.vulnerability_data.cisco_advisories, null, 2));
+            zip.file("palo_alto_advisories.json", JSON.stringify(backupData.vulnerability_data.palo_alto_advisories, null, 2));
+            zip.file("user_preferences.json", JSON.stringify(backupData.user_preferences, null, 2));
+
+            // ✅ SECURITY: users.json NOT included (contains password hashes)
 
             // Add metadata file
             const metadata = {
@@ -540,9 +600,12 @@ class BackupService {
                 version: "2.0",
                 tables_included: [
                     "vulnerabilities_current", "vulnerability_snapshots", "vulnerability_daily_totals",
-                    "vulnerability_imports", "vulnerability_templates", "kev_status", "ticket_vulnerabilities",
-                    "tickets", "ticket_templates", "email_templates", "sync_metadata"
+                    "vendor_daily_totals", "vulnerability_imports", "vulnerability_templates", "kev_status",
+                    "ticket_vulnerabilities", "cisco_advisories", "palo_alto_advisories",
+                    "tickets", "ticket_templates", "email_templates", "sync_metadata",
+                    "user_preferences"
                 ],
+                security_note: "users table NOT included (password hashes excluded for security)",
                 total_records: backupData.backup_metadata.total_vulnerability_records + backupData.backup_metadata.total_ticket_records,
                 restore_instructions: "Use the comprehensive backup restore API with this ZIP file"
             };
@@ -577,13 +640,48 @@ class BackupService {
             const vulnData = await this.exportVulnerabilities();
             const zip = new JSZip();
 
-            // Add vulnerability data
-            zip.file("vulnerabilities.json", JSON.stringify(vulnData, null, 2));
+            // Add metadata (small, safe to stringify)
+            const metadata = {
+                type: vulnData.type,
+                exported_at: vulnData.exported_at,
+                tables: Object.keys(vulnData).filter(key => key !== "type" && key !== "exported_at")
+            };
+            zip.file("_metadata.json", JSON.stringify(metadata, null, 2));
 
-            // Add individual tables
+            // Add individual tables with chunking for large datasets
+            // JSON.stringify has ~500MB string length limit, so chunk large tables
+            const CHUNK_SIZE = 10000; // 10K records per chunk
             Object.keys(vulnData).forEach(key => {
                 if (key !== "type" && key !== "exported_at" && vulnData[key].data) {
-                    zip.file(`${key}.json`, JSON.stringify(vulnData[key], null, 2));
+                    const tableData = vulnData[key].data;
+                    const recordCount = tableData.length;
+
+                    if (recordCount > CHUNK_SIZE) {
+                        // Split into chunks
+                        const numChunks = Math.ceil(recordCount / CHUNK_SIZE);
+                        console.log(`📦 Splitting ${key} into ${numChunks} chunks (${recordCount} records)`);
+
+                        for (let i = 0; i < numChunks; i++) {
+                            const start = i * CHUNK_SIZE;
+                            const end = Math.min(start + CHUNK_SIZE, recordCount);
+                            const chunk = tableData.slice(start, end);
+                            const chunkData = { count: chunk.length, data: chunk };
+                            zip.file(`${key}_chunk_${i + 1}_of_${numChunks}.json`, JSON.stringify(chunkData, null, 2));
+                        }
+
+                        // Add chunk index file
+                        const chunkIndex = {
+                            table_name: key,
+                            total_records: recordCount,
+                            chunk_size: CHUNK_SIZE,
+                            num_chunks: numChunks,
+                            chunks: Array.from({ length: numChunks }, (_, i) => `${key}_chunk_${i + 1}_of_${numChunks}.json`)
+                        };
+                        zip.file(`${key}_chunks_index.json`, JSON.stringify(chunkIndex, null, 2));
+                    } else {
+                        // Small table, add as single file
+                        zip.file(`${key}.json`, JSON.stringify(vulnData[key], null, 2));
+                    }
                 }
             });
 
@@ -610,10 +708,15 @@ class BackupService {
             const ticketData = await this.exportTickets();
             const zip = new JSZip();
 
-            // Add ticket data
-            zip.file("tickets.json", JSON.stringify(ticketData, null, 2));
+            // Add metadata (small, safe to stringify)
+            const metadata = {
+                type: ticketData.type,
+                exported_at: ticketData.exported_at,
+                tables: Object.keys(ticketData).filter(key => key !== "type" && key !== "exported_at")
+            };
+            zip.file("_metadata.json", JSON.stringify(metadata, null, 2));
 
-            // Add individual tables
+            // Add individual tables only (avoids JSON.stringify length limits on huge combined object)
             Object.keys(ticketData).forEach(key => {
                 if (key !== "type" && key !== "exported_at" && ticketData[key].data) {
                     zip.file(`${key}.json`, JSON.stringify(ticketData[key], null, 2));

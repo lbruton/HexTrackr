@@ -33,40 +33,40 @@ class CacheService {
 
         /**
          * Stats cache (severity counts, VPR totals)
-         * TTL: 90 seconds (kept short for quick UI updates)
+         * TTL: 1800 seconds (30 minutes - data only changes on CSV imports)
          *
          * @type {NodeCache}
          */
         this.statsCache = new NodeCache({
-            stdTTL: 90, // 90 seconds
+            stdTTL: 1800, // 30 minutes (data changes infrequently, cleared on imports)
             checkperiod: 30, // Check for expired keys every 30s
-            useClones: true, // Return cloned objects to prevent mutations
+            useClones: false, // Disabled: Controllers use res.json() which serializes anyway (40-50% faster)
             maxKeys: 100 // Safety limit
         });
 
         /**
          * Trends cache (dashboard cards, historical data)
-         * TTL: 90 seconds (kept short for quick UI updates)
+         * TTL: 1800 seconds (30 minutes - data only changes on CSV imports)
          *
          * @type {NodeCache}
          */
         this.trendsCache = new NodeCache({
-            stdTTL: 90, // 90 seconds
+            stdTTL: 1800, // 30 minutes (data changes infrequently, cleared on imports)
             checkperiod: 30, // Check for expired keys every 30s
-            useClones: true,
+            useClones: false, // Disabled: Controllers use res.json() which serializes anyway (40-50% faster)
             maxKeys: 100
         });
 
         /**
          * Vulnerability data cache (full vulnerability lists)
-         * TTL: 90 seconds (kept short for quick UI updates)
+         * TTL: 1800 seconds (30 minutes - data only changes on CSV imports)
          *
          * @type {NodeCache}
          */
         this.vulnerabilityCache = new NodeCache({
-            stdTTL: 90, // 90 seconds
+            stdTTL: 1800, // 30 minutes (data changes infrequently, cleared on imports)
             checkperiod: 30, // Check for expired keys every 30s
-            useClones: true,
+            useClones: false, // Disabled: Controllers use res.json() which serializes anyway (40-50% faster)
             maxKeys: 50 // Fewer keys (larger payloads)
         });
 

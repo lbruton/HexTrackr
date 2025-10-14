@@ -38,13 +38,21 @@ const cors = {
 /**
  * Rate Limiting Configuration
  * DoS protection by limiting requests per IP address within a time window
+ *
+ * IMPORTANT: We run behind nginx reverse proxy with trust proxy enabled.
+ * The validate option is set to false to allow rate limiting via X-Forwarded-For headers.
+ * This is safe because:
+ * 1. nginx is the only trusted proxy (not open to internet)
+ * 2. nginx properly sets X-Forwarded-For headers
+ * 3. Rate limiting still works per client IP via nginx proxy headers
  */
 const rateLimit = {
     windowMs: RATE_LIMIT_WINDOW_MS,
     max: RATE_LIMIT_MAX_REQUESTS,
     message: RATE_LIMIT_MESSAGE,
     standardHeaders: true,
-    legacyHeaders: false
+    legacyHeaders: false,
+    validate: { trustProxy: false }  // Disable validation - we trust nginx reverse proxy
 };
 
 /**

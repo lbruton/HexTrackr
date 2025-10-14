@@ -220,6 +220,27 @@ function createTables(db) {
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
 
+  // 7b. Vendor daily totals - vendor-specific aggregated metrics (Migration 008)
+  // Permanent storage for vendor-specific trend data
+  // Never cleaned up by db-snapshot-cleanup.js
+  db.run(`CREATE TABLE IF NOT EXISTS vendor_daily_totals (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    scan_date TEXT NOT NULL,
+    vendor TEXT NOT NULL,
+    critical_count INTEGER DEFAULT 0,
+    critical_total_vpr REAL DEFAULT 0,
+    high_count INTEGER DEFAULT 0,
+    high_total_vpr REAL DEFAULT 0,
+    medium_count INTEGER DEFAULT 0,
+    medium_total_vpr REAL DEFAULT 0,
+    low_count INTEGER DEFAULT 0,
+    low_total_vpr REAL DEFAULT 0,
+    total_vulnerabilities INTEGER DEFAULT 0,
+    total_vpr REAL DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(scan_date, vendor)
+  )`);
+
   // 8. Vulnerability staging - import staging area
   // NEW (Migration 006): Added operating_system and solution_text columns
   db.run(`CREATE TABLE IF NOT EXISTS vulnerability_staging (
@@ -388,6 +409,10 @@ function createTables(db) {
   db.run("CREATE INDEX IF NOT EXISTS idx_staging_processed ON vulnerability_staging (processed)");
   db.run("CREATE INDEX IF NOT EXISTS idx_staging_batch_id ON vulnerability_staging (batch_id)");
   db.run("CREATE INDEX IF NOT EXISTS idx_staging_unprocessed_batch ON vulnerability_staging (processed, batch_id)");
+  // Vendor daily totals indexes (Migration 008)
+  db.run("CREATE INDEX IF NOT EXISTS idx_vendor_daily_scan_date ON vendor_daily_totals(scan_date)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_vendor_daily_vendor ON vendor_daily_totals(vendor)");
+  db.run("CREATE INDEX IF NOT EXISTS idx_vendor_daily_composite ON vendor_daily_totals(vendor, scan_date)");
   db.run("CREATE INDEX IF NOT EXISTS idx_email_templates_name ON email_templates (name)");
   db.run("CREATE INDEX IF NOT EXISTS idx_email_templates_active ON email_templates (is_active)");
   db.run("CREATE INDEX IF NOT EXISTS idx_email_templates_category ON email_templates (category)");
