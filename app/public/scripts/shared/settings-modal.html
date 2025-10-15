@@ -158,6 +158,86 @@
                                         </div>
                                     </div>
 
+                                    <!-- Tenable Integration (HEX-233) -->
+                                    <div class="col-lg-6 mb-4" data-integration="tenable">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-shield-virus me-2 text-success"></i>
+                                                    Tenable
+                                                </h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-3">
+                                                    <label class="form-label">API Integration</label>
+                                                    <div class="alert alert-info mb-0">
+                                                        <i class="fas fa-info-circle me-2"></i>
+                                                        <small><strong>Coming Soon:</strong> API integration for automated vulnerability scanning</small>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">API Credentials</label>
+                                                    <div class="d-flex align-items-center justify-content-between">
+                                                        <span class="badge bg-secondary">Not Available</span>
+                                                        <button type="button" class="btn btn-sm btn-outline-primary" disabled>
+                                                            <i class="fas fa-key me-2"></i>Add Credentials
+                                                        </button>
+                                                    </div>
+                                                    <small class="text-muted">API integration coming soon</small>
+                                                </div>
+                                                <hr>
+                                                <div class="mb-3">
+                                                    <label class="form-label">CSV Import</label>
+                                                    <p class="text-muted small mb-2">Import Tenable vulnerability scan data from CSV files</p>
+                                                    <button type="button" class="btn btn-success w-100" id="importCsvBtn">
+                                                        <i class="fas fa-upload me-2"></i>Import Tenable CSV
+                                                    </button>
+                                                    <small class="text-muted">Supports vendor-neutral CSV format</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Netbox Integration (HEX-233) -->
+                                    <div class="col-lg-6 mb-4" data-integration="netbox">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-server me-2 text-info"></i>
+                                                    Netbox
+                                                </h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-3">
+                                                    <label class="form-label">API Integration</label>
+                                                    <div class="alert alert-warning mb-0">
+                                                        <i class="fas fa-clock me-2"></i>
+                                                        <small><strong>Pending Approval:</strong> API access request in progress</small>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">API Credentials</label>
+                                                    <div class="d-flex align-items-center justify-content-between">
+                                                        <span class="badge bg-secondary">Awaiting Approval</span>
+                                                        <button type="button" class="btn btn-sm btn-outline-primary" disabled>
+                                                            <i class="fas fa-key me-2"></i>Add Credentials
+                                                        </button>
+                                                    </div>
+                                                    <small class="text-muted">API integration pending approval</small>
+                                                </div>
+                                                <hr>
+                                                <div class="mb-3">
+                                                    <label class="form-label">CSV Import</label>
+                                                    <p class="text-muted small mb-2">Import Netbox device inventory from CSV files</p>
+                                                    <button type="button" class="btn btn-outline-info w-100" id="importNetboxCsvBtn" disabled>
+                                                        <i class="fas fa-upload me-2"></i>Import Netbox CSV
+                                                    </button>
+                                                    <small class="text-muted">CSV format specification coming soon</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <!-- ServiceNow Integration -->
                                     <div class="col-lg-6 mb-4" data-integration="servicenow">
                                         <div class="card">
