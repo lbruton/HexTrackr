@@ -374,15 +374,10 @@ class ProgressModal {
      */
     handleProgressComplete(data) {
         console.log("📨 handleProgressComplete() received data:", data);
-        console.log("📊 Metadata keys:", data.metadata ? Object.keys(data.metadata) : "none");
-        console.log("📊 Has importSummary:", !!(data.metadata && data.metadata.importSummary));
         console.log("Modal state - isVisible:", this.isVisible, "currentSessionId:", this.currentSessionId, "data.sessionId:", data.sessionId);
-
+        
         if (!this.isVisible || data.sessionId !== this.currentSessionId) {
             console.warn("⚠️ Progress complete ignored - modal not visible or session mismatch");
-            console.warn("   isVisible:", this.isVisible);
-            console.warn("   currentSessionId:", this.currentSessionId);
-            console.warn("   data.sessionId:", data.sessionId);
             return;
         }
 
@@ -396,14 +391,9 @@ class ProgressModal {
         // Store import summary if available
         if (data.metadata && data.metadata.importSummary) {
             this.progressData.importSummary = data.metadata.importSummary;
-            console.log("📊 Import summary received with", data.metadata.importSummary.cveDiscovery?.totalNewCves || 0, "new CVEs and", data.metadata.importSummary.cveDiscovery?.totalResolvedCves || 0, "resolved CVEs");
-            console.log("📊 Full summary object:", JSON.stringify(data.metadata.importSummary, null, 2));
+            console.log("📊 Import summary received:", data.metadata.importSummary);
         } else {
-            console.error("❌ NO IMPORT SUMMARY IN METADATA!");
-            console.error("   data.metadata exists:", !!data.metadata);
-            if (data.metadata) {
-                console.error("   Available metadata keys:", Object.keys(data.metadata));
-            }
+            console.log("ℹ️ No import summary in metadata");
         }
 
         // Update UI to show 100% completion
@@ -863,7 +853,7 @@ class ProgressModal {
         // This ensures cache is busted and new data is loaded
         if (wasSuccessfulImport && window.refreshPageData) {
             console.log("Progress modal closed: Triggering page refresh to bust cache");
-            window.refreshPageData("vulnerabilities", true);
+            window.refreshPageData("vulnerabilities");
         } else if (wasSuccessfulImport && window.vulnManager && typeof window.vulnManager.loadData === "function") {
             // Fallback: directly call loadData with cache bust
             console.log("Progress modal closed: Triggering loadData with cache bust");

@@ -8,8 +8,31 @@
    Modal Base Styles
    =========================== */
 
+/* Modal Z-Index Stacking - Ensures nested modals appear on top */
+/* Base modal layer */
+#settingsModal {
+    z-index: 1055;
+}
+
+#settingsModal .modal-backdrop {
+    z-index: 1054;
+}
+
+/* Secondary modals (opened from settings modal) - higher z-index */
+#scanDateModal,
+#progressModal {
+    z-index: 1065;
+}
+
+#scanDateModal .modal-backdrop,
+#progressModal .modal-backdrop {
+    z-index: 1064;
+}
+
 /* Enhanced Modal with Blur Effect */
 .modal-blur {
+    /* stylelint-disable-next-line property-no-vendor-prefix */
+    -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
 }
 
