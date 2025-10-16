@@ -127,6 +127,23 @@ document.addEventListener("DOMContentLoaded", () => {
     window.modernVulnManager = new ModernVulnManager();
     // Create global alias for HTML onclick handlers
     window.vulnManager = window.modernVulnManager;
+    
+    // Handle URL search parameter (e.g., ?search=LOCATION from tickets page)
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchTerm = urlParams.get("search");
+    if (searchTerm) {
+        // Wait for search box to be available, then fill and trigger search
+        setTimeout(() => {
+            const searchBox = document.getElementById("searchInput");
+            if (searchBox) {
+                searchBox.value = searchTerm;
+                // Trigger input event to activate search
+                searchBox.dispatchEvent(new Event("input", { bubbles: true }));
+                // Clean up URL without page reload
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }, 500);
+    }
 });
 
 /**
