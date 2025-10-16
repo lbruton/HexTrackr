@@ -17,38 +17,40 @@ The theme system is built on four core layers that work together to provide cons
 
 ### Core Theme Files (Global)
 
+All CSS files are located in `app/public/styles/` directory.
+
 | File | Purpose | Scope |
 |------|---------|-------|
-| `css-variables.css` | Global CSS custom properties for all themes | Application-wide |
-| `ag-grid-overrides.css` | AG-Grid specific color overrides with !important | AG-Grid components |
+| `styles/css-variables.css` | Global CSS custom properties for all themes (499 lines - single source of truth) | Application-wide |
+| `styles/ag-grid-overrides.css` | AG-Grid specific color overrides with !important | AG-Grid components |
 
 ### Shared Component Styles
 
 | File | Purpose | Components |
 |------|---------|------------|
-| `shared/base.css` | Core base styles and typography | Global foundation |
-| `shared/dark-theme.css` | Dark mode color overrides | All components (dark) |
-| `shared/light-theme.css` | Light mode color overrides | All components (light) |
-| `shared/header.css` | Navigation header styling | Header component |
-| `shared/modals.css` | Modal dialog styling | All modal components |
-| `shared/cards.css` | Card component styling | Device/vulnerability cards |
-| `shared/tables.css` | Table styling (non-AG-Grid) | Bootstrap tables |
-| `shared/badges.css` | Badge and pill styling | Status badges, VPR badges |
-| `shared/animations.css` | CSS animations and transitions | Loading, hover effects |
-| `shared/layouts.css` | Layout and grid system | Page layouts |
+| `styles/shared/base.css` | Core base styles and typography | Global foundation |
+| `styles/shared/dark-theme.css` | Dark mode color overrides | All components (dark) |
+| `styles/shared/light-theme.css` | Light mode color overrides | All components (light) |
+| `styles/shared/header.css` | Navigation header styling | Header component |
+| `styles/shared/modals.css` | Modal dialog styling | All modal components |
+| `styles/shared/cards.css` | Card component styling | Device/vulnerability cards |
+| `styles/shared/tables.css` | Table styling (non-AG-Grid) | Bootstrap tables |
+| `styles/shared/badges.css` | Badge and pill styling | Status badges, VPR badges |
+| `styles/shared/animations.css` | CSS animations and transitions | Loading, hover effects |
+| `styles/shared/layouts.css` | Layout and grid system | Page layouts |
 
 ### Page-Specific Styles
 
 | File | Purpose | Page |
 |------|---------|------|
-| `pages/vulnerabilities.css` | Vulnerability dashboard specific styles | vulnerabilities.html |
-| `pages/tickets.css` | AG-Grid tickets page styles | tickets.html |
+| `styles/pages/vulnerabilities.css` | Vulnerability dashboard specific styles | vulnerabilities.html |
+| `styles/pages/tickets.css` | AG-Grid tickets page styles | tickets.html |
 
 ### Utility Styles
 
 | File | Purpose | Usage |
 |------|---------|-------|
-| `utils/responsive.css` | Responsive design utilities | Media queries, breakpoints |
+| `styles/utils/responsive.css` | Responsive design utilities | Media queries, breakpoints |
 
 ---
 
@@ -71,6 +73,7 @@ The centralized color system uses CSS custom properties to ensure consistency ac
   --hextrackr-surface-1: #ffffff;    /* Cards */
   --hextrackr-surface-2: #ffffff;    /* Elevated surfaces */
   --hextrackr-surface-3: #f5f5f5;    /* Modals */
+  --hextrackr-surface-4: #f0f0f0;    /* Highest elevation */
 
   /* Text Colors */
   --hextrackr-text: #2d3748;
@@ -83,11 +86,17 @@ The centralized color system uses CSS custom properties to ensure consistency ac
   --hextrackr-border-muted: rgba(0, 0, 0, 0.12);
   --hextrackr-border-strong: rgba(0, 0, 0, 0.16);
 
-  /* VPR Severity Colors */
-  --vpr-critical: #dc2626;
-  --vpr-high: #d97706;
-  --vpr-medium: #2563eb;
-  --vpr-low: #16a34a;
+  /* VPR Severity Colors (Standard - Brighter) */
+  --vpr-critical: #ef4444;
+  --vpr-high: #f97316;
+  --vpr-medium: #3b82f6;
+  --vpr-low: #22c55e;
+
+  /* VPR Severity Colors (WCAG Contrast-Optimized - Darker for AA compliance) */
+  --vpr-critical-contrast: #dc2626;
+  --vpr-high-contrast: #d97706;
+  --vpr-medium-contrast: #2563eb;
+  --vpr-low-contrast: #16a34a;
 
   /* Ticket Accent Colors (WCAG AA Compliant) */
   --ticket-accent-blue: #2563eb;     /* 7.1:1 contrast */
@@ -114,6 +123,7 @@ The centralized color system uses CSS custom properties to ensure consistency ac
   --hextrackr-surface-1: #1a2234;    /* Cards */
   --hextrackr-surface-2: #202c42;    /* Elevated surfaces */
   --hextrackr-surface-3: #1a2234;    /* Modals */
+  --hextrackr-surface-4: #253350;    /* Highest elevation */
 
   /* Text Colors */
   --hextrackr-text: #ffffff;
@@ -126,11 +136,17 @@ The centralized color system uses CSS custom properties to ensure consistency ac
   --hextrackr-border-muted: rgba(255, 255, 255, 0.12);
   --hextrackr-border-strong: rgba(255, 255, 255, 0.16);
 
-  /* VPR Severity Colors (adjusted for dark mode) */
+  /* VPR Severity Colors (Standard - Brighter for dark backgrounds) */
   --vpr-critical: #f87171;
   --vpr-high: #fb923c;
   --vpr-medium: #60a5fa;
   --vpr-low: #34d399;
+
+  /* VPR Severity Colors (WCAG Contrast-Optimized - Even brighter for AA compliance on dark) */
+  --vpr-critical-contrast: #fca5a5;
+  --vpr-high-contrast: #fdba74;
+  --vpr-medium-contrast: #93c5fd;
+  --vpr-low-contrast: #6ee7b7;
 
   /* Ticket Accent Colors (WCAG AA Compliant) */
   --ticket-accent-blue: #60a5fa;     /* 7.1:1 contrast */
@@ -152,9 +168,14 @@ The centralized color system uses CSS custom properties to ensure consistency ac
 
 ```css
 .card {
-  background: var(--hextrackr-surface-base);
-  border: 1px solid var(--hextrackr-border-color);
-  color: var(--hextrackr-text-primary);
+  background: var(--hextrackr-surface-1);
+  border: 1px solid var(--hextrackr-border);
+  color: var(--hextrackr-text);
+}
+
+.severity-badge {
+  background: var(--vpr-critical);           /* Standard brighter color */
+  background: var(--vpr-critical-contrast);  /* Or use WCAG contrast-optimized */
 }
 ```
 
@@ -165,6 +186,185 @@ The centralized color system uses CSS custom properties to ensure consistency ac
   background: #ffffff; /* Don't hardcode */
   border: 1px solid #e2e8f0; /* Use variables instead */
 }
+```
+
+**❌ Incorrect Variable Names:**
+
+```css
+.card {
+  background: var(--hextrackr-surface-base);    /* WRONG - doesn't exist */
+  border: 1px solid var(--hextrackr-border-color); /* WRONG - use --hextrackr-border */
+  color: var(--hextrackr-text-primary);         /* WRONG - use --hextrackr-text */
+}
+```
+
+### Complete CSS Variables Reference
+
+The `css-variables.css` file (499 lines) contains extensive variable systems beyond the core colors shown above. Here's the complete reference:
+
+#### Typography System
+
+```css
+/* Font Families */
+--hextrackr-font-family: -apple-system, blinkmacsystemfont, "Segoe UI", roboto, ...;
+--hextrackr-mono-font: "SF Mono", monaco, "Cascadia Code", ...;
+
+/* Font Sizes */
+--hextrackr-text-xs: 0.75rem;
+--hextrackr-text-sm: 0.875rem;
+--hextrackr-text-base: 1rem;
+--hextrackr-text-lg: 1.125rem;
+--hextrackr-text-xl: 1.25rem;
+--hextrackr-text-2xl: 1.5rem;
+/* ... up to 6xl */
+
+/* Font Weights */
+--hextrackr-font-normal: 400;
+--hextrackr-font-medium: 500;
+--hextrackr-font-semibold: 600;
+--hextrackr-font-bold: 700;
+
+/* Line Heights */
+--hextrackr-leading-tight: 1.25;
+--hextrackr-leading-normal: 1.5;
+--hextrackr-leading-relaxed: 1.75;
+```
+
+#### Spacing Scale
+
+```css
+/* Spacing Units (0.25rem increments) */
+--hextrackr-space-1: 0.25rem;   /* 4px */
+--hextrackr-space-2: 0.5rem;    /* 8px */
+--hextrackr-space-3: 0.75rem;   /* 12px */
+--hextrackr-space-4: 1rem;      /* 16px */
+--hextrackr-space-5: 1.25rem;   /* 20px */
+--hextrackr-space-6: 1.5rem;    /* 24px */
+/* ... up to space-16 (4rem / 64px) */
+
+/* Negative spacing also available */
+--hextrackr-space-n1: -0.25rem;
+/* ... negative variants */
+```
+
+#### Shadow Hierarchy
+
+```css
+/* Elevation Shadows */
+--hextrackr-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+--hextrackr-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+--hextrackr-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+--hextrackr-shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+--hextrackr-shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.25);
+
+/* Utility Shadows */
+--hextrackr-shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+--hextrackr-shadow-none: none;
+```
+
+#### Z-Index Layers
+
+```css
+/* Layering System */
+--hextrackr-z-dropdown: 1000;
+--hextrackr-z-sticky: 1020;
+--hextrackr-z-fixed: 1030;
+--hextrackr-z-modal-backdrop: 1040;
+--hextrackr-z-modal: 1050;
+--hextrackr-z-popover: 1060;
+--hextrackr-z-tooltip: 1070;
+```
+
+#### Border Radius Scale
+
+```css
+/* Rounded Corners */
+--hextrackr-rounded-none: 0;
+--hextrackr-rounded-sm: 0.125rem;
+--hextrackr-rounded: 0.25rem;
+--hextrackr-rounded-md: 0.375rem;
+--hextrackr-rounded-lg: 0.5rem;
+--hextrackr-rounded-xl: 0.75rem;
+--hextrackr-rounded-2xl: 1rem;
+--hextrackr-rounded-full: 9999px;
+```
+
+#### Transition Timings
+
+```css
+/* Animation Durations */
+--hextrackr-transition-fast: 150ms;
+--hextrackr-transition-base: 200ms;
+--hextrackr-transition-slow: 300ms;
+
+/* Easing Functions */
+--hextrackr-ease-in: cubic-bezier(0.4, 0, 1, 1);
+--hextrackr-ease-out: cubic-bezier(0, 0, 0.2, 1);
+--hextrackr-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+```
+
+#### Interactive States
+
+```css
+/* Hover States */
+--hextrackr-hover-bg: rgba(0, 0, 0, 0.05);  /* Light mode */
+--hextrackr-hover-bg-dark: rgba(255, 255, 255, 0.1);  /* Dark mode */
+
+/* Active/Focus States */
+--hextrackr-focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.2);
+--hextrackr-active-bg: rgba(0, 0, 0, 0.1);
+```
+
+#### Modal Component Variables
+
+```css
+/* Modal Specific */
+--hextrackr-modal-backdrop: rgba(0, 0, 0, 0.5);
+--hextrackr-modal-header-bg: var(--hextrackr-surface-3);
+--hextrackr-modal-body-bg: var(--hextrackr-surface-1);
+--hextrackr-modal-footer-border: var(--hextrackr-border);
+```
+
+#### Risk Card Components
+
+```css
+/* Risk Score Gradients */
+--hextrackr-risk-critical-gradient: linear-gradient(135deg, #dc2626, #991b1b);
+--hextrackr-risk-high-gradient: linear-gradient(135deg, #d97706, #92400e);
+--hextrackr-risk-medium-gradient: linear-gradient(135deg, #2563eb, #1e40af);
+--hextrackr-risk-low-gradient: linear-gradient(135deg, #16a34a, #15803d);
+```
+
+#### Info Card Components
+
+```css
+/* Info Card Backgrounds */
+--hextrackr-info-bg: #eff6ff;
+--hextrackr-info-border: #bfdbfe;
+--hextrackr-info-text: #1e40af;
+
+--hextrackr-warning-bg: #fef3c7;
+--hextrackr-warning-border: #fcd34d;
+--hextrackr-warning-text: #92400e;
+
+--hextrackr-success-bg: #d1fae5;
+--hextrackr-success-border: #6ee7b7;
+--hextrackr-success-text: #065f46;
+
+--hextrackr-error-bg: #fee2e2;
+--hextrackr-error-border: #fca5a5;
+--hextrackr-error-text: #991b1b;
+```
+
+#### Utility Color Classes
+
+```css
+/* Additional UI Colors */
+--hextrackr-link: #2563eb;
+--hextrackr-link-hover: #1d4ed8;
+--hextrackr-divider: var(--hextrackr-border);
+--hextrackr-code-bg: #f3f4f6;
+--hextrackr-code-text: #1f2937;
 ```
 
 ---
@@ -188,6 +388,14 @@ const chartTheme = THEME_CONFIG.getApexChartsTheme(true);
 // Apply CSS variables programmatically
 THEME_CONFIG.applyCssVariables(document.documentElement, true);
 ```
+
+**⚠️ Known Issue - CSS/JS Synchronization:**
+
+The VPR colors defined in `theme-config.js` currently differ from those in `css-variables.css`:
+- `theme-config.js`: Uses contrast-optimized colors as primary values
+- `css-variables.css`: Defines both standard and contrast-optimized variants
+
+For consistent theming, prefer reading colors directly from CSS variables via `getComputedStyle()` rather than hardcoding values in JavaScript. This ensures the single source of truth (`css-variables.css`) is always authoritative.
 
 ### AG-Grid Theme Manager (`ag-grid-theme-manager.js`)
 
@@ -306,15 +514,15 @@ Each page can extend the base theme while maintaining consistency:
 ```css
 /* pages/vulnerabilities.css */
 .vulnerability-card {
-  background: var(--hextrackr-surface-base);
-  border: 1px solid var(--hextrackr-border-color);
+  background: var(--hextrackr-surface-1);
+  border: 1px solid var(--hextrackr-border);
   /* Page-specific styles while using theme variables */
-  border-radius: 0.75rem;
-  padding: 1.5rem;
+  border-radius: var(--hextrackr-rounded-xl);
+  padding: var(--hextrackr-space-6);
 }
 
 .severity-critical {
-  background-color: var(--vpr-critical);
+  background-color: var(--vpr-critical);  /* or var(--vpr-critical-contrast) for WCAG */
   color: white;
 }
 ```
@@ -326,9 +534,9 @@ Modals automatically inherit theme variables:
 ```css
 /* shared/modals.css */
 .modal-content {
-  background-color: var(--hextrackr-surface-base);
-  border: 1px solid var(--hextrackr-border-color);
-  color: var(--hextrackr-text-primary);
+  background-color: var(--hextrackr-surface-3);
+  border: 1px solid var(--hextrackr-border);
+  color: var(--hextrackr-text);
 }
 ```
 
@@ -351,12 +559,12 @@ When creating new components:
 /* Pattern for page-specific customizations */
 .page-specific-component {
   /* Use theme variables as base */
-  background: var(--hextrackr-surface-base);
-  color: var(--hextrackr-text-primary);
+  background: var(--hextrackr-surface-1);
+  color: var(--hextrackr-text);
 
-  /* Add page-specific enhancements */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border-radius: 0.5rem;
+  /* Add page-specific enhancements using variable system */
+  box-shadow: var(--hextrackr-shadow-md);
+  border-radius: var(--hextrackr-rounded-lg);
 }
 ```
 
@@ -453,9 +661,9 @@ cellRenderer: (params) => {
 
 /* After */
 .card {
-  background: var(--hextrackr-surface-base);
-  border: 1px solid var(--hextrackr-border-color);
-  color: var(--hextrackr-text-primary);
+  background: var(--hextrackr-surface-1);
+  border: 1px solid var(--hextrackr-border);
+  color: var(--hextrackr-text);
 }
 ```
 
@@ -505,4 +713,4 @@ HexTrackr's JSDoc developer documentation (`/app/dev-docs-html/`) includes autom
 
 ---
 
-*Last Updated: 2025-09-20 | Version: 2.0.0*
+*Last Updated: 2025-10-16 | Version: 3.0.0 | Audit: DOCS-52*

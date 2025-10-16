@@ -52,7 +52,13 @@
 <li><strong>VPR Totals</strong> (default): Sum of Vulnerability Priority Rating scores (risk-based view)</li>
 <li><strong>Vulnerability Counts</strong>: Total number of vulnerabilities in each severity level</li>
 </ul>
-<h4>Hidden Power Feature: Vendor Breakdown Export</h4><p><strong>Secret Shortcut</strong>: Hold Cmd+Shift (Mac) or Ctrl+Shift (Windows) and click any VPR card to instantly export a detailed vendor breakdown CSV with severity totals for each vendor.</p>
+<h4>Hidden Power Feature: VPR Trend Export</h4><p><strong>Power Tool Shortcuts</strong>: Hold keyboard modifiers and click any VPR card to instantly export detailed CSV trend reports:</p>
+<ul>
+<li><strong>Cmd+Alt+Click</strong> (Mac) or <strong>Ctrl+Alt+Click</strong> (Windows): <strong>Latest vs Previous</strong> - Most recent two scans (1-day)</li>
+<li><strong>Cmd+Shift+Click</strong> (Mac) or <strong>Ctrl+Shift+Click</strong> (Windows): <strong>7-Day Comparison</strong> - Current vs 7 days ago</li>
+<li><strong>Alt+Shift+Click</strong> (opt+shift on Mac): <strong>30-Day Comparison</strong> - Current vs 30 days ago</li>
+</ul>
+<p>Each CSV includes vendor breakdown (Cisco, Palo Alto, Other) with both VPR totals and vulnerability counts. Actual scan dates are shown in the report header with graceful fallback if insufficient historical data exists.</p>
 <h3>Vendor Filtering</h3><p>Filter vulnerabilities by vendor to focus on specific technology stacks:</p>
 <ul>
 <li><strong>CISCO</strong>: Cisco Systems vulnerabilities (IOS, IOS-XE, ASA, etc.)</li>
@@ -284,8 +290,14 @@
 <li><strong>KEV Badges</strong>: Click to view full CISA KEV information</li>
 <li><strong>Modal Navigation</strong>: Smoothly transition between device and vulnerability views</li>
 </ul>
-<h3>Keyboard Shortcuts</h3><ul>
-<li><strong>Cmd+Shift+Click</strong> (Mac) or <strong>Ctrl+Shift+Click</strong> (Windows) on VPR cards: Export vendor breakdown</li>
+<h3>Keyboard Shortcuts</h3><p><strong>VPR Card Export Shortcuts</strong>:</p>
+<ul>
+<li><strong>Cmd+Alt+Click</strong> (Mac) or <strong>Ctrl+Alt+Click</strong> (Windows): Export latest vs previous (1-day)</li>
+<li><strong>Cmd+Shift+Click</strong> (Mac) or <strong>Ctrl+Shift+Click</strong> (Windows): Export 7-day trend comparison</li>
+<li><strong>Alt+Shift+Click</strong> (opt+shift on Mac): Export 30-day trend comparison</li>
+</ul>
+<p><strong>General Navigation</strong>:</p>
+<ul>
 <li><strong>Escape</strong>: Close open modals</li>
 <li><strong>Tab</strong>: Navigate through form fields</li>
 </ul>

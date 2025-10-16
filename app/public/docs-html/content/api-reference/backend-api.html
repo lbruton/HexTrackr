@@ -43,6 +43,56 @@
 <td>Lists vulnerabilities with filtering, sorting, and pagination</td>
 </tr>
 <tr>
+<td>GET</td>
+<td><code>/api/vulnerabilities/:id</code></td>
+<td>Get single vulnerability by ID</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/vulnerabilities/count</code></td>
+<td>Filtered vulnerability counts (HEX-112 Phase 2)</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/vulnerabilities/kev-stats</code></td>
+<td>KEV-specific statistics (HEX-112 Phase 2)</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/vulnerabilities/vendor-stats</code></td>
+<td>Vendor distribution statistics (HEX-112 Phase 2)</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/vulnerabilities/top-devices</code></td>
+<td>Top affected devices by vulnerability count (HEX-112 Phase 2)</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/vulnerabilities/cvss-distribution</code></td>
+<td>CVSS score distribution (HEX-112 Phase 2)</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/vulnerabilities/severity-distribution</code></td>
+<td>Severity counts by level (HEX-112 Phase 2)</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/vulnerabilities/recent</code></td>
+<td>Recent vulnerabilities feed (HEX-112 Phase 2)</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/vulnerabilities/export</code></td>
+<td>Streaming CSV export with filters (HEX-112 Phase 2)</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/vulnerabilities/last-import</code></td>
+<td>Last CSV import date (HEX-240)</td>
+</tr>
+<tr>
 <td>POST</td>
 <td><code>/api/vulnerabilities</code></td>
 <td>Creates new vulnerability record</td>
@@ -59,6 +109,11 @@
 </tr>
 <tr>
 <td>POST</td>
+<td><code>/api/vulnerabilities/bulk-delete</code></td>
+<td>Bulk delete vulnerabilities by IDs</td>
+</tr>
+<tr>
+<td>POST</td>
 <td><code>/api/vulnerabilities/import</code></td>
 <td>Imports CSV file with progress tracking</td>
 </tr>
@@ -68,14 +123,25 @@
 <td>Clears all vulnerability data</td>
 </tr>
 </tbody></table>
+<p><strong>HEX-112 Pagination Enhancements (Since v1.0.50):</strong></p>
+<p>The HEX-112 Phase 2 endpoints enable efficient pagination and statistics calculation without loading all vulnerabilities client-side:</p>
+<ul>
+<li><strong>Performance</strong>: Reduces client-side data transfer from 30k+ records to targeted results</li>
+<li><strong>Filtering</strong>: All endpoints support query parameters for vendor, severity, KEV status</li>
+<li><strong>Caching</strong>: Server-side caching reduces database load</li>
+<li><strong>Streaming</strong>: Export endpoint streams results for memory efficiency</li>
+</ul>
 <h3>TicketController</h3><p><strong>Location:</strong> <code>app/controllers/ticketController.js</code></p>
-<p>Manages support tickets and associated device tracking.</p>
+<p>Manages support tickets and associated device tracking with XT# generation and device navigation.</p>
 <p><strong>Key Features:</strong></p>
 <ul>
 <li>Complete ticket lifecycle management</li>
 <li>Device association tracking (stored as JSON)</li>
 <li>Status workflow (Open → In Progress → Closed)</li>
 <li>Priority-based sorting and filtering</li>
+<li>XT# ticket number generation (HEX-196)</li>
+<li>Device-based ticket lookup and navigation (HEX-203)</li>
+<li>Batch device lookup for performance optimization</li>
 </ul>
 <p><strong>Main Endpoints:</strong></p>
 <table>
@@ -97,6 +163,21 @@
 <td>Gets specific ticket details</td>
 </tr>
 <tr>
+<td>GET</td>
+<td><code>/api/tickets/next-xt-number</code></td>
+<td>Generate next XT ticket number (HEX-196)</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/tickets/by-device/:hostname</code></td>
+<td>Get all tickets for specific device (HEX-203)</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/tickets/batch-device-lookup</code></td>
+<td>Batch device ticket lookup (HEX-203)</td>
+</tr>
+<tr>
 <td>POST</td>
 <td><code>/api/tickets</code></td>
 <td>Creates new ticket</td>
@@ -114,18 +195,34 @@
 <tr>
 <td>DELETE</td>
 <td><code>/api/tickets/:id</code></td>
-<td>Deletes ticket</td>
+<td>Deletes ticket (soft delete with deleted_at)</td>
 </tr>
 </tbody></table>
-<h3>ImportController</h3><p><strong>Location:</strong> <code>app/controllers/importController.js</code></p>
-<p>Handles CSV file imports from vulnerability scanners.</p>
+<p><strong>XT# Ticket System (Since v1.0.58 - HEX-196):</strong></p>
+<ul>
+<li><strong>Format</strong>: <code>XT-####</code> (e.g., XT-0001, XT-0042)</li>
+<li><strong>Auto-generation</strong>: <code>/next-xt-number</code> returns next available number</li>
+<li><strong>Soft Delete</strong>: Deleted tickets preserve XT# to prevent reuse</li>
+<li><strong>Purpose</strong>: Provides human-friendly ticket reference for coordination</li>
+</ul>
+<p><strong>Device Navigation (Since v1.0.60 - HEX-203):</strong></p>
+<ul>
+<li><strong>Single Device</strong>: <code>/by-device/:hostname</code> returns all tickets for a device</li>
+<li><strong>Batch Lookup</strong>: <code>/batch-device-lookup</code> accepts array of hostnames for efficient N+1 query reduction</li>
+<li><strong>Performance</strong>: Reduces 100+ individual requests to single SQL query with IN clause</li>
+</ul>
+<h3>ImportController</h3><p><strong>Location:</strong> <code>app/controllers/importController.js</code><br><strong>Base Paths:</strong> <code>/api/vulnerabilities</code>, <code>/api/import</code></p>
+<p>Handles CSV and JSON file imports from vulnerability scanners with lifecycle management and batch processing.</p>
 <p><strong>Key Features:</strong></p>
 <ul>
 <li>Multi-format CSV support (Tenable, Qualys, Rapid7)</li>
+<li>JSON-based import for programmatic uploads</li>
 <li>Automatic scan date extraction from filenames</li>
 <li>Progress tracking via WebSocket</li>
 <li>Staging mode for large files (&gt;10,000 rows)</li>
 <li>Duplicate detection and merging</li>
+<li>Vulnerability lifecycle management (active, grace_period, resolved)</li>
+<li>Import history tracking</li>
 </ul>
 <p><strong>Main Endpoints:</strong></p>
 <table>
@@ -138,28 +235,63 @@
 </thead>
 <tbody><tr>
 <td>POST</td>
-<td><code>/api/import/vulnerabilities</code></td>
-<td>Standard vulnerability import</td>
+<td><code>/api/vulnerabilities/import</code></td>
+<td>Standard vulnerability CSV import (primary endpoint)</td>
 </tr>
 <tr>
 <td>POST</td>
-<td><code>/api/import/staging</code></td>
-<td>Staged import for large files</td>
+<td><code>/api/vulnerabilities/import-staging</code></td>
+<td>Staged CSV import for large files</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/import/vulnerabilities</code></td>
+<td>JSON-based vulnerability import</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/import/tickets</code></td>
+<td>JSON-based ticket import</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/import</code></td>
+<td>Generic import handler</td>
 </tr>
 <tr>
 <td>GET</td>
-<td><code>/api/import/progress/:id</code></td>
-<td>Real-time import progress</td>
+<td><code>/api/imports</code></td>
+<td>Import history with status tracking</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/import/progress/:sessionId</code></td>
+<td>Real-time import progress by session ID</td>
 </tr>
 </tbody></table>
+<p><strong>Import Workflow:</strong></p>
+<ol>
+<li><strong>CSV Upload</strong> - File uploaded to <code>/api/vulnerabilities/import</code> or <code>/import-staging</code></li>
+<li><strong>Staging</strong> - Data loaded into <code>vulnerability_staging</code> table for validation</li>
+<li><strong>Processing</strong> - Batch processing (1000 records at a time) with deduplication</li>
+<li><strong>Lifecycle</strong> - Tracks vulnerability state (active → grace_period → resolved)</li>
+<li><strong>Statistics</strong> - Calculates daily totals with VPR aggregation</li>
+<li><strong>Progress</strong> - Real-time updates via WebSocket</li>
+</ol>
+<p><strong>Supported Import Types:</strong></p>
+<ul>
+<li><strong>CSV</strong>: Tenable, Qualys, Rapid7 formats</li>
+<li><strong>JSON</strong>: Programmatic uploads with structured data</li>
+</ul>
 <h3>BackupController</h3><p><strong>Location:</strong> <code>app/controllers/backupController.js</code></p>
-<p>Database backup and restoration management.</p>
+<p>Database backup and restoration management with modern ZIP export capabilities.</p>
 <p><strong>Key Features:</strong></p>
 <ul>
 <li>Timestamped backup creation</li>
 <li>Compression support for large databases</li>
 <li>Backup rotation and cleanup</li>
 <li>Validation before restoration</li>
+<li>ZIP export for data portability (vulnerabilities, tickets, complete backups)</li>
 </ul>
 <p><strong>Main Endpoints:</strong></p>
 <table>
@@ -190,7 +322,28 @@
 <td><code>/api/backup/:filename</code></td>
 <td>Deletes backup file</td>
 </tr>
+<tr>
+<td>GET</td>
+<td><code>/api/backup/export/vulnerabilities</code></td>
+<td>Export vulnerabilities as ZIP archive</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/backup/export/tickets</code></td>
+<td>Export tickets as ZIP archive</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/backup/export/all</code></td>
+<td>Export complete backup as ZIP archive</td>
+</tr>
 </tbody></table>
+<p><strong>ZIP Export Features:</strong></p>
+<ul>
+<li><strong>Format</strong>: Standard ZIP archive with JSON/CSV data</li>
+<li><strong>Use Cases</strong>: Data portability, external analysis, compliance reporting</li>
+<li><strong>Streaming</strong>: Large datasets streamed for memory efficiency</li>
+</ul>
 <h3>DocsController</h3><p><strong>Location:</strong> <code>app/controllers/docsController.js</code></p>
 <p>Serves documentation portal and API documentation.</p>
 <p><strong>Main Endpoints:</strong></p>
@@ -239,10 +392,136 @@
 </tr>
 <tr>
 <td>GET</td>
-<td><code>/api/kev/vulnerability/:cveId</code></td>
+<td><code>/api/kev/check-autosync</code></td>
+<td>Check if auto-sync needed based on schedule</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/kev/stats</code></td>
+<td>KEV dashboard statistics</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/kev/all</code></td>
+<td>Get all KEV vulnerabilities from catalog</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/kev/matched</code></td>
+<td>Get matched KEVs in current environment</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/kev/:cveId</code></td>
 <td>Get KEV details for specific CVE</td>
 </tr>
 </tbody></table>
+<p><strong>Rate Limiting:</strong></p>
+<ul>
+<li><code>/sync</code> endpoint: 3 requests per 5 minutes (prevents API abuse)</li>
+</ul>
+<h3>CiscoController</h3><p><strong>Location:</strong> <code>app/controllers/ciscoController.js</code><br><strong>Since:</strong> v1.0.63</p>
+<p>Manages Cisco PSIRT (Product Security Incident Response Team) advisory integration for Cisco device vulnerabilities.</p>
+<p><strong>Key Features:</strong></p>
+<ul>
+<li>Automatic synchronization with Cisco PSIRT API</li>
+<li>CVE-to-advisory matching for Cisco devices</li>
+<li>Fix availability tracking and remediation guidance</li>
+<li>Sync status monitoring and error handling</li>
+<li>Integration with vulnerability classification system</li>
+</ul>
+<p><strong>Main Endpoints:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>POST</td>
+<td><code>/api/cisco/sync</code></td>
+<td>Trigger Cisco PSIRT advisory synchronization</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/cisco/status</code></td>
+<td>Get sync status and advisory statistics</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/cisco/check-autosync</code></td>
+<td>Check if auto-sync needed based on schedule</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/cisco/advisory/:cveId</code></td>
+<td>Get Cisco advisory details for specific CVE</td>
+</tr>
+</tbody></table>
+<p><strong>Rate Limiting:</strong></p>
+<ul>
+<li><code>/sync</code> endpoint: 10 requests per 10 minutes</li>
+</ul>
+<p><strong>Advisory Integration:</strong></p>
+<ul>
+<li>Matches CVEs to official Cisco advisories</li>
+<li>Provides fix availability status</li>
+<li>Links to vendor security bulletins</li>
+<li>Tracks affected Cisco product versions</li>
+</ul>
+<h3>PaloAltoController</h3><p><strong>Location:</strong> <code>app/controllers/paloAltoController.js</code><br><strong>Since:</strong> v1.0.63</p>
+<p>Manages Palo Alto Networks security advisory integration for Palo Alto device vulnerabilities.</p>
+<p><strong>Key Features:</strong></p>
+<ul>
+<li>Automatic synchronization with Palo Alto Security Advisory API</li>
+<li>CVE-to-advisory matching for Palo Alto devices</li>
+<li>Fix availability tracking and remediation guidance</li>
+<li>Sync status monitoring and error handling</li>
+<li>Integration with vulnerability classification system</li>
+</ul>
+<p><strong>Main Endpoints:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>POST</td>
+<td><code>/api/palo/sync</code></td>
+<td>Trigger Palo Alto advisory synchronization</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/palo/status</code></td>
+<td>Get sync status and advisory statistics</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/palo/check-autosync</code></td>
+<td>Check if auto-sync needed based on schedule</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/palo/advisory/:cveId</code></td>
+<td>Get Palo Alto advisory details for specific CVE</td>
+</tr>
+</tbody></table>
+<p><strong>Rate Limiting:</strong></p>
+<ul>
+<li><code>/sync</code> endpoint: 10 requests per 10 minutes</li>
+</ul>
+<p><strong>Advisory Integration:</strong></p>
+<ul>
+<li>Matches CVEs to official Palo Alto advisories</li>
+<li>Provides fix availability status</li>
+<li>Links to vendor security bulletins</li>
+<li>Tracks affected Palo Alto product versions</li>
+</ul>
 <h3>AuthController</h3><p><strong>Location:</strong> <code>app/controllers/authController.js</code><br><strong>Since:</strong> v1.0.46</p>
 <p>Handles user authentication, session management, and security features including CSRF protection and account lockout.</p>
 <p><strong>Key Features:</strong></p>
@@ -381,6 +660,18 @@ X-<span class="hljs-variable constant_">CSRF</span>-<span class="hljs-title clas
 <td>Get specific preference by key</td>
 </tr>
 <tr>
+<td>GET</td>
+<td><code>/api/preferences/count</code></td>
+<td>✅ Protected</td>
+<td>Get preference count for current user</td>
+</tr>
+<tr>
+<td>HEAD</td>
+<td><code>/api/preferences/:key</code></td>
+<td>✅ Protected</td>
+<td>Check if preference exists (returns 200 or 404)</td>
+</tr>
+<tr>
 <td>POST</td>
 <td><code>/api/preferences</code></td>
 <td>✅ Protected</td>
@@ -477,10 +768,22 @@ X-<span class="hljs-variable constant_">CSRF</span>-<span class="hljs-title clas
 <td>Get specific template</td>
 </tr>
 <tr>
+<td>GET</td>
+<td><code>/api/templates/by-name/:name</code></td>
+<td>✅ Protected</td>
+<td>Get template by name (alternative lookup)</td>
+</tr>
+<tr>
 <td>POST</td>
 <td><code>/api/templates</code></td>
 <td>✅ Protected</td>
 <td>Create new template</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/templates/:id/preview</code></td>
+<td>✅ Protected</td>
+<td>Preview template with data (non-destructive)</td>
 </tr>
 <tr>
 <td>PUT</td>
@@ -532,9 +835,20 @@ X-<span class="hljs-variable constant_">CSRF</span>-<span class="hljs-title clas
 <p><strong>Key Methods:</strong></p>
 <ul>
 <li><code>getAll()</code> - Retrieve vulnerabilities with filters</li>
+<li><code>getById(id)</code> - Get single vulnerability by ID</li>
+<li><code>getCount(filters)</code> - Filtered vulnerability counts (HEX-112)</li>
+<li><code>getKevStats(filters)</code> - KEV-specific statistics (HEX-112)</li>
+<li><code>getVendorStats(filters)</code> - Vendor distribution statistics (HEX-112)</li>
+<li><code>getTopAffectedDevices(filters, limit)</code> - Top devices by vulnerability count (HEX-112)</li>
+<li><code>getCvssDistribution(filters)</code> - CVSS score distribution (HEX-112)</li>
+<li><code>getSeverityDistribution(filters)</code> - Severity counts by level (HEX-112)</li>
+<li><code>getRecentVulnerabilities(filters, limit)</code> - Recent vulnerabilities feed (HEX-112)</li>
+<li><code>streamExport(filters)</code> - Streaming CSV export (HEX-112)</li>
+<li><code>getLastImportDate()</code> - Last CSV import date (HEX-240)</li>
 <li><code>create()</code> - Add new vulnerability</li>
 <li><code>update()</code> - Modify existing record</li>
 <li><code>delete()</code> - Remove vulnerability</li>
+<li><code>bulkDelete(ids)</code> - Bulk delete vulnerabilities by IDs</li>
 <li><code>importBatch()</code> - Process CSV data in chunks</li>
 <li><code>createSnapshot()</code> - Save point-in-time state</li>
 </ul>
@@ -550,7 +864,7 @@ X-<span class="hljs-variable constant_">CSRF</span>-<span class="hljs-title clas
 <li>Host-based vulnerability grouping</li>
 </ul>
 <h3>TicketService</h3><p><strong>Location:</strong> <code>app/services/ticketService.js</code></p>
-<p>Ticket management and device tracking.</p>
+<p>Ticket management and device tracking with XT# generation and device navigation.</p>
 <p><strong>Features:</strong></p>
 <ul>
 <li>Full ticket CRUD operations</li>
@@ -558,6 +872,21 @@ X-<span class="hljs-variable constant_">CSRF</span>-<span class="hljs-title clas
 <li>Status transition validation</li>
 <li>Priority-based operations</li>
 <li>Automatic timestamp management</li>
+<li>XT# ticket number generation (HEX-196)</li>
+<li>Device-based ticket lookup (HEX-203)</li>
+<li>Batch device lookup for performance</li>
+</ul>
+<p><strong>Core Methods:</strong></p>
+<ul>
+<li><code>getAll()</code> - Retrieve all tickets</li>
+<li><code>getById(id)</code> - Get specific ticket</li>
+<li><code>generateNextXTNumber()</code> - Generate next XT# (HEX-196)</li>
+<li><code>getTicketsByDevice(hostname)</code> - Get tickets for device (HEX-203)</li>
+<li><code>getTicketsByDeviceBatch(hostnames)</code> - Batch device lookup (HEX-203)</li>
+<li><code>create(ticketData)</code> - Create new ticket</li>
+<li><code>update(id, ticketData)</code> - Update ticket</li>
+<li><code>delete(id)</code> - Soft delete ticket (sets deleted_at)</li>
+<li><code>updateDevices(id, devices)</code> - Update device associations</li>
 </ul>
 <h3>ImportService</h3><p><strong>Location:</strong> <code>app/services/importService.js</code></p>
 <p>Vendor CSV import processing with lifecycle management and batch operations.</p>
@@ -792,6 +1121,55 @@ db.<span class="hljs-title function_">transaction</span>(<span class="hljs-funct
 <li><code>getFileTypeCounts()</code> - Breakdown of file types in codebase</li>
 <li><code>getEndpointInventory()</code> - List all API routes with documentation status</li>
 </ul>
+<h3>CiscoAdvisoryService</h3><p><strong>Location:</strong> <code>app/services/ciscoAdvisoryService.js</code><br><strong>Since:</strong> v1.0.63</p>
+<p>Cisco PSIRT API integration for security advisory synchronization and CVE matching.</p>
+<p><strong>Key Features:</strong></p>
+<ul>
+<li>Cisco PSIRT API client with authentication</li>
+<li>CVE-to-advisory matching for Cisco devices</li>
+<li>Advisory database management (cisco_advisories table)</li>
+<li>Sync status tracking and error handling</li>
+<li>Fix availability determination</li>
+</ul>
+<p><strong>Core Methods:</strong></p>
+<ul>
+<li><code>syncAdvisories()</code> - Fetch latest advisories from Cisco PSIRT API</li>
+<li><code>getAdvisoryByCve(cveId)</code> - Retrieve Cisco advisory for specific CVE</li>
+<li><code>getSyncStatus()</code> - Current sync status and statistics</li>
+<li><code>matchVulnerabilities()</code> - Update vulnerability records with Cisco advisory IDs</li>
+<li><code>checkAutoSync()</code> - Determine if auto-sync is needed based on schedule</li>
+</ul>
+<p><strong>API Integration:</strong></p>
+<ul>
+<li><strong>Endpoint</strong>: Cisco PSIRT OpenVuln API</li>
+<li><strong>Authentication</strong>: OAuth 2.0 client credentials</li>
+<li><strong>Rate Limiting</strong>: 10 requests per 10 minutes</li>
+<li><strong>Data Format</strong>: JSON responses with advisory metadata</li>
+</ul>
+<h3>PaloAltoService</h3><p><strong>Location:</strong> <code>app/services/paloAltoService.js</code><br><strong>Since:</strong> v1.0.63</p>
+<p>Palo Alto Networks Security Advisory API integration for vulnerability tracking.</p>
+<p><strong>Key Features:</strong></p>
+<ul>
+<li>Palo Alto Security Advisory API client</li>
+<li>CVE-to-advisory matching for Palo Alto devices</li>
+<li>Advisory database management (palo_advisories table)</li>
+<li>Sync status tracking and error handling</li>
+<li>Fix availability determination</li>
+</ul>
+<p><strong>Core Methods:</strong></p>
+<ul>
+<li><code>syncAdvisories()</code> - Fetch latest advisories from Palo Alto API</li>
+<li><code>getAdvisoryByCve(cveId)</code> - Retrieve Palo Alto advisory for specific CVE</li>
+<li><code>getSyncStatus()</code> - Current sync status and statistics</li>
+<li><code>matchVulnerabilities()</code> - Update vulnerability records with Palo Alto advisory IDs</li>
+<li><code>checkAutoSync()</code> - Determine if auto-sync is needed based on schedule</li>
+</ul>
+<p><strong>API Integration:</strong></p>
+<ul>
+<li><strong>Endpoint</strong>: Palo Alto Security Advisory API</li>
+<li><strong>Rate Limiting</strong>: 10 requests per 10 minutes</li>
+<li><strong>Data Format</strong>: JSON responses with advisory metadata</li>
+</ul>
 <hr>
 <h2 id="routes">Routes</h2><p>Route modules define API endpoints and apply middleware.</p>
 <h3>Vulnerability Routes</h3><p><strong>File:</strong> <code>app/routes/vulnerabilities.js</code><br><strong>Base Path:</strong> <code>/api/vulnerabilities</code></p>
@@ -972,7 +1350,7 @@ app.<span class="hljs-title function_">use</span>(<span class="hljs-title functi
 </tr>
 </tbody></table>
 <hr>
-<h2 id="database">Database Schema</h2><h3>Tables</h3><h4>vulnerabilities</h4><p>Primary table for vulnerability data.</p>
+<h2 id="database">Database Schema</h2><h3>Tables</h3><h4>vulnerabilities</h4><p>Primary table for vulnerability data with vendor classification and advisory integration.</p>
 <table>
 <thead>
 <tr>
@@ -1057,6 +1435,41 @@ app.<span class="hljs-title function_">use</span>(<span class="hljs-title functi
 <td>Scan timestamp</td>
 </tr>
 <tr>
+<td><strong>vendor</strong></td>
+<td><strong>TEXT</strong></td>
+<td><strong>Vendor classification (CISCO, Palo Alto, Other) - HEX-241</strong></td>
+</tr>
+<tr>
+<td><strong>has_kev</strong></td>
+<td><strong>INTEGER</strong></td>
+<td><strong>KEV flag (0/1 boolean) - v1.0.22</strong></td>
+</tr>
+<tr>
+<td><strong>cisco_advisory_id</strong></td>
+<td><strong>TEXT</strong></td>
+<td><strong>Cisco PSIRT advisory ID - v1.0.63</strong></td>
+</tr>
+<tr>
+<td><strong>palo_advisory_id</strong></td>
+<td><strong>TEXT</strong></td>
+<td><strong>Palo Alto advisory ID - v1.0.63</strong></td>
+</tr>
+<tr>
+<td><strong>lifecycle_status</strong></td>
+<td><strong>TEXT</strong></td>
+<td><strong>active/grace_period/resolved - Import lifecycle</strong></td>
+</tr>
+<tr>
+<td><strong>last_seen_date</strong></td>
+<td><strong>TEXT</strong></td>
+<td><strong>Last appearance in scan - Lifecycle tracking</strong></td>
+</tr>
+<tr>
+<td><strong>resolved_date</strong></td>
+<td><strong>TEXT</strong></td>
+<td><strong>Resolution timestamp - Lifecycle tracking</strong></td>
+</tr>
+<tr>
 <td>created_at</td>
 <td>TEXT</td>
 <td>Record creation</td>
@@ -1067,7 +1480,7 @@ app.<span class="hljs-title function_">use</span>(<span class="hljs-title functi
 <td>Last modification</td>
 </tr>
 </tbody></table>
-<h4>tickets</h4><p>Support ticket tracking.</p>
+<h4>tickets</h4><p>Support ticket tracking with XT# system and soft delete.</p>
 <table>
 <thead>
 <tr>
@@ -1080,6 +1493,11 @@ app.<span class="hljs-title function_">use</span>(<span class="hljs-title functi
 <td>id</td>
 <td>INTEGER PRIMARY KEY</td>
 <td>Auto-incrementing ID</td>
+</tr>
+<tr>
+<td><strong>xt_number</strong></td>
+<td><strong>TEXT</strong></td>
+<td><strong>XT# identifier (XT-0001, XT-0042) - HEX-196</strong></td>
 </tr>
 <tr>
 <td>title</td>
@@ -1120,6 +1538,447 @@ app.<span class="hljs-title function_">use</span>(<span class="hljs-title functi
 <td>closed_at</td>
 <td>TEXT</td>
 <td>Closure timestamp</td>
+</tr>
+<tr>
+<td><strong>deleted_at</strong></td>
+<td><strong>TEXT</strong></td>
+<td><strong>Soft delete timestamp - HEX-196</strong></td>
+</tr>
+</tbody></table>
+<h4>users</h4><p>User authentication and profile data <strong>(Since v1.0.46 - HEX-133)</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>id</td>
+<td>INTEGER PRIMARY KEY</td>
+<td>Auto-incrementing user ID</td>
+</tr>
+<tr>
+<td>username</td>
+<td>TEXT NOT NULL UNIQUE</td>
+<td>Login username</td>
+</tr>
+<tr>
+<td>password_hash</td>
+<td>TEXT NOT NULL</td>
+<td>Argon2id password hash</td>
+</tr>
+<tr>
+<td>email</td>
+<td>TEXT</td>
+<td>User email address</td>
+</tr>
+<tr>
+<td>role</td>
+<td>TEXT</td>
+<td>User role (admin, user)</td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>TEXT</td>
+<td>Account creation timestamp</td>
+</tr>
+<tr>
+<td>updated_at</td>
+<td>TEXT</td>
+<td>Last profile update</td>
+</tr>
+</tbody></table>
+<h4>sessions</h4><p>SQLite session store for authentication <strong>(Since v1.0.46)</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>sid</td>
+<td>TEXT PRIMARY KEY</td>
+<td>Session ID (primary key)</td>
+</tr>
+<tr>
+<td>sess</td>
+<td>TEXT NOT NULL</td>
+<td>JSON session data</td>
+</tr>
+<tr>
+<td>expired</td>
+<td>INTEGER NOT NULL</td>
+<td>Expiration timestamp (Unix epoch)</td>
+</tr>
+</tbody></table>
+<h4>preferences</h4><p>User preference storage with JSON values <strong>(Since v1.0.48 - HEX-138)</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>id</td>
+<td>INTEGER PRIMARY KEY</td>
+<td>Auto-incrementing ID</td>
+</tr>
+<tr>
+<td>user_id</td>
+<td>INTEGER NOT NULL</td>
+<td>Foreign key to users table</td>
+</tr>
+<tr>
+<td>key</td>
+<td>TEXT NOT NULL</td>
+<td>Preference key (dot notation)</td>
+</tr>
+<tr>
+<td>value</td>
+<td>TEXT</td>
+<td>JSON-serialized preference value</td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>TEXT</td>
+<td>Creation timestamp</td>
+</tr>
+<tr>
+<td>updated_at</td>
+<td>TEXT</td>
+<td>Last modification</td>
+</tr>
+</tbody></table>
+<p><strong>Indexes:</strong> <code>(user_id, key)</code> UNIQUE</p>
+<h4>templates</h4><p>Template system for emails and tickets <strong>(Since v1.0.21)</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>id</td>
+<td>INTEGER PRIMARY KEY</td>
+<td>Auto-incrementing ID</td>
+</tr>
+<tr>
+<td>name</td>
+<td>TEXT NOT NULL</td>
+<td>Template name</td>
+</tr>
+<tr>
+<td>category</td>
+<td>TEXT</td>
+<td>email, ticket, notification</td>
+</tr>
+<tr>
+<td>subject</td>
+<td>TEXT</td>
+<td>Email subject or ticket title</td>
+</tr>
+<tr>
+<td>body</td>
+<td>TEXT NOT NULL</td>
+<td>Template content with variables</td>
+</tr>
+<tr>
+<td>variables</td>
+<td>TEXT</td>
+<td>JSON array of variable names</td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>TEXT</td>
+<td>Creation timestamp</td>
+</tr>
+<tr>
+<td>updated_at</td>
+<td>TEXT</td>
+<td>Last modification</td>
+</tr>
+</tbody></table>
+<h4>kev_catalog</h4><p>CISA Known Exploited Vulnerabilities catalog <strong>(Since v1.0.22)</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>id</td>
+<td>INTEGER PRIMARY KEY</td>
+<td>Auto-incrementing ID</td>
+</tr>
+<tr>
+<td>cve_id</td>
+<td>TEXT NOT NULL UNIQUE</td>
+<td>CVE identifier</td>
+</tr>
+<tr>
+<td>vendor_project</td>
+<td>TEXT</td>
+<td>Vendor name</td>
+</tr>
+<tr>
+<td>product</td>
+<td>TEXT</td>
+<td>Product name</td>
+</tr>
+<tr>
+<td>vulnerability_name</td>
+<td>TEXT</td>
+<td>KEV vulnerability name</td>
+</tr>
+<tr>
+<td>date_added</td>
+<td>TEXT</td>
+<td>CISA addition date</td>
+</tr>
+<tr>
+<td>short_description</td>
+<td>TEXT</td>
+<td>Brief description</td>
+</tr>
+<tr>
+<td>required_action</td>
+<td>TEXT</td>
+<td>Remediation action</td>
+</tr>
+<tr>
+<td>due_date</td>
+<td>TEXT</td>
+<td>Remediation deadline</td>
+</tr>
+<tr>
+<td>known_ransomware</td>
+<td>INTEGER</td>
+<td>Ransomware campaign flag (0/1)</td>
+</tr>
+<tr>
+<td>notes</td>
+<td>TEXT</td>
+<td>Additional notes</td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>TEXT</td>
+<td>Record creation</td>
+</tr>
+<tr>
+<td>updated_at</td>
+<td>TEXT</td>
+<td>Last sync update</td>
+</tr>
+</tbody></table>
+<h4>cisco_advisories</h4><p>Cisco PSIRT security advisories <strong>(Since v1.0.63)</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>id</td>
+<td>INTEGER PRIMARY KEY</td>
+<td>Auto-incrementing ID</td>
+</tr>
+<tr>
+<td>advisory_id</td>
+<td>TEXT NOT NULL UNIQUE</td>
+<td>Cisco advisory ID</td>
+</tr>
+<tr>
+<td>cve_id</td>
+<td>TEXT</td>
+<td>CVE identifier</td>
+</tr>
+<tr>
+<td>advisory_title</td>
+<td>TEXT</td>
+<td>Advisory title</td>
+</tr>
+<tr>
+<td>publication_url</td>
+<td>TEXT</td>
+<td>Link to Cisco advisory</td>
+</tr>
+<tr>
+<td>sir</td>
+<td>TEXT</td>
+<td>Security Impact Rating (Critical/High/Medium/Low)</td>
+</tr>
+<tr>
+<td>first_published</td>
+<td>TEXT</td>
+<td>Publication date</td>
+</tr>
+<tr>
+<td>last_updated</td>
+<td>TEXT</td>
+<td>Last update date</td>
+</tr>
+<tr>
+<td>status</td>
+<td>TEXT</td>
+<td>Advisory status</td>
+</tr>
+<tr>
+<td>version</td>
+<td>TEXT</td>
+<td>Advisory version</td>
+</tr>
+<tr>
+<td>cwe_id</td>
+<td>TEXT</td>
+<td>CWE identifier</td>
+</tr>
+<tr>
+<td>product_names</td>
+<td>TEXT</td>
+<td>JSON array of affected products</td>
+</tr>
+<tr>
+<td>summary</td>
+<td>TEXT</td>
+<td>Advisory summary</td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>TEXT</td>
+<td>Record creation</td>
+</tr>
+<tr>
+<td>updated_at</td>
+<td>TEXT</td>
+<td>Last sync update</td>
+</tr>
+</tbody></table>
+<h4>palo_advisories</h4><p>Palo Alto Networks security advisories <strong>(Since v1.0.63)</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>id</td>
+<td>INTEGER PRIMARY KEY</td>
+<td>Auto-incrementing ID</td>
+</tr>
+<tr>
+<td>advisory_id</td>
+<td>TEXT NOT NULL UNIQUE</td>
+<td>Palo Alto advisory ID</td>
+</tr>
+<tr>
+<td>cve_id</td>
+<td>TEXT</td>
+<td>CVE identifier</td>
+</tr>
+<tr>
+<td>advisory_title</td>
+<td>TEXT</td>
+<td>Advisory title</td>
+</tr>
+<tr>
+<td>publication_url</td>
+<td>TEXT</td>
+<td>Link to Palo Alto advisory</td>
+</tr>
+<tr>
+<td>severity</td>
+<td>TEXT</td>
+<td>Severity rating</td>
+</tr>
+<tr>
+<td>publication_date</td>
+<td>TEXT</td>
+<td>Publication date</td>
+</tr>
+<tr>
+<td>last_updated</td>
+<td>TEXT</td>
+<td>Last update date</td>
+</tr>
+<tr>
+<td>affected_products</td>
+<td>TEXT</td>
+<td>JSON array of affected products</td>
+</tr>
+<tr>
+<td>summary</td>
+<td>TEXT</td>
+<td>Advisory summary</td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>TEXT</td>
+<td>Record creation</td>
+</tr>
+<tr>
+<td>updated_at</td>
+<td>TEXT</td>
+<td>Last sync update</td>
+</tr>
+</tbody></table>
+<h4>vendor_patterns</h4><p>Hostname patterns for vendor classification <strong>(Since v1.0.63 - HEX-241)</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>id</td>
+<td>INTEGER PRIMARY KEY</td>
+<td>Auto-incrementing ID</td>
+</tr>
+<tr>
+<td>pattern</td>
+<td>TEXT NOT NULL UNIQUE</td>
+<td>Hostname pattern (regex or literal)</td>
+</tr>
+<tr>
+<td>vendor</td>
+<td>TEXT NOT NULL</td>
+<td>Vendor name (CISCO, Palo Alto)</td>
+</tr>
+<tr>
+<td>description</td>
+<td>TEXT</td>
+<td>Pattern description</td>
+</tr>
+<tr>
+<td>priority</td>
+<td>INTEGER DEFAULT 0</td>
+<td>Matching priority (higher first)</td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>TEXT</td>
+<td>Record creation</td>
+</tr>
+<tr>
+<td>updated_at</td>
+<td>TEXT</td>
+<td>Last modification</td>
 </tr>
 </tbody></table>
 <h4>vulnerability_imports</h4><p>Import operation tracking.</p>
@@ -1269,6 +2128,53 @@ app.<span class="hljs-title function_">use</span>(<span class="hljs-title functi
 <li>User input sanitized to prevent injection attacks</li>
 </ul>
 <h3>Rate Limiting</h3><p>Configurable per-endpoint limits to prevent abuse and brute force attacks.</p>
+<p><strong>Endpoint-Specific Rate Limits:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Window</th>
+<th>Max Requests</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>/api/kev/sync</code></td>
+<td>5 minutes</td>
+<td>3</td>
+<td>Prevent KEV API abuse</td>
+</tr>
+<tr>
+<td><code>/api/cisco/sync</code></td>
+<td>10 minutes</td>
+<td>10</td>
+<td>Prevent Cisco PSIRT API abuse</td>
+</tr>
+<tr>
+<td><code>/api/palo/sync</code></td>
+<td>10 minutes</td>
+<td>10</td>
+<td>Prevent Palo Alto API abuse</td>
+</tr>
+<tr>
+<td>Global (all endpoints)</td>
+<td>15 minutes</td>
+<td>100</td>
+<td>General brute force protection</td>
+</tr>
+</tbody></table>
+<p><strong>Implementation:</strong></p>
+<ul>
+<li>Uses <code>express-rate-limit</code> middleware</li>
+<li>IP-based tracking for distributed systems</li>
+<li>Returns <code>429 Too Many Requests</code> when limit exceeded</li>
+<li>Rate limit headers included in responses:<ul>
+<li><code>X-RateLimit-Limit</code> - Maximum requests allowed</li>
+<li><code>X-RateLimit-Remaining</code> - Requests remaining</li>
+<li><code>X-RateLimit-Reset</code> - Timestamp when limit resets</li>
+</ul>
+</li>
+</ul>
 <h3>CORS Policy</h3><p>Whitelist-based origin control with credentials support.</p>
 <hr>
 <h2>Environment Variables</h2><pre><code class="language-bash"><span class="hljs-comment"># Server Configuration</span>

@@ -166,9 +166,9 @@
 </ul>
 <p><strong>Main Components:</strong></p>
 <ul>
-<li><code>TicketManager</code> - Main ticket controller</li>
-<li><code>TicketGrid</code> - AG-Grid configuration</li>
-<li><code>DeviceModal</code> - Device management</li>
+<li><code>HexagonTicketsManager</code> - Main ticket controller class</li>
+<li>AG-Grid for ticket table rendering</li>
+<li>Device management modals</li>
 </ul>
 <p><strong>Key Methods:</strong></p>
 <table>
@@ -183,24 +183,32 @@
 <td>Initialize ticket interface</td>
 </tr>
 <tr>
-<td><code>loadTickets()</code></td>
-<td>Fetch and display tickets</td>
+<td><code>loadTicketsFromDB()</code></td>
+<td>Fetch tickets from database API</td>
 </tr>
 <tr>
-<td><code>createTicket()</code></td>
-<td>Open new ticket modal</td>
+<td><code>renderTickets()</code></td>
+<td>Display tickets in table with pagination</td>
 </tr>
 <tr>
-<td><code>updateTicket()</code></td>
-<td>Edit existing ticket</td>
+<td><code>saveTicket()</code></td>
+<td>Create or update ticket</td>
 </tr>
 <tr>
-<td><code>updateDevices()</code></td>
-<td>Manage associated devices</td>
+<td><code>editTicket(id)</code></td>
+<td>Open ticket edit modal</td>
 </tr>
 <tr>
-<td><code>deleteTicket()</code></td>
+<td><code>viewTicket(id)</code></td>
+<td>Display read-only ticket details</td>
+</tr>
+<tr>
+<td><code>deleteTicket(id)</code></td>
 <td>Remove ticket with confirmation</td>
+</tr>
+<tr>
+<td><code>bundleTicketFiles(id)</code></td>
+<td>Generate downloadable ticket bundle</td>
 </tr>
 </tbody></table>
 <hr>
@@ -217,22 +225,37 @@
 </ul>
 <p><strong>Usage:</strong></p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> themeController = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ThemeController</span>();
-themeController.<span class="hljs-title function_">initializeToggle</span>();</code></pre><h3>AGGridResponsiveConfig</h3><p><strong>Location:</strong> <code>app/public/scripts/shared/ag-grid-responsive-config.js</code></p>
-<p>Provides responsive AG-Grid configuration with theme support.</p>
-<p><strong>Features:</strong></p>
+themeController.<span class="hljs-title function_">initializeToggle</span>();</code></pre><h3>AG-Grid Configuration Functions</h3><p><strong>Location:</strong> <code>app/public/scripts/shared/ag-grid-responsive-config.js</code></p>
+<p>Provides responsive AG-Grid configuration functions with theme support and optimized column definitions.</p>
+<p><strong>Primary Function:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-title function_">createVulnerabilityGridOptions</span>(componentContext, isDarkMode, usePagination)</code></pre><p><strong>Features:</strong></p>
 <ul>
-<li>Automatic theme detection</li>
-<li>Responsive column sizing</li>
-<li>Custom cell renderers</li>
-<li>Export functionality</li>
-<li>Pagination controls</li>
+<li>Responsive column definitions with mobile/desktop breakpoints</li>
+<li>Automatic theme detection and application</li>
+<li>Custom cell renderers for vulnerabilities, vendors, CVEs</li>
+<li>Optimized column widths (minWidth, maxWidth, flex)</li>
+<li>Pagination support (optional)</li>
 </ul>
-<p><strong>Configuration Example:</strong></p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> gridOptions = <span class="hljs-title class_">AGGridResponsiveConfig</span>.<span class="hljs-title function_">getDefaultGridOptions</span>({
-    <span class="hljs-attr">columnDefs</span>: [...],
-    <span class="hljs-attr">rowData</span>: [...],
-    <span class="hljs-attr">onGridReady</span>: <span class="hljs-function">(<span class="hljs-params">params</span>) =&gt;</span> {...}
-});</code></pre><h3>AGGridThemeManager</h3><p><strong>Location:</strong> <code>app/public/scripts/shared/ag-grid-theme-manager.js</code><br><strong>Since:</strong> v1.0.40+</p>
+<p><strong>Usage Example:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { createVulnerabilityGridOptions } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./ag-grid-responsive-config.js&#x27;</span>;
+
+<span class="hljs-comment">// Create grid options for vulnerabilities page</span>
+<span class="hljs-keyword">const</span> gridOptions = <span class="hljs-title function_">createVulnerabilityGridOptions</span>(
+    <span class="hljs-variable language_">this</span>,           <span class="hljs-comment">// Component context for callbacks</span>
+    <span class="hljs-literal">false</span>,          <span class="hljs-comment">// isDarkMode (false = light theme)</span>
+    <span class="hljs-literal">true</span>            <span class="hljs-comment">// usePagination (true = enable pagination)</span>
+);
+
+<span class="hljs-comment">// Apply to AG-Grid</span>
+<span class="hljs-keyword">const</span> gridApi = agGrid.<span class="hljs-title function_">createGrid</span>(gridContainer, gridOptions);</code></pre><p><strong>Column Definitions:</strong></p>
+<p>The function generates responsive columnDefs with:</p>
+<ul>
+<li>Optimized widths based on screen size (mobile, desktop)</li>
+<li>Custom cell renderers for CVE links, vendor badges, VPR scores</li>
+<li>Built-in filtering and sorting</li>
+<li>Hide/show logic for mobile screens</li>
+</ul>
+<h3>AGGridThemeManager</h3><p><strong>Location:</strong> <code>app/public/scripts/shared/ag-grid-theme-manager.js</code><br><strong>Since:</strong> v1.0.40+</p>
 <p>Centralized theme management for all AG-Grid instances across the application.</p>
 <p><strong>Key Features:</strong></p>
 <ul>
@@ -275,27 +298,37 @@ themeController.<span class="hljs-title function_">initializeToggle</span>();</c
 <li><strong>Responsive Design</strong>: Mobile-friendly pagination controls</li>
 <li><strong>State Persistence</strong>: Remembers user&#39;s page size preference</li>
 </ul>
-<p><strong>Usage:</strong></p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> pagination = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PaginationController</span>({
-    <span class="hljs-attr">itemsPerPage</span>: <span class="hljs-number">25</span>,
-    <span class="hljs-attr">onPageChange</span>: <span class="hljs-function">(<span class="hljs-params">page, pageSize</span>) =&gt;</span> {
-        <span class="hljs-title function_">renderPage</span>(page, pageSize);
-    }
+<p><strong>Constructor:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Constructor takes simple parameters (not options object)</span>
+<span class="hljs-title function_">constructor</span>(<span class="hljs-params">defaultPageSize = <span class="hljs-number">12</span>, availableSizes = [<span class="hljs-number">6</span>, <span class="hljs-number">12</span>, <span class="hljs-number">24</span>, <span class="hljs-number">48</span>, <span class="hljs-number">64</span>, <span class="hljs-number">96</span>]</span>)</code></pre><p><strong>Usage:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Create pagination controller with default page size and available sizes</span>
+<span class="hljs-keyword">const</span> pagination = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PaginationController</span>(<span class="hljs-number">25</span>, [<span class="hljs-number">10</span>, <span class="hljs-number">25</span>, <span class="hljs-number">50</span>, <span class="hljs-number">100</span>]);
+
+<span class="hljs-comment">// Set total items (required before rendering)</span>
+pagination.<span class="hljs-title function_">setTotalItems</span>(<span class="hljs-number">1245</span>);
+
+<span class="hljs-comment">// Render pagination controls with callback</span>
+pagination.<span class="hljs-title function_">renderPaginationControls</span>(<span class="hljs-string">&#x27;paginationContainer&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
+    <span class="hljs-comment">// This callback is invoked when user changes pages</span>
+    <span class="hljs-keyword">const</span> currentPage = pagination.<span class="hljs-title function_">getCurrentPage</span>();
+    <span class="hljs-keyword">const</span> pageSize = pagination.<span class="hljs-title function_">getPageInfo</span>().<span class="hljs-property">pageSize</span>;
+    <span class="hljs-title function_">renderPage</span>(currentPage, pageSize);
 });
 
-pagination.<span class="hljs-title function_">setTotalItems</span>(<span class="hljs-number">1245</span>); <span class="hljs-comment">// Update total count</span>
-pagination.<span class="hljs-title function_">goToPage</span>(<span class="hljs-number">3</span>);         <span class="hljs-comment">// Navigate to specific page</span></code></pre><p><strong>Core Methods:</strong></p>
+<span class="hljs-comment">// Navigate programmatically</span>
+pagination.<span class="hljs-title function_">setCurrentPage</span>(<span class="hljs-number">3</span>);</code></pre><p><strong>Core Methods:</strong></p>
 <ul>
 <li><code>setTotalItems(count)</code> - Update total item count and recalculate pages</li>
-<li><code>goToPage(pageNumber)</code> - Navigate to specific page</li>
-<li><code>nextPage()</code> - Move to next page</li>
-<li><code>previousPage()</code> - Move to previous page</li>
-<li><code>setPageSize(size)</code> - Change items per page</li>
-<li><code>getCurrentPage()</code> - Get active page number</li>
-<li><code>getTotalPages()</code> - Get total page count</li>
+<li><code>getCurrentPageData(items)</code> - Get items for current page from array</li>
+<li><code>setCurrentPage(page)</code> - Navigate to specific page</li>
+<li><code>setPageSize(size)</code> - Change items per page (must be in availableSizes)</li>
+<li><code>getPageInfo()</code> - Get pagination state (currentPage, totalPages, pageSize, etc.)</li>
+<li><code>renderTopControls(containerId, onPageSizeChange, options)</code> - Render sort dropdown + items-per-page above cards</li>
+<li><code>renderPaginationControls(containerId, onPageChange)</code> - Render bottom pagination arrows/numbers</li>
 </ul>
-<p><strong>HTML Structure:</strong></p>
-<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;pagination-controls&quot;</span>&gt;</span>
+<p><strong>Generated HTML Structure</strong> <em>(for reference only - do not create manually)</em>:</p>
+<pre><code class="language-html"><span class="hljs-comment">&lt;!-- Auto-generated by renderPaginationControls() --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;pagination-controls&quot;</span>&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;pagination-info&quot;</span>&gt;</span>Showing 1-25 of 1,245 results<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;pagination-buttons&quot;</span>&gt;</span>
         <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;btn-first&quot;</span>&gt;</span>First<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
@@ -310,7 +343,8 @@ pagination.<span class="hljs-title function_">goToPage</span>(<span class="hljs-
         <span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;50&quot;</span>&gt;</span>50 per page<span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span>
         <span class="hljs-tag">&lt;<span class="hljs-name">option</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;100&quot;</span>&gt;</span>100 per page<span class="hljs-tag">&lt;/<span class="hljs-name">option</span>&gt;</span>
     <span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></code></pre><h3>VulnerabilityDataManager</h3><p><strong>Location:</strong> <code>app/public/scripts/shared/vulnerability-data.js</code></p>
+<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></code></pre><p><strong>Note:</strong> The HTML structure above is automatically generated by the <code>renderPaginationControls()</code> and <code>renderTopControls()</code> methods. Do not create this HTML manually - let the controller generate it.</p>
+<h3>VulnerabilityDataManager</h3><p><strong>Location:</strong> <code>app/public/scripts/shared/vulnerability-data.js</code></p>
 <p>Core data management for vulnerabilities.</p>
 <p><strong>Responsibilities:</strong></p>
 <ul>
@@ -501,100 +535,91 @@ pagination.<span class="hljs-title function_">goToPage</span>(<span class="hljs-
 <li>Navigation state</li>
 <li>Notification badges</li>
 </ul>
-<h3>PreferencesService</h3><p><strong>Location:</strong> <code>app/public/scripts/shared/preferences-service.js</code><br><strong>Since:</strong> v1.0.48</p>
-<p>Frontend client for user preferences API with local caching and synchronization.</p>
+<h3>PreferencesSync</h3><p><strong>Location:</strong> <code>app/public/scripts/shared/preferences-sync.js</code><br><strong>Since:</strong> v1.0.48</p>
+<p>Frontend synchronization client for user preferences between localStorage and backend PreferencesService API.</p>
 <p><strong>Key Features:</strong></p>
 <ul>
-<li><strong>API Integration</strong>: Communicates with <code>/api/preferences</code> endpoints</li>
-<li><strong>Local Caching</strong>: IndexedDB storage for offline access</li>
-<li><strong>Cross-Tab Sync</strong>: Preferences sync across browser tabs via storage events</li>
-<li><strong>Automatic Save</strong>: Debounced saves to reduce API calls</li>
-<li><strong>Typed Preferences</strong>: TypeScript-style preference definitions</li>
+<li><strong>Backend Sync</strong>: Syncs preferences to <code>/api/preferences</code> endpoints</li>
+<li><strong>localStorage Cache</strong>: Fast local storage for immediate access</li>
+<li><strong>Debounced Writes</strong>: Batches preference updates to reduce API calls</li>
+<li><strong>Cross-Tab Sync</strong>: Automatic synchronization across browser tabs</li>
+<li><strong>Theme Priority</strong>: Immediate sync for theme changes (no debounce)</li>
 </ul>
 <p><strong>Core Methods:</strong></p>
-<pre><code class="language-javascript"><span class="hljs-comment">// Get preference (returns from cache if available)</span>
-<span class="hljs-keyword">const</span> theme = <span class="hljs-keyword">await</span> <span class="hljs-title class_">PreferencesService</span>.<span class="hljs-title function_">get</span>(<span class="hljs-string">&#x27;dashboard.theme&#x27;</span>);
-<span class="hljs-comment">// Returns: { mode: &quot;dark&quot;, accent: &quot;blue&quot; }</span>
+<pre><code class="language-javascript"><span class="hljs-comment">// Initialize sync system (loads preferences from database to localStorage)</span>
+<span class="hljs-keyword">await</span> preferencesSync.<span class="hljs-title function_">initialize</span>();
 
-<span class="hljs-comment">// Set preference (auto-saves to server)</span>
-<span class="hljs-keyword">await</span> <span class="hljs-title class_">PreferencesService</span>.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;dashboard.theme&#x27;</span>, { <span class="hljs-attr">mode</span>: <span class="hljs-string">&#x27;dark&#x27;</span>, <span class="hljs-attr">accent</span>: <span class="hljs-string">&#x27;blue&#x27;</span> });
+<span class="hljs-comment">// Sync theme immediately (high-priority, no debounce)</span>
+<span class="hljs-keyword">await</span> preferencesSync.<span class="hljs-title function_">syncTheme</span>(<span class="hljs-string">&#x27;dark&#x27;</span>);
 
-<span class="hljs-comment">// Bulk update (single API call)</span>
-<span class="hljs-keyword">await</span> <span class="hljs-title class_">PreferencesService</span>.<span class="hljs-title function_">bulkUpdate</span>({
-    <span class="hljs-string">&#x27;dashboard.theme&#x27;</span>: { <span class="hljs-attr">mode</span>: <span class="hljs-string">&#x27;dark&#x27;</span> },
-    <span class="hljs-string">&#x27;dashboard.defaultView&#x27;</span>: <span class="hljs-string">&#x27;grid&#x27;</span>,
-    <span class="hljs-string">&#x27;notifications.enabled&#x27;</span>: <span class="hljs-literal">true</span>
-});
+<span class="hljs-comment">// Queue a preference for debounced sync</span>
+preferencesSync.<span class="hljs-title function_">queueSync</span>(<span class="hljs-string">&#x27;pagination_enabled&#x27;</span>, <span class="hljs-literal">true</span>);
 
-<span class="hljs-comment">// Reset to defaults</span>
-<span class="hljs-keyword">await</span> <span class="hljs-title class_">PreferencesService</span>.<span class="hljs-title function_">reset</span>();
+<span class="hljs-comment">// Force immediate sync of all queued preferences</span>
+<span class="hljs-keyword">await</span> preferencesSync.<span class="hljs-title function_">syncNow</span>();
 
-<span class="hljs-comment">// Clear cache</span>
-<span class="hljs-title class_">PreferencesService</span>.<span class="hljs-title function_">clearCache</span>();</code></pre><p><strong>Preference Keys:</strong></p>
+<span class="hljs-comment">// Flush sync queue to database</span>
+<span class="hljs-keyword">await</span> preferencesSync.<span class="hljs-title function_">flushSyncQueue</span>();</code></pre><p><strong>Synced Preference Keys:</strong></p>
 <table>
 <thead>
 <tr>
 <th>Key</th>
-<th>Type</th>
+<th>Storage Key</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody><tr>
-<td><code>dashboard.theme</code></td>
-<td>Object</td>
-<td>Theme settings (mode, accent)</td>
+<td><code>theme</code></td>
+<td><code>hextrackr-theme</code></td>
+<td>Theme preference (&#39;light&#39; or &#39;dark&#39;)</td>
 </tr>
 <tr>
-<td><code>dashboard.defaultView</code></td>
-<td>String</td>
-<td>Default view (&#39;grid&#39; or &#39;cards&#39;)</td>
+<td><code>markdown_template_ticket</code></td>
+<td><code>hextrackr-markdown-ticket</code></td>
+<td>Ticket markdown template</td>
 </tr>
 <tr>
-<td><code>dashboard.chartMetric</code></td>
-<td>String</td>
-<td>Chart metric (&#39;vpr&#39; or &#39;count&#39;)</td>
+<td><code>markdown_template_vulnerability</code></td>
+<td><code>hextrackr-markdown-vulnerability</code></td>
+<td>Vulnerability markdown template</td>
 </tr>
 <tr>
-<td><code>vulnerabilities.filters</code></td>
-<td>Object</td>
-<td>Saved filter configurations</td>
+<td><code>pagination_enabled</code></td>
+<td><code>hextrackr_enablePagination</code></td>
+<td>Pagination feature flag</td>
 </tr>
 <tr>
-<td><code>vulnerabilities.pageSize</code></td>
-<td>Number</td>
-<td>Rows per page (10, 25, 50, 100)</td>
+<td><code>kev_auto_refresh</code></td>
+<td><code>kevAutoSyncEnabled</code></td>
+<td>KEV auto-sync setting</td>
 </tr>
 <tr>
-<td><code>notifications.enabled</code></td>
-<td>Boolean</td>
-<td>Enable/disable notifications</td>
-</tr>
-<tr>
-<td><code>export.defaultFormat</code></td>
-<td>String</td>
-<td>Default export format (&#39;csv&#39;, &#39;json&#39;, &#39;pdf&#39;)</td>
-</tr>
-<tr>
-<td><code>grid.columnState</code></td>
-<td>Array</td>
-<td>AG-Grid column visibility/order</td>
+<td><code>cisco_api_key</code></td>
+<td><code>hextrackr-cisco-key</code></td>
+<td>Cisco API credentials</td>
 </tr>
 </tbody></table>
-<p><strong>Cross-Tab Synchronization:</strong></p>
-<pre><code class="language-javascript"><span class="hljs-comment">// Automatic sync via storage events</span>
-<span class="hljs-variable language_">window</span>.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;storage&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">e</span>) =&gt;</span> {
-    <span class="hljs-keyword">if</span> (e.<span class="hljs-property">key</span> === <span class="hljs-string">&#x27;hextrackr-preferences&#x27;</span>) {
-        <span class="hljs-title class_">PreferencesService</span>.<span class="hljs-title function_">refreshFromStorage</span>();
-        <span class="hljs-comment">// Trigger UI updates</span>
-        <span class="hljs-title function_">applyPreferences</span>();
-    }
-});</code></pre><p><strong>Caching Strategy:</strong></p>
+<p><strong>How It Works:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-comment">// 1. On page load, PreferencesSync loads from database to localStorage</span>
+<span class="hljs-keyword">await</span> preferencesSync.<span class="hljs-title function_">initialize</span>();
+
+<span class="hljs-comment">// 2. Theme changes are synced immediately</span>
+<span class="hljs-keyword">await</span> preferencesSync.<span class="hljs-title function_">syncTheme</span>(<span class="hljs-string">&#x27;dark&#x27;</span>);
+<span class="hljs-comment">// → Updates localStorage + database instantly</span>
+
+<span class="hljs-comment">// 3. Other preferences are queued and debounced (1 second)</span>
+preferencesSync.<span class="hljs-title function_">queueSync</span>(<span class="hljs-string">&#x27;pagination_enabled&#x27;</span>, <span class="hljs-literal">true</span>);
+<span class="hljs-comment">// → Waits 1 second, then batches all queued updates</span>
+
+<span class="hljs-comment">// 4. Before page unload, force immediate sync</span>
+<span class="hljs-keyword">await</span> preferencesSync.<span class="hljs-title function_">syncNow</span>();</code></pre><p><strong>Integration with Backend:</strong></p>
+<p>PreferencesSync communicates with the backend <code>PreferencesService</code> (located at <code>app/services/preferencesService.js</code>) via these endpoints:</p>
 <ul>
-<li><strong>IndexedDB</strong>: Primary cache for preferences (survives page reload)</li>
-<li><strong>Memory Cache</strong>: In-memory map for fast reads during session</li>
-<li><strong>TTL</strong>: Cache entries expire after 1 hour, force refresh from server</li>
-<li><strong>Invalidation</strong>: Automatic cache invalidation on set/update operations</li>
+<li><code>GET /api/preferences</code> - Load all preferences</li>
+<li><code>POST /api/preferences/:key</code> - Set single preference</li>
+<li><code>POST /api/preferences/bulk</code> - Bulk update preferences</li>
 </ul>
+<p><strong>Note:</strong> PreferencesSync is a frontend-only component. The actual preferences API service runs on the backend.</p>
 <h3>AuthState</h3><p><strong>Location:</strong> <code>app/public/scripts/shared/auth-state.js</code><br><strong>Since:</strong> v1.0.46</p>
 <p>Frontend authentication state management with session monitoring.</p>
 <p><strong>Key Features:</strong></p>
@@ -885,9 +910,23 @@ vendorDropdown.<span class="hljs-title function_">addEventListener</span>(<span 
 <li>Migration running</li>
 </ul>
 <hr>
-<h2>Module Loading Pattern</h2><p>All modules follow a consistent loading pattern:</p>
-<pre><code class="language-javascript"><span class="hljs-comment">// Module definition</span>
-<span class="hljs-keyword">class</span> <span class="hljs-title class_">ComponentName</span> {
+<h2>Module Loading Patterns</h2><p>HexTrackr uses <strong>multiple module loading patterns</strong> depending on component age and refactoring status. Here are the common patterns:</p>
+<h3>Pattern 1: ES6 Module Export (Modern)</h3><p>Used in newer, refactored components:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Component definition</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">ComponentName</span> {
+    <span class="hljs-title function_">constructor</span>(<span class="hljs-params"></span>) {
+        <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">init</span>();
+    }
+
+    <span class="hljs-title function_">init</span>(<span class="hljs-params"></span>) {
+        <span class="hljs-comment">// Initialization logic</span>
+    }
+}
+
+<span class="hljs-comment">// Import in other modules</span>
+<span class="hljs-keyword">import</span> { <span class="hljs-title class_">ComponentName</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./component-name.js&#x27;</span>;</code></pre><p><strong>Examples:</strong> <code>ModernVulnManager</code>, <code>ThemeController</code></p>
+<h3>Pattern 2: Global Window Assignment (Legacy)</h3><p>Used in older components for compatibility:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">ComponentName</span> {
     <span class="hljs-title function_">constructor</span>(<span class="hljs-params">options = {}</span>) {
         <span class="hljs-variable language_">this</span>.<span class="hljs-property">options</span> = { ...<span class="hljs-variable language_">this</span>.<span class="hljs-property">defaultOptions</span>, ...options };
         <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">init</span>();
@@ -899,32 +938,53 @@ vendorDropdown.<span class="hljs-title function_">addEventListener</span>(<span 
         <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">loadData</span>();
     }
 
-    <span class="hljs-title function_">setupDOM</span>(<span class="hljs-params"></span>) {
-        <span class="hljs-comment">// DOM references</span>
-    }
-
-    <span class="hljs-title function_">attachEventListeners</span>(<span class="hljs-params"></span>) {
-        <span class="hljs-comment">// Event bindings</span>
-    }
-
-    <span class="hljs-title function_">loadData</span>(<span class="hljs-params"></span>) {
-        <span class="hljs-comment">// Initial data load</span>
-    }
-
     <span class="hljs-title function_">destroy</span>(<span class="hljs-params"></span>) {
         <span class="hljs-comment">// Cleanup</span>
     }
 }
 
-<span class="hljs-comment">// Auto-initialization</span>
+<span class="hljs-comment">// Auto-initialization on DOM ready</span>
 <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;DOMContentLoaded&#x27;</span>, <span class="hljs-function">() =&gt;</span> {
     <span class="hljs-variable language_">window</span>.<span class="hljs-property">component</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComponentName</span>();
 });
 
-<span class="hljs-comment">// Export for module use</span>
+<span class="hljs-comment">// Export for testing/module environments</span>
 <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> <span class="hljs-variable language_">module</span> !== <span class="hljs-string">&#x27;undefined&#x27;</span> &amp;&amp; <span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span>) {
     <span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = <span class="hljs-title class_">ComponentName</span>;
-}</code></pre><hr>
+}</code></pre><p><strong>Examples:</strong> <code>HexagonTicketsManager</code>, <code>ToastManager</code></p>
+<h3>Pattern 3: Deferred/Lazy Initialization</h3><p>Used for components that initialize on-demand:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">ComponentName</span> {
+    <span class="hljs-title function_">constructor</span>(<span class="hljs-params"></span>) {
+        <span class="hljs-comment">// Lightweight constructor</span>
+        <span class="hljs-variable language_">this</span>.<span class="hljs-property">initialized</span> = <span class="hljs-literal">false</span>;
+    }
+
+    <span class="hljs-keyword">async</span> <span class="hljs-title function_">initialize</span>(<span class="hljs-params"></span>) {
+        <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">this</span>.<span class="hljs-property">initialized</span>) <span class="hljs-keyword">return</span>;
+
+        <span class="hljs-comment">// Heavy initialization work</span>
+        <span class="hljs-keyword">await</span> <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">loadDependencies</span>();
+        <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">setupEventListeners</span>();
+        <span class="hljs-variable language_">this</span>.<span class="hljs-property">initialized</span> = <span class="hljs-literal">true</span>;
+    }
+}
+
+<span class="hljs-comment">// Component created but not initialized</span>
+<span class="hljs-variable language_">window</span>.<span class="hljs-property">component</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ComponentName</span>();
+
+<span class="hljs-comment">// Initialize when needed</span>
+<span class="hljs-keyword">await</span> <span class="hljs-variable language_">window</span>.<span class="hljs-property">component</span>.<span class="hljs-title function_">initialize</span>();</code></pre><p><strong>Examples:</strong> <code>VulnerabilityChartManager</code> (lazy-loads on first view switch)</p>
+<h3>Pattern 4: Functional/Utility Modules</h3><p>Helper functions without class structure:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Utility functions</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">helperFunction</span>(<span class="hljs-params">param</span>) {
+    <span class="hljs-keyword">return</span> processedResult;
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">CONSTANTS</span> = {
+    <span class="hljs-attr">KEY</span>: <span class="hljs-string">&#x27;value&#x27;</span>
+};</code></pre><p><strong>Examples:</strong> <code>CVEUtilities</code>, <code>ValidationUtils</code></p>
+<p><strong>Note:</strong> The application is gradually migrating from Pattern 2 (global window) to Pattern 1 (ES6 modules) as components are refactored.</p>
+<hr>
 <h2>Event System</h2><h3>Custom Events</h3><p>The application uses custom events for component communication:</p>
 <table>
 <thead>
