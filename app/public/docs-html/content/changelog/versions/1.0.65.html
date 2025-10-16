@@ -280,11 +280,147 @@ Store: JSON array in first_fixed column</code></pre><p><strong>Comparison: Cisco
 <li>✅ No nginx cache issues (TTL-based resolution)</li>
 </ul>
 <hr>
-<h2>Bug Fixes</h2><h3>AG-Grid Column Filter Async Values</h3><p><strong>Reported Issue</strong>: User initially reported AG-Grid column filters not working for Palo Alto fixed versions.</p>
+<h2>Bug Fixes</h2><h3>VPR Cards CSV Export - Multiple Issues Fixed</h3><p><strong>Linear Issue</strong>: Related to HEX-144, HEX-149 (VPR weekly summary export)</p>
+<h4>Issue 1: 4 CSV Downloads Instead of 1</h4><p><strong>Problem</strong>: Cmd+Shift+Click on any VPR card spawned 4 CSV downloads instead of 1.</p>
+<p><strong>Root Cause</strong>: Event listener accumulation - <code>setupVprExportShortcut()</code> was called multiple times during page lifecycle, and each call created a new bound function with <code>.bind(this)</code> inside the forEach loop. The <code>removeEventListener</code> couldn&#39;t remove previous listeners because <code>.bind()</code> creates new function references each time.</p>
+<p><strong>Fix</strong> (vulnerability-statistics.js:525-560):</p>
+<ol>
+<li>Added <code>_exportShortcutInitialized</code> flag to track setup state</li>
+<li>Bind click handler ONCE before loop, store in <code>this._handleCardClickBound</code></li>
+<li>Only set flag AFTER cards found and listeners attached (DOM-ready check)</li>
+<li>Return early without setting flag if cards don&#39;t exist yet</li>
+</ol>
+<p><strong>Result</strong>: Single CSV download on Cmd+Shift+Click.</p>
+<hr>
+<h4>Issue 2: CSV Export Using Filtered Totals</h4><p><strong>Problem</strong>: When global filters applied (vendor, KEV status, search), CSV export showed filtered totals instead of full database totals.</p>
+<p><strong>Root Cause</strong>: CSV export read values from DOM elements (which display filtered values) instead of in-memory unfiltered data.</p>
+<p><strong>Original Code</strong> (line 756-770):</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> totalVprEl = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">`<span class="hljs-subst">${severity}</span>TotalVPR`</span>);
+overallTotals[severity] = <span class="hljs-built_in">parseFloat</span>(totalVprEl.<span class="hljs-property">textContent</span>) || <span class="hljs-number">0</span>;</code></pre><p><strong>Fix</strong>: Read from <code>this.dataManager.getStatistics()</code> instead of DOM:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> stats = <span class="hljs-variable language_">this</span>.<span class="hljs-property">dataManager</span>.<span class="hljs-title function_">getStatistics</span>();
+overallTotals[severity] = severityStats.<span class="hljs-property">total_vpr</span> || <span class="hljs-number">0</span>;
+overallCounts[severity] = severityStats.<span class="hljs-property">count</span> || <span class="hljs-number">0</span>;</code></pre><p><strong>Result</strong>: CSV export always shows full database totals regardless of active filters.</p>
+<hr>
+<h4>Issue 3: OVERALL Section Showing 0 Change</h4><p><strong>Problem</strong>: OVERALL section in CSV report compared today vs today (showing 0 change), while vendor sections properly compared scan dates.</p>
+<p><strong>Root Cause</strong>: OVERALL section read from <code>dataManager.getStatistics()</code> (today&#39;s snapshot only), while vendor sections fetched from trends API (historical comparison).</p>
+<p><strong>User Feedback</strong>: &quot;Whats the difference between the totals card, and the individual filters cards in this report, because now we have 0 difference in our totals but the summaries for each properly show todays upload vs previous days upload differences&quot;</p>
+<p><strong>Fix</strong> (vulnerability-statistics.js:765-863):</p>
+<ol>
+<li><p>Updated <code>_aggregateVprByVendor()</code> to return <code>dates</code> object:</p>
+<pre><code class="language-javascript"><span class="hljs-attr">dates</span>: {
+    <span class="hljs-attr">current</span>: currentWeek.<span class="hljs-property">date</span>,
+    <span class="hljs-attr">previous</span>: previousWeek?.<span class="hljs-property">date</span> || <span class="hljs-string">&quot;N/A&quot;</span>
+}</code></pre></li>
+<li><p>Aggregate overall totals from all three vendors (Cisco + Palo Alto + Other):</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> overallTotals = {};
+severities.<span class="hljs-title function_">forEach</span>(<span class="hljs-function"><span class="hljs-params">severity</span> =&gt;</span> {
+    overallTotals[severity] =
+        (ciscoTotals[severity] || <span class="hljs-number">0</span>) +
+        (paloTotals[severity] || <span class="hljs-number">0</span>) +
+        (otherTotals[severity] || <span class="hljs-number">0</span>);
+});</code></pre></li>
+<li><p>Calculate weighted average percentage changes:</p>
+<pre><code class="language-javascript">overallPctChanges[severity] = (
+    (ciscoPctChanges[severity] * vprWeights[<span class="hljs-number">0</span>] / totalVprWeight) +
+    (paloPctChanges[severity] * vprWeights[<span class="hljs-number">1</span>] / totalVprWeight) +
+    (otherPctChanges[severity] * vprWeights[<span class="hljs-number">2</span>] / totalVprWeight)
+);</code></pre></li>
+<li><p>Updated <code>_formatVendorTable()</code> signature to accept <code>dates</code> parameter:</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">_formatVendorTable</span>(currentTotals, percentChanges, dates)</code></pre></li>
+<li><p>Changed CSV row labels from generic to actual scan dates:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> prevLabel = dates?.<span class="hljs-property">previous</span> || <span class="hljs-string">&quot;PREV UPLOAD&quot;</span>;     <span class="hljs-comment">// &quot;2025-10-12&quot;</span>
+<span class="hljs-keyword">const</span> currentLabel = dates?.<span class="hljs-property">current</span> || <span class="hljs-string">&quot;CURRENT UPLOAD&quot;</span>;  <span class="hljs-comment">// &quot;2025-10-13&quot;</span></code></pre></li>
+</ol>
+<p><strong>Result</strong>:</p>
+<ul>
+<li>OVERALL section now properly compares scan dates (not upload timestamps)</li>
+<li>CSV shows actual dates (e.g., &quot;2025-10-12&quot; / &quot;2025-10-13&quot;) instead of &quot;PREV UPLOAD&quot; / &quot;CURRENT UPLOAD&quot;</li>
+<li>All sections (OVERALL, CISCO, PALO ALTO, OTHER) show consistent date comparisons</li>
+</ul>
+<hr>
+<h3>AG-Grid Column Filter Async Values</h3><p><strong>Reported Issue</strong>: User initially reported AG-Grid column filters not working for Palo Alto fixed versions.</p>
 <p><strong>Investigation</strong>: Suspected missing <code>getQuickFilterText</code> or cache restoration.</p>
 <p><strong>Actual Cause</strong>: Nginx cache layer (not browser cache) - hard refresh didn&#39;t clear it.</p>
 <p><strong>Resolution</strong>: Natural TTL expiration after a few minutes - everything started working.</p>
 <p><strong>Outcome</strong>: No code changes needed - working as designed. Nginx cache cleared automatically after TTL expired.</p>
+<hr>
+<h2>Features Added (Post-Release)</h2><h3>VPR Historical Trend Comparison CSV Exports</h3><p><strong>New Feature</strong>: Power tool keyboard shortcuts for exporting VPR trend comparisons over different timeframes.</p>
+<p><strong>Problem</strong>: Users needed longer-term trend analysis beyond the existing &quot;latest vs previous&quot; comparison to identify gradual vulnerability accumulation and assess patching campaign effectiveness.</p>
+<p><strong>Solution</strong>: Three keyboard shortcuts on VPR cards for instant CSV exports:</p>
+<table>
+<thead>
+<tr>
+<th>Shortcut (Mac)</th>
+<th>Shortcut (Windows)</th>
+<th>Timeframe</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Cmd+Shift+Click</code></td>
+<td><code>Ctrl+Shift+Click</code></td>
+<td><strong>7 Days</strong></td>
+<td>Current vs ~7 days ago</td>
+</tr>
+<tr>
+<td><code>Cmd+Alt+Click</code></td>
+<td><code>Ctrl+Alt+Click</code></td>
+<td><strong>30 Days</strong></td>
+<td>Current vs ~30 days ago</td>
+</tr>
+<tr>
+<td><code>Cmd+Shift+Alt+Click</code></td>
+<td><code>Ctrl+Shift+Alt+Click</code></td>
+<td><strong>Latest vs Previous</strong></td>
+<td>Most recent two scans</td>
+</tr>
+</tbody></table>
+<p><strong>Implementation</strong> (vulnerability-statistics.js):</p>
+<ol>
+<li><code>_findHistoricalSnapshot(trends, daysBack)</code> - Finds closest snapshot within timeframe with graceful fallback</li>
+<li><code>_aggregateVprByVendorHistorical(vendor, daysBack)</code> - Fetches vendor data with historical comparison</li>
+<li><code>exportVprHistoricalComparison(daysBack)</code> - Generates CSV with 7-day or 30-day comparison</li>
+<li>Updated <code>_handleCardClick(event)</code> - Detects Alt modifier for new shortcuts</li>
+</ol>
+<p><strong>CSV Output Example</strong>:</p>
+<pre><code class="language-csv">WEEKLY VPR COMPARISON (7 DAYS)
+Date Range: 2025-10-06 to 2025-10-13
+
+OVERALL VPR TOTALS,,,,,,OVERALL VULNERABILITY COUNTS
+PERIOD,CRITICAL,HIGH,MEDIUM,LOW,TOTAL,,PERIOD,CRITICAL,HIGH,MEDIUM,LOW,TOTAL
+2025-10-06,148.0,23222.0,18689.9,1484.9,43544.8,,2025-10-06,12,234,456,78,780
+2025-10-13,203.2,23216.7,24452.7,1483.9,49356.5,,2025-10-13,15,235,480,77,807
+CHANGE,55.2,-5.3,5762.8,-1.0,5811.7,,CHANGE,3,1,24,-1,27
+...</code></pre><p><strong>Graceful Fallback</strong>: If insufficient historical data exists:</p>
+<ul>
+<li>Uses oldest available snapshot</li>
+<li>CSV header shows: <code>&quot;LIMITED DATA - using oldest available: X days&quot;</code></li>
+<li>Note explains fallback behavior</li>
+<li>Actual dates displayed (e.g., &quot;2025-09-22&quot; not &quot;30 days ago&quot;)</li>
+</ul>
+<p><strong>Filename Format</strong>: <code>HexTrackr_VPR_WEEKLY_7day_2025-10-06_to_2025-10-13.csv</code></p>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/vulnerability-statistics.js</code> (~340 lines added)<ul>
+<li>Lines 703-766: <code>_findHistoricalSnapshot()</code> method</li>
+<li>Lines 768-887: <code>_aggregateVprByVendorHistorical()</code> method</li>
+<li>Lines 1114-1279: <code>exportVprHistoricalComparison()</code> method</li>
+<li>Lines 570-605: Updated <code>_handleCardClick()</code> for Alt modifier detection</li>
+</ul>
+</li>
+</ul>
+<p><strong>Documentation</strong>:</p>
+<ul>
+<li><code>/docs/FEATURE_VPR_HISTORICAL_CSV_COMPARISON.md</code> - Complete technical specification</li>
+<li><code>app/public/docs-source/guides/user-guide.md</code> - Updated keyboard shortcuts section</li>
+</ul>
+<p><strong>Benefits</strong>:</p>
+<ul>
+<li>Weekly and monthly trend visibility</li>
+<li>Evidence for patching campaign effectiveness</li>
+<li>Early detection of gradual vulnerability accumulation</li>
+<li>Long-term security posture assessment</li>
+</ul>
 <hr>
 <h2>Breaking Changes</h2><p>None. All changes are additive and follow established patterns from Cisco integration.</p>
 <hr>

@@ -9,14 +9,15 @@
 <h2 id="execution-order">Middleware Execution Order</h2><p>Understanding middleware order is critical - middleware executes top-to-bottom, and authentication/security depend on correct ordering.</p>
 <p><strong>Complete Middleware Stack</strong> (from <code>app/public/server.js</code>):</p>
 <ol>
-<li><strong>Trust Proxy</strong> - Enable Express to read nginx headers (<code>X-Forwarded-Proto</code>, <code>X-Forwarded-For</code>)</li>
-<li><strong>CORS</strong> - Cross-origin resource sharing for API access</li>
-<li><strong>Session Management</strong> - SQLite session store with secure cookies</li>
-<li><strong>Body Parsing</strong> - JSON and URL-encoded request bodies (50MB limit)</li>
-<li><strong>CSRF Protection</strong> - Double-submit cookie pattern (excludes login/status/csrf endpoints)</li>
-<li><strong>Rate Limiting</strong> - <code>/api/*</code> routes only (100 requests per 15 minutes)</li>
-<li><strong>Compression</strong> - Gzip/deflate (only if NOT behind nginx)</li>
-<li><strong>Security Headers</strong> - Custom headers (X-Content-Type-Options, X-Frame-Options, X-XSS-Protection)</li>
+<li><strong>Trust Proxy</strong> (line 78) - Enable Express to read nginx headers (<code>X-Forwarded-Proto</code>, <code>X-Forwarded-For</code>)</li>
+<li><strong>WebSocket Authentication</strong> (lines 101-123) - Session-based authentication for WebSocket handshakes</li>
+<li><strong>CORS</strong> (line 189) - Cross-origin resource sharing for API access (HTTPS-only)</li>
+<li><strong>Session Management</strong> (line 190) - SQLite session store with secure cookies</li>
+<li><strong>Body Parsing</strong> (lines 194-195) - JSON and URL-encoded request bodies (100MB limit)</li>
+<li><strong>CSRF Protection</strong> (lines 200-224) - Double-submit cookie pattern (excludes login/status/csrf endpoints)</li>
+<li><strong>Rate Limiting</strong> (line 226) - <code>/api/*</code> routes only (60 requests per 15 min, cache-aware)</li>
+<li><strong>Compression</strong> (line 232) - Gzip/deflate (only if NOT behind nginx)</li>
+<li><strong>Security Headers</strong> (lines 236-241) - Custom headers (X-Content-Type-Options, X-Frame-Options, X-XSS-Protection)</li>
 <li><strong>Static File Serving</strong> - Documentation portal, JSDoc, public assets (<strong>blocks <code>/data</code> directory</strong>)</li>
 <li><strong>Route Handlers</strong> - API endpoints with authentication middleware</li>
 <li><strong>Global Error Handler</strong> - Catches all unhandled errors</li>
@@ -77,6 +78,42 @@
 <li><strong>Cleanup</strong>: Every 15 minutes (900000ms)</li>
 <li><strong>Structure</strong>: Session ID (primary key), data (JSON), expiry (timestamp)</li>
 </ul>
+<h3>WebSocket Session Authentication</h3><p><strong>Location:</strong> <code>app/public/server.js</code> (lines 101-123)<br><strong>Since:</strong> v1.0.46</p>
+<p>Secure WebSocket connections require session-based authentication at handshake time.</p>
+<p><strong>Implementation:</strong></p>
+<pre><code class="language-javascript">io.<span class="hljs-property">engine</span>.<span class="hljs-title function_">use</span>(<span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+    <span class="hljs-keyword">const</span> isHandshake = req.<span class="hljs-property">_query</span>.<span class="hljs-property">sid</span> === <span class="hljs-literal">undefined</span>;
+    <span class="hljs-keyword">if</span> (!isHandshake) {
+        <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(); <span class="hljs-comment">// Skip auth for polling requests</span>
+    }
+
+    <span class="hljs-comment">// Apply session middleware during handshake</span>
+    <span class="hljs-title function_">sessionMiddleware</span>(req, res, <span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> {
+        <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(err);
+
+        <span class="hljs-comment">// Check if user is authenticated</span>
+        <span class="hljs-keyword">if</span> (!req.<span class="hljs-property">session</span> || !req.<span class="hljs-property">session</span>.<span class="hljs-property">userId</span>) {
+            <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&quot;Authentication required&quot;</span>));
+        }
+
+        <span class="hljs-title function_">next</span>();
+    });
+});</code></pre><p><strong>Security Features:</strong></p>
+<ul>
+<li>Authentication <strong>only on handshake</strong> (when <code>sid</code> is undefined)</li>
+<li>Subsequent polling requests skip auth check (performance optimization)</li>
+<li>Reuses session middleware for consistent auth logic</li>
+<li>Unauthenticated connections are rejected with error</li>
+<li>Session username is logged on successful handshake</li>
+</ul>
+<p><strong>WebSocket Events:</strong></p>
+<ul>
+<li><code>join-progress</code> - Join progress tracking room</li>
+<li><code>leave-progress</code> - Leave progress tracking room</li>
+<li><code>progress</code> - Progress updates (throttled to 100ms)</li>
+<li><code>complete</code> - Operation completed</li>
+<li><code>error</code> - Operation failed</li>
+</ul>
 <h3>Authentication Protection (`requireAuth`)</h3><p><strong>Location:</strong> <code>app/middleware/auth.js</code> (lines 52-68)<br><strong>Since:</strong> v1.0.46</p>
 <p>Route protection middleware that enforces authentication on protected endpoints.</p>
 <p><strong>Behavior:</strong></p>
@@ -125,7 +162,7 @@ router.<span class="hljs-title function_">get</span>(<span class="hljs-string">&
 <span class="hljs-keyword">if</span> (req.<span class="hljs-property">body</span>.<span class="hljs-property">rememberMe</span>) {
     <span class="hljs-title function_">extendSession</span>(req);  <span class="hljs-comment">// Sets maxAge to 30 days</span>
 }</code></pre><hr>
-<h2 id="csrf">CSRF Protection</h2><p><strong>Library:</strong> <code>csrf-sync</code><br><strong>Implementation:</strong> <code>app/public/server.js</code> (lines 195-219)<br><strong>Since:</strong> v1.0.46</p>
+<h2 id="csrf">CSRF Protection</h2><p><strong>Library:</strong> <code>csrf-sync</code><br><strong>Implementation:</strong> <code>app/public/server.js</code> (lines 200-212)<br><strong>Since:</strong> v1.0.46</p>
 <p>Double-submit cookie pattern for CSRF protection on all state-changing requests.</p>
 <p><strong>Configuration:</strong></p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> { csrfSynchronisedProtection, generateToken } = <span class="hljs-title function_">csrfSync</span>({
@@ -178,7 +215,7 @@ router.<span class="hljs-title function_">get</span>(<span class="hljs-string">&
 </ul>
 <p><strong>All other POST/PUT/DELETE requests require valid CSRF token.</strong></p>
 <hr>
-<h2 id="trust-proxy">Trust Proxy Configuration</h2><p><strong>Setting:</strong> <code>app.set(&quot;trust proxy&quot;, true)</code><br><strong>Location:</strong> <code>app/public/server.js</code> (line 73)<br><strong>Since:</strong> v1.0.46 (HEX-128 Fix)</p>
+<h2 id="trust-proxy">Trust Proxy Configuration</h2><p><strong>Setting:</strong> <code>app.set(&quot;trust proxy&quot;, true)</code><br><strong>Location:</strong> <code>app/public/server.js</code> (line 78)<br><strong>Since:</strong> v1.0.46 (HEX-128 Fix)</p>
 <p><strong>Critical Importance</strong>: HexTrackr <strong>ALWAYS</strong> runs behind nginx reverse proxy. Trust proxy is <strong>ALWAYS</strong> enabled.</p>
 <p><strong>Why This Matters:</strong></p>
 <ol>
@@ -258,22 +295,46 @@ Rate limiting works ✅</code></pre><p><strong>Related Settings:</strong></p>
     <span class="hljs-string">&quot;X-Frame-Options&quot;</span>: <span class="hljs-string">&quot;DENY&quot;</span>,                <span class="hljs-comment">// Prevent clickjacking</span>
     <span class="hljs-string">&quot;X-XSS-Protection&quot;</span>: <span class="hljs-string">&quot;1; mode=block&quot;</span>       <span class="hljs-comment">// Legacy XSS protection</span>
 }</code></pre><p><strong>Note</strong>: HexTrackr does <strong>NOT</strong> use Helmet.js (custom headers instead).</p>
-<h3>Rate Limiting</h3><p><strong>Location:</strong> <code>app/middleware/security.js</code> (lines 152-163)<br><strong>Applied:</strong> <code>/api/*</code> routes only</p>
+<h3>Rate Limiting</h3><p><strong>Location:</strong> <code>app/middleware/security.js</code> (lines 153-182)<br><strong>Applied:</strong> <code>/api/*</code> routes only</p>
 <p><strong>Configuration:</strong></p>
 <pre><code class="language-javascript">{
-    <span class="hljs-attr">windowMs</span>: <span class="hljs-number">15</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>,  <span class="hljs-comment">// 15 minutes</span>
-    <span class="hljs-attr">max</span>: <span class="hljs-number">100</span>,                  <span class="hljs-comment">// 100 requests per window</span>
-    <span class="hljs-attr">standardHeaders</span>: <span class="hljs-literal">true</span>,      <span class="hljs-comment">// Send rate limit info in headers</span>
+    <span class="hljs-attr">windowMs</span>: <span class="hljs-number">15</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>,  <span class="hljs-comment">// 15 minutes (production) / 1 minute (development)</span>
+    <span class="hljs-attr">max</span>: <span class="hljs-number">60</span>,                   <span class="hljs-comment">// 60 requests per window (production) / 10000 (development)</span>
+    <span class="hljs-attr">standardHeaders</span>: <span class="hljs-literal">true</span>,     <span class="hljs-comment">// Send rate limit info in headers</span>
     <span class="hljs-attr">legacyHeaders</span>: <span class="hljs-literal">false</span>,
-    <span class="hljs-attr">trust</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-literal">true</span>          <span class="hljs-comment">// Trust proxy for client IP</span>
-}</code></pre><h3>CORS Middleware</h3><p><strong>Location:</strong> <code>app/middleware/security.js</code> (lines 138-145)<br><strong>Configuration Source:</strong> <code>utils/constants.js</code></p>
+    <span class="hljs-attr">trust</span>: <span class="hljs-function">() =&gt;</span> <span class="hljs-literal">true</span>,         <span class="hljs-comment">// Trust proxy for client IP</span>
+    <span class="hljs-comment">// Cache-aware: Cache HITs are excluded from rate limiting (zero server load)</span>
+    <span class="hljs-attr">skip</span>: <span class="hljs-function">(<span class="hljs-params">req, res</span>) =&gt;</span> {
+        <span class="hljs-keyword">const</span> cacheHeader = res.<span class="hljs-title function_">getHeader</span>(<span class="hljs-string">&quot;X-Cache&quot;</span>);
+        <span class="hljs-keyword">return</span> cacheHeader &amp;&amp; (cacheHeader.<span class="hljs-title function_">includes</span>(<span class="hljs-string">&quot;HIT&quot;</span>) || cacheHeader.<span class="hljs-title function_">includes</span>(<span class="hljs-string">&quot;HIT-LARGE-QUERY&quot;</span>));
+    }
+}</code></pre><h3>CORS Middleware</h3><p><strong>Location:</strong> <code>app/middleware/security.js</code> (lines 138-145)<br><strong>Configuration Source:</strong> <code>utils/constants.js</code> (lines 14-25)</p>
+<p><strong>HTTPS-Only Security:</strong> CORS dynamically allows <strong>ONLY HTTPS connections</strong> - all HTTP origins are rejected.</p>
 <p><strong>Settings:</strong></p>
 <pre><code class="language-javascript">{
-    <span class="hljs-attr">origin</span>: <span class="hljs-variable constant_">CORS_ORIGINS</span>,      <span class="hljs-comment">// Allowed origins</span>
+    <span class="hljs-attr">origin</span>: <span class="hljs-variable constant_">CORS_ORIGINS</span>,      <span class="hljs-comment">// Dynamic function: allows HTTPS, rejects HTTP</span>
     <span class="hljs-attr">methods</span>: <span class="hljs-variable constant_">CORS_METHODS</span>,     <span class="hljs-comment">// Allowed HTTP methods</span>
     <span class="hljs-attr">allowedHeaders</span>: <span class="hljs-variable constant_">CORS_HEADERS</span>,  <span class="hljs-comment">// Allowed headers</span>
     <span class="hljs-attr">credentials</span>: <span class="hljs-literal">true</span>          <span class="hljs-comment">// Allow cookies</span>
-}</code></pre><h3>Input Validation Middleware</h3><p><strong>Location:</strong> <code>app/middleware/security.js</code> (lines 282-304)</p>
+}</code></pre><p><strong>CORS_ORIGINS Function (constants.js:14-25):</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> <span class="hljs-variable constant_">CORS_ORIGINS</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params">origin, callback</span>) {
+    <span class="hljs-comment">// Allow same-origin requests (no origin header)</span>
+    <span class="hljs-keyword">if</span> (!origin) { <span class="hljs-keyword">return</span> <span class="hljs-title function_">callback</span>(<span class="hljs-literal">null</span>, <span class="hljs-literal">true</span>); }
+
+    <span class="hljs-comment">// Allow any HTTPS connection</span>
+    <span class="hljs-keyword">if</span> (origin.<span class="hljs-title function_">startsWith</span>(<span class="hljs-string">&quot;https://&quot;</span>)) {
+        <span class="hljs-keyword">return</span> <span class="hljs-title function_">callback</span>(<span class="hljs-literal">null</span>, <span class="hljs-literal">true</span>);
+    }
+
+    <span class="hljs-comment">// Reject all HTTP connections</span>
+    <span class="hljs-title function_">callback</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&quot;Only HTTPS connections allowed&quot;</span>));
+};</code></pre><p><strong>Security Impact:</strong></p>
+<ul>
+<li>All HTTP origins are <strong>rejected</strong> with error: &quot;Only HTTPS connections allowed&quot;</li>
+<li>HTTPS requirement is enforced at the CORS layer (prevents HTTP API access)</li>
+<li>Same-origin requests (no <code>Origin</code> header) are allowed (server-to-server)</li>
+</ul>
+<h3>Input Validation Middleware</h3><p><strong>Location:</strong> <code>app/middleware/security.js</code> (lines 282-304)</p>
 <p>Validates query parameters for injection attacks.</p>
 <p><strong>Checks:</strong></p>
 <ul>
@@ -480,7 +541,7 @@ router.<span class="hljs-title function_">get</span>(<span class="hljs-string">&
 <tr>
 <td><code>ALLOWED_ORIGINS</code></td>
 <td>CORS whitelist (comma-separated)</td>
-<td><code>http://localhost:8080</code></td>
+<td>Dynamic HTTPS-only function</td>
 </tr>
 <tr>
 <td><code>MAX_FILE_SIZE</code></td>
@@ -490,12 +551,12 @@ router.<span class="hljs-title function_">get</span>(<span class="hljs-string">&
 <tr>
 <td><code>RATE_LIMIT_WINDOW</code></td>
 <td>Rate limit window (ms)</td>
-<td><code>900000</code> (15 min)</td>
+<td><code>900000</code> (15 min prod) / <code>60000</code> (1 min dev)</td>
 </tr>
 <tr>
 <td><code>RATE_LIMIT_MAX</code></td>
 <td>Max requests per window</td>
-<td><code>100</code></td>
+<td><code>60</code> (prod) / <code>10000</code> (dev)</td>
 </tr>
 </tbody></table>
 <hr>
@@ -533,7 +594,7 @@ db.<span class="hljs-title function_">get</span>(<span class="hljs-string">&quot
 <span class="hljs-comment">// ✅ Always validate file paths</span>
 <span class="hljs-keyword">const</span> safePath = <span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">validatePath</span>(userInput);
 <span class="hljs-keyword">const</span> content = <span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">safeReadFileSync</span>(safePath);</code></pre><hr>
-<p><strong>Version</strong>: 1.0.54<br><strong>Last Updated</strong>: 2025-10-09</p>
+<p><strong>Version</strong>: 1.0.66<br><strong>Last Updated</strong>: 2025-10-16</p>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be

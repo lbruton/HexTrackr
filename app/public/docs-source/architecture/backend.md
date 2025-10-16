@@ -18,25 +18,25 @@ The backend is a modular Node.js/Express application providing REST endpoints, r
 
 | Component | Purpose | Location |
 | --------- | ------- | -------- |
-| `server.js` | Main application runtime (orchestration + initialization) | `/app/public/` |
+| `server.js` (~557 lines) | Main application runtime (orchestration + initialization) | `/app/public/` |
 | **Controllers** | Business logic (mixed patterns - see Controller Patterns section) | `/app/controllers/` |
 | **Services** | Data access and business services | `/app/services/` |
 | **Routes** | Express route definitions | `/app/routes/` |
 | **Configuration** | Database, middleware, websocket configs | `/app/config/` |
-| **Utilities** | PathValidator, ProgressTracker, helpers | `/app/utils/` |
+| **Utilities** | PathValidator, ProgressTracker, helpers, seedEmailTemplates | `/app/utils/` |
 | `init-database.js` | Bootstrap base schema & indexes | `/app/public/scripts/` |
-| Rate Limiting | IP-based request throttling (100 req/15min) | Express middleware |
+| Rate Limiting | Cache-aware throttling (60 req/15min prod, 10,000 req/min dev) | Express middleware |
 
 ### Module Organization
 
 | Directory | Contents | Pattern |
 | --------- | -------- | ------- |
-| `/app/controllers/` | 9 controller modules | Singleton pattern (8), Functional (1) |
-| `/app/services/` | 15 service modules | Functional exports with dependency injection |
-| `/app/routes/` | 10 route definition files | Express router pattern |
+| `/app/controllers/` | 11 controller modules | Singleton (6), Constructor (4), Functional (1) |
+| `/app/services/` | 18 service modules | Functional exports with dependency injection |
+| `/app/routes/` | 12 route definition files | Express router pattern |
 | `/app/config/` | 5 configuration modules | Module exports |
 | `/app/middleware/` | 5 middleware modules | Express middleware pattern |
-| `/app/utils/` | 4 utility modules | Static class methods |
+| `/app/utils/` | 5 utility modules | Static class methods and helper functions |
 
 ### Controller Files
 
@@ -48,22 +48,27 @@ The backend is a modular Node.js/Express application providing REST endpoints, r
 | `templateController.js` | Singleton | 7 static methods | `initialize(db)` |
 | `authController.js` | Singleton | 5 static methods | `initialize(db)` |
 | `preferencesController.js` | Singleton | 7 static methods | `initialize(db)` |
-| `kevController.js` | Singleton | 7 static methods | `initialize(db)` |
-| `docsController.js` | Singleton | 2 static methods | Direct instantiation |
+| `kevController.js` *(v1.0.22+)* | Constructor | 7 instance methods | `constructor(db)` |
+| `ciscoController.js` *(v1.0.63+, HEX-141)* | Constructor | 6 instance methods | `constructor(db, preferencesService)` |
+| `paloAltoController.js` *(v1.0.63+, HEX-209)* | Constructor | 6 instance methods | `constructor(db, preferencesService)` |
+| `docsController.js` | Constructor | 2 instance methods | `constructor()` - Direct instantiation |
 | `importController.js` | Functional | 6 exported functions | `setProgressTracker(tracker)` |
 
 ### Service Files
 
 | Service | Purpose | Key Methods |
 | ------- | ------- | ----------- |
-| `databaseService.js` | Core database operations | `getDb()`, `runQuery()`, `transaction()` |
+| `databaseService.js` | Core database operations | `getDb()`, `runQuery()`, `transaction()`, `startAutoVacuum()` |
 | `authService.js` *(v1.0.46+)* | Authentication and session management | `authenticateUser()`, `validateSession()`, `changePassword()` |
 | `vulnerabilityService.js` | Vulnerability CRUD operations | `getVulnerabilities()`, `createVulnerability()`, `streamExport()` |
 | `vulnerabilityStatsService.js` | Statistics and aggregations | `getStats()`, `getTrends()`, `getVendorStats()` |
 | `ticketService.js` | Ticket CRUD operations | `getTickets()`, `createTicket()`, `updateTicket()` |
 | `templateService.js` *(v1.0.46+)* | Email template management | `getTemplates()`, `createTemplate()`, `updateTemplate()` |
-| `preferencesService.js` *(v1.0.46+)* | User preferences CRUD | `getPreferences()`, `updatePreferences()` |
+| `preferencesService.js` *(v1.0.46+)* | User preferences CRUD | `getPreferences()`, `updatePreferences()`, `getPreference()`, `setPreference()` |
 | `kevService.js` *(v1.0.22+)* | CISA KEV integration | `syncKevData()`, `getSyncStatus()`, `getKevByCve()` |
+| `ciscoAdvisoryService.js` *(v1.0.63+, HEX-141)* | Cisco PSIRT advisory integration | `syncCiscoAdvisories()`, `getSyncStatus()`, `getCiscoCredentials()` |
+| `paloAltoService.js` *(v1.0.63+, HEX-209)* | Palo Alto Security Advisory integration | `syncPaloAdvisories()`, `getSyncStatus()`, `fetchPaloAdvisories()` |
+| `hostnameParserService.js` | Hostname parsing and normalization | `parseHostname()`, `extractDomain()`, `normalizeHostname()` |
 | `importService.js` | Import business logic | `processVulnerabilitiesWithLifecycle()`, `bulkLoadToStagingTable()` |
 | `backupService.js` | Backup/restore operations | `getBackupStats()`, `restoreBackup()`, `exportData()` |
 | `docsService.js` | Documentation statistics | `computeStats()`, `computeApiEndpoints()` |
@@ -76,11 +81,11 @@ The backend is a modular Node.js/Express application providing REST endpoints, r
 
 ## Controller Patterns
 
-The backend uses two distinct controller patterns, with ongoing migration toward singleton pattern for consistency:
+The backend uses three distinct controller patterns, balancing consistency with flexibility based on controller requirements:
 
 ### Singleton Pattern Controllers
 
-Eight controllers implement the singleton pattern (`VulnerabilityController`, `TicketController`, `BackupController`, `TemplateController`, `AuthController`, `PreferencesController`, `KevController`, `DocsController`):
+Six controllers implement the singleton pattern (`VulnerabilityController`, `TicketController`, `BackupController`, `TemplateController`, `AuthController`, `PreferencesController`):
 
 ```javascript
 class VulnerabilityController {
@@ -117,9 +122,64 @@ class VulnerabilityController {
 - All route methods are static
 - Throws error if accessed before initialization
 
+### Constructor Pattern Controllers
+
+Four controllers use the constructor pattern (`KevController`, `CiscoController`, `PaloAltoController`, `DocsController`). These controllers instantiate new instances via routes, providing flexibility for dependency injection:
+
+**KevController (Constructor with factory function in routes):**
+
+```javascript
+class KevController {
+    constructor(db) {
+        this.kevService = new KevService(db);
+    }
+
+    async syncKevData(req, res) {
+        // Instance method implementation
+    }
+}
+
+// Route file uses factory function
+module.exports = (db) => {
+    const controller = new KevController(db);
+    const router = express.Router();
+    router.post("/sync", controller.syncKevData.bind(controller));
+    return router;
+};
+```
+
+**CiscoController & PaloAltoController (Constructor with multiple dependencies):**
+
+```javascript
+class CiscoController {
+    constructor(db, preferencesService) {
+        this.ciscoAdvisoryService = new CiscoAdvisoryService(db, preferencesService);
+    }
+
+    async syncCiscoAdvisories(req, res) {
+        // Instance method implementation
+    }
+}
+
+// Route file instantiates with dependencies
+module.exports = (db, preferencesService) => {
+    const controller = new CiscoController(db, preferencesService);
+    const router = express.Router();
+    router.post("/sync", controller.syncCiscoAdvisories.bind(controller));
+    return router;
+};
+```
+
+**Characteristics:**
+
+- Constructor-based dependency injection
+- Instance methods (not static)
+- Route files use factory functions that return configured routers
+- Flexible for controllers with varying dependencies
+
 ### Functional Pattern Controllers
 
-Two controllers (`ImportController`, `DocsController`) use different patterns:
+One controller (`ImportController`) uses functional exports:
 
 **ImportController (Functional exports):**
 
@@ -141,32 +201,11 @@ module.exports = {
 };
 ```
 
-**DocsController (Instance-based):**
+**Pattern Selection Guidelines:**
 
-```javascript
-class DocsController {
-    constructor() {
-        // Direct instantiation
-    }
-
-    async getStats() {
-        // Instance method
-    }
-}
-
-const docsController = new DocsController();
-
-module.exports = {
-    getStats: () => docsController.getStats(),
-    // Wrapped methods...
-};
-```
-
-### Migration Status
-
-| Controller | Current Pattern | Target Pattern | Priority | Status |
-| ---------- | -------------- | -------------- | -------- | ------ |
-| ImportController | Functional | Singleton | Low | Legacy pattern retained for compatibility |
+- **Singleton**: Use for stateless controllers with global dependencies (database, progress tracker)
+- **Constructor**: Use for controllers with varying dependencies or requiring multiple instances
+- **Functional**: Legacy pattern retained for compatibility (ImportController)
 
 ---
 
@@ -181,53 +220,68 @@ async function initializeApplication() {
     const db = databaseService.db;
     global.db = db;  // Maintain compatibility
 
-    // 2. Initialize utilities
+    // 2. Start auto-VACUUM scheduler (HEX-250: Database bloat prevention)
+    await databaseService.startAutoVacuum();
+
+    // 3. Initialize utilities
     const progressTracker = new ProgressTracker(io);
 
-    // 3. Initialize ALL controllers with dependencies
+    // 4. Initialize ALL controllers with dependencies
     // ORDER MATTERS - initialize before importing routes!
+    // Singleton pattern controllers
     VulnerabilityController.initialize(db, progressTracker);
     TicketController.initialize(db);
     BackupController.initialize(db);
     TemplateController.initialize(db);
     AuthController.initialize(db);
     PreferencesController.initialize(db);
-    KevController.initialize(db);
 
-    // For functional controllers
+    // Functional controllers
     ImportController.setProgressTracker(progressTracker);
 
-    // 4. Seed data (if needed)
+    // NOTE: Constructor pattern controllers (KEV, Cisco, Palo Alto, Docs)
+    // are instantiated directly in their route files, not here
+
+    // 5. Seed data (if needed)
     await seedAllTemplates(db);
 
-    // 5. NOW import routes (after controllers are ready)
-    const vulnerabilityRoutes = require("../routes/vulnerabilities");
-    const ticketRoutes = require("../routes/tickets");
-    const backupRoutes = require("../routes/backup");
-    const templateRoutes = require("../routes/templates");
-    const authRoutes = require("../routes/auth");
-    const preferencesRoutes = require("../routes/preferences");
-    const kevRoutes = require("../routes/kev");
-    const importRoutes = require("../routes/imports");
-    const docsRoutes = require("../routes/docs");
-    const devicesRoutes = require("../routes/devices");
+    // 6. Import route modules (loaded at top of file)
+    // Routes are already imported as module dependencies:
+    // const vulnerabilityRoutes = require("../routes/vulnerabilities");
+    // const ticketRoutes = require("../routes/tickets");
+    // const backupRoutes = require("../routes/backup");
+    // const templateRoutes = require("../routes/templates");
+    // const authRoutes = require("../routes/auth");
+    // const preferencesRoutes = require("../routes/preferences");
+    // const kevRoutes = require("../routes/kev");  // Factory function
+    // const ciscoRoutes = require("../routes/cisco");  // Factory function (HEX-141)
+    // const paloRoutes = require("../routes/palo-alto");  // Factory function (HEX-209)
+    // const importRoutes = require("../routes/imports");
+    // const docsRoutes = require("../routes/docs");
+    // const deviceRoutes = require("../routes/devices");
 
-    // 6. Mount routes on Express app
-    app.use("/api/vulnerabilities", vulnerabilityRoutes);
-    app.use("/api/tickets", ticketRoutes);
+    // 7. Mount routes on Express app
+    app.use("/api/docs", docsRoutes);
     app.use("/api/backup", backupRoutes);
+    app.use("/api/vulnerabilities", vulnerabilityRoutes);
+    app.use("/api", importRoutes);  // Import routes at root API level
+    app.use("/api/tickets", ticketRoutes);
     app.use("/api/templates", templateRoutes);
+    app.use("/api/kev", kevRoutes(db));  // Factory function with db
+    app.use("/api/cisco", ciscoRoutes(db, PreferencesController.getInstance().preferencesService));  // HEX-141
+    app.use("/api/palo", paloRoutes(db, PreferencesController.getInstance().preferencesService));  // HEX-209
+    app.use("/api/devices", deviceRoutes);  // HEX-101
     app.use("/api/auth", authRoutes);
     app.use("/api/preferences", preferencesRoutes);
-    app.use("/api/kev", kevRoutes);
-    app.use("/api", importRoutes);  // Import routes at root API level
-    app.use("/api/docs", docsRoutes);
-    app.use("/api/devices", devicesRoutes);
 
-    // 7. Start server
-    server.listen(PORT, () => {
+    // 8. Start server
+    server.listen(PORT, "0.0.0.0", () => {
         console.log(`Server running on port ${PORT}`);
     });
+
+    // 9. Start background sync workers (HEX-141, HEX-209)
+    startCiscoBackgroundSync(db);  // Cisco PSIRT advisory sync
+    // Palo Alto sync is started within startCiscoBackgroundSync()
 }
 ```
 
@@ -282,15 +336,15 @@ class PathValidator {
 | ------- | -------------- | ------- |
 | **Trust Proxy** *(CRITICAL)* | `app.set("trust proxy", true)` | **ALWAYS enabled** - Required for nginx reverse proxy, enables HTTPS detection |
 | **Session Management** *(v1.0.46+)* | `express-session` + SQLite store | 24-hour expiry (30 days with Remember Me), HTTPS-only cookies |
-| **Authentication** *(v1.0.46+)* | Argon2id + `requireAuth` middleware | 46 protected endpoints, account lockout after 5 failed attempts |
+| **Authentication** *(v1.0.46+)* | Argon2id + `requireAuth` middleware | 46+ protected endpoints, account lockout after 5 failed attempts |
 | **CSRF Protection** *(v1.0.46+)* | `csrf-sync` (Synchronizer Token Pattern) | Token-based protection for all state-changing requests |
-| **CORS** | `cors()` with credentials | Configured for cross-origin requests with cookies |
-| **Rate Limiting** | `express-rate-limit` | 1,000 req/15min per IP (increased for single-user use) |
+| **CORS** | `cors()` with dynamic validation | **HTTPS-only** - Rejects HTTP origins, allows same-origin requests |
+| **Rate Limiting** | `express-rate-limit` with cache awareness | **Production**: 60 req/15min per IP, **Development**: 10,000 req/min (cache hits excluded) |
 | **Compression** | `compression()` | **Conditional**: Only if `TRUST_PROXY !== "true"` (avoids double compression with nginx) |
-| **Parsing** | `express.json` & `express.urlencoded` | 100MB limit for large CSV uploads |
-| **Uploads** | `multer` | CSV import only, 100MB cap, MIME type validation |
-| **Security Headers** | Custom middleware | `X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection` |
-| **Static Assets** | `express.static` | Serves root + `docs-html/` directories |
+| **Parsing** | `express.json` & `express.urlencoded` | 100MB limit for request bodies (CSV imports) |
+| **Uploads** | `multer` | CSV import only, 100MB cap, MIME type validation (`text/csv`) |
+| **Security Headers** | Custom middleware | `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `X-XSS-Protection: 1; mode=block` |
+| **Static Assets** | `express.static` | Serves root, `docs-html/`, `dev-docs-html/`, and `/config` directories |
 | **Error Handling** | Global error handler | Catches unhandled errors, formats responses, logs details |
 
 ---
@@ -558,24 +612,27 @@ return `desc:${descriptionHash}|host:${hostIdentifier}`;
 | ------ | --------- | -------------- | ------------- |
 | Health | 1 endpoint | Public | System health check |
 | Authentication *(v1.0.46+)* | 6 endpoints | Mixed | Login, logout, status, CSRF, profile, password change |
-| Vulnerabilities | 18 endpoints | `requireAuth` | CRUD, stats, trends, import/export, vendor stats |
-| Imports | 13 endpoints | `requireAuth` | CSV/JSON imports, progress tracking |
-| Tickets | 5 endpoints | `requireAuth` | Ticket CRUD operations |
-| Backup/Restore | 9 endpoints | `requireAuth` | Backup, restore, JSON/ZIP exports |
-| KEV *(v1.0.22+)* | 7 endpoints | `requireAuth` | CISA KEV sync, status, lookup |
-| Templates *(v1.0.46+)* | 7 endpoints | `requireAuth` | Email template management |
-| Preferences *(v1.0.46+)* | 7 endpoints | `requireAuth` | User preferences CRUD |
+| Vulnerabilities | 18+ endpoints | `requireAuth` | CRUD, stats, trends, import/export, vendor stats |
+| Imports | 13+ endpoints | `requireAuth` | CSV/JSON imports, progress tracking |
+| Tickets | 5+ endpoints | `requireAuth` | Ticket CRUD operations |
+| Backup/Restore | 9+ endpoints | `requireAuth` | Backup, restore, JSON/ZIP exports |
+| KEV *(v1.0.22+)* | 7+ endpoints | `requireAuth` | CISA KEV sync, status, lookup |
+| Cisco PSIRT *(v1.0.63+, HEX-141)* | 6+ endpoints | `requireAuth` | Cisco advisory sync, status, credentials, lookup |
+| Palo Alto Security *(v1.0.63+, HEX-209)* | 6+ endpoints | `requireAuth` | Palo Alto advisory sync, status, lookup |
+| Templates *(v1.0.46+)* | 7+ endpoints | `requireAuth` | Email template management |
+| Preferences *(v1.0.46+)* | 7+ endpoints | `requireAuth` | User preferences CRUD |
 | Devices *(HEX-101)* | 1 endpoint | `requireAuth` | Device statistics with vendor breakdown |
 | Documentation | 2 endpoints | Public | Stats and portal delivery |
 
 ### API Endpoint Summary
 
-- **Total Endpoints**: 75 REST endpoints across 10 route modules
-- **Protected Endpoints**: 46 endpoints with `requireAuth` middleware
-- **Public Endpoints**: 9 endpoints (health, auth, docs)
-- **Import System**: 13 dedicated import endpoints with progress tracking
-- **WebSocket**: Separate progress tracking on port 8988
-- **Rate Limited**: 1,000 requests per 15 minutes per IP (increased for single-user use)
+- **Total Endpoints**: 85+ REST endpoints across 13 route modules
+- **Protected Endpoints**: 46+ endpoints with `requireAuth` middleware
+- **Public Endpoints**: 9+ endpoints (health, auth, docs)
+- **Import System**: 13+ dedicated import endpoints with progress tracking
+- **External Integrations**: CISA KEV, Cisco PSIRT, Palo Alto Security advisories
+- **WebSocket**: Real-time progress tracking on same port as REST API (8080)
+- **Rate Limited**: Production: 60 req/15min, Development: 10,000 req/min (cache hits excluded)
 
 ---
 
@@ -585,11 +642,14 @@ return `desc:${descriptionHash}|host:${hostIdentifier}`;
 
 HexTrackr implements a sophisticated WebSocket-based progress tracking system through the `ProgressTracker` class:
 
-- **Port**: 8988 (separate from REST API)
-- **Library**: Socket.io with enhanced session management
+- **Port**: Same as REST API (8080) - WebSocket runs on the same HTTP/HTTPS server instance
+- **Library**: Socket.io with enhanced session management and authentication
 - **Session Management**: UUID-based sessions with metadata tracking
+- **Authentication**: WebSocket handshake validates Express session cookies
 - **Throttling**: 100ms minimum interval between progress events
 - **Auto-cleanup**: 30-minute session timeout with automatic garbage collection
+
+**Note**: `WEBSOCKET_PORT = 8988` in constants.js is a planned/legacy value, not currently used. The WebSocket server shares the same port as the REST API.
 
 ### ProgressTracker Features
 
@@ -721,28 +781,41 @@ PathValidator.safeUnlinkSync(filePath)
 
 ### Rate Limiting Configuration
 
+**Configuration** (`app/config/middleware.js`):
+
 ```javascript
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP',
-  standardHeaders: true,
-  legacyHeaders: false
-});
+const rateLimit = {
+    windowMs: RATE_LIMIT_WINDOW_MS,  // Dynamic: 15min (prod) / 1min (dev)
+    max: RATE_LIMIT_MAX_REQUESTS,    // 60 (prod) / 10000 (dev)
+    message: RATE_LIMIT_MESSAGE,
+    standardHeaders: true,
+    legacyHeaders: false,
+    validate: { trustProxy: false }  // Disable validation - we trust nginx reverse proxy
+};
 ```
+
+**Constants** (`app/utils/constants.js`):
+
+```javascript
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
+const RATE_LIMIT_WINDOW_MS = IS_PRODUCTION ? 15 * 60 * 1000 : 1 * 60 * 1000; // 15 min (prod) / 1 min (dev)
+const RATE_LIMIT_MAX_REQUESTS = IS_PRODUCTION ? 60 : 10000; // 60 (prod) / 10000 (dev) - cache HITs excluded
+```
+
+**Cache-Aware Rate Limiting**: With the introduction of `cacheService.js` (v1.0.46+), rate limits were reduced from 100 to 60 requests per window (40% reduction) because cached responses are excluded from rate limiting.
 
 ### Future Security Enhancements
 
-| Concern | Planned |
-| ------- | ------- |
-| Authentication | JWT-based authentication with role-based access control |
-| API Security | API key authentication for external integrations |
-| Audit Logging | Central audit logging of security events and rejections |
-| TLS | Built-in HTTPS support with automatic certificate management |
-| Input Validation | JSON schema (Ajv) enforcement for all API endpoints |
-| Structured Logging | Structured JSON logging with request IDs and correlation |
-| Vulnerability Scanning | Automated dependency vulnerability scanning |
-| Secret Management | Environment-based secret management with rotation |
+| Concern | Status | Planned Enhancement |
+| ------- | ------ | ------------------- |
+| ~~Authentication~~ | ✅ **IMPLEMENTED (v1.0.46+)** | Session-based auth with Argon2id, SQLite sessions, 46+ protected endpoints |
+| API Security | Planned | API key authentication for external integrations |
+| Audit Logging | Planned | Central audit logging of security events and rejections |
+| ~~TLS/HTTPS~~ | ✅ **IMPLEMENTED** | HTTPS support via nginx reverse proxy with X-Forwarded-Proto |
+| Input Validation | Partial | JSON schema (Ajv) enforcement for all API endpoints |
+| Structured Logging | Planned | Structured JSON logging with request IDs and correlation |
+| Vulnerability Scanning | Planned | Automated dependency vulnerability scanning (Codacy integration available) |
+| Secret Management | Partial | Environment-based secrets via `.env` (rotation not automated) |
 
 ---
 
@@ -777,11 +850,13 @@ const limiter = rateLimit({
 
 ### Legacy Migration
 
-| Area | Enhancement | Priority |
-| ---- | ---------- | -------- |
-| **Legacy Deprecation** | Retire legacy vulnerabilities table and endpoints | High |
-| **Data Migration** | Automated migration from legacy to rollover architecture | High |
-| **API Versioning** | Implement API versioning for backward compatibility | Medium |
+| Area | Enhancement | Status | Priority |
+| ---- | ---------- | ------ | -------- |
+| **Legacy Deprecation** | Retire legacy vulnerabilities table and endpoints | On Hold | Low |
+| **Data Migration** | Automated migration from legacy to rollover architecture | On Hold | Low |
+| **API Versioning** | Implement API versioning for backward compatibility | Not Started | Medium |
+
+**Note**: Legacy `vulnerabilities` table remains in active use alongside the rollover architecture (`vulnerabilities_current`, `vulnerability_snapshots`). Full deprecation requires careful migration planning to ensure data continuity.
 
 ### Testing & Quality Assurance
 
