@@ -142,6 +142,33 @@
     }
 
     /**
+     * Normalize vendor name from hostname for device icon color coding (HEX-241).
+     * Simplified version of helpers.js normalizeVendor() for frontend use.
+     * @param {string} hostname - Device hostname to analyze.
+     * @returns {string} Normalized vendor name: "CISCO", "Palo Alto", or "Other".
+     */
+    function normalizeVendor(hostname) {
+        if (!hostname || typeof hostname !== "string") {
+            return "Other";
+        }
+
+        const lower = hostname.toLowerCase();
+
+        // Cisco patterns: hostname contains "cisco" OR matches naming convention
+        // Common Cisco naming: <site><location><type><number> (e.g., grim01rtr01, grim01sw01, grim01fw01)
+        if (lower.includes("cisco") || /^[a-z]{4}[a-z0-9]{2}(rtr|sw|fw|asa)/.test(lower)) {
+            return "CISCO";
+        }
+
+        // Palo Alto patterns: hostname contains "pan", "palo", or matches naming convention
+        if (lower.includes("pan") || lower.includes("palo")) {
+            return "Palo Alto";
+        }
+
+        return "Other";
+    }
+
+    /**
      * Build all column definitions for the tickets grid.
      * @param {HexagonTicketsManager} manager - Ticket manager instance.
      * @returns {import('ag-grid-community').ColDef[]}
@@ -296,43 +323,6 @@
                 }
             },
             {
-                headerName: "Devices",
-                field: "devices",
-                colId: "devices",
-                flex: 1,
-                minWidth: 150,
-                filter: "agTextColumnFilter",
-                hide: true, // Hidden to give other columns more space - data available in markdown/modal
-                cellRenderer: (params) => {
-                    const container = document.createElement("div");
-                    container.className = "ticket-grid-multi";
-
-                    const devices = Array.isArray(params.value) ? params.value : [];
-                    const cleaned = devices
-                        .map((device) => (typeof device === "string" ? device.trim() : ""))
-                        .filter(Boolean)
-                        .sort((a, b) => a.localeCompare(b, "en", { sensitivity: "base" }));
-
-                    if (cleaned.length === 0) {
-                        container.appendChild(createElement("span", "N/A", "text-muted"));
-                        return container;
-                    }
-
-                    const primary = document.createElement("span");
-                    primary.className = "ticket-grid-strong";
-                    primary.innerHTML = manager.highlightSearch(cleaned[0]);
-                    container.appendChild(primary);
-
-                    if (cleaned.length > 1) {
-                        const indicator = createElement("span", "…", "ticket-grid-more");
-                        indicator.title = cleaned.join("\n");
-                        container.appendChild(indicator);
-                    }
-
-                    return container;
-                }
-            },
-            {
                 headerName: "Supervisor",
                 field: "supervisor",
                 colId: "supervisor",
@@ -449,6 +439,70 @@
                     label.appendChild(strong);
 
                     return label;
+                }
+            },
+            {
+                headerName: "Devices",
+                field: "devices",
+                colId: "devices",
+                width: 100,
+                minWidth: 90,
+                maxWidth: 120,
+                filter: "agTextColumnFilter",
+                cellClass: "text-center",
+                cellRenderer: (params) => {
+                    const container = document.createElement("div");
+                    container.className = "d-flex align-items-center justify-content-center gap-2";
+
+                    const devices = Array.isArray(params.value) ? params.value : [];
+                    const cleaned = devices
+                        .map((device) => (typeof device === "string" ? device.trim() : ""))
+                        .filter(Boolean);
+
+                    if (cleaned.length === 0) {
+                        container.innerHTML = "<span class=\"text-muted\">N/A</span>";
+                        return container;
+                    }
+
+                    // Detect vendor for color coding (HEX-241)
+                    const vendors = new Set();
+                    cleaned.forEach(hostname => {
+                        const vendor = normalizeVendor(hostname);
+                        vendors.add(vendor);
+                    });
+
+                    // Determine icon color based on vendor mix
+                    let iconColorClass = "text-secondary"; // Default gray
+                    if (vendors.size === 1) {
+                        const vendor = Array.from(vendors)[0];
+                        if (vendor === "CISCO") {
+                            iconColorClass = "text-primary"; // Blue for Cisco
+                        } else if (vendor === "Palo Alto") {
+                            iconColorClass = "text-warning"; // Orange for Palo Alto
+                        }
+                    } else if (vendors.size > 1) {
+                        iconColorClass = "text-info"; // Cyan for mixed vendors
+                    }
+
+                    // Device icon
+                    const icon = document.createElement("i");
+                    icon.className = `ti ti-devices ${iconColorClass}`;
+                    icon.style.fontSize = "1.2rem";
+
+                    // Device count badge
+                    const badge = document.createElement("span");
+                    badge.className = "badge bg-secondary-lt";
+                    badge.textContent = cleaned.length;
+
+                    // Tooltip with boot order (preserves device sequence)
+                    container.title = cleaned.map((device, index) => `#${index}: ${device}`).join("\n");
+                    container.setAttribute("data-bs-toggle", "tooltip");
+                    container.setAttribute("data-bs-placement", "top");
+
+                    container.appendChild(icon);
+                    container.appendChild(badge);
+
+                    return container;
                 }
             },
             {
@@ -625,6 +679,10 @@
             onFirstDataRendered: () => {
                 manager.sizeTicketsGridColumns();
                 manager.updatePaginationDisplay();
+
+                // Initialize Bootstrap tooltips for device count cells (HEX-241)
+                const tooltipTriggerList = document.querySelectorAll("[data-bs-toggle=\"tooltip\"]");
+                [...tooltipTriggerList].map(el => new bootstrap.Tooltip(el));
             },
             onModelUpdated: () => {
                 manager.updatePaginationDisplay();
