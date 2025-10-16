@@ -12,6 +12,8 @@ services:
       - ./app:/app/app
       # Exclude node_modules to use container's version
       - /app/node_modules
+      # Mount config directory for import patterns (HEX-241)
+      - ./config:/app/config:ro
       # Mount database directory for persistence (HEX-133: moved outside public root)
       - ./app/data:/app/app/data:rw
       # Mount uploads directory for file persistence
