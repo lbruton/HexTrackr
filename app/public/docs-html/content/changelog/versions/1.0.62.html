@@ -48,6 +48,45 @@
 </li>
 <li><strong>Improved Click Handling</strong>: Using <code>Element.closest()</code> for reliable event delegation with nested icons</li>
 </ul>
+<h4>Back-to-Top Navigation Button</h4><ul>
+<li><strong>Smart Visibility</strong>: Automatically appears on vulnerabilities.html when page is scrollable and user scrolls &gt; 300px</li>
+<li><strong>Responsive Positioning</strong>: Fixed to bottom-right corner with circular design</li>
+<li><strong>Smooth Transitions</strong>: Fade in/out with 0.3s animation</li>
+<li><strong>Universal Coverage</strong>: Works across all view modes (table, device cards, vulnerability cards)</li>
+<li><strong>Theme Integration</strong>: Uses CSS custom properties for consistent styling in light/dark modes</li>
+</ul>
+<h4>KEV Multi-Vulnerability Picker</h4><ul>
+<li><strong>Smart Badge Display</strong>: KEV badges now show count when device has multiple KEVs (e.g., &quot;KEV (3)&quot;)</li>
+<li><strong>Picker Modal Pattern</strong>: When 2+ KEVs exist, clicking badge opens selection modal with:<ul>
+<li>CVE IDs with severity badges (color-coded by risk level)</li>
+<li>VPR scores for each vulnerability</li>
+<li>Truncated descriptions (100 characters)</li>
+<li>Click-to-view individual KEV details</li>
+</ul>
+</li>
+<li><strong>Single KEV Shortcut</strong>: When device has only 1 KEV, badge click opens details directly (no picker)</li>
+<li><strong>Consistent Implementation</strong>: Same pattern used in both Device Security Overview modal and device cards</li>
+<li><strong>Data Storage Pattern</strong>: Uses <code>window.kevModalData</code> with unique IDs for click handler access</li>
+</ul>
+<h4>Vulnerability Card Sort Enhancements</h4><ul>
+<li><strong>Aligned Naming</strong>: Updated sort options to match device card semantics:<ul>
+<li><strong>KEV Priority</strong>: KEV status (high→low) → VPR score (high→low) → Alphabetical</li>
+<li><strong>VPR Priority</strong>: VPR score (high→low) → Alphabetical</li>
+<li><strong>Device Priority</strong>: # devices (high→low) → VPR score (high→low) → Alphabetical</li>
+<li><strong>Vulnerability A-Z</strong>: Alphabetical by CVE (ascending)</li>
+<li><strong>Vulnerability Z-A</strong>: Alphabetical by CVE (descending)</li>
+</ul>
+</li>
+<li><strong>Multi-Level Sorting</strong>: All sort modes include tertiary alphabetical sorting for consistent tie-breaking</li>
+<li><strong>Default Changed</strong>: KEV Priority now default sort mode (previously VPR Priority)</li>
+</ul>
+<h4>Edit Ticket Modal Improvements</h4><ul>
+<li><strong>View Markdown Button</strong>: Added one-click button to Ticket Number (XT#) card for quick markdown preview access</li>
+<li><strong>Smart Visibility</strong>: Button only appears when editing existing tickets (hidden for new ticket creation)</li>
+<li><strong>Flexbox Positioning</strong>: Button positioned on right side of card using modern layout techniques</li>
+<li><strong>Smooth Modal Transitions</strong>: 300ms delay between closing edit modal and opening view modal</li>
+<li><strong>Visual Clarity</strong>: Eye icon with &quot;View Markdown&quot; label for intuitive understanding</li>
+</ul>
 <h3>🔧 Technical Details</h3><h4>Files Modified</h4><ul>
 <li><p><strong>Backend</strong>:</p>
 <ul>
@@ -58,12 +97,13 @@
 </li>
 <li><p><strong>Frontend</strong>:</p>
 <ul>
-<li><code>app/public/scripts/shared/vulnerability-cards.js</code> - Button state logic, modal implementation</li>
-<li><code>app/public/scripts/shared/device-security-modal.js</code> - Smart ticket button, power tools integration</li>
-<li><code>app/public/scripts/pages/tickets.js</code> - URL parameter handling, device reorder improvements</li>
-<li><code>app/public/vulnerabilities.html</code> - Multi-ticket picker modal HTML, device modal button placeholder</li>
-<li><code>app/public/tickets.html</code> - Tabler Icons CDN, device reorder template updates</li>
+<li><code>app/public/scripts/shared/vulnerability-cards.js</code> - Button state logic, modal implementation, KEV multi-badge handling, vulnerability sort logic updates</li>
+<li><code>app/public/scripts/shared/device-security-modal.js</code> - Smart ticket button, power tools integration, KEV multi-badge handling</li>
+<li><code>app/public/scripts/pages/tickets.js</code> - URL parameter handling, device reorder improvements, view markdown modal switching</li>
+<li><code>app/public/vulnerabilities.html</code> - Multi-ticket picker modal HTML, device modal button placeholder, KEV picker modal HTML, back-to-top button HTML</li>
+<li><code>app/public/tickets.html</code> - Tabler Icons CDN, device reorder template updates, view markdown button</li>
 <li><code>app/public/styles/pages/tickets.css</code> - Device reorder button styling with hover states</li>
+<li><code>app/public/styles/pages/vulnerabilities.css</code> - Back-to-top button styles</li>
 </ul>
 </li>
 </ul>

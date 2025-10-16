@@ -186,8 +186,8 @@
     <span class="hljs-variable constant_">EXPRESS_URLENCODED_LIMIT</span> <span class="hljs-comment">// &quot;50mb&quot;</span>
 } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/constants&#x27;</span>);</code></pre><p><strong>Rate Limiting</strong></p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> {
-    <span class="hljs-variable constant_">RATE_LIMIT_WINDOW_MS</span>,  <span class="hljs-comment">// 15 minutes</span>
-    <span class="hljs-variable constant_">RATE_LIMIT_MAX_REQUESTS</span> <span class="hljs-comment">// 100 (prod) / 1000 (dev)</span>
+    <span class="hljs-variable constant_">RATE_LIMIT_WINDOW_MS</span>,  <span class="hljs-comment">// 15 minutes (prod) / 1 minute (dev)</span>
+    <span class="hljs-variable constant_">RATE_LIMIT_MAX_REQUESTS</span> <span class="hljs-comment">// 60 (prod) / 10000 (dev) - cache HITs excluded</span>
 } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/constants&#x27;</span>);</code></pre><p><strong>Security Headers</strong></p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> {
     <span class="hljs-variable constant_">X_CONTENT_TYPE_OPTIONS</span>, <span class="hljs-comment">// &quot;nosniff&quot;</span>
@@ -229,12 +229,12 @@
     <span class="hljs-variable constant_">WEB_IMPORT_SOURCE</span>      <span class="hljs-comment">// &quot;web&quot;</span>
 } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/constants&#x27;</span>);</code></pre><p><strong>Used By:</strong> All backend modules (server, controllers, services, middleware)</p>
 <hr>
-<h3>PathValidator.js - Security Utility Class</h3><p><strong>Location:</strong> <code>app/utils/PathValidator.js</code><br><strong>Since:</strong> v1.0.46 (Security enhancement)<br><strong>Purpose:</strong> Prevent directory traversal attacks and validate file paths</p>
+<h3>PathValidator Class - Security Utility</h3><p><strong>Location:</strong> <code>app/middleware/security.js</code> (lines 36-131)<br><strong>Since:</strong> v1.0.22<br><strong>Purpose:</strong> Prevent directory traversal attacks and validate file paths</p>
 <h4>Key Methods</h4><p><strong><code>PathValidator.validatePath(filePath)</code></strong></p>
 <p>Validate and normalize paths, detect traversal attempts.</p>
 <p><strong>Throws:</strong> Error if path contains traversal patterns (<code>../</code>, absolute paths, null bytes)</p>
 <p><strong>Returns:</strong> Normalized safe path</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">const</span> <span class="hljs-title class_">PathValidator</span> = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./utils/PathValidator&#x27;</span>);
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> { <span class="hljs-title class_">PathValidator</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;../middleware/security&#x27;</span>);
 
 <span class="hljs-comment">// Valid path</span>
 <span class="hljs-keyword">const</span> safe = <span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">validatePath</span>(<span class="hljs-string">&quot;uploads/data.csv&quot;</span>);
@@ -282,7 +282,7 @@
 <p><strong><code>PathValidator.safeUnlinkSync(filePath)</code></strong></p>
 <p>Secure file deletion wrapper.</p>
 <pre><code class="language-javascript"><span class="hljs-title class_">PathValidator</span>.<span class="hljs-title function_">safeUnlinkSync</span>(<span class="hljs-string">&quot;uploads/temp.csv&quot;</span>); <span class="hljs-comment">// Delete file</span></code></pre><hr>
-<p><strong>Used By:</strong> helpers.js, version-manager.js, documentation controllers, file upload handlers</p>
+<p><strong>Used By:</strong> Exported from security.js, used by version-manager.js, documentation controllers, file upload handlers</p>
 <hr>
 <h3>ProgressTracker.js - Real-time Progress Management</h3><p><strong>Location:</strong> <code>app/utils/ProgressTracker.js</code><br><strong>Since:</strong> v1.0.0 (WebSocket integration)<br><strong>Purpose:</strong> WebSocket-based progress tracking for long-running operations (CSV imports, backups)</p>
 <h4>Key Methods</h4><p><strong><code>constructor(io)</code></strong></p>
@@ -1159,7 +1159,7 @@ errorMessages.<span class="hljs-property">api</span>.<span class="hljs-property"
 <li><strong>Template variables</strong>: 20 variables across 6 categories with type-based recommendations</li>
 </ul>
 <hr>
-<p><strong>Last Updated:</strong> 2025-10-09<br><strong>Version:</strong> 1.0.54</p>
+<p><strong>Last Updated:</strong> 2025-10-16<br><strong>Version:</strong> 1.0.66</p>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be
