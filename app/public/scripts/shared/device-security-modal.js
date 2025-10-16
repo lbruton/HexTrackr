@@ -437,7 +437,10 @@ class DeviceSecurityModal {
                 colId: "first_seen",
                 width: 120,
                 cellRenderer: (params) => {
-                    return params.value ? new Date(params.value + 'T00:00:00').toLocaleDateString() : "N/A";
+                    if (params.value && typeof params.value === 'string' && params.value.trim() !== "") {
+                        return new Date(params.value).toLocaleDateString();
+                    }
+                    return "N/A";
                 }
             },
             {
