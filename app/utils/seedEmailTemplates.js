@@ -58,10 +58,13 @@ We have submitted a Hexagon work order ([HEXAGON_NUM]) for the [SITE_NAME] site.
 
 We are shipping replacement equipment that needs to be installed.
 
-**SHIPPING DETAILS:**
-• Equipment Ship To: [SITE_ADDRESS]
+**SHIPPING ADDRESS:**
+[SITE_ADDRESS]
 • Tracking Number: [TRACKING_NUMBER]
-• Return Old Equipment To: [RETURN_ADDRESS]
+
+**RETURN ADDRESS:**
+[RETURN_ADDRESS]
+• Return Tracking: [RETURN_TRACKING]
 
 Please see the attached notes for more information. If you have any questions or concerns please feel free to reach out to NetOps at netops@oneok.com.
 
@@ -195,10 +198,13 @@ const markdownReplacementTemplate = `# Hexagon Work Request
 **Overview:**
 Replacement equipment is being shipped for installation at the [SITE_NAME] site.
 
-**Shipping Information:**
-- Ship To: [SITE_ADDRESS]
+**Shipping Address:**
+[SITE_ADDRESS]
 - Tracking: [TRACKING_NUMBER]
-- Return Address: [RETURN_ADDRESS]
+
+**Return Address:**
+[RETURN_ADDRESS]
+- Return Tracking: [RETURN_TRACKING]
 
 **Equipment to be Replaced:**
 The following [DEVICE_COUNT] device(s) will be replaced:

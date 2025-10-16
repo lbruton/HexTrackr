@@ -321,6 +321,38 @@ class TicketController {
             });
         }
     }
+
+    /**
+     * Get address suggestions for autofill based on site and location
+     * Returns most recent addresses (shipping and return) from matching tickets
+     * @route GET /api/tickets/address-suggestions?site=XXX&location=YYY
+     */
+    static async getAddressSuggestions(req, res) {
+        try {
+            const controller = TicketController.getInstance();
+            const { site, location } = req.query;
+
+            if (!site || !location) {
+                return res.status(400).json({
+                    success: false,
+                    error: "site and location query parameters are required"
+                });
+            }
+
+            const addresses = await controller.ticketService.getAddressesBySiteLocation(site, location);
+            res.json({
+                success: true,
+                data: addresses
+            });
+        } catch (error) {
+            console.error("Error fetching address suggestions:", error);
+            res.status(500).json({
+                success: false,
+                error: "Failed to fetch address suggestions",
+                details: error.message
+            });
+        }
+    }
 }
 
 module.exports = TicketController;

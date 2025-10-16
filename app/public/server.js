@@ -301,8 +301,16 @@ async function initializeApplication() {
     });
 
     // Documentation deep-link redirects (mirror original behavior)
-    app.get(/^\/docs-html\/([^\/]+)\.html$/, (req, res) => {
+    app.get(/^\/docs-html\/([^\/]+)\.html$/, (req, res, next) => {
         let section = req.params[0];
+        // Standalone pages that should NOT be redirected to the portal
+        const standalonePages = ["database-erd-full"];
+
+        // If it's a standalone page, let it pass through to static middleware
+        if (standalonePages.includes(section)) {
+            return next();
+        }
+
         const validSections = [
             "getting-started", "user-guides", "development", "architecture",
             "api-reference", "project-management", "security", "index",

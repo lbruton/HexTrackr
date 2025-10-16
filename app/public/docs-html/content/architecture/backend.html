@@ -19,7 +19,7 @@
 </tr>
 </thead>
 <tbody><tr>
-<td><code>server.js</code></td>
+<td><code>server.js</code> (~557 lines)</td>
 <td>Main application runtime (orchestration + initialization)</td>
 <td><code>/app/public/</code></td>
 </tr>
@@ -45,7 +45,7 @@
 </tr>
 <tr>
 <td><strong>Utilities</strong></td>
-<td>PathValidator, ProgressTracker, helpers</td>
+<td>PathValidator, ProgressTracker, helpers, seedEmailTemplates</td>
 <td><code>/app/utils/</code></td>
 </tr>
 <tr>
@@ -55,7 +55,7 @@
 </tr>
 <tr>
 <td>Rate Limiting</td>
-<td>IP-based request throttling (100 req/15min)</td>
+<td>Cache-aware throttling (60 req/15min prod, 10,000 req/min dev)</td>
 <td>Express middleware</td>
 </tr>
 </tbody></table>
@@ -69,17 +69,17 @@
 </thead>
 <tbody><tr>
 <td><code>/app/controllers/</code></td>
-<td>9 controller modules</td>
-<td>Singleton pattern (8), Functional (1)</td>
+<td>11 controller modules</td>
+<td>Singleton (6), Constructor (4), Functional (1)</td>
 </tr>
 <tr>
 <td><code>/app/services/</code></td>
-<td>15 service modules</td>
+<td>18 service modules</td>
 <td>Functional exports with dependency injection</td>
 </tr>
 <tr>
 <td><code>/app/routes/</code></td>
-<td>10 route definition files</td>
+<td>12 route definition files</td>
 <td>Express router pattern</td>
 </tr>
 <tr>
@@ -94,8 +94,8 @@
 </tr>
 <tr>
 <td><code>/app/utils/</code></td>
-<td>4 utility modules</td>
-<td>Static class methods</td>
+<td>5 utility modules</td>
+<td>Static class methods and helper functions</td>
 </tr>
 </tbody></table>
 <h3>Controller Files</h3><table>
@@ -144,16 +144,28 @@
 <td><code>initialize(db)</code></td>
 </tr>
 <tr>
-<td><code>kevController.js</code></td>
-<td>Singleton</td>
-<td>7 static methods</td>
-<td><code>initialize(db)</code></td>
+<td><code>kevController.js</code> <em>(v1.0.22+)</em></td>
+<td>Constructor</td>
+<td>7 instance methods</td>
+<td><code>constructor(db)</code></td>
+</tr>
+<tr>
+<td><code>ciscoController.js</code> <em>(v1.0.63+, HEX-141)</em></td>
+<td>Constructor</td>
+<td>6 instance methods</td>
+<td><code>constructor(db, preferencesService)</code></td>
+</tr>
+<tr>
+<td><code>paloAltoController.js</code> <em>(v1.0.63+, HEX-209)</em></td>
+<td>Constructor</td>
+<td>6 instance methods</td>
+<td><code>constructor(db, preferencesService)</code></td>
 </tr>
 <tr>
 <td><code>docsController.js</code></td>
-<td>Singleton</td>
-<td>2 static methods</td>
-<td>Direct instantiation</td>
+<td>Constructor</td>
+<td>2 instance methods</td>
+<td><code>constructor()</code> - Direct instantiation</td>
 </tr>
 <tr>
 <td><code>importController.js</code></td>
@@ -173,7 +185,7 @@
 <tbody><tr>
 <td><code>databaseService.js</code></td>
 <td>Core database operations</td>
-<td><code>getDb()</code>, <code>runQuery()</code>, <code>transaction()</code></td>
+<td><code>getDb()</code>, <code>runQuery()</code>, <code>transaction()</code>, <code>startAutoVacuum()</code></td>
 </tr>
 <tr>
 <td><code>authService.js</code> <em>(v1.0.46+)</em></td>
@@ -203,12 +215,27 @@
 <tr>
 <td><code>preferencesService.js</code> <em>(v1.0.46+)</em></td>
 <td>User preferences CRUD</td>
-<td><code>getPreferences()</code>, <code>updatePreferences()</code></td>
+<td><code>getPreferences()</code>, <code>updatePreferences()</code>, <code>getPreference()</code>, <code>setPreference()</code></td>
 </tr>
 <tr>
 <td><code>kevService.js</code> <em>(v1.0.22+)</em></td>
 <td>CISA KEV integration</td>
 <td><code>syncKevData()</code>, <code>getSyncStatus()</code>, <code>getKevByCve()</code></td>
+</tr>
+<tr>
+<td><code>ciscoAdvisoryService.js</code> <em>(v1.0.63+, HEX-141)</em></td>
+<td>Cisco PSIRT advisory integration</td>
+<td><code>syncCiscoAdvisories()</code>, <code>getSyncStatus()</code>, <code>getCiscoCredentials()</code></td>
+</tr>
+<tr>
+<td><code>paloAltoService.js</code> <em>(v1.0.63+, HEX-209)</em></td>
+<td>Palo Alto Security Advisory integration</td>
+<td><code>syncPaloAdvisories()</code>, <code>getSyncStatus()</code>, <code>fetchPaloAdvisories()</code></td>
+</tr>
+<tr>
+<td><code>hostnameParserService.js</code></td>
+<td>Hostname parsing and normalization</td>
+<td><code>parseHostname()</code>, <code>extractDomain()</code>, <code>normalizeHostname()</code></td>
 </tr>
 <tr>
 <td><code>importService.js</code></td>
@@ -247,8 +274,8 @@
 </tr>
 </tbody></table>
 <hr>
-<h2>Controller Patterns</h2><p>The backend uses two distinct controller patterns, with ongoing migration toward singleton pattern for consistency:</p>
-<h3>Singleton Pattern Controllers</h3><p>Eight controllers implement the singleton pattern (<code>VulnerabilityController</code>, <code>TicketController</code>, <code>BackupController</code>, <code>TemplateController</code>, <code>AuthController</code>, <code>PreferencesController</code>, <code>KevController</code>, <code>DocsController</code>):</p>
+<h2>Controller Patterns</h2><p>The backend uses three distinct controller patterns, balancing consistency with flexibility based on controller requirements:</p>
+<h3>Singleton Pattern Controllers</h3><p>Six controllers implement the singleton pattern (<code>VulnerabilityController</code>, <code>TicketController</code>, <code>BackupController</code>, <code>TemplateController</code>, <code>AuthController</code>, <code>PreferencesController</code>):</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">VulnerabilityController</span> {
     <span class="hljs-keyword">static</span> instance = <span class="hljs-literal">null</span>;
 
@@ -280,7 +307,49 @@
 <li>All route methods are static</li>
 <li>Throws error if accessed before initialization</li>
 </ul>
-<h3>Functional Pattern Controllers</h3><p>Two controllers (<code>ImportController</code>, <code>DocsController</code>) use different patterns:</p>
+<h3>Constructor Pattern Controllers</h3><p>Four controllers use the constructor pattern (<code>KevController</code>, <code>CiscoController</code>, <code>PaloAltoController</code>, <code>DocsController</code>). These controllers instantiate new instances via routes, providing flexibility for dependency injection:</p>
+<p><strong>KevController (Constructor with factory function in routes):</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">KevController</span> {
+    <span class="hljs-title function_">constructor</span>(<span class="hljs-params">db</span>) {
+        <span class="hljs-variable language_">this</span>.<span class="hljs-property">kevService</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">KevService</span>(db);
+    }
+
+    <span class="hljs-keyword">async</span> <span class="hljs-title function_">syncKevData</span>(<span class="hljs-params">req, res</span>) {
+        <span class="hljs-comment">// Instance method implementation</span>
+    }
+}
+
+<span class="hljs-comment">// Route file uses factory function</span>
+<span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = <span class="hljs-function">(<span class="hljs-params">db</span>) =&gt;</span> {
+    <span class="hljs-keyword">const</span> controller = <span class="hljs-keyword">new</span> <span class="hljs-title class_">KevController</span>(db);
+    <span class="hljs-keyword">const</span> router = express.<span class="hljs-title class_">Router</span>();
+    router.<span class="hljs-title function_">post</span>(<span class="hljs-string">&quot;/sync&quot;</span>, controller.<span class="hljs-property">syncKevData</span>.<span class="hljs-title function_">bind</span>(controller));
+    <span class="hljs-keyword">return</span> router;
+};</code></pre><p><strong>CiscoController &amp; PaloAltoController (Constructor with multiple dependencies):</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">CiscoController</span> {
+    <span class="hljs-title function_">constructor</span>(<span class="hljs-params">db, preferencesService</span>) {
+        <span class="hljs-variable language_">this</span>.<span class="hljs-property">ciscoAdvisoryService</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">CiscoAdvisoryService</span>(db, preferencesService);
+    }
+
+    <span class="hljs-keyword">async</span> <span class="hljs-title function_">syncCiscoAdvisories</span>(<span class="hljs-params">req, res</span>) {
+        <span class="hljs-comment">// Instance method implementation</span>
+    }
+}
+
+<span class="hljs-comment">// Route file instantiates with dependencies</span>
+<span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = <span class="hljs-function">(<span class="hljs-params">db, preferencesService</span>) =&gt;</span> {
+    <span class="hljs-keyword">const</span> controller = <span class="hljs-keyword">new</span> <span class="hljs-title class_">CiscoController</span>(db, preferencesService);
+    <span class="hljs-keyword">const</span> router = express.<span class="hljs-title class_">Router</span>();
+    router.<span class="hljs-title function_">post</span>(<span class="hljs-string">&quot;/sync&quot;</span>, controller.<span class="hljs-property">syncCiscoAdvisories</span>.<span class="hljs-title function_">bind</span>(controller));
+    <span class="hljs-keyword">return</span> router;
+};</code></pre><p><strong>Characteristics:</strong></p>
+<ul>
+<li>Constructor-based dependency injection</li>
+<li>Instance methods (not static)</li>
+<li>Route files use factory functions that return configured routers</li>
+<li>Flexible for controllers with varying dependencies</li>
+</ul>
+<h3>Functional Pattern Controllers</h3><p>One controller (<code>ImportController</code>) uses functional exports:</p>
 <p><strong>ImportController (Functional exports):</strong></p>
 <pre><code class="language-javascript"><span class="hljs-keyword">let</span> progressTracker = <span class="hljs-literal">null</span>;
 
@@ -296,40 +365,12 @@
     setProgressTracker,
     importVulnerabilities,
     <span class="hljs-comment">// Other functions...</span>
-};</code></pre><p><strong>DocsController (Instance-based):</strong></p>
-<pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">DocsController</span> {
-    <span class="hljs-title function_">constructor</span>(<span class="hljs-params"></span>) {
-        <span class="hljs-comment">// Direct instantiation</span>
-    }
-
-    <span class="hljs-keyword">async</span> <span class="hljs-title function_">getStats</span>(<span class="hljs-params"></span>) {
-        <span class="hljs-comment">// Instance method</span>
-    }
-}
-
-<span class="hljs-keyword">const</span> docsController = <span class="hljs-keyword">new</span> <span class="hljs-title class_">DocsController</span>();
-
-<span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = {
-    <span class="hljs-attr">getStats</span>: <span class="hljs-function">() =&gt;</span> docsController.<span class="hljs-title function_">getStats</span>(),
-    <span class="hljs-comment">// Wrapped methods...</span>
-};</code></pre><h3>Migration Status</h3><table>
-<thead>
-<tr>
-<th>Controller</th>
-<th>Current Pattern</th>
-<th>Target Pattern</th>
-<th>Priority</th>
-<th>Status</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>ImportController</td>
-<td>Functional</td>
-<td>Singleton</td>
-<td>Low</td>
-<td>Legacy pattern retained for compatibility</td>
-</tr>
-</tbody></table>
+};</code></pre><p><strong>Pattern Selection Guidelines:</strong></p>
+<ul>
+<li><strong>Singleton</strong>: Use for stateless controllers with global dependencies (database, progress tracker)</li>
+<li><strong>Constructor</strong>: Use for controllers with varying dependencies or requiring multiple instances</li>
+<li><strong>Functional</strong>: Legacy pattern retained for compatibility (ImportController)</li>
+</ul>
 <hr>
 <h2>Initialization Sequence</h2><p><strong>CRITICAL</strong>: The initialization order is crucial for proper dependency injection. Controllers must be initialized BEFORE routes are imported.</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">initializeApplication</span>(<span class="hljs-params"></span>) {
@@ -338,53 +379,68 @@
     <span class="hljs-keyword">const</span> db = databaseService.<span class="hljs-property">db</span>;
     <span class="hljs-variable language_">global</span>.<span class="hljs-property">db</span> = db;  <span class="hljs-comment">// Maintain compatibility</span>
 
-    <span class="hljs-comment">// 2. Initialize utilities</span>
+    <span class="hljs-comment">// 2. Start auto-VACUUM scheduler (HEX-250: Database bloat prevention)</span>
+    <span class="hljs-keyword">await</span> databaseService.<span class="hljs-title function_">startAutoVacuum</span>();
+
+    <span class="hljs-comment">// 3. Initialize utilities</span>
     <span class="hljs-keyword">const</span> progressTracker = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ProgressTracker</span>(io);
 
-    <span class="hljs-comment">// 3. Initialize ALL controllers with dependencies</span>
+    <span class="hljs-comment">// 4. Initialize ALL controllers with dependencies</span>
     <span class="hljs-comment">// ORDER MATTERS - initialize before importing routes!</span>
+    <span class="hljs-comment">// Singleton pattern controllers</span>
     <span class="hljs-title class_">VulnerabilityController</span>.<span class="hljs-title function_">initialize</span>(db, progressTracker);
     <span class="hljs-title class_">TicketController</span>.<span class="hljs-title function_">initialize</span>(db);
     <span class="hljs-title class_">BackupController</span>.<span class="hljs-title function_">initialize</span>(db);
     <span class="hljs-title class_">TemplateController</span>.<span class="hljs-title function_">initialize</span>(db);
     <span class="hljs-title class_">AuthController</span>.<span class="hljs-title function_">initialize</span>(db);
     <span class="hljs-title class_">PreferencesController</span>.<span class="hljs-title function_">initialize</span>(db);
-    <span class="hljs-title class_">KevController</span>.<span class="hljs-title function_">initialize</span>(db);
 
-    <span class="hljs-comment">// For functional controllers</span>
+    <span class="hljs-comment">// Functional controllers</span>
     <span class="hljs-title class_">ImportController</span>.<span class="hljs-title function_">setProgressTracker</span>(progressTracker);
 
-    <span class="hljs-comment">// 4. Seed data (if needed)</span>
+    <span class="hljs-comment">// <span class="hljs-doctag">NOTE:</span> Constructor pattern controllers (KEV, Cisco, Palo Alto, Docs)</span>
+    <span class="hljs-comment">// are instantiated directly in their route files, not here</span>
+
+    <span class="hljs-comment">// 5. Seed data (if needed)</span>
     <span class="hljs-keyword">await</span> <span class="hljs-title function_">seedAllTemplates</span>(db);
 
-    <span class="hljs-comment">// 5. NOW import routes (after controllers are ready)</span>
-    <span class="hljs-keyword">const</span> vulnerabilityRoutes = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;../routes/vulnerabilities&quot;</span>);
-    <span class="hljs-keyword">const</span> ticketRoutes = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;../routes/tickets&quot;</span>);
-    <span class="hljs-keyword">const</span> backupRoutes = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;../routes/backup&quot;</span>);
-    <span class="hljs-keyword">const</span> templateRoutes = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;../routes/templates&quot;</span>);
-    <span class="hljs-keyword">const</span> authRoutes = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;../routes/auth&quot;</span>);
-    <span class="hljs-keyword">const</span> preferencesRoutes = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;../routes/preferences&quot;</span>);
-    <span class="hljs-keyword">const</span> kevRoutes = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;../routes/kev&quot;</span>);
-    <span class="hljs-keyword">const</span> importRoutes = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;../routes/imports&quot;</span>);
-    <span class="hljs-keyword">const</span> docsRoutes = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;../routes/docs&quot;</span>);
-    <span class="hljs-keyword">const</span> devicesRoutes = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;../routes/devices&quot;</span>);
+    <span class="hljs-comment">// 6. Import route modules (loaded at top of file)</span>
+    <span class="hljs-comment">// Routes are already imported as module dependencies:</span>
+    <span class="hljs-comment">// const vulnerabilityRoutes = require(&quot;../routes/vulnerabilities&quot;);</span>
+    <span class="hljs-comment">// const ticketRoutes = require(&quot;../routes/tickets&quot;);</span>
+    <span class="hljs-comment">// const backupRoutes = require(&quot;../routes/backup&quot;);</span>
+    <span class="hljs-comment">// const templateRoutes = require(&quot;../routes/templates&quot;);</span>
+    <span class="hljs-comment">// const authRoutes = require(&quot;../routes/auth&quot;);</span>
+    <span class="hljs-comment">// const preferencesRoutes = require(&quot;../routes/preferences&quot;);</span>
+    <span class="hljs-comment">// const kevRoutes = require(&quot;../routes/kev&quot;);  // Factory function</span>
+    <span class="hljs-comment">// const ciscoRoutes = require(&quot;../routes/cisco&quot;);  // Factory function (HEX-141)</span>
+    <span class="hljs-comment">// const paloRoutes = require(&quot;../routes/palo-alto&quot;);  // Factory function (HEX-209)</span>
+    <span class="hljs-comment">// const importRoutes = require(&quot;../routes/imports&quot;);</span>
+    <span class="hljs-comment">// const docsRoutes = require(&quot;../routes/docs&quot;);</span>
+    <span class="hljs-comment">// const deviceRoutes = require(&quot;../routes/devices&quot;);</span>
 
-    <span class="hljs-comment">// 6. Mount routes on Express app</span>
-    app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/vulnerabilities&quot;</span>, vulnerabilityRoutes);
-    app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/tickets&quot;</span>, ticketRoutes);
+    <span class="hljs-comment">// 7. Mount routes on Express app</span>
+    app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/docs&quot;</span>, docsRoutes);
     app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/backup&quot;</span>, backupRoutes);
+    app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/vulnerabilities&quot;</span>, vulnerabilityRoutes);
+    app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api&quot;</span>, importRoutes);  <span class="hljs-comment">// Import routes at root API level</span>
+    app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/tickets&quot;</span>, ticketRoutes);
     app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/templates&quot;</span>, templateRoutes);
+    app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/kev&quot;</span>, <span class="hljs-title function_">kevRoutes</span>(db));  <span class="hljs-comment">// Factory function with db</span>
+    app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/cisco&quot;</span>, <span class="hljs-title function_">ciscoRoutes</span>(db, <span class="hljs-title class_">PreferencesController</span>.<span class="hljs-title function_">getInstance</span>().<span class="hljs-property">preferencesService</span>));  <span class="hljs-comment">// HEX-141</span>
+    app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/palo&quot;</span>, <span class="hljs-title function_">paloRoutes</span>(db, <span class="hljs-title class_">PreferencesController</span>.<span class="hljs-title function_">getInstance</span>().<span class="hljs-property">preferencesService</span>));  <span class="hljs-comment">// HEX-209</span>
+    app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/devices&quot;</span>, deviceRoutes);  <span class="hljs-comment">// HEX-101</span>
     app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/auth&quot;</span>, authRoutes);
     app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/preferences&quot;</span>, preferencesRoutes);
-    app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/kev&quot;</span>, kevRoutes);
-    app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api&quot;</span>, importRoutes);  <span class="hljs-comment">// Import routes at root API level</span>
-    app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/docs&quot;</span>, docsRoutes);
-    app.<span class="hljs-title function_">use</span>(<span class="hljs-string">&quot;/api/devices&quot;</span>, devicesRoutes);
 
-    <span class="hljs-comment">// 7. Start server</span>
-    server.<span class="hljs-title function_">listen</span>(<span class="hljs-variable constant_">PORT</span>, <span class="hljs-function">() =&gt;</span> {
+    <span class="hljs-comment">// 8. Start server</span>
+    server.<span class="hljs-title function_">listen</span>(<span class="hljs-variable constant_">PORT</span>, <span class="hljs-string">&quot;0.0.0.0&quot;</span>, <span class="hljs-function">() =&gt;</span> {
         <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Server running on port <span class="hljs-subst">${PORT}</span>`</span>);
     });
+
+    <span class="hljs-comment">// 9. Start background sync workers (HEX-141, HEX-209)</span>
+    <span class="hljs-title function_">startCiscoBackgroundSync</span>(db);  <span class="hljs-comment">// Cisco PSIRT advisory sync</span>
+    <span class="hljs-comment">// Palo Alto sync is started within startCiscoBackgroundSync()</span>
 }</code></pre><h3>Common Initialization Errors</h3><table>
 <thead>
 <tr>
@@ -464,7 +520,7 @@
 <tr>
 <td><strong>Authentication</strong> <em>(v1.0.46+)</em></td>
 <td>Argon2id + <code>requireAuth</code> middleware</td>
-<td>46 protected endpoints, account lockout after 5 failed attempts</td>
+<td>46+ protected endpoints, account lockout after 5 failed attempts</td>
 </tr>
 <tr>
 <td><strong>CSRF Protection</strong> <em>(v1.0.46+)</em></td>
@@ -473,13 +529,13 @@
 </tr>
 <tr>
 <td><strong>CORS</strong></td>
-<td><code>cors()</code> with credentials</td>
-<td>Configured for cross-origin requests with cookies</td>
+<td><code>cors()</code> with dynamic validation</td>
+<td><strong>HTTPS-only</strong> - Rejects HTTP origins, allows same-origin requests</td>
 </tr>
 <tr>
 <td><strong>Rate Limiting</strong></td>
-<td><code>express-rate-limit</code></td>
-<td>1,000 req/15min per IP (increased for single-user use)</td>
+<td><code>express-rate-limit</code> with cache awareness</td>
+<td><strong>Production</strong>: 60 req/15min per IP, <strong>Development</strong>: 10,000 req/min (cache hits excluded)</td>
 </tr>
 <tr>
 <td><strong>Compression</strong></td>
@@ -489,22 +545,22 @@
 <tr>
 <td><strong>Parsing</strong></td>
 <td><code>express.json</code> &amp; <code>express.urlencoded</code></td>
-<td>100MB limit for large CSV uploads</td>
+<td>100MB limit for request bodies (CSV imports)</td>
 </tr>
 <tr>
 <td><strong>Uploads</strong></td>
 <td><code>multer</code></td>
-<td>CSV import only, 100MB cap, MIME type validation</td>
+<td>CSV import only, 100MB cap, MIME type validation (<code>text/csv</code>)</td>
 </tr>
 <tr>
 <td><strong>Security Headers</strong></td>
 <td>Custom middleware</td>
-<td><code>X-Content-Type-Options</code>, <code>X-Frame-Options</code>, <code>X-XSS-Protection</code></td>
+<td><code>X-Content-Type-Options: nosniff</code>, <code>X-Frame-Options: DENY</code>, <code>X-XSS-Protection: 1; mode=block</code></td>
 </tr>
 <tr>
 <td><strong>Static Assets</strong></td>
 <td><code>express.static</code></td>
-<td>Serves root + <code>docs-html/</code> directories</td>
+<td>Serves root, <code>docs-html/</code>, <code>dev-docs-html/</code>, and <code>/config</code> directories</td>
 </tr>
 <tr>
 <td><strong>Error Handling</strong></td>
@@ -732,43 +788,55 @@ router.<span class="hljs-title function_">post</span>(<span class="hljs-string">
 </tr>
 <tr>
 <td>Vulnerabilities</td>
-<td>18 endpoints</td>
+<td>18+ endpoints</td>
 <td><code>requireAuth</code></td>
 <td>CRUD, stats, trends, import/export, vendor stats</td>
 </tr>
 <tr>
 <td>Imports</td>
-<td>13 endpoints</td>
+<td>13+ endpoints</td>
 <td><code>requireAuth</code></td>
 <td>CSV/JSON imports, progress tracking</td>
 </tr>
 <tr>
 <td>Tickets</td>
-<td>5 endpoints</td>
+<td>5+ endpoints</td>
 <td><code>requireAuth</code></td>
 <td>Ticket CRUD operations</td>
 </tr>
 <tr>
 <td>Backup/Restore</td>
-<td>9 endpoints</td>
+<td>9+ endpoints</td>
 <td><code>requireAuth</code></td>
 <td>Backup, restore, JSON/ZIP exports</td>
 </tr>
 <tr>
 <td>KEV <em>(v1.0.22+)</em></td>
-<td>7 endpoints</td>
+<td>7+ endpoints</td>
 <td><code>requireAuth</code></td>
 <td>CISA KEV sync, status, lookup</td>
 </tr>
 <tr>
+<td>Cisco PSIRT <em>(v1.0.63+, HEX-141)</em></td>
+<td>6+ endpoints</td>
+<td><code>requireAuth</code></td>
+<td>Cisco advisory sync, status, credentials, lookup</td>
+</tr>
+<tr>
+<td>Palo Alto Security <em>(v1.0.63+, HEX-209)</em></td>
+<td>6+ endpoints</td>
+<td><code>requireAuth</code></td>
+<td>Palo Alto advisory sync, status, lookup</td>
+</tr>
+<tr>
 <td>Templates <em>(v1.0.46+)</em></td>
-<td>7 endpoints</td>
+<td>7+ endpoints</td>
 <td><code>requireAuth</code></td>
 <td>Email template management</td>
 </tr>
 <tr>
 <td>Preferences <em>(v1.0.46+)</em></td>
-<td>7 endpoints</td>
+<td>7+ endpoints</td>
 <td><code>requireAuth</code></td>
 <td>User preferences CRUD</td>
 </tr>
@@ -786,22 +854,25 @@ router.<span class="hljs-title function_">post</span>(<span class="hljs-string">
 </tr>
 </tbody></table>
 <h3>API Endpoint Summary</h3><ul>
-<li><strong>Total Endpoints</strong>: 75 REST endpoints across 10 route modules</li>
-<li><strong>Protected Endpoints</strong>: 46 endpoints with <code>requireAuth</code> middleware</li>
-<li><strong>Public Endpoints</strong>: 9 endpoints (health, auth, docs)</li>
-<li><strong>Import System</strong>: 13 dedicated import endpoints with progress tracking</li>
-<li><strong>WebSocket</strong>: Separate progress tracking on port 8988</li>
-<li><strong>Rate Limited</strong>: 1,000 requests per 15 minutes per IP (increased for single-user use)</li>
+<li><strong>Total Endpoints</strong>: 85+ REST endpoints across 13 route modules</li>
+<li><strong>Protected Endpoints</strong>: 46+ endpoints with <code>requireAuth</code> middleware</li>
+<li><strong>Public Endpoints</strong>: 9+ endpoints (health, auth, docs)</li>
+<li><strong>Import System</strong>: 13+ dedicated import endpoints with progress tracking</li>
+<li><strong>External Integrations</strong>: CISA KEV, Cisco PSIRT, Palo Alto Security advisories</li>
+<li><strong>WebSocket</strong>: Real-time progress tracking on same port as REST API (8080)</li>
+<li><strong>Rate Limited</strong>: Production: 60 req/15min, Development: 10,000 req/min (cache hits excluded)</li>
 </ul>
 <hr>
 <h2>Real-time Communication (WebSocket)</h2><h3>ProgressTracker Architecture</h3><p>HexTrackr implements a sophisticated WebSocket-based progress tracking system through the <code>ProgressTracker</code> class:</p>
 <ul>
-<li><strong>Port</strong>: 8988 (separate from REST API)</li>
-<li><strong>Library</strong>: Socket.io with enhanced session management</li>
+<li><strong>Port</strong>: Same as REST API (8080) - WebSocket runs on the same HTTP/HTTPS server instance</li>
+<li><strong>Library</strong>: Socket.io with enhanced session management and authentication</li>
 <li><strong>Session Management</strong>: UUID-based sessions with metadata tracking</li>
+<li><strong>Authentication</strong>: WebSocket handshake validates Express session cookies</li>
 <li><strong>Throttling</strong>: 100ms minimum interval between progress events</li>
 <li><strong>Auto-cleanup</strong>: 30-minute session timeout with automatic garbage collection</li>
 </ul>
+<p><strong>Note</strong>: <code>WEBSOCKET_PORT = 8988</code> in constants.js is a planned/legacy value, not currently used. The WebSocket server shares the same port as the REST API.</p>
 <h3>ProgressTracker Features</h3><pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">ProgressTracker</span> {
   <span class="hljs-title function_">constructor</span>(<span class="hljs-params">io</span>) {
     <span class="hljs-variable language_">this</span>.<span class="hljs-property">sessions</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>();
@@ -974,50 +1045,65 @@ router.<span class="hljs-title function_">post</span>(<span class="hljs-string">
 <li>Exception-based error handling</li>
 <li>Graceful fallbacks for invalid paths</li>
 </ul>
-<h3>Rate Limiting Configuration</h3><pre><code class="language-javascript"><span class="hljs-keyword">const</span> limiter = <span class="hljs-title function_">rateLimit</span>({
-  <span class="hljs-attr">windowMs</span>: <span class="hljs-number">15</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>, <span class="hljs-comment">// 15 minutes</span>
-  <span class="hljs-attr">max</span>: <span class="hljs-number">100</span>, <span class="hljs-comment">// Limit each IP to 100 requests per windowMs</span>
-  <span class="hljs-attr">message</span>: <span class="hljs-string">&#x27;Too many requests from this IP&#x27;</span>,
-  <span class="hljs-attr">standardHeaders</span>: <span class="hljs-literal">true</span>,
-  <span class="hljs-attr">legacyHeaders</span>: <span class="hljs-literal">false</span>
-});</code></pre><h3>Future Security Enhancements</h3><table>
+<h3>Rate Limiting Configuration</h3><p><strong>Configuration</strong> (<code>app/config/middleware.js</code>):</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> rateLimit = {
+    <span class="hljs-attr">windowMs</span>: <span class="hljs-variable constant_">RATE_LIMIT_WINDOW_MS</span>,  <span class="hljs-comment">// Dynamic: 15min (prod) / 1min (dev)</span>
+    <span class="hljs-attr">max</span>: <span class="hljs-variable constant_">RATE_LIMIT_MAX_REQUESTS</span>,    <span class="hljs-comment">// 60 (prod) / 10000 (dev)</span>
+    <span class="hljs-attr">message</span>: <span class="hljs-variable constant_">RATE_LIMIT_MESSAGE</span>,
+    <span class="hljs-attr">standardHeaders</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attr">legacyHeaders</span>: <span class="hljs-literal">false</span>,
+    <span class="hljs-attr">validate</span>: { <span class="hljs-attr">trustProxy</span>: <span class="hljs-literal">false</span> }  <span class="hljs-comment">// Disable validation - we trust nginx reverse proxy</span>
+};</code></pre><p><strong>Constants</strong> (<code>app/utils/constants.js</code>):</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> <span class="hljs-variable constant_">IS_PRODUCTION</span> = process.<span class="hljs-property">env</span>.<span class="hljs-property">NODE_ENV</span> === <span class="hljs-string">&quot;production&quot;</span>;
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">RATE_LIMIT_WINDOW_MS</span> = <span class="hljs-variable constant_">IS_PRODUCTION</span> ? <span class="hljs-number">15</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span> : <span class="hljs-number">1</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>; <span class="hljs-comment">// 15 min (prod) / 1 min (dev)</span>
+<span class="hljs-keyword">const</span> <span class="hljs-variable constant_">RATE_LIMIT_MAX_REQUESTS</span> = <span class="hljs-variable constant_">IS_PRODUCTION</span> ? <span class="hljs-number">60</span> : <span class="hljs-number">10000</span>; <span class="hljs-comment">// 60 (prod) / 10000 (dev) - cache HITs excluded</span></code></pre><p><strong>Cache-Aware Rate Limiting</strong>: With the introduction of <code>cacheService.js</code> (v1.0.46+), rate limits were reduced from 100 to 60 requests per window (40% reduction) because cached responses are excluded from rate limiting.</p>
+<h3>Future Security Enhancements</h3><table>
 <thead>
 <tr>
 <th>Concern</th>
-<th>Planned</th>
+<th>Status</th>
+<th>Planned Enhancement</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>Authentication</td>
-<td>JWT-based authentication with role-based access control</td>
+<td><del>Authentication</del></td>
+<td>✅ <strong>IMPLEMENTED (v1.0.46+)</strong></td>
+<td>Session-based auth with Argon2id, SQLite sessions, 46+ protected endpoints</td>
 </tr>
 <tr>
 <td>API Security</td>
+<td>Planned</td>
 <td>API key authentication for external integrations</td>
 </tr>
 <tr>
 <td>Audit Logging</td>
+<td>Planned</td>
 <td>Central audit logging of security events and rejections</td>
 </tr>
 <tr>
-<td>TLS</td>
-<td>Built-in HTTPS support with automatic certificate management</td>
+<td><del>TLS/HTTPS</del></td>
+<td>✅ <strong>IMPLEMENTED</strong></td>
+<td>HTTPS support via nginx reverse proxy with X-Forwarded-Proto</td>
 </tr>
 <tr>
 <td>Input Validation</td>
+<td>Partial</td>
 <td>JSON schema (Ajv) enforcement for all API endpoints</td>
 </tr>
 <tr>
 <td>Structured Logging</td>
+<td>Planned</td>
 <td>Structured JSON logging with request IDs and correlation</td>
 </tr>
 <tr>
 <td>Vulnerability Scanning</td>
-<td>Automated dependency vulnerability scanning</td>
+<td>Planned</td>
+<td>Automated dependency vulnerability scanning (Codacy integration available)</td>
 </tr>
 <tr>
 <td>Secret Management</td>
-<td>Environment-based secret management with rotation</td>
+<td>Partial</td>
+<td>Environment-based secrets via <code>.env</code> (rotation not automated)</td>
 </tr>
 </tbody></table>
 <hr>
@@ -1113,25 +1199,30 @@ router.<span class="hljs-title function_">post</span>(<span class="hljs-string">
 <tr>
 <th>Area</th>
 <th>Enhancement</th>
+<th>Status</th>
 <th>Priority</th>
 </tr>
 </thead>
 <tbody><tr>
 <td><strong>Legacy Deprecation</strong></td>
 <td>Retire legacy vulnerabilities table and endpoints</td>
-<td>High</td>
+<td>On Hold</td>
+<td>Low</td>
 </tr>
 <tr>
 <td><strong>Data Migration</strong></td>
 <td>Automated migration from legacy to rollover architecture</td>
-<td>High</td>
+<td>On Hold</td>
+<td>Low</td>
 </tr>
 <tr>
 <td><strong>API Versioning</strong></td>
 <td>Implement API versioning for backward compatibility</td>
+<td>Not Started</td>
 <td>Medium</td>
 </tr>
 </tbody></table>
+<p><strong>Note</strong>: Legacy <code>vulnerabilities</code> table remains in active use alongside the rollover architecture (<code>vulnerabilities_current</code>, <code>vulnerability_snapshots</code>). Full deprecation requires careful migration planning to ensure data continuity.</p>
 <h3>Testing & Quality Assurance</h3><table>
 <thead>
 <tr>

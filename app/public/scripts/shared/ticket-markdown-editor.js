@@ -415,9 +415,22 @@ Generated: [GENERATED_TIME]`;
             "[NOTES]": ticket.notes || ticket.additional_notes || "N/A",
             "[GENERATED_TIME]": new Date().toLocaleString(),
             "[VULNERABILITY_SUMMARY]": this.generateVulnerabilitySummary(ticket),
-            "[SITE_ADDRESS]": ticket.site_address || "[SITE ADDRESS - TBD]",
-            "[RETURN_ADDRESS]": ticket.return_address || "[RETURN ADDRESS - TBD]",
-            "[TRACKING_NUMBER]": ticket.tracking_number || "[TRACKING NUMBER - TBD]",
+            "[SITE_ADDRESS]": ticket.site_address || this.formatAddress(
+                ticket.shipping_line1 || ticket.shippingLine1,
+                ticket.shipping_line2 || ticket.shippingLine2,
+                ticket.shipping_city || ticket.shippingCity,
+                ticket.shipping_state || ticket.shippingState,
+                ticket.shipping_zip || ticket.shippingZip
+            ) || "N/A",
+            "[RETURN_ADDRESS]": ticket.return_address || this.formatAddress(
+                ticket.return_line1 || ticket.returnLine1,
+                ticket.return_line2 || ticket.returnLine2,
+                ticket.return_city || ticket.returnCity,
+                ticket.return_state || ticket.returnState,
+                ticket.return_zip || ticket.returnZip
+            ) || "N/A",
+            "[TRACKING_NUMBER]": ticket.outbound_tracking || ticket.outboundTracking || ticket.tracking_number || "N/A",
+            "[RETURN_TRACKING]": ticket.return_tracking || ticket.returnTracking || "N/A",
             "[MITIGATION_DETAILS]": ticket.mitigation_details || "[MITIGATION DETAILS - TBD]"
         };
 
@@ -453,6 +466,31 @@ Generated: [GENERATED_TIME]`;
         } catch (_error) {
             return dateString;
         }
+    }
+
+    /**
+     * Format address fields into readable text block
+     * @param {string} line1 - Address line 1
+     * @param {string} line2 - Address line 2 (optional)
+     * @param {string} city - City
+     * @param {string} state - State code
+     * @param {string} zip - ZIP code
+     * @returns {string|null} Formatted address or null if no address provided
+     */
+    formatAddress(line1, line2, city, state, zip) {
+        const parts = [];
+
+        if (line1) parts.push(line1);
+        if (line2) parts.push(line2);
+        if (city && state && zip) {
+            parts.push(`${city}, ${state} ${zip}`);
+        } else if (city || state || zip) {
+            // Handle partial city/state/zip
+            const cityStateZip = [city, state, zip].filter(Boolean).join(" ");
+            if (cityStateZip) parts.push(cityStateZip);
+        }
+
+        return parts.length > 0 ? parts.join("\n") : null;
     }
 
     /**

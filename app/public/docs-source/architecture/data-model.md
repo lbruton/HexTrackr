@@ -2,9 +2,9 @@
 
 This document provides a definitive overview of the HexTrackr database schema. The primary bootstrap is `scripts/init-database.js`; however, the live schema evolves further at runtime via idempotent `ALTER TABLE` and index creation logic inside `server.js` and migration code executed during imports. The authoritative state is therefore the **live SQLite schema** (captured below) rather than the historical `schema.sql` file (now outdated and retained only for legacy reference).
 
-**Schema Summary** (v1.0.54):
-- **15 Core Tables**: Vulnerabilities (4), Tickets (2), KEV (2), Templates (3), Authentication (2), Import/Staging (2)
-- **37+ Indexes**: Performance-optimized queries on critical fields
+**Schema Summary** (v1.0.66):
+- **16 Core Tables**: Vulnerabilities (4), Tickets (2), KEV (2), Templates (3), Authentication (2), Import/Staging (2), Analytics (1)
+- **49 Indexes**: Performance-optimized queries on critical fields
 - **4-Tier Deduplication**: Enhanced unique key generation with confidence scoring
 - **KEV Integration**: CISA Known Exploited Vulnerabilities catalog synchronization
 - **Template System**: Email, ticket, and vulnerability report templates with variable substitution
@@ -21,28 +21,28 @@ This document provides a definitive overview of the HexTrackr database schema. T
 
 ### `tickets`
 
-Stores all ticketing information. This table has **indexes for query performance** on dates, status, site codes, and external ticket numbers. It has evolved from a minimal design to a richer structure with relational hooks into `sites` and `locations`.
+Stores all ticketing information. This table has **indexes for query performance** on dates, status, site codes, and external ticket numbers. Site and location tracking uses TEXT fields (`site`, `site_id`, `location`, `location_id`) for flexible data storage.
 
 | Column | Type | Constraints | Description |
 | --- | --- | --- | --- |
 | `id` | TEXT | PK | Stable unique identifier supplied by UI (string, not auto-increment). |
-| `date_submitted` | TEXT | NOT NULL | Submission date (ISO date). |
-| `date_due` | TEXT | NOT NULL | Due date (ISO date). |
-| `hexagon_ticket` | TEXT | Indexed | External Hexagon reference. |
-| `service_now_ticket` | TEXT | Indexed | External ServiceNow reference. |
-| `location` | TEXT | NOT NULL, Indexed | Human readable location label. |
+| `xt_number` | TEXT | UNIQUE | Alternate human-friendly number (used when `id` absent in legacy imports). |
+| `date_submitted` | TEXT |  | Submission date (ISO date) - nullable. |
+| `date_due` | TEXT |  | Due date (ISO date) - nullable. |
+| `hexagon_ticket` | TEXT |  | External Hexagon reference. |
+| `service_now_ticket` | TEXT |  | External ServiceNow reference. |
+| `location` | TEXT | NOT NULL | Human readable location label. |
 | `devices` | TEXT |  | Semicolon-delimited device names preserving boot order (imports accept JSON arrays and are normalised). |
-| `supervisor` | TEXT |  | Supervisor name. |
+| `supervisor` | TEXT |  | Supervisor name (can be semicolon-delimited for multiple). |
 | `tech` | TEXT |  | Assigned technician. |
-| `status` | TEXT | DEFAULT 'Open', Indexed | Workflow status (Open, Completed, etc.). |
+| `status` | TEXT | DEFAULT 'Open' | Workflow status (Open, Completed, etc.). |
 | `notes` | TEXT |  | Free form notes. |
 | `attachments` | TEXT |  | JSON array of attachment metadata. |
-| `created_at` | TEXT | NOT NULL | Creation timestamp (string). |
-| `updated_at` | TEXT | NOT NULL | Last update timestamp. |
-| `site` | TEXT | Indexed | Higher-level site grouping. |
-| `xt_number` | TEXT | Indexed | Alternate human-friendly number (used when `id` absent in legacy imports). |
-| `site_id` | INTEGER | FK to `sites.id`, Indexed | Optional normalized site reference. |
-| `location_id` | INTEGER | FK to `locations.id`, Indexed | Optional normalized location reference. |
+| `created_at` | DATETIME | DEFAULT CURRENT_TIMESTAMP | Creation timestamp. |
+| `updated_at` | DATETIME | DEFAULT CURRENT_TIMESTAMP | Last update timestamp. |
+| `site` | TEXT |  | Higher-level site grouping. |
+| `site_id` | TEXT |  | Optional site identifier (TEXT, not FK). |
+| `location_id` | TEXT |  | Optional location identifier (TEXT, not FK). |
 
 **Ticket Indexes** (all created automatically): location, status, date_submitted, date_due, hexagon_ticket, service_now_ticket, site, xt_number, site_id, location_id.
 
@@ -95,8 +95,14 @@ Current deduplicated state (one row per active unique vulnerability for the most
 | `vendor` | TEXT |  | Normalized vendor (currently mirrors vendor_reference). |
 | `vulnerability_date` | TEXT |  | Publication date. |
 | `state` | TEXT | DEFAULT 'open' | Physical state (open/closed). |
-| `lifecycle_state` | TEXT |  | Logical state (active/resolved/reopened). |
+| `lifecycle_state` | TEXT | DEFAULT 'active' | Logical state (active/resolved/reopened). |
 | `resolved_date` | TEXT |  | Date when marked as resolved. |
+| `resolution_reason` | TEXT |  | Reason why vulnerability was resolved. |
+| `confidence_score` | INTEGER | DEFAULT 50 | Deduplication confidence (0-100). |
+| `dedup_tier` | INTEGER | DEFAULT 4 | Deduplication tier level (1-4). |
+| `enhanced_unique_key` | TEXT |  | Enhanced 4-tier deduplication key. |
+| `operating_system` | TEXT |  | Operating system information (added Migration 006). |
+| `solution_text` | TEXT |  | Extended solution details (added Migration 006). |
 | `created_at` | DATETIME | DEFAULT CURRENT_TIMESTAMP | Insert timestamp. |
 | `updated_at` | DATETIME |  | Last update timestamp. |
 | `unique_key` | TEXT | UNIQUE | Composite key (see Rollover section). |
@@ -105,7 +111,11 @@ Current deduplicated state (one row per active unique vulnerability for the most
 
 This table is an append-only log of **all vulnerabilities from every scan**. It serves as the historical record for trend analysis.
 
-*Shares the same columns as `vulnerabilities_current` (except `unique_key` not unique) and acts as an append-only log for every scan ingestion.*
+*Schema similar to `vulnerabilities_current` with the following key differences:*
+- `unique_key` is **not unique** (allows duplicate vulnerabilities across scan dates)
+- Additional deduplication metadata: `confidence_score`, `dedup_tier`, `enhanced_unique_key`
+- Includes Migration 006 columns: `operating_system`, `solution_text`
+- Acts as append-only log for every scan ingestion
 
 ### `vulnerability_daily_totals`
 
@@ -129,6 +139,35 @@ This table stores pre-calculated daily aggregates to power the dashboard charts 
 | `reopened_count` | INTEGER | Count of previously resolved vulnerabilities that reappeared. |
 | `created_at` | DATETIME | Record creation timestamp. |
 | `updated_at` | DATETIME | Last update timestamp. |
+
+### `vendor_daily_totals` *(v1.0.62 - Migration 008)*
+
+Vendor-specific daily aggregates for trend analysis and vendor comparison. This table provides granular insights into vulnerability distribution across different vendors (Cisco, Palo Alto, etc.).
+
+| Column | Type | Description |
+| --- | --- | --- |
+| `id` | INTEGER | **Primary Key**. |
+| `scan_date` | TEXT | The date for which the totals are calculated. |
+| `vendor` | TEXT | Vendor name (cisco, paloalto, etc.). |
+| `critical_count` | INTEGER | Count of Critical vulnerabilities for this vendor on this date. |
+| `critical_total_vpr` | REAL | Sum of VPR scores for Critical vulnerabilities. |
+| `high_count` | INTEGER | Count of High vulnerabilities. |
+| `high_total_vpr` | REAL | Sum of VPR scores for High vulnerabilities. |
+| `medium_count` | INTEGER | Count of Medium vulnerabilities. |
+| `medium_total_vpr` | REAL | Sum of VPR scores for Medium vulnerabilities. |
+| `low_count` | INTEGER | Count of Low vulnerabilities. |
+| `low_total_vpr` | REAL | Sum of VPR scores for Low vulnerabilities. |
+| `total_vulnerabilities` | INTEGER | Sum of all vulnerability counts for this vendor/date. |
+| `total_vpr` | REAL | Sum of all VPR scores for this vendor/date. |
+| `created_at` | DATETIME | Record creation timestamp. |
+| **UNIQUE** | (scan_date, vendor) | One record per vendor per date. |
+
+**Indexes**:
+- `idx_vendor_daily_scan_date` (scan_date)
+- `idx_vendor_daily_vendor` (vendor)
+- `idx_vendor_daily_composite` (vendor, scan_date)
+
+**Purpose**: Permanent storage for vendor-specific trend data. Unlike `vulnerability_daily_totals`, this table is **never cleaned up** by db-snapshot-cleanup.js, providing long-term vendor performance tracking.
 
 ### `vulnerability_staging`
 
@@ -160,6 +199,8 @@ This table serves as a **bulk import staging area** for high-performance CSV pro
 | `processed` | BOOLEAN | DEFAULT 0 | Whether row has been processed into `vulnerabilities_current`. |
 | `batch_id` | INTEGER |  | Sub-batch identifier for parallel processing. |
 | `processing_error` | TEXT |  | Error message if processing failed. |
+| `operating_system` | TEXT |  | Operating system information (added Migration 006). |
+| `solution_text` | TEXT |  | Extended solution details (added Migration 006). |
 | `created_at` | DATETIME | DEFAULT CURRENT_TIMESTAMP | Staging timestamp. |
 | `processed_at` | DATETIME |  | Processing completion timestamp. |
 
@@ -331,40 +372,75 @@ Many-to-many relationship between tickets and (legacy) `vulnerabilities` (pre-ro
 | `relationship_type` | TEXT | DEFAULT 'remediation' | Relationship semantics. |
 | `notes` | TEXT |  | Free-form link-specific notes. |
 
-### `sites` & `locations`
-
-Reference/normalization tables to allow structured site & location taxonomy.
-
-| Table | Column | Type | Constraints | Description |
-| ----- | ------ | ---- | ----------- | ----------- |
-| `sites` | `id` | INTEGER | PK AUTOINCREMENT | Row id. |
-|  | `code` | VARCHAR(50) | UNIQUE NOT NULL | Short site code. |
-|  | `name` | VARCHAR(255) | NOT NULL | Descriptive name. |
-|  | `description` | TEXT |  | Optional details. |
-|  | `created_at` | DATETIME | DEFAULT CURRENT_TIMESTAMP | Creation time. |
-|  | `updated_at` | DATETIME | DEFAULT CURRENT_TIMESTAMP | Last update. |
-| `locations` | `id` | INTEGER | PK AUTOINCREMENT | Row id. |
-|  | `code` | VARCHAR(50) | UNIQUE NOT NULL | Location code. |
-|  | `name` | VARCHAR(255) | NOT NULL | Descriptive label. |
-|  | `description` | TEXT |  | Optional details. |
-|  | `created_at` | DATETIME | DEFAULT CURRENT_TIMESTAMP | Creation time. |
-|  | `updated_at` | DATETIME | DEFAULT CURRENT_TIMESTAMP | Last update. |
+**Note on Sites & Locations**: The `tickets` table includes TEXT fields (`site`, `site_id`, `location`, `location_id`) for flexible site/location tracking. Dedicated normalization tables (`sites`, `locations`) are **not currently implemented** but may be added in future versions for structured taxonomy.
 
 ## Indexes
 
-To ensure efficient querying, the following indexes are created:
+To ensure efficient querying, **49 indexes** are automatically created during database initialization.
 
-### Index Inventory
+### Index Inventory by Table
 
-| Purpose | Index |
-| ------- | ----- |
-| Snapshot query by date | `idx_snapshots_scan_date` |
-| Snapshot query by hostname | `idx_snapshots_hostname` |
-| Snapshot query by severity | `idx_snapshots_severity` |
-| Current lookup by unique key | `idx_current_unique_key` |
-| Current query by scan date | `idx_current_scan_date` |
-| Tickets filtering | Multiple (see tickets section) |
-| Legacy vulnerabilities (pre-rollover) | `idx_vulnerabilities_hostname`, `idx_vulnerabilities_severity`, `idx_vulnerabilities_cve`, `idx_vulnerabilities_import` |
+**vulnerability_snapshots** (5 indexes):
+- `idx_snapshots_scan_date` - Query by date
+- `idx_snapshots_hostname` - Query by hostname
+- `idx_snapshots_severity` - Query by severity
+- `idx_snapshots_enhanced_key` - Enhanced deduplication
+- `idx_snapshots_cve` - KEV integration lookups
+
+**vulnerabilities_current** (9 indexes):
+- `idx_current_unique_key` - Primary deduplication key
+- `idx_current_scan_date` - Query by scan date
+- `idx_current_enhanced_unique_key` - Enhanced deduplication
+- `idx_current_lifecycle_scan` - Composite (lifecycle_state, scan_date)
+- `idx_current_confidence_tier` - Composite (confidence_score, dedup_tier)
+- `idx_current_active_severity` - Composite (lifecycle_state, severity)
+- `idx_current_resolved_date` - Resolution tracking
+- `idx_current_cve` - KEV integration lookups
+- `idx_current_vendor` - Vendor filtering (HEX-101)
+
+**vulnerability_staging** (4 indexes):
+- `idx_staging_import_id` - Import batch tracking
+- `idx_staging_processed` - Processing status
+- `idx_staging_batch_id` - Batch processing
+- `idx_staging_unprocessed_batch` - Composite (processed, batch_id)
+
+**tickets** (10 indexes):
+- `idx_tickets_status` - Status filtering
+- `idx_tickets_site` - Site grouping
+- `idx_tickets_location` - Location filtering
+- `idx_tickets_xt` - XT number lookups
+- Plus 6 auto-created indexes for: date_submitted, date_due, hexagon_ticket, service_now_ticket, site_id, location_id
+
+**vulnerabilities (legacy)** (4 indexes):
+- `idx_vulnerabilities_hostname` - Hostname lookups
+- `idx_vulnerabilities_severity` - Severity filtering
+- `idx_vulnerabilities_cve` - CVE lookups
+- `idx_vulnerabilities_import` - Import batch tracking
+
+**vendor_daily_totals** (3 indexes):
+- `idx_vendor_daily_scan_date` - Date-based queries
+- `idx_vendor_daily_vendor` - Vendor-based queries
+- `idx_vendor_daily_composite` - Composite (vendor, scan_date)
+
+**kev_status** (4 indexes):
+- `idx_kev_status_cve_id` - CVE lookups
+- `idx_kev_status_date_added` - Chronological queries
+- `idx_kev_status_due_date` - Deadline tracking
+- `idx_kev_status_ransomware` - Partial index (WHERE known_ransomware_use = 1)
+
+**Template Tables** (9 indexes total):
+- Email templates: `idx_email_templates_name`, `idx_email_templates_active`, `idx_email_templates_category`
+- Ticket templates: `idx_ticket_templates_name`, `idx_ticket_templates_category`, `idx_ticket_templates_active`
+- Vulnerability templates: `idx_vulnerability_templates_name`, `idx_vulnerability_templates_category`, `idx_vulnerability_templates_active`
+
+**Authentication & User Management** (4 indexes):
+- Users: `idx_users_username`, `idx_users_email`
+- User preferences: `idx_user_preferences_user_id`, `idx_user_preferences_key`
+
+**Other Indexes** (3 indexes):
+- `idx_ticket_vulns_ticket` - Junction table (ticket_id)
+- `idx_ticket_vulns_vuln` - Junction table (vulnerability_id)
+- `idx_sync_metadata_type_time` - Composite (sync_type, sync_time DESC)
 
 > Note: The legacy `vulnerabilities` table remains ONLY for backup/export endpoints (`/api/backup/vulnerabilities`, `/api/backup/all`). All imports and dashboards use the rollover trio (`vulnerability_snapshots`, `vulnerabilities_current`, `vulnerability_daily_totals`).
 
@@ -432,3 +508,7 @@ The modal system uses strategic field selection for data aggregation:
 ---
 
 The above reflects the database as inspected on the current build date. Regenerate this document after structural changes or migration scripts are introduced.
+
+---
+
+*Last Updated: 2025-10-16 | Version: v1.0.66 | Audit: DOCS-53*

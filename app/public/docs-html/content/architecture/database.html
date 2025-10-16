@@ -1,24 +1,75 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
-    <h1>Database Architecture</h1><p>HexTrackr uses a file-based SQLite 3 database as its primary data store. This document provides an updated overview of the current (live) database architecture, including rollover vulnerability tables, normalization references, and key data flows.</p>
+    <h1>Database Architecture</h1><p>HexTrackr uses a file-based SQLite 3 database as its primary data store. This document provides a comprehensive overview of the current database architecture, including all 19 tables, vendor advisory integrations, and optimized performance configurations.</p>
 <h2>Engine</h2><ul>
 <li><strong>Type</strong>: SQLite 3</li>
 <li><strong>Location</strong>: <code>data/hextrackr.db</code></li>
-<li><strong>Initialization</strong>: The database is initialized by the <code>scripts/init-database.js</code> script.</li>
+<li><strong>Initialization</strong>: <code>app/public/scripts/init-database.js</code></li>
+<li><strong>Driver</strong>: <code>better-sqlite3</code> (Node.js)</li>
+<li><strong>Session Store</strong>: <code>better-sqlite3-session-store</code></li>
 </ul>
 <hr>
-<h2>Entity Relationship Diagram (Current)</h2><p>The diagram below reflects the active tables used by the rollover ingestion pipeline and ticketing system. The legacy <code>vulnerabilities</code> table still exists (for backup/export compatibility) but is not part of the primary analytics path.</p>
+<h2>Schema Overview (v1.0.66)</h2><p><strong>Tables</strong>: 19 total</p>
+<ul>
+<li><strong>Vulnerability Management</strong>: 7 tables (vulnerabilities, vulnerabilities_current, vulnerability_snapshots, vulnerability_staging, vulnerability_imports, vulnerability_daily_totals, vendor_daily_totals)</li>
+<li><strong>Vendor Advisories</strong>: 3 tables (kev_status, cisco_advisories, palo_alto_advisories)</li>
+<li><strong>Ticket Management</strong>: 2 tables (tickets, ticket_vulnerabilities)</li>
+<li><strong>Template System</strong>: 3 tables (email_templates, ticket_templates, vulnerability_templates)</li>
+<li><strong>Authentication</strong>: 2 tables (users, user_preferences)</li>
+<li><strong>System</strong>: 2 tables (sync_metadata, sessions)</li>
+</ul>
+<p><strong>Indexes</strong>: 72 total (59 user-created + 13 auto-generated)</p>
+<p><strong>Key Features</strong>:</p>
+<ul>
+<li>4-tier deduplication system with confidence scoring</li>
+<li>Multi-vendor advisory integration (KEV, Cisco PSIRT, Palo Alto)</li>
+<li>Lifecycle state management (active/resolved/reopened)</li>
+<li>Soft delete support for tickets</li>
+<li>Cross-device user preference synchronization</li>
+<li>Automated VACUUM scheduler for space reclamation</li>
+</ul>
+<hr>
+<h2>Entity Relationship Diagram</h2><p>The diagram below shows all 19 tables and their key relationships in the production database.</p>
+<div style="text-align: center; margin: 1.5rem 0;">
+  <a href="/docs-html/database-erd-full.html" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="display: inline-block; padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #3d5afe 0%, #5c7cfa 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; box-shadow: 0 4px 12px rgba(61, 90, 254, 0.3); transition: all 0.3s ease;">
+    🗺️ View Full-Size Interactive Map
+  </a>
+  <p style="margin-top: 0.75rem; font-size: 0.9rem; color: #888;">
+    Opens in new window with zoom controls and full navigation
+  </p>
+</div>
+
 <div class="mermaid">erDiagram
-    vulnerability_imports ||--o{ vulnerability_snapshots : batches
-    vulnerability_imports ||--o{ vulnerabilities_current : source
-    vulnerability_imports ||--o{ vulnerability_daily_totals : aggregates
-    tickets ||--o{ ticket_vulnerabilities : links
-    vulnerabilities_current ||--o{ ticket_vulnerabilities : links
-    sites ||--o{ tickets : contextual
-    locations ||--o{ tickets : contextual
+    %% Vulnerability Management Core
+    vulnerability_imports ||--o{ vulnerability_snapshots : "batches"
+    vulnerability_imports ||--o{ vulnerabilities_current : "source"
+    vulnerability_imports ||--o{ vulnerabilities : "legacy"
+    vulnerability_imports ||--o{ vulnerability_staging : "staging"
+    vulnerability_imports ||--o{ vulnerability_daily_totals : "aggregates"
+    vulnerability_imports ||--o{ vendor_daily_totals : "vendor_aggregates"
+
+    %% Vendor Advisory Enrichment (LEFT JOIN)
+    vulnerabilities_current }o..o| kev_status : "LEFT JOIN on cve"
+    vulnerabilities_current }o..o| cisco_advisories : "LEFT JOIN on cve"
+    vulnerabilities_current }o..o| palo_alto_advisories : "LEFT JOIN on cve"
+    vulnerabilities }o..o| cisco_advisories : "LEFT JOIN on cve"
+    vulnerabilities }o..o| palo_alto_advisories : "LEFT JOIN on cve"
+
+    %% Ticket-Vulnerability Junction
+    tickets ||--o{ ticket_vulnerabilities : "links"
+    vulnerabilities_current ||--o{ ticket_vulnerabilities : "links"
+
+    %% Authentication
+    users ||--o{ user_preferences : "owns"
+
+    %% Sync Tracking
+    sync_metadata ||--o{ kev_status : "tracks_kev_sync"
+    sync_metadata ||--o{ cisco_advisories : "tracks_cisco_sync"
+    sync_metadata ||--o{ palo_alto_advisories : "tracks_palo_sync"
+    sync_metadata ||--o{ vulnerability_imports : "tracks_auto_vacuum"
 
     vulnerability_imports {
-        INTEGER id PK
+        INTEGER id
         TEXT filename
         TEXT import_date
         INTEGER row_count
@@ -29,10 +80,9 @@
         DATETIME created_at
     }
 
-    vulnerability_snapshots {
-        INTEGER id PK
-        INTEGER import_id FK
-        TEXT scan_date
+    vulnerabilities {
+        INTEGER id
+        INTEGER import_id
         TEXT hostname
         TEXT ip_address
         TEXT cve
@@ -46,14 +96,25 @@
         TEXT description
         TEXT solution
         TEXT vendor_reference
+        TEXT vendor
         TEXT vulnerability_date
         TEXT state
-        TEXT unique_key
+        TEXT import_date
+        TEXT operating_system
+        TEXT solution_text
+        INTEGER is_fixed
+        TEXT fixed_cisco_versions
+        TEXT fixed_cisco_url
+        DATETIME cisco_synced_at
+        TEXT fixed_palo_versions
+        TEXT fixed_palo_url
+        DATETIME palo_synced_at
+        DATETIME created_at
     }
 
-    vulnerabilities_current {
-        INTEGER id PK
-        INTEGER import_id FK
+    vulnerability_snapshots {
+        INTEGER id
+        INTEGER import_id
         TEXT scan_date
         TEXT hostname
         TEXT ip_address
@@ -71,16 +132,52 @@
         TEXT vendor
         TEXT vulnerability_date
         TEXT state
-        TEXT unique_key UK
+        TEXT unique_key
+        INTEGER confidence_score
+        INTEGER dedup_tier
+        TEXT enhanced_unique_key
+        TEXT operating_system
+        TEXT solution_text
+        DATETIME created_at
+    }
+
+    vulnerabilities_current {
+        INTEGER id
+        INTEGER import_id
+        TEXT scan_date
+        TEXT hostname
+        TEXT ip_address
+        TEXT cve
+        TEXT severity
+        REAL vpr_score
+        REAL cvss_score
+        TEXT first_seen
+        TEXT last_seen
+        TEXT plugin_id
+        TEXT plugin_name
+        TEXT description
+        TEXT solution
+        TEXT vendor_reference
+        TEXT vendor
+        TEXT vulnerability_date
+        TEXT state
+        TEXT unique_key
         TEXT lifecycle_state
         TEXT resolved_date
+        TEXT resolution_reason
+        INTEGER confidence_score
+        INTEGER dedup_tier
+        TEXT enhanced_unique_key
+        TEXT operating_system
+        TEXT solution_text
+        INTEGER is_fix_available
         DATETIME created_at
         DATETIME updated_at
     }
 
     vulnerability_daily_totals {
-        INTEGER id PK
-        TEXT scan_date UK
+        INTEGER id
+        TEXT scan_date
         INTEGER critical_count
         REAL critical_total_vpr
         INTEGER high_count
@@ -97,20 +194,96 @@
         DATETIME updated_at
     }
 
-    sites {
-        INTEGER id PK
-        TEXT code UK
-        TEXT name
+    vendor_daily_totals {
+        INTEGER id
+        TEXT vendor
+        TEXT scan_date
+        INTEGER critical_count
+        REAL critical_total_vpr
+        INTEGER high_count
+        REAL high_total_vpr
+        INTEGER medium_count
+        REAL medium_total_vpr
+        INTEGER low_count
+        REAL low_total_vpr
+        INTEGER total_vulnerabilities
+        REAL total_vpr
+        DATETIME created_at
     }
 
-    locations {
-        INTEGER id PK
-        TEXT code UK
-        TEXT name
+    vulnerability_staging {
+        INTEGER id
+        INTEGER import_id
+        TEXT hostname
+        TEXT ip_address
+        TEXT cve
+        TEXT severity
+        REAL vpr_score
+        REAL cvss_score
+        TEXT plugin_id
+        TEXT plugin_name
+        TEXT description
+        TEXT solution
+        TEXT vendor_reference
+        TEXT vendor
+        TEXT vulnerability_date
+        TEXT state
+        TEXT enhanced_unique_key
+        REAL confidence_score
+        INTEGER dedup_tier
+        TEXT lifecycle_state
+        JSON raw_csv_row
+        BOOLEAN processed
+        INTEGER batch_id
+        TEXT processing_error
+        TEXT operating_system
+        TEXT solution_text
+        DATETIME created_at
+        DATETIME processed_at
+    }
+
+    kev_status {
+        TEXT cve_id
+        DATE date_added
+        TEXT vulnerability_name
+        TEXT vendor_project
+        TEXT product
+        TEXT required_action
+        DATE due_date
+        BOOLEAN known_ransomware_use
+        TEXT notes
+        TIMESTAMP last_synced
+    }
+
+    cisco_advisories {
+        TEXT cve_id
+        TEXT advisory_id
+        TEXT advisory_title
+        TEXT severity
+        TEXT cvss_score
+        TEXT first_fixed
+        TEXT affected_releases
+        TEXT product_names
+        TEXT publication_url
+        TIMESTAMP last_synced
+    }
+
+    palo_alto_advisories {
+        TEXT cve_id
+        TEXT advisory_id
+        TEXT advisory_title
+        TEXT severity
+        TEXT cvss_score
+        TEXT first_fixed
+        TEXT affected_versions
+        TEXT product_name
+        TEXT publication_url
+        TIMESTAMP last_synced
     }
 
     tickets {
-        TEXT id PK
+        TEXT id
+        TEXT xt_number
         TEXT date_submitted
         TEXT date_due
         TEXT hexagon_ticket
@@ -123,164 +296,432 @@
         TEXT notes
         TEXT attachments
         TEXT site
-        TEXT xt_number
-        INTEGER site_id FK
-        INTEGER location_id FK
-        TEXT created_at
-        TEXT updated_at
+        TEXT site_id
+        TEXT location_id
+        TEXT job_type
+        TEXT tracking_number
+        TEXT outbound_tracking
+        TEXT return_tracking
+        TEXT shipping_line1
+        TEXT shipping_line2
+        TEXT shipping_city
+        TEXT shipping_state
+        TEXT shipping_zip
+        TEXT return_line1
+        TEXT return_line2
+        TEXT return_city
+        TEXT return_state
+        TEXT return_zip
+        TEXT site_address
+        TEXT return_address
+        TEXT software_versions
+        TEXT mitigation_details
+        INTEGER deleted
+        TEXT deleted_at
+        TEXT deletion_reason
+        TEXT deleted_by
+        DATETIME created_at
+        DATETIME updated_at
     }
 
     ticket_vulnerabilities {
-        INTEGER id PK
-        TEXT ticket_id FK
-        INTEGER vulnerability_id FK
+        INTEGER id
+        TEXT ticket_id
+        INTEGER vulnerability_id
+        TEXT relationship_type
+        TEXT notes
+        DATETIME created_at
+    }
+
+    sync_metadata {
+        INTEGER id
+        TEXT sync_type
+        TIMESTAMP sync_time
+        TEXT version
+        INTEGER record_count
+        TEXT status
+        TEXT error_message
+        TIMESTAMP created_at
+    }
+
+    users {
+        TEXT id
+        TEXT username
+        TEXT email
+        TEXT password_hash
+        TEXT role
+        INTEGER is_active
+        DATETIME last_login
+        INTEGER failed_attempts
+        DATETIME failed_login_timestamp
+        DATETIME created_at
+        DATETIME updated_at
+    }
+
+    user_preferences {
+        INTEGER id
+        TEXT user_id
+        TEXT preference_key
+        TEXT preference_value
+        DATETIME created_at
+        DATETIME updated_at
+    }
+
+    email_templates {
+        INTEGER id
+        TEXT name
+        TEXT description
+        TEXT template_content
+        TEXT default_content
+        TEXT variables
+        TEXT category
+        BOOLEAN is_active
+        DATETIME created_at
+        DATETIME updated_at
+    }
+
+    ticket_templates {
+        INTEGER id
+        TEXT name
+        TEXT description
+        TEXT template_content
+        TEXT default_content
+        TEXT variables
+        TEXT category
+        BOOLEAN is_active
+        DATETIME created_at
+        DATETIME updated_at
+    }
+
+    vulnerability_templates {
+        INTEGER id
+        TEXT name
+        TEXT description
+        TEXT template_content
+        TEXT default_content
+        TEXT variables
+        TEXT category
+        BOOLEAN is_active
+        DATETIME created_at
+        DATETIME updated_at
+    }
+
+    sessions {
+        TEXT sid
+        TEXT sess
+        DATETIME expired
     }</div><hr>
-<h2>Data Flows</h2><h3>Vulnerability CSV Import (Rollover Pipeline)</h3><p>This flow shows how a CSV file upload is processed and stored in the database using the rollover architecture.</p>
-<div class="mermaid">sequenceDiagram
-    participant User
-    participant API as POST /api/vulnerabilities/import
-    participant DB as SQLite
-
-    User-&gt;&gt;API: Upload csvFile (+ optional scanDate)
-    API-&gt;&gt;DB: INSERT into vulnerability_imports
-    API-&gt;&gt;DB: INSERT into vulnerability_snapshots (append-only)
-    API-&gt;&gt;DB: UPSERT logic in vulnerabilities_current (implemented as SELECT + conditional INSERT/UPDATE in code)
-    API-&gt;&gt;DB: DELETE stale rows from vulnerabilities_current
-    API-&gt;&gt;DB: INSERT OR REPLACE vulnerability_daily_totals (aggregates)
-    API--&gt;&gt;User: { success, importId, scanDate, performanceMetrics }</div><blockquote>
-<p><strong>Staging fast-path</strong>: <code>POST /api/vulnerabilities/import-staging</code> executes the same workflow but bulk loads into <code>vulnerability_staging</code> first and streams session progress through Socket.io.</p>
-</blockquote>
-<h3>Ticket Creation / Update</h3><p>This flow shows the simple process of creating a new ticket.</p>
-<div class="mermaid">sequenceDiagram
-    participant User
-    participant API as POST /api/tickets
-    participant DB as SQLite
-
-    User-&gt;&gt;API: { ticketData }
-    API-&gt;&gt;DB: INSERT (or UPDATE for modifications) into tickets
-    API--&gt;&gt;User: { success, id }</div><hr>
-<h2>Legacy Table Notice</h2><p>The original <code>vulnerabilities</code> table remains in the database to support existing backup endpoints (<code>/api/backup/vulnerabilities</code>, <code>/api/backup/all</code>). This table is used ONLY for exports - all new imports and analytics use the rollover architecture. New analytics and UI panels rely exclusively on the rollover trio:</p>
-<ul>
-<li><code>vulnerability_snapshots</code> (historical log)</li>
-<li><code>vulnerabilities_current</code> (deduplicated active set)</li>
-<li><code>vulnerability_daily_totals</code> (aggregated trends)</li>
-</ul>
-<p>Migration plan (tracked in roadmap) will eventually deprecate the legacy ingestion path and unify export logic on the rollover schema.</p>
-<hr>
-<h2>Lifecycle State Management</h2><p>The <code>vulnerabilities_current</code> table uses a <code>lifecycle_state</code> column to track vulnerability status:</p>
-<ul>
-<li><strong>active</strong>: Currently detected vulnerability</li>
-<li><strong>resolved</strong>: Vulnerability no longer detected (marked with resolved_date)</li>
-<li><strong>reopened</strong>: Previously resolved vulnerability that reappeared</li>
-</ul>
-<p>This enables accurate tracking of vulnerability remediation and regression.</p>
-<hr>
-<h2>Index Overview</h2><table>
-<thead>
-<tr>
-<th>Table</th>
-<th>Index</th>
-<th>Purpose</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>vulnerability_snapshots</td>
-<td>scan_date, hostname, severity</td>
-<td>Historical filtering &amp; trends</td>
-</tr>
-<tr>
-<td>vulnerabilities_current</td>
-<td>unique_key, scan_date</td>
-<td>Fast dedupe lookups &amp; date filtering</td>
-</tr>
-<tr>
-<td>vulnerability_daily_totals</td>
-<td>scan_date (UNIQUE)</td>
-<td>Idempotent aggregates</td>
-</tr>
-<tr>
-<td>tickets</td>
-<td>multiple (location, status, date_submitted, date_due, external refs)</td>
-<td>UI filtering &amp; reporting</td>
-</tr>
-<tr>
-<td>sites / locations</td>
-<td>code (UNIQUE)</td>
-<td>Lookup by code</td>
-</tr>
-</tbody></table>
-<hr>
-<h2>Staging Tables</h2><p>HexTrackr uses staging tables to process new data before it is moved into the production tables. This allows for data validation and transformation without affecting the live data.</p>
-<ul>
-<li><code>vulnerabilities_staging</code>: Used for staging new vulnerability data.</li>
-</ul>
-<p>For more information on the data lifecycle, see the <a href="#architecture/data-lifecycle">Data Lifecycle and Rollover Mechanism</a> documentation.</p>
-<hr>
-<h2>Database Migrations</h2><p>Database migrations are handled automatically by the application through runtime schema evolution using idempotent ALTER TABLE statements.</p>
-<hr>
-<h2>KEV Integration Tables *(v1.0.22+)*</h2><p>The CISA Known Exploited Vulnerabilities (KEV) integration introduces dedicated tables for tracking actively exploited vulnerabilities.</p>
-<h3>`kev_status`</h3><p>Stores Known Exploited Vulnerabilities metadata from CISA&#39;s KEV catalog (<a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog">https://www.cisa.gov/known-exploited-vulnerabilities-catalog</a>).</p>
+<h2>Core Tables - Detailed Schemas</h2><h3>Ticket Management</h3><h4>`tickets` (40 columns)</h4><p>Complete ticketing system with shipping addresses, soft delete, and job type categorization.</p>
 <table>
 <thead>
 <tr>
 <th>Column</th>
 <th>Type</th>
+<th>Constraints</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody><tr>
-<td><code>cve_id</code></td>
+<td><code>id</code></td>
 <td>TEXT</td>
-<td><strong>Primary key</strong> - CVE identifier (e.g., CVE-2021-44228)</td>
+<td>PRIMARY KEY</td>
+<td>Stable unique identifier (UUID format)</td>
 </tr>
 <tr>
-<td><code>date_added</code></td>
-<td>DATE</td>
-<td>When CISA added vulnerability to KEV catalog (NOT NULL)</td>
-</tr>
-<tr>
-<td><code>vulnerability_name</code></td>
+<td><code>xt_number</code></td>
 <td>TEXT</td>
-<td>CISA-provided vulnerability name</td>
+<td>UNIQUE</td>
+<td>XactTrackr ticket number (e.g., &quot;XT-0042&quot;)</td>
 </tr>
 <tr>
-<td><code>vendor_project</code></td>
+<td><code>date_submitted</code></td>
 <td>TEXT</td>
-<td>Affected vendor or project</td>
+<td></td>
+<td>Submission date (ISO 8601)</td>
 </tr>
 <tr>
-<td><code>product</code></td>
+<td><code>date_due</code></td>
 <td>TEXT</td>
-<td>Specific product affected</td>
+<td></td>
+<td>Due date (ISO 8601)</td>
 </tr>
 <tr>
-<td><code>required_action</code></td>
+<td><code>hexagon_ticket</code></td>
 <td>TEXT</td>
-<td>CISA-mandated remediation action</td>
+<td></td>
+<td>External Hexagon reference</td>
 </tr>
 <tr>
-<td><code>due_date</code></td>
-<td>DATE</td>
-<td>Federal agency remediation deadline</td>
+<td><code>service_now_ticket</code></td>
+<td>TEXT</td>
+<td></td>
+<td>External ServiceNow reference</td>
 </tr>
 <tr>
-<td><code>known_ransomware_use</code></td>
-<td>BOOLEAN</td>
-<td>Whether used in ransomware campaigns (1 = Yes, 0 = No)</td>
+<td><code>location</code></td>
+<td>TEXT</td>
+<td>NOT NULL</td>
+<td>Human-readable location label</td>
+</tr>
+<tr>
+<td><code>devices</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Semicolon-delimited device names</td>
+</tr>
+<tr>
+<td><code>supervisor</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Supervisor name(s)</td>
+</tr>
+<tr>
+<td><code>tech</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Assigned technician</td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td>TEXT</td>
+<td>DEFAULT &#39;Open&#39;</td>
+<td>Workflow status</td>
 </tr>
 <tr>
 <td><code>notes</code></td>
 <td>TEXT</td>
-<td>Additional CISA context and guidance</td>
+<td></td>
+<td>Free-form notes</td>
 </tr>
 <tr>
-<td><code>last_synced</code></td>
-<td>TIMESTAMP</td>
-<td>Last synchronization timestamp (DEFAULT CURRENT_TIMESTAMP)</td>
+<td><code>attachments</code></td>
+<td>TEXT</td>
+<td></td>
+<td>JSON array of attachment metadata</td>
+</tr>
+<tr>
+<td><code>site</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Higher-level site grouping</td>
+</tr>
+<tr>
+<td><code>site_id</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Optional site identifier</td>
+</tr>
+<tr>
+<td><code>location_id</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Optional location identifier</td>
+</tr>
+<tr>
+<td><code>job_type</code></td>
+<td>TEXT</td>
+<td>DEFAULT &#39;Upgrade&#39;</td>
+<td>Work categorization (Upgrade, Replace, Refresh, Mitigate, Other)</td>
+</tr>
+<tr>
+<td><code>tracking_number</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Legacy combined tracking (for templates)</td>
+</tr>
+<tr>
+<td><code>outbound_tracking</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Outbound shipment tracking number</td>
+</tr>
+<tr>
+<td><code>return_tracking</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Return shipment tracking number</td>
+</tr>
+<tr>
+<td><code>shipping_line1</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Shipping address line 1</td>
+</tr>
+<tr>
+<td><code>shipping_line2</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Shipping address line 2</td>
+</tr>
+<tr>
+<td><code>shipping_city</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Shipping city</td>
+</tr>
+<tr>
+<td><code>shipping_state</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Shipping state</td>
+</tr>
+<tr>
+<td><code>shipping_zip</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Shipping ZIP code</td>
+</tr>
+<tr>
+<td><code>return_line1</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Return address line 1</td>
+</tr>
+<tr>
+<td><code>return_line2</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Return address line 2</td>
+</tr>
+<tr>
+<td><code>return_city</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Return city</td>
+</tr>
+<tr>
+<td><code>return_state</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Return state</td>
+</tr>
+<tr>
+<td><code>return_zip</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Return ZIP code</td>
+</tr>
+<tr>
+<td><code>site_address</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Site location address</td>
+</tr>
+<tr>
+<td><code>return_address</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Return facility address</td>
+</tr>
+<tr>
+<td><code>software_versions</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Software version info (Upgrade job type)</td>
+</tr>
+<tr>
+<td><code>mitigation_details</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Mitigation plan details (Mitigate job type)</td>
+</tr>
+<tr>
+<td><code>deleted</code></td>
+<td>INTEGER</td>
+<td>DEFAULT 0</td>
+<td>Soft delete flag (0 = active, 1 = deleted)</td>
+</tr>
+<tr>
+<td><code>deleted_at</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Soft delete timestamp</td>
+</tr>
+<tr>
+<td><code>deletion_reason</code></td>
+<td>TEXT</td>
+<td></td>
+<td>User-provided deletion reason (HEX-248)</td>
+</tr>
+<tr>
+<td><code>deleted_by</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Username who deleted the ticket (HEX-248)</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Creation timestamp</td>
+</tr>
+<tr>
+<td><code>updated_at</code></td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Last modification timestamp</td>
 </tr>
 </tbody></table>
-<p><strong>Relationship</strong>: <code>vulnerabilities_current</code> LEFT JOINed with <code>kev_status</code> on <code>cve</code> = <code>cve_id</code> to enrich vulnerability data with KEV flags and due dates.</p>
-<h3>`sync_metadata`</h3><p>Tracks KEV catalog synchronization history and status.</p>
+<p><strong>Indexes</strong>: 10 indexes on location, status, dates, external references, site fields, xt_number, deleted, job_type</p>
+<p><strong>Migration Files</strong>:</p>
+<ul>
+<li><code>004-soft-delete-tickets.sql</code> (soft delete columns)</li>
+<li><code>007-add-job-type.sql</code> (job_type column)</li>
+<li><code>009-add-job-type-fields.sql</code> (tracking, software_versions, mitigation_details)</li>
+<li><code>010-restructure-address-fields.sql</code> (structured address components)</li>
+<li><code>011-add-ticket-deletion-reason.sql</code> (deletion audit trail)</li>
+</ul>
+<hr>
+<h4>`ticket_vulnerabilities` (6 columns)</h4><p>Junction table linking tickets to vulnerabilities with relationship metadata.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Constraints</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>INTEGER</td>
+<td>PRIMARY KEY AUTOINCREMENT</td>
+<td>Junction record ID</td>
+</tr>
+<tr>
+<td><code>ticket_id</code></td>
+<td>TEXT</td>
+<td>NOT NULL, FK → tickets.id</td>
+<td>Ticket identifier</td>
+</tr>
+<tr>
+<td><code>vulnerability_id</code></td>
+<td>INTEGER</td>
+<td>NOT NULL, FK → vulnerabilities_current.id</td>
+<td>Vulnerability identifier</td>
+</tr>
+<tr>
+<td><code>relationship_type</code></td>
+<td>TEXT</td>
+<td>DEFAULT &#39;remediation&#39;</td>
+<td>Relationship classification (remediation, investigation, etc.)</td>
+</tr>
+<tr>
+<td><code>notes</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Additional context for the relationship</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Link creation timestamp</td>
+</tr>
+</tbody></table>
+<p><strong>Indexes</strong>: 2 indexes (ticket_id, vulnerability_id) for bidirectional lookups</p>
+<hr>
+<h3>Vulnerability Management</h3><h4>`vulnerabilities` (29 columns)</h4><p>Legacy vulnerability table with Cisco and Palo Alto fix tracking columns. Still used for backup/export compatibility.</p>
 <table>
 <thead>
 <tr>
@@ -291,136 +732,2343 @@
 </thead>
 <tbody><tr>
 <td><code>id</code></td>
+<td>INTEGER PRIMARY KEY</td>
+<td>Auto-incrementing ID</td>
+</tr>
+<tr>
+<td><code>import_id</code></td>
+<td>INTEGER FK</td>
+<td>References vulnerability_imports.id</td>
+</tr>
+<tr>
+<td><code>hostname</code></td>
+<td>TEXT</td>
+<td>Device hostname</td>
+</tr>
+<tr>
+<td><code>ip_address</code></td>
+<td>TEXT</td>
+<td>Device IP address</td>
+</tr>
+<tr>
+<td><code>cve</code></td>
+<td>TEXT</td>
+<td>CVE identifier</td>
+</tr>
+<tr>
+<td><code>severity</code></td>
+<td>TEXT</td>
+<td>Severity rating (Critical, High, Medium, Low)</td>
+</tr>
+<tr>
+<td><code>vpr_score</code></td>
+<td>REAL</td>
+<td>Vulnerability Priority Rating</td>
+</tr>
+<tr>
+<td><code>cvss_score</code></td>
+<td>REAL</td>
+<td>CVSS score</td>
+</tr>
+<tr>
+<td><code>first_seen</code></td>
+<td>TEXT</td>
+<td>First detection date</td>
+</tr>
+<tr>
+<td><code>last_seen</code></td>
+<td>TEXT</td>
+<td>Most recent detection</td>
+</tr>
+<tr>
+<td><code>plugin_id</code></td>
+<td>TEXT</td>
+<td>Scanner plugin ID</td>
+</tr>
+<tr>
+<td><code>plugin_name</code></td>
+<td>TEXT</td>
+<td>Scanner plugin name</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>TEXT</td>
+<td>Vulnerability description</td>
+</tr>
+<tr>
+<td><code>solution</code></td>
+<td>TEXT</td>
+<td>Remediation guidance</td>
+</tr>
+<tr>
+<td><code>vendor_reference</code></td>
+<td>TEXT</td>
+<td>Scanner tool identifier</td>
+</tr>
+<tr>
+<td><code>vendor</code></td>
+<td>TEXT</td>
+<td>Normalized vendor (CISCO, Palo Alto, Other)</td>
+</tr>
+<tr>
+<td><code>vulnerability_date</code></td>
+<td>TEXT</td>
+<td>Vulnerability publication date</td>
+</tr>
+<tr>
+<td><code>state</code></td>
+<td>TEXT</td>
+<td>Vulnerability state (open/closed)</td>
+</tr>
+<tr>
+<td><code>import_date</code></td>
+<td>TEXT</td>
+<td>Import timestamp</td>
+</tr>
+<tr>
+<td><code>operating_system</code></td>
+<td>TEXT</td>
+<td>Device OS (Migration 006)</td>
+</tr>
+<tr>
+<td><code>solution_text</code></td>
+<td>TEXT</td>
+<td>Additional solution details (Migration 006)</td>
+</tr>
+<tr>
+<td><code>is_fixed</code></td>
 <td>INTEGER</td>
-<td><strong>Primary key</strong> - Sync record identifier (AUTOINCREMENT)</td>
+<td>Vendor-neutral fix flag (0/1) - ANY vendor has fix</td>
+</tr>
+<tr>
+<td><code>fixed_cisco_versions</code></td>
+<td>TEXT</td>
+<td>Display string: &quot;15.2(4)M11, 16.3.1&quot;</td>
+</tr>
+<tr>
+<td><code>fixed_cisco_url</code></td>
+<td>TEXT</td>
+<td>Link to Cisco advisory</td>
+</tr>
+<tr>
+<td><code>cisco_synced_at</code></td>
+<td>DATETIME</td>
+<td>Last Cisco data sync timestamp</td>
+</tr>
+<tr>
+<td><code>fixed_palo_versions</code></td>
+<td>TEXT</td>
+<td>Display string: &quot;10.2.0-h3, 11.0.0&quot;</td>
+</tr>
+<tr>
+<td><code>fixed_palo_url</code></td>
+<td>TEXT</td>
+<td>Link to Palo Alto advisory</td>
+</tr>
+<tr>
+<td><code>palo_synced_at</code></td>
+<td>DATETIME</td>
+<td>Last Palo Alto data sync timestamp</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>DATETIME</td>
+<td>Record creation timestamp</td>
+</tr>
+</tbody></table>
+<p><strong>Pattern</strong>: Denormalized vendor fix columns enable fast queries without JOINs</p>
+<hr>
+<h4>`vulnerabilities_current` (30 columns)</h4><p>Active vulnerability dataset with lifecycle state tracking and fix availability flag.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>INTEGER PRIMARY KEY</td>
+<td>Auto-incrementing ID</td>
+</tr>
+<tr>
+<td><code>import_id</code></td>
+<td>INTEGER FK</td>
+<td>References vulnerability_imports.id</td>
+</tr>
+<tr>
+<td><code>scan_date</code></td>
+<td>TEXT NOT NULL</td>
+<td>Scan execution date</td>
+</tr>
+<tr>
+<td><code>hostname</code></td>
+<td>TEXT</td>
+<td>Device hostname</td>
+</tr>
+<tr>
+<td><code>ip_address</code></td>
+<td>TEXT</td>
+<td>Device IP address</td>
+</tr>
+<tr>
+<td><code>cve</code></td>
+<td>TEXT</td>
+<td>CVE identifier</td>
+</tr>
+<tr>
+<td><code>severity</code></td>
+<td>TEXT</td>
+<td>Severity rating</td>
+</tr>
+<tr>
+<td><code>vpr_score</code></td>
+<td>REAL</td>
+<td>Vulnerability Priority Rating</td>
+</tr>
+<tr>
+<td><code>cvss_score</code></td>
+<td>REAL</td>
+<td>CVSS score</td>
+</tr>
+<tr>
+<td><code>first_seen</code></td>
+<td>TEXT</td>
+<td>First detection date</td>
+</tr>
+<tr>
+<td><code>last_seen</code></td>
+<td>TEXT</td>
+<td>Most recent detection</td>
+</tr>
+<tr>
+<td><code>plugin_id</code></td>
+<td>TEXT</td>
+<td>Scanner plugin ID</td>
+</tr>
+<tr>
+<td><code>plugin_name</code></td>
+<td>TEXT</td>
+<td>Scanner plugin name</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>TEXT</td>
+<td>Vulnerability description</td>
+</tr>
+<tr>
+<td><code>solution</code></td>
+<td>TEXT</td>
+<td>Remediation guidance</td>
+</tr>
+<tr>
+<td><code>vendor_reference</code></td>
+<td>TEXT</td>
+<td>Scanner tool identifier</td>
+</tr>
+<tr>
+<td><code>vendor</code></td>
+<td>TEXT</td>
+<td>Normalized vendor (CISCO, Palo Alto, Other)</td>
+</tr>
+<tr>
+<td><code>vulnerability_date</code></td>
+<td>TEXT</td>
+<td>Vulnerability publication date</td>
+</tr>
+<tr>
+<td><code>state</code></td>
+<td>TEXT</td>
+<td>Vulnerability state</td>
+</tr>
+<tr>
+<td><code>unique_key</code></td>
+<td>TEXT</td>
+<td>UNIQUE constraint for deduplication</td>
+</tr>
+<tr>
+<td><code>lifecycle_state</code></td>
+<td>TEXT</td>
+<td>Active/resolved/reopened tracking</td>
+</tr>
+<tr>
+<td><code>resolved_date</code></td>
+<td>TEXT</td>
+<td>Resolution timestamp</td>
+</tr>
+<tr>
+<td><code>resolution_reason</code></td>
+<td>TEXT</td>
+<td>Reason for resolution</td>
+</tr>
+<tr>
+<td><code>confidence_score</code></td>
+<td>INTEGER</td>
+<td>Deduplication confidence (0-100)</td>
+</tr>
+<tr>
+<td><code>dedup_tier</code></td>
+<td>INTEGER</td>
+<td>Deduplication tier (1-4)</td>
+</tr>
+<tr>
+<td><code>enhanced_unique_key</code></td>
+<td>TEXT</td>
+<td>4-tier deduplication key</td>
+</tr>
+<tr>
+<td><code>operating_system</code></td>
+<td>TEXT</td>
+<td>Device OS</td>
+</tr>
+<tr>
+<td><code>solution_text</code></td>
+<td>TEXT</td>
+<td>Additional solution details</td>
+</tr>
+<tr>
+<td><code>is_fix_available</code></td>
+<td>INTEGER</td>
+<td>Vendor-neutral fix availability flag (0/1)</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>DATETIME</td>
+<td>Record creation timestamp</td>
+</tr>
+<tr>
+<td><code>updated_at</code></td>
+<td>DATETIME</td>
+<td>Last modification timestamp</td>
+</tr>
+</tbody></table>
+<p><strong>Key Feature</strong>: <code>is_fix_available</code> flag enables instant filtering for vulnerabilities with vendor fixes (indexed)</p>
+<p><strong>Lifecycle States</strong>:</p>
+<ul>
+<li><code>active</code>: Currently detected vulnerability</li>
+<li><code>resolved</code>: No longer detected (with resolved_date)</li>
+<li><code>reopened</code>: Previously resolved, reappeared</li>
+</ul>
+<hr>
+<h4>`vulnerability_snapshots` (26 columns)</h4><p>Historical append-only log of all vulnerability detections. Never modified, only inserted.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>INTEGER PRIMARY KEY</td>
+<td>Auto-incrementing ID</td>
+</tr>
+<tr>
+<td><code>import_id</code></td>
+<td>INTEGER FK</td>
+<td>References vulnerability_imports.id</td>
+</tr>
+<tr>
+<td><code>scan_date</code></td>
+<td>TEXT NOT NULL</td>
+<td>Scan execution date</td>
+</tr>
+<tr>
+<td><code>hostname</code></td>
+<td>TEXT</td>
+<td>Device hostname</td>
+</tr>
+<tr>
+<td><code>ip_address</code></td>
+<td>TEXT</td>
+<td>Device IP address</td>
+</tr>
+<tr>
+<td><code>cve</code></td>
+<td>TEXT</td>
+<td>CVE identifier</td>
+</tr>
+<tr>
+<td><code>severity</code></td>
+<td>TEXT</td>
+<td>Severity rating</td>
+</tr>
+<tr>
+<td><code>vpr_score</code></td>
+<td>REAL</td>
+<td>Vulnerability Priority Rating</td>
+</tr>
+<tr>
+<td><code>cvss_score</code></td>
+<td>REAL</td>
+<td>CVSS score</td>
+</tr>
+<tr>
+<td><code>first_seen</code></td>
+<td>TEXT</td>
+<td>First detection date</td>
+</tr>
+<tr>
+<td><code>last_seen</code></td>
+<td>TEXT</td>
+<td>Most recent detection</td>
+</tr>
+<tr>
+<td><code>plugin_id</code></td>
+<td>TEXT</td>
+<td>Scanner plugin ID</td>
+</tr>
+<tr>
+<td><code>plugin_name</code></td>
+<td>TEXT</td>
+<td>Scanner plugin name</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>TEXT</td>
+<td>Vulnerability description</td>
+</tr>
+<tr>
+<td><code>solution</code></td>
+<td>TEXT</td>
+<td>Remediation guidance</td>
+</tr>
+<tr>
+<td><code>vendor_reference</code></td>
+<td>TEXT</td>
+<td>Scanner tool identifier</td>
+</tr>
+<tr>
+<td><code>vendor</code></td>
+<td>TEXT</td>
+<td>Normalized vendor</td>
+</tr>
+<tr>
+<td><code>vulnerability_date</code></td>
+<td>TEXT</td>
+<td>Vulnerability publication date</td>
+</tr>
+<tr>
+<td><code>state</code></td>
+<td>TEXT</td>
+<td>Vulnerability state</td>
+</tr>
+<tr>
+<td><code>unique_key</code></td>
+<td>TEXT</td>
+<td>Deduplication key</td>
+</tr>
+<tr>
+<td><code>confidence_score</code></td>
+<td>INTEGER</td>
+<td>Deduplication confidence</td>
+</tr>
+<tr>
+<td><code>dedup_tier</code></td>
+<td>INTEGER</td>
+<td>Deduplication tier</td>
+</tr>
+<tr>
+<td><code>enhanced_unique_key</code></td>
+<td>TEXT</td>
+<td>4-tier deduplication key</td>
+</tr>
+<tr>
+<td><code>operating_system</code></td>
+<td>TEXT</td>
+<td>Device OS</td>
+</tr>
+<tr>
+<td><code>solution_text</code></td>
+<td>TEXT</td>
+<td>Additional solution details</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>DATETIME</td>
+<td>Record creation timestamp</td>
+</tr>
+</tbody></table>
+<p><strong>Cleanup Policy</strong>: Retains last 3 scan dates for rollback capability (managed by <code>db-snapshot-cleanup.js</code>)</p>
+<hr>
+<h4>`vulnerability_staging` (28 columns)</h4><p>High-performance bulk import staging area with enhanced deduplication preprocessing.</p>
+<p><strong>Key Features</strong>:</p>
+<ul>
+<li>4-tier deduplication scoring (0.95, 0.75, 0.50, 0.25 confidence)</li>
+<li>Bulk loading for 10k+ row imports</li>
+<li>Error tracking per row</li>
+<li>Raw CSV preservation for audit</li>
+</ul>
+<p><strong>Notable Columns</strong>:</p>
+<ul>
+<li><code>enhanced_unique_key</code>: 4-tier deduplication identifier</li>
+<li><code>confidence_score</code>: Match reliability (0.0-1.0)</li>
+<li><code>dedup_tier</code>: Tier level (1=highest, 4=lowest)</li>
+<li><code>processed</code>: Boolean migration flag</li>
+<li><code>raw_csv_row</code>: JSON preservation of original data</li>
+<li><code>processing_error</code>: Error message for failed rows</li>
+</ul>
+<hr>
+<h4>`vulnerability_imports` (8 columns)</h4><p>Audit log tracking each CSV import batch.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>INTEGER PRIMARY KEY</td>
+<td>Auto-incrementing batch ID</td>
+</tr>
+<tr>
+<td><code>filename</code></td>
+<td>TEXT NOT NULL</td>
+<td>Uploaded file name</td>
+</tr>
+<tr>
+<td><code>import_date</code></td>
+<td>TEXT NOT NULL</td>
+<td>Import execution timestamp</td>
+</tr>
+<tr>
+<td><code>row_count</code></td>
+<td>INTEGER NOT NULL</td>
+<td>Number of rows processed</td>
+</tr>
+<tr>
+<td><code>vendor</code></td>
+<td>TEXT</td>
+<td>Vendor classification (Cisco, Tenable, Qualys)</td>
+</tr>
+<tr>
+<td><code>file_size</code></td>
+<td>INTEGER</td>
+<td>File size in bytes</td>
+</tr>
+<tr>
+<td><code>processing_time</code></td>
+<td>INTEGER</td>
+<td>Processing duration (milliseconds)</td>
+</tr>
+<tr>
+<td><code>raw_headers</code></td>
+<td>TEXT</td>
+<td>JSON array of CSV column headers</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>DATETIME</td>
+<td>Record creation timestamp</td>
+</tr>
+</tbody></table>
+<hr>
+<h4>`vulnerability_daily_totals` (15 columns)</h4><p>Aggregated vulnerability metrics by scan date for trend analysis.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>INTEGER PRIMARY KEY</td>
+<td>Auto-incrementing ID</td>
+</tr>
+<tr>
+<td><code>scan_date</code></td>
+<td>TEXT</td>
+<td>UNIQUE constraint - scan date</td>
+</tr>
+<tr>
+<td><code>critical_count</code></td>
+<td>INTEGER</td>
+<td>Count of Critical severity</td>
+</tr>
+<tr>
+<td><code>critical_total_vpr</code></td>
+<td>REAL</td>
+<td>Sum of VPR for Critical</td>
+</tr>
+<tr>
+<td><code>high_count</code></td>
+<td>INTEGER</td>
+<td>Count of High severity</td>
+</tr>
+<tr>
+<td><code>high_total_vpr</code></td>
+<td>REAL</td>
+<td>Sum of VPR for High</td>
+</tr>
+<tr>
+<td><code>medium_count</code></td>
+<td>INTEGER</td>
+<td>Count of Medium severity</td>
+</tr>
+<tr>
+<td><code>medium_total_vpr</code></td>
+<td>REAL</td>
+<td>Sum of VPR for Medium</td>
+</tr>
+<tr>
+<td><code>low_count</code></td>
+<td>INTEGER</td>
+<td>Count of Low severity</td>
+</tr>
+<tr>
+<td><code>low_total_vpr</code></td>
+<td>REAL</td>
+<td>Sum of VPR for Low</td>
+</tr>
+<tr>
+<td><code>total_vulnerabilities</code></td>
+<td>INTEGER</td>
+<td>Total vulnerability count</td>
+</tr>
+<tr>
+<td><code>total_vpr</code></td>
+<td>REAL</td>
+<td>Sum of all VPR scores</td>
+</tr>
+<tr>
+<td><code>resolved_count</code></td>
+<td>INTEGER</td>
+<td>Count of resolved vulnerabilities</td>
+</tr>
+<tr>
+<td><code>reopened_count</code></td>
+<td>INTEGER</td>
+<td>Count of reopened vulnerabilities</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>DATETIME</td>
+<td>Record creation timestamp</td>
+</tr>
+<tr>
+<td><code>updated_at</code></td>
+<td>DATETIME</td>
+<td>Last modification timestamp</td>
+</tr>
+</tbody></table>
+<p><strong>Unique Constraint</strong>: <code>scan_date</code> (idempotent aggregates - safe to re-run)</p>
+<hr>
+<h4>`vendor_daily_totals` (14 columns)</h4><p>Vendor-specific aggregated metrics (Cisco, Palo Alto, Other). Never cleaned up - permanent historical storage.</p>
+<p><strong>Migration</strong>: 008-vendor-daily-totals.sql</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>INTEGER PRIMARY KEY</td>
+<td>Auto-incrementing ID</td>
+</tr>
+<tr>
+<td><code>scan_date</code></td>
+<td>TEXT NOT NULL</td>
+<td>Scan date</td>
+</tr>
+<tr>
+<td><code>vendor</code></td>
+<td>TEXT NOT NULL</td>
+<td>Vendor classification</td>
+</tr>
+<tr>
+<td><code>critical_count</code></td>
+<td>INTEGER</td>
+<td>Critical severity count</td>
+</tr>
+<tr>
+<td><code>critical_total_vpr</code></td>
+<td>REAL</td>
+<td>Critical VPR sum</td>
+</tr>
+<tr>
+<td><code>high_count</code></td>
+<td>INTEGER</td>
+<td>High severity count</td>
+</tr>
+<tr>
+<td><code>high_total_vpr</code></td>
+<td>REAL</td>
+<td>High VPR sum</td>
+</tr>
+<tr>
+<td><code>medium_count</code></td>
+<td>INTEGER</td>
+<td>Medium severity count</td>
+</tr>
+<tr>
+<td><code>medium_total_vpr</code></td>
+<td>REAL</td>
+<td>Medium VPR sum</td>
+</tr>
+<tr>
+<td><code>low_count</code></td>
+<td>INTEGER</td>
+<td>Low severity count</td>
+</tr>
+<tr>
+<td><code>low_total_vpr</code></td>
+<td>REAL</td>
+<td>Low VPR sum</td>
+</tr>
+<tr>
+<td><code>total_vulnerabilities</code></td>
+<td>INTEGER</td>
+<td>Total count</td>
+</tr>
+<tr>
+<td><code>total_vpr</code></td>
+<td>REAL</td>
+<td>Total VPR sum</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>DATETIME</td>
+<td>Record creation timestamp</td>
+</tr>
+</tbody></table>
+<p><strong>Unique Constraint</strong>: <code>(scan_date, vendor)</code> composite key</p>
+<p><strong>Purpose</strong>: Fixes issue where vendor filters only showed 3 dates (snapshot cleanup period) while &quot;All Vendors&quot; showed complete history.</p>
+<hr>
+<h3>Vendor Advisory Integration</h3><h4>`kev_status` (10 columns)</h4><p>CISA Known Exploited Vulnerabilities catalog data (v1.0.22+).</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Constraints</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>cve_id</code></td>
+<td>TEXT</td>
+<td>PRIMARY KEY</td>
+<td>CVE identifier (e.g., CVE-2021-44228)</td>
+</tr>
+<tr>
+<td><code>date_added</code></td>
+<td>DATE</td>
+<td>NOT NULL</td>
+<td>Date CISA added to KEV catalog</td>
+</tr>
+<tr>
+<td><code>vulnerability_name</code></td>
+<td>TEXT</td>
+<td></td>
+<td>CISA-provided vulnerability name</td>
+</tr>
+<tr>
+<td><code>vendor_project</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Affected vendor or project</td>
+</tr>
+<tr>
+<td><code>product</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Specific product affected</td>
+</tr>
+<tr>
+<td><code>required_action</code></td>
+<td>TEXT</td>
+<td></td>
+<td>CISA-mandated remediation action</td>
+</tr>
+<tr>
+<td><code>due_date</code></td>
+<td>DATE</td>
+<td></td>
+<td>Federal agency remediation deadline</td>
+</tr>
+<tr>
+<td><code>known_ransomware_use</code></td>
+<td>BOOLEAN</td>
+<td>DEFAULT 0</td>
+<td>Ransomware campaign usage flag (1=Yes, 0=No)</td>
+</tr>
+<tr>
+<td><code>notes</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Additional CISA context and guidance</td>
+</tr>
+<tr>
+<td><code>last_synced</code></td>
+<td>TIMESTAMP</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Last synchronization timestamp</td>
+</tr>
+</tbody></table>
+<p><strong>Relationship</strong>: LEFT JOIN with <code>vulnerabilities_current</code> on <code>cve</code> = <code>cve_id</code> to enrich vulnerability data</p>
+<p><strong>API Source</strong>: <a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog">https://www.cisa.gov/known-exploited-vulnerabilities-catalog</a></p>
+<hr>
+<h4>`cisco_advisories` (10 columns)</h4><p>Cisco PSIRT advisory data with fixed software versions (v1.0.63+).</p>
+<p><strong>Migration</strong>: 005-cisco-advisories.sql (HEX-141)</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>cve_id</code></td>
+<td>TEXT PRIMARY KEY</td>
+<td>CVE identifier</td>
+</tr>
+<tr>
+<td><code>advisory_id</code></td>
+<td>TEXT</td>
+<td>Cisco advisory ID (e.g., &quot;cisco-sa-20241001-xyz&quot;)</td>
+</tr>
+<tr>
+<td><code>advisory_title</code></td>
+<td>TEXT</td>
+<td>Human-readable advisory title</td>
+</tr>
+<tr>
+<td><code>severity</code></td>
+<td>TEXT</td>
+<td>Cisco severity rating (Critical, High, Medium, Low)</td>
+</tr>
+<tr>
+<td><code>cvss_score</code></td>
+<td>TEXT</td>
+<td>CVSS score from Cisco advisory</td>
+</tr>
+<tr>
+<td><code>first_fixed</code></td>
+<td>TEXT</td>
+<td>JSON array: [&quot;15.2(4)M11&quot;, &quot;16.3.1&quot;, &quot;17.1.1&quot;]</td>
+</tr>
+<tr>
+<td><code>affected_releases</code></td>
+<td>TEXT</td>
+<td>JSON array of affected software versions</td>
+</tr>
+<tr>
+<td><code>product_names</code></td>
+<td>TEXT</td>
+<td>JSON array of affected Cisco products</td>
+</tr>
+<tr>
+<td><code>publication_url</code></td>
+<td>TEXT</td>
+<td>Direct link to Cisco advisory page</td>
+</tr>
+<tr>
+<td><code>last_synced</code></td>
+<td>TIMESTAMP</td>
+<td>Last synchronization timestamp</td>
+</tr>
+</tbody></table>
+<p><strong>Relationship</strong>: LEFT JOIN with <code>vulnerabilities_current</code> and <code>vulnerabilities</code> on <code>cve</code> = <code>cve_id</code></p>
+<p><strong>API Source</strong>: Cisco PSIRT OpenVuln API</p>
+<p><strong>Pattern</strong>: Mirrors KEV implementation - separate table for rich metadata, denormalized columns in vulnerabilities table for fast queries</p>
+<hr>
+<h4>`palo_alto_advisories` (10 columns)</h4><p>Palo Alto Networks security advisory data with fixed PAN-OS versions (v1.0.63+).</p>
+<p><strong>Migration</strong>: 006-palo-alto-advisories.sql (HEX-209)</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>cve_id</code></td>
+<td>TEXT PRIMARY KEY</td>
+<td>CVE identifier</td>
+</tr>
+<tr>
+<td><code>advisory_id</code></td>
+<td>TEXT</td>
+<td>Palo Alto advisory ID (same as CVE)</td>
+</tr>
+<tr>
+<td><code>advisory_title</code></td>
+<td>TEXT</td>
+<td>Human-readable advisory title</td>
+</tr>
+<tr>
+<td><code>severity</code></td>
+<td>TEXT</td>
+<td>Severity rating from CVSS metrics</td>
+</tr>
+<tr>
+<td><code>cvss_score</code></td>
+<td>TEXT</td>
+<td>CVSS score</td>
+</tr>
+<tr>
+<td><code>first_fixed</code></td>
+<td>TEXT</td>
+<td>JSON array: [&quot;10.2.0-h3&quot;, &quot;10.2.1-h2&quot;, &quot;11.0.0&quot;]</td>
+</tr>
+<tr>
+<td><code>affected_versions</code></td>
+<td>TEXT</td>
+<td>JSON array from x_affectedList</td>
+</tr>
+<tr>
+<td><code>product_name</code></td>
+<td>TEXT</td>
+<td>Affected product (always &quot;PAN-OS&quot; for v1)</td>
+</tr>
+<tr>
+<td><code>publication_url</code></td>
+<td>TEXT</td>
+<td>Constructed: <a href="https://security.paloaltonetworks.com/{cve_id}">https://security.paloaltonetworks.com/{cve_id}</a></td>
+</tr>
+<tr>
+<td><code>last_synced</code></td>
+<td>TIMESTAMP</td>
+<td>Last synchronization timestamp</td>
+</tr>
+</tbody></table>
+<p><strong>Relationship</strong>: LEFT JOIN with <code>vulnerabilities_current</code> and <code>vulnerabilities</code> on <code>cve</code> = <code>cve_id</code></p>
+<p><strong>API Source</strong>: <a href="https://security.paloaltonetworks.com/json/{CVE-ID}">https://security.paloaltonetworks.com/json/{CVE-ID}</a> (public API)</p>
+<p><strong>Version Matching</strong>: Smart major.minor family matching with Azure Marketplace format handling</p>
+<hr>
+<h4>`sync_metadata` (8 columns)</h4><p>Multi-purpose synchronization tracking for KEV, Cisco, Palo Alto, and auto-VACUUM operations.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Constraints</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>INTEGER</td>
+<td>PRIMARY KEY AUTOINCREMENT</td>
+<td>Sync record identifier</td>
 </tr>
 <tr>
 <td><code>sync_type</code></td>
 <td>TEXT</td>
-<td>Type of sync operation (e.g., &#39;kev_catalog&#39;) - NOT NULL</td>
+<td>NOT NULL</td>
+<td>Sync operation type</td>
 </tr>
 <tr>
 <td><code>sync_time</code></td>
 <td>TIMESTAMP</td>
-<td>Sync execution timestamp (NOT NULL)</td>
+<td>NOT NULL</td>
+<td>Sync execution timestamp</td>
 </tr>
 <tr>
 <td><code>version</code></td>
 <td>TEXT</td>
-<td>Catalog version or timestamp from CISA</td>
+<td></td>
+<td>Catalog version or timestamp (KEV only)</td>
 </tr>
 <tr>
 <td><code>record_count</code></td>
 <td>INTEGER</td>
-<td>Number of KEV records synced</td>
+<td></td>
+<td>Number of records synced</td>
 </tr>
 <tr>
 <td><code>status</code></td>
 <td>TEXT</td>
-<td>Sync status (completed/failed/in_progress) - DEFAULT &#39;completed&#39;</td>
+<td>DEFAULT &#39;completed&#39;</td>
+<td>Sync status (completed/failed/in_progress)</td>
 </tr>
 <tr>
 <td><code>error_message</code></td>
 <td>TEXT</td>
+<td></td>
 <td>Error details if sync failed</td>
 </tr>
 <tr>
 <td><code>created_at</code></td>
 <td>TIMESTAMP</td>
-<td>Record creation timestamp (DEFAULT CURRENT_TIMESTAMP)</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Record creation timestamp</td>
 </tr>
 </tbody></table>
-<p><strong>Purpose</strong>: Audit trail for KEV sync operations, enables monitoring and troubleshooting of catalog updates.</p>
-<h3>KEV Data Flow</h3><div class="mermaid">graph TD
+<p><strong>Supported sync_type Values</strong>:</p>
+<ul>
+<li><code>kev_catalog</code> - CISA KEV synchronization</li>
+<li><code>cisco</code> - Cisco PSIRT advisory sync</li>
+<li><code>palo_alto</code> - Palo Alto advisory sync</li>
+<li><code>auto_vacuum</code> - Automated database VACUUM operations (HEX-250)</li>
+</ul>
+<p><strong>Purpose</strong>: Audit trail for sync operations, enables monitoring and troubleshooting</p>
+<hr>
+<h3>Authentication & User Management</h3><h4>`users` (11 columns)</h4><p>User accounts with Argon2id password hashing and account lockout protection (v1.0.46+).</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Constraints</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>TEXT</td>
+<td>PRIMARY KEY</td>
+<td>User identifier (UUID format)</td>
+</tr>
+<tr>
+<td><code>username</code></td>
+<td>TEXT</td>
+<td>UNIQUE NOT NULL</td>
+<td>Login username</td>
+</tr>
+<tr>
+<td><code>email</code></td>
+<td>TEXT</td>
+<td></td>
+<td>User email address</td>
+</tr>
+<tr>
+<td><code>password_hash</code></td>
+<td>TEXT</td>
+<td>NOT NULL</td>
+<td>Argon2id hash (never plaintext)</td>
+</tr>
+<tr>
+<td><code>role</code></td>
+<td>TEXT</td>
+<td>DEFAULT &#39;superadmin&#39;</td>
+<td>User role (superadmin/admin/user)</td>
+</tr>
+<tr>
+<td><code>is_active</code></td>
+<td>INTEGER</td>
+<td>DEFAULT 1</td>
+<td>Account active flag (0=disabled, 1=active)</td>
+</tr>
+<tr>
+<td><code>last_login</code></td>
+<td>DATETIME</td>
+<td></td>
+<td>Last successful login timestamp</td>
+</tr>
+<tr>
+<td><code>failed_attempts</code></td>
+<td>INTEGER</td>
+<td>DEFAULT 0</td>
+<td>Consecutive failed login count</td>
+</tr>
+<tr>
+<td><code>failed_login_timestamp</code></td>
+<td>DATETIME</td>
+<td></td>
+<td>Last failed login timestamp</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Account creation timestamp</td>
+</tr>
+<tr>
+<td><code>updated_at</code></td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Last modification timestamp</td>
+</tr>
+</tbody></table>
+<p><strong>Security Features</strong>:</p>
+<ul>
+<li>Argon2id password hashing (memoryCost: 19456, timeCost: 2, parallelism: 1)</li>
+<li>Account lockout after 5 failed attempts</li>
+<li>15-minute lockout duration</li>
+</ul>
+<hr>
+<h4>`user_preferences` (6 columns)</h4><p>User-specific UI preferences with cross-device synchronization (HEX-138).</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Constraints</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>INTEGER</td>
+<td>PRIMARY KEY AUTOINCREMENT</td>
+<td>Preference record ID</td>
+</tr>
+<tr>
+<td><code>user_id</code></td>
+<td>TEXT</td>
+<td>NOT NULL FK → users.id</td>
+<td>User identifier (CASCADE DELETE)</td>
+</tr>
+<tr>
+<td><code>preference_key</code></td>
+<td>TEXT</td>
+<td>NOT NULL</td>
+<td>Setting identifier (e.g., &#39;theme&#39;, &#39;dashboard_layout&#39;)</td>
+</tr>
+<tr>
+<td><code>preference_value</code></td>
+<td>TEXT</td>
+<td>NOT NULL</td>
+<td>Setting value (JSON or plain text)</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Record creation timestamp</td>
+</tr>
+<tr>
+<td><code>updated_at</code></td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Last modification timestamp</td>
+</tr>
+</tbody></table>
+<p><strong>Unique Constraint</strong>: <code>(user_id, preference_key)</code> composite key</p>
+<p><strong>Trigger</strong>: <code>user_preferences_updated_at</code> auto-updates <code>updated_at</code> on modification</p>
+<hr>
+<h4>`sessions`</h4><p>Auto-created by <code>better-sqlite3-session-store</code>. Not explicitly defined in schema.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>sid</code></td>
+<td>TEXT PRIMARY KEY</td>
+<td>Session identifier</td>
+</tr>
+<tr>
+<td><code>sess</code></td>
+<td>TEXT</td>
+<td>Serialized session data (JSON)</td>
+</tr>
+<tr>
+<td><code>expired</code></td>
+<td>DATETIME</td>
+<td>Session expiration timestamp</td>
+</tr>
+</tbody></table>
+<p><strong>Automatic Cleanup</strong>: Expired sessions purged by session store middleware</p>
+<hr>
+<h3>Template System</h3><h4>`email_templates`, `ticket_templates`, `vulnerability_templates`</h4><p>All three template tables share identical schema (10 columns each).</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Constraints</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>INTEGER</td>
+<td>PRIMARY KEY AUTOINCREMENT</td>
+<td>Template record ID</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>TEXT</td>
+<td>NOT NULL UNIQUE</td>
+<td>Template identifier</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Template description</td>
+</tr>
+<tr>
+<td><code>template_content</code></td>
+<td>TEXT</td>
+<td>NOT NULL</td>
+<td>Customized template (user-modified)</td>
+</tr>
+<tr>
+<td><code>default_content</code></td>
+<td>TEXT</td>
+<td>NOT NULL</td>
+<td>Original default (for reset)</td>
+</tr>
+<tr>
+<td><code>variables</code></td>
+<td>TEXT</td>
+<td>NOT NULL</td>
+<td>JSON array of supported variables</td>
+</tr>
+<tr>
+<td><code>category</code></td>
+<td>TEXT</td>
+<td>DEFAULT varies</td>
+<td>Template category</td>
+</tr>
+<tr>
+<td><code>is_active</code></td>
+<td>BOOLEAN</td>
+<td>DEFAULT 1</td>
+<td>Template enabled flag (0=disabled, 1=active)</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Record creation timestamp</td>
+</tr>
+<tr>
+<td><code>updated_at</code></td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Last modification timestamp</td>
+</tr>
+</tbody></table>
+<p><strong>Variable Substitution</strong>: Mustache-style variables like <code>{{ticket_id}}</code>, <code>{{severity}}</code>, <code>{{vpr_score}}</code> replaced at runtime</p>
+<p><strong>Supported Variables Examples</strong>:</p>
+<ul>
+<li>Email: <code>{{recipient}}</code>, <code>{{subject}}</code>, <code>{{cve}}</code>, <code>{{severity}}</code></li>
+<li>Ticket: <code>{{ticket_id}}</code>, <code>{{location}}</code>, <code>{{devices}}</code>, <code>{{status}}</code></li>
+<li>Vulnerability: <code>{{cve}}</code>, <code>{{hostname}}</code>, <code>{{vpr_score}}</code>, <code>{{description}}</code></li>
+</ul>
+<hr>
+<h2>Data Flows</h2><h3>Vulnerability CSV Import (Rollover Pipeline)</h3><p>This flow shows the complete CSV import process using the rollover architecture.</p>
+<div class="mermaid">sequenceDiagram
+    participant User
+    participant API as POST /api/vulnerabilities/import
+    participant DB as SQLite Database
+    participant Worker as Background Worker
+
+    User-&gt;&gt;API: Upload CSV file (+ optional scanDate)
+    API-&gt;&gt;DB: INSERT INTO vulnerability_imports
+    Note over API,DB: Batch ID created
+
+    API-&gt;&gt;DB: INSERT INTO vulnerability_snapshots (append-only)
+    Note over DB: Historical log - never modified
+
+    API-&gt;&gt;DB: UPSERT INTO vulnerabilities_current
+    Note over DB: Deduplication via unique_key&lt;br/&gt;UPDATE if exists, INSERT if new
+
+    API-&gt;&gt;DB: DELETE stale rows FROM vulnerabilities_current
+    Note over DB: Remove vulnerabilities not in current scan&lt;br/&gt;Mark as lifecycle_state='resolved'
+
+    API-&gt;&gt;DB: INSERT OR REPLACE INTO vulnerability_daily_totals
+    Note over DB: Aggregated metrics by severity
+
+    API-&gt;&gt;DB: INSERT OR REPLACE INTO vendor_daily_totals
+    Note over DB: Vendor-specific metrics (Cisco/Palo/Other)
+
+    API--&gt;&gt;User: { success, importId, scanDate, performanceMetrics }
+
+    Worker-&gt;&gt;DB: LEFT JOIN vulnerabilities_current with kev_status
+    Note over Worker,DB: Enrich with KEV flags
+
+    Worker-&gt;&gt;DB: LEFT JOIN vulnerabilities_current with cisco_advisories
+    Note over Worker,DB: Enrich with Cisco fix data
+
+    Worker-&gt;&gt;DB: LEFT JOIN vulnerabilities_current with palo_alto_advisories
+    Note over Worker,DB: Enrich with Palo Alto fix data</div><p><strong>Fast-Path Alternative</strong>: <code>POST /api/vulnerabilities/import-staging</code> uses <code>vulnerability_staging</code> table for bulk loading with Socket.io progress streaming.</p>
+<hr>
+<h3>KEV Catalog Sync Data Flow</h3><div class="mermaid">graph TD
     A[CISA KEV API] --&gt;|HTTPS GET| B[KEV Service]
     B --&gt;|Parse JSON| C[sync_metadata]
-    B --&gt;|Upsert Records| D[kev_status]
-    D --&gt;|LEFT JOIN| E[vulnerabilities_current]
+    B --&gt;|UPSERT Records| D[kev_status]
+    D --&gt;|LEFT JOIN on cve_id| E[vulnerabilities_current]
     E --&gt;|Enrich with KEV flags| F[UI: Vulnerability Grid]
-    C --&gt;|Sync Status| G[Settings Modal]</div><hr>
-<h2>Authentication & User Management Tables *(v1.0.46+)*</h2><h3>`users`</h3><p>Stores user accounts with Argon2id password hashing and account lockout tracking.</p>
-<p><strong>Key Fields</strong>:</p>
-<ul>
-<li><code>id</code> (TEXT, PK): User identifier</li>
-<li><code>username</code> (TEXT, UNIQUE): Login username</li>
-<li><code>password_hash</code> (TEXT): Argon2id hash (never plaintext)</li>
-<li><code>role</code> (TEXT): User role (superadmin/admin/user)</li>
-<li><code>failed_attempts</code> (INTEGER): Consecutive failed logins (account locked after 5)</li>
-<li><code>last_login</code> (DATETIME): Last successful login timestamp</li>
-</ul>
-<p><strong>Security</strong>: Passwords hashed with Argon2id, account locked for 15 minutes after 5 failed attempts.</p>
-<h3>`user_preferences`</h3><p>Stores user-specific UI preferences for cross-device synchronization (HEX-138).</p>
-<p><strong>Key Fields</strong>:</p>
-<ul>
-<li><code>user_id</code> (TEXT, FK): References <code>users.id</code> with CASCADE DELETE</li>
-<li><code>preference_key</code> (TEXT): Setting identifier (e.g., &#39;theme&#39;, &#39;dashboard_layout&#39;)</li>
-<li><code>preference_value</code> (TEXT): Setting value (JSON or plain text)</li>
-<li><strong>UNIQUE</strong> constraint on (<code>user_id</code>, <code>preference_key</code>)</li>
-</ul>
-<p><strong>Trigger</strong>: <code>user_preferences_updated_at</code> auto-updates <code>updated_at</code> on modification.</p>
-<p><strong>Session Storage</strong>: Sessions stored in separate <code>sessions</code> table (auto-created by <code>better-sqlite3-session-store</code>).</p>
+    C --&gt;|Sync Status| G[Settings Modal]
+
+    style A fill:#e1f5ff
+    style D fill:#fff3cd
+    style E fill:#d4edda
+    style F fill:#cce5ff</div><p><strong>API Endpoint</strong>: <a href="https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json">https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json</a></p>
+<p><strong>Sync Frequency</strong>: Daily background sync + manual trigger</p>
 <hr>
-<h2>Template System Tables *(v1.0.46+)*</h2><p>HexTrackr provides customizable templates with variable substitution for emails, tickets, and reports.</p>
-<h3>`email_templates`, `ticket_templates`, `vulnerability_templates`</h3><p>All three template tables share identical schema structure:</p>
-<p><strong>Key Fields</strong>:</p>
-<ul>
-<li><code>name</code> (TEXT, UNIQUE): Template identifier</li>
-<li><code>template_content</code> (TEXT): Customized template (user-modified)</li>
-<li><code>default_content</code> (TEXT): Original default (for reset)</li>
-<li><code>variables</code> (TEXT): JSON array of supported variables (e.g., <code>{{cve}}</code>, <code>{{hostname}}</code>)</li>
-<li><code>category</code> (TEXT): Template category</li>
-<li><code>is_active</code> (BOOLEAN): Whether template is enabled</li>
-</ul>
-<p><strong>Variable Substitution</strong>: Templates use Mustache-style variables like <code>{{ticket_id}}</code>, <code>{{severity}}</code>, <code>{{vpr_score}}</code> replaced at runtime.</p>
+<h3>Cisco PSIRT Advisory Sync Data Flow</h3><div class="mermaid">graph TD
+    A[Cisco PSIRT OpenVuln API] --&gt;|HTTPS GET with API Key| B[Cisco Advisory Service]
+    B --&gt;|Parse JSON| C[sync_metadata]
+    B --&gt;|UPSERT Records| D[cisco_advisories]
+    D --&gt;|LEFT JOIN on cve_id| E[vulnerabilities_current]
+    E --&gt;|Enrich with fixed_cisco_versions| F[UI: Device Security Modal]
+    D --&gt;|UPDATE denormalized columns| G[vulnerabilities table]
+    G --&gt;|is_fixed flag| H[UI: Fixed Version Column]
+    C --&gt;|Sync Status| I[Settings Modal]
+
+    style A fill:#e1f5ff
+    style D fill:#fff3cd
+    style E fill:#d4edda
+    style F fill:#cce5ff
+    style G fill:#f8d7da</div><p><strong>API Authentication</strong>: Requires Cisco API key + secret (stored in <code>user_preferences</code>)</p>
+<p><strong>Sync Frequency</strong>: Daily background sync + manual trigger</p>
+<p><strong>Version Matching</strong>: Smart matching for IOS, IOS XE, IOS XR, NX-OS versions</p>
 <hr>
-<h2>Enhanced Staging & Performance</h2><h3>`vulnerability_staging`</h3><p>Bulk import staging area for high-performance CSV processing with enhanced deduplication.</p>
-<p><strong>Key Features</strong>:</p>
+<h3>Palo Alto Advisory Sync Data Flow</h3><div class="mermaid">graph TD
+    A[Palo Alto Security Advisory API] --&gt;|HTTPS GET - Public API| B[Palo Alto Advisory Service]
+    B --&gt;|Parse JSON| C[sync_metadata]
+    B --&gt;|UPSERT Records| D[palo_alto_advisories]
+    D --&gt;|LEFT JOIN on cve_id| E[vulnerabilities_current]
+    E --&gt;|Enrich with fixed_palo_versions| F[UI: Device Security Modal]
+    D --&gt;|UPDATE denormalized columns| G[vulnerabilities table]
+    G --&gt;|is_fixed flag| H[UI: Fixed Version Column]
+    C --&gt;|Sync Status| I[Settings Modal]
+
+    style A fill:#e1f5ff
+    style D fill:#fff3cd
+    style E fill:#d4edda
+    style F fill:#cce5ff
+    style G fill:#f8d7da</div><p><strong>API Endpoint</strong>: <a href="https://security.paloaltonetworks.com/json/{CVE-ID}">https://security.paloaltonetworks.com/json/{CVE-ID}</a></p>
+<p><strong>No Authentication Required</strong>: Public API (highly reliable)</p>
+<p><strong>Sync Frequency</strong>: Daily background sync + manual trigger</p>
+<p><strong>Version Matching</strong>: Major.minor family matching with Azure Marketplace format normalization</p>
+<hr>
+<h3>Ticket Creation / Update</h3><p>Simple ticket CRUD operations with soft delete support.</p>
+<div class="mermaid">sequenceDiagram
+    participant User
+    participant API as POST /api/tickets
+    participant DB as SQLite Database
+
+    User-&gt;&gt;API: { ticketData }
+    API-&gt;&gt;DB: INSERT INTO tickets
+    Note over DB: UUID id generated&lt;br/&gt;xt_number auto-assigned
+    API--&gt;&gt;User: { success, id, xt_number }
+
+    Note over User,API: Update Operation
+    User-&gt;&gt;API: PUT /api/tickets/:id
+    API-&gt;&gt;DB: UPDATE tickets SET ... WHERE id = ?
+    Note over DB: updated_at auto-updated
+    API--&gt;&gt;User: { success }
+
+    Note over User,API: Soft Delete Operation
+    User-&gt;&gt;API: DELETE /api/tickets/:id
+    API-&gt;&gt;User: Prompt for deletion_reason
+    User-&gt;&gt;API: { deletion_reason }
+    API-&gt;&gt;DB: UPDATE tickets SET deleted=1, deleted_at=NOW(), deletion_reason=?, deleted_by=?
+    Note over DB: Ticket hidden from UI&lt;br/&gt;Audit trail preserved
+    API--&gt;&gt;User: { success }</div><hr>
+<h2>Index Inventory (72 Total)</h2><h3>Vulnerability Tables (23 indexes)</h3><table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Index Name</th>
+<th>Columns</th>
+<th>Type</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>vulnerabilities</code></td>
+<td><code>idx_vulnerabilities_hostname</code></td>
+<td>hostname</td>
+<td>Standard</td>
+<td>Device-based queries</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_vulnerabilities_severity</code></td>
+<td>severity</td>
+<td>Standard</td>
+<td>Severity filtering</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_vulnerabilities_cve</code></td>
+<td>cve</td>
+<td>Standard</td>
+<td>CVE lookups</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_vulnerabilities_import</code></td>
+<td>import_id</td>
+<td>Standard</td>
+<td>Batch tracking</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_vulnerabilities_is_fixed</code></td>
+<td>is_fixed</td>
+<td>Partial (WHERE is_fixed=1)</td>
+<td>Fixed vulnerability queries</td>
+</tr>
+<tr>
+<td><code>vulnerability_snapshots</code></td>
+<td><code>idx_snapshots_scan_date</code></td>
+<td>scan_date</td>
+<td>Standard</td>
+<td>Historical date filtering</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_snapshots_hostname</code></td>
+<td>hostname</td>
+<td>Standard</td>
+<td>Device queries</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_snapshots_severity</code></td>
+<td>severity</td>
+<td>Standard</td>
+<td>Severity filtering</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_snapshots_enhanced_key</code></td>
+<td>enhanced_unique_key</td>
+<td>Standard</td>
+<td>4-tier deduplication</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_snapshots_cve</code></td>
+<td>cve</td>
+<td>Standard</td>
+<td>CVE lookups</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_snapshots_import_id</code></td>
+<td>import_id</td>
+<td>Standard</td>
+<td>Batch tracking</td>
+</tr>
+<tr>
+<td><code>vulnerabilities_current</code></td>
+<td><code>idx_current_unique_key</code></td>
+<td>unique_key</td>
+<td>Standard</td>
+<td>Fast deduplication</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_current_scan_date</code></td>
+<td>scan_date</td>
+<td>Standard</td>
+<td>Date filtering</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_current_enhanced_unique_key</code></td>
+<td>enhanced_unique_key</td>
+<td>Standard</td>
+<td>4-tier deduplication</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_current_lifecycle_scan</code></td>
+<td>lifecycle_state, scan_date</td>
+<td>Composite</td>
+<td>Lifecycle queries</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_current_confidence_tier</code></td>
+<td>confidence_score, dedup_tier</td>
+<td>Composite</td>
+<td>Quality filtering</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_current_active_severity</code></td>
+<td>lifecycle_state, severity</td>
+<td>Composite</td>
+<td>Active vulnerability reports</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_current_resolved_date</code></td>
+<td>resolved_date</td>
+<td>Standard</td>
+<td>Resolution tracking</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_current_cve</code></td>
+<td>cve</td>
+<td>Standard</td>
+<td>CVE searches</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_current_vendor</code></td>
+<td>vendor</td>
+<td>Standard</td>
+<td>Vendor filtering (HEX-101)</td>
+</tr>
+<tr>
+<td><code>vulnerability_daily_totals</code></td>
+<td><code>idx_daily_totals_scan_date</code></td>
+<td>scan_date</td>
+<td>UNIQUE</td>
+<td>Idempotent aggregates</td>
+</tr>
+<tr>
+<td><code>vendor_daily_totals</code></td>
+<td><code>idx_vendor_daily_scan_date</code></td>
+<td>scan_date</td>
+<td>Standard</td>
+<td>Date filtering</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_vendor_daily_vendor</code></td>
+<td>vendor</td>
+<td>Standard</td>
+<td>Vendor filtering</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_vendor_daily_composite</code></td>
+<td>vendor, scan_date</td>
+<td>UNIQUE Composite</td>
+<td>Vendor trend analysis</td>
+</tr>
+</tbody></table>
+<h3>Staging Tables (4 indexes)</h3><table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Index Name</th>
+<th>Columns</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>vulnerability_staging</code></td>
+<td><code>idx_staging_import_id</code></td>
+<td>import_id</td>
+<td>Import batch association</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_staging_processed</code></td>
+<td>processed</td>
+<td>Batch migration tracking</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_staging_batch_id</code></td>
+<td>batch_id</td>
+<td>Batch grouping</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_staging_unprocessed_batch</code></td>
+<td>processed, batch_id</td>
+<td>Composite - unprocessed batch queries</td>
+</tr>
+</tbody></table>
+<h3>Import Tracking (4 indexes)</h3><table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Index Name</th>
+<th>Columns</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>vulnerability_imports</code></td>
+<td><code>idx_imports_import_date</code></td>
+<td>import_date</td>
+<td>Import history queries</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_imports_vendor</code></td>
+<td>vendor</td>
+<td>Vendor-specific tracking</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_imports_filename</code></td>
+<td>filename</td>
+<td>File-based lookups</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_imports_created_at</code></td>
+<td>created_at</td>
+<td>Chronological sorting</td>
+</tr>
+</tbody></table>
+<h3>KEV Integration (5 indexes)</h3><table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Index Name</th>
+<th>Columns</th>
+<th>Type</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>kev_status</code></td>
+<td>PRIMARY KEY</td>
+<td>cve_id</td>
+<td>Primary</td>
+<td>Fast KEV lookups during JOIN</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_kev_status_date_added</code></td>
+<td>date_added</td>
+<td>Standard</td>
+<td>CISA timeline queries</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_kev_status_cve_id</code></td>
+<td>cve_id</td>
+<td>Standard</td>
+<td>CVE lookups</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_kev_status_due_date</code></td>
+<td>due_date</td>
+<td>Standard</td>
+<td>Deadline tracking</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_kev_status_ransomware</code></td>
+<td>known_ransomware_use</td>
+<td>Partial (WHERE known_ransomware_use=1)</td>
+<td>Ransomware campaign tracking</td>
+</tr>
+</tbody></table>
+<h3>Vendor Advisory Integration (5 indexes)</h3><table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Index Name</th>
+<th>Columns</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>cisco_advisories</code></td>
+<td>PRIMARY KEY</td>
+<td>cve_id</td>
+<td>Fast Cisco advisory lookups</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_cisco_advisories_cve</code></td>
+<td>cve_id</td>
+<td>CVE searches</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_cisco_advisories_synced</code></td>
+<td>last_synced</td>
+<td>Sync tracking</td>
+</tr>
+<tr>
+<td><code>palo_alto_advisories</code></td>
+<td>PRIMARY KEY</td>
+<td>cve_id</td>
+<td>Fast Palo Alto advisory lookups</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_palo_advisories_cve</code></td>
+<td>cve_id</td>
+<td>CVE searches</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_palo_advisories_synced</code></td>
+<td>last_synced</td>
+<td>Sync tracking</td>
+</tr>
+</tbody></table>
+<h3>Sync Metadata (1 index)</h3><table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Index Name</th>
+<th>Columns</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>sync_metadata</code></td>
+<td><code>idx_sync_metadata_type_time</code></td>
+<td>sync_type, sync_time DESC</td>
+<td>Sync history queries</td>
+</tr>
+</tbody></table>
+<h3>Ticket Management (11 indexes)</h3><table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Index Name</th>
+<th>Columns</th>
+<th>Type</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>tickets</code></td>
+<td><code>idx_tickets_location</code></td>
+<td>location</td>
+<td>Standard</td>
+<td>Location filtering</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_tickets_status</code></td>
+<td>status</td>
+<td>Standard</td>
+<td>Status-based queries</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_tickets_date_submitted</code></td>
+<td>date_submitted</td>
+<td>Standard</td>
+<td>Submission timeline</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_tickets_date_due</code></td>
+<td>date_due</td>
+<td>Standard</td>
+<td>Due date tracking</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_tickets_hexagon</code></td>
+<td>hexagon_ticket</td>
+<td>Standard</td>
+<td>External reference lookup</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_tickets_service_now</code></td>
+<td>service_now_ticket</td>
+<td>Standard</td>
+<td>ServiceNow integration</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_tickets_xt</code></td>
+<td>xt_number</td>
+<td>UNIQUE</td>
+<td>XactTrackr ticket lookup</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_tickets_site</code></td>
+<td>site</td>
+<td>Standard</td>
+<td>Site filtering</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_tickets_deleted</code></td>
+<td>deleted</td>
+<td>Standard</td>
+<td>Soft delete queries</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_tickets_job_type</code></td>
+<td>job_type</td>
+<td>Standard</td>
+<td>Job type filtering</td>
+</tr>
+<tr>
+<td><code>ticket_vulnerabilities</code></td>
+<td><code>idx_ticket_vulns_ticket</code></td>
+<td>ticket_id</td>
+<td>Standard</td>
+<td>Ticket → vulnerability joins</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_ticket_vulns_vuln</code></td>
+<td>vulnerability_id</td>
+<td>Standard</td>
+<td>Vulnerability → ticket joins</td>
+</tr>
+</tbody></table>
+<h3>Template System (9 indexes)</h3><table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Index Name</th>
+<th>Columns</th>
+<th>Type</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>email_templates</code></td>
+<td><code>idx_email_templates_name</code></td>
+<td>name</td>
+<td>UNIQUE</td>
+<td>Template name lookups</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_email_templates_category</code></td>
+<td>category</td>
+<td>Standard</td>
+<td>Category filtering</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_email_templates_active</code></td>
+<td>is_active</td>
+<td>Standard</td>
+<td>Active template queries</td>
+</tr>
+<tr>
+<td><code>ticket_templates</code></td>
+<td><code>idx_ticket_templates_name</code></td>
+<td>name</td>
+<td>UNIQUE</td>
+<td>Template name lookups</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_ticket_templates_category</code></td>
+<td>category</td>
+<td>Standard</td>
+<td>Category filtering</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_ticket_templates_active</code></td>
+<td>is_active</td>
+<td>Standard</td>
+<td>Active template queries</td>
+</tr>
+<tr>
+<td><code>vulnerability_templates</code></td>
+<td><code>idx_vuln_templates_name</code></td>
+<td>name</td>
+<td>UNIQUE</td>
+<td>Template name lookups</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_vuln_templates_category</code></td>
+<td>category</td>
+<td>Standard</td>
+<td>Category filtering</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_vuln_templates_active</code></td>
+<td>is_active</td>
+<td>Standard</td>
+<td>Active template queries</td>
+</tr>
+</tbody></table>
+<h3>Authentication (5 indexes)</h3><table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Index Name</th>
+<th>Columns</th>
+<th>Type</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>users</code></td>
+<td><code>idx_users_username</code></td>
+<td>username</td>
+<td>UNIQUE</td>
+<td>Login username lookups</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_users_email</code></td>
+<td>email</td>
+<td>Standard</td>
+<td>Email-based queries</td>
+</tr>
+<tr>
+<td><code>user_preferences</code></td>
+<td>Composite UNIQUE</td>
+<td>user_id, preference_key</td>
+<td>UNIQUE</td>
+<td>Preference uniqueness constraint</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_user_preferences_user_id</code></td>
+<td>user_id</td>
+<td>Standard (FK)</td>
+<td>CASCADE DELETE performance</td>
+</tr>
+<tr>
+<td></td>
+<td><code>idx_user_preferences_key</code></td>
+<td>user_id, preference_key</td>
+<td>Composite</td>
+<td>Preference lookups</td>
+</tr>
+</tbody></table>
+<h3>Auto-Generated Indexes (13 indexes)</h3><p>SQLite auto-creates indexes for:</p>
 <ul>
-<li><strong>4-tier deduplication scoring</strong>: Tier 1-4 with confidence scores (0.95, 0.75, 0.50, 0.25)</li>
-<li><strong>Bulk loading</strong>: 10k+ rows with preprocessing before production commit</li>
-<li><strong>Error tracking</strong>: <code>processing_error</code> field for failed rows</li>
-<li><strong>Audit trail</strong>: <code>raw_csv_row</code> JSON preserves original data</li>
-</ul>
-<p><strong>Fields of Note</strong>:</p>
-<ul>
-<li><code>enhanced_unique_key</code>: 4-tier deduplication key</li>
-<li><code>confidence_score</code>: Deduplication reliability (0.0-1.0)</li>
-<li><code>dedup_tier</code>: Tier level (1 = highest confidence, 4 = lowest)</li>
-<li><code>processed</code>: Boolean flag for migration to <code>vulnerabilities_current</code></li>
+<li>PRIMARY KEY constraints (not explicitly named)</li>
+<li>UNIQUE constraints (named <code>sqlite_autoindex_*</code>)</li>
 </ul>
 <hr>
-<h2>Data Integrity & Future Enhancements</h2><table>
+<h2>Database Configuration & Performance</h2><h3>PRAGMA Settings</h3><p>The database is initialized with optimized performance and safety settings:</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Value</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>foreign_keys</code></td>
+<td><code>ON</code></td>
+<td>Enable foreign key constraints for referential integrity</td>
+</tr>
+<tr>
+<td><code>journal_mode</code></td>
+<td><code>WAL</code></td>
+<td>Write-Ahead Logging for better concurrency and crash recovery</td>
+</tr>
+<tr>
+<td><code>synchronous</code></td>
+<td><code>NORMAL</code></td>
+<td>Balance between safety and performance (safe with WAL mode)</td>
+</tr>
+</tbody></table>
+<p><strong>Implementation</strong>: <code>app/public/scripts/init-database.js</code> and <code>app/config/database.js</code></p>
+<hr>
+<h3>Cache Configuration</h3><table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>cache_size</code></td>
+<td><code>-64000</code></td>
+<td>64MB page cache for improved query performance</td>
+</tr>
+<tr>
+<td><code>timeout</code></td>
+<td><code>30000ms</code></td>
+<td>Database lock timeout (30 seconds)</td>
+</tr>
+</tbody></table>
+<p><strong>Page Size</strong>: SQLite default (4KB pages)</p>
+<p><strong>Memory Usage</strong>: ~64MB for page cache + connection overhead</p>
+<hr>
+<h3>Auto-VACUUM Scheduler</h3><p><strong>Status</strong>: Fully Implemented (HEX-250, v1.0.62)</p>
+<p>Automatic database optimization runs on a scheduled basis to reclaim unused space and optimize indexes.</p>
+<p><strong>Configuration</strong>:</p>
+<ul>
+<li><strong>Frequency</strong>: Every 7 days</li>
+<li><strong>Schedule</strong>: Daily check at 2:00 AM</li>
+<li><strong>Operation</strong>: Full VACUUM (rebuilds entire database file)</li>
+<li><strong>Tracking</strong>: Execution history stored in <code>sync_metadata</code> table (<code>sync_type = &#39;auto_vacuum&#39;</code>)</li>
+<li><strong>Config File</strong>: <code>app/config/database.js</code></li>
+<li><strong>Settings</strong>: <code>enableAutoVacuum: true</code>, <code>vacuumIntervalDays: 7</code></li>
+</ul>
+<p><strong>Performance Impact</strong>:</p>
+<ul>
+<li><strong>Duration</strong>: 30-60 seconds for typical database sizes</li>
+<li><strong>Locking</strong>: Exclusive lock during VACUUM (blocks all queries)</li>
+<li><strong>Space Reclamation</strong>: HEX-250 reclaimed 286MB (50% reduction) in production</li>
+</ul>
+<p><strong>Example sync_metadata Record</strong>:</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;sync_type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;auto_vacuum&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;sync_time&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2025-10-16T02:00:00.000Z&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;version&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">null</span></span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;record_count&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">null</span></span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;completed&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;error_message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">null</span></span>
+<span class="hljs-punctuation">}</span></code></pre><p><strong>Manual Trigger</strong>: <code>POST /api/database/vacuum</code> (admin only)</p>
+<hr>
+<h2>Data Integrity & Constraints</h2><h3>Current Implementation</h3><table>
 <thead>
 <tr>
 <th>Area</th>
-<th>Current</th>
-<th>Planned</th>
+<th>Implementation</th>
+<th>Details</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>Severity values</td>
-<td>Free text</td>
-<td>Add CHECK constraint / normalization table</td>
+<td>Free text (TEXT)</td>
+<td>Accepted: Critical, High, Medium, Low (enforced in application layer)</td>
+</tr>
+<tr>
+<td>Deduplication</td>
+<td>4-tier confidence scoring</td>
+<td>Tier 1 (0.95), Tier 2 (0.75), Tier 3 (0.50), Tier 4 (0.25)</td>
 </tr>
 <tr>
 <td>Vendor fields</td>
-<td>vendor_reference + vendor</td>
-<td>Consolidate and document mapping rules</td>
+<td>Dual tracking</td>
+<td><code>vendor_reference</code> (scan tool ID) + <code>vendor</code> (normalized name)</td>
+</tr>
+<tr>
+<td>Unique constraints</td>
+<td>Database-enforced</td>
+<td><code>xt_number</code> (tickets), <code>username</code> (users), <code>scan_date</code> (daily totals), <code>(user_id, preference_key)</code> (user_preferences)</td>
+</tr>
+<tr>
+<td>Foreign keys</td>
+<td>PRAGMA-enabled</td>
+<td><code>PRAGMA foreign_keys = ON</code> enforced at connection level</td>
 </tr>
 <tr>
 <td>Orphan cleanup</td>
-<td>Manual (app logic)</td>
-<td>ON DELETE CASCADE for future RDBMS migration</td>
-</tr>
-<tr>
-<td>Performance</td>
-<td>Basic single-file SQLite</td>
-<td>WAL mode + scheduled VACUUM (future)</td>
+<td>Application logic</td>
+<td>Manual cleanup routines (future: ON DELETE CASCADE for RDBMS migration)</td>
 </tr>
 </tbody></table>
 <hr>
-<p>This document reflects the schema as of the current release cycle. Re-run architecture analysis after structural migrations or table additions.</p>
-<pre><code class="language-"></code></pre>
+<h3>Deduplication System (4-Tier)</h3><p>The enhanced deduplication system uses <code>enhanced_unique_key</code> + <code>confidence_score</code> + <code>dedup_tier</code> for intelligent vulnerability matching across scanner reconfigurations and network changes.</p>
+<p><strong>Tier Definitions</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Confidence</th>
+<th>Match Criteria</th>
+<th>Use Case</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Tier 1</strong></td>
+<td>0.95</td>
+<td>CVE + hostname + IP</td>
+<td>Exact device match (highest confidence)</td>
+</tr>
+<tr>
+<td><strong>Tier 2</strong></td>
+<td>0.75</td>
+<td>CVE + hostname</td>
+<td>IP address changed (DHCP, network reconfiguration)</td>
+</tr>
+<tr>
+<td><strong>Tier 3</strong></td>
+<td>0.50</td>
+<td>CVE + IP</td>
+<td>Hostname changed (device renamed)</td>
+</tr>
+<tr>
+<td><strong>Tier 4</strong></td>
+<td>0.25</td>
+<td>CVE only</td>
+<td>Device variation (multiple affected devices)</td>
+</tr>
+</tbody></table>
+<p><strong>Key Generation</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Tier 1: CVE + hostname + IP</span>
+enhanced_unique_key = <span class="hljs-string">`<span class="hljs-subst">${cve}</span>_<span class="hljs-subst">${hostname}</span>_<span class="hljs-subst">${ip_address}</span>`</span>;
+
+<span class="hljs-comment">// Tier 2: CVE + hostname</span>
+enhanced_unique_key = <span class="hljs-string">`<span class="hljs-subst">${cve}</span>_<span class="hljs-subst">${hostname}</span>_NOIP`</span>;
+
+<span class="hljs-comment">// Tier 3: CVE + IP</span>
+enhanced_unique_key = <span class="hljs-string">`<span class="hljs-subst">${cve}</span>_NOHOSTNAME_<span class="hljs-subst">${ip_address}</span>`</span>;
+
+<span class="hljs-comment">// Tier 4: CVE only</span>
+enhanced_unique_key = <span class="hljs-string">`<span class="hljs-subst">${cve}</span>_NODEVICE`</span>;</code></pre><p><strong>Benefits</strong>:</p>
+<ul>
+<li>Accurate tracking across scanner reconfigurations</li>
+<li>Handles DHCP IP changes gracefully</li>
+<li>Prevents false &quot;resolved&quot; detections</li>
+<li>Enables confidence-based filtering</li>
+</ul>
+<hr>
+<h3>Lifecycle State Management</h3><p>The <code>vulnerabilities_current</code> table tracks vulnerability lifecycle with three states:</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Description</th>
+<th>Transition</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>active</code></td>
+<td>Currently detected in latest scan</td>
+<td>Default state on INSERT</td>
+</tr>
+<tr>
+<td><code>resolved</code></td>
+<td>No longer detected (remediated)</td>
+<td>Set when vulnerability absent from new scan</td>
+</tr>
+<tr>
+<td><code>reopened</code></td>
+<td>Previously resolved, now detected again</td>
+<td>Set when resolved vulnerability reappears</td>
+</tr>
+</tbody></table>
+<p><strong>Resolution Process</strong>:</p>
+<ol>
+<li>Import new scan (scan_date = 2025-10-16)</li>
+<li>Compare with previous scan (scan_date = 2025-10-15)</li>
+<li>Vulnerabilities in 2025-10-15 but NOT in 2025-10-16:<ul>
+<li><code>lifecycle_state</code> = &#39;resolved&#39;</li>
+<li><code>resolved_date</code> = &#39;2025-10-16&#39;</li>
+<li><code>resolution_reason</code> = &#39;not_detected_in_scan&#39;</li>
+</ul>
+</li>
+</ol>
+<p><strong>Reopening Process</strong>:</p>
+<ol>
+<li>Vulnerability was <code>lifecycle_state</code> = &#39;resolved&#39;</li>
+<li>Reappears in new scan</li>
+<li>Update to <code>lifecycle_state</code> = &#39;reopened&#39;</li>
+<li>Clear <code>resolved_date</code> and <code>resolution_reason</code></li>
+</ol>
+<p><strong>Metrics Tracking</strong>:</p>
+<ul>
+<li><code>vulnerability_daily_totals.resolved_count</code> - vulnerabilities resolved on that scan date</li>
+<li><code>vulnerability_daily_totals.reopened_count</code> - vulnerabilities reopened on that scan date</li>
+</ul>
+<hr>
+<h2>Legacy Table Notice</h2><p>The original <code>vulnerabilities</code> table (29 columns) remains in the database to support existing backup endpoints:</p>
+<ul>
+<li><code>GET /api/backup/vulnerabilities</code></li>
+<li><code>GET /api/backup/all</code></li>
+</ul>
+<p><strong>Current Usage</strong>: Export-only (not used for analytics or UI)</p>
+<p><strong>Rollover Architecture</strong> (active system):</p>
+<ul>
+<li><code>vulnerability_snapshots</code> - Historical append-only log</li>
+<li><code>vulnerabilities_current</code> - Deduplicated active set with lifecycle tracking</li>
+<li><code>vulnerability_daily_totals</code> - Aggregated trend data</li>
+<li><code>vendor_daily_totals</code> - Vendor-specific trend data</li>
+</ul>
+<p><strong>Migration Status</strong>: Tracked in roadmap - will eventually unify export logic on rollover schema</p>
+<hr>
+<h2>Vendor Advisory Data Flow Patterns</h2><h3>Common Pattern: Denormalized + Enrichment</h3><p>All three vendor advisory integrations (KEV, Cisco, Palo Alto) follow the same architectural pattern:</p>
+<ol>
+<li><p><strong>Separate Advisory Table</strong>: Rich metadata storage</p>
+<ul>
+<li><code>kev_status</code> (CISA)</li>
+<li><code>cisco_advisories</code> (Cisco PSIRT)</li>
+<li><code>palo_alto_advisories</code> (Palo Alto)</li>
+</ul>
+</li>
+<li><p><strong>Denormalized Columns</strong>: Fast query performance</p>
+<ul>
+<li><code>vulnerabilities.is_fixed</code> (vendor-neutral boolean)</li>
+<li><code>vulnerabilities.fixed_cisco_versions</code> (display string)</li>
+<li><code>vulnerabilities.fixed_palo_versions</code> (display string)</li>
+<li><code>vulnerabilities_current.is_fix_available</code> (indexed boolean)</li>
+</ul>
+</li>
+<li><p><strong>LEFT JOIN Enrichment</strong>: UI data loading</p>
+<pre><code class="language-sql"><span class="hljs-keyword">SELECT</span> v.<span class="hljs-operator">*</span>, k.date_added <span class="hljs-keyword">AS</span> kev_date_added,
+       c.first_fixed <span class="hljs-keyword">AS</span> cisco_fixed_versions,
+       p.first_fixed <span class="hljs-keyword">AS</span> palo_fixed_versions
+<span class="hljs-keyword">FROM</span> vulnerabilities_current v
+<span class="hljs-keyword">LEFT</span> <span class="hljs-keyword">JOIN</span> kev_status k <span class="hljs-keyword">ON</span> v.cve <span class="hljs-operator">=</span> k.cve_id
+<span class="hljs-keyword">LEFT</span> <span class="hljs-keyword">JOIN</span> cisco_advisories c <span class="hljs-keyword">ON</span> v.cve <span class="hljs-operator">=</span> c.cve_id
+<span class="hljs-keyword">LEFT</span> <span class="hljs-keyword">JOIN</span> palo_alto_advisories p <span class="hljs-keyword">ON</span> v.cve <span class="hljs-operator">=</span> p.cve_id
+<span class="hljs-keyword">WHERE</span> v.lifecycle_state <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;active&#x27;</span>;</code></pre></li>
+<li><p><strong>Background Sync</strong>: Daily updates via <code>sync_metadata</code></p>
+</li>
+</ol>
+<p><strong>Benefits</strong>:</p>
+<ul>
+<li>Fast queries (no JOIN required for boolean flags)</li>
+<li>Rich metadata available when needed (LEFT JOIN)</li>
+<li>Auditability (sync_metadata tracks all operations)</li>
+<li>Scalability (add new vendors without schema redesign)</li>
+</ul>
+<hr>
+<h2>Migration History</h2><p>Tracked in <code>/app/public/scripts/migrations/</code> directory:</p>
+<table>
+<thead>
+<tr>
+<th>Migration</th>
+<th>Version</th>
+<th>Issue</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>004-soft-delete-tickets.sql</code></td>
+<td>v1.0.x</td>
+<td>HEX-196</td>
+<td>Add soft delete support to tickets table</td>
+</tr>
+<tr>
+<td><code>005-cisco-advisories.sql</code></td>
+<td>v1.0.63</td>
+<td>HEX-141</td>
+<td>Cisco PSIRT advisory infrastructure</td>
+</tr>
+<tr>
+<td><code>005-remove-xt-unique-constraint.sql</code></td>
+<td>v1.0.x</td>
+<td>HEX-196</td>
+<td>Remove UNIQUE constraint on xt_number</td>
+</tr>
+<tr>
+<td><code>006-add-os-solution-columns.sql</code></td>
+<td>v1.0.x</td>
+<td>-</td>
+<td>Add operating_system and solution_text columns</td>
+</tr>
+<tr>
+<td><code>006-palo-alto-advisories.sql</code></td>
+<td>v1.0.63</td>
+<td>HEX-209</td>
+<td>Palo Alto advisory infrastructure</td>
+</tr>
+<tr>
+<td><code>006-user-preferences.sql</code></td>
+<td>v1.0.46</td>
+<td>HEX-138</td>
+<td>User preferences for cross-device sync</td>
+</tr>
+<tr>
+<td><code>007-add-job-type.sql</code></td>
+<td>v1.0.57</td>
+<td>HEX-203</td>
+<td>Add job_type field for work categorization</td>
+</tr>
+<tr>
+<td><code>007-normalize-palo-vendors.sql</code></td>
+<td>v1.0.63</td>
+<td>-</td>
+<td>Normalize Palo Alto vendor names</td>
+</tr>
+<tr>
+<td><code>008-create-job-type-templates.sql</code></td>
+<td>v1.0.57</td>
+<td>-</td>
+<td>Job type-specific ticket templates</td>
+</tr>
+<tr>
+<td><code>008-vendor-daily-totals.sql</code></td>
+<td>v1.0.x</td>
+<td>-</td>
+<td>Vendor-specific daily aggregation table</td>
+</tr>
+<tr>
+<td><code>009-add-job-type-fields.sql</code></td>
+<td>v1.0.57</td>
+<td>-</td>
+<td>Tracking numbers and job-specific fields</td>
+</tr>
+<tr>
+<td><code>010-restructure-address-fields.sql</code></td>
+<td>v1.0.57</td>
+<td>-</td>
+<td>Structured address components (line1, line2, city, state, zip)</td>
+</tr>
+<tr>
+<td><code>011-add-ticket-deletion-reason.sql</code></td>
+<td>v1.0.66</td>
+<td>HEX-248</td>
+<td>Deletion audit trail (deletion_reason, deleted_by)</td>
+</tr>
+</tbody></table>
+<p><strong>Migration Strategy</strong>: Idempotent ALTER TABLE statements executed at runtime (no down migrations)</p>
+<hr>
+<h2>Database Size & Performance Metrics</h2><p><strong>Typical Production Database</strong>:</p>
+<ul>
+<li><strong>File Size</strong>: ~500MB (pre-VACUUM), ~214MB (post-VACUUM with HEX-250)</li>
+<li><strong>Row Counts</strong>:<ul>
+<li><code>vulnerabilities_current</code>: ~50,000 active vulnerabilities</li>
+<li><code>vulnerability_snapshots</code>: ~150,000 historical records (last 3 scans)</li>
+<li><code>vulnerability_daily_totals</code>: ~365 days of trend data</li>
+<li><code>vendor_daily_totals</code>: ~1,095 records (365 days × 3 vendors)</li>
+<li><code>tickets</code>: ~500-1,000 tickets</li>
+<li><code>kev_status</code>: ~1,000 CISA KEV records</li>
+<li><code>cisco_advisories</code>: ~500 Cisco advisories</li>
+<li><code>palo_alto_advisories</code>: ~50 Palo Alto advisories</li>
+</ul>
+</li>
+</ul>
+<p><strong>Query Performance</strong> (production benchmarks):</p>
+<ul>
+<li><code>SELECT * FROM vulnerabilities_current WHERE lifecycle_state = &#39;active&#39;</code>: ~50ms (50k rows)</li>
+<li><code>SELECT * FROM vulnerabilities_current WHERE cve = ?</code>: ~1ms (indexed)</li>
+<li><code>SELECT * FROM tickets WHERE deleted = 0</code>: ~10ms (500 rows)</li>
+<li>KEV/Cisco/Palo enrichment LEFT JOIN: ~100ms (50k rows)</li>
+</ul>
+<p><strong>Import Performance</strong>:</p>
+<ul>
+<li>CSV import (10k rows): ~30-45 seconds</li>
+<li>Staging fast-path (10k rows): ~20-30 seconds</li>
+<li>VACUUM operation: ~30-60 seconds (blocking)</li>
+</ul>
+<hr>
+<h2>Future Enhancements</h2><p><strong>Planned Improvements</strong> (from roadmap):</p>
+<ol>
+<li><p><strong>Additional Vendor Integrations</strong>:</p>
+<ul>
+<li>Microsoft Security Response Center (MSRC)</li>
+<li>Juniper SIRT</li>
+<li>Fortinet PSIRT</li>
+</ul>
+</li>
+<li><p><strong>Enhanced Deduplication</strong>:</p>
+<ul>
+<li>Machine learning-based confidence scoring</li>
+<li>Multi-vendor correlation (same CVE across vendors)</li>
+</ul>
+</li>
+<li><p><strong>Performance Optimizations</strong>:</p>
+<ul>
+<li>Incremental VACUUM (SQLite 3.40+ feature)</li>
+<li>Materialized views for complex queries</li>
+<li>Read replicas for reporting</li>
+</ul>
+</li>
+<li><p><strong>Data Retention Policies</strong>:</p>
+<ul>
+<li>Configurable snapshot retention (currently hardcoded to 3)</li>
+<li>Automatic archival of old tickets</li>
+<li>Compliance-driven retention rules</li>
+</ul>
+</li>
+</ol>
+<hr>
+<p>This document reflects the schema as of <strong>v1.0.66</strong>. Re-run architecture analysis after structural migrations or table additions.</p>
+<p><strong>Last Updated</strong>: 2025-10-16</p>
+
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be
              fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
