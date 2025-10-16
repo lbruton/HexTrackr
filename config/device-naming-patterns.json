@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "HexTrackr Device Naming Pattern Configuration",
+  "description": "Configuration for parsing device hostnames and extracting site/location information",
+  "version": "1.0.0",
+  
+  "deviceTypePatterns": [
+    {
+      "pattern": "nswan",
+      "description": "Switch (WAN)",
+      "type": "switch",
+      "precedence": 1
+    },
+    {
+      "pattern": "nrwan",
+      "description": "Router (WAN)",
+      "type": "router",
+      "precedence": 2
+    },
+    {
+      "pattern": "nfpan",
+      "description": "Palo Alto Firewall",
+      "type": "firewall",
+      "precedence": 3
+    },
+    {
+      "pattern": "newan",
+      "description": "Edge Device",
+      "type": "edge",
+      "precedence": 4
+    }
+  ],
+  
+  "locationPatterns": {
+    "description": "Patterns for extracting location from hostname",
+    "strategy": "device_type_prefix",
+    "comment": "Location is everything BEFORE the device type pattern"
+  },
+  
+  "siteCodeMappings": {
+    "description": "Map extracted locations to known 4-character site codes (Hexagon EAM)",
+    "comment": "Key = location string, Value = {site_code, confidence, aliases}",
+    "mappings": [
+      {
+        "location": "tulsatower",
+        "site_code": "TULS",
+        "aliases": ["tulsa", "tulsatwr", "tulstower"],
+        "confidence": 0.95,
+        "source": "manual_config"
+      },
+      {
+        "location": "stroud",
+        "site_code": "STRO",
+        "aliases": ["strd", "strou", "stroud"],
+        "confidence": 0.95,
+        "source": "manual_config"
+      },
+      {
+        "location": "okc",
+        "site_code": "OKCY",
+        "aliases": ["oklahoma", "okcity", "oklahomacity"],
+        "confidence": 0.90,
+        "source": "manual_config"
+      }
+    ]
+  },
+  
+  "fallbackRules": {
+    "site_code_length": 4,
+    "location_code_length": 5,
+    "comment": "If regex parsing fails, fall back to substring extraction"
+  },
+  
+  "fuzzyMatchSettings": {
+    "enabled": true,
+    "min_similarity": 0.6,
+    "max_results": 5,
+    "comment": "When user types site/location, fuzzy search existing codes"
+  }
+}
