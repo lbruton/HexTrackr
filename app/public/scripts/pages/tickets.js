@@ -91,7 +91,7 @@ class HexagonTicketsManager {
     transformTicketData(rawTicket) {
         // Calculate if the ticket is overdue based on due date
         const dueDate = rawTicket.date_due || rawTicket.dateDue;
-        const isOverdue = dueDate ? new Date(dueDate) < new Date() : false;
+        const isOverdue = dueDate ? new Date(dueDate + 'T00:00:00') < new Date() : false;
         let status = rawTicket.status || "";
         
         // Auto-update status to "Overdue" if conditions are met
@@ -1950,7 +1950,7 @@ class HexagonTicketsManager {
         }
         
         // Fallback for other date formats
-        return new Date(dateString).toLocaleDateString("en-US", {
+        return new Date(dateString + 'T00:00:00').toLocaleDateString("en-US", {
             year: "numeric",
             month: "short",
             day: "numeric"
@@ -2277,8 +2277,8 @@ class HexagonTicketsManager {
                 const desc = (vuln.plugin_name || vuln.description || "N/A").substring(0, 50);
                 const severity = vuln.severity || "N/A";
                 const vpr = vuln.vpr_score ? vuln.vpr_score.toFixed(1) : "N/A";
-                const firstSeen = vuln.first_seen ? new Date(vuln.first_seen).toLocaleDateString() : "N/A";
-                const lastSeen = vuln.last_seen ? new Date(vuln.last_seen).toLocaleDateString() : "N/A";
+                const firstSeen = vuln.first_seen ? new Date(vuln.first_seen + 'T00:00:00').toLocaleDateString() : "N/A";
+                const lastSeen = vuln.last_seen ? new Date(vuln.last_seen + 'T00:00:00').toLocaleDateString() : "N/A";
 
                 markdown += `| ${id} | ${desc} | ${severity} | ${vpr} | ${firstSeen} | ${lastSeen} |\n`;
             });

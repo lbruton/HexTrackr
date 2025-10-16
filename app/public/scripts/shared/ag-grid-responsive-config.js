@@ -54,7 +54,7 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
             maxWidth: 150,
             resizable: true,
             cellRenderer: (params) => {
-                return params.value ? new Date(params.value).toLocaleDateString() : "-";
+                return params.value ? new Date(params.value + 'T00:00:00').toLocaleDateString() : "-";
             },
             hide: isMobile,
         },
