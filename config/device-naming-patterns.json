@@ -9,27 +9,71 @@
       "pattern": "nswan",
       "description": "Switch (WAN)",
       "type": "switch",
+      "vendor": "CISCO",
       "precedence": 1
+    },
+    {
+      "pattern": "swan",
+      "description": "Switch",
+      "type": "switch",
+      "vendor": "CISCO",
+      "precedence": 2
     },
     {
       "pattern": "nrwan",
       "description": "Router (WAN)",
       "type": "router",
-      "precedence": 2
+      "vendor": "CISCO",
+      "precedence": 3
+    },
+    {
+      "pattern": "rtr",
+      "description": "Router",
+      "type": "router",
+      "vendor": "CISCO",
+      "precedence": 4
     },
     {
       "pattern": "nfpan",
       "description": "Palo Alto Firewall",
       "type": "firewall",
-      "precedence": 3
+      "vendor": "Palo Alto",
+      "precedence": 5
+    },
+    {
+      "pattern": "fw",
+      "description": "Firewall",
+      "type": "firewall",
+      "vendor": "CISCO",
+      "precedence": 6
+    },
+    {
+      "pattern": "asa",
+      "description": "Cisco ASA Firewall",
+      "type": "firewall",
+      "vendor": "CISCO",
+      "precedence": 7
+    },
+    {
+      "pattern": "sw",
+      "description": "Switch (Generic)",
+      "type": "switch",
+      "vendor": "CISCO",
+      "precedence": 8
     },
     {
       "pattern": "newan",
       "description": "Edge Device",
       "type": "edge",
-      "precedence": 4
+      "vendor": "CISCO",
+      "precedence": 9
     }
   ],
+
+  "vendorKeywords": {
+    "CISCO": ["cisco"],
+    "Palo Alto": ["pan", "palo", "paloalto"]
+  },
   
   "locationPatterns": {
     "description": "Patterns for extracting location from hostname",

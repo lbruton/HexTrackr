@@ -16,6 +16,46 @@
     const COLOR_CLASS_COUNT = 6;
     const GRID_ID = "ticketsAgGrid";
 
+    // Device naming patterns config (loaded from config file)
+    let deviceNamingConfig = null;
+
+    /**
+     * Load device naming patterns configuration (HEX-241)
+     * @returns {Promise<Object>} Device naming config object
+     */
+    async function loadDeviceNamingConfig() {
+        if (deviceNamingConfig) {
+            return deviceNamingConfig;
+        }
+
+        try {
+            const response = await fetch("/config/device-naming-patterns.json");
+            if (!response.ok) {
+                throw new Error(`Failed to load config: ${response.status}`);
+            }
+            deviceNamingConfig = await response.json();
+            console.log("[HEX-241] Loaded device naming config:", deviceNamingConfig.deviceTypePatterns.length, "patterns");
+            return deviceNamingConfig;
+        } catch (error) {
+            console.error("[HEX-241] Failed to load device naming config:", error);
+            // Return fallback config
+            deviceNamingConfig = {
+                deviceTypePatterns: [
+                    { pattern: "nswan", vendor: "CISCO" },
+                    { pattern: "swan", vendor: "CISCO" },
+                    { pattern: "rtr", vendor: "CISCO" },
+                    { pattern: "fw", vendor: "CISCO" },
+                    { pattern: "asa", vendor: "CISCO" }
+                ],
+                vendorKeywords: {
+                    "CISCO": ["cisco"],
+                    "Palo Alto": ["pan", "palo"]
+                }
+            };
+            return deviceNamingConfig;
+        }
+    }
+
     /**
      * Detect the current theme, aligning with the shared theme controller.
      * @returns {boolean} True when dark mode is active.
@@ -143,7 +183,7 @@
 
     /**
      * Normalize vendor name from hostname for device icon color coding (HEX-241).
-     * Simplified version of helpers.js normalizeVendor() for frontend use.
+     * Uses config/device-naming-patterns.json for pattern matching.
      * @param {string} hostname - Device hostname to analyze.
      * @returns {string} Normalized vendor name: "CISCO", "Palo Alto", or "Other".
      */
@@ -154,15 +194,34 @@
 
         const lower = hostname.toLowerCase();
 
-        // Cisco patterns: hostname contains "cisco" OR matches device type patterns
-        // Device types: nswan (network switch), swan (switch), rtr (router), sw (switch), fw (firewall), asa (ASA)
-        if (lower.includes("cisco") || /(nswan|swan|rtr|sw|fw|asa)\d+$/.test(lower)) {
-            return "CISCO";
+        // If config not loaded yet, use fallback patterns
+        if (!deviceNamingConfig) {
+            if (lower.includes("cisco") || /(nswan|swan|rtr|sw|fw|asa)\d+$/.test(lower)) {
+                return "CISCO";
+            }
+            if (lower.includes("pan") || lower.includes("palo")) {
+                return "Palo Alto";
+            }
+            return "Other";
         }
 
-        // Palo Alto patterns: hostname contains "pan", "palo", or matches naming convention
-        if (lower.includes("pan") || lower.includes("palo")) {
-            return "Palo Alto";
+        // Check vendor keywords first (e.g., "cisco", "pan", "palo")
+        if (deviceNamingConfig.vendorKeywords) {
+            for (const [vendor, keywords] of Object.entries(deviceNamingConfig.vendorKeywords)) {
+                if (keywords.some(keyword => lower.includes(keyword))) {
+                    return vendor;
+                }
+            }
+        }
+
+        // Check device type patterns (e.g., "nswan01", "rtr02")
+        if (deviceNamingConfig.deviceTypePatterns) {
+            for (const config of deviceNamingConfig.deviceTypePatterns) {
+                const regex = new RegExp(`${config.pattern}\\d+$`);
+                if (regex.test(lower)) {
+                    return config.vendor || "Other";
+                }
+            }
         }
 
         return "Other";
@@ -733,6 +792,11 @@
         if (this.agGridInitialized) {
             return;
         }
+
+        // Load device naming config for vendor detection (HEX-241)
+        loadDeviceNamingConfig().catch(err => {
+            console.warn("[HEX-241] Config load failed, using fallback patterns:", err);
+        });
 
         const gridContainer = document.getElementById(GRID_ID);
         if (!gridContainer) {
