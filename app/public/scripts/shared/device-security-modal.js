@@ -170,37 +170,9 @@ class DeviceSecurityModal {
      * Load and display the most recent fixed version for this device
      * Queries all CVEs in parallel and displays the highest fixed version available
      * @param {Object} device - The device data object
+     *
+     * Note: compareVersions() moved to ciscoAdvisoryHelper (HEX-246) - shared function
      */
-    /**
-     * Compare two Cisco IOS version strings for sorting (descending order)
-     * @param {string} a - First version string (e.g., "16.9(4)")
-     * @param {string} b - Second version string (e.g., "15.2(7)E")
-     * @returns {number} - Negative if a > b, positive if a < b, 0 if equal
-     */
-    compareVersions(a, b) {
-        // Extract version components: major.minor(maintenance)train
-        const parseVersion = (ver) => {
-            const match = ver.match(/^(\d+)\.(\d+)\((\d+)\)([A-Z]*)/);
-            if (!match) return { major: 0, minor: 0, maint: 0, train: '' };
-            return {
-                major: parseInt(match[1], 10),
-                minor: parseInt(match[2], 10),
-                maint: parseInt(match[3], 10),
-                train: match[4] || ''
-            };
-        };
-
-        const vA = parseVersion(a);
-        const vB = parseVersion(b);
-
-        // Compare major, minor, maintenance in order
-        if (vA.major !== vB.major) return vB.major - vA.major;
-        if (vA.minor !== vB.minor) return vB.minor - vA.minor;
-        if (vA.maint !== vB.maint) return vB.maint - vA.maint;
-
-        // Train identifiers compared alphabetically (descending)
-        return vB.train.localeCompare(vA.train);
-    }
 
     async loadDeviceFixedVersion(device) {
         const fixedVersionElement = document.getElementById('deviceFixedVersion');
@@ -254,8 +226,8 @@ class DeviceSecurityModal {
             const validVersions = [...new Set(fixedVersions.filter(v => v !== null && v !== 'No Fix'))];
 
             if (validVersions.length > 0) {
-                // Sort versions (highest/most recent first)
-                validVersions.sort((a, b) => this.compareVersions(a, b));
+                // Sort versions (highest/most recent first) using shared function - HEX-246
+                validVersions.sort((a, b) => window.ciscoAdvisoryHelper.compareVersions(a, b));
 
                 // Display all unique versions, comma-separated
                 const versionList = validVersions.map(v => DOMPurify.sanitize(v) + '+').join(', ');

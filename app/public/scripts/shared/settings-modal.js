@@ -709,10 +709,11 @@ async function saveCiscoCredentials() {
             console.log("🔒 Cisco credentials saved to database");
 
             // Update status in main settings card
-            const credentialStatus = document.getElementById("ciscoCredentialStatus");
-            if (credentialStatus) {
-                credentialStatus.textContent = "Configured ✓";
-                credentialStatus.className = "badge bg-success";
+            const credentialButton = document.getElementById("manageCiscoCredentials");
+            const credentialButtonText = document.getElementById("ciscoCredentialButtonText");
+            if (credentialButton && credentialButtonText) {
+                credentialButton.className = "btn btn-outline-success";
+                credentialButton.innerHTML = '<i class="fas fa-check me-2"></i><span id="ciscoCredentialButtonText">Credentials Configured</span>';
             }
 
             // Enable sync button
@@ -774,10 +775,11 @@ async function clearCiscoCredentials() {
                 console.log("🗑️ Cisco credentials deleted from database");
 
                 // Update status in main settings card
-                const credentialStatus = document.getElementById("ciscoCredentialStatus");
-                if (credentialStatus) {
-                    credentialStatus.textContent = "Not Configured";
-                    credentialStatus.className = "badge bg-secondary";
+                const credentialButton = document.getElementById("manageCiscoCredentials");
+                const credentialButtonText = document.getElementById("ciscoCredentialButtonText");
+                if (credentialButton && credentialButtonText) {
+                    credentialButton.className = "btn btn-outline-primary";
+                    credentialButton.innerHTML = '<i class="fas fa-key me-2"></i><span id="ciscoCredentialButtonText">Manage Credentials</span>';
                 }
 
                 // Disable sync button
@@ -834,23 +836,24 @@ async function loadCiscoSyncStatus() {
         // Check if credentials are configured
         if (window.preferencesService) {
             const result = await window.preferencesService.getPreference("cisco_api_key");
-            const credentialStatus = document.getElementById("ciscoCredentialStatus");
+            const credentialButton = document.getElementById("manageCiscoCredentials");
+            const credentialButtonText = document.getElementById("ciscoCredentialButtonText");
             const syncButton = document.getElementById("syncCiscoNow");
 
             if (result.success && result.data && result.data.value) {
                 // Credentials exist
-                if (credentialStatus) {
-                    credentialStatus.textContent = "Configured ✓";
-                    credentialStatus.className = "badge bg-success";
+                if (credentialButton && credentialButtonText) {
+                    credentialButton.className = "btn btn-outline-success";
+                    credentialButton.innerHTML = '<i class="fas fa-check me-2"></i><span id="ciscoCredentialButtonText">Credentials Configured</span>';
                 }
                 if (syncButton) {
                     syncButton.disabled = false;
                 }
             } else {
                 // No credentials
-                if (credentialStatus) {
-                    credentialStatus.textContent = "Not Configured";
-                    credentialStatus.className = "badge bg-secondary";
+                if (credentialButton && credentialButtonText) {
+                    credentialButton.className = "btn btn-outline-primary";
+                    credentialButton.innerHTML = '<i class="fas fa-key me-2"></i><span id="ciscoCredentialButtonText">Manage Credentials</span>';
                 }
                 if (syncButton) {
                     syncButton.disabled = true;

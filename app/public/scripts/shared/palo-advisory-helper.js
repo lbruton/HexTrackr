@@ -60,6 +60,39 @@ class PaloAdvisoryHelper {
     }
 
     /**
+     * Compare two Palo Alto PAN-OS version strings for sorting (descending order)
+     * Returns highest/most recent version first
+     *
+     * Format: major.minor.patch-hHotfix (e.g., "11.1.2-h5", "10.2.0-h3")
+     *
+     * @param {string} a - First version string (e.g., "11.1.2-h5")
+     * @param {string} b - Second version string (e.g., "10.2.0-h3")
+     * @returns {number} - Negative if a > b, positive if a < b, 0 if equal
+     */
+    compareVersions(a, b) {
+        // Extract version components: major.minor.patch-hHotfix
+        const parseVersion = (ver) => {
+            const match = ver.match(/^(\d+)\.(\d+)\.(\d+)(?:-h(\d+))?/);
+            if (!match) return { major: 0, minor: 0, patch: 0, hotfix: 0 };
+            return {
+                major: parseInt(match[1], 10),
+                minor: parseInt(match[2], 10),
+                patch: parseInt(match[3], 10),
+                hotfix: match[4] ? parseInt(match[4], 10) : 0
+            };
+        };
+
+        const vA = parseVersion(a);
+        const vB = parseVersion(b);
+
+        // Compare major, minor, patch, hotfix in order
+        if (vA.major !== vB.major) return vB.major - vA.major;
+        if (vA.minor !== vB.minor) return vB.minor - vA.minor;
+        if (vA.patch !== vB.patch) return vB.patch - vA.patch;
+        return vB.hotfix - vA.hotfix;
+    }
+
+    /**
      * Match fixed version from array based on installed version
      *
      * Logic:
@@ -238,11 +271,22 @@ class PaloAdvisoryHelper {
             cves.map(cve => this.getFixedVersion(cve, device.vendor, device.operating_system))
         );
 
-        // Return first non-null fixed version
-        // TODO: Future enhancement - prioritize by VPR score or severity
-        const fixedVersion = advisories.find(v => v !== null);
+        // Filter out nulls and deduplicate
+        const validVersions = [...new Set(advisories.filter(v => v !== null))];
 
-        return fixedVersion || null;
+        if (validVersions.length === 0) {
+            return null;
+        }
+
+        if (validVersions.length === 1) {
+            return validVersions[0];
+        }
+
+        // Sort versions (highest/most recent first) - HEX-246
+        validVersions.sort((a, b) => this.compareVersions(a, b));
+
+        // Return highest version
+        return validVersions[0];
     }
 
     /**

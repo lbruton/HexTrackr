@@ -37,42 +37,37 @@
                                                     Cisco PSIRT Advisory Sync
                                                 </h6>
                                             </div>
-                                            <div class="card-body">
-                                                <div class="mb-3">
-                                                    <label class="form-label">API Credentials</label>
-                                                    <div class="d-flex align-items-center justify-content-between">
-                                                        <button type="button" class="btn btn-sm btn-outline-primary" id="manageCiscoCredentials">
-                                                            <i class="fas fa-key me-2"></i>Manage Credentials
-                                                        </button>
-                                                        <span class="badge bg-secondary" id="ciscoCredentialStatus">Not Configured</span>
+                                            <div class="card-body d-flex flex-column">
+                                                <div class="flex-grow-1">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Last Sync</label>
+                                                        <div class="text-muted" id="ciscoLastSync">Never synced</div>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Cisco Advisory Statistics</label>
+                                                        <div class="text-muted" id="ciscoStats">
+                                                            <span id="ciscoTotalCves">0</span> Total Cisco CVEs •
+                                                            <span id="ciscoSyncedCount">0</span> Advisories Found •
+                                                            <span id="ciscoMatchedCount">0</span> Fixed Versions Available
+                                                        </div>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <div class="form-check form-switch">
+                                                            <input class="form-check-input" type="checkbox" id="ciscoAutoSync" checked>
+                                                            <label class="form-check-label" for="ciscoAutoSync">
+                                                                <strong>Enable background sync</strong>
+                                                            </label>
+                                                        </div>
+                                                        <small class="text-muted">Automatically syncs advisory data every 24 hours on server startup</small>
                                                     </div>
                                                 </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label">Last Sync</label>
-                                                    <div class="text-muted" id="ciscoLastSync">Never synced</div>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label">Cisco Advisory Statistics</label>
-                                                    <div class="text-muted" id="ciscoStats">
-                                                        <span id="ciscoTotalCves">0</span> Total Cisco CVEs •
-                                                        <span id="ciscoSyncedCount">0</span> Advisories Found •
-                                                        <span id="ciscoMatchedCount">0</span> Fixed Versions Available
-                                                    </div>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <div class="form-check form-switch">
-                                                        <input class="form-check-input" type="checkbox" id="ciscoAutoSync" checked>
-                                                        <label class="form-check-label" for="ciscoAutoSync">
-                                                            <strong>Enable background sync</strong>
-                                                        </label>
-                                                    </div>
-                                                    <small class="text-muted">Automatically syncs advisory data every 24 hours on server startup</small>
-                                                </div>
-                                                <div class="d-flex justify-content-between align-items-center">
+                                                <div class="d-flex justify-content-between">
                                                     <button type="button" class="btn btn-outline-primary" id="syncCiscoNow" disabled>
                                                         <i class="fas fa-sync me-2"></i>Sync Now
                                                     </button>
-                                                    <span class="badge bg-secondary" id="ciscoStatus">Not Synced</span>
+                                                    <button type="button" class="btn btn-outline-primary" id="manageCiscoCredentials">
+                                                        <i class="fas fa-key me-2"></i><span id="ciscoCredentialButtonText">Manage Credentials</span>
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -104,16 +99,16 @@
                                                         <div class="form-check form-switch">
                                                             <input class="form-check-input" type="checkbox" id="kevAutoSync" checked>
                                                             <label class="form-check-label" for="kevAutoSync">
-                                                                Auto-sync every 24 hours
+                                                                <strong>Enable background sync</strong>
                                                             </label>
                                                         </div>
+                                                        <small class="text-muted">Automatically syncs advisory data every 24 hours on server startup</small>
                                                     </div>
                                                 </div>
-                                                <div class="d-flex justify-content-between align-items-center">
+                                                <div>
                                                     <button type="button" class="btn btn-outline-danger" id="syncKevNow">
                                                         <i class="fas fa-sync me-2"></i>Sync Now
                                                     </button>
-                                                    <span class="badge bg-secondary" id="kevStatus">Not Synced</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -152,11 +147,10 @@
                                                         <small class="text-muted">Automatically syncs advisory data every 24 hours on server startup</small>
                                                     </div>
                                                 </div>
-                                                <div class="d-flex justify-content-between align-items-center">
+                                                <div>
                                                     <button type="button" class="btn btn-outline-warning" id="syncPaloNow">
                                                         <i class="fas fa-sync me-2"></i>Sync Now
                                                     </button>
-                                                    <span class="badge bg-secondary" id="paloStatus">Not Synced</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -171,45 +165,33 @@
                                                     ServiceNow Integration
                                                 </h6>
                                             </div>
-                                            <div class="card-body">
-                                                <div class="mb-3">
-                                                    <div class="form-check form-switch">
-                                                        <input class="form-check-input" type="checkbox" id="serviceNowEnabled">
-                                                        <label class="form-check-label" for="serviceNowEnabled">
-                                                            <strong>Enable ServiceNow Integration</strong>
-                                                        </label>
+                                            <div class="card-body d-flex flex-column">
+                                                <div class="flex-grow-1">
+                                                    <div class="mb-3" id="serviceNowConfig">
+                                                        <label for="serviceNowInstance" class="form-label">ServiceNow Instance URL</label>
+                                                        <input type="url" class="form-control" id="serviceNowInstance"
+                                                               placeholder="https://yourorg.service-now.com"
+                                                               pattern="https://.*\.service-now\.com">
+                                                        <div class="form-text">
+                                                            Enter your organization's ServiceNow instance URL (e.g., https://yourorg.service-now.com)
+                                                        </div>
                                                     </div>
-                                                    <small class="text-muted">When enabled, Service Now ticket numbers become clickable links</small>
-                                                </div>
-
-                                                <div class="mb-3" id="serviceNowConfig">
-                                                    <label for="serviceNowInstance" class="form-label">ServiceNow Instance URL</label>
-                                                    <input type="url" class="form-control" id="serviceNowInstance"
-                                                           placeholder="https://yourorg.service-now.com"
-                                                           pattern="https://.*\.service-now\.com">
-                                                    <div class="form-text">
-                                                        Enter your organization's ServiceNow instance URL (e.g., https://yourorg.service-now.com)
+                                                    <div class="mb-3">
+                                                        <div class="form-check form-switch">
+                                                            <input class="form-check-input" type="checkbox" id="serviceNowEnabled">
+                                                            <label class="form-check-label" for="serviceNowEnabled">
+                                                                <strong>Enable ServiceNow Integration</strong>
+                                                            </label>
+                                                        </div>
+                                                        <small class="text-muted">When enabled, Service Now ticket numbers become clickable links</small>
                                                     </div>
                                                 </div>
-
-                                                <div class="mb-3">
-                                                    <label class="form-label">URL Pattern Preview</label>
-                                                    <div class="p-2 bg-light rounded">
-                                                        <code id="urlPatternPreview">
-                                                            Configure your instance URL to see the link pattern
-                                                        </code>
-                                                    </div>
-                                                    <small class="text-muted">
-                                                        Clicking INC/CHG numbers will open ServiceNow with this pattern
-                                                    </small>
-                                                </div>
-
-                                                <div class="d-flex gap-2">
-                                                    <button type="button" class="btn btn-outline-primary" id="testServiceNowLink">
-                                                        <i class="fas fa-external-link-alt me-2"></i>Test Link
-                                                    </button>
+                                                <div class="d-flex justify-content-between">
                                                     <button type="button" class="btn btn-outline-success" id="saveServiceNowSettings">
                                                         <i class="fas fa-save me-2"></i>Save Configuration
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-primary" id="testServiceNowLink">
+                                                        <i class="fas fa-external-link-alt me-2"></i>Test Link
                                                     </button>
                                                 </div>
                                             </div>
@@ -227,32 +209,50 @@
                                             </div>
                                             <div class="card-body d-flex flex-column">
                                                 <div class="flex-grow-1">
+                                                    <div class="row mb-3">
+                                                        <div class="col-6">
+                                                            <label class="form-label">Last Sync (API)</label>
+                                                            <div class="text-muted" id="netboxLastSync">Never synced</div>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <label class="form-label">Last Import (CSV)</label>
+                                                            <div class="text-muted" id="netboxLastImport">No imports yet</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mb-3">
+                                                        <div class="col-6">
+                                                            <label class="form-label">API Statistics</label>
+                                                            <div class="text-muted">
+                                                                <span id="netboxApiDevices">0</span> Devices •
+                                                                <span id="netboxApiSites">0</span> Sites
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <label class="form-label">CSV Statistics</label>
+                                                            <div class="text-muted">
+                                                                <span id="netboxCsvDevices">0</span> Devices Imported
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                     <div class="mb-3">
-                                                        <label class="form-label">API Integration</label>
                                                         <div class="alert alert-info mb-0">
                                                             <i class="fas fa-info-circle me-2"></i>
                                                             <small><strong>Coming Soon:</strong> API integration for automated device inventory</small>
                                                         </div>
                                                     </div>
-                                                    <div class="mb-3">
-                                                        <label class="form-label">API Credentials</label>
-                                                        <div class="d-flex align-items-center justify-content-between">
-                                                            <span class="badge bg-secondary">Not Available</span>
-                                                            <button type="button" class="btn btn-sm btn-outline-primary" disabled>
-                                                                <i class="fas fa-key me-2"></i>Add Credentials
-                                                            </button>
-                                                        </div>
-                                                        <small class="text-muted">API integration pending approval</small>
-                                                    </div>
-                                                    <hr>
                                                 </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label">CSV Import</label>
-                                                    <p class="text-muted small mb-2">Import Netbox device inventory from CSV files</p>
-                                                    <button type="button" class="btn btn-outline-info w-100" id="importNetboxCsvBtn" disabled>
-                                                        <i class="fas fa-upload me-2"></i>Import Netbox CSV
+                                                <div class="d-flex justify-content-between">
+                                                    <div class="d-flex gap-2">
+                                                        <button type="button" class="btn btn-outline-info" id="syncNetboxNow" disabled>
+                                                            <i class="fas fa-sync me-2"></i>Sync Now
+                                                        </button>
+                                                        <button type="button" class="btn btn-outline-info" id="importNetboxCsvBtn" disabled>
+                                                            <i class="fas fa-upload me-2"></i>CSV Import
+                                                        </button>
+                                                    </div>
+                                                    <button type="button" class="btn btn-outline-primary" id="manageNetboxCredentials" disabled>
+                                                        <i class="fas fa-key me-2"></i>Configure Credentials
                                                     </button>
-                                                    <small class="text-muted">CSV format specification coming soon</small>
                                                 </div>
                                             </div>
                                         </div>
@@ -267,36 +267,52 @@
                                                     Tenable
                                                 </h6>
                                             </div>
-                                            <div class="card-body">
-                                                <div class="mb-3">
-                                                    <label class="form-label">API Integration</label>
-                                                    <div class="alert alert-info mb-0">
-                                                        <i class="fas fa-info-circle me-2"></i>
-                                                        <small><strong>Coming Soon:</strong> API integration for automated vulnerability scanning</small>
+                                            <div class="card-body d-flex flex-column">
+                                                <div class="flex-grow-1">
+                                                    <div class="row mb-3">
+                                                        <div class="col-6">
+                                                            <label class="form-label">Last Sync (API)</label>
+                                                            <div class="text-muted" id="tenableLastSync">Never synced</div>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <label class="form-label">Last Import (CSV)</label>
+                                                            <div class="text-muted" id="tenableLastImport">No imports yet</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mb-3">
+                                                        <div class="col-6">
+                                                            <label class="form-label">API Statistics</label>
+                                                            <div class="text-muted">
+                                                                <span id="tenableApiVulns">0</span> Vulnerabilities •
+                                                                <span id="tenableApiScans">0</span> Scans
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <label class="form-label">CSV Statistics</label>
+                                                            <div class="text-muted">
+                                                                <span id="tenableCsvVulns">0</span> Vulnerabilities Imported
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <div class="alert alert-info mb-0">
+                                                            <i class="fas fa-info-circle me-2"></i>
+                                                            <small><strong>Coming Soon:</strong> API integration for automated vulnerability scanning</small>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label">API Credentials</label>
-                                                    <div class="d-flex align-items-center justify-content-between">
-                                                        <span class="badge bg-secondary">Not Available</span>
-                                                        <button type="button" class="btn btn-sm btn-outline-primary" disabled>
-                                                            <i class="fas fa-key me-2"></i>Add Credentials
+                                                <div class="d-flex justify-content-between">
+                                                    <div class="d-flex gap-2">
+                                                        <button type="button" class="btn btn-outline-success" id="syncTenableNow" disabled>
+                                                            <i class="fas fa-sync me-2"></i>Sync Now
+                                                        </button>
+                                                        <button type="button" class="btn btn-success" id="importCsvBtn">
+                                                            <i class="fas fa-upload me-2"></i>CSV Import
                                                         </button>
                                                     </div>
-                                                    <small class="text-muted">API integration coming soon</small>
-                                                </div>
-                                                <hr>
-                                                <div class="mb-3">
-                                                    <label class="form-label">CSV Import</label>
-                                                    <p class="text-muted small mb-2">Import Tenable vulnerability scan data from CSV files</p>
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Last CSV Import</label>
-                                                        <div class="text-muted" id="tenableLastImport">No imports yet</div>
-                                                    </div>
-                                                    <button type="button" class="btn btn-success w-100" id="importCsvBtn">
-                                                        <i class="fas fa-upload me-2"></i>Import Tenable CSV
+                                                    <button type="button" class="btn btn-outline-primary" id="manageTenableCredentials" disabled>
+                                                        <i class="fas fa-key me-2"></i>Configure Credentials
                                                     </button>
-                                                    <small class="text-muted">Supports vendor-neutral CSV format</small>
                                                 </div>
                                             </div>
                                         </div>
