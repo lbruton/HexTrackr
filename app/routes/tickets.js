@@ -29,6 +29,7 @@ router.post("/migrate", requireAuth, TicketController.migrateTickets);
 router.get("/next-xt-number", requireAuth, TicketController.getNextXTNumber);
 router.get("/by-device/:hostname", requireAuth, TicketController.getTicketsByDevice);
 router.post("/batch-device-lookup", requireAuth, TicketController.getTicketsByDeviceBatch);
+router.get("/address-suggestions", requireAuth, TicketController.getAddressSuggestions);
 
 /**
  * T053 INTEGRATION NOTES:

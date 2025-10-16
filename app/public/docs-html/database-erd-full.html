@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HexTrackr Database ERD - Full View</title>
+    <style>
+        :root {
+            /* Dark theme (default) */
+            --bg-primary: #1a1d26;
+            --bg-secondary: #2a2d3a;
+            --bg-tertiary: #1f2330;
+            --text-primary: #e4e6eb;
+            --text-secondary: #a0a4b8;
+            --border-color: #3d5afe;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+        }
+
+        [data-bs-theme="light"] {
+            /* Light theme */
+            --bg-primary: #f5f7fb;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #fafbfc;
+            --text-primary: #1a1d26;
+            --text-secondary: #6c757d;
+            --border-color: #3d5afe;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px var(--shadow-color);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border-color);
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .header .subtitle {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-left: 1rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            background: #3d5afe;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            background: #5c7cfa;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(61, 90, 254, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .zoom-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .zoom-btn {
+            padding: 0.5rem;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .diagram-container {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: auto;
+            padding: 2rem;
+            background: radial-gradient(circle at 50% 50%, var(--bg-tertiary) 0%, var(--bg-primary) 100%);
+            transition: background 0.3s ease;
+        }
+
+        .diagram-wrapper {
+            min-width: fit-content;
+            transform-origin: top left;
+            transition: transform 0.2s ease;
+        }
+
+        .mermaid {
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px var(--shadow-color);
+            border: 1px solid var(--bg-secondary);
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-primary);
+            padding: 0.75rem 2rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--bg-secondary);
+            backdrop-filter: blur(10px);
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .legend {
+            position: fixed;
+            top: 100px;
+            right: 2rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            max-width: 250px;
+            box-shadow: 0 4px 16px var(--shadow-color);
+            z-index: 999;
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .legend h3 {
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin: 0.5rem 0;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+        }
+
+        .legend-symbol {
+            font-family: monospace;
+            color: var(--border-color);
+            font-weight: bold;
+        }
+    </style>
+    <script>
+        // Detect and apply HexTrackr theme from localStorage
+        function getHexTrackrTheme() {
+            try {
+                const stored = localStorage.getItem('hextrackr-theme');
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    return parsed.theme || 'dark';
+                }
+            } catch (e) {
+                const legacyTheme = localStorage.getItem('hextrackr-theme');
+                if (legacyTheme) return legacyTheme;
+            }
+            return 'dark'; // default
+        }
+
+        // Apply theme immediately to prevent flash
+        const currentTheme = getHexTrackrTheme();
+        document.documentElement.setAttribute('data-bs-theme', currentTheme);
+    </script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+
+        const theme = document.documentElement.getAttribute('data-bs-theme');
+        const isDark = theme === 'dark';
+
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: isDark ? 'dark' : 'default',
+            themeVariables: isDark ? {
+                primaryColor: '#2a2d3a',
+                primaryTextColor: '#e4e6eb',
+                primaryBorderColor: '#3d5afe',
+                lineColor: '#5c7cfa',
+                secondaryColor: '#1f2330',
+                tertiaryColor: '#1a1d26'
+            } : {
+                primaryColor: '#ffffff',
+                primaryTextColor: '#1a1d26',
+                primaryBorderColor: '#3d5afe',
+                lineColor: '#5c7cfa',
+                secondaryColor: '#fafbfc',
+                tertiaryColor: '#f5f7fb'
+            },
+            er: {
+                diagramPadding: 40,
+                layoutDirection: 'TB',
+                minEntityWidth: 100,
+                minEntityHeight: 75,
+                entityPadding: 15,
+                fontSize: 12
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="header">
+        <div style="display: flex; align-items: center;">
+            <h1>HexTrackr Database ERD</h1>
+            <span class="subtitle">19 Tables • 72 Indexes • Multi-Vendor Integration</span>
+        </div>
+        <div class="controls">
+            <div class="zoom-controls">
+                <button class="btn zoom-btn" onclick="zoomIn()" title="Zoom In">+</button>
+                <button class="btn zoom-btn" onclick="zoomOut()" title="Zoom Out">−</button>
+                <button class="btn zoom-btn" onclick="resetZoom()" title="Reset Zoom">⟲</button>
+            </div>
+            <a href="/docs-html/#architecture" class="btn btn-secondary">← Back to Docs</a>
+        </div>
+    </div>
+
+    <div class="legend">
+        <h3>Relationship Legend</h3>
+        <div class="legend-item">
+            <span class="legend-symbol">||--o{</span>
+            <span>One to Many</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-symbol">}o..o|</span>
+            <span>LEFT JOIN (Optional)</span>
+        </div>
+        <div class="legend-item" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #3d5afe;">
+            <span style="font-size: 0.8rem; color: #a0a4b8;">
+                Use mouse wheel or zoom controls to navigate
+            </span>
+        </div>
+    </div>
+
+    <div class="diagram-container" id="diagramContainer">
+        <div class="diagram-wrapper" id="diagramWrapper">
+            <div class="mermaid">
+erDiagram
+    %% Vulnerability Management Core
+    vulnerability_imports ||--o{ vulnerability_snapshots : "batches"
+    vulnerability_imports ||--o{ vulnerabilities_current : "source"
+    vulnerability_imports ||--o{ vulnerabilities : "legacy"
+    vulnerability_imports ||--o{ vulnerability_staging : "staging"
+    vulnerability_imports ||--o{ vulnerability_daily_totals : "aggregates"
+    vulnerability_imports ||--o{ vendor_daily_totals : "vendor_aggregates"
+
+    %% Vendor Advisory Enrichment (LEFT JOIN)
+    vulnerabilities_current }o..o| kev_status : "LEFT JOIN on cve"
+    vulnerabilities_current }o..o| cisco_advisories : "LEFT JOIN on cve"
+    vulnerabilities_current }o..o| palo_alto_advisories : "LEFT JOIN on cve"
+    vulnerabilities }o..o| cisco_advisories : "LEFT JOIN on cve"
+    vulnerabilities }o..o| palo_alto_advisories : "LEFT JOIN on cve"
+
+    %% Ticket-Vulnerability Junction
+    tickets ||--o{ ticket_vulnerabilities : "links"
+    vulnerabilities_current ||--o{ ticket_vulnerabilities : "links"
+
+    %% Authentication
+    users ||--o{ user_preferences : "owns"
+
+    %% Sync Tracking
+    sync_metadata ||--o{ kev_status : "tracks_kev_sync"
+    sync_metadata ||--o{ cisco_advisories : "tracks_cisco_sync"
+    sync_metadata ||--o{ palo_alto_advisories : "tracks_palo_sync"
+    sync_metadata ||--o{ vulnerability_imports : "tracks_auto_vacuum"
+
+    vulnerability_imports {
+        INTEGER id
+        TEXT filename
+        TEXT import_date
+        INTEGER row_count
+        TEXT vendor
+        INTEGER file_size
+        INTEGER processing_time
+        TEXT raw_headers
+        DATETIME created_at
+    }
+
+    vulnerabilities {
+        INTEGER id
+        INTEGER import_id
+        TEXT hostname
+        TEXT ip_address
+        TEXT cve
+        TEXT severity
+        REAL vpr_score
+        REAL cvss_score
+        TEXT first_seen
+        TEXT last_seen
+        TEXT plugin_id
+        TEXT plugin_name
+        TEXT description
+        TEXT solution
+        TEXT vendor_reference
+        TEXT vendor
+        TEXT vulnerability_date
+        TEXT state
+        TEXT import_date
+        TEXT operating_system
+        TEXT solution_text
+        INTEGER is_fixed
+        TEXT fixed_cisco_versions
+        TEXT fixed_cisco_url
+        DATETIME cisco_synced_at
+        TEXT fixed_palo_versions
+        TEXT fixed_palo_url
+        DATETIME palo_synced_at
+        DATETIME created_at
+    }
+
+    vulnerability_snapshots {
+        INTEGER id
+        INTEGER import_id
+        TEXT scan_date
+        TEXT hostname
+        TEXT ip_address
+        TEXT cve
+        TEXT severity
+        REAL vpr_score
+        REAL cvss_score
+        TEXT first_seen
+        TEXT last_seen
+        TEXT plugin_id
+        TEXT plugin_name
+        TEXT description
+        TEXT solution
+        TEXT vendor_reference
+        TEXT vendor
+        TEXT vulnerability_date
+        TEXT state
+        TEXT unique_key
+        INTEGER confidence_score
+        INTEGER dedup_tier
+        TEXT enhanced_unique_key
+        TEXT operating_system
+        TEXT solution_text
+        DATETIME created_at
+    }
+
+    vulnerabilities_current {
+        INTEGER id
+        INTEGER import_id
+        TEXT scan_date
+        TEXT hostname
+        TEXT ip_address
+        TEXT cve
+        TEXT severity
+        REAL vpr_score
+        REAL cvss_score
+        TEXT first_seen
+        TEXT last_seen
+        TEXT plugin_id
+        TEXT plugin_name
+        TEXT description
+        TEXT solution
+        TEXT vendor_reference
+        TEXT vendor
+        TEXT vulnerability_date
+        TEXT state
+        TEXT unique_key
+        TEXT lifecycle_state
+        TEXT resolved_date
+        TEXT resolution_reason
+        INTEGER confidence_score
+        INTEGER dedup_tier
+        TEXT enhanced_unique_key
+        TEXT operating_system
+        TEXT solution_text
+        INTEGER is_fix_available
+        DATETIME created_at
+        DATETIME updated_at
+    }
+
+    vulnerability_daily_totals {
+        INTEGER id
+        TEXT scan_date
+        INTEGER critical_count
+        REAL critical_total_vpr
+        INTEGER high_count
+        REAL high_total_vpr
+        INTEGER medium_count
+        REAL medium_total_vpr
+        INTEGER low_count
+        REAL low_total_vpr
+        INTEGER total_vulnerabilities
+        REAL total_vpr
+        INTEGER resolved_count
+        INTEGER reopened_count
+        DATETIME created_at
+        DATETIME updated_at
+    }
+
+    vendor_daily_totals {
+        INTEGER id
+        TEXT vendor
+        TEXT scan_date
+        INTEGER critical_count
+        REAL critical_total_vpr
+        INTEGER high_count
+        REAL high_total_vpr
+        INTEGER medium_count
+        REAL medium_total_vpr
+        INTEGER low_count
+        REAL low_total_vpr
+        INTEGER total_vulnerabilities
+        REAL total_vpr
+        DATETIME created_at
+    }
+
+    vulnerability_staging {
+        INTEGER id
+        INTEGER import_id
+        TEXT hostname
+        TEXT ip_address
+        TEXT cve
+        TEXT severity
+        REAL vpr_score
+        REAL cvss_score
+        TEXT plugin_id
+        TEXT plugin_name
+        TEXT description
+        TEXT solution
+        TEXT vendor_reference
+        TEXT vendor
+        TEXT vulnerability_date
+        TEXT state
+        TEXT enhanced_unique_key
+        REAL confidence_score
+        INTEGER dedup_tier
+        TEXT lifecycle_state
+        JSON raw_csv_row
+        BOOLEAN processed
+        INTEGER batch_id
+        TEXT processing_error
+        TEXT operating_system
+        TEXT solution_text
+        DATETIME created_at
+        DATETIME processed_at
+    }
+
+    kev_status {
+        TEXT cve_id
+        DATE date_added
+        TEXT vulnerability_name
+        TEXT vendor_project
+        TEXT product
+        TEXT required_action
+        DATE due_date
+        BOOLEAN known_ransomware_use
+        TEXT notes
+        TIMESTAMP last_synced
+    }
+
+    cisco_advisories {
+        TEXT cve_id
+        TEXT advisory_id
+        TEXT advisory_title
+        TEXT severity
+        TEXT cvss_score
+        TEXT first_fixed
+        TEXT affected_releases
+        TEXT product_names
+        TEXT publication_url
+        TIMESTAMP last_synced
+    }
+
+    palo_alto_advisories {
+        TEXT cve_id
+        TEXT advisory_id
+        TEXT advisory_title
+        TEXT severity
+        TEXT cvss_score
+        TEXT first_fixed
+        TEXT affected_versions
+        TEXT product_name
+        TEXT publication_url
+        TIMESTAMP last_synced
+    }
+
+    tickets {
+        TEXT id
+        TEXT xt_number
+        TEXT date_submitted
+        TEXT date_due
+        TEXT hexagon_ticket
+        TEXT service_now_ticket
+        TEXT location
+        TEXT devices
+        TEXT supervisor
+        TEXT tech
+        TEXT status
+        TEXT notes
+        TEXT attachments
+        TEXT site
+        TEXT site_id
+        TEXT location_id
+        TEXT job_type
+        TEXT tracking_number
+        TEXT outbound_tracking
+        TEXT return_tracking
+        TEXT shipping_line1
+        TEXT shipping_line2
+        TEXT shipping_city
+        TEXT shipping_state
+        TEXT shipping_zip
+        TEXT return_line1
+        TEXT return_line2
+        TEXT return_city
+        TEXT return_state
+        TEXT return_zip
+        TEXT site_address
+        TEXT return_address
+        TEXT software_versions
+        TEXT mitigation_details
+        INTEGER deleted
+        TEXT deleted_at
+        TEXT deletion_reason
+        TEXT deleted_by
+        DATETIME created_at
+        DATETIME updated_at
+    }
+
+    ticket_vulnerabilities {
+        INTEGER id
+        TEXT ticket_id
+        INTEGER vulnerability_id
+        TEXT relationship_type
+        TEXT notes
+        DATETIME created_at
+    }
+
+    sync_metadata {
+        INTEGER id
+        TEXT sync_type
+        TIMESTAMP sync_time
+        TEXT version
+        INTEGER record_count
+        TEXT status
+        TEXT error_message
+        TIMESTAMP created_at
+    }
+
+    users {
+        TEXT id
+        TEXT username
+        TEXT email
+        TEXT password_hash
+        TEXT role
+        INTEGER is_active
+        DATETIME last_login
+        INTEGER failed_attempts
+        DATETIME failed_login_timestamp
+        DATETIME created_at
+        DATETIME updated_at
+    }
+
+    user_preferences {
+        INTEGER id
+        TEXT user_id
+        TEXT preference_key
+        TEXT preference_value
+        DATETIME created_at
+        DATETIME updated_at
+    }
+
+    email_templates {
+        INTEGER id
+        TEXT name
+        TEXT description
+        TEXT template_content
+        TEXT default_content
+        TEXT variables
+        TEXT category
+        BOOLEAN is_active
+        DATETIME created_at
+        DATETIME updated_at
+    }
+
+    ticket_templates {
+        INTEGER id
+        TEXT name
+        TEXT description
+        TEXT template_content
+        TEXT default_content
+        TEXT variables
+        TEXT category
+        BOOLEAN is_active
+        DATETIME created_at
+        DATETIME updated_at
+    }
+
+    vulnerability_templates {
+        INTEGER id
+        TEXT name
+        TEXT description
+        TEXT template_content
+        TEXT default_content
+        TEXT variables
+        TEXT category
+        BOOLEAN is_active
+        DATETIME created_at
+        DATETIME updated_at
+    }
+
+    sessions {
+        TEXT sid
+        TEXT sess
+        DATETIME expired
+    }
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        HexTrackr v1.0.66 | SQLite 3 Database Architecture | Last Updated: 2025-10-16
+    </div>
+
+    <script>
+        let currentZoom = 1.0;
+        const zoomStep = 0.1;
+        const minZoom = 0.5;
+        const maxZoom = 2.0;
+
+        function zoomIn() {
+            if (currentZoom < maxZoom) {
+                currentZoom += zoomStep;
+                updateZoom();
+            }
+        }
+
+        function zoomOut() {
+            if (currentZoom > minZoom) {
+                currentZoom -= zoomStep;
+                updateZoom();
+            }
+        }
+
+        function resetZoom() {
+            currentZoom = 1.0;
+            updateZoom();
+        }
+
+        function updateZoom() {
+            const wrapper = document.getElementById('diagramWrapper');
+            wrapper.style.transform = `scale(${currentZoom})`;
+        }
+
+        // Mouse wheel zoom
+        document.getElementById('diagramContainer').addEventListener('wheel', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                e.preventDefault();
+                if (e.deltaY < 0) {
+                    zoomIn();
+                } else {
+                    zoomOut();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

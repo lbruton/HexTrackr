@@ -1,10 +1,10 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
     <h1>HexTrackr Data Model</h1><p>This document provides a definitive overview of the HexTrackr database schema. The primary bootstrap is <code>scripts/init-database.js</code>; however, the live schema evolves further at runtime via idempotent <code>ALTER TABLE</code> and index creation logic inside <code>server.js</code> and migration code executed during imports. The authoritative state is therefore the <strong>live SQLite schema</strong> (captured below) rather than the historical <code>schema.sql</code> file (now outdated and retained only for legacy reference).</p>
-<p><strong>Schema Summary</strong> (v1.0.54):</p>
+<p><strong>Schema Summary</strong> (v1.0.66):</p>
 <ul>
-<li><strong>15 Core Tables</strong>: Vulnerabilities (4), Tickets (2), KEV (2), Templates (3), Authentication (2), Import/Staging (2)</li>
-<li><strong>37+ Indexes</strong>: Performance-optimized queries on critical fields</li>
+<li><strong>16 Core Tables</strong>: Vulnerabilities (4), Tickets (2), KEV (2), Templates (3), Authentication (2), Import/Staging (2), Analytics (1)</li>
+<li><strong>49 Indexes</strong>: Performance-optimized queries on critical fields</li>
 <li><strong>4-Tier Deduplication</strong>: Enhanced unique key generation with confidence scoring</li>
 <li><strong>KEV Integration</strong>: CISA Known Exploited Vulnerabilities catalog synchronization</li>
 <li><strong>Template System</strong>: Email, ticket, and vulnerability report templates with variable substitution</li>
@@ -15,7 +15,7 @@
 <li><strong>Database File</strong>: <code>data/hextrackr.db</code></li>
 </ul>
 <hr>
-<h2>Core Tables</h2><h3>`tickets`</h3><p>Stores all ticketing information. This table has <strong>indexes for query performance</strong> on dates, status, site codes, and external ticket numbers. It has evolved from a minimal design to a richer structure with relational hooks into <code>sites</code> and <code>locations</code>.</p>
+<h2>Core Tables</h2><h3>`tickets`</h3><p>Stores all ticketing information. This table has <strong>indexes for query performance</strong> on dates, status, site codes, and external ticket numbers. Site and location tracking uses TEXT fields (<code>site</code>, <code>site_id</code>, <code>location</code>, <code>location_id</code>) for flexible data storage.</p>
 <table>
 <thead>
 <tr>
@@ -32,33 +32,39 @@
 <td>Stable unique identifier supplied by UI (string, not auto-increment).</td>
 </tr>
 <tr>
+<td><code>xt_number</code></td>
+<td>TEXT</td>
+<td>UNIQUE</td>
+<td>Alternate human-friendly number (used when <code>id</code> absent in legacy imports).</td>
+</tr>
+<tr>
 <td><code>date_submitted</code></td>
 <td>TEXT</td>
-<td>NOT NULL</td>
-<td>Submission date (ISO date).</td>
+<td></td>
+<td>Submission date (ISO date) - nullable.</td>
 </tr>
 <tr>
 <td><code>date_due</code></td>
 <td>TEXT</td>
-<td>NOT NULL</td>
-<td>Due date (ISO date).</td>
+<td></td>
+<td>Due date (ISO date) - nullable.</td>
 </tr>
 <tr>
 <td><code>hexagon_ticket</code></td>
 <td>TEXT</td>
-<td>Indexed</td>
+<td></td>
 <td>External Hexagon reference.</td>
 </tr>
 <tr>
 <td><code>service_now_ticket</code></td>
 <td>TEXT</td>
-<td>Indexed</td>
+<td></td>
 <td>External ServiceNow reference.</td>
 </tr>
 <tr>
 <td><code>location</code></td>
 <td>TEXT</td>
-<td>NOT NULL, Indexed</td>
+<td>NOT NULL</td>
 <td>Human readable location label.</td>
 </tr>
 <tr>
@@ -71,7 +77,7 @@
 <td><code>supervisor</code></td>
 <td>TEXT</td>
 <td></td>
-<td>Supervisor name.</td>
+<td>Supervisor name (can be semicolon-delimited for multiple).</td>
 </tr>
 <tr>
 <td><code>tech</code></td>
@@ -82,7 +88,7 @@
 <tr>
 <td><code>status</code></td>
 <td>TEXT</td>
-<td>DEFAULT &#39;Open&#39;, Indexed</td>
+<td>DEFAULT &#39;Open&#39;</td>
 <td>Workflow status (Open, Completed, etc.).</td>
 </tr>
 <tr>
@@ -99,39 +105,33 @@
 </tr>
 <tr>
 <td><code>created_at</code></td>
-<td>TEXT</td>
-<td>NOT NULL</td>
-<td>Creation timestamp (string).</td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Creation timestamp.</td>
 </tr>
 <tr>
 <td><code>updated_at</code></td>
-<td>TEXT</td>
-<td>NOT NULL</td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
 <td>Last update timestamp.</td>
 </tr>
 <tr>
 <td><code>site</code></td>
 <td>TEXT</td>
-<td>Indexed</td>
+<td></td>
 <td>Higher-level site grouping.</td>
 </tr>
 <tr>
-<td><code>xt_number</code></td>
-<td>TEXT</td>
-<td>Indexed</td>
-<td>Alternate human-friendly number (used when <code>id</code> absent in legacy imports).</td>
-</tr>
-<tr>
 <td><code>site_id</code></td>
-<td>INTEGER</td>
-<td>FK to <code>sites.id</code>, Indexed</td>
-<td>Optional normalized site reference.</td>
+<td>TEXT</td>
+<td></td>
+<td>Optional site identifier (TEXT, not FK).</td>
 </tr>
 <tr>
 <td><code>location_id</code></td>
-<td>INTEGER</td>
-<td>FK to <code>locations.id</code>, Indexed</td>
-<td>Optional normalized location reference.</td>
+<td>TEXT</td>
+<td></td>
+<td>Optional location identifier (TEXT, not FK).</td>
 </tr>
 </tbody></table>
 <p><strong>Ticket Indexes</strong> (all created automatically): location, status, date_submitted, date_due, hexagon_ticket, service_now_ticket, site, xt_number, site_id, location_id.</p>
@@ -330,7 +330,7 @@
 <tr>
 <td><code>lifecycle_state</code></td>
 <td>TEXT</td>
-<td></td>
+<td>DEFAULT &#39;active&#39;</td>
 <td>Logical state (active/resolved/reopened).</td>
 </tr>
 <tr>
@@ -338,6 +338,42 @@
 <td>TEXT</td>
 <td></td>
 <td>Date when marked as resolved.</td>
+</tr>
+<tr>
+<td><code>resolution_reason</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Reason why vulnerability was resolved.</td>
+</tr>
+<tr>
+<td><code>confidence_score</code></td>
+<td>INTEGER</td>
+<td>DEFAULT 50</td>
+<td>Deduplication confidence (0-100).</td>
+</tr>
+<tr>
+<td><code>dedup_tier</code></td>
+<td>INTEGER</td>
+<td>DEFAULT 4</td>
+<td>Deduplication tier level (1-4).</td>
+</tr>
+<tr>
+<td><code>enhanced_unique_key</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Enhanced 4-tier deduplication key.</td>
+</tr>
+<tr>
+<td><code>operating_system</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Operating system information (added Migration 006).</td>
+</tr>
+<tr>
+<td><code>solution_text</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Extended solution details (added Migration 006).</td>
 </tr>
 <tr>
 <td><code>created_at</code></td>
@@ -359,7 +395,13 @@
 </tr>
 </tbody></table>
 <h3>`vulnerability_snapshots`</h3><p>This table is an append-only log of <strong>all vulnerabilities from every scan</strong>. It serves as the historical record for trend analysis.</p>
-<p><em>Shares the same columns as <code>vulnerabilities_current</code> (except <code>unique_key</code> not unique) and acts as an append-only log for every scan ingestion.</em></p>
+<p><em>Schema similar to <code>vulnerabilities_current</code> with the following key differences:</em></p>
+<ul>
+<li><code>unique_key</code> is <strong>not unique</strong> (allows duplicate vulnerabilities across scan dates)</li>
+<li>Additional deduplication metadata: <code>confidence_score</code>, <code>dedup_tier</code>, <code>enhanced_unique_key</code></li>
+<li>Includes Migration 006 columns: <code>operating_system</code>, <code>solution_text</code></li>
+<li>Acts as append-only log for every scan ingestion</li>
+</ul>
 <h3>`vulnerability_daily_totals`</h3><p>This table stores pre-calculated daily aggregates to power the dashboard charts efficiently.</p>
 <table>
 <thead>
@@ -450,6 +492,98 @@
 <td>Last update timestamp.</td>
 </tr>
 </tbody></table>
+<h3>`vendor_daily_totals` *(v1.0.62 - Migration 008)*</h3><p>Vendor-specific daily aggregates for trend analysis and vendor comparison. This table provides granular insights into vulnerability distribution across different vendors (Cisco, Palo Alto, etc.).</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>INTEGER</td>
+<td><strong>Primary Key</strong>.</td>
+</tr>
+<tr>
+<td><code>scan_date</code></td>
+<td>TEXT</td>
+<td>The date for which the totals are calculated.</td>
+</tr>
+<tr>
+<td><code>vendor</code></td>
+<td>TEXT</td>
+<td>Vendor name (cisco, paloalto, etc.).</td>
+</tr>
+<tr>
+<td><code>critical_count</code></td>
+<td>INTEGER</td>
+<td>Count of Critical vulnerabilities for this vendor on this date.</td>
+</tr>
+<tr>
+<td><code>critical_total_vpr</code></td>
+<td>REAL</td>
+<td>Sum of VPR scores for Critical vulnerabilities.</td>
+</tr>
+<tr>
+<td><code>high_count</code></td>
+<td>INTEGER</td>
+<td>Count of High vulnerabilities.</td>
+</tr>
+<tr>
+<td><code>high_total_vpr</code></td>
+<td>REAL</td>
+<td>Sum of VPR scores for High vulnerabilities.</td>
+</tr>
+<tr>
+<td><code>medium_count</code></td>
+<td>INTEGER</td>
+<td>Count of Medium vulnerabilities.</td>
+</tr>
+<tr>
+<td><code>medium_total_vpr</code></td>
+<td>REAL</td>
+<td>Sum of VPR scores for Medium vulnerabilities.</td>
+</tr>
+<tr>
+<td><code>low_count</code></td>
+<td>INTEGER</td>
+<td>Count of Low vulnerabilities.</td>
+</tr>
+<tr>
+<td><code>low_total_vpr</code></td>
+<td>REAL</td>
+<td>Sum of VPR scores for Low vulnerabilities.</td>
+</tr>
+<tr>
+<td><code>total_vulnerabilities</code></td>
+<td>INTEGER</td>
+<td>Sum of all vulnerability counts for this vendor/date.</td>
+</tr>
+<tr>
+<td><code>total_vpr</code></td>
+<td>REAL</td>
+<td>Sum of all VPR scores for this vendor/date.</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>DATETIME</td>
+<td>Record creation timestamp.</td>
+</tr>
+<tr>
+<td><strong>UNIQUE</strong></td>
+<td>(scan_date, vendor)</td>
+<td>One record per vendor per date.</td>
+</tr>
+</tbody></table>
+<p><strong>Indexes</strong>:</p>
+<ul>
+<li><code>idx_vendor_daily_scan_date</code> (scan_date)</li>
+<li><code>idx_vendor_daily_vendor</code> (vendor)</li>
+<li><code>idx_vendor_daily_composite</code> (vendor, scan_date)</li>
+</ul>
+<p><strong>Purpose</strong>: Permanent storage for vendor-specific trend data. Unlike <code>vulnerability_daily_totals</code>, this table is <strong>never cleaned up</strong> by db-snapshot-cleanup.js, providing long-term vendor performance tracking.</p>
 <h3>`vulnerability_staging`</h3><p>This table serves as a <strong>bulk import staging area</strong> for high-performance CSV processing with enhanced deduplication scoring.</p>
 <table>
 <thead>
@@ -603,6 +737,18 @@
 <td>TEXT</td>
 <td></td>
 <td>Error message if processing failed.</td>
+</tr>
+<tr>
+<td><code>operating_system</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Operating system information (added Migration 006).</td>
+</tr>
+<tr>
+<td><code>solution_text</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Extended solution details (added Migration 006).</td>
 </tr>
 <tr>
 <td><code>created_at</code></td>
@@ -1157,139 +1303,80 @@
 <td>Free-form link-specific notes.</td>
 </tr>
 </tbody></table>
-<h3>`sites` & `locations`</h3><p>Reference/normalization tables to allow structured site &amp; location taxonomy.</p>
-<table>
-<thead>
-<tr>
-<th>Table</th>
-<th>Column</th>
-<th>Type</th>
-<th>Constraints</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>sites</code></td>
-<td><code>id</code></td>
-<td>INTEGER</td>
-<td>PK AUTOINCREMENT</td>
-<td>Row id.</td>
-</tr>
-<tr>
-<td></td>
-<td><code>code</code></td>
-<td>VARCHAR(50)</td>
-<td>UNIQUE NOT NULL</td>
-<td>Short site code.</td>
-</tr>
-<tr>
-<td></td>
-<td><code>name</code></td>
-<td>VARCHAR(255)</td>
-<td>NOT NULL</td>
-<td>Descriptive name.</td>
-</tr>
-<tr>
-<td></td>
-<td><code>description</code></td>
-<td>TEXT</td>
-<td></td>
-<td>Optional details.</td>
-</tr>
-<tr>
-<td></td>
-<td><code>created_at</code></td>
-<td>DATETIME</td>
-<td>DEFAULT CURRENT_TIMESTAMP</td>
-<td>Creation time.</td>
-</tr>
-<tr>
-<td></td>
-<td><code>updated_at</code></td>
-<td>DATETIME</td>
-<td>DEFAULT CURRENT_TIMESTAMP</td>
-<td>Last update.</td>
-</tr>
-<tr>
-<td><code>locations</code></td>
-<td><code>id</code></td>
-<td>INTEGER</td>
-<td>PK AUTOINCREMENT</td>
-<td>Row id.</td>
-</tr>
-<tr>
-<td></td>
-<td><code>code</code></td>
-<td>VARCHAR(50)</td>
-<td>UNIQUE NOT NULL</td>
-<td>Location code.</td>
-</tr>
-<tr>
-<td></td>
-<td><code>name</code></td>
-<td>VARCHAR(255)</td>
-<td>NOT NULL</td>
-<td>Descriptive label.</td>
-</tr>
-<tr>
-<td></td>
-<td><code>description</code></td>
-<td>TEXT</td>
-<td></td>
-<td>Optional details.</td>
-</tr>
-<tr>
-<td></td>
-<td><code>created_at</code></td>
-<td>DATETIME</td>
-<td>DEFAULT CURRENT_TIMESTAMP</td>
-<td>Creation time.</td>
-</tr>
-<tr>
-<td></td>
-<td><code>updated_at</code></td>
-<td>DATETIME</td>
-<td>DEFAULT CURRENT_TIMESTAMP</td>
-<td>Last update.</td>
-</tr>
-</tbody></table>
-<h2>Indexes</h2><p>To ensure efficient querying, the following indexes are created:</p>
-<h3>Index Inventory</h3><table>
-<thead>
-<tr>
-<th>Purpose</th>
-<th>Index</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Snapshot query by date</td>
-<td><code>idx_snapshots_scan_date</code></td>
-</tr>
-<tr>
-<td>Snapshot query by hostname</td>
-<td><code>idx_snapshots_hostname</code></td>
-</tr>
-<tr>
-<td>Snapshot query by severity</td>
-<td><code>idx_snapshots_severity</code></td>
-</tr>
-<tr>
-<td>Current lookup by unique key</td>
-<td><code>idx_current_unique_key</code></td>
-</tr>
-<tr>
-<td>Current query by scan date</td>
-<td><code>idx_current_scan_date</code></td>
-</tr>
-<tr>
-<td>Tickets filtering</td>
-<td>Multiple (see tickets section)</td>
-</tr>
-<tr>
-<td>Legacy vulnerabilities (pre-rollover)</td>
-<td><code>idx_vulnerabilities_hostname</code>, <code>idx_vulnerabilities_severity</code>, <code>idx_vulnerabilities_cve</code>, <code>idx_vulnerabilities_import</code></td>
-</tr>
-</tbody></table>
+<p><strong>Note on Sites &amp; Locations</strong>: The <code>tickets</code> table includes TEXT fields (<code>site</code>, <code>site_id</code>, <code>location</code>, <code>location_id</code>) for flexible site/location tracking. Dedicated normalization tables (<code>sites</code>, <code>locations</code>) are <strong>not currently implemented</strong> but may be added in future versions for structured taxonomy.</p>
+<h2>Indexes</h2><p>To ensure efficient querying, <strong>49 indexes</strong> are automatically created during database initialization.</p>
+<h3>Index Inventory by Table</h3><p><strong>vulnerability_snapshots</strong> (5 indexes):</p>
+<ul>
+<li><code>idx_snapshots_scan_date</code> - Query by date</li>
+<li><code>idx_snapshots_hostname</code> - Query by hostname</li>
+<li><code>idx_snapshots_severity</code> - Query by severity</li>
+<li><code>idx_snapshots_enhanced_key</code> - Enhanced deduplication</li>
+<li><code>idx_snapshots_cve</code> - KEV integration lookups</li>
+</ul>
+<p><strong>vulnerabilities_current</strong> (9 indexes):</p>
+<ul>
+<li><code>idx_current_unique_key</code> - Primary deduplication key</li>
+<li><code>idx_current_scan_date</code> - Query by scan date</li>
+<li><code>idx_current_enhanced_unique_key</code> - Enhanced deduplication</li>
+<li><code>idx_current_lifecycle_scan</code> - Composite (lifecycle_state, scan_date)</li>
+<li><code>idx_current_confidence_tier</code> - Composite (confidence_score, dedup_tier)</li>
+<li><code>idx_current_active_severity</code> - Composite (lifecycle_state, severity)</li>
+<li><code>idx_current_resolved_date</code> - Resolution tracking</li>
+<li><code>idx_current_cve</code> - KEV integration lookups</li>
+<li><code>idx_current_vendor</code> - Vendor filtering (HEX-101)</li>
+</ul>
+<p><strong>vulnerability_staging</strong> (4 indexes):</p>
+<ul>
+<li><code>idx_staging_import_id</code> - Import batch tracking</li>
+<li><code>idx_staging_processed</code> - Processing status</li>
+<li><code>idx_staging_batch_id</code> - Batch processing</li>
+<li><code>idx_staging_unprocessed_batch</code> - Composite (processed, batch_id)</li>
+</ul>
+<p><strong>tickets</strong> (10 indexes):</p>
+<ul>
+<li><code>idx_tickets_status</code> - Status filtering</li>
+<li><code>idx_tickets_site</code> - Site grouping</li>
+<li><code>idx_tickets_location</code> - Location filtering</li>
+<li><code>idx_tickets_xt</code> - XT number lookups</li>
+<li>Plus 6 auto-created indexes for: date_submitted, date_due, hexagon_ticket, service_now_ticket, site_id, location_id</li>
+</ul>
+<p><strong>vulnerabilities (legacy)</strong> (4 indexes):</p>
+<ul>
+<li><code>idx_vulnerabilities_hostname</code> - Hostname lookups</li>
+<li><code>idx_vulnerabilities_severity</code> - Severity filtering</li>
+<li><code>idx_vulnerabilities_cve</code> - CVE lookups</li>
+<li><code>idx_vulnerabilities_import</code> - Import batch tracking</li>
+</ul>
+<p><strong>vendor_daily_totals</strong> (3 indexes):</p>
+<ul>
+<li><code>idx_vendor_daily_scan_date</code> - Date-based queries</li>
+<li><code>idx_vendor_daily_vendor</code> - Vendor-based queries</li>
+<li><code>idx_vendor_daily_composite</code> - Composite (vendor, scan_date)</li>
+</ul>
+<p><strong>kev_status</strong> (4 indexes):</p>
+<ul>
+<li><code>idx_kev_status_cve_id</code> - CVE lookups</li>
+<li><code>idx_kev_status_date_added</code> - Chronological queries</li>
+<li><code>idx_kev_status_due_date</code> - Deadline tracking</li>
+<li><code>idx_kev_status_ransomware</code> - Partial index (WHERE known_ransomware_use = 1)</li>
+</ul>
+<p><strong>Template Tables</strong> (9 indexes total):</p>
+<ul>
+<li>Email templates: <code>idx_email_templates_name</code>, <code>idx_email_templates_active</code>, <code>idx_email_templates_category</code></li>
+<li>Ticket templates: <code>idx_ticket_templates_name</code>, <code>idx_ticket_templates_category</code>, <code>idx_ticket_templates_active</code></li>
+<li>Vulnerability templates: <code>idx_vulnerability_templates_name</code>, <code>idx_vulnerability_templates_category</code>, <code>idx_vulnerability_templates_active</code></li>
+</ul>
+<p><strong>Authentication &amp; User Management</strong> (4 indexes):</p>
+<ul>
+<li>Users: <code>idx_users_username</code>, <code>idx_users_email</code></li>
+<li>User preferences: <code>idx_user_preferences_user_id</code>, <code>idx_user_preferences_key</code></li>
+</ul>
+<p><strong>Other Indexes</strong> (3 indexes):</p>
+<ul>
+<li><code>idx_ticket_vulns_ticket</code> - Junction table (ticket_id)</li>
+<li><code>idx_ticket_vulns_vuln</code> - Junction table (vulnerability_id)</li>
+<li><code>idx_sync_metadata_type_time</code> - Composite (sync_type, sync_time DESC)</li>
+</ul>
 <blockquote>
 <p>Note: The legacy <code>vulnerabilities</code> table remains ONLY for backup/export endpoints (<code>/api/backup/vulnerabilities</code>, <code>/api/backup/all</code>). All imports and dashboards use the rollover trio (<code>vulnerability_snapshots</code>, <code>vulnerabilities_current</code>, <code>vulnerability_daily_totals</code>).</p>
 </blockquote>
@@ -1375,6 +1462,8 @@
 </tbody></table>
 <hr>
 <p>The above reflects the database as inspected on the current build date. Regenerate this document after structural changes or migration scripts are introduced.</p>
+<hr>
+<p><em>Last Updated: 2025-10-16 | Version: v1.0.66 | Audit: DOCS-53</em></p>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be

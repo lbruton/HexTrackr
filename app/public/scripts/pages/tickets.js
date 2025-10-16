@@ -386,6 +386,34 @@ class HexagonTicketsManager {
             this.handleLocationToDeviceAutofill(e.target.value);
         });
 
+        // Address autofill when both site and location are populated
+        document.getElementById("site").addEventListener("blur", () => {
+            this.checkAddressAutofill();
+        });
+        document.getElementById("location").addEventListener("blur", () => {
+            this.checkAddressAutofill();
+        });
+
+        // Input validation: City fields - letters, spaces, hyphens only
+        ["shippingCity", "returnCity"].forEach(id => {
+            const field = document.getElementById(id);
+            if (field) {
+                field.addEventListener("input", (e) => {
+                    e.target.value = e.target.value.replace(/[^A-Za-z\s\-]/g, "");
+                });
+            }
+        });
+
+        // Input validation: ZIP fields - numbers and hyphens only
+        ["shippingZip", "returnZip"].forEach(id => {
+            const field = document.getElementById(id);
+            if (field) {
+                field.addEventListener("input", (e) => {
+                    e.target.value = e.target.value.replace(/[^0-9\-]/g, "");
+                });
+            }
+        });
+
         // Track manual edits to device fields to disable autofill for manually edited fields
         document.getElementById("devicesContainer").addEventListener("input", (e) => {
             if (e.target.classList.contains("device-input")) {
@@ -627,7 +655,7 @@ class HexagonTicketsManager {
             // Autofill if field is empty OR was previously autofilled (not manually edited)
             const isEmpty = !firstDeviceInput.value.trim();
             const wasAutofilled = firstDeviceInput.dataset.autofilled === "true";
-            
+
             if (isEmpty || wasAutofilled) {
                 firstDeviceInput.value = locationValue.trim();
                 // Mark as autofilled if there's content, remove if empty
@@ -638,6 +666,75 @@ class HexagonTicketsManager {
                 }
             }
         }
+    }
+
+    /**
+     * Check if address autofill should be triggered
+     * Fetches most recent addresses for matching site+location
+     * Only for Replace/Refresh jobs, only populates empty fields
+     */
+    async checkAddressAutofill() {
+        const site = document.getElementById("site").value.trim();
+        const location = document.getElementById("location").value.trim();
+        const jobType = document.getElementById("jobType").value;
+
+        // Only autofill for Replace/Refresh jobs
+        if (jobType !== "Replace" && jobType !== "Refresh") {
+            return;
+        }
+
+        // Need both site and location
+        if (!site || !location) {
+            return;
+        }
+
+        // Skip if addresses are already populated
+        const shippingLine1 = document.getElementById("shippingLine1");
+        if (shippingLine1 && shippingLine1.value.trim()) {
+            return; // User has already entered data
+        }
+
+        try {
+            const response = await fetch(`/api/tickets/address-suggestions?site=${encodeURIComponent(site)}&location=${encodeURIComponent(location)}`);
+            const result = await response.json();
+
+            if (result.success && result.data) {
+                const addresses = result.data;
+
+                // Populate shipping address (only if empty)
+                if (addresses.shipping_line1) {
+                    this.populateAddressFields("shipping", addresses);
+                }
+
+                // Populate return address (only if empty)
+                if (addresses.return_line1) {
+                    this.populateAddressFields("return", addresses);
+                }
+
+                // Do NOT populate tracking numbers (per requirements)
+            }
+        } catch (error) {
+            console.error("Error fetching address suggestions:", error);
+            // Silent fail - don't show error to user
+        }
+    }
+
+    /**
+     * Populate address form fields (shipping or return)
+     * @param {string} type - "shipping" or "return"
+     * @param {object} addresses - Address data from API
+     */
+    populateAddressFields(type, addresses) {
+        const fields = ["line1", "line2", "city", "state", "zip"];
+        fields.forEach(field => {
+            const elementId = `${type}${field.charAt(0).toUpperCase() + field.slice(1)}`;
+            const element = document.getElementById(elementId);
+            const dbField = `${type}_${field}`;
+
+            if (element && !element.value.trim() && addresses[dbField]) {
+                element.value = addresses[dbField];
+            }
+        });
     }
 
     removeDeviceField(deviceEntry) {
@@ -2879,7 +2976,24 @@ class HexagonTicketsManager {
             "[JOB_TYPE]": ticket.jobType || ticket.job_type || "Upgrade",
             "[NOTES]": ticket.notes || "N/A",
             "[GENERATED_TIME]": new Date().toLocaleString(),
-            "[GREETING]": this.getSupervisorGreeting(ticket.supervisor)
+            "[GREETING]": this.getSupervisorGreeting(ticket.supervisor),
+            // HEX-242: Address fields for Replace/Refresh tickets
+            "[SITE_ADDRESS]": ticket.site_address || this.formatAddress(
+                ticket.shipping_line1 || ticket.shippingLine1,
+                ticket.shipping_line2 || ticket.shippingLine2,
+                ticket.shipping_city || ticket.shippingCity,
+                ticket.shipping_state || ticket.shippingState,
+                ticket.shipping_zip || ticket.shippingZip
+            ) || "N/A",
+            "[RETURN_ADDRESS]": ticket.return_address || this.formatAddress(
+                ticket.return_line1 || ticket.returnLine1,
+                ticket.return_line2 || ticket.returnLine2,
+                ticket.return_city || ticket.returnCity,
+                ticket.return_state || ticket.returnState,
+                ticket.return_zip || ticket.returnZip
+            ) || "N/A",
+            "[TRACKING_NUMBER]": ticket.outbound_tracking || ticket.outboundTracking || ticket.tracking_number || "N/A",
+            "[RETURN_TRACKING]": ticket.return_tracking || ticket.returnTracking || "N/A"
         };
 
         // Handle vulnerabilities array (backward compatibility)
@@ -3150,6 +3264,44 @@ class HexagonTicketsManager {
         }
 
         return trimmed;
+    }
+
+    /**
+     * Format address fields into multi-line string
+     * @description Formats shipping/return address components into standardized address block
+     * @param {string} line1 - Address line 1 (street address)
+     * @param {string} line2 - Address line 2 (suite, apt, etc.)
+     * @param {string} city - City name
+     * @param {string} state - State abbreviation
+     * @param {string} zip - ZIP code
+     * @returns {string|null} Formatted address with newlines, or null if no address provided
+     * @example
+     * const addr = this.formatAddress('123 Main St', 'Suite 100', 'Dallas', 'TX', '75001');
+     * // Returns: "123 Main St\nSuite 100\nDallas, TX 75001"
+     * @since 1.0.66 (HEX-242)
+     * @module TicketsManager
+     */
+    formatAddress(line1, line2, city, state, zip) {
+        // Format as proper U.S. mailing address with line breaks for markdown display
+        const addressLines = [];
+
+        // Add address line 1
+        if (line1) addressLines.push(line1);
+
+        // Add address line 2
+        if (line2) addressLines.push(line2);
+
+        // Add city, state, zip on one line
+        if (city && state && zip) {
+            addressLines.push(`${city}, ${state} ${zip}`);
+        } else if (city || state || zip) {
+            // Handle partial city/state/zip
+            const cityStateZip = [city, state, zip].filter(Boolean).join(" ");
+            if (cityStateZip) addressLines.push(cityStateZip);
+        }
+
+        // Join with newlines for multi-line display in markdown
+        return addressLines.length > 0 ? addressLines.join("\n") : null;
     }
 
     /**
