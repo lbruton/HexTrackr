@@ -1,12 +1,60 @@
-# HexTrackr v1.0.66 - Device-Level Fixed Version Search
+# HexTrackr v1.0.66 - UI Polish & Fixed Version Search
 
 **Release Date**: 2025-10-15
-**Type**: Bug Fix
-**Linear Issue**: [HEX-234](https://linear.app/hextrackr/issue/HEX-234)
+**Type**: Bug Fixes & UI Improvements
+**Linear Issues**: [HEX-234](https://linear.app/hextrackr/issue/HEX-234), [HEX-240](https://linear.app/hextrackr/issue/HEX-240)
 
 ---
 
-## Bug Fix: Fixed Version Search Implementation
+## Feature: Tenable Last Import Date Display (HEX-240)
+
+### Summary
+Added "Last CSV Import" date display to Tenable integration card in Settings modal, following the same pattern as KEV and Palo Alto sync status displays.
+
+### Implementation
+**Backend**:
+- Added `getLastImportDate()` method to `vulnerabilityStatsService.js`
+- Queries `vulnerability_daily_totals` table for most recent scan date
+- Added controller method `getLastImport()` in `vulnerabilityController.js`
+- New endpoint: `GET /api/vulnerabilities/last-import` (authenticated)
+
+**Frontend**:
+- Added `loadTenableImportStatus()` function to `settings-modal.js`
+- Displays formatted date (e.g., "Oct 13, 2025") on Tenable card
+- Wired up event listener to load status when Settings modal opens
+
+**Data Source**: `vulnerability_daily_totals` table (populated on every CSV import)
+**No database changes required** - uses existing infrastructure
+
+### Files Changed
+```
+M app/services/vulnerabilityStatsService.js (Lines 670-691)
+M app/controllers/vulnerabilityController.js (Lines 210-227)
+M app/routes/vulnerabilities.js (Line 54)
+M app/public/scripts/shared/settings-modal.js (Lines 1399-1426, 164)
+```
+
+---
+
+## UI Fix: Third-Party Integration Card Layout Consistency
+
+### Changes
+1. **Cisco PSIRT Card**: Swapped "Manage Credentials" button and status badge positions
+   - Button now appears on left, badge on right (better visual hierarchy)
+   - Matches credential management patterns across the UI
+
+2. **Netbox Card**: Added flex-column layout to anchor CSV import button to bottom
+   - Matches KEV, Palo Alto, and Tenable card structure
+   - Consistent visual alignment across all integration cards
+
+### Files Changed
+```
+M app/public/scripts/shared/settings-modal.html (Lines 43-48, 228-257)
+```
+
+---
+
+## Bug Fix: Fixed Version Search Implementation (HEX-234)
 
 ### Problem
 Search functionality did not query fixed software versions, preventing users from finding devices by their recommended fixed version (e.g., "15.2(4)E4", "No Fix", etc.).
