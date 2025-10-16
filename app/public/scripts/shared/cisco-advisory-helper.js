@@ -80,6 +80,39 @@ class CiscoAdvisoryHelper {
     }
 
     /**
+     * Compare two Cisco IOS version strings for sorting (descending order)
+     * Returns highest/most recent version first
+     *
+     * @param {string} a - First version string (e.g., "16.9(4)")
+     * @param {string} b - Second version string (e.g., "15.2(7)E")
+     * @returns {number} - Negative if a > b, positive if a < b, 0 if equal
+     */
+    compareVersions(a, b) {
+        // Extract version components: major.minor(maintenance)train
+        const parseVersion = (ver) => {
+            const match = ver.match(/^(\d+)\.(\d+)\((\d+)\)([A-Z]*)/);
+            if (!match) return { major: 0, minor: 0, maint: 0, train: '' };
+            return {
+                major: parseInt(match[1], 10),
+                minor: parseInt(match[2], 10),
+                maint: parseInt(match[3], 10),
+                train: match[4] || ''
+            };
+        };
+
+        const vA = parseVersion(a);
+        const vB = parseVersion(b);
+
+        // Compare major, minor, maintenance in order
+        if (vA.major !== vB.major) return vB.major - vA.major;
+        if (vA.minor !== vB.minor) return vB.minor - vA.minor;
+        if (vA.maint !== vB.maint) return vB.maint - vA.maint;
+
+        // Train identifiers compared alphabetically (descending)
+        return vB.train.localeCompare(vA.train);
+    }
+
+    /**
      * Match fixed version from array based on installed OS type
      *
      * @param {string} installedVersion - Installed version (e.g., "CISCO IOS XE 16.9.2")
@@ -245,11 +278,22 @@ class CiscoAdvisoryHelper {
             cves.map(cve => this.getFixedVersion(cve, device.vendor, device.operating_system))
         );
 
-        // Return first non-null fixed version
-        // TODO: Future enhancement - prioritize by VPR score or severity
-        const fixedVersion = advisories.find(v => v !== null);
+        // Filter out nulls and deduplicate
+        const validVersions = [...new Set(advisories.filter(v => v !== null))];
 
-        return fixedVersion || null;
+        if (validVersions.length === 0) {
+            return null;
+        }
+
+        if (validVersions.length === 1) {
+            return validVersions[0];
+        }
+
+        // Sort versions (highest/most recent first) - HEX-246
+        validVersions.sort((a, b) => this.compareVersions(a, b));
+
+        // Return highest version
+        return validVersions[0];
     }
 
     /**
