@@ -7,7 +7,7 @@
   "deviceTypePatterns": [
     {
       "pattern": "nswan",
-      "description": "Switch (WAN)",
+      "description": "Network Switch (WAN)",
       "type": "switch",
       "vendor": "CISCO",
       "precedence": 1
@@ -21,7 +21,7 @@
     },
     {
       "pattern": "nrwan",
-      "description": "Router (WAN)",
+      "description": "Network Router (WAN)",
       "type": "router",
       "vendor": "CISCO",
       "precedence": 3
@@ -34,39 +34,97 @@
       "precedence": 4
     },
     {
+      "pattern": "ns",
+      "description": "Network Switch",
+      "type": "switch",
+      "vendor": "CISCO",
+      "precedence": 5,
+      "comment": "Matches patterns like tulns31com01-vlan31"
+    },
+    {
+      "pattern": "com",
+      "description": "Communication Interface",
+      "type": "interface",
+      "vendor": "CISCO",
+      "precedence": 6,
+      "comment": "Matches VLAN interfaces like tulns31com01-vlan31"
+    },
+    {
       "pattern": "nfpan",
-      "description": "Palo Alto Firewall",
+      "description": "Palo Alto Network Firewall",
       "type": "firewall",
       "vendor": "Palo Alto",
-      "precedence": 5
+      "precedence": 7
+    },
+    {
+      "pattern": "nfscada",
+      "description": "Palo Alto SCADA Firewall",
+      "type": "firewall",
+      "vendor": "Palo Alto",
+      "precedence": 8
+    },
+    {
+      "pattern": "papan",
+      "description": "Palo Alto PA Firewall",
+      "type": "firewall",
+      "vendor": "Palo Alto",
+      "precedence": 9
+    },
+    {
+      "pattern": "extpan",
+      "description": "Palo Alto External Firewall",
+      "type": "firewall",
+      "vendor": "Palo Alto",
+      "precedence": 10
+    },
+    {
+      "pattern": "intpan",
+      "description": "Palo Alto Internal Firewall",
+      "type": "firewall",
+      "vendor": "Palo Alto",
+      "precedence": 11
+    },
+    {
+      "pattern": "campuspan",
+      "description": "Palo Alto Campus Firewall",
+      "type": "firewall",
+      "vendor": "Palo Alto",
+      "precedence": 12
+    },
+    {
+      "pattern": "devpan",
+      "description": "Palo Alto Development Firewall",
+      "type": "firewall",
+      "vendor": "Palo Alto",
+      "precedence": 13
     },
     {
       "pattern": "fw",
-      "description": "Firewall",
+      "description": "Firewall (Generic)",
       "type": "firewall",
       "vendor": "CISCO",
-      "precedence": 6
+      "precedence": 14
     },
     {
       "pattern": "asa",
       "description": "Cisco ASA Firewall",
       "type": "firewall",
       "vendor": "CISCO",
-      "precedence": 7
+      "precedence": 15
     },
     {
       "pattern": "sw",
       "description": "Switch (Generic)",
       "type": "switch",
       "vendor": "CISCO",
-      "precedence": 8
+      "precedence": 16
     },
     {
       "pattern": "newan",
       "description": "Edge Device",
       "type": "edge",
       "vendor": "CISCO",
-      "precedence": 9
+      "precedence": 17
     }
   ],
 
