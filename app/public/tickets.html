@@ -918,6 +918,9 @@
                     </form>
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-info me-auto" onclick="searchVulnerabilitiesFromTicket('ticketModal')">
+                        <i class="fas fa-search me-2"></i>Search Vulnerabilities
+                    </button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-primary" onclick="saveTicket()">
                         <i class="fas fa-save me-2"></i>Save Ticket
@@ -1142,6 +1145,9 @@
                     </div>
                 </div>
                 <div class="modal-footer" id="viewTicketModalFooter">
+                    <button type="button" class="btn btn-outline-info me-auto" onclick="searchVulnerabilitiesFromTicket('viewTicketModal')">
+                        <i class="fas fa-search me-2"></i>Search Vulnerabilities
+                    </button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary" onclick="editTicketFromView()">
                         <i class="fas fa-edit me-2"></i>Edit Ticket
@@ -1201,6 +1207,27 @@
                 e.target.click();
             }
         });
+
+        /**
+         * Navigate to vulnerabilities page with location search pre-filled
+         * @param {string} modalId - ID of the modal to read location from
+         */
+        function searchVulnerabilitiesFromTicket(modalId) {
+            // Get location value from the appropriate modal
+            let location = '';
+            if (modalId === 'ticketModal') {
+                location = document.getElementById('location')?.value || '';
+            } else if (modalId === 'viewTicketModal') {
+                location = document.getElementById('viewLocation')?.textContent || '';
+            }
+            
+            // Navigate to vulnerabilities page with search parameter
+            if (location) {
+                window.location.href = `/vulnerabilities.html?search=${encodeURIComponent(location)}`;
+            } else {
+                window.location.href = '/vulnerabilities.html';
+            }
+        }
     </script>
 
     <script>

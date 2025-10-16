@@ -168,6 +168,7 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
                     if (!advisoryHelper) {
                         cell.innerHTML = `<span class="font-monospace text-muted small">N/A</span>`;
                         params.node.setDataValue('fixed_version', 'N/A');  // Update AG-Grid data model for search
+                        params.data.fixed_version = 'N/A';  // HEX-234: Update source data for search
                         return;
                     }
 
@@ -180,13 +181,16 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
                         if (fixedVersion) {
                             cell.innerHTML = `<span class="font-monospace text-success small">${DOMPurify.sanitize(fixedVersion)}+</span>`;
                             params.node.setDataValue('fixed_version', fixedVersion);  // Update AG-Grid data model
+                            params.data.fixed_version = fixedVersion;  // HEX-234: Update source data for search
                         } else {
                             cell.innerHTML = `<span class="font-monospace text-muted small">No Fix</span>`;
                             params.node.setDataValue('fixed_version', 'No Fix');
+                            params.data.fixed_version = 'No Fix';  // HEX-234: Update source data for search
                         }
                     } catch (error) {
                         cell.innerHTML = `<span class="font-monospace text-muted small">Error</span>`;
                         params.node.setDataValue('fixed_version', 'Error');
+                        params.data.fixed_version = 'Error';  // HEX-234: Update source data for search
                     }
                 }, 0);
 
