@@ -351,6 +351,16 @@ async function initializeApplication() {
         res.status(403).json({ error: "Forbidden" });
     });
 
+    // HEX-241: Serve device naming patterns config
+    app.use("/config", express.static(path.join(__dirname, "../../config"), {
+        setHeaders: (res, filePath) => {
+            if (filePath.endsWith(".json")) {
+                res.setHeader("Cache-Control", "public, max-age=300"); // 5 minute cache
+                res.setHeader("Content-Type", "application/json");
+            }
+        }
+    }));
+
     app.use(express.static(__dirname, {
         setHeaders: (res, filePath) => {
             if (filePath.endsWith(".html")) {
