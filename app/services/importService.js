@@ -1694,7 +1694,15 @@ function cleanupOldSnapshots(retainCount = 3) {
                     console.error("❌ Error deleting old snapshots:", deleteErr);
                 } else {
                     console.log("✅ Snapshot cleanup complete: Deleted", this.changes.toLocaleString(), "rows");
-                    console.log("   Database will reclaim space on next VACUUM operation");
+
+                    // Run VACUUM to reclaim disk space from deleted snapshots
+                    db.run("VACUUM", (vacuumErr) => {
+                        if (vacuumErr) {
+                            console.warn("⚠️  VACUUM failed after snapshot cleanup:", vacuumErr.message);
+                        } else {
+                            console.log("✅ Database compacted - disk space reclaimed");
+                        }
+                    });
                 }
             });
         }

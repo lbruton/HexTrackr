@@ -661,6 +661,115 @@ class DatabaseService {
     }
 
     /**
+     * Check if VACUUM is needed based on last run time
+     * Uses config from database.js:322-328
+     */
+    async shouldRunVacuum() {
+        const { config } = require("../config/database");
+
+        if (!config.maintenance.enableAutoVacuum) {
+            return false;
+        }
+
+        try {
+            const result = await this.get(
+                "SELECT sync_time FROM sync_metadata WHERE sync_type = 'vacuum' ORDER BY sync_time DESC LIMIT 1"
+            );
+
+            if (!result) {
+                // Never run before
+                return true;
+            }
+
+            const lastVacuum = new Date(result.sync_time);
+            const now = new Date();
+            const daysSinceLastVacuum = (now - lastVacuum) / (1000 * 60 * 60 * 24);
+
+            return daysSinceLastVacuum >= config.maintenance.vacuumIntervalDays;
+        } catch (error) {
+            console.warn("⚠️  Error checking VACUUM status:", error.message);
+            return false;
+        }
+    }
+
+    /**
+     * Run VACUUM operation to reclaim disk space
+     * Tracks execution in sync_metadata table
+     */
+    async runVacuum() {
+        return new Promise((resolve, reject) => {
+            const startTime = Date.now();
+            console.log("🔧 Starting database VACUUM operation...");
+
+            this.db.run("VACUUM", async (vacuumErr) => {
+                if (vacuumErr) {
+                    console.error("❌ VACUUM failed:", vacuumErr.message);
+                    reject(vacuumErr);
+                    return;
+                }
+
+                const duration = ((Date.now() - startTime) / 1000).toFixed(2);
+                console.log(`✅ Database VACUUM complete in ${duration}s`);
+
+                // Record in sync_metadata
+                try {
+                    await this.run(
+                        "INSERT INTO sync_metadata (sync_type, sync_time, record_count) VALUES ('vacuum', ?, ?)",
+                        [new Date().toISOString(), duration]
+                    );
+                    resolve({ success: true, duration });
+                } catch (metadataErr) {
+                    console.warn("⚠️  Failed to record VACUUM in sync_metadata:", metadataErr.message);
+                    resolve({ success: true, duration }); // VACUUM succeeded even if metadata failed
+                }
+            });
+        });
+    }
+
+    /**
+     * Start auto-VACUUM scheduler
+     * Runs based on config.maintenance.vacuumIntervalDays
+     */
+    async startAutoVacuum() {
+        const { config } = require("../config/database");
+
+        if (!config.maintenance.enableAutoVacuum) {
+            console.log("ℹ️  Auto-VACUUM disabled in config");
+            return;
+        }
+
+        console.log(`ℹ️  Auto-VACUUM enabled: every ${config.maintenance.vacuumIntervalDays} days`);
+
+        // Check immediately on startup
+        try {
+            const shouldRun = await this.shouldRunVacuum();
+            if (shouldRun) {
+                console.log("🔧 Running startup VACUUM (overdue)...");
+                await this.runVacuum();
+            }
+        } catch (error) {
+            console.error("❌ Startup VACUUM check failed:", error.message);
+        }
+
+        // Schedule periodic checks (daily at 2 AM)
+        const checkInterval = 24 * 60 * 60 * 1000; // 24 hours
+        setInterval(async () => {
+            try {
+                const now = new Date();
+                if (now.getHours() === 2) { // Run at 2 AM
+                    const shouldRun = await this.shouldRunVacuum();
+                    if (shouldRun) {
+                        console.log("🔧 Running scheduled VACUUM...");
+                        await this.runVacuum();
+                    }
+                }
+            } catch (error) {
+                console.error("❌ Scheduled VACUUM check failed:", error.message);
+            }
+        }, checkInterval);
+    }
+
+    /**
      * Close database connection
      */
     async close() {

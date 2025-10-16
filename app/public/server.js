@@ -169,6 +169,9 @@ async function initializeApplication() {
     const db = databaseService.db; // underlying sqlite3.Database instance
     global.db = db; // maintain compatibility with legacy services
 
+    // Start auto-VACUUM scheduler (HEX-250: Database bloat prevention)
+    await databaseService.startAutoVacuum();
+
     // Initialize controllers that depend on database/progress tracker
     VulnerabilityController.initialize(db, progressTracker);
     TicketController.initialize(db);
