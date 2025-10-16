@@ -4,7 +4,22 @@
     { "pattern": "palo\\s*alto", "vendor": "Palo Alto" }
   ],
   "hostnameVendorPatterns": [
-    { "pattern": "n[rs]wan", "vendor": "CISCO" },
-    { "pattern": "nfpan", "vendor": "Palo Alto" }
+    { "pattern": "nswan", "vendor": "CISCO" },
+    { "pattern": "swan", "vendor": "CISCO" },
+    { "pattern": "nrwan", "vendor": "CISCO" },
+    { "pattern": "rtr", "vendor": "CISCO" },
+    { "pattern": "(?:^|\\D)ns\\d+", "vendor": "CISCO" },
+    { "pattern": "(?:^|\\D)com\\d+", "vendor": "CISCO" },
+    { "pattern": "(?:^|\\D)fw\\d+", "vendor": "CISCO" },
+    { "pattern": "asa", "vendor": "CISCO" },
+    { "pattern": "(?:^|\\D)sw\\d+", "vendor": "CISCO" },
+    { "pattern": "newan", "vendor": "CISCO" },
+    { "pattern": "nfpan", "vendor": "Palo Alto" },
+    { "pattern": "nfscada", "vendor": "Palo Alto" },
+    { "pattern": "papan", "vendor": "Palo Alto" },
+    { "pattern": "extpan", "vendor": "Palo Alto" },
+    { "pattern": "intpan", "vendor": "Palo Alto" },
+    { "pattern": "campuspan", "vendor": "Palo Alto" },
+    { "pattern": "devpan", "vendor": "Palo Alto" }
   ]
 }
