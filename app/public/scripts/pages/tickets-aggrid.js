@@ -682,7 +682,9 @@
 
                 // Initialize Bootstrap tooltips for device count cells (HEX-241)
                 const tooltipTriggerList = document.querySelectorAll("[data-bs-toggle=\"tooltip\"]");
-                [...tooltipTriggerList].map(el => new bootstrap.Tooltip(el));
+                [...tooltipTriggerList].map(el => new bootstrap.Tooltip(el, {
+                    delay: { show: 100, hide: 0 } // Fast tooltip display (100ms show, instant hide)
+                }));
             },
             onModelUpdated: () => {
                 manager.updatePaginationDisplay();
