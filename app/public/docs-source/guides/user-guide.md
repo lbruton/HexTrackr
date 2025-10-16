@@ -63,9 +63,9 @@ At the top of the dashboard, you'll see four risk cards displaying vulnerability
 
 **Power Tool Shortcuts**: Hold keyboard modifiers and click any VPR card to instantly export detailed CSV trend reports:
 
+- **Cmd+Alt+Click** (Mac) or **Ctrl+Alt+Click** (Windows): **Latest vs Previous** - Most recent two scans (1-day)
 - **Cmd+Shift+Click** (Mac) or **Ctrl+Shift+Click** (Windows): **7-Day Comparison** - Current vs 7 days ago
-- **Cmd+Alt+Click** (Mac) or **Ctrl+Alt+Click** (Windows): **30-Day Comparison** - Current vs 30 days ago
-- **Cmd+Shift+Alt+Click** (Mac) or **Ctrl+Shift+Alt+Click** (Windows): **Latest vs Previous** - Most recent two scans
+- **Alt+Shift+Click** (opt+shift on Mac): **30-Day Comparison** - Current vs 30 days ago
 
 Each CSV includes vendor breakdown (Cisco, Palo Alto, Other) with both VPR totals and vulnerability counts. Actual scan dates are shown in the report header with graceful fallback if insufficient historical data exists.
 
@@ -357,9 +357,9 @@ Click through the interface seamlessly:
 ### Keyboard Shortcuts
 
 **VPR Card Export Shortcuts**:
+- **Cmd+Alt+Click** (Mac) or **Ctrl+Alt+Click** (Windows): Export latest vs previous (1-day)
 - **Cmd+Shift+Click** (Mac) or **Ctrl+Shift+Click** (Windows): Export 7-day trend comparison
-- **Cmd+Alt+Click** (Mac) or **Ctrl+Alt+Click** (Windows): Export 30-day trend comparison
-- **Cmd+Shift+Alt+Click** (Mac) or **Ctrl+Shift+Alt+Click** (Windows): Export latest vs previous comparison
+- **Alt+Shift+Click** (opt+shift on Mac): Export 30-day trend comparison
 
 **General Navigation**:
 - **Escape**: Close open modals
