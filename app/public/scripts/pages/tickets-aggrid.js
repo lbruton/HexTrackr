@@ -154,9 +154,9 @@
 
         const lower = hostname.toLowerCase();
 
-        // Cisco patterns: hostname contains "cisco" OR matches naming convention
-        // Common Cisco naming: <site><location><type><number> (e.g., grim01rtr01, grim01sw01, grim01fw01)
-        if (lower.includes("cisco") || /^[a-z]{4}[a-z0-9]{2}(rtr|sw|fw|asa)/.test(lower)) {
+        // Cisco patterns: hostname contains "cisco" OR matches device type patterns
+        // Device types: nswan (network switch), swan (switch), rtr (router), sw (switch), fw (firewall), asa (ASA)
+        if (lower.includes("cisco") || /(nswan|swan|rtr|sw|fw|asa)\d+$/.test(lower)) {
             return "CISCO";
         }
 
