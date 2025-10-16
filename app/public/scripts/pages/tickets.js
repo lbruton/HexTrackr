@@ -47,7 +47,7 @@ class HexagonTicketsManager {
         this.sortDirection = "asc";
         // Pagination properties
         this.currentPage = 1;
-        this.rowsPerPage = 25;
+        this.rowsPerPage = 10;
         this.isDeviceOrderReversed = false; // Track reverse state
 
         // Card filter state

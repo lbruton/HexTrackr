@@ -618,7 +618,7 @@
                     manager.pendingRowData = null;
                 }
 
-                setPaginationPageSize(manager.gridApi, manager.rowsPerPage || 25);
+                setPaginationPageSize(manager.gridApi, manager.rowsPerPage || 10);
                 manager.sizeTicketsGridColumns();
                 manager.updatePaginationDisplay();
             },
@@ -774,7 +774,7 @@
             return;
         }
 
-        const fallbackPageSize = this.rowsPerPage || 25;
+        const fallbackPageSize = this.rowsPerPage || 10;
         const pageSize = getPaginationPageSize(this.gridApi, fallbackPageSize);
         const currentPageIndex = Math.max(getCurrentPaginationPage(this.gridApi), 0);
         const totalRows = this.filteredTicketsCount || 0;
@@ -833,9 +833,9 @@
 
         if (this.gridApi) {
             this.gridApi.setGridOption("rowData", rowData);
-            setPaginationPageSize(this.gridApi, this.rowsPerPage || 25);
+            setPaginationPageSize(this.gridApi, this.rowsPerPage || 10);
 
-            const pageSize = getPaginationPageSize(this.gridApi, this.rowsPerPage || 25);
+            const pageSize = getPaginationPageSize(this.gridApi, this.rowsPerPage || 10);
             const totalPages = rowData.length === 0 ? 0 : Math.ceil(rowData.length / pageSize);
             const currentIndex = getCurrentPaginationPage(this.gridApi);
 
