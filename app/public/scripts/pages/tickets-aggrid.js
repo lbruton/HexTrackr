@@ -450,6 +450,20 @@
                 maxWidth: 120,
                 filter: "agTextColumnFilter",
                 cellClass: "text-center",
+                filterValueGetter: (params) => {
+                    // Make filter searchable by device names (HEX-241)
+                    const devices = Array.isArray(params.data.devices) ? params.data.devices : [];
+                    return devices
+                        .map((device) => (typeof device === "string" ? device.trim() : ""))
+                        .filter(Boolean)
+                        .join(" "); // Return space-separated device names for text search
+                },
+                comparator: (valueA, valueB) => {
+                    // Sort by device count (HEX-241)
+                    const countA = Array.isArray(valueA) ? valueA.filter(d => d && typeof d === "string" && d.trim()).length : 0;
+                    const countB = Array.isArray(valueB) ? valueB.filter(d => d && typeof d === "string" && d.trim()).length : 0;
+                    return countA - countB;
+                },
                 cellRenderer: (params) => {
                     const container = document.createElement("div");
                     container.className = "d-flex align-items-center justify-content-center gap-2";
@@ -468,11 +482,12 @@
                     const vendors = new Set();
                     cleaned.forEach(hostname => {
                         const vendor = normalizeVendor(hostname);
+                        console.log(`[HEX-241 Debug] Hostname: "${hostname}" -> Vendor: "${vendor}"`);
                         vendors.add(vendor);
                     });
 
                     // Determine icon color based on vendor mix
-                    let iconColorClass = "text-secondary"; // Default gray
+                    let iconColorClass = "text-secondary"; // Default gray for Other or mixed
                     if (vendors.size === 1) {
                         const vendor = Array.from(vendors)[0];
                         if (vendor === "CISCO") {
@@ -480,8 +495,9 @@
                         } else if (vendor === "Palo Alto") {
                             iconColorClass = "text-warning"; // Orange for Palo Alto
                         }
+                        console.log(`[HEX-241 Debug] Single vendor: ${vendor}, Color: ${iconColorClass}`);
                     } else if (vendors.size > 1) {
-                        iconColorClass = "text-info"; // Cyan for mixed vendors
+                        console.log(`[HEX-241 Debug] Mixed vendors: ${Array.from(vendors).join(", ")}, Color: gray`);
                     }
 
                     // Device icon
