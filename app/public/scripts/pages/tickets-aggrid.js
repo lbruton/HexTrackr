@@ -546,7 +546,6 @@
                     const vendors = new Set();
                     cleaned.forEach(hostname => {
                         const vendor = normalizeVendor(hostname);
-                        console.log(`[HEX-241 Debug] Hostname: "${hostname}" -> Vendor: "${vendor}"`);
                         vendors.add(vendor);
                     });
 
@@ -559,9 +558,6 @@
                         } else if (vendor === "Palo Alto") {
                             iconColorClass = "text-warning"; // Orange for Palo Alto
                         }
-                        console.log(`[HEX-241 Debug] Single vendor: ${vendor}, Color: ${iconColorClass}`);
-                    } else if (vendors.size > 1) {
-                        console.log(`[HEX-241 Debug] Mixed vendors: ${Array.from(vendors).join(", ")}, Color: gray`);
                     }
 
                     // Device icon
