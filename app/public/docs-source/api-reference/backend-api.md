@@ -39,17 +39,37 @@ The primary controller for vulnerability management, handling everything from CR
 |--------|----------|-------------|
 | GET | `/api/vulnerabilities/stats` | Returns comprehensive statistics including severity distribution and trends |
 | GET | `/api/vulnerabilities` | Lists vulnerabilities with filtering, sorting, and pagination |
+| GET | `/api/vulnerabilities/:id` | Get single vulnerability by ID |
+| GET | `/api/vulnerabilities/count` | Filtered vulnerability counts (HEX-112 Phase 2) |
+| GET | `/api/vulnerabilities/kev-stats` | KEV-specific statistics (HEX-112 Phase 2) |
+| GET | `/api/vulnerabilities/vendor-stats` | Vendor distribution statistics (HEX-112 Phase 2) |
+| GET | `/api/vulnerabilities/top-devices` | Top affected devices by vulnerability count (HEX-112 Phase 2) |
+| GET | `/api/vulnerabilities/cvss-distribution` | CVSS score distribution (HEX-112 Phase 2) |
+| GET | `/api/vulnerabilities/severity-distribution` | Severity counts by level (HEX-112 Phase 2) |
+| GET | `/api/vulnerabilities/recent` | Recent vulnerabilities feed (HEX-112 Phase 2) |
+| GET | `/api/vulnerabilities/export` | Streaming CSV export with filters (HEX-112 Phase 2) |
+| GET | `/api/vulnerabilities/last-import` | Last CSV import date (HEX-240) |
 | POST | `/api/vulnerabilities` | Creates new vulnerability record |
 | PUT | `/api/vulnerabilities/:id` | Updates existing vulnerability |
 | DELETE | `/api/vulnerabilities/:id` | Deletes specific vulnerability |
+| POST | `/api/vulnerabilities/bulk-delete` | Bulk delete vulnerabilities by IDs |
 | POST | `/api/vulnerabilities/import` | Imports CSV file with progress tracking |
 | DELETE | `/api/vulnerabilities/all` | Clears all vulnerability data |
+
+**HEX-112 Pagination Enhancements (Since v1.0.50):**
+
+The HEX-112 Phase 2 endpoints enable efficient pagination and statistics calculation without loading all vulnerabilities client-side:
+
+- **Performance**: Reduces client-side data transfer from 30k+ records to targeted results
+- **Filtering**: All endpoints support query parameters for vendor, severity, KEV status
+- **Caching**: Server-side caching reduces database load
+- **Streaming**: Export endpoint streams results for memory efficiency
 
 ### TicketController
 
 **Location:** `app/controllers/ticketController.js`
 
-Manages support tickets and associated device tracking.
+Manages support tickets and associated device tracking with XT# generation and device navigation.
 
 **Key Features:**
 
@@ -57,6 +77,9 @@ Manages support tickets and associated device tracking.
 - Device association tracking (stored as JSON)
 - Status workflow (Open → In Progress → Closed)
 - Priority-based sorting and filtering
+- XT# ticket number generation (HEX-196)
+- Device-based ticket lookup and navigation (HEX-203)
+- Batch device lookup for performance optimization
 
 **Main Endpoints:**
 
@@ -64,10 +87,26 @@ Manages support tickets and associated device tracking.
 |--------|----------|-------------|
 | GET | `/api/tickets` | Lists all tickets with device information |
 | GET | `/api/tickets/:id` | Gets specific ticket details |
+| GET | `/api/tickets/next-xt-number` | Generate next XT ticket number (HEX-196) |
+| GET | `/api/tickets/by-device/:hostname` | Get all tickets for specific device (HEX-203) |
+| POST | `/api/tickets/batch-device-lookup` | Batch device ticket lookup (HEX-203) |
 | POST | `/api/tickets` | Creates new ticket |
 | PUT | `/api/tickets/:id` | Updates ticket information |
 | PUT | `/api/tickets/:id/devices` | Updates associated devices |
-| DELETE | `/api/tickets/:id` | Deletes ticket |
+| DELETE | `/api/tickets/:id` | Deletes ticket (soft delete with deleted_at) |
+
+**XT# Ticket System (Since v1.0.58 - HEX-196):**
+
+- **Format**: `XT-####` (e.g., XT-0001, XT-0042)
+- **Auto-generation**: `/next-xt-number` returns next available number
+- **Soft Delete**: Deleted tickets preserve XT# to prevent reuse
+- **Purpose**: Provides human-friendly ticket reference for coordination
+
+**Device Navigation (Since v1.0.60 - HEX-203):**
+
+- **Single Device**: `/by-device/:hostname` returns all tickets for a device
+- **Batch Lookup**: `/batch-device-lookup` accepts array of hostnames for efficient N+1 query reduction
+- **Performance**: Reduces 100+ individual requests to single SQL query with IN clause
 
 ### ImportController
 
@@ -116,7 +155,7 @@ Handles CSV and JSON file imports from vulnerability scanners with lifecycle man
 
 **Location:** `app/controllers/backupController.js`
 
-Database backup and restoration management.
+Database backup and restoration management with modern ZIP export capabilities.
 
 **Key Features:**
 
@@ -124,6 +163,7 @@ Database backup and restoration management.
 - Compression support for large databases
 - Backup rotation and cleanup
 - Validation before restoration
+- ZIP export for data portability (vulnerabilities, tickets, complete backups)
 
 **Main Endpoints:**
 
@@ -133,6 +173,15 @@ Database backup and restoration management.
 | GET | `/api/backup/list` | Lists available backups |
 | POST | `/api/backup/restore` | Restores from backup |
 | DELETE | `/api/backup/:filename` | Deletes backup file |
+| GET | `/api/backup/export/vulnerabilities` | Export vulnerabilities as ZIP archive |
+| GET | `/api/backup/export/tickets` | Export tickets as ZIP archive |
+| GET | `/api/backup/export/all` | Export complete backup as ZIP archive |
+
+**ZIP Export Features:**
+
+- **Format**: Standard ZIP archive with JSON/CSV data
+- **Use Cases**: Data portability, external analysis, compliance reporting
+- **Streaming**: Large datasets streamed for memory efficiency
 
 ### DocsController
 
@@ -362,6 +411,8 @@ Manages user-specific preferences and application settings with flexible JSON va
 |--------|----------|---------------|-------------|
 | GET | `/api/preferences` | ✅ Protected | Get all preferences for current user |
 | GET | `/api/preferences/:key` | ✅ Protected | Get specific preference by key |
+| GET | `/api/preferences/count` | ✅ Protected | Get preference count for current user |
+| HEAD | `/api/preferences/:key` | ✅ Protected | Check if preference exists (returns 200 or 404) |
 | POST | `/api/preferences` | ✅ Protected | Create new preference |
 | PUT | `/api/preferences/:key` | ✅ Protected | Update existing preference |
 | DELETE | `/api/preferences/:key` | ✅ Protected | Delete specific preference |
@@ -427,7 +478,9 @@ Manages email and ticket templates for consistent communication and ticket creat
 |--------|----------|---------------|-------------|
 | GET | `/api/templates` | ✅ Protected | List all templates |
 | GET | `/api/templates/:id` | ✅ Protected | Get specific template |
+| GET | `/api/templates/by-name/:name` | ✅ Protected | Get template by name (alternative lookup) |
 | POST | `/api/templates` | ✅ Protected | Create new template |
+| POST | `/api/templates/:id/preview` | ✅ Protected | Preview template with data (non-destructive) |
 | PUT | `/api/templates/:id` | ✅ Protected | Update template |
 | DELETE | `/api/templates/:id` | ✅ Protected | Delete template |
 | GET | `/api/templates/category/:category` | ✅ Protected | Get templates by category |
@@ -471,9 +524,20 @@ Core service for vulnerability data operations.
 **Key Methods:**
 
 - `getAll()` - Retrieve vulnerabilities with filters
+- `getById(id)` - Get single vulnerability by ID
+- `getCount(filters)` - Filtered vulnerability counts (HEX-112)
+- `getKevStats(filters)` - KEV-specific statistics (HEX-112)
+- `getVendorStats(filters)` - Vendor distribution statistics (HEX-112)
+- `getTopAffectedDevices(filters, limit)` - Top devices by vulnerability count (HEX-112)
+- `getCvssDistribution(filters)` - CVSS score distribution (HEX-112)
+- `getSeverityDistribution(filters)` - Severity counts by level (HEX-112)
+- `getRecentVulnerabilities(filters, limit)` - Recent vulnerabilities feed (HEX-112)
+- `streamExport(filters)` - Streaming CSV export (HEX-112)
+- `getLastImportDate()` - Last CSV import date (HEX-240)
 - `create()` - Add new vulnerability
 - `update()` - Modify existing record
 - `delete()` - Remove vulnerability
+- `bulkDelete(ids)` - Bulk delete vulnerabilities by IDs
 - `importBatch()` - Process CSV data in chunks
 - `createSnapshot()` - Save point-in-time state
 
@@ -496,7 +560,7 @@ Analytics and reporting for vulnerability data.
 
 **Location:** `app/services/ticketService.js`
 
-Ticket management and device tracking.
+Ticket management and device tracking with XT# generation and device navigation.
 
 **Features:**
 
@@ -505,6 +569,21 @@ Ticket management and device tracking.
 - Status transition validation
 - Priority-based operations
 - Automatic timestamp management
+- XT# ticket number generation (HEX-196)
+- Device-based ticket lookup (HEX-203)
+- Batch device lookup for performance
+
+**Core Methods:**
+
+- `getAll()` - Retrieve all tickets
+- `getById(id)` - Get specific ticket
+- `generateNextXTNumber()` - Generate next XT# (HEX-196)
+- `getTicketsByDevice(hostname)` - Get tickets for device (HEX-203)
+- `getTicketsByDeviceBatch(hostnames)` - Batch device lookup (HEX-203)
+- `create(ticketData)` - Create new ticket
+- `update(id, ticketData)` - Update ticket
+- `delete(id)` - Soft delete ticket (sets deleted_at)
+- `updateDevices(id, devices)` - Update device associations
 
 ### ImportService
 
@@ -787,6 +866,65 @@ Documentation statistics and coverage analysis.
 - `getFileTypeCounts()` - Breakdown of file types in codebase
 - `getEndpointInventory()` - List all API routes with documentation status
 
+### CiscoAdvisoryService
+
+**Location:** `app/services/ciscoAdvisoryService.js`
+**Since:** v1.0.63
+
+Cisco PSIRT API integration for security advisory synchronization and CVE matching.
+
+**Key Features:**
+
+- Cisco PSIRT API client with authentication
+- CVE-to-advisory matching for Cisco devices
+- Advisory database management (cisco_advisories table)
+- Sync status tracking and error handling
+- Fix availability determination
+
+**Core Methods:**
+
+- `syncAdvisories()` - Fetch latest advisories from Cisco PSIRT API
+- `getAdvisoryByCve(cveId)` - Retrieve Cisco advisory for specific CVE
+- `getSyncStatus()` - Current sync status and statistics
+- `matchVulnerabilities()` - Update vulnerability records with Cisco advisory IDs
+- `checkAutoSync()` - Determine if auto-sync is needed based on schedule
+
+**API Integration:**
+
+- **Endpoint**: Cisco PSIRT OpenVuln API
+- **Authentication**: OAuth 2.0 client credentials
+- **Rate Limiting**: 10 requests per 10 minutes
+- **Data Format**: JSON responses with advisory metadata
+
+### PaloAltoService
+
+**Location:** `app/services/paloAltoService.js`
+**Since:** v1.0.63
+
+Palo Alto Networks Security Advisory API integration for vulnerability tracking.
+
+**Key Features:**
+
+- Palo Alto Security Advisory API client
+- CVE-to-advisory matching for Palo Alto devices
+- Advisory database management (palo_advisories table)
+- Sync status tracking and error handling
+- Fix availability determination
+
+**Core Methods:**
+
+- `syncAdvisories()` - Fetch latest advisories from Palo Alto API
+- `getAdvisoryByCve(cveId)` - Retrieve Palo Alto advisory for specific CVE
+- `getSyncStatus()` - Current sync status and statistics
+- `matchVulnerabilities()` - Update vulnerability records with Palo Alto advisory IDs
+- `checkAutoSync()` - Determine if auto-sync is needed based on schedule
+
+**API Integration:**
+
+- **Endpoint**: Palo Alto Security Advisory API
+- **Rate Limiting**: 10 requests per 10 minutes
+- **Data Format**: JSON responses with advisory metadata
+
 ---
 
 ## Routes {#routes}
@@ -1067,7 +1205,7 @@ Real-time communication for progress updates and live data.
 
 #### vulnerabilities
 
-Primary table for vulnerability data.
+Primary table for vulnerability data with vendor classification and advisory integration.
 
 | Column | Type | Description |
 |--------|------|-------------|
@@ -1086,16 +1224,24 @@ Primary table for vulnerability data.
 | plugin_output | TEXT | Scanner output |
 | vpr_score | REAL | VPR score |
 | scan_date | TEXT | Scan timestamp |
+| **vendor** | **TEXT** | **Vendor classification (CISCO, Palo Alto, Other) - HEX-241** |
+| **has_kev** | **INTEGER** | **KEV flag (0/1 boolean) - v1.0.22** |
+| **cisco_advisory_id** | **TEXT** | **Cisco PSIRT advisory ID - v1.0.63** |
+| **palo_advisory_id** | **TEXT** | **Palo Alto advisory ID - v1.0.63** |
+| **lifecycle_status** | **TEXT** | **active/grace_period/resolved - Import lifecycle** |
+| **last_seen_date** | **TEXT** | **Last appearance in scan - Lifecycle tracking** |
+| **resolved_date** | **TEXT** | **Resolution timestamp - Lifecycle tracking** |
 | created_at | TEXT | Record creation |
 | updated_at | TEXT | Last modification |
 
 #### tickets
 
-Support ticket tracking.
+Support ticket tracking with XT# system and soft delete.
 
 | Column | Type | Description |
 |--------|------|-------------|
 | id | INTEGER PRIMARY KEY | Auto-incrementing ID |
+| **xt_number** | **TEXT** | **XT# identifier (XT-0001, XT-0042) - HEX-196** |
 | title | TEXT | Ticket title |
 | description | TEXT | Full description |
 | status | TEXT | Open/In Progress/Closed |
@@ -1104,6 +1250,136 @@ Support ticket tracking.
 | created_at | TEXT | Creation timestamp |
 | updated_at | TEXT | Last update |
 | closed_at | TEXT | Closure timestamp |
+| **deleted_at** | **TEXT** | **Soft delete timestamp - HEX-196** |
+
+#### users
+
+User authentication and profile data **(Since v1.0.46 - HEX-133)**.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| id | INTEGER PRIMARY KEY | Auto-incrementing user ID |
+| username | TEXT NOT NULL UNIQUE | Login username |
+| password_hash | TEXT NOT NULL | Argon2id password hash |
+| email | TEXT | User email address |
+| role | TEXT | User role (admin, user) |
+| created_at | TEXT | Account creation timestamp |
+| updated_at | TEXT | Last profile update |
+
+#### sessions
+
+SQLite session store for authentication **(Since v1.0.46)**.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| sid | TEXT PRIMARY KEY | Session ID (primary key) |
+| sess | TEXT NOT NULL | JSON session data |
+| expired | INTEGER NOT NULL | Expiration timestamp (Unix epoch) |
+
+#### preferences
+
+User preference storage with JSON values **(Since v1.0.48 - HEX-138)**.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| id | INTEGER PRIMARY KEY | Auto-incrementing ID |
+| user_id | INTEGER NOT NULL | Foreign key to users table |
+| key | TEXT NOT NULL | Preference key (dot notation) |
+| value | TEXT | JSON-serialized preference value |
+| created_at | TEXT | Creation timestamp |
+| updated_at | TEXT | Last modification |
+
+**Indexes:** `(user_id, key)` UNIQUE
+
+#### templates
+
+Template system for emails and tickets **(Since v1.0.21)**.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| id | INTEGER PRIMARY KEY | Auto-incrementing ID |
+| name | TEXT NOT NULL | Template name |
+| category | TEXT | email, ticket, notification |
+| subject | TEXT | Email subject or ticket title |
+| body | TEXT NOT NULL | Template content with variables |
+| variables | TEXT | JSON array of variable names |
+| created_at | TEXT | Creation timestamp |
+| updated_at | TEXT | Last modification |
+
+#### kev_catalog
+
+CISA Known Exploited Vulnerabilities catalog **(Since v1.0.22)**.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| id | INTEGER PRIMARY KEY | Auto-incrementing ID |
+| cve_id | TEXT NOT NULL UNIQUE | CVE identifier |
+| vendor_project | TEXT | Vendor name |
+| product | TEXT | Product name |
+| vulnerability_name | TEXT | KEV vulnerability name |
+| date_added | TEXT | CISA addition date |
+| short_description | TEXT | Brief description |
+| required_action | TEXT | Remediation action |
+| due_date | TEXT | Remediation deadline |
+| known_ransomware | INTEGER | Ransomware campaign flag (0/1) |
+| notes | TEXT | Additional notes |
+| created_at | TEXT | Record creation |
+| updated_at | TEXT | Last sync update |
+
+#### cisco_advisories
+
+Cisco PSIRT security advisories **(Since v1.0.63)**.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| id | INTEGER PRIMARY KEY | Auto-incrementing ID |
+| advisory_id | TEXT NOT NULL UNIQUE | Cisco advisory ID |
+| cve_id | TEXT | CVE identifier |
+| advisory_title | TEXT | Advisory title |
+| publication_url | TEXT | Link to Cisco advisory |
+| sir | TEXT | Security Impact Rating (Critical/High/Medium/Low) |
+| first_published | TEXT | Publication date |
+| last_updated | TEXT | Last update date |
+| status | TEXT | Advisory status |
+| version | TEXT | Advisory version |
+| cwe_id | TEXT | CWE identifier |
+| product_names | TEXT | JSON array of affected products |
+| summary | TEXT | Advisory summary |
+| created_at | TEXT | Record creation |
+| updated_at | TEXT | Last sync update |
+
+#### palo_advisories
+
+Palo Alto Networks security advisories **(Since v1.0.63)**.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| id | INTEGER PRIMARY KEY | Auto-incrementing ID |
+| advisory_id | TEXT NOT NULL UNIQUE | Palo Alto advisory ID |
+| cve_id | TEXT | CVE identifier |
+| advisory_title | TEXT | Advisory title |
+| publication_url | TEXT | Link to Palo Alto advisory |
+| severity | TEXT | Severity rating |
+| publication_date | TEXT | Publication date |
+| last_updated | TEXT | Last update date |
+| affected_products | TEXT | JSON array of affected products |
+| summary | TEXT | Advisory summary |
+| created_at | TEXT | Record creation |
+| updated_at | TEXT | Last sync update |
+
+#### vendor_patterns
+
+Hostname patterns for vendor classification **(Since v1.0.63 - HEX-241)**.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| id | INTEGER PRIMARY KEY | Auto-incrementing ID |
+| pattern | TEXT NOT NULL UNIQUE | Hostname pattern (regex or literal) |
+| vendor | TEXT NOT NULL | Vendor name (CISCO, Palo Alto) |
+| description | TEXT | Pattern description |
+| priority | INTEGER DEFAULT 0 | Matching priority (higher first) |
+| created_at | TEXT | Record creation |
+| updated_at | TEXT | Last modification |
 
 #### vulnerability_imports
 
@@ -1239,6 +1515,24 @@ Client → HTTPS (443) → nginx → HTTP (8080) → Express
 ### Rate Limiting
 
 Configurable per-endpoint limits to prevent abuse and brute force attacks.
+
+**Endpoint-Specific Rate Limits:**
+
+| Endpoint | Window | Max Requests | Purpose |
+|----------|--------|--------------|---------|
+| `/api/kev/sync` | 5 minutes | 3 | Prevent KEV API abuse |
+| `/api/cisco/sync` | 10 minutes | 10 | Prevent Cisco PSIRT API abuse |
+| `/api/palo/sync` | 10 minutes | 10 | Prevent Palo Alto API abuse |
+| Global (all endpoints) | 15 minutes | 100 | General brute force protection |
+
+**Implementation:**
+- Uses `express-rate-limit` middleware
+- IP-based tracking for distributed systems
+- Returns `429 Too Many Requests` when limit exceeded
+- Rate limit headers included in responses:
+  - `X-RateLimit-Limit` - Maximum requests allowed
+  - `X-RateLimit-Remaining` - Requests remaining
+  - `X-RateLimit-Reset` - Timestamp when limit resets
 
 ### CORS Policy
 

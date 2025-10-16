@@ -150,19 +150,21 @@ Support ticket management interface.
 
 **Main Components:**
 
-- `TicketManager` - Main ticket controller
-- `TicketGrid` - AG-Grid configuration
-- `DeviceModal` - Device management
+- `HexagonTicketsManager` - Main ticket controller class
+- AG-Grid for ticket table rendering
+- Device management modals
 
 **Key Methods:**
 | Method | Purpose |
 |--------|---------|
 | `init()` | Initialize ticket interface |
-| `loadTickets()` | Fetch and display tickets |
-| `createTicket()` | Open new ticket modal |
-| `updateTicket()` | Edit existing ticket |
-| `updateDevices()` | Manage associated devices |
-| `deleteTicket()` | Remove ticket with confirmation |
+| `loadTicketsFromDB()` | Fetch tickets from database API |
+| `renderTickets()` | Display tickets in table with pagination |
+| `saveTicket()` | Create or update ticket |
+| `editTicket(id)` | Open ticket edit modal |
+| `viewTicket(id)` | Display read-only ticket details |
+| `deleteTicket(id)` | Remove ticket with confirmation |
+| `bundleTicketFiles(id)` | Generate downloadable ticket bundle |
 
 ---
 
@@ -191,29 +193,49 @@ const themeController = new ThemeController();
 themeController.initializeToggle();
 ```
 
-### AGGridResponsiveConfig
+### AG-Grid Configuration Functions
 
 **Location:** `app/public/scripts/shared/ag-grid-responsive-config.js`
 
-Provides responsive AG-Grid configuration with theme support.
+Provides responsive AG-Grid configuration functions with theme support and optimized column definitions.
+
+**Primary Function:**
+
+```javascript
+createVulnerabilityGridOptions(componentContext, isDarkMode, usePagination)
+```
 
 **Features:**
 
-- Automatic theme detection
-- Responsive column sizing
-- Custom cell renderers
-- Export functionality
-- Pagination controls
+- Responsive column definitions with mobile/desktop breakpoints
+- Automatic theme detection and application
+- Custom cell renderers for vulnerabilities, vendors, CVEs
+- Optimized column widths (minWidth, maxWidth, flex)
+- Pagination support (optional)
 
-**Configuration Example:**
+**Usage Example:**
 
 ```javascript
-const gridOptions = AGGridResponsiveConfig.getDefaultGridOptions({
-    columnDefs: [...],
-    rowData: [...],
-    onGridReady: (params) => {...}
-});
+import { createVulnerabilityGridOptions } from './ag-grid-responsive-config.js';
+
+// Create grid options for vulnerabilities page
+const gridOptions = createVulnerabilityGridOptions(
+    this,           // Component context for callbacks
+    false,          // isDarkMode (false = light theme)
+    true            // usePagination (true = enable pagination)
+);
+
+// Apply to AG-Grid
+const gridApi = agGrid.createGrid(gridContainer, gridOptions);
 ```
+
+**Column Definitions:**
+
+The function generates responsive columnDefs with:
+- Optimized widths based on screen size (mobile, desktop)
+- Custom cell renderers for CVE links, vendor badges, VPR scores
+- Built-in filtering and sorting
+- Hide/show logic for mobile screens
 
 ### AGGridThemeManager
 
@@ -283,33 +305,48 @@ User-facing pagination controls for device cards and large datasets.
 - **Responsive Design**: Mobile-friendly pagination controls
 - **State Persistence**: Remembers user's page size preference
 
+**Constructor:**
+
+```javascript
+// Constructor takes simple parameters (not options object)
+constructor(defaultPageSize = 12, availableSizes = [6, 12, 24, 48, 64, 96])
+```
+
 **Usage:**
 
 ```javascript
-const pagination = new PaginationController({
-    itemsPerPage: 25,
-    onPageChange: (page, pageSize) => {
-        renderPage(page, pageSize);
-    }
+// Create pagination controller with default page size and available sizes
+const pagination = new PaginationController(25, [10, 25, 50, 100]);
+
+// Set total items (required before rendering)
+pagination.setTotalItems(1245);
+
+// Render pagination controls with callback
+pagination.renderPaginationControls('paginationContainer', () => {
+    // This callback is invoked when user changes pages
+    const currentPage = pagination.getCurrentPage();
+    const pageSize = pagination.getPageInfo().pageSize;
+    renderPage(currentPage, pageSize);
 });
 
-pagination.setTotalItems(1245); // Update total count
-pagination.goToPage(3);         // Navigate to specific page
+// Navigate programmatically
+pagination.setCurrentPage(3);
 ```
 
 **Core Methods:**
 
 - `setTotalItems(count)` - Update total item count and recalculate pages
-- `goToPage(pageNumber)` - Navigate to specific page
-- `nextPage()` - Move to next page
-- `previousPage()` - Move to previous page
-- `setPageSize(size)` - Change items per page
-- `getCurrentPage()` - Get active page number
-- `getTotalPages()` - Get total page count
+- `getCurrentPageData(items)` - Get items for current page from array
+- `setCurrentPage(page)` - Navigate to specific page
+- `setPageSize(size)` - Change items per page (must be in availableSizes)
+- `getPageInfo()` - Get pagination state (currentPage, totalPages, pageSize, etc.)
+- `renderTopControls(containerId, onPageSizeChange, options)` - Render sort dropdown + items-per-page above cards
+- `renderPaginationControls(containerId, onPageChange)` - Render bottom pagination arrows/numbers
 
-**HTML Structure:**
+**Generated HTML Structure** *(for reference only - do not create manually)*:
 
 ```html
+<!-- Auto-generated by renderPaginationControls() -->
 <div class="pagination-controls">
     <div class="pagination-info">Showing 1-25 of 1,245 results</div>
     <div class="pagination-buttons">
@@ -327,6 +364,8 @@ pagination.goToPage(3);         // Navigate to specific page
     </select>
 </div>
 ```
+
+**Note:** The HTML structure above is automatically generated by the `renderPaginationControls()` and `renderTopControls()` methods. Do not create this HTML manually - let the controller generate it.
 
 ### VulnerabilityDataManager
 
@@ -538,77 +577,78 @@ Dynamic header with theme toggle and user menu.
 - Navigation state
 - Notification badges
 
-### PreferencesService
+### PreferencesSync
 
-**Location:** `app/public/scripts/shared/preferences-service.js`
+**Location:** `app/public/scripts/shared/preferences-sync.js`
 **Since:** v1.0.48
 
-Frontend client for user preferences API with local caching and synchronization.
+Frontend synchronization client for user preferences between localStorage and backend PreferencesService API.
 
 **Key Features:**
 
-- **API Integration**: Communicates with `/api/preferences` endpoints
-- **Local Caching**: IndexedDB storage for offline access
-- **Cross-Tab Sync**: Preferences sync across browser tabs via storage events
-- **Automatic Save**: Debounced saves to reduce API calls
-- **Typed Preferences**: TypeScript-style preference definitions
+- **Backend Sync**: Syncs preferences to `/api/preferences` endpoints
+- **localStorage Cache**: Fast local storage for immediate access
+- **Debounced Writes**: Batches preference updates to reduce API calls
+- **Cross-Tab Sync**: Automatic synchronization across browser tabs
+- **Theme Priority**: Immediate sync for theme changes (no debounce)
 
 **Core Methods:**
 
 ```javascript
-// Get preference (returns from cache if available)
-const theme = await PreferencesService.get('dashboard.theme');
-// Returns: { mode: "dark", accent: "blue" }
+// Initialize sync system (loads preferences from database to localStorage)
+await preferencesSync.initialize();
 
-// Set preference (auto-saves to server)
-await PreferencesService.set('dashboard.theme', { mode: 'dark', accent: 'blue' });
+// Sync theme immediately (high-priority, no debounce)
+await preferencesSync.syncTheme('dark');
 
-// Bulk update (single API call)
-await PreferencesService.bulkUpdate({
-    'dashboard.theme': { mode: 'dark' },
-    'dashboard.defaultView': 'grid',
-    'notifications.enabled': true
-});
+// Queue a preference for debounced sync
+preferencesSync.queueSync('pagination_enabled', true);
 
-// Reset to defaults
-await PreferencesService.reset();
+// Force immediate sync of all queued preferences
+await preferencesSync.syncNow();
 
-// Clear cache
-PreferencesService.clearCache();
+// Flush sync queue to database
+await preferencesSync.flushSyncQueue();
 ```
 
-**Preference Keys:**
+**Synced Preference Keys:**
 
-| Key | Type | Description |
-|-----|------|-------------|
-| `dashboard.theme` | Object | Theme settings (mode, accent) |
-| `dashboard.defaultView` | String | Default view ('grid' or 'cards') |
-| `dashboard.chartMetric` | String | Chart metric ('vpr' or 'count') |
-| `vulnerabilities.filters` | Object | Saved filter configurations |
-| `vulnerabilities.pageSize` | Number | Rows per page (10, 25, 50, 100) |
-| `notifications.enabled` | Boolean | Enable/disable notifications |
-| `export.defaultFormat` | String | Default export format ('csv', 'json', 'pdf') |
-| `grid.columnState` | Array | AG-Grid column visibility/order |
+| Key | Storage Key | Description |
+|-----|-------------|-------------|
+| `theme` | `hextrackr-theme` | Theme preference ('light' or 'dark') |
+| `markdown_template_ticket` | `hextrackr-markdown-ticket` | Ticket markdown template |
+| `markdown_template_vulnerability` | `hextrackr-markdown-vulnerability` | Vulnerability markdown template |
+| `pagination_enabled` | `hextrackr_enablePagination` | Pagination feature flag |
+| `kev_auto_refresh` | `kevAutoSyncEnabled` | KEV auto-sync setting |
+| `cisco_api_key` | `hextrackr-cisco-key` | Cisco API credentials |
 
-**Cross-Tab Synchronization:**
+**How It Works:**
 
 ```javascript
-// Automatic sync via storage events
-window.addEventListener('storage', (e) => {
-    if (e.key === 'hextrackr-preferences') {
-        PreferencesService.refreshFromStorage();
-        // Trigger UI updates
-        applyPreferences();
-    }
-});
+// 1. On page load, PreferencesSync loads from database to localStorage
+await preferencesSync.initialize();
+
+// 2. Theme changes are synced immediately
+await preferencesSync.syncTheme('dark');
+// → Updates localStorage + database instantly
+
+// 3. Other preferences are queued and debounced (1 second)
+preferencesSync.queueSync('pagination_enabled', true);
+// → Waits 1 second, then batches all queued updates
+
+// 4. Before page unload, force immediate sync
+await preferencesSync.syncNow();
 ```
 
-**Caching Strategy:**
+**Integration with Backend:**
 
-- **IndexedDB**: Primary cache for preferences (survives page reload)
-- **Memory Cache**: In-memory map for fast reads during session
-- **TTL**: Cache entries expire after 1 hour, force refresh from server
-- **Invalidation**: Automatic cache invalidation on set/update operations
+PreferencesSync communicates with the backend `PreferencesService` (located at `app/services/preferencesService.js`) via these endpoints:
+
+- `GET /api/preferences` - Load all preferences
+- `POST /api/preferences/:key` - Set single preference
+- `POST /api/preferences/bulk` - Bulk update preferences
+
+**Note:** PreferencesSync is a frontend-only component. The actual preferences API service runs on the backend.
 
 ### AuthState
 
@@ -971,12 +1011,37 @@ Sets up initial database schema and data.
 
 ---
 
-## Module Loading Pattern
+## Module Loading Patterns
 
-All modules follow a consistent loading pattern:
+HexTrackr uses **multiple module loading patterns** depending on component age and refactoring status. Here are the common patterns:
+
+### Pattern 1: ES6 Module Export (Modern)
+
+Used in newer, refactored components:
 
 ```javascript
-// Module definition
+// Component definition
+export class ComponentName {
+    constructor() {
+        this.init();
+    }
+
+    init() {
+        // Initialization logic
+    }
+}
+
+// Import in other modules
+import { ComponentName } from './component-name.js';
+```
+
+**Examples:** `ModernVulnManager`, `ThemeController`
+
+### Pattern 2: Global Window Assignment (Legacy)
+
+Used in older components for compatibility:
+
+```javascript
 class ComponentName {
     constructor(options = {}) {
         this.options = { ...this.defaultOptions, ...options };
@@ -989,33 +1054,72 @@ class ComponentName {
         this.loadData();
     }
 
-    setupDOM() {
-        // DOM references
-    }
-
-    attachEventListeners() {
-        // Event bindings
-    }
-
-    loadData() {
-        // Initial data load
-    }
-
     destroy() {
         // Cleanup
     }
 }
 
-// Auto-initialization
+// Auto-initialization on DOM ready
 document.addEventListener('DOMContentLoaded', () => {
     window.component = new ComponentName();
 });
 
-// Export for module use
+// Export for testing/module environments
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = ComponentName;
 }
 ```
+
+**Examples:** `HexagonTicketsManager`, `ToastManager`
+
+### Pattern 3: Deferred/Lazy Initialization
+
+Used for components that initialize on-demand:
+
+```javascript
+class ComponentName {
+    constructor() {
+        // Lightweight constructor
+        this.initialized = false;
+    }
+
+    async initialize() {
+        if (this.initialized) return;
+
+        // Heavy initialization work
+        await this.loadDependencies();
+        this.setupEventListeners();
+        this.initialized = true;
+    }
+}
+
+// Component created but not initialized
+window.component = new ComponentName();
+
+// Initialize when needed
+await window.component.initialize();
+```
+
+**Examples:** `VulnerabilityChartManager` (lazy-loads on first view switch)
+
+### Pattern 4: Functional/Utility Modules
+
+Helper functions without class structure:
+
+```javascript
+// Utility functions
+export function helperFunction(param) {
+    return processedResult;
+}
+
+export const CONSTANTS = {
+    KEY: 'value'
+};
+```
+
+**Examples:** `CVEUtilities`, `ValidationUtils`
+
+**Note:** The application is gradually migrating from Pattern 2 (global window) to Pattern 1 (ES6 modules) as components are refactored.
 
 ---
 

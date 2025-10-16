@@ -256,11 +256,16 @@ class TicketService {
      * Extracted from server.js line 3424-3435
      * Updated: HEX-196 - Soft delete for audit trail and XT# uniqueness
      */
-    async deleteTicket(ticketId) {
+    async deleteTicket(ticketId, deletionReason = null, deletedBy = null) {
         return new Promise((resolve, reject) => {
             this.db.run(
-                "UPDATE tickets SET deleted = 1, deleted_at = datetime('now') WHERE id = ?",
-                [ticketId],
+                `UPDATE tickets
+                 SET deleted = 1,
+                     deleted_at = datetime('now'),
+                     deletion_reason = ?,
+                     deleted_by = ?
+                 WHERE id = ?`,
+                [deletionReason, deletedBy, ticketId],
                 function(err) {
                     if (err) {
                         return reject(new Error("Failed to delete ticket: " + err.message));
@@ -323,7 +328,11 @@ class TicketService {
                             notes: ticket.notes || "",
                             xtNumber: ticket.xt_number || ticket.xtNumber || "",
                             createdAt: ticket.created_at || new Date().toISOString(),
-                            updatedAt: ticket.updated_at || new Date().toISOString()
+                            updatedAt: ticket.updated_at || new Date().toISOString(),
+                            deleted: ticket.deleted || 0,
+                            deletedAt: ticket.deleted_at || ticket.deletedAt || null,
+                            deletionReason: ticket.deletion_reason || ticket.deletionReason || null,
+                            deletedBy: ticket.deleted_by || ticket.deletedBy || null
                         };
 
                         await this.createTicket(mappedTicket);
@@ -406,8 +415,9 @@ class TicketService {
                 INSERT OR REPLACE INTO tickets (
                     id, xt_number, date_submitted, date_due, hexagon_ticket,
                     service_now_ticket, location, devices, supervisor, tech,
-                    status, notes, created_at, updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    status, notes, created_at, updated_at, deleted, deleted_at,
+                    deletion_reason, deleted_by
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             `);
 
             let imported = 0;
@@ -431,7 +441,11 @@ class TicketService {
                         mapped.status,
                         mapped.notes,
                         mapped.createdAt,
-                        mapped.updatedAt
+                        mapped.updatedAt,
+                        mapped.deleted || 0,
+                        mapped.deletedAt || null,
+                        mapped.deletionReason || null,
+                        mapped.deletedBy || null
                     ], (err) => {
                         if (err) {
                             console.error(`Error importing ticket row ${index + 1}:`, err);
@@ -481,7 +495,11 @@ class TicketService {
             status: row.status || row["Status"] || "Open",
             notes: row.notes || row["Notes"] || "",
             createdAt: row.created_at || now,
-            updatedAt: now
+            updatedAt: now,
+            deleted: row.deleted || row["Deleted"] || 0,
+            deletedAt: row.deleted_at || row["Deleted At"] || null,
+            deletionReason: row.deletion_reason || row["Deletion Reason"] || null,
+            deletedBy: row.deleted_by || row["Deleted By"] || null
         };
     }
 

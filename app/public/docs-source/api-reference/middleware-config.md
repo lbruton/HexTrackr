@@ -16,17 +16,18 @@ Understanding middleware order is critical - middleware executes top-to-bottom, 
 
 **Complete Middleware Stack** (from `app/public/server.js`):
 
-1. **Trust Proxy** - Enable Express to read nginx headers (`X-Forwarded-Proto`, `X-Forwarded-For`)
-2. **CORS** - Cross-origin resource sharing for API access
-3. **Session Management** - SQLite session store with secure cookies
-4. **Body Parsing** - JSON and URL-encoded request bodies (50MB limit)
-5. **CSRF Protection** - Double-submit cookie pattern (excludes login/status/csrf endpoints)
-6. **Rate Limiting** - `/api/*` routes only (100 requests per 15 minutes)
-7. **Compression** - Gzip/deflate (only if NOT behind nginx)
-8. **Security Headers** - Custom headers (X-Content-Type-Options, X-Frame-Options, X-XSS-Protection)
-9. **Static File Serving** - Documentation portal, JSDoc, public assets (**blocks `/data` directory**)
-10. **Route Handlers** - API endpoints with authentication middleware
-11. **Global Error Handler** - Catches all unhandled errors
+1. **Trust Proxy** (line 78) - Enable Express to read nginx headers (`X-Forwarded-Proto`, `X-Forwarded-For`)
+2. **WebSocket Authentication** (lines 101-123) - Session-based authentication for WebSocket handshakes
+3. **CORS** (line 189) - Cross-origin resource sharing for API access (HTTPS-only)
+4. **Session Management** (line 190) - SQLite session store with secure cookies
+5. **Body Parsing** (lines 194-195) - JSON and URL-encoded request bodies (100MB limit)
+6. **CSRF Protection** (lines 200-224) - Double-submit cookie pattern (excludes login/status/csrf endpoints)
+7. **Rate Limiting** (line 226) - `/api/*` routes only (60 requests per 15 min, cache-aware)
+8. **Compression** (line 232) - Gzip/deflate (only if NOT behind nginx)
+9. **Security Headers** (lines 236-241) - Custom headers (X-Content-Type-Options, X-Frame-Options, X-XSS-Protection)
+10. **Static File Serving** - Documentation portal, JSDoc, public assets (**blocks `/data` directory**)
+11. **Route Handlers** - API endpoints with authentication middleware
+12. **Global Error Handler** - Catches all unhandled errors
 
 ---
 
@@ -89,6 +90,50 @@ const sessionMiddleware = session({
 - **Table**: `sessions` (auto-created)
 - **Cleanup**: Every 15 minutes (900000ms)
 - **Structure**: Session ID (primary key), data (JSON), expiry (timestamp)
+
+### WebSocket Session Authentication
+
+**Location:** `app/public/server.js` (lines 101-123)
+**Since:** v1.0.46
+
+Secure WebSocket connections require session-based authentication at handshake time.
+
+**Implementation:**
+
+```javascript
+io.engine.use((req, res, next) => {
+    const isHandshake = req._query.sid === undefined;
+    if (!isHandshake) {
+        return next(); // Skip auth for polling requests
+    }
+
+    // Apply session middleware during handshake
+    sessionMiddleware(req, res, (err) => {
+        if (err) return next(err);
+
+        // Check if user is authenticated
+        if (!req.session || !req.session.userId) {
+            return next(new Error("Authentication required"));
+        }
+
+        next();
+    });
+});
+```
+
+**Security Features:**
+- Authentication **only on handshake** (when `sid` is undefined)
+- Subsequent polling requests skip auth check (performance optimization)
+- Reuses session middleware for consistent auth logic
+- Unauthenticated connections are rejected with error
+- Session username is logged on successful handshake
+
+**WebSocket Events:**
+- `join-progress` - Join progress tracking room
+- `leave-progress` - Leave progress tracking room
+- `progress` - Progress updates (throttled to 100ms)
+- `complete` - Operation completed
+- `error` - Operation failed
 
 ### Authentication Protection (`requireAuth`)
 
@@ -167,7 +212,7 @@ if (req.body.rememberMe) {
 ## CSRF Protection {#csrf}
 
 **Library:** `csrf-sync`
-**Implementation:** `app/public/server.js` (lines 195-219)
+**Implementation:** `app/public/server.js` (lines 200-212)
 **Since:** v1.0.46
 
 Double-submit cookie pattern for CSRF protection on all state-changing requests.
@@ -249,7 +294,7 @@ await fetch(`/api/vulnerabilities?_csrf=${csrfToken}`, {
 ## Trust Proxy Configuration {#trust-proxy}
 
 **Setting:** `app.set("trust proxy", true)`
-**Location:** `app/public/server.js` (line 73)
+**Location:** `app/public/server.js` (line 78)
 **Since:** v1.0.46 (HEX-128 Fix)
 
 **Critical Importance**: HexTrackr **ALWAYS** runs behind nginx reverse proxy. Trust proxy is **ALWAYS** enabled.
@@ -360,36 +405,65 @@ PathValidator.safeUnlinkSync(filePath)
 
 ### Rate Limiting
 
-**Location:** `app/middleware/security.js` (lines 152-163)
+**Location:** `app/middleware/security.js` (lines 153-182)
 **Applied:** `/api/*` routes only
 
 **Configuration:**
 
 ```javascript
 {
-    windowMs: 15 * 60 * 1000,  // 15 minutes
-    max: 100,                  // 100 requests per window
-    standardHeaders: true,      // Send rate limit info in headers
+    windowMs: 15 * 60 * 1000,  // 15 minutes (production) / 1 minute (development)
+    max: 60,                   // 60 requests per window (production) / 10000 (development)
+    standardHeaders: true,     // Send rate limit info in headers
     legacyHeaders: false,
-    trust: () => true          // Trust proxy for client IP
+    trust: () => true,         // Trust proxy for client IP
+    // Cache-aware: Cache HITs are excluded from rate limiting (zero server load)
+    skip: (req, res) => {
+        const cacheHeader = res.getHeader("X-Cache");
+        return cacheHeader && (cacheHeader.includes("HIT") || cacheHeader.includes("HIT-LARGE-QUERY"));
+    }
 }
 ```
 
 ### CORS Middleware
 
 **Location:** `app/middleware/security.js` (lines 138-145)
-**Configuration Source:** `utils/constants.js`
+**Configuration Source:** `utils/constants.js` (lines 14-25)
+
+**HTTPS-Only Security:** CORS dynamically allows **ONLY HTTPS connections** - all HTTP origins are rejected.
 
 **Settings:**
 
 ```javascript
 {
-    origin: CORS_ORIGINS,      // Allowed origins
+    origin: CORS_ORIGINS,      // Dynamic function: allows HTTPS, rejects HTTP
     methods: CORS_METHODS,     // Allowed HTTP methods
     allowedHeaders: CORS_HEADERS,  // Allowed headers
     credentials: true          // Allow cookies
 }
 ```
+
+**CORS_ORIGINS Function (constants.js:14-25):**
+
+```javascript
+const CORS_ORIGINS = function(origin, callback) {
+    // Allow same-origin requests (no origin header)
+    if (!origin) { return callback(null, true); }
+
+    // Allow any HTTPS connection
+    if (origin.startsWith("https://")) {
+        return callback(null, true);
+    }
+
+    // Reject all HTTP connections
+    callback(new Error("Only HTTPS connections allowed"));
+};
+```
+
+**Security Impact:**
+- All HTTP origins are **rejected** with error: "Only HTTPS connections allowed"
+- HTTPS requirement is enforced at the CORS layer (prevents HTTP API access)
+- Same-origin requests (no `Origin` header) are allowed (server-to-server)
 
 ### Input Validation Middleware
 
@@ -673,10 +747,10 @@ Logs all errors with request context before passing to global error handler.
 |----------|-------------|---------|
 | `NODE_ENV` | Environment mode | `production` |
 | `TRUST_PROXY` | Trust proxy mode | `true` (ALWAYS in code) |
-| `ALLOWED_ORIGINS` | CORS whitelist (comma-separated) | `http://localhost:8080` |
+| `ALLOWED_ORIGINS` | CORS whitelist (comma-separated) | Dynamic HTTPS-only function |
 | `MAX_FILE_SIZE` | Upload size limit | `100MB` |
-| `RATE_LIMIT_WINDOW` | Rate limit window (ms) | `900000` (15 min) |
-| `RATE_LIMIT_MAX` | Max requests per window | `100` |
+| `RATE_LIMIT_WINDOW` | Rate limit window (ms) | `900000` (15 min prod) / `60000` (1 min dev) |
+| `RATE_LIMIT_MAX` | Max requests per window | `60` (prod) / `10000` (dev) |
 
 ---
 
@@ -744,5 +818,5 @@ const content = PathValidator.safeReadFileSync(safePath);
 
 ---
 
-**Version**: 1.0.54
-**Last Updated**: 2025-10-09
+**Version**: 1.0.66
+**Last Updated**: 2025-10-16

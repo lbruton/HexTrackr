@@ -120,8 +120,15 @@ class TicketController {
         try {
             const controller = TicketController.getInstance();
             const ticketId = req.params.id;
+            const { deletion_reason } = req.body; // Accept reason from request body
+            const deletedBy = req.user?.username || 'system'; // From auth session
 
-            const deletedCount = await controller.ticketService.deleteTicket(ticketId);
+            const deletedCount = await controller.ticketService.deleteTicket(
+                ticketId,
+                deletion_reason,
+                deletedBy
+            );
+
             res.json({
                 success: true,
                 deleted: deletedCount
