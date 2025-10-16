@@ -161,6 +161,7 @@ console.log("✅ HexTrackr Settings Modal (shared) loaded successfully");
             settingsModalElement.addEventListener("shown.bs.modal", loadKevSyncStatus);
             settingsModalElement.addEventListener("shown.bs.modal", loadCiscoSyncStatus);
             settingsModalElement.addEventListener("shown.bs.modal", loadPaloSyncStatus); // HEX-209
+            settingsModalElement.addEventListener("shown.bs.modal", loadTenableImportStatus); // HEX-240
         }
         
         // Settings save button
@@ -1393,6 +1394,35 @@ async function loadPaloSyncStatus() {
         }
     } catch (error) {
         console.error("Error loading Palo Alto status:", error);
+    }
+}
+
+/**
+ * Load Tenable last import date on modal open (HEX-240)
+ * @async
+ * @function loadTenableImportStatus
+ * @returns {Promise<void>}
+ */
+async function loadTenableImportStatus() {
+    try {
+        // Fetch last import date from backend
+        const response = await authState.authenticatedFetch("/api/vulnerabilities/last-import");
+        if (response.ok) {
+            const data = await response.json();
+            if (data.lastImport) {
+                const lastImportElement = document.getElementById("tenableLastImport");
+                if (lastImportElement) {
+                    const importDate = new Date(data.lastImport);
+                    lastImportElement.textContent = importDate.toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric"
+                    });
+                }
+            }
+        }
+    } catch (error) {
+        console.error("Error loading Tenable import status:", error);
     }
 }
 

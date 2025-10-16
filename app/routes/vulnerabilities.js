@@ -51,6 +51,7 @@ const upload = multer({
 router.get("/stats", requireAuth, VulnerabilityController.getStats);
 router.get("/recent-trends", requireAuth, VulnerabilityController.getRecentTrends);
 router.get("/trends", requireAuth, VulnerabilityController.getTrends);
+router.get("/last-import", requireAuth, VulnerabilityController.getLastImport); // HEX-240: Last CSV import date
 
 // HEX-112 Phase 2: New endpoints for pagination migration
 router.get("/count", requireAuth, VulnerabilityController.getCount); // Filtered counts
