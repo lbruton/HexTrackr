@@ -214,11 +214,16 @@
             }
         }
 
-        // Check device type patterns (e.g., "nswan01", "rtr02")
+        // Check device type patterns (e.g., "nswan01", "rtr02", "tulns31com01-vlan31")
         if (deviceNamingConfig.deviceTypePatterns) {
             for (const config of deviceNamingConfig.deviceTypePatterns) {
-                const regex = new RegExp(`${config.pattern}\\d+$`);
-                if (regex.test(lower)) {
+                // Try two patterns:
+                // 1. Pattern at end with digits: "nswan01", "extpan02"
+                // 2. Pattern anywhere in hostname: "tulns31com01", "ns" or "com" in VLAN interfaces
+                const endPattern = new RegExp(`${config.pattern}\\d+(-vlan\\d+)?$`);
+                const anywherePattern = new RegExp(config.pattern);
+
+                if (endPattern.test(lower) || anywherePattern.test(lower)) {
                     return config.vendor || "Other";
                 }
             }
