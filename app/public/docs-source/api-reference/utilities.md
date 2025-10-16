@@ -338,8 +338,8 @@ const {
 **Rate Limiting**
 ```javascript
 const {
-    RATE_LIMIT_WINDOW_MS,  // 15 minutes
-    RATE_LIMIT_MAX_REQUESTS // 100 (prod) / 1000 (dev)
+    RATE_LIMIT_WINDOW_MS,  // 15 minutes (prod) / 1 minute (dev)
+    RATE_LIMIT_MAX_REQUESTS // 60 (prod) / 10000 (dev) - cache HITs excluded
 } = require('./utils/constants');
 ```
 
@@ -414,10 +414,10 @@ const {
 
 ---
 
-### PathValidator.js - Security Utility Class
+### PathValidator Class - Security Utility
 
-**Location:** `app/utils/PathValidator.js`
-**Since:** v1.0.46 (Security enhancement)
+**Location:** `app/middleware/security.js` (lines 36-131)
+**Since:** v1.0.22
 **Purpose:** Prevent directory traversal attacks and validate file paths
 
 #### Key Methods
@@ -431,7 +431,7 @@ Validate and normalize paths, detect traversal attempts.
 **Returns:** Normalized safe path
 
 ```javascript
-const PathValidator = require('./utils/PathValidator');
+const { PathValidator } = require('../middleware/security');
 
 // Valid path
 const safe = PathValidator.validatePath("uploads/data.csv");
@@ -528,7 +528,7 @@ PathValidator.safeUnlinkSync("uploads/temp.csv"); // Delete file
 
 ---
 
-**Used By:** helpers.js, version-manager.js, documentation controllers, file upload handlers
+**Used By:** Exported from security.js, used by version-manager.js, documentation controllers, file upload handlers
 
 ---
 
@@ -2087,5 +2087,5 @@ HexTrackr's utility layer provides 31+ specialized modules across backend and fr
 
 ---
 
-**Last Updated:** 2025-10-09
-**Version:** 1.0.54
+**Last Updated:** 2025-10-16
+**Version:** 1.0.66

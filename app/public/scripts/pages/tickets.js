@@ -373,6 +373,14 @@ class HexagonTicketsManager {
             }
         });
 
+        // Delete confirmation modal (HEX-248)
+        const confirmDeleteBtn = document.getElementById('confirmDeleteTicket');
+        if (confirmDeleteBtn) {
+            confirmDeleteBtn.addEventListener('click', () => {
+                this.confirmDeleteTicket();
+            });
+        }
+
         // Location-to-device autofill functionality for new tickets only
         document.getElementById("location").addEventListener("input", (e) => {
             this.handleLocationToDeviceAutofill(e.target.value);
@@ -1222,17 +1230,72 @@ class HexagonTicketsManager {
     }
 
     async deleteTicket(id) {
-        if (confirm("Are you sure you want to delete this ticket?")) {
-            try {
-                await this.deleteTicketFromDB(id);
+        // Store ticket ID for modal (HEX-248)
+        this.pendingDeleteTicketId = id;
+
+        // Get ticket for display
+        const ticket = this.getTicketById(id);
+        if (!ticket) {
+            this.showToast("Ticket not found", "error");
+            return;
+        }
+
+        // Populate modal
+        document.getElementById('deleteTicketNumber').textContent =
+            ticket.xt_number || ticket.id;
+        document.getElementById('deletionReasonInput').value = '';
+        document.getElementById('deletionReasonInput').classList.remove('is-invalid');
+
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('deleteTicketModal'));
+        modal.show();
+    }
+
+    /**
+     * Confirm and execute ticket deletion with reason (HEX-248)
+     * Called when user clicks "Delete Ticket" button in modal
+     */
+    async confirmDeleteTicket() {
+        const reasonInput = document.getElementById('deletionReasonInput');
+        const reason = reasonInput.value.trim();
+
+        if (!reason) {
+            reasonInput.classList.add('is-invalid');
+            this.showToast("Please provide a reason for deletion", "warning");
+            return;
+        }
+
+        try {
+            // Send DELETE with body
+            const response = await authState.authenticatedFetch(
+                `/api/tickets/${this.pendingDeleteTicketId}`,
+                {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ deletion_reason: reason })
+                }
+            );
+
+            if (response.ok) {
+                // Hide modal
+                const modal = bootstrap.Modal.getInstance(
+                    document.getElementById('deleteTicketModal')
+                );
+                modal.hide();
+
+                // Reload and notify
+                await this.loadTicketsFromDB();
                 this.renderTickets();
                 this.updateStatistics();
                 this.populateLocationFilter();
-                this.showToast("Ticket deleted successfully!", "success");
-            } catch (_error) {
-                // Error is already handled in deleteTicketFromDB
-                return;
+                this.showToast("Ticket deleted successfully", "success");
+            } else {
+                const error = await response.json();
+                throw new Error(error.error || "Failed to delete ticket");
             }
+        } catch (error) {
+            console.error("Error deleting ticket:", error);
+            this.showToast("Failed to delete ticket: " + error.message, "error");
         }
     }
 
