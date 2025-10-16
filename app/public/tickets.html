@@ -829,67 +829,89 @@
                             <div class="row">
                                 <!-- Left column: Outbound Shipping Address -->
                                 <div class="col-md-6">
-                                    <div class="mb-2">
+                                    <div class="mb-3">
                                         <label class="form-label fw-bold">
                                             <i class="ti ti-truck me-1"></i>Shipping Address
                                         </label>
                                     </div>
-                                    <div class="mb-2">
-                                        <input type="text" class="form-control form-control-sm" id="shippingLine1" placeholder="Address Line 1">
+                                    <div class="mb-3">
+                                        <label for="shippingLine1" class="form-label">Address Line 1</label>
+                                        <input type="text" class="form-control" id="shippingLine1" placeholder="Street address">
                                     </div>
-                                    <div class="mb-2">
-                                        <input type="text" class="form-control form-control-sm" id="shippingLine2" placeholder="Address Line 2 (Optional)">
+                                    <div class="mb-3">
+                                        <label for="shippingLine2" class="form-label">Address Line 2 <span class="text-muted">(Optional)</span></label>
+                                        <input type="text" class="form-control" id="shippingLine2" placeholder="Apt, suite, unit, building, floor, etc.">
                                     </div>
-                                    <div class="row g-2 mb-2">
+                                    <div class="row">
                                         <div class="col-md-6">
-                                            <input type="text" class="form-control form-control-sm" id="shippingCity" placeholder="City">
+                                            <div class="mb-3">
+                                                <label for="shippingCity" class="form-label">City</label>
+                                                <input type="text" class="form-control" id="shippingCity" placeholder="City" pattern="[A-Za-z\s\-]+" title="City should only contain letters, spaces, and hyphens">
+                                            </div>
                                         </div>
                                         <div class="col-md-3">
-                                            <select class="form-select form-select-sm" id="shippingState">
-                                                <option value="">State</option>
-                                                <option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option><option value="AR">AR</option><option value="CA">CA</option><option value="CO">CO</option><option value="CT">CT</option><option value="DE">DE</option><option value="FL">FL</option><option value="GA">GA</option><option value="HI">HI</option><option value="ID">ID</option><option value="IL">IL</option><option value="IN">IN</option><option value="IA">IA</option><option value="KS">KS</option><option value="KY">KY</option><option value="LA">LA</option><option value="ME">ME</option><option value="MD">MD</option><option value="MA">MA</option><option value="MI">MI</option><option value="MN">MN</option><option value="MS">MS</option><option value="MO">MO</option><option value="MT">MT</option><option value="NE">NE</option><option value="NV">NV</option><option value="NH">NH</option><option value="NJ">NJ</option><option value="NM">NM</option><option value="NY">NY</option><option value="NC">NC</option><option value="ND">ND</option><option value="OH">OH</option><option value="OK">OK</option><option value="OR">OR</option><option value="PA">PA</option><option value="RI">RI</option><option value="SC">SC</option><option value="SD">SD</option><option value="TN">TN</option><option value="TX">TX</option><option value="UT">UT</option><option value="VT">VT</option><option value="VA">VA</option><option value="WA">WA</option><option value="WV">WV</option><option value="WI">WI</option><option value="WY">WY</option>
-                                            </select>
+                                            <div class="mb-3">
+                                                <label for="shippingState" class="form-label">State</label>
+                                                <select class="form-select" id="shippingState">
+                                                    <option value="">Select...</option>
+                                                    <option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option><option value="AR">AR</option><option value="CA">CA</option><option value="CO">CO</option><option value="CT">CT</option><option value="DE">DE</option><option value="FL">FL</option><option value="GA">GA</option><option value="HI">HI</option><option value="ID">ID</option><option value="IL">IL</option><option value="IN">IN</option><option value="IA">IA</option><option value="KS">KS</option><option value="KY">KY</option><option value="LA">LA</option><option value="ME">ME</option><option value="MD">MD</option><option value="MA">MA</option><option value="MI">MI</option><option value="MN">MN</option><option value="MS">MS</option><option value="MO">MO</option><option value="MT">MT</option><option value="NE">NE</option><option value="NV">NV</option><option value="NH">NH</option><option value="NJ">NJ</option><option value="NM">NM</option><option value="NY">NY</option><option value="NC">NC</option><option value="ND">ND</option><option value="OH">OH</option><option value="OK">OK</option><option value="OR">OR</option><option value="PA">PA</option><option value="RI">RI</option><option value="SC">SC</option><option value="SD">SD</option><option value="TN">TN</option><option value="TX">TX</option><option value="UT">UT</option><option value="VT">VT</option><option value="VA">VA</option><option value="WA">WA</option><option value="WV">WV</option><option value="WI">WI</option><option value="WY">WY</option>
+                                                </select>
+                                            </div>
                                         </div>
                                         <div class="col-md-3">
-                                            <input type="text" class="form-control form-control-sm" id="shippingZip" placeholder="ZIP" maxlength="10">
+                                            <div class="mb-3">
+                                                <label for="shippingZip" class="form-label">ZIP</label>
+                                                <input type="text" class="form-control" id="shippingZip" placeholder="ZIP" maxlength="10" pattern="[0-9\-]+" title="ZIP should only contain numbers and hyphens">
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="outboundTracking" class="form-label">Outbound Tracking</label>
-                                        <input type="text" class="form-control form-control-sm" id="outboundTracking" placeholder="Tracking number for shipment to site">
+                                        <label for="outboundTracking" class="form-label">Outbound Tracking <span class="text-muted">(Optional)</span></label>
+                                        <input type="text" class="form-control" id="outboundTracking" placeholder="Tracking number for shipment to site">
                                     </div>
                                 </div>
 
                                 <!-- Right column: Return Shipping Address -->
                                 <div class="col-md-6">
-                                    <div class="mb-2">
+                                    <div class="mb-3">
                                         <label class="form-label fw-bold">
                                             <i class="ti ti-package-export me-1"></i>Return Address
                                         </label>
                                     </div>
-                                    <div class="mb-2">
-                                        <input type="text" class="form-control form-control-sm" id="returnLine1" placeholder="Address Line 1">
+                                    <div class="mb-3">
+                                        <label for="returnLine1" class="form-label">Address Line 1</label>
+                                        <input type="text" class="form-control" id="returnLine1" placeholder="Street address">
                                     </div>
-                                    <div class="mb-2">
-                                        <input type="text" class="form-control form-control-sm" id="returnLine2" placeholder="Address Line 2 (Optional)">
+                                    <div class="mb-3">
+                                        <label for="returnLine2" class="form-label">Address Line 2 <span class="text-muted">(Optional)</span></label>
+                                        <input type="text" class="form-control" id="returnLine2" placeholder="Apt, suite, unit, building, floor, etc.">
                                     </div>
-                                    <div class="row g-2 mb-2">
+                                    <div class="row">
                                         <div class="col-md-6">
-                                            <input type="text" class="form-control form-control-sm" id="returnCity" placeholder="City">
+                                            <div class="mb-3">
+                                                <label for="returnCity" class="form-label">City</label>
+                                                <input type="text" class="form-control" id="returnCity" placeholder="City" pattern="[A-Za-z\s\-]+" title="City should only contain letters, spaces, and hyphens">
+                                            </div>
                                         </div>
                                         <div class="col-md-3">
-                                            <select class="form-select form-select-sm" id="returnState">
-                                                <option value="">State</option>
-                                                <option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option><option value="AR">AR</option><option value="CA">CA</option><option value="CO">CO</option><option value="CT">CT</option><option value="DE">DE</option><option value="FL">FL</option><option value="GA">GA</option><option value="HI">HI</option><option value="ID">ID</option><option value="IL">IL</option><option value="IN">IN</option><option value="IA">IA</option><option value="KS">KS</option><option value="KY">KY</option><option value="LA">LA</option><option value="ME">ME</option><option value="MD">MD</option><option value="MA">MA</option><option value="MI">MI</option><option value="MN">MN</option><option value="MS">MS</option><option value="MO">MO</option><option value="MT">MT</option><option value="NE">NE</option><option value="NV">NV</option><option value="NH">NH</option><option value="NJ">NJ</option><option value="NM">NM</option><option value="NY">NY</option><option value="NC">NC</option><option value="ND">ND</option><option value="OH">OH</option><option value="OK">OK</option><option value="OR">OR</option><option value="PA">PA</option><option value="RI">RI</option><option value="SC">SC</option><option value="SD">SD</option><option value="TN">TN</option><option value="TX">TX</option><option value="UT">UT</option><option value="VT">VT</option><option value="VA">VA</option><option value="WA">WA</option><option value="WV">WV</option><option value="WI">WI</option><option value="WY">WY</option>
-                                            </select>
+                                            <div class="mb-3">
+                                                <label for="returnState" class="form-label">State</label>
+                                                <select class="form-select" id="returnState">
+                                                    <option value="">Select...</option>
+                                                    <option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option><option value="AR">AR</option><option value="CA">CA</option><option value="CO">CO</option><option value="CT">CT</option><option value="DE">DE</option><option value="FL">FL</option><option value="GA">GA</option><option value="HI">HI</option><option value="ID">ID</option><option value="IL">IL</option><option value="IN">IN</option><option value="IA">IA</option><option value="KS">KS</option><option value="KY">KY</option><option value="LA">LA</option><option value="ME">ME</option><option value="MD">MD</option><option value="MA">MA</option><option value="MI">MI</option><option value="MN">MN</option><option value="MS">MS</option><option value="MO">MO</option><option value="MT">MT</option><option value="NE">NE</option><option value="NV">NV</option><option value="NH">NH</option><option value="NJ">NJ</option><option value="NM">NM</option><option value="NY">NY</option><option value="NC">NC</option><option value="ND">ND</option><option value="OH">OH</option><option value="OK">OK</option><option value="OR">OR</option><option value="PA">PA</option><option value="RI">RI</option><option value="SC">SC</option><option value="SD">SD</option><option value="TN">TN</option><option value="TX">TX</option><option value="UT">UT</option><option value="VT">VT</option><option value="VA">VA</option><option value="WA">WA</option><option value="WV">WV</option><option value="WI">WI</option><option value="WY">WY</option>
+                                                </select>
+                                            </div>
                                         </div>
                                         <div class="col-md-3">
-                                            <input type="text" class="form-control form-control-sm" id="returnZip" placeholder="ZIP" maxlength="10">
+                                            <div class="mb-3">
+                                                <label for="returnZip" class="form-label">ZIP</label>
+                                                <input type="text" class="form-control" id="returnZip" placeholder="ZIP" maxlength="10" pattern="[0-9\-]+" title="ZIP should only contain numbers and hyphens">
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="returnTracking" class="form-label">Return Tracking</label>
-                                        <input type="text" class="form-control form-control-sm" id="returnTracking" placeholder="Tracking number for return label">
+                                        <label for="returnTracking" class="form-label">Return Tracking <span class="text-muted">(Optional)</span></label>
+                                        <input type="text" class="form-control" id="returnTracking" placeholder="Tracking number for return label">
                                     </div>
                                 </div>
                             </div>

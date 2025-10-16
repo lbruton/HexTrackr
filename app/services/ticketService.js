@@ -134,8 +134,11 @@ class TicketService {
             const sql = `INSERT INTO tickets (
                 id, date_submitted, date_due, hexagon_ticket, service_now_ticket, location,
                 devices, supervisor, tech, status, job_type, notes, attachments,
-                created_at, updated_at, site, xt_number, site_id, location_id
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                created_at, updated_at, site, xt_number, site_id, location_id,
+                shipping_line1, shipping_line2, shipping_city, shipping_state, shipping_zip,
+                return_line1, return_line2, return_city, return_state, return_zip,
+                outbound_tracking, return_tracking, site_address, return_address
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
             const params = [
                 payload.id,
@@ -156,7 +159,37 @@ class TicketService {
                 payload.site,
                 payload.xt_number,
                 payload.site_id,
-                payload.location_id
+                payload.location_id,
+                // Shipping address fields
+                payload.shippingLine1 || payload.shipping_line1 || null,
+                payload.shippingLine2 || payload.shipping_line2 || null,
+                payload.shippingCity || payload.shipping_city || null,
+                payload.shippingState || payload.shipping_state || null,
+                payload.shippingZip || payload.shipping_zip || null,
+                // Return address fields
+                payload.returnLine1 || payload.return_line1 || null,
+                payload.returnLine2 || payload.return_line2 || null,
+                payload.returnCity || payload.return_city || null,
+                payload.returnState || payload.return_state || null,
+                payload.returnZip || payload.return_zip || null,
+                // Tracking numbers
+                payload.outboundTracking || payload.outbound_tracking || null,
+                payload.returnTracking || payload.return_tracking || null,
+                // Legacy formatted address fields
+                this._formatAddress(
+                    payload.shippingLine1 || payload.shipping_line1,
+                    payload.shippingLine2 || payload.shipping_line2,
+                    payload.shippingCity || payload.shipping_city,
+                    payload.shippingState || payload.shipping_state,
+                    payload.shippingZip || payload.shipping_zip
+                ),
+                this._formatAddress(
+                    payload.returnLine1 || payload.return_line1,
+                    payload.returnLine2 || payload.return_line2,
+                    payload.returnCity || payload.return_city,
+                    payload.returnState || payload.return_state,
+                    payload.returnZip || payload.return_zip
+                )
             ];
 
             this.db.run(sql, params, function(err) {
@@ -209,14 +242,31 @@ class TicketService {
                 notes: ticket.notes ?? existingTicket.notes,
                 site: ticket.site ?? existingTicket.site,
                 site_id: ticket.site_id ?? existingTicket.site_id,
-                location_id: ticket.location_id ?? existingTicket.location_id
+                location_id: ticket.location_id ?? existingTicket.location_id,
+
+                // Address fields - use ?? to allow clearing with empty strings
+                shippingLine1: ticket.shippingLine1 ?? ticket.shipping_line1 ?? existingTicket.shipping_line1,
+                shippingLine2: ticket.shippingLine2 ?? ticket.shipping_line2 ?? existingTicket.shipping_line2,
+                shippingCity: ticket.shippingCity ?? ticket.shipping_city ?? existingTicket.shipping_city,
+                shippingState: ticket.shippingState ?? ticket.shipping_state ?? existingTicket.shipping_state,
+                shippingZip: ticket.shippingZip ?? ticket.shipping_zip ?? existingTicket.shipping_zip,
+                returnLine1: ticket.returnLine1 ?? ticket.return_line1 ?? existingTicket.return_line1,
+                returnLine2: ticket.returnLine2 ?? ticket.return_line2 ?? existingTicket.return_line2,
+                returnCity: ticket.returnCity ?? ticket.return_city ?? existingTicket.return_city,
+                returnState: ticket.returnState ?? ticket.return_state ?? existingTicket.return_state,
+                returnZip: ticket.returnZip ?? ticket.return_zip ?? existingTicket.return_zip,
+                outboundTracking: ticket.outboundTracking ?? ticket.outbound_tracking ?? existingTicket.outbound_tracking,
+                returnTracking: ticket.returnTracking ?? ticket.return_tracking ?? existingTicket.return_tracking
             };
 
             return new Promise((resolve, reject) => {
                 const sql = `UPDATE tickets SET
                     date_submitted = ?, date_due = ?, hexagon_ticket = ?, service_now_ticket = ?,
                     location = ?, devices = ?, supervisor = ?, tech = ?, status = ?, job_type = ?, notes = ?,
-                    attachments = ?, updated_at = ?, site = ?, xt_number = ?, site_id = ?, location_id = ?
+                    attachments = ?, updated_at = ?, site = ?, xt_number = ?, site_id = ?, location_id = ?,
+                    shipping_line1 = ?, shipping_line2 = ?, shipping_city = ?, shipping_state = ?, shipping_zip = ?,
+                    return_line1 = ?, return_line2 = ?, return_city = ?, return_state = ?, return_zip = ?,
+                    outbound_tracking = ?, return_tracking = ?, site_address = ?, return_address = ?
                     WHERE id = ?`;
                 const params = [
                     payload.dateSubmitted,
@@ -236,6 +286,36 @@ class TicketService {
                     payload.xt_number,
                     payload.site_id,
                     payload.location_id,
+                    // Shipping address
+                    payload.shippingLine1 || null,
+                    payload.shippingLine2 || null,
+                    payload.shippingCity || null,
+                    payload.shippingState || null,
+                    payload.shippingZip || null,
+                    // Return address
+                    payload.returnLine1 || null,
+                    payload.returnLine2 || null,
+                    payload.returnCity || null,
+                    payload.returnState || null,
+                    payload.returnZip || null,
+                    // Tracking numbers
+                    payload.outboundTracking || null,
+                    payload.returnTracking || null,
+                    // Legacy formatted addresses
+                    this._formatAddress(
+                        payload.shippingLine1,
+                        payload.shippingLine2,
+                        payload.shippingCity,
+                        payload.shippingState,
+                        payload.shippingZip
+                    ),
+                    this._formatAddress(
+                        payload.returnLine1,
+                        payload.returnLine2,
+                        payload.returnCity,
+                        payload.returnState,
+                        payload.returnZip
+                    ),
                     ticketId
                 ];
 
@@ -762,6 +842,60 @@ class TicketService {
                 });
             });
         });
+    }
+
+    /**
+     * Get address suggestions based on site and location
+     * Returns most recent addresses (shipping and return) for matching site+location
+     * Used for autofill functionality in create/edit ticket modal
+     * @param {string} site - Site name
+     * @param {string} location - Location name
+     * @returns {Promise<Object|null>} Address data or null if no match found
+     */
+    async getAddressesBySiteLocation(site, location) {
+        return new Promise((resolve, reject) => {
+            const sql = `SELECT
+                shipping_line1, shipping_line2, shipping_city, shipping_state, shipping_zip,
+                return_line1, return_line2, return_city, return_state, return_zip
+                FROM tickets
+                WHERE site = ? AND location = ? AND deleted = 0
+                AND (shipping_line1 IS NOT NULL OR return_line1 IS NOT NULL)
+                ORDER BY created_at DESC
+                LIMIT 1`;
+
+            this.db.get(sql, [site, location], (err, row) => {
+                if (err) {
+                    return reject(new Error("Failed to fetch address suggestions: " + err.message));
+                }
+                resolve(row || null);
+            });
+        });
+    }
+
+    /**
+     * Format address fields into a single text block for legacy site_address/return_address columns
+     * @param {string} line1 - Address line 1
+     * @param {string} line2 - Address line 2 (optional)
+     * @param {string} city - City
+     * @param {string} state - State code
+     * @param {string} zip - ZIP code
+     * @returns {string|null} Formatted address or null if no address provided
+     */
+    _formatAddress(line1, line2, city, state, zip) {
+        // Filter out empty/null/undefined values
+        const parts = [];
+
+        if (line1) parts.push(line1);
+        if (line2) parts.push(line2);
+        if (city && state && zip) {
+            parts.push(`${city}, ${state} ${zip}`);
+        } else if (city || state || zip) {
+            // Handle partial city/state/zip
+            const cityStateZip = [city, state, zip].filter(Boolean).join(" ");
+            if (cityStateZip) parts.push(cityStateZip);
+        }
+
+        return parts.length > 0 ? parts.join("\n") : null;
     }
 }
 
