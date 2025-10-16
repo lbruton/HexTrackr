@@ -72,24 +72,45 @@ Manages support tickets and associated device tracking.
 ### ImportController
 
 **Location:** `app/controllers/importController.js`
+**Base Paths:** `/api/vulnerabilities`, `/api/import`
 
-Handles CSV file imports from vulnerability scanners.
+Handles CSV and JSON file imports from vulnerability scanners with lifecycle management and batch processing.
 
 **Key Features:**
 
 - Multi-format CSV support (Tenable, Qualys, Rapid7)
+- JSON-based import for programmatic uploads
 - Automatic scan date extraction from filenames
 - Progress tracking via WebSocket
 - Staging mode for large files (>10,000 rows)
 - Duplicate detection and merging
+- Vulnerability lifecycle management (active, grace_period, resolved)
+- Import history tracking
 
 **Main Endpoints:**
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/import/vulnerabilities` | Standard vulnerability import |
-| POST | `/api/import/staging` | Staged import for large files |
-| GET | `/api/import/progress/:id` | Real-time import progress |
+| POST | `/api/vulnerabilities/import` | Standard vulnerability CSV import (primary endpoint) |
+| POST | `/api/vulnerabilities/import-staging` | Staged CSV import for large files |
+| POST | `/api/import/vulnerabilities` | JSON-based vulnerability import |
+| POST | `/api/import/tickets` | JSON-based ticket import |
+| POST | `/api/import` | Generic import handler |
+| GET | `/api/imports` | Import history with status tracking |
+| GET | `/api/import/progress/:sessionId` | Real-time import progress by session ID |
+
+**Import Workflow:**
+
+1. **CSV Upload** - File uploaded to `/api/vulnerabilities/import` or `/import-staging`
+2. **Staging** - Data loaded into `vulnerability_staging` table for validation
+3. **Processing** - Batch processing (1000 records at a time) with deduplication
+4. **Lifecycle** - Tracks vulnerability state (active → grace_period → resolved)
+5. **Statistics** - Calculates daily totals with VPR aggregation
+6. **Progress** - Real-time updates via WebSocket
+
+**Supported Import Types:**
+- **CSV**: Tenable, Qualys, Rapid7 formats
+- **JSON**: Programmatic uploads with structured data
 
 ### BackupController
 
@@ -146,7 +167,80 @@ Manages CISA Known Exploited Vulnerabilities (KEV) integration and synchronizati
 |--------|----------|-------------|
 | POST | `/api/kev/sync` | Trigger manual KEV synchronization from CISA |
 | GET | `/api/kev/status` | Get current sync status and statistics |
-| GET | `/api/kev/vulnerability/:cveId` | Get KEV details for specific CVE |
+| GET | `/api/kev/check-autosync` | Check if auto-sync needed based on schedule |
+| GET | `/api/kev/stats` | KEV dashboard statistics |
+| GET | `/api/kev/all` | Get all KEV vulnerabilities from catalog |
+| GET | `/api/kev/matched` | Get matched KEVs in current environment |
+| GET | `/api/kev/:cveId` | Get KEV details for specific CVE |
+
+**Rate Limiting:**
+- `/sync` endpoint: 3 requests per 5 minutes (prevents API abuse)
+
+### CiscoController
+
+**Location:** `app/controllers/ciscoController.js`
+**Since:** v1.0.63
+
+Manages Cisco PSIRT (Product Security Incident Response Team) advisory integration for Cisco device vulnerabilities.
+
+**Key Features:**
+
+- Automatic synchronization with Cisco PSIRT API
+- CVE-to-advisory matching for Cisco devices
+- Fix availability tracking and remediation guidance
+- Sync status monitoring and error handling
+- Integration with vulnerability classification system
+
+**Main Endpoints:**
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/cisco/sync` | Trigger Cisco PSIRT advisory synchronization |
+| GET | `/api/cisco/status` | Get sync status and advisory statistics |
+| GET | `/api/cisco/check-autosync` | Check if auto-sync needed based on schedule |
+| GET | `/api/cisco/advisory/:cveId` | Get Cisco advisory details for specific CVE |
+
+**Rate Limiting:**
+- `/sync` endpoint: 10 requests per 10 minutes
+
+**Advisory Integration:**
+- Matches CVEs to official Cisco advisories
+- Provides fix availability status
+- Links to vendor security bulletins
+- Tracks affected Cisco product versions
+
+### PaloAltoController
+
+**Location:** `app/controllers/paloAltoController.js`
+**Since:** v1.0.63
+
+Manages Palo Alto Networks security advisory integration for Palo Alto device vulnerabilities.
+
+**Key Features:**
+
+- Automatic synchronization with Palo Alto Security Advisory API
+- CVE-to-advisory matching for Palo Alto devices
+- Fix availability tracking and remediation guidance
+- Sync status monitoring and error handling
+- Integration with vulnerability classification system
+
+**Main Endpoints:**
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/palo/sync` | Trigger Palo Alto advisory synchronization |
+| GET | `/api/palo/status` | Get sync status and advisory statistics |
+| GET | `/api/palo/check-autosync` | Check if auto-sync needed based on schedule |
+| GET | `/api/palo/advisory/:cveId` | Get Palo Alto advisory details for specific CVE |
+
+**Rate Limiting:**
+- `/sync` endpoint: 10 requests per 10 minutes
+
+**Advisory Integration:**
+- Matches CVEs to official Palo Alto advisories
+- Provides fix availability status
+- Links to vendor security bulletins
+- Tracks affected Palo Alto product versions
 
 ### AuthController
 

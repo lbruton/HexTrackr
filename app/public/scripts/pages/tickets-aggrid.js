@@ -296,8 +296,8 @@
                     return span;
                 },
                 comparator: (dateA, dateB) => {
-                    const a = dateA ? new Date(dateA).getTime() : 0;
-                    const b = dateB ? new Date(dateB).getTime() : 0;
+                    const a = dateA ? new Date(dateA + 'T00:00:00').getTime() : 0;
+                    const b = dateB ? new Date(dateB + 'T00:00:00').getTime() : 0;
                     return a - b;
                 }
             },
@@ -316,8 +316,8 @@
                     return span;
                 },
                 comparator: (dateA, dateB) => {
-                    const a = dateA ? new Date(dateA).getTime() : 0;
-                    const b = dateB ? new Date(dateB).getTime() : 0;
+                    const a = dateA ? new Date(dateA + 'T00:00:00').getTime() : 0;
+                    const b = dateB ? new Date(dateB + 'T00:00:00').getTime() : 0;
                     return a - b;
                 }
             },
