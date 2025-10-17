@@ -80,7 +80,7 @@
             this.monitoring.isMonitoring = true;
             
             if (this.config.enableDebugLogging) {
-                console.log("Modal Monitor initialized with configuration:", this.config);
+                logger.debug("ui", "Modal Monitor initialized with configuration:", this.config);
             }
         }
 
@@ -89,7 +89,7 @@
          */
         startMemoryMonitoring() {
             if (!performance.memory) {
-                console.warn("Performance.memory not available - memory monitoring disabled");
+                logger.warn("ui", "Performance.memory not available - memory monitoring disabled");
                 return;
             }
 
@@ -101,7 +101,7 @@
             }, 5000);
 
             if (this.config.enableDebugLogging) {
-                console.log("🧠 Memory monitoring started, baseline:", this.formatBytes(this.monitoring.memoryBaseline));
+                logger.debug("ui", "🧠 Memory monitoring started, baseline:", this.formatBytes(this.monitoring.memoryBaseline));
             }
         }
 
@@ -153,7 +153,7 @@
             this.logError(error);
             
             if (this.config.enableDebugLogging) {
-                console.warn("🚨 Memory leak detected:", error.details);
+                logger.warn("ui", "🚨 Memory leak detected:", error.details);
             }
 
             // Trigger memory leak event
@@ -199,7 +199,7 @@
             };
 
             if (this.config.enableDebugLogging) {
-                console.log("Performance instrumentation enabled");
+                logger.debug("ui", "Performance instrumentation enabled");
             }
         }
 
@@ -248,7 +248,7 @@
             };
 
             if (this.config.enableDebugLogging) {
-                console.log("Error tracking enabled");
+                logger.debug("ui", "Error tracking enabled");
             }
         }
 
@@ -270,7 +270,7 @@
             });
 
             if (this.config.enableDebugLogging) {
-                console.log(` Tracking ${operationType} operation: ${operationId}`);
+                logger.debug("ui", ` Tracking ${operationType} operation: ${operationId}`);
             }
 
             return operationId;
@@ -282,7 +282,7 @@
         trackModalOperationEnd(operationId, success = true, errorInfo = null) {
             const operation = this.monitoring.activeOperations.get(operationId);
             if (!operation) {
-                console.warn("Trying to end unknown operation:", operationId);
+                logger.warn("ui", "Trying to end unknown operation:", operationId);
                 return null;
             }
 
@@ -335,7 +335,7 @@
             this.trimMetricsArrays();
 
             if (this.config.enableDebugLogging) {
-                console.log(` Operation ${operationId} completed in ${measure.duration.toFixed(2)}ms`);
+                logger.debug("ui", ` Operation ${operationId} completed in ${measure.duration.toFixed(2)}ms`);
             }
 
             return result;
@@ -360,7 +360,7 @@
             this.logError(error);
 
             if (this.config.enableDebugLogging) {
-                console.warn("🐌 Performance issue detected:", error.details);
+                logger.warn("ui", "🐌 Performance issue detected:", error.details);
             }
 
             // Trigger performance issue event
@@ -407,7 +407,7 @@
             }, this.config.reportInterval);
 
             if (this.config.enableDebugLogging) {
-                console.log(` Periodic reporting started (${this.config.reportInterval}ms interval)`);
+                logger.debug("ui", ` Periodic reporting started (${this.config.reportInterval}ms interval)`);
             }
         }
 
@@ -435,7 +435,7 @@
             this.dispatchEvent("modalPerformanceReport", report);
 
             if (this.config.enableDebugLogging) {
-                console.log("Performance report generated:", report);
+                logger.debug("ui", "Performance report generated:", report);
             }
 
             return report;
@@ -604,7 +604,7 @@
             this.monitoring.activeOperations.clear();
             
             if (this.config.enableDebugLogging) {
-                console.log("Modal Monitor destroyed");
+                logger.debug("ui", "Modal Monitor destroyed");
             }
         }
     }
@@ -623,7 +623,7 @@
 
         setupIntegration() {
             if (!this.modal) {
-                console.warn("No modal instance provided for monitoring integration");
+                logger.warn("ui", "No modal instance provided for monitoring integration");
                 return;
             }
 
@@ -632,13 +632,13 @@
             this.wrapModalMethod("showModal", "open");
             this.wrapModalMethod("clearModalStateData", "cleanup");
 
-            console.log("Modal monitoring integration setup complete");
+            logger.debug("ui", "Modal monitoring integration setup complete");
         }
 
         wrapModalMethod(methodName, operationType) {
             const originalMethod = this.modal[methodName];
             if (!originalMethod) {
-                console.warn(`Method ${methodName} not found on modal instance`);
+                logger.warn("ui", `Method ${methodName} not found on modal instance`);
                 return;
             }
 
@@ -690,9 +690,9 @@
     // Auto-initialize if window.modalMonitorConfig exists
     if (global.modalMonitorConfig) {
         global.modalMonitor = new ModalMonitor(global.modalMonitorConfig);
-        console.log("Modal Monitor auto-initialized from global config");
+        logger.debug("ui", "Modal Monitor auto-initialized from global config");
     }
 
-    console.log("Modal Monitoring system loaded and ready!");
+    logger.debug("ui", "Modal Monitoring system loaded and ready!");
 
 })(window);

@@ -54,7 +54,7 @@ function generateSecureId(prefix, randomBytes = 2) {
     } else {
         // Fallback: Use timestamp + performance.now() for non-HTTPS environments
         // This provides reasonable uniqueness for UI operations while maintaining functionality
-        console.warn(`crypto.getRandomValues not available, using timestamp fallback for ${prefix} ID`);
+        logger.warn("ui", `crypto.getRandomValues not available, using timestamp fallback for ${prefix} ID`);
 
         // performance.now() provides microsecond precision, adding entropy to timestamp
         const random = performance.now().toString(36).replace(".", "");
