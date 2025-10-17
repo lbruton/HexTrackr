@@ -1,15 +1,17 @@
 /**
  * Centralized Logging Utility for HexTrackr
  *
- * Controls console logging based on environment and debug flags.
+ * Controls console logging based on environment, debug flags, and categories.
  * In production, console.log calls are silently dropped (zero CPU cost).
+ * Supports encrypted audit logging to backend.
  *
  * Usage:
  *   import { logger } from './logger.js';
- *   logger.log('User clicked button');    // Only in debug mode
- *   logger.info('Data loaded');            // Always shown
- *   logger.warn('Cache miss');             // Always shown
- *   logger.error('API failed', error);     // Always shown
+ *   logger.debug('vulnerability', 'User clicked button');    // Category-aware debug
+ *   logger.info('ui', 'Data loaded');                        // Category-aware info
+ *   logger.warn('websocket', 'Connection lost');             // Category-aware warn
+ *   logger.error('api', 'API failed', error);                // Category-aware error
+ *   logger.audit('user.login', 'User logged in', { userId }); // Encrypted audit log
  *
  * Enable debug mode:
  *   localStorage.setItem('hextrackr_debug', 'true');
@@ -26,12 +28,63 @@ class Logger {
                              window.location.hostname === '127.0.0.1' ||
                              window.location.hostname === 'dev.hextrackr.com';
 
+        // Configuration cache
+        this.config = null;
+        this.configLoaded = false;
+
+        // Load configuration asynchronously (non-blocking)
+        this.loadConfig().catch(err => {
+            console.warn('Failed to load logging config, using defaults:', err.message);
+        });
+
         // Log initialization (only once)
         if (this.debugMode) {
             console.log('🐛 Debug mode enabled - verbose logging active');
         } else if (!this.isDevelopment) {
             console.log('📊 HexTrackr production mode - debug logs disabled');
         }
+    }
+
+    /**
+     * Load logging configuration from server
+     * @returns {Promise<void>}
+     */
+    async loadConfig() {
+        try {
+            const response = await fetch('/config/logging.config.json');
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            this.config = await response.json();
+            this.configLoaded = true;
+        } catch (error) {
+            // Use default config if fetch fails
+            this.config = this._getDefaultConfig();
+            this.configLoaded = true;
+        }
+    }
+
+    /**
+     * Get default configuration (fallback)
+     * @private
+     * @returns {Object} Default config
+     */
+    _getDefaultConfig() {
+        return {
+            global: { enabled: true, emojis: true, timestamps: true, auditEnabled: true },
+            frontend: {
+                categories: {
+                    auth: { enabled: true },
+                    ui: { enabled: true },
+                    vulnerability: { enabled: true },
+                    ticket: { enabled: true },
+                    websocket: { enabled: true },
+                    import: { enabled: true },
+                    database: { enabled: true }
+                }
+            },
+            emojis: { debug: '🐛', info: 'ℹ️', warn: '⚠️', error: '❌', success: '✅' }
+        };
     }
 
     /**
@@ -49,51 +102,168 @@ class Logger {
     }
 
     /**
+     * Check if logging should occur for given level and category
+     * @private
+     * @param {string} level - Log level (debug, info, warn, error)
+     * @param {string} category - Log category (auth, ui, vulnerability, etc.)
+     * @returns {boolean} Whether to log
+     */
+    _shouldLog(level, category) {
+        // If config not loaded yet, allow all logs
+        if (!this.configLoaded) {
+            return true;
+        }
+
+        // Check global enabled flag
+        if (!this.config?.global?.enabled) {
+            return false;
+        }
+
+        // Check category-specific toggle
+        if (category && this.config?.frontend?.categories?.[category]) {
+            return this.config.frontend.categories[category].enabled !== false;
+        }
+
+        // Default: allow if no category specified or category not found
+        return true;
+    }
+
+    /**
      * Debug log - only shown in debug mode or development
      * Use for verbose debugging, performance traces, state dumps
+     * @param {string} category - Log category (auth, ui, vulnerability, etc.)
      * @param {...any} args - Arguments to log
      */
-    log(...args) {
+    log(category, ...args) {
+        // Support legacy usage without category
+        if (typeof category !== 'string' || !this._shouldLog('debug', category)) {
+            if (typeof category !== 'string') {
+                args.unshift(category);
+                category = null;
+            } else {
+                return; // Category disabled
+            }
+        }
+
         if (this.debugMode || this.isDevelopment) {
             console.log(...args);
         }
     }
 
     /**
-     * Debug log - alias for log()
+     * Debug log - category-aware
+     * @param {string} category - Log category (auth, ui, vulnerability, etc.)
      * @param {...any} args - Arguments to log
      */
-    debug(...args) {
+    debug(category, ...args) {
+        // Support legacy usage without category
+        if (typeof category !== 'string' || !this._shouldLog('debug', category)) {
+            if (typeof category !== 'string') {
+                args.unshift(category);
+                category = null;
+            } else {
+                return; // Category disabled
+            }
+        }
+
         if (this.debugMode || this.isDevelopment) {
             console.log(...args);
         }
     }
 
     /**
-     * Info log - always shown (important operational messages)
+     * Info log - category-aware, always shown (important operational messages)
      * Use for: User actions, feature milestones, cache hits/misses
+     * @param {string} category - Log category (auth, ui, vulnerability, etc.)
      * @param {...any} args - Arguments to log
      */
-    info(...args) {
+    info(category, ...args) {
+        // Support legacy usage without category
+        if (typeof category !== 'string' || !this._shouldLog('info', category)) {
+            if (typeof category !== 'string') {
+                args.unshift(category);
+                category = null;
+            } else {
+                return; // Category disabled
+            }
+        }
+
         console.info(...args);
     }
 
     /**
-     * Warning log - always shown
+     * Warning log - category-aware, always shown
      * Use for: Deprecations, fallbacks, non-critical errors
+     * @param {string} category - Log category (auth, ui, vulnerability, etc.)
      * @param {...any} args - Arguments to log
      */
-    warn(...args) {
+    warn(category, ...args) {
+        // Support legacy usage without category
+        if (typeof category !== 'string' || !this._shouldLog('warn', category)) {
+            if (typeof category !== 'string') {
+                args.unshift(category);
+                category = null;
+            } else {
+                return; // Category disabled
+            }
+        }
+
         console.warn(...args);
     }
 
     /**
-     * Error log - always shown
+     * Error log - category-aware, always shown
      * Use for: Exceptions, failed API calls, critical issues
+     * @param {string} category - Log category (auth, ui, vulnerability, etc.)
      * @param {...any} args - Arguments to log
      */
-    error(...args) {
+    error(category, ...args) {
+        // Support legacy usage without category
+        if (typeof category !== 'string' || !this._shouldLog('error', category)) {
+            if (typeof category !== 'string') {
+                args.unshift(category);
+                category = null;
+            } else {
+                return; // Category disabled
+            }
+        }
+
         console.error(...args);
+    }
+
+    /**
+     * Audit log - sends encrypted log to backend
+     * @param {string} category - Audit category (user.login, ticket.delete, etc.)
+     * @param {string} message - Audit message
+     * @param {Object} [data] - Additional data to log
+     * @returns {Promise<void>}
+     */
+    async audit(category, message, data = null) {
+        try {
+            // Check if audit logging is enabled
+            if (!this.config?.global?.auditEnabled) {
+                return;
+            }
+
+            // Send to backend audit endpoint
+            const response = await fetch('/api/audit-logs', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    category,
+                    message,
+                    data
+                })
+            });
+
+            if (!response.ok) {
+                console.warn('Failed to write audit log:', response.statusText);
+            }
+        } catch (error) {
+            console.warn('Audit log failed:', error.message);
+        }
     }
 
     /**

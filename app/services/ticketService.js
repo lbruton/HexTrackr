@@ -137,8 +137,9 @@ class TicketService {
                 created_at, updated_at, site, xt_number, site_id, location_id,
                 shipping_line1, shipping_line2, shipping_city, shipping_state, shipping_zip,
                 return_line1, return_line2, return_city, return_state, return_zip,
-                outbound_tracking, return_tracking, site_address, return_address
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                outbound_tracking, return_tracking, site_address, return_address,
+                software_versions, mitigation_details
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
             const params = [
                 payload.id,
@@ -189,7 +190,10 @@ class TicketService {
                     payload.returnCity || payload.return_city,
                     payload.returnState || payload.return_state,
                     payload.returnZip || payload.return_zip
-                )
+                ),
+                // Job-specific fields
+                payload.softwareVersions || payload.software_versions || null,
+                payload.mitigationDetails || payload.mitigation_details || null
             ];
 
             this.db.run(sql, params, function(err) {
@@ -256,7 +260,11 @@ class TicketService {
                 returnState: ticket.returnState ?? ticket.return_state ?? existingTicket.return_state,
                 returnZip: ticket.returnZip ?? ticket.return_zip ?? existingTicket.return_zip,
                 outboundTracking: ticket.outboundTracking ?? ticket.outbound_tracking ?? existingTicket.outbound_tracking,
-                returnTracking: ticket.returnTracking ?? ticket.return_tracking ?? existingTicket.return_tracking
+                returnTracking: ticket.returnTracking ?? ticket.return_tracking ?? existingTicket.return_tracking,
+
+                // Job-specific fields
+                softwareVersions: ticket.softwareVersions ?? ticket.software_versions ?? existingTicket.software_versions,
+                mitigationDetails: ticket.mitigationDetails ?? ticket.mitigation_details ?? existingTicket.mitigation_details
             };
 
             return new Promise((resolve, reject) => {
@@ -266,7 +274,8 @@ class TicketService {
                     attachments = ?, updated_at = ?, site = ?, xt_number = ?, site_id = ?, location_id = ?,
                     shipping_line1 = ?, shipping_line2 = ?, shipping_city = ?, shipping_state = ?, shipping_zip = ?,
                     return_line1 = ?, return_line2 = ?, return_city = ?, return_state = ?, return_zip = ?,
-                    outbound_tracking = ?, return_tracking = ?, site_address = ?, return_address = ?
+                    outbound_tracking = ?, return_tracking = ?, site_address = ?, return_address = ?,
+                    software_versions = ?, mitigation_details = ?
                     WHERE id = ?`;
                 const params = [
                     payload.dateSubmitted,
@@ -316,6 +325,9 @@ class TicketService {
                         payload.returnState,
                         payload.returnZip
                     ),
+                    // Job-specific fields
+                    payload.softwareVersions || null,
+                    payload.mitigationDetails || null,
                     ticketId
                 ];
 

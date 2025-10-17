@@ -53,6 +53,7 @@ const ImportController = require("../controllers/importController");
 const DocsController = require("../controllers/docsController");
 const AuthController = require("../controllers/authController");
 const PreferencesController = require("../controllers/preferencesController");
+const AuditLogController = require("../controllers/auditLogController"); // HEX-254: Audit log API
 
 // Route modules
 const vulnerabilityRoutes = require("../routes/vulnerabilities");
@@ -67,6 +68,7 @@ const paloRoutes = require("../routes/palo-alto"); // HEX-209: Palo Alto advisor
 const deviceRoutes = require("../routes/devices"); // HEX-101: Device statistics endpoint
 const authRoutes = require("../routes/auth");
 const preferencesRoutes = require("../routes/preferences"); // HEX-138: User preferences API
+const auditLogRoutes = require("../routes/auditLogs"); // HEX-254: Audit log API
 
 // Express application & HTTP/HTTPS server
 const app = express();
@@ -185,6 +187,7 @@ async function initializeApplication() {
     TemplateController.initialize(db);
     AuthController.initialize(db);
     PreferencesController.initialize(db); // HEX-138: User preferences
+    AuditLogController.initialize(); // HEX-254: Audit log API (uses global logger)
 
     // Seed email templates (v1.0.21 feature)
     const { seedAllTemplates } = require("../utils/seedEmailTemplates");
@@ -284,6 +287,7 @@ async function initializeApplication() {
     app.use("/api/devices", deviceRoutes); // HEX-101: Device statistics endpoint
     app.use("/api/auth", authRoutes);
     app.use("/api/preferences", preferencesRoutes); // HEX-138: User preferences
+    app.use("/api/audit-logs", auditLogRoutes); // HEX-254: Audit log API
 
     // Legacy lightweight endpoints retained from monolith
     app.get("/api/sites", (req, res) => {
@@ -435,6 +439,7 @@ async function initializeApplication() {
  */
 function startCiscoBackgroundSync(db) {
     const SYNC_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+    const STARTUP_DELAY = 5 * 60 * 1000; // 5 minutes - prevent database corruption on rapid Docker restarts
     const ADMIN_USER_ID = "00000000-0000-0000-0000-000000000001"; // Default admin user UUID
 
     const preferencesService = new PreferencesService();
@@ -492,11 +497,11 @@ function startCiscoBackgroundSync(db) {
         }
     }
 
-    // Run initial sync on startup (after 10 second delay to let server fully initialize)
-    console.log("⏰ Cisco advisory background sync scheduled (runs on startup + every 24 hours)");
+    // Run initial sync on startup (5 minute delay to prevent database corruption on rapid restarts)
+    console.log("⏰ Cisco advisory background sync scheduled (runs 5 min after startup + every 24 hours)");
     setTimeout(() => {
         runSync();
-    }, 10000);
+    }, STARTUP_DELAY);
 
     // Schedule recurring sync every 24 hours
     setInterval(runSync, SYNC_INTERVAL);
@@ -548,11 +553,12 @@ function startCiscoBackgroundSync(db) {
         }
     }
 
-    // Run initial sync on startup (after 20 second delay, staggered from Cisco)
-    console.log("⏰ Palo Alto advisory background sync scheduled (runs on startup + every 24 hours)");
+    // Run initial sync on startup (5 min + 30s delay, staggered after Cisco to prevent overlap)
+    const PALO_STARTUP_DELAY = STARTUP_DELAY + 30000; // 5 minutes 30 seconds
+    console.log("⏰ Palo Alto advisory background sync scheduled (runs 5.5 min after startup + every 24 hours)");
     setTimeout(() => {
         runPaloSync();
-    }, 20000); // 20s delay (staggered after Cisco's 10s)
+    }, PALO_STARTUP_DELAY);
 
     // Schedule recurring sync every 24 hours
     setInterval(runPaloSync, SYNC_INTERVAL);
