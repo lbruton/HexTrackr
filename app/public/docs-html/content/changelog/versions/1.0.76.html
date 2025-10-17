@@ -1,0 +1,99 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.76</h1><hr>
+<h2>[1.0.76]</h2><h3>Changed</h3><h4>Frontend Shared Utilities Migration (HEX-254/HEX-275) - 2025-10-17</h4><p><strong>Description</strong>: Migrated frontend shared utility scripts (progress modals, settings, ticket views, modal monitoring) to use the unified logging system with category-aware logging.</p>
+<p><strong>Key Changes</strong>:</p>
+<ul>
+<li>Migrated shared utility scripts to enhanced logger</li>
+<li>Replaced all raw console statements with category-aware logger methods</li>
+<li>Enhanced frontend utility logging consistency across all shared components</li>
+<li>Completed frontend migration phase of unified logging system</li>
+</ul>
+<p><strong>Technical Implementation</strong>:</p>
+<ul>
+<li>Replaced <code>console.log()</code> calls with <code>logger.debug(&#39;ui&#39;, message, data)</code></li>
+<li>Replaced <code>console.warn()</code> calls with <code>logger.warn(&#39;ui&#39;, message, data)</code></li>
+<li>Replaced <code>console.error()</code> calls with <code>logger.error(&#39;ui&#39;, message, data)</code></li>
+<li>All UI logging now respects configuration from <code>/config/logging.config.json</code></li>
+<li>Category-based filtering enables targeted debugging of utility interactions</li>
+</ul>
+<p><strong>Use Case</strong>: Frontend developers can now filter utility script logs (modals, progress tracking, settings) using the same category-based system as page controllers and backend services. This completes the frontend migration phase.</p>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li>TBD (to be updated during implementation)</li>
+</ul>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li><input disabled="" type="checkbox"> Application loads correctly at <a href="https://dev.hextrackr.com">https://dev.hextrackr.com</a></li>
+<li><input disabled="" type="checkbox"> Modals open and display data correctly</li>
+<li><input disabled="" type="checkbox"> Progress tracking functional</li>
+<li><input disabled="" type="checkbox"> Settings modal works as expected</li>
+<li><input disabled="" type="checkbox"> Browser console shows categorized logger output</li>
+<li><input disabled="" type="checkbox"> No raw console statements remain in migrated files</li>
+<li><input disabled="" type="checkbox"> Logger configuration controls output levels</li>
+<li><input disabled="" type="checkbox"> Docker restart successful</li>
+<li><input disabled="" type="checkbox"> Application logs show clean category-based output</li>
+</ul>
+<p><strong>Issues</strong>:</p>
+<ul>
+<li><a href="https://linear.app/hextrackr/issue/HEX-254">HEX-254</a> - Parent: Implement Unified Logging System with Audit Trail</li>
+<li><a href="https://linear.app/hextrackr/issue/HEX-275">HEX-275</a> - Session 12: Frontend Shared Utilities Migration to LoggingService</li>
+</ul>
+<hr>
+<h2>Progress Tracker</h2><p><strong>Logging System Migration</strong> (HEX-254):</p>
+<ul>
+<li><strong>Completed</strong>: 11 / 14 sessions (79%)</li>
+<li><strong>Session 12</strong>: Frontend shared utilities (IN PROGRESS)</li>
+<li><strong>Previous Sessions</strong>:<ul>
+<li>✅ Session 1-3: Foundation (config, backend service, frontend enhancement)</li>
+<li>✅ Session 4-5: Cleanup (HEX references, emojis)</li>
+<li>✅ Session 6: Auth services migration</li>
+<li>✅ Session 7: Database service migration</li>
+<li>✅ Session 8: Import service migration</li>
+<li>✅ Session 9: Priority backend services migration</li>
+<li>✅ Session 10: Frontend core data layer</li>
+<li>✅ Session 11: Frontend UI &amp; page scripts</li>
+<li>🚧 Session 12: Frontend shared utilities</li>
+</ul>
+</li>
+<li><strong>Remaining Sessions</strong>:<ul>
+<li>Session 13: Admin UI - Audit log viewer</li>
+<li>Session 14: Final testing &amp; documentation</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2>Notes</h2><h3>Migration Pattern</h3><p><strong>Frontend Utility Logging Pattern</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// BEFORE</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Progress updated:&#x27;</span>, percent);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">warn</span>(<span class="hljs-string">&#x27;Modal already open&#x27;</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;Failed to load settings:&#x27;</span>, error);
+
+<span class="hljs-comment">// AFTER</span>
+logger.<span class="hljs-title function_">debug</span>(<span class="hljs-string">&#x27;ui&#x27;</span>, <span class="hljs-string">&#x27;Progress updated:&#x27;</span>, { percent });
+logger.<span class="hljs-title function_">warn</span>(<span class="hljs-string">&#x27;ui&#x27;</span>, <span class="hljs-string">&#x27;Modal already open&#x27;</span>);
+logger.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;ui&#x27;</span>, <span class="hljs-string">&#x27;Failed to load settings:&#x27;</span>, { <span class="hljs-attr">error</span>: error.<span class="hljs-property">message</span> });</code></pre><p><strong>Modal Lifecycle Logging</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Modal initialization</span>
+logger.<span class="hljs-title function_">info</span>(<span class="hljs-string">&#x27;ui&#x27;</span>, <span class="hljs-string">&#x27;Progress modal initialized&#x27;</span>);
+
+<span class="hljs-comment">// User interaction</span>
+logger.<span class="hljs-title function_">debug</span>(<span class="hljs-string">&#x27;ui&#x27;</span>, <span class="hljs-string">&#x27;Settings updated&#x27;</span>, { <span class="hljs-attr">setting</span>: key, value });
+
+<span class="hljs-comment">// Error handling</span>
+logger.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;ui&#x27;</span>, <span class="hljs-string">&#x27;Modal failed to open&#x27;</span>, { <span class="hljs-attr">error</span>: err.<span class="hljs-property">message</span>, <span class="hljs-attr">context</span>: <span class="hljs-string">&#x27;settings&#x27;</span> });</code></pre><h3>Frontend Logger Categories</h3><p>Available categories for frontend logging:</p>
+<ul>
+<li><code>ui</code> - User interface interactions (Sessions 11-12 ✅)</li>
+<li><code>websocket</code> - WebSocket connections (Session 10 ✅)</li>
+<li><code>vulnerability</code> - Vulnerability data operations (Session 10 ✅)</li>
+<li><code>ticket</code> - Ticket operations</li>
+<li><code>api</code> - API calls</li>
+<li><code>import</code> - Import operations</li>
+<li><code>auth</code> - Authentication</li>
+</ul>
+<hr>
+<p><em>Changelog Version: 1.0.76 | Session 12 | HEX-254 Unified Logging System</em></p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
