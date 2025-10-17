@@ -564,6 +564,52 @@ function startCiscoBackgroundSync(db) {
     setInterval(runPaloSync, SYNC_INTERVAL);
 }
 
+// HEX-272: Graceful shutdown handler to prevent database corruption on Docker restart
+// Docker sends SIGTERM on restart - we need to close DB connection cleanly before exit
+let isShuttingDown = false;
+
+async function gracefulShutdown(signal) {
+    if (isShuttingDown) {
+        console.log("Shutdown already in progress, ignoring additional signal");
+        return;
+    }
+
+    isShuttingDown = true;
+    console.log(`\n${signal} received: Starting graceful shutdown...`);
+
+    try {
+        // 1. Stop accepting new HTTP connections
+        if (server) {
+            console.log("Closing HTTP server (no new connections accepted)...");
+            server.close(() => {
+                console.log("HTTP server closed");
+            });
+        }
+
+        // 2. Checkpoint WAL to flush all pending writes
+        console.log("Checkpointing WAL to flush pending database writes...");
+        await getDatabaseService().checkpoint();
+        console.log("WAL checkpoint completed");
+
+        // 3. Close database connection
+        console.log("Closing database connection...");
+        await getDatabaseService().close();
+        console.log("Database connection closed cleanly");
+
+        // 4. Exit cleanly
+        console.log("Graceful shutdown complete");
+        process.exit(0);
+
+    } catch (error) {
+        console.error("Error during graceful shutdown:", error);
+        process.exit(1);
+    }
+}
+
+// Register shutdown handlers for SIGTERM (Docker stop) and SIGINT (Ctrl+C)
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
 initializeApplication().catch(error => {
     console.error("Failed to start server:", error);
     process.exit(1);
