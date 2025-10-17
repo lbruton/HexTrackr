@@ -33,6 +33,30 @@ class DatabaseService {
     }
 
     /**
+     * Safely log to LoggingService if available
+     * @param {string} level - Log level (info, warn, error, debug)
+     * @param {string} message - Log message
+     * @param {Object} data - Additional data to log
+     */
+    _log(level, message, data = {}) {
+        if (global.logger && global.logger.database && typeof global.logger.database[level] === 'function') {
+            global.logger.database[level](message, data);
+        }
+    }
+
+    /**
+     * Safely create audit log if available
+     * @param {string} category - Audit category
+     * @param {string} message - Audit message
+     * @param {Object} data - Audit data
+     */
+    _audit(category, message, data = {}) {
+        if (global.logger && typeof global.logger.audit === 'function') {
+            global.logger.audit(category, message, data, null, null);
+        }
+    }
+
+    /**
      * Initialize database connection and schema
      * Extracted from server.js lines 1934 + 2785-3280
      */
@@ -48,12 +72,19 @@ class DatabaseService {
                 // Create database connection (from server.js line 1934)
                 this.db = new sqlite3.Database(this.dbPath, (err) => {
                     if (err) {
-                        console.error("Failed to connect to database:", err.message);
+                        this._log('error', "Failed to connect to database", {
+                            error: err.message,
+                            path: this.dbPath
+                        });
                         reject(err);
                         return;
                     }
 
-                    console.log("Connected to SQLite database");
+                    this._log('info', "Database connection established", {
+                        path: this.dbPath,
+                        journalMode: "WAL",
+                        cacheSize: "64MB"
+                    });
                     this.connectionPool.currentConnections = 1;
                     this.isInitialized = true;
 
@@ -111,7 +142,10 @@ class DatabaseService {
                 alterStatements.forEach(sql => {
                     this.db.run(sql, (err) => {
                         if (err && !err.message.includes("duplicate column")) {
-                            console.error("Schema update failed:", err.message);
+                            this._log('error', "Schema update failed", {
+                                error: err.message,
+                                sql: sql.substring(0, 100)
+                            });
                         }
                     });
                 });
@@ -453,13 +487,29 @@ class DatabaseService {
                 return;
             }
 
+            const startTime = Date.now();
+
             this.db.all(sql, params, (err, rows) => {
+                const duration = Date.now() - startTime;
+
                 if (err) {
-                    console.error("Database query error:", err.message);
-                    console.error("SQL:", sql);
-                    console.error("Params:", params);
+                    this._log('error', "Database query error", {
+                        error: err.message,
+                        sql: sql.substring(0, 200),
+                        params: params,
+                        duration: `${duration}ms`
+                    });
                     reject(err);
                 } else {
+                    // Log slow queries (>500ms)
+                    if (duration > 500) {
+                        this._log('warn', "Slow query detected", {
+                            duration: `${duration}ms`,
+                            sql: sql.substring(0, 200),
+                            params: params,
+                            rowCount: rows ? rows.length : 0
+                        });
+                    }
                     resolve(rows);
                 }
             });
@@ -477,13 +527,28 @@ class DatabaseService {
                 return;
             }
 
+            const startTime = Date.now();
+
             this.db.get(sql, params, (err, row) => {
+                const duration = Date.now() - startTime;
+
                 if (err) {
-                    console.error("Database query error:", err.message);
-                    console.error("SQL:", sql);
-                    console.error("Params:", params);
+                    this._log('error', "Database query error", {
+                        error: err.message,
+                        sql: sql.substring(0, 200),
+                        params: params,
+                        duration: `${duration}ms`
+                    });
                     reject(err);
                 } else {
+                    // Log slow queries (>500ms)
+                    if (duration > 500) {
+                        this._log('warn', "Slow query detected", {
+                            duration: `${duration}ms`,
+                            sql: sql.substring(0, 200),
+                            params: params
+                        });
+                    }
                     resolve(row);
                 }
             });
@@ -501,13 +566,29 @@ class DatabaseService {
                 return;
             }
 
+            const startTime = Date.now();
+
             this.db.run(sql, params, function(err) {
+                const duration = Date.now() - startTime;
+
                 if (err) {
-                    console.error("Database execution error:", err.message);
-                    console.error("SQL:", sql);
-                    console.error("Params:", params);
+                    this._log('error', "Database execution error", {
+                        error: err.message,
+                        sql: sql.substring(0, 200),
+                        params: params,
+                        duration: `${duration}ms`
+                    });
                     reject(err);
                 } else {
+                    // Log slow operations (>500ms)
+                    if (duration > 500) {
+                        this._log('warn', "Slow database operation detected", {
+                            duration: `${duration}ms`,
+                            sql: sql.substring(0, 200),
+                            params: params,
+                            changes: this.changes
+                        });
+                    }
                     resolve({
                         lastID: this.lastID,
                         changes: this.changes
@@ -687,7 +768,9 @@ class DatabaseService {
 
             return daysSinceLastVacuum >= config.maintenance.vacuumIntervalDays;
         } catch (error) {
-            console.warn("Error checking VACUUM status:", error.message);
+            this._log('warn', "Error checking VACUUM status", {
+                error: error.message
+            });
             return false;
         }
     }
@@ -699,17 +782,27 @@ class DatabaseService {
     async runVacuum() {
         return new Promise((resolve, reject) => {
             const startTime = Date.now();
-            console.log("Starting database VACUUM operation...");
+            this._log('info', "Starting database VACUUM operation");
 
             this.db.run("VACUUM", async (vacuumErr) => {
                 if (vacuumErr) {
-                    console.error("VACUUM failed:", vacuumErr.message);
+                    this._log('error', "VACUUM operation failed", {
+                        error: vacuumErr.message
+                    });
                     reject(vacuumErr);
                     return;
                 }
 
                 const duration = ((Date.now() - startTime) / 1000).toFixed(2);
-                console.log(` Database VACUUM complete in ${duration}s`);
+                this._log('info', "Database VACUUM completed successfully", {
+                    duration: `${duration}s`
+                });
+
+                // Audit log for VACUUM operation
+                this.this._audit("database.vacuum", "Database VACUUM operation completed", {
+                    duration: `${duration}s`,
+                    startTime: new Date(startTime).toISOString()
+                }, null, null);
 
                 // Record in sync_metadata
                 try {
@@ -719,7 +812,9 @@ class DatabaseService {
                     );
                     resolve({ success: true, duration });
                 } catch (metadataErr) {
-                    console.warn("Failed to record VACUUM in sync_metadata:", metadataErr.message);
+                    this._log('warn', "Failed to record VACUUM in sync_metadata", {
+                        error: metadataErr.message
+                    });
                     resolve({ success: true, duration }); // VACUUM succeeded even if metadata failed
                 }
             });
@@ -734,21 +829,25 @@ class DatabaseService {
         const { config } = require("../config/database");
 
         if (!config.maintenance.enableAutoVacuum) {
-            console.log("Auto-VACUUM disabled in config");
+            this._log('info', "Auto-VACUUM disabled in configuration");
             return;
         }
 
-        console.log(` Auto-VACUUM enabled: every ${config.maintenance.vacuumIntervalDays} days`);
+        this._log('info', "Auto-VACUUM scheduler started", {
+            intervalDays: config.maintenance.vacuumIntervalDays
+        });
 
         // Check immediately on startup
         try {
             const shouldRun = await this.shouldRunVacuum();
             if (shouldRun) {
-                console.log("Running startup VACUUM (overdue)...");
+                this._log('info', "Running startup VACUUM (overdue)");
                 await this.runVacuum();
             }
         } catch (error) {
-            console.error("Startup VACUUM check failed:", error.message);
+            this._log('error', "Startup VACUUM check failed", {
+                error: error.message
+            });
         }
 
         // Schedule periodic checks (daily at 2 AM)
@@ -759,12 +858,14 @@ class DatabaseService {
                 if (now.getHours() === 2) { // Run at 2 AM
                     const shouldRun = await this.shouldRunVacuum();
                     if (shouldRun) {
-                        console.log("Running scheduled VACUUM...");
+                        this._log('info', "Running scheduled VACUUM");
                         await this.runVacuum();
                     }
                 }
             } catch (error) {
-                console.error("Scheduled VACUUM check failed:", error.message);
+                this._log('error', "Scheduled VACUUM check failed", {
+                    error: error.message
+                });
             }
         }, checkInterval);
     }
@@ -781,17 +882,21 @@ class DatabaseService {
 
             // Wait for active transactions to complete
             if (this.activeTransactions.size > 0) {
-                console.log(`Waiting for ${this.activeTransactions.size} active transactions to complete...`);
+                this._log('info', "Waiting for active transactions to complete", {
+                    activeTransactions: this.activeTransactions.size
+                });
                 setTimeout(() => this.close().then(resolve).catch(reject), 1000);
                 return;
             }
 
             this.db.close((err) => {
                 if (err) {
-                    console.error("Error closing database:", err.message);
+                    this._log('error', "Error closing database connection", {
+                        error: err.message
+                    });
                     reject(err);
                 } else {
-                    console.log("Database connection closed");
+                    this._log('info', "Database connection closed successfully");
                     this.isInitialized = false;
                     this.connectionPool.currentConnections = 0;
                     resolve();
