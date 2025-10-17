@@ -1488,9 +1488,10 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Ensure both editors are available
             if (window.ticketEditor && window.templateEditor) {
-                console.log('✅ Unified edit mode ready');
+                console.log('Unified edit mode ready');
             } else {
-                console.warn('⚠️ Some editors not available for unified mode');
+                // Not a problem - editors load on demand
+                console.debug('Unified edit mode: editors will initialize on first use');
             }
         });
     </script>
