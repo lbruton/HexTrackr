@@ -57,7 +57,7 @@ function escapeHtml(text) {
  */
 
 // 🚀 HEXTRACKR SETTINGS MODAL - SHARED COMPONENT
-console.log("HexTrackr Settings Modal (shared) loaded successfully");
+logger.debug("ui", "HexTrackr Settings Modal (shared) loaded successfully");
 
 /**
  * Settings Modal State Management
@@ -73,9 +73,9 @@ console.log("HexTrackr Settings Modal (shared) loaded successfully");
         await this.loadModalHtml();
         this.setupEventListeners();
         initServiceNowSettings(); // Call as standalone function instead of method
-        console.log("Settings modal initialized");
+        logger.debug("ui", "Settings modal initialized");
       } catch (error) {
-        console.error("Failed to initialize settings modal:", error);
+        logger.error("ui", "Failed to initialize settings modal:", error);
       }
     },
 
@@ -108,10 +108,10 @@ console.log("HexTrackr Settings Modal (shared) loaded successfully");
         // Get reference to the modal element for Bootstrap
         this.modal = document.getElementById("settingsModal");
         
-        console.log("HexTrackr Settings Modal (shared) loaded successfully");
+        logger.debug("ui", "HexTrackr Settings Modal (shared) loaded successfully");
         
       } catch (error) {
-        console.error("Failed to load shared settings modal:", error);
+        logger.error("ui", "Failed to load shared settings modal:", error);
         throw error;
       }
     },
@@ -193,7 +193,7 @@ console.log("HexTrackr Settings Modal (shared) loaded successfully");
             });
         });
 
-        console.log("Settings modal event listeners configured");
+        logger.debug("ui", "Settings modal event listeners configured");
     },
     
     /**
@@ -237,12 +237,12 @@ console.log("HexTrackr Settings Modal (shared) loaded successfully");
                     }
                 });
 
-                console.log(` Switched to ${sectionId} section`);
+                logger.debug("ui", ` Switched to ${sectionId} section`);
             } else {
-                console.warn(` Section ${targetSectionId} not found`);
+                logger.warn("ui", ` Section ${targetSectionId} not found`);
             }
         } else {
-            console.warn(` Unknown section ID: ${sectionId}`);
+            logger.warn("ui", ` Unknown section ID: ${sectionId}`);
         }
     }
 };
@@ -275,7 +275,7 @@ async function refreshStats() {
             dbSizeEl.textContent = sizeStr;
         }
     } catch (error) {
-        console.error("Error fetching stats:", error);
+        logger.error("ui", "Error fetching stats:", error);
         showNotification("Error loading statistics", "danger");
     }
 }
@@ -321,7 +321,7 @@ async function exportData(type) {
             throw new Error("Export failed");
         }
     } catch (error) {
-        console.error("Error creating export:", error);
+        logger.error("ui", "Error creating export:", error);
         showNotification(`Export failed: ${error.message}`, "danger");
     }
 }
@@ -473,7 +473,7 @@ async function backupData(type) {
         showNotification(`ZIP backup created: ${filename}`, "success");
         
     } catch (error) {
-        console.error("Error creating ZIP backup:", error);
+        logger.error("ui", "Error creating ZIP backup:", error);
         showNotification(`ZIP backup failed: ${error.message}`, "danger");
     }
 }
@@ -516,7 +516,7 @@ async function importData(type) {
                 throw new Error(error.message || "Import failed");
             }
         } catch (error) {
-            console.error("Error importing data:", error);
+            logger.error("ui", "Error importing data:", error);
             showNotification(`Import failed: ${error.message}`, "danger");
         }
     };
@@ -559,7 +559,7 @@ async function clearData(type) {
             throw new Error("Clear operation failed");
         }
     } catch (error) {
-        console.error("Error clearing data:", error);
+        logger.error("ui", "Error clearing data:", error);
         showNotification(`Error clearing data: ${error.message}`, "danger");
     }
 }
@@ -663,7 +663,7 @@ async function openCiscoCredentialsModal() {
         const credentialsModal = new bootstrap.Modal(document.getElementById("ciscoCredentialsModal"));
         credentialsModal.show();
     } catch (error) {
-        console.error("Error opening Cisco credentials modal:", error);
+        logger.error("ui", "Error opening Cisco credentials modal:", error);
         showNotification("Failed to open credentials modal", "error");
     }
 }
@@ -706,7 +706,7 @@ async function saveCiscoCredentials() {
 
         if (window.preferencesSync) {
             await window.preferencesSync.syncCiscoCredentials(ciscoApiKey);
-            console.log("🔒 Cisco credentials saved to database");
+            logger.debug("ui", "🔒 Cisco credentials saved to database");
 
             // Update status in main settings card
             const credentialButton = document.getElementById("manageCiscoCredentials");
@@ -737,7 +737,7 @@ async function saveCiscoCredentials() {
             throw new Error("PreferencesSync not available");
         }
     } catch (error) {
-        console.error("Failed to save Cisco credentials:", error);
+        logger.error("ui", "Failed to save Cisco credentials:", error);
         showNotification("Failed to save credentials: " + error.message, "error");
     } finally {
         // Re-enable save button
@@ -772,7 +772,7 @@ async function clearCiscoCredentials() {
             const result = await window.preferencesSync.prefsService.deletePreference("cisco_api_key");
 
             if (result.success) {
-                console.log("Cisco credentials deleted from database");
+                logger.debug("ui", "Cisco credentials deleted from database");
 
                 // Update status in main settings card
                 const credentialButton = document.getElementById("manageCiscoCredentials");
@@ -802,7 +802,7 @@ async function clearCiscoCredentials() {
             throw new Error("PreferencesSync not available");
         }
     } catch (error) {
-        console.error("Failed to clear Cisco credentials:", error);
+        logger.error("ui", "Failed to clear Cisco credentials:", error);
         showNotification("Failed to clear credentials: " + error.message, "error");
     } finally {
         // Re-enable button
@@ -909,7 +909,7 @@ async function loadCiscoSyncStatus() {
             }
         }
     } catch (error) {
-        console.error("Error loading Cisco sync status:", error);
+        logger.error("ui", "Error loading Cisco sync status:", error);
     }
 }
 
@@ -981,7 +981,7 @@ async function syncCiscoNow() {
             throw new Error(result.message || result.error || "Unknown sync error");
         }
     } catch (error) {
-        console.error("Cisco sync error:", error);
+        logger.error("ui", "Cisco sync error:", error);
         showNotification("Failed to sync Cisco advisories: " + error.message, "error");
 
         if (statusBadge) {
@@ -1019,7 +1019,7 @@ async function toggleCiscoAutoSync() {
             );
 
             if (result.success) {
-                console.log(` Cisco background sync ${isEnabled ? "enabled" : "disabled"}`);
+                logger.debug("ui", ` Cisco background sync ${isEnabled ? "enabled" : "disabled"}`);
                 showNotification(`Background sync ${isEnabled ? "enabled" : "disabled"}`, "success");
             } else {
                 throw new Error(result.error || "Failed to save preference");
@@ -1028,7 +1028,7 @@ async function toggleCiscoAutoSync() {
             throw new Error("PreferencesService not available");
         }
     } catch (error) {
-        console.error("Failed to toggle Cisco background sync:", error);
+        logger.error("ui", "Failed to toggle Cisco background sync:", error);
         showNotification("Failed to update background sync setting: " + error.message, "error");
         // Revert checkbox on error
         if (autoSyncCheckbox) {
@@ -1077,7 +1077,7 @@ async function syncKevData() {
         showNotification(`KEV sync completed: ${result.totalKevs} total KEVs, ${result.matchedCount} matched in your environment`, "success");
 
     } catch (error) {
-        console.error("KEV sync error:", error);
+        logger.error("ui", "KEV sync error:", error);
         showNotification("Failed to sync KEV data: " + error.message, "error");
 
         if (statusBadge) {
@@ -1120,7 +1120,7 @@ async function toggleKevAutoSync() {
             throw new Error("PreferencesService not available");
         }
     } catch (error) {
-        console.error("Failed to toggle KEV auto-sync:", error);
+        logger.error("ui", "Failed to toggle KEV auto-sync:", error);
         showNotification("Failed to update KEV auto-sync setting", "error");
         // Revert checkbox on error
         autoSyncCheckbox.checked = !autoSyncCheckbox.checked;
@@ -1162,7 +1162,7 @@ function updateKevSyncStatus(status) {
     // Store last sync time to preferences API (removed localStorage)
     if (window.preferencesService && status.lastSync) {
         window.preferencesService.setPreference("kev_last_sync", status.lastSync)
-            .catch(err => console.warn("Failed to save KEV last sync time:", err));
+            .catch(err => logger.warn("ui", "Failed to save KEV last sync time:", err));
     }
 }
 
@@ -1212,7 +1212,7 @@ async function loadKevSyncStatus() {
             updateKevSyncStatus(status);
         }
     } catch (error) {
-        console.error("Error loading KEV status:", error);
+        logger.error("ui", "Error loading KEV status:", error);
     }
 }
 
@@ -1256,7 +1256,7 @@ async function syncPaloNow() {
         showNotification(`Palo Alto sync completed: ${result.totalAdvisories} advisories, ${result.matchedCount} with fixed versions`, "success");
 
     } catch (error) {
-        console.error("Palo Alto sync error:", error);
+        logger.error("ui", "Palo Alto sync error:", error);
         showNotification("Failed to sync Palo Alto advisories: " + error.message, "error");
 
         if (statusBadge) {
@@ -1299,7 +1299,7 @@ async function togglePaloAutoSync() {
             throw new Error("PreferencesService not available");
         }
     } catch (error) {
-        console.error("Failed to toggle Palo Alto auto-sync:", error);
+        logger.error("ui", "Failed to toggle Palo Alto auto-sync:", error);
         showNotification("Failed to update Palo Alto auto-sync setting", "error");
         // Revert checkbox on error
         autoSyncCheckbox.checked = !autoSyncCheckbox.checked;
@@ -1346,7 +1346,7 @@ function updatePaloSyncStatus(status) {
     // Store last sync time to preferences API
     if (window.preferencesService && status.lastSync) {
         window.preferencesService.setPreference("palo_last_sync", status.lastSync)
-            .catch(err => console.warn("Failed to save Palo Alto last sync time:", err));
+            .catch(err => logger.warn("ui", "Failed to save Palo Alto last sync time:", err));
     }
 }
 
@@ -1396,7 +1396,7 @@ async function loadPaloSyncStatus() {
             updatePaloSyncStatus(status);
         }
     } catch (error) {
-        console.error("Error loading Palo Alto status:", error);
+        logger.error("ui", "Error loading Palo Alto status:", error);
     }
 }
 
@@ -1425,7 +1425,7 @@ async function loadTenableImportStatus() {
             }
         }
     } catch (error) {
-        console.error("Error loading Tenable import status:", error);
+        logger.error("ui", "Error loading Tenable import status:", error);
     }
 }
 
@@ -1437,7 +1437,7 @@ async function loadTenableImportStatus() {
 async function loadSettings() {
     try {
         if (!window.preferencesService) {
-            console.warn("PreferencesService not available, using defaults");
+            logger.warn("ui", "PreferencesService not available, using defaults");
             return;
         }
 
@@ -1474,10 +1474,10 @@ async function loadSettings() {
                 enableApiAuth.checked = prefsMap.api_auth_enabled === true || prefsMap.api_auth_enabled === "true";
             }
 
-            console.log("Settings loaded from preferences API");
+            logger.debug("ui", "Settings loaded from preferences API");
         }
     } catch (error) {
-        console.error("Error loading settings:", error);
+        logger.error("ui", "Error loading settings:", error);
         // Fail silently - use default values
     }
 }
@@ -1512,7 +1512,7 @@ async function saveSettings() {
             const result = await window.preferencesService.setMultiplePreferences(settings);
 
             if (result.success) {
-                console.log("Settings saved to database successfully");
+                logger.debug("ui", "Settings saved to database successfully");
             } else {
                 throw new Error(result.error || "Failed to save settings");
             }
@@ -1538,7 +1538,7 @@ async function saveSettings() {
         }
         
     } catch (error) {
-        console.error("Error saving settings:", error);
+        logger.error("ui", "Error saving settings:", error);
         showNotification("Error saving settings. Please try again.", "danger");
     }
 }
@@ -1551,7 +1551,7 @@ async function saveSettings() {
 function showNotification(message, type) {
     // Fallback notification system
     // This will be replaced with proper toast notifications later
-    console.log(`${type.toUpperCase()}: ${message}`);
+    logger.debug("ui", `${type.toUpperCase()}: ${message}`);
     
     // Try to use page-specific toast if available
     if (window.showToast) {
@@ -1609,7 +1609,7 @@ function initServiceNowSettings() {
 async function loadServiceNowSettings() {
     try {
         if (!window.preferencesService) {
-            console.warn("PreferencesService not available for ServiceNow settings");
+            logger.warn("ui", "PreferencesService not available for ServiceNow settings");
             return;
         }
 
@@ -1645,7 +1645,7 @@ async function loadServiceNowSettings() {
             window.serviceNowSettingsCache.instanceUrl = instanceUrl;
         }
     } catch (error) {
-        console.error("Error loading ServiceNow settings:", error);
+        logger.error("ui", "Error loading ServiceNow settings:", error);
     }
 }
 
@@ -1695,7 +1695,7 @@ async function saveServiceNowSettings() {
             window.refreshPageData("serviceNow");
         }
     } catch (error) {
-        console.error("Error saving ServiceNow settings:", error);
+        logger.error("ui", "Error saving ServiceNow settings:", error);
         showNotification("Failed to save ServiceNow settings", "error");
     }
 }
@@ -1833,7 +1833,7 @@ async function generateServiceNowUrl(ticketNumber) {
         
         return `${baseUrl}/nav_to.do?uri=${encodeURIComponent(tableUrl)}`;
     } catch (error) {
-        console.error("Error generating ServiceNow URL:", error);
+        logger.error("ui", "Error generating ServiceNow URL:", error);
         return null;
     }
 }
@@ -1881,7 +1881,7 @@ function generateServiceNowUrlSync(ticketNumber) {
 
         return `${baseUrl}/nav_to.do?uri=${encodeURIComponent(tableUrl)}`;
     } catch (error) {
-        console.error("Error generating ServiceNow URL (sync):", error);
+        logger.error("ui", "Error generating ServiceNow URL (sync):", error);
         return null;
     }
 }
@@ -1908,7 +1908,7 @@ async function isServiceNowEnabled() {
 
         return enabled && instanceUrl;
     } catch (error) {
-        console.error("Error checking ServiceNow status:", error);
+        logger.error("ui", "Error checking ServiceNow status:", error);
         return false;
     }
 }
@@ -2031,7 +2031,7 @@ async function exportAllDataAsCSV() {
             throw new Error("Failed to fetch data for export");
         }
     } catch (error) {
-        console.error("Error creating all data CSV export:", error);
+        logger.error("ui", "Error creating all data CSV export:", error);
         showNotification(`All data CSV export failed: ${error.message}`, "danger");
     }
 }
@@ -2091,7 +2091,7 @@ async function importCSV(type) {
                     throw new Error(error.message || "Import failed");
                 }
             } catch (error) {
-                console.error("Import error:", error);
+                logger.error("ui", "Import error:", error);
                 showNotification(`Import failed: ${error.message}`, "danger");
             } finally {
                 // Clean up
@@ -2104,7 +2104,7 @@ async function importCSV(type) {
         fileInput.click();
         
     } catch (error) {
-        console.error("Error setting up import:", error);
+        logger.error("ui", "Error setting up import:", error);
         showNotification(`Import setup failed: ${error.message}`, "danger");
     }
 }
@@ -2178,7 +2178,7 @@ async function restoreFullSystemBackup() {
         // Call restoreData with 'all' type
         await restoreData("all");
     } catch (error) {
-        console.error("Error with full system restore:", error);
+        logger.error("ui", "Error with full system restore:", error);
         showNotification(`System restore failed: ${error.message}`, "danger");
     }
 }
@@ -2290,7 +2290,7 @@ async function restoreData(type) {
                     throw new Error(error.message || "Restore failed");
                 }
             } catch (error) {
-                console.error("Error restoring data:", error);
+                logger.error("ui", "Error restoring data:", error);
                 showNotification(`Restore failed: ${error.message}`, "danger");
             } finally {
                 // Clean up
@@ -2303,7 +2303,7 @@ async function restoreData(type) {
         input.click();
         
     } catch (error) {
-        console.error("Error setting up restore:", error);
+        logger.error("ui", "Error setting up restore:", error);
         showNotification(`Restore setup failed: ${error.message}`, "danger");
     }
 }
