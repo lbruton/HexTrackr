@@ -2,6 +2,22 @@ const crypto = require("crypto");
 const { normalizeXtNumber } = require("../utils/helpers");
 
 /**
+ * Defensive logging helpers
+ * Safely log to LoggingService with fallback for initialization
+ */
+function _log(level, message, data = {}) {
+    if (global.logger && global.logger.ticket && typeof global.logger.ticket[level] === 'function') {
+        global.logger.ticket[level](message, data);
+    }
+}
+
+function _audit(category, message, data = {}) {
+    if (global.logger && typeof global.logger.audit === 'function') {
+        global.logger.audit(category, message, data, null, null);
+    }
+}
+
+/**
  * TicketService - Ticket business logic and database operations
  * Extracted from server.js lines: 3320-3344, 3369-3394, 3396-3422, 3424-3435, 3437-3479, 3482-3498, 1802-1874, 3606-3621
  *
@@ -45,7 +61,7 @@ class TicketService {
 
                 // Log the structure of the first row for debugging
                 if (rows.length > 0) {
-                    console.log("Sample ticket row:", Object.keys(rows[0]));
+                    _log('info', "Sample ticket row:", Object.keys(rows[0]));
                 }
 
                 // Transform the rows to ensure each ticket has an id (use xt_number if id is null)
@@ -65,7 +81,7 @@ class TicketService {
                                 [normalizedXt, row.id],
                                 (updateErr) => {
                                     if (updateErr) {
-                                        console.error("Failed to normalize xt_number for ticket", row.id, updateErr);
+                                        _log('error', "Failed to normalize xt_number for ticket", row.id, updateErr);
                                     }
                                 }
                             );
@@ -79,7 +95,7 @@ class TicketService {
                         try {
                             row.devices = JSON.parse(row.devices);
                         } catch (e) {
-                            console.error("Failed to parse devices JSON for ticket", row.id, e);
+                            _log('error', "Failed to parse devices JSON for ticket", row.id, e);
                             row.devices = [];
                         }
                     } else if (!row.devices) {
@@ -430,7 +446,7 @@ class TicketService {
                         await this.createTicket(mappedTicket);
                         imported++;
                     } catch (err) {
-                        console.error("Error importing ticket:", err);
+                        _log('error', "Error importing ticket:", err);
                         skipped++;
                     }
                 }
@@ -481,7 +497,7 @@ class TicketService {
 
                 this.db.run(sql, params, function(err) {
                     if (err) {
-                        console.error("Error migrating ticket:", err);
+                        _log('error', "Error migrating ticket:", err);
                         errorCount++;
                     } else {
                         successCount++;
@@ -540,7 +556,7 @@ class TicketService {
                         mapped.deletedBy || null
                     ], (err) => {
                         if (err) {
-                            console.error(`Error importing ticket row ${index + 1}:`, err);
+                            _log('error', `Error importing ticket row ${index + 1}:`, err);
                             errors.push(`Row ${index + 1}: ${err.message}`);
                         } else {
                             imported++;
@@ -711,7 +727,7 @@ class TicketService {
                     try {
                         row.devices = JSON.parse(row.devices);
                     } catch (parseError) {
-                        console.error(`Failed to parse devices for ticket ${row.id}:`, parseError);
+                        _log('error', `Failed to parse devices for ticket ${row.id}:`, parseError);
                         row.devices = [];
                     }
                     return row;
