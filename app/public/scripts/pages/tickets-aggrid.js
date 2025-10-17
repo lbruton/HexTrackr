@@ -514,6 +514,11 @@
                 maxWidth: 120,
                 filter: "agTextColumnFilter",
                 cellClass: "text-center",
+                valueFormatter: (params) => {
+                    // Suppress AG Grid warning about object data type
+                    const devices = Array.isArray(params.value) ? params.value : [];
+                    return devices.length > 0 ? `${devices.length} device${devices.length > 1 ? 's' : ''}` : 'N/A';
+                },
                 filterValueGetter: (params) => {
                     // Make filter searchable by device names (HEX-241)
                     const devices = Array.isArray(params.data.devices) ? params.data.devices : [];
@@ -732,7 +737,7 @@
             animateRows: true,
             rowHeight: 42,
             domLayout: "autoHeight",
-            rowSelection: "single",
+            rowSelection: { mode: 'singleRow', checkboxes: false, enableClickSelection: true },
             rowClassRules: {
                 "ticket-row-overdue": (params) => {
                     if (!params.data) {return false;}

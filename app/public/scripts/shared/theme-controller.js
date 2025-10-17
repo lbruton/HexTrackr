@@ -92,10 +92,15 @@ export class ThemeController {
     };
     
     // T028: Initialize ChartThemeAdapter for AG-Grid and ApexCharts theme management
+    // (Only available on pages with charts - gracefully degrades if not present)
     try {
-      this.chartThemeAdapter = new window.ChartThemeAdapter();
+      if (typeof window.ChartThemeAdapter === 'function') {
+        this.chartThemeAdapter = new window.ChartThemeAdapter();
+      } else {
+        this.chartThemeAdapter = null; // Not needed on this page
+      }
     } catch (error) {
-      console.warn("ChartThemeAdapter initialization failed:", error);
+      console.debug("ChartThemeAdapter not available on this page (non-critical):", error);
       this.chartThemeAdapter = null;
     }
     
