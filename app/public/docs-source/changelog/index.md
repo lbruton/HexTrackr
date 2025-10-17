@@ -2,7 +2,7 @@
 
 Welcome to the HexTrackr changelog! This page tracks all notable changes, features, and fixes across all versions of HexTrackr.
 
-**Current Version**: [v1.0.65](#changelog/versions/1.0.65)
+**Current Version**: [v1.0.68](#changelog/versions/1.0.68)
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
@@ -14,6 +14,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### Latest Releases
 
+- [**v1.0.68**](#changelog/versions/1.0.68) - 2025-10-17 - 🚧 Logging System Session 4: Remove HEX References
+- [**v1.0.67**](#changelog/versions/1.0.67) - 2025-10-17 - Unified Logging System with Encrypted Audit Trail (Sessions 1-3)
+- [**v1.0.66**](#changelog/versions/1.0.66) - 2025-10-13 - Database Maintenance & Self-Cleaning Architecture
 - [**v1.0.65**](#changelog/versions/1.0.65) - 2025-10-13 - Palo Alto Networks Security Advisory Integration
 - [**v1.0.64**](#changelog/versions/1.0.64) - 2025-10-12 - UI Polish, Search Enhancement & Critical Advisory Sync Fix
 - [**v1.0.63**](#changelog/versions/1.0.63) - 2025-10-11 - Cisco PSIRT Advisory Sync (UI Foundation)
