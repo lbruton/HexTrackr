@@ -38,12 +38,10 @@ class WebSocketClient {
     }
 
     /**
-     * Debug logging method - only logs when debug mode is enabled
+     * Debug logging method - uses enhanced logger with 'websocket' category
      */
-    debug(...args) {
-        if (this.debugMode) {
-            console.log("[WebSocket]", ...args);
-        }
+    debug(message, data = {}) {
+        logger.debug('websocket', message, data);
     }
 
     /**
@@ -70,12 +68,12 @@ class WebSocketClient {
                 } else {
                     // Unknown or unsupported protocol, throw an error instead of defaulting to http
                     const errorMsg = `Unknown or unsupported protocol ('${window.location.protocol}'). Please configure the WebSocket protocol explicitly.`;
-                    this.debug(errorMsg);
+                    this.debug(errorMsg, { protocol: window.location.protocol });
                     reject(new Error(errorMsg));
                     return;
                 }
                 const url = `${protocol}//${this.config.host}${this.config.port ? ":" + this.config.port : ""}`;
-                this.debug("Connecting to WebSocket server:", url);
+                this.debug("Connecting to WebSocket server", { url });
                 
                 this.socket = io(url, {
                     transports: ["polling", "websocket"],
@@ -107,13 +105,13 @@ class WebSocketClient {
                 
                 this.socket.on("connect_error", (error) => {
                     window.clearTimeout(timeout);
-                    console.error("WebSocket connection error:", error);
+                    logger.error('websocket', "WebSocket connection error", { error: error.message });
                     this.handleConnectionError();
                     reject(error);
                 });
-                
+
             } catch (error) {
-                console.error("WebSocket connection failed:", error);
+                logger.error('websocket', "WebSocket connection failed", { error: error.message });
                 reject(error);
             }
         });
@@ -127,15 +125,15 @@ class WebSocketClient {
             this.reconnectAttempts++;
             this.attemptReconnection();
         } else {
-            console.error("Max reconnection attempts reached");
+            logger.error('websocket', "Max reconnection attempts reached", { attempts: this.reconnectAttempts });
             this.triggerCallback("connectionFailed", { attempts: this.reconnectAttempts });
         }
     }
     
     attemptReconnection() {
         const delay = Math.min(this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1), 30000);
-        this.debug(`Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
-        
+        this.debug("Reconnecting to WebSocket", { delay, attempt: this.reconnectAttempts, maxAttempts: this.maxReconnectAttempts });
+
         window.setTimeout(() => {
             this.connect();
         }, delay);
@@ -162,32 +160,32 @@ class WebSocketClient {
         }
         
         this.socket.on("disconnect", (reason) => {
-            this.debug("WebSocket disconnected:", reason);
+            this.debug("WebSocket disconnected", { reason });
             this.isConnected = false;
             this.stopHeartbeat();
-            
+
             if (reason === "io server disconnect") {
                 this.handleConnectionError();
             }
-            
+
             this.triggerCallback("disconnect", { reason });
         });
-        
+
         this.socket.on("pong", () => {
             this.debug("Heartbeat pong received");
         });
-        
+
         this.socket.on("progress-update", (data) => {
             this.handleProgressUpdate(data);
         });
-        
+
         this.socket.on("progress-status", (data) => {
-            this.debug("Progress status:", data);
+            this.debug("Progress status", data);
             this.triggerCallback("progressStatus", data);
         });
-        
+
         this.socket.on("progress-complete", (data) => {
-            this.debug("Progress complete:", data);
+            this.debug("Progress complete", data);
             this.triggerCallback("progressComplete", data);
         });
     }
@@ -240,7 +238,7 @@ class WebSocketClient {
                 try {
                     callback(data);
                 } catch (error) {
-                    console.error(`Error in ${event} callback:`, error);
+                    logger.error('websocket', `Error in ${event} callback`, { error: error.message, event });
                 }
             });
         }
@@ -248,18 +246,18 @@ class WebSocketClient {
     
     joinProgressRoom(sessionId) {
         if (this.isConnected && this.socket) {
-            this.debug("Joining progress room:", sessionId);
+            this.debug("Joining progress room", { sessionId });
             this.socket.emit("join-progress", sessionId);
         }
     }
-    
+
     leaveProgressRoom(sessionId) {
         if (this.isConnected && this.socket) {
-            this.debug("Leaving progress room:", sessionId);
+            this.debug("Leaving progress room", { sessionId });
             this.socket.emit("leave-progress", sessionId);
         }
     }
-    
+
     disconnect() {
         this.debug("Disconnecting WebSocket client");
         this.config.autoReconnect = false;
