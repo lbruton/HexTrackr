@@ -34,10 +34,10 @@
                 throw new Error(`Failed to load config: ${response.status}`);
             }
             deviceNamingConfig = await response.json();
-            console.log("[HEX-241] Loaded device naming config:", deviceNamingConfig.deviceTypePatterns.length, "patterns");
+            console.log("Loaded device naming config:", deviceNamingConfig.deviceTypePatterns.length, "patterns");
             return deviceNamingConfig;
         } catch (error) {
-            console.error("[HEX-241] Failed to load device naming config:", error);
+            console.error("Failed to load device naming config:", error);
             // Return fallback config
             deviceNamingConfig = {
                 deviceTypePatterns: [
@@ -794,9 +794,9 @@
             return;
         }
 
-        // Load device naming config for vendor detection (HEX-241)
+        // Load device naming config for vendor detection
         loadDeviceNamingConfig().catch(err => {
-            console.warn("[HEX-241] Config load failed, using fallback patterns:", err);
+            console.warn("Config load failed, using fallback patterns:", err);
         });
 
         const gridContainer = document.getElementById(GRID_ID);

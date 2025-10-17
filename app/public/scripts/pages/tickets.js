@@ -597,19 +597,19 @@ class HexagonTicketsManager {
      */
     async generateNextXtNumber() {
         // Call backend API to generate next XT# (includes deleted tickets)
-        // HEX-196: No fallback - if API fails, the error should bubble up
-        console.log("[HEX-196] Calling /api/tickets/next-xt-number...");
+        // No fallback - if API fails, the error should bubble up
+        console.log("Calling /api/tickets/next-xt-number...");
         const response = await fetch("/api/tickets/next-xt-number");
-        console.log("[HEX-196] Response status:", response.status, response.statusText);
+        console.log("Response status:", response.status, response.statusText);
 
         if (!response.ok) {
             const errorText = await response.text();
-            console.error("[HEX-196] API error response:", errorText);
+            console.error("API error response:", errorText);
             throw new Error(`Failed to generate XT#: ${response.statusText} - ${errorText}`);
         }
 
         const data = await response.json();
-        console.log("[HEX-196] Backend returned:", data.nextXtNumber);
+        console.log("Backend returned:", data.nextXtNumber);
         return data.nextXtNumber;
     }
 
