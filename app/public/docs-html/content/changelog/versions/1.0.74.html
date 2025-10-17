@@ -1,0 +1,96 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.74</h1><hr>
+<h2>[1.0.74]</h2><h3>Changed</h3><h4>Frontend Core Data Layer Migration (HEX-254/HEX-262) - 2025-10-17</h4><p><strong>Description</strong>: Migrated core frontend data layer scripts (vulnerability-data.js and websocket-client.js) to use the unified logging system with category-aware logging.</p>
+<p><strong>Key Changes</strong>:</p>
+<ul>
+<li>Migrated <code>vulnerability-data.js</code> to use enhanced logger with &#39;vulnerability&#39; category</li>
+<li>Migrated <code>websocket-client.js</code> to use enhanced logger with &#39;websocket&#39; category</li>
+<li>Replaced all raw console statements with category-aware logger methods</li>
+<li>Enhanced frontend logging consistency with backend LoggingService pattern</li>
+</ul>
+<p><strong>Technical Implementation</strong>:</p>
+<ul>
+<li>Replaced <code>console.log()</code> calls with <code>logger.debug(category, message, data)</code></li>
+<li>Replaced <code>console.warn()</code> calls with <code>logger.warn(category, message, data)</code></li>
+<li>Replaced <code>console.error()</code> calls with <code>logger.error(category, message, data)</code></li>
+<li>Replaced WebSocket custom <code>this.debug()</code> calls with logger methods</li>
+<li>All logging now respects configuration from <code>/config/logging.config.json</code></li>
+</ul>
+<p><strong>Use Case</strong>: Frontend developers can now filter vulnerability data operations and WebSocket connection logs using the same category-based system as backend services. This provides consistent debugging across the entire application stack.</p>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/vulnerability-data.js</code>: Migrated console statements to logger.debug/warn/error with &#39;vulnerability&#39; category</li>
+<li><code>app/public/scripts/shared/websocket-client.js</code>: Migrated console statements and custom debug method to logger with &#39;websocket&#39; category</li>
+</ul>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li><input disabled="" type="checkbox"> Vulnerability data loads correctly at <a href="https://dev.hextrackr.com">https://dev.hextrackr.com</a></li>
+<li><input disabled="" type="checkbox"> WebSocket connection establishes successfully</li>
+<li><input disabled="" type="checkbox"> Browser console shows categorized logger output</li>
+<li><input disabled="" type="checkbox"> No raw console statements remain in migrated files</li>
+<li><input disabled="" type="checkbox"> Real-time updates work as expected</li>
+<li><input disabled="" type="checkbox"> Logger configuration controls output levels</li>
+</ul>
+<p><strong>Issues</strong>:</p>
+<ul>
+<li><a href="https://linear.app/hextrackr/issue/HEX-254">HEX-254</a> - Parent: Implement Unified Logging System with Audit Trail</li>
+<li><a href="https://linear.app/hextrackr/issue/HEX-262">HEX-262</a> - Session 10: Frontend Migration - Core Data Layer</li>
+</ul>
+<hr>
+<h2>Progress Tracker</h2><p><strong>Logging System Migration</strong> (HEX-254):</p>
+<ul>
+<li><strong>Completed</strong>: 10 / 14 sessions (71%)</li>
+<li><strong>Session 10</strong>: Frontend core data layer (vulnerability-data.js, websocket-client.js)</li>
+<li><strong>Previous Sessions</strong>:<ul>
+<li>✅ Session 1-3: Foundation (config, backend service, frontend enhancement)</li>
+<li>✅ Session 4-5: Cleanup (HEX references, emojis)</li>
+<li>✅ Session 6: Auth services migration</li>
+<li>✅ Session 7: Database service migration</li>
+<li>✅ Session 8: Import service migration</li>
+<li>✅ Session 9: Priority backend services migration</li>
+<li>✅ Session 10: Frontend core data layer</li>
+</ul>
+</li>
+<li><strong>Remaining Sessions</strong>:<ul>
+<li>Session 11: Frontend UI &amp; page scripts</li>
+<li>Session 12: Frontend shared utilities</li>
+<li>Session 13: Admin UI - Audit log viewer</li>
+<li>Session 14: Final testing &amp; documentation</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2>Notes</h2><h3>Migration Pattern</h3><p><strong>Frontend Logging Pattern</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// BEFORE</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;[VULN-DATA] Loading vulnerabilities...&#x27;</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">warn</span>(<span class="hljs-string">&#x27;Cache miss for key:&#x27;</span>, key);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;Failed to fetch:&#x27;</span>, error);
+
+<span class="hljs-comment">// AFTER</span>
+logger.<span class="hljs-title function_">debug</span>(<span class="hljs-string">&#x27;vulnerability&#x27;</span>, <span class="hljs-string">&#x27;Loading vulnerabilities...&#x27;</span>);
+logger.<span class="hljs-title function_">warn</span>(<span class="hljs-string">&#x27;vulnerability&#x27;</span>, <span class="hljs-string">&#x27;Cache miss for key:&#x27;</span>, { key });
+logger.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;vulnerability&#x27;</span>, <span class="hljs-string">&#x27;Failed to fetch:&#x27;</span>, { <span class="hljs-attr">error</span>: error.<span class="hljs-property">message</span> });</code></pre><p><strong>WebSocket Logging Pattern</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// BEFORE</span>
+<span class="hljs-variable language_">this</span>.<span class="hljs-title function_">debug</span>(<span class="hljs-string">&#x27;WebSocket connected&#x27;</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Message received:&#x27;</span>, data);
+
+<span class="hljs-comment">// AFTER</span>
+logger.<span class="hljs-title function_">debug</span>(<span class="hljs-string">&#x27;websocket&#x27;</span>, <span class="hljs-string">&#x27;WebSocket connected&#x27;</span>);
+logger.<span class="hljs-title function_">info</span>(<span class="hljs-string">&#x27;websocket&#x27;</span>, <span class="hljs-string">&#x27;Message received:&#x27;</span>, { data });</code></pre><h3>Frontend Logger Categories</h3><p>Available categories for frontend logging:</p>
+<ul>
+<li><code>ui</code> - User interface interactions</li>
+<li><code>websocket</code> - WebSocket connections (Session 10 ✅)</li>
+<li><code>vulnerability</code> - Vulnerability data operations (Session 10 ✅)</li>
+<li><code>ticket</code> - Ticket operations</li>
+<li><code>api</code> - API calls</li>
+<li><code>import</code> - Import operations</li>
+<li><code>auth</code> - Authentication</li>
+</ul>
+<hr>
+<p><em>Changelog Version: 1.0.74 | Session 10 | HEX-254 Unified Logging System</em></p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
