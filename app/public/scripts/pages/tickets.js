@@ -157,28 +157,28 @@ class HexagonTicketsManager {
             const response = await authState.authenticatedFetch("/api/tickets");
             if (response.ok) {
                 const rawTickets = await response.json();
-                console.log("Raw tickets from DB:", rawTickets);
-                console.log("First raw ticket:", rawTickets[0]);
+                logger.debug("ui", "Raw tickets from DB:", rawTickets);
+                logger.debug("ui", "First raw ticket:", rawTickets[0]);
                 
                 // Changed from using map with this.transformTicketData to using an arrow function
                 // to ensure 'this' context is preserved
                 this.tickets = rawTickets.map(ticket => this.transformTicketData(ticket));
                 
-                console.log("Loaded", this.tickets.length, "tickets from database");
+                logger.debug("ui", "Loaded", this.tickets.length, "tickets from database");
                 // Debug: Check first ticket to ensure it has an id
                 if (this.tickets.length > 0) {
-                    console.log("First transformed ticket:", this.tickets[0]);
-                    console.log("First ticket ID:", this.tickets[0].id);
+                    logger.debug("ui", "First transformed ticket:", this.tickets[0]);
+                    logger.debug("ui", "First ticket ID:", this.tickets[0].id);
                     
                     // Debug: Check all ticket IDs
-                    console.log("All ticket IDs:", this.tickets.map(t => t.id));
+                    logger.debug("ui", "All ticket IDs:", this.tickets.map(t => t.id));
                 }
             } else {
-                console.error("Failed to load tickets:", response.statusText);
+                logger.error("ui", "Failed to load tickets:", response.statusText);
                 this.showToast("Failed to load tickets from database", "error");
             }
         } catch (error) {
-            console.error("Error loading tickets:", error);
+            logger.error("ui", "Error loading tickets:", error);
             this.showToast("Error connecting to database", "error");
         }
     }
@@ -198,7 +198,7 @@ class HexagonTicketsManager {
 
             if (response.ok) {
                 const result = await response.json();
-                console.log("Ticket saved:", result.message);
+                logger.debug("ui", "Ticket saved:", result.message);
                 // Reload tickets from database to ensure consistency
                 await this.loadTicketsFromDB();
                 return result;
@@ -207,7 +207,7 @@ class HexagonTicketsManager {
                 throw new Error(error.error || "Failed to save ticket");
             }
         } catch (error) {
-            console.error("Error saving ticket:", error);
+            logger.error("ui", "Error saving ticket:", error);
             this.showToast("Error saving ticket: " + error.message, "error");
             throw error;
         }
@@ -225,12 +225,12 @@ class HexagonTicketsManager {
             });
 
             if (response.ok) {
-                console.log(`Ticket ${ticketId} status updated to Overdue`);
+                logger.debug("ui", `Ticket ${ticketId} status updated to Overdue`);
             } else {
-                console.error(`Failed to update ticket ${ticketId} status to Overdue`);
+                logger.error("ui", `Failed to update ticket ${ticketId} status to Overdue`);
             }
         } catch (error) {
-            console.error(`Error updating ticket ${ticketId} to overdue:`, error);
+            logger.error("ui", `Error updating ticket ${ticketId} to overdue:`, error);
         }
     }
 
@@ -242,7 +242,7 @@ class HexagonTicketsManager {
 
             if (response.ok) {
                 const result = await response.json();
-                console.log("Ticket deleted:", result.message);
+                logger.debug("ui", "Ticket deleted:", result.message);
                 // Reload tickets from database to ensure consistency
                 await this.loadTicketsFromDB();
                 return result;
@@ -251,7 +251,7 @@ class HexagonTicketsManager {
                 throw new Error(error.error || "Failed to delete ticket");
             }
         } catch (error) {
-            console.error("Error deleting ticket:", error);
+            logger.error("ui", "Error deleting ticket:", error);
             this.showToast("Error deleting ticket: " + error.message, "error");
             throw error;
         }
@@ -268,7 +268,7 @@ class HexagonTicketsManager {
                 return;
             }
 
-            console.log("Found", tickets.length, "tickets in localStorage, migrating to database...");
+            logger.debug("ui", "Found", tickets.length, "tickets in localStorage, migrating to database...");
             this.showToast("Migrating tickets from localStorage to database...", "info");
 
             const response = await authState.authenticatedFetch("/api/tickets/migrate", {
@@ -281,7 +281,7 @@ class HexagonTicketsManager {
 
             if (response.ok) {
                 const result = await response.json();
-                console.log("Migration successful:", result.message);
+                logger.debug("ui", "Migration successful:", result.message);
                 this.showToast(`Migration successful: ${result.message}`, "success");
                 
                 // Clear localStorage after successful migration
@@ -291,13 +291,13 @@ class HexagonTicketsManager {
                 if (response.status === 409) {
                     // Database already has data, just clear localStorage
                     localStorage.removeItem("hexagonTickets");
-                    console.log("Database already contains tickets, cleared localStorage");
+                    logger.debug("ui", "Database already contains tickets, cleared localStorage");
                 } else {
                     throw new Error(error.error || "Migration failed");
                 }
             }
         } catch (error) {
-            console.error("Migration error:", error);
+            logger.error("ui", "Migration error:", error);
             this.showToast("Migration error: " + error.message, "error");
         }
     }
@@ -368,7 +368,7 @@ class HexagonTicketsManager {
                 // Use setTimeout to ensure DOM is fully rendered before updating device numbers
                 setTimeout(() => {
                     this.updateDeviceNumbers();
-                    console.log("Device numbers updated after modal show");
+                    logger.debug("ui", "Device numbers updated after modal show");
                 }, 100);
             }
         });
@@ -598,18 +598,18 @@ class HexagonTicketsManager {
     async generateNextXtNumber() {
         // Call backend API to generate next XT# (includes deleted tickets)
         // No fallback - if API fails, the error should bubble up
-        console.log("Calling /api/tickets/next-xt-number...");
+        logger.debug("ui", "Calling /api/tickets/next-xt-number...");
         const response = await fetch("/api/tickets/next-xt-number");
-        console.log("Response status:", response.status, response.statusText);
+        logger.debug("ui", "Response status:", response.status, response.statusText);
 
         if (!response.ok) {
             const errorText = await response.text();
-            console.error("API error response:", errorText);
+            logger.error("ui", "API error response:", errorText);
             throw new Error(`Failed to generate XT#: ${response.statusText} - ${errorText}`);
         }
 
         const data = await response.json();
-        console.log("Backend returned:", data.nextXtNumber);
+        logger.debug("ui", "Backend returned:", data.nextXtNumber);
         return data.nextXtNumber;
     }
 
@@ -714,7 +714,7 @@ class HexagonTicketsManager {
                 // Do NOT populate tracking numbers (per requirements)
             }
         } catch (error) {
-            console.error("Error fetching address suggestions:", error);
+            logger.error("ui", "Error fetching address suggestions:", error);
             // Silent fail - don't show error to user
         }
     }
@@ -797,13 +797,13 @@ class HexagonTicketsManager {
         const container = document.getElementById("devicesContainer");
         const deviceEntries = container.querySelectorAll(".device-entry");
         
-        console.log(`Updating ${deviceEntries.length} device numbers`); // Debug log
+        logger.debug("ui", `Updating ${deviceEntries.length} device numbers`); // Debug log
         
         deviceEntries.forEach((entry, index) => {
             const numberIndicator = entry.querySelector(".device-number-indicator");
             if (numberIndicator) {
                 const newNumber = `#${index + 1}`;
-                console.log(`Setting device ${index} to ${newNumber}`); // Debug log
+                logger.debug("ui", `Setting device ${index} to ${newNumber}`); // Debug log
                 numberIndicator.textContent = newNumber;
                 
                 // Add a subtle highlight effect to show the number updated
@@ -816,7 +816,7 @@ class HexagonTicketsManager {
                     numberIndicator.style.color = "#6c757d";
                 }, 800);
             } else {
-                console.warn(`No number indicator found for device ${index}`); // Debug log
+                logger.warn("ui", `No number indicator found for device ${index}`); // Debug log
             }
             
             // Update up/down button states
@@ -846,7 +846,7 @@ class HexagonTicketsManager {
             return; // Nothing to reverse
         }
         
-        console.log("Reversing device order"); // Debug log
+        logger.debug("ui", "Reversing device order"); // Debug log
         
         // Clear the container
         container.innerHTML = "";
@@ -1391,16 +1391,16 @@ class HexagonTicketsManager {
                 throw new Error(error.error || "Failed to delete ticket");
             }
         } catch (error) {
-            console.error("Error deleting ticket:", error);
+            logger.error("ui", "Error deleting ticket:", error);
             this.showToast("Failed to delete ticket: " + error.message, "error");
         }
     }
 
     viewTicket(id) {
-        console.log("viewTicket called with id:", id);
+        logger.debug("ui", "viewTicket called with id:", id);
         const ticket = this.getTicketById(id);
         if (!ticket) {
-            console.error("Ticket not found with id:", id);
+            logger.error("ui", "Ticket not found with id:", id);
             return;
         }
 
@@ -1409,7 +1409,7 @@ class HexagonTicketsManager {
             // Display in the markdown view modal
             document.getElementById("markdownContent").textContent = markdownContent;
         }).catch(error => {
-            console.error("Error generating ticket markdown:", error);
+            logger.error("ui", "Error generating ticket markdown:", error);
             document.getElementById("markdownContent").textContent = "Error loading ticket details";
         });
         document.getElementById("viewTicketModal").setAttribute("data-ticket-id", id);
@@ -1472,15 +1472,15 @@ class HexagonTicketsManager {
         // Check if we're using Bootstrap or Tabler
         const viewTicketModal = document.getElementById("viewTicketModal");
         if (typeof bootstrap !== "undefined" && bootstrap.Modal) {
-            console.log("Using Bootstrap Modal");
+            logger.debug("ui", "Using Bootstrap Modal");
             const modal = new bootstrap.Modal(viewTicketModal);
             modal.show();
         } else if (typeof Tabler !== "undefined" && Tabler.Modal) {
-            console.log("Using Tabler Modal");
+            logger.debug("ui", "Using Tabler Modal");
             const modal = new Tabler.Modal(viewTicketModal);
             modal.show();
         } else {
-            console.log("Manually showing modal with jQuery or native methods");
+            logger.debug("ui", "Manually showing modal with jQuery or native methods");
             // Fallback to manually adding the classes
             viewTicketModal.classList.add("show");
             viewTicketModal.style.display = "block";
@@ -1512,7 +1512,7 @@ class HexagonTicketsManager {
         const ticketId = this.currentEditingId;
 
         if (!ticketId) {
-            console.error("[Modal Switch] No ticket ID available - cannot switch to view modal");
+            logger.error("ui", "[Modal Switch] No ticket ID available - cannot switch to view modal");
             this.showToast("Cannot view ticket - no ticket ID found", "error");
             return;
         }
@@ -1535,7 +1535,7 @@ class HexagonTicketsManager {
         const ticket = this.getTicketById(ticketId);
 
         if (!ticket) {
-            console.error("[VulnModal] No ticket found for vulnerability loading");
+            logger.error("ui", "[VulnModal] No ticket found for vulnerability loading");
             return;
         }
 
@@ -1556,9 +1556,9 @@ class HexagonTicketsManager {
             }
 
             // Fetch vulnerabilities for this ticket's devices
-            console.log("[VulnModal] Fetching vulnerabilities for devices:", ticket.devices);
+            logger.debug("ui", "[VulnModal] Fetching vulnerabilities for devices:", ticket.devices);
             const vulnerabilities = await this.fetchVulnerabilitiesForDevices(ticket.devices);
-            console.log("[VulnModal] Fetched vulnerabilities:", vulnerabilities?.length || 0);
+            logger.debug("ui", "[VulnModal] Fetched vulnerabilities:", vulnerabilities?.length || 0);
 
             if (!vulnerabilities || vulnerabilities.length === 0) {
                 // No vulnerabilities found
@@ -1585,10 +1585,10 @@ class HexagonTicketsManager {
                 vulnLoading.style.display = "none";
             }
 
-            console.log("[VulnModal] Vulnerability markdown loaded successfully");
+            logger.debug("ui", "[VulnModal] Vulnerability markdown loaded successfully");
 
         } catch (error) {
-            console.error("[VulnModal] Error loading vulnerability markdown:", error);
+            logger.error("ui", "[VulnModal] Error loading vulnerability markdown:", error);
             if (vulnContent) {
                 vulnContent.textContent = "# Error Loading Vulnerabilities\n\nFailed to load vulnerability data. Please try again.";
                 vulnContent.style.display = "block";
@@ -1902,7 +1902,7 @@ class HexagonTicketsManager {
 
         // Defense-in-depth: Length limit to prevent excessive processing
         if (searchTerm.length > 100) {
-            console.warn("[Security] Search term too long, truncating from", searchTerm.length, "to 100 chars");
+            logger.warn("ui", "[Security] Search term too long, truncating from", searchTerm.length, "to 100 chars");
             searchTerm = searchTerm.substring(0, 100);
         }
 
@@ -1946,7 +1946,7 @@ class HexagonTicketsManager {
         // Validate filter type
         const validTypes = ["all", "open", "overdue", "completed"];
         if (!validTypes.includes(filterType)) {
-            console.warn(`Invalid filter type: ${filterType}`);
+            logger.warn("ui", `Invalid filter type: ${filterType}`);
             return;
         }
 
@@ -2322,7 +2322,7 @@ class HexagonTicketsManager {
             }));
 
             if (!response.ok) {
-                console.error("[VulnBundle] Failed to fetch vulnerabilities:", response.status);
+                logger.error("ui", "[VulnBundle] Failed to fetch vulnerabilities:", response.status);
                 return [];
             }
 
@@ -2330,7 +2330,7 @@ class HexagonTicketsManager {
 
             // Check if we got the expected data structure
             if (!data || !data.data || !Array.isArray(data.data)) {
-                console.error("[VulnBundle] Unexpected API response structure");
+                logger.error("ui", "[VulnBundle] Unexpected API response structure");
                 return [];
             }
 
@@ -2344,12 +2344,12 @@ class HexagonTicketsManager {
             // Log matching summary (production-friendly)
             if (matchedVulns.length > 0) {
                 const uniqueHosts = new Set(matchedVulns.map(v => v.hostname));
-                console.log(`[VulnBundle] Found ${matchedVulns.length} vulnerabilities across ${uniqueHosts.size} device(s)`);
+                logger.debug("ui", `[VulnBundle] Found ${matchedVulns.length} vulnerabilities across ${uniqueHosts.size} device(s)`);
             }
 
             return matchedVulns;
         } catch (error) {
-            console.error("[VulnBundle] Error fetching vulnerabilities:", error);
+            logger.error("ui", "[VulnBundle] Error fetching vulnerabilities:", error);
             return [];
         }
     }
@@ -2369,12 +2369,12 @@ class HexagonTicketsManager {
                 const variableMap = this.buildVariableMap(ticket, vulnerabilities);
                 return this.processTemplateWithVariables(template, variableMap);
             } else {
-                console.warn("Vulnerability template not found in database, using fallback");
+                logger.warn("ui", "Vulnerability template not found in database, using fallback");
                 // Fallback to hardcoded template
                 return this.generateVulnerabilityMarkdownFallback(ticket, vulnerabilities);
             }
         } catch (error) {
-            console.error("Error generating vulnerability markdown from template:", error);
+            logger.error("ui", "Error generating vulnerability markdown from template:", error);
             // Use fallback on any error
             return this.generateVulnerabilityMarkdownFallback(ticket, vulnerabilities);
         }
@@ -2526,7 +2526,7 @@ class HexagonTicketsManager {
                         try {
                             deviceArray = JSON.parse(deviceArray);
                         } catch (e) {
-                            console.error("[VulnBundle] Failed to parse devices string:", e);
+                            logger.error("ui", "[VulnBundle] Failed to parse devices string:", e);
                             deviceArray = [];
                         }
                     }
@@ -2547,7 +2547,7 @@ class HexagonTicketsManager {
 
                         // Only proceed if there are vulnerabilities in the database
                         if (totalVulns > 0 && deviceArray.length > 0) {
-                            console.log(`[VulnBundle] Checking ${deviceArray.length} devices for vulnerabilities...`);
+                            logger.debug("ui", `[VulnBundle] Checking ${deviceArray.length} devices for vulnerabilities...`);
                             const vulnerabilities = await this.fetchVulnerabilitiesForDevices(deviceArray);
 
                             if (vulnerabilities && vulnerabilities.length > 0) {
@@ -2556,13 +2556,13 @@ class HexagonTicketsManager {
                                 if (vulnMarkdown) {
                                     const vulnBlob = new Blob([vulnMarkdown], { type: "text/markdown" });
                                     zip.file(`${baseFilename}_vulnerabilities.md`, vulnBlob);
-                                    console.log("[VulnBundle] Vulnerability report added to bundle");
+                                    logger.debug("ui", "[VulnBundle] Vulnerability report added to bundle");
                                 }
                             }
                         }
                     }
                 } catch (error) {
-                    console.error("[VulnBundle] Error during vulnerability processing:", error);
+                    logger.error("ui", "[VulnBundle] Error during vulnerability processing:", error);
                     // Continue without vulnerability report - don't fail the whole bundle
                 }
             }
@@ -2613,7 +2613,7 @@ class HexagonTicketsManager {
 
             this.showToast(`Bundle downloaded: ${baseFilename}_bundle.zip`, "success");
         } catch (error) {
-            console.error("Error creating bundle:", error);
+            logger.error("ui", "Error creating bundle:", error);
             this.showToast("Error creating bundle", "error");
         }
     }
@@ -2818,7 +2818,7 @@ class HexagonTicketsManager {
                     content: base64Content
                 });
             } catch (error) {
-                console.error("Error processing shared documentation:", error);
+                logger.error("ui", "Error processing shared documentation:", error);
                 this.showToast(`Error uploading ${file.name}`, "error");
             }
         }
@@ -2852,7 +2852,7 @@ class HexagonTicketsManager {
         const countBadge = document.getElementById("attachDocsCount");
 
         if (!btn) {
-            console.debug("Attach button not found in DOM");
+            logger.debug("ui", "Attach button not found in DOM");
             return;
         }
 
@@ -2925,7 +2925,7 @@ class HexagonTicketsManager {
         try {
             const response = await authState.authenticatedFetch(`/api/templates/by-name/${templateName}`);
             if (!response.ok) {
-                console.warn(`Template ${templateName} not found in database, using fallback`);
+                logger.warn("ui", `Template ${templateName} not found in database, using fallback`);
                 return null;
             }
             const result = await response.json();
@@ -2934,7 +2934,7 @@ class HexagonTicketsManager {
             }
             return null;
         } catch (error) {
-            console.error(`Error fetching template ${templateName}:`, error);
+            logger.error("ui", `Error fetching template ${templateName}:`, error);
             return null;
         }
     }
@@ -3095,7 +3095,7 @@ class HexagonTicketsManager {
         Object.keys(variables).forEach(variable => {
             // Defense-in-depth: Length validation for variable names
             if (variable.length > 50) {
-                console.warn("[Security] Variable name too long, skipping:", variable.substring(0, 20) + "...");
+                logger.warn("ui", "[Security] Variable name too long, skipping:", variable.substring(0, 20) + "...");
                 return; // Skip this variable
             }
 
@@ -3124,7 +3124,7 @@ class HexagonTicketsManager {
                 return this.processTemplateWithVariables(template, variables);
             }
         } catch (error) {
-            console.error("Error using ticket template:", error);
+            logger.error("ui", "Error using ticket template:", error);
         }
 
         // Fallback to hardcoded template if database fails
@@ -3351,12 +3351,12 @@ class HexagonTicketsManager {
                 const variableMap = this.buildVariableMap(ticket, "email");
                 return this.processTemplateWithVariables(template, variableMap);
             } else {
-                console.warn("Email template not found in database, using fallback");
+                logger.warn("ui", "Email template not found in database, using fallback");
                 // Fallback to hardcoded template
                 return this.generateEmailMarkdownFallback(ticket);
             }
         } catch (error) {
-            console.error("Error generating email markdown from template:", error);
+            logger.error("ui", "Error generating email markdown from template:", error);
             // Use fallback on any error
             return this.generateEmailMarkdownFallback(ticket);
         }
@@ -3431,7 +3431,7 @@ class HexagonTicketsManager {
         navigator.clipboard.writeText(content).then(() => {
             this.showToast("Ticket markdown copied to clipboard!", "success");
         }).catch(err => {
-            console.error("Failed to copy ticket markdown:", err);
+            logger.error("ui", "Failed to copy ticket markdown:", err);
             this.showToast("Failed to copy ticket markdown", "error");
         });
     }
@@ -3456,7 +3456,7 @@ class HexagonTicketsManager {
         navigator.clipboard.writeText(content).then(() => {
             this.showToast("Vulnerability report copied to clipboard!", "success");
         }).catch(err => {
-            console.error("Failed to copy vulnerability markdown:", err);
+            logger.error("ui", "Failed to copy vulnerability markdown:", err);
             this.showToast("Failed to copy vulnerability report", "error");
         });
     }
@@ -3481,7 +3481,7 @@ class HexagonTicketsManager {
         navigator.clipboard.writeText(content).then(() => {
             this.showToast("Email template copied to clipboard!", "success");
         }).catch(err => {
-            console.error("Failed to copy email markdown:", err);
+            logger.error("ui", "Failed to copy email markdown:", err);
             this.showToast("Failed to copy email template", "error");
         });
     }
@@ -3492,7 +3492,7 @@ class HexagonTicketsManager {
         const ticket = this.getTicketById(ticketId);
 
         if (!ticket) {
-            console.error("[EmailTemplate] Ticket not found:", ticketId);
+            logger.error("ui", "[EmailTemplate] Ticket not found:", ticketId);
             document.getElementById("emailMarkdownContent").textContent = "# Error Loading Email Template\n\nTicket not found.";
             document.getElementById("emailMarkdownContent").style.display = "block";
             document.getElementById("emailLoadingMessage").style.display = "none";
@@ -3515,7 +3515,7 @@ class HexagonTicketsManager {
                         summaryBlock = this.generateVulnerabilitySummaryForEmail(ticket, vulnerabilities || []);
                     }
                 } catch (vulnError) {
-                    console.error("[EmailTemplate] Error fetching vulnerabilities:", vulnError);
+                    logger.error("ui", "[EmailTemplate] Error fetching vulnerabilities:", vulnError);
                     summaryBlock = "**VULNERABILITY SUMMARY:**\n\nUnable to fetch vulnerability data.";
                 }
             }
@@ -3540,9 +3540,9 @@ class HexagonTicketsManager {
             document.getElementById("emailMarkdownContent").style.display = "block";
             document.getElementById("emailLoadingMessage").style.display = "none";
 
-            console.log("[EmailTemplate] Email template generated for ticket:", ticketId);
+            logger.debug("ui", "[EmailTemplate] Email template generated for ticket:", ticketId);
         } catch (error) {
-            console.error("[EmailTemplate] Error generating email template:", error);
+            logger.error("ui", "[EmailTemplate] Error generating email template:", error);
             document.getElementById("emailMarkdownContent").textContent = "# Error Loading Email Template\n\nFailed to generate email template. Please try again.";
             document.getElementById("emailMarkdownContent").style.display = "block";
             document.getElementById("emailLoadingMessage").style.display = "none";
@@ -3625,7 +3625,7 @@ class HexagonTicketsManager {
                 throw new Error(error.error || "Failed to import tickets");
             }
         } catch (error) {
-            console.error("Error importing CSV:", error);
+            logger.error("ui", "Error importing CSV:", error);
             this.showToast("Error importing CSV file: " + error.message, "error");
         }
     }
@@ -3827,7 +3827,7 @@ class HexagonTicketsManager {
                     tickets.push(ticket);
                     nextImportNumber += 1;
                 } else {
-                    console.log("Skipping ticket with missing location:", ticket);
+                    logger.debug("ui", "Skipping ticket with missing location:", ticket);
                 }
             }
         }
@@ -3979,7 +3979,7 @@ document.addEventListener("DOMContentLoaded", function() {
     if (openTicketId) {
         // Wait for grid initialization, then open the edit modal
         setTimeout(() => {
-            console.log(`[Ticket Navigation] Auto-opening ticket ${openTicketId} from URL parameter`);
+            logger.debug("ui", `[Ticket Navigation] Auto-opening ticket ${openTicketId} from URL parameter`);
             window.ticketManager.editTicket(openTicketId);
 
             // Clean up URL without page reload
@@ -4005,7 +4005,7 @@ document.addEventListener("DOMContentLoaded", function() {
             try {
                 ticketData = JSON.parse(ticketDataRaw);
             } catch (e) {
-                console.error("[Power Tool] Failed to parse createTicketData JSON:", e);
+                logger.error("ui", "[Power Tool] Failed to parse createTicketData JSON:", e);
                 ticketData = null;
             }
         }

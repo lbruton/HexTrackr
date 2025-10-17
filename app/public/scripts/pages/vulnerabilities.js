@@ -58,7 +58,7 @@ export class ModernVulnManager {
         // Expose gridOptions for debugging and theme validation
         this.gridOptions = this.gridManager ? this.gridManager.gridOptions : null;
 
-        console.log("ModernVulnManager: All modules initialized via orchestrator");
+        logger.info("ui", "ModernVulnManager: All modules initialized via orchestrator");
     }
 
     // Delegate all public methods to the orchestrator
@@ -117,7 +117,7 @@ window.refreshPageData = function(type, bustCache = false) {
         bustCache = true;
     }
     if (type === "vulnerabilities" && window.modernVulnManager) {
-        console.log("Refreshing vulnerability data after import completion");
+        logger.info("ui", "Refreshing vulnerability data after import completion");
         window.modernVulnManager.loadData(bustCache);
     }
 };
@@ -187,7 +187,7 @@ function setupVendorToggle() {
             const label = document.querySelector(`label[for="${e.target.id}"]`);
             const vendor = label.dataset.vendor; // "" = All, "CISCO", "Palo Alto", "Other"
 
-            console.log(`Vendor filter changed to: ${vendor || "All Vendors"}`);
+            logger.debug("ui", `Vendor filter changed to: ${vendor || "All Vendors"}`);
 
             try {
                 // Sync dropdown to match radio button (prevent infinite loop by checking current value)
@@ -204,7 +204,7 @@ function setupVendorToggle() {
                 await window.modernVulnManager.chartManager.update(false, vendor);
 
             } catch (error) {
-                console.error("Failed to update vendor filter:", error);
+                logger.error("ui", "Failed to update vendor filter:", { error: error.message });
                 // Error handling enhancement (loading states, toast) comes in Task 3.2
             }
         });
@@ -252,7 +252,7 @@ document.addEventListener("DOMContentLoaded", () => {
 window.addEventListener("pageshow", (event) => {
     if (event.persisted && window.modernVulnManager && window.modernVulnManager.chartManager) {
         // Page was restored from bfcache, reload charts with current vendor selection
-        console.log("Page restored from bfcache, reloading charts");
+        logger.debug("ui", "Page restored from bfcache, reloading charts");
         const vendor = getCurrentVendor();
         window.modernVulnManager.chartManager.update(false, vendor);
     }
