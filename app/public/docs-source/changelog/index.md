@@ -14,8 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### Latest Releases
 
-- [**v1.0.70**](#changelog/versions/1.0.70) - 2025-10-17 - 🚧 Logging System Session 6: Migrate Authentication Service
-- [**v1.0.69**](#changelog/versions/1.0.69) - 2025-10-17 - 🚧 Logging System Session 5: Remove Emoji Usage
+- [**v1.0.70**](#changelog/versions/1.0.70) - 2025-10-17 - Logging System Session 6: Migrate Authentication Service
+- [**v1.0.69**](#changelog/versions/1.0.69) - 2025-10-17 - Logging System Session 5: Remove Emoji Usage
 - [**v1.0.68**](#changelog/versions/1.0.68) - 2025-10-17 - Logging System Session 4: Remove HEX References
 - [**v1.0.67**](#changelog/versions/1.0.67) - 2025-10-17 - Unified Logging System with Encrypted Audit Trail (Sessions 1-3)
 - [**v1.0.66**](#changelog/versions/1.0.66) - 2025-10-13 - Database Maintenance & Self-Cleaning Architecture

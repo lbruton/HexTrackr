@@ -51,6 +51,11 @@ const sessionMiddleware = session({
  */
 function requireAuth(req, res, next) {
     if (!req.session || !req.session.userId) {
+        global.logger.auth.warn("Unauthorized access attempt to protected route", {
+            path: req.path,
+            method: req.method,
+            ip: req.ip
+        });
         return res.status(401).json({
             error: "Authentication required",
             authenticated: false

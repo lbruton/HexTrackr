@@ -65,6 +65,19 @@ class AuthController {
 
             // Authentication failed (invalid username or password)
             if (!result) {
+                // Audit failed login attempt
+                global.logger.audit("user.failed_login", "Failed login attempt", {
+                    username,
+                    reason: "Invalid credentials",
+                    ip: req.ip,
+                    userAgent: req.headers['user-agent']
+                }, null, req);
+
+                global.logger.auth.warn("Authentication failed: Invalid credentials", {
+                    username,
+                    ip: req.ip
+                });
+
                 return res.status(401).json({
                     success: false,
                     error: "Invalid username or password"
@@ -75,6 +88,20 @@ class AuthController {
             if (result.locked) {
                 // Get remaining attempts for details
                 const attemptsRemaining = await controller.authService.getRemainingAttempts(result.userId);
+
+                // Audit account lockout event
+                global.logger.audit("user.account_locked", "Account locked due to failed login attempts", {
+                    userId: result.userId,
+                    lockoutMinutes: 15,
+                    ip: req.ip,
+                    userAgent: req.headers['user-agent']
+                }, result.userId, req);
+
+                global.logger.auth.warn("Account locked due to failed attempts", {
+                    userId: result.userId,
+                    lockoutMinutes: 15,
+                    attemptsRemaining
+                });
 
                 return res.status(403).json({
                     success: false,
@@ -99,12 +126,30 @@ class AuthController {
             // Save session before sending response (required for async stores)
             req.session.save((err) => {
                 if (err) {
-                    console.error("Session save error:", err);
+                    global.logger.auth.error("Session save failed during login", {
+                        username,
+                        error: err.message
+                    });
                     return res.status(500).json({
                         success: false,
                         error: "Failed to create session"
                     });
                 }
+
+                // Audit successful login
+                global.logger.audit("user.login", "User logged in successfully", {
+                    userId: result.id,
+                    username: result.username,
+                    rememberMe: !!rememberMe,
+                    ip: req.ip,
+                    userAgent: req.headers['user-agent']
+                }, result.id, req);
+
+                global.logger.auth.info("User authenticated successfully", {
+                    userId: result.id,
+                    username: result.username,
+                    rememberMe: !!rememberMe
+                });
 
                 // Return success with user details (without password hash)
                 res.json({
@@ -121,7 +166,10 @@ class AuthController {
             });
 
         } catch (error) {
-            console.error("Login error:", error);
+            global.logger.auth.error("Login exception occurred", {
+                error: error.message,
+                stack: error.stack
+            });
             res.status(500).json({
                 success: false,
                 error: "Login failed",
@@ -138,10 +186,16 @@ class AuthController {
      */
     static async logout(req, res) {
         try {
+            const userId = req.user?.id;
+            const username = req.user?.username;
+
             // Destroy session
             req.session.destroy((err) => {
                 if (err) {
-                    console.error("Logout error:", err);
+                    global.logger.auth.error("Session destruction failed during logout", {
+                        userId,
+                        error: err.message
+                    });
                     // Even if session destroy fails, clear the cookie
                     res.clearCookie("hextrackr.sid");
                     return res.status(500).json({
@@ -150,6 +204,18 @@ class AuthController {
                         details: err.message
                     });
                 }
+
+                // Audit successful logout
+                global.logger.audit("user.logout", "User logged out", {
+                    userId,
+                    username,
+                    ip: req.ip
+                }, userId, req);
+
+                global.logger.auth.info("User logged out successfully", {
+                    userId,
+                    username
+                });
 
                 // Clear session cookie to ensure complete logout
                 res.clearCookie("hextrackr.sid");
@@ -163,7 +229,10 @@ class AuthController {
             });
 
         } catch (error) {
-            console.error("Logout error:", error);
+            global.logger.auth.error("Logout exception occurred", {
+                error: error.message,
+                stack: error.stack
+            });
             // Clear cookie even on error
             res.clearCookie("hextrackr.sid");
             res.status(500).json({
@@ -221,7 +290,9 @@ class AuthController {
             });
 
         } catch (error) {
-            console.error("Status check error:", error);
+            global.logger.auth.error("Status check exception occurred", {
+                error: error.message
+            });
             res.status(500).json({
                 success: false,
                 error: "Status check failed",
@@ -267,11 +338,27 @@ class AuthController {
             const result = await controller.authService.changePassword(userId, oldPassword, newPassword);
 
             if (!result.success) {
+                global.logger.auth.warn("Password change failed: Incorrect old password", {
+                    userId,
+                    username: req.user.username
+                });
                 return res.status(401).json({
                     success: false,
                     error: result.error
                 });
             }
+
+            // Audit successful password change
+            global.logger.audit("user.password_change", "User password changed", {
+                userId,
+                username: req.user.username,
+                ip: req.ip
+            }, userId, req);
+
+            global.logger.auth.info("Password changed successfully", {
+                userId,
+                username: req.user.username
+            });
 
             res.json({
                 success: true,
@@ -281,7 +368,11 @@ class AuthController {
             });
 
         } catch (error) {
-            console.error("Change password error:", error);
+            global.logger.auth.error("Password change exception occurred", {
+                userId,
+                error: error.message,
+                stack: error.stack
+            });
             res.status(500).json({
                 success: false,
                 error: "Password change failed",
@@ -325,7 +416,9 @@ class AuthController {
             });
 
         } catch (error) {
-            console.error("Get profile error:", error);
+            global.logger.auth.error("Get profile exception occurred", {
+                error: error.message
+            });
             res.status(500).json({
                 success: false,
                 error: "Failed to retrieve profile",
