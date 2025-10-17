@@ -35,7 +35,7 @@
  * });
  */
 
-console.log("HexTrackr Progress Modal (shared) loaded successfully");
+logger.debug("ui", "HexTrackr Progress Modal (shared) loaded successfully");
 
 /**
  * Real-time Progress Modal Class
@@ -307,7 +307,7 @@ class ProgressModal {
         this.isVisible = true;
         this.bsModal.show();
 
-        console.log("Progress modal shown with session:", sessionId);
+        logger.debug("ui", "Progress modal shown with session:", sessionId);
     }
     
     /**
@@ -333,10 +333,10 @@ class ProgressModal {
      * @param {Object} data - Progress data from WebSocket
      */
     handleProgressUpdate(data) {
-        console.log("Progress update received:", data, "Visible:", this.isVisible, "Session match:", data.sessionId === this.currentSessionId);
+        logger.debug("ui", "Progress update received:", data, "Visible:", this.isVisible, "Session match:", data.sessionId === this.currentSessionId);
         
         if (!this.isVisible || data.sessionId !== this.currentSessionId) {
-            console.log("Progress update ignored - modal not visible or session mismatch");
+            logger.debug("ui", "Progress update ignored - modal not visible or session mismatch");
             return;
         }
         
@@ -373,15 +373,15 @@ class ProgressModal {
      * @param {Object} data - Completion data from WebSocket
      */
     handleProgressComplete(data) {
-        console.log("📨 handleProgressComplete() received data:", data);
-        console.log("Modal state - isVisible:", this.isVisible, "currentSessionId:", this.currentSessionId, "data.sessionId:", data.sessionId);
+        logger.debug("ui", "📨 handleProgressComplete() received data:", data);
+        logger.debug("ui", "Modal state - isVisible:", this.isVisible, "currentSessionId:", this.currentSessionId, "data.sessionId:", data.sessionId);
         
         if (!this.isVisible || data.sessionId !== this.currentSessionId) {
-            console.warn("Progress complete ignored - modal not visible or session mismatch");
+            logger.warn("ui", "Progress complete ignored - modal not visible or session mismatch");
             return;
         }
 
-        console.log("Progress complete event accepted for processing");
+        logger.debug("ui", "Progress complete event accepted for processing");
 
         // Update progress data to completion
         this.progressData.progress = 100;
@@ -391,16 +391,16 @@ class ProgressModal {
         // Store import summary if available
         if (data.metadata && data.metadata.importSummary) {
             this.progressData.importSummary = data.metadata.importSummary;
-            console.log("Import summary received:", data.metadata.importSummary);
+            logger.debug("ui", "Import summary received:", data.metadata.importSummary);
         } else {
-            console.log("No import summary in metadata");
+            logger.debug("ui", "No import summary in metadata");
         }
 
         // Update UI to show 100% completion
         this.updateUI();
 
         // Show success state with summary
-        console.log("Calling showSuccess() from handleProgressComplete...");
+        logger.debug("ui", "Calling showSuccess() from handleProgressComplete...");
         this.showSuccess(this.progressData.message, data.metadata ? data.metadata.importSummary : null);
 
         // Modal will stay open until user manually closes it
@@ -472,7 +472,7 @@ class ProgressModal {
      * @param {Object} importSummary - Optional import summary data
      */
     showSuccess(message, importSummary = null) {
-        console.log("showSuccess() called with:", { message, hasImportSummary: !!importSummary });
+        logger.debug("ui", "showSuccess() called with:", { message, hasImportSummary: !!importSummary });
         
         // Hide spinner
         const spinner = this.modal.querySelector(".spinner-border");
@@ -484,7 +484,7 @@ class ProgressModal {
         const header = this.modal.querySelector(".modal-header");
         if (header) {
             header.className = "modal-header bg-success text-white";
-            console.log("Modal header updated to success state");
+            logger.debug("ui", "Modal header updated to success state");
         }
 
         // Show success alert
@@ -493,24 +493,24 @@ class ProgressModal {
         if (successAlert && successMessage) {
             successMessage.textContent = message;
             successAlert.classList.remove("d-none");
-            console.log("Success alert shown with message:", message);
+            logger.debug("ui", "Success alert shown with message:", message);
         }
 
         // Display import summary if available
         if (importSummary) {
             this.displayImportSummary(importSummary);
         } else {
-            console.log("No import summary to display");
+            logger.debug("ui", "No import summary to display");
         }
 
         // Update buttons
-        console.log("🔘 Calling showCompleteButtons()...");
+        logger.debug("ui", "🔘 Calling showCompleteButtons()...");
         this.showCompleteButtons();
 
         // Update progress bar to 100%
         this.update({ progress: 100 });
 
-        console.log("showSuccess() completed", importSummary ? "with summary" : "without summary");
+        logger.debug("ui", "showSuccess() completed", importSummary ? "with summary" : "without summary");
     }
 
     /**
@@ -537,7 +537,7 @@ class ProgressModal {
         summaryContainer.innerHTML = summaryHTML;
         summaryContainer.classList.remove("d-none");
 
-        console.log("Import summary displayed:", summary);
+        logger.debug("ui", "Import summary displayed:", summary);
     }
 
     /**
@@ -765,7 +765,7 @@ class ProgressModal {
         // Update buttons
         this.showCompleteButtons();
         
-        console.error("Progress modal: Error state shown -", message);
+        logger.error("ui", "Progress modal: Error state shown -", message);
     }
     
     /**
@@ -776,7 +776,7 @@ class ProgressModal {
         const exportBtn = document.getElementById("progressExportBtn");
         const closeBtn = document.getElementById("progressCloseBtn");
 
-        console.log("showCompleteButtons() called - Button elements:", {
+        logger.debug("ui", "showCompleteButtons() called - Button elements:", {
             cancelBtn: !!cancelBtn,
             exportBtn: !!exportBtn,
             closeBtn: !!closeBtn
@@ -784,19 +784,19 @@ class ProgressModal {
 
         if (cancelBtn) {
             cancelBtn.classList.add("d-none");
-            console.log("Cancel button hidden");
+            logger.debug("ui", "Cancel button hidden");
         } else {
-            console.error("Cancel button not found!");
+            logger.error("ui", "Cancel button not found!");
         }
 
         // Show export button only if import summary is present
         if (exportBtn) {
             if (this.progressData.importSummary) {
                 exportBtn.classList.remove("d-none");
-                console.log("Export button shown (import summary present)");
+                logger.debug("ui", "Export button shown (import summary present)");
             } else {
                 exportBtn.classList.add("d-none");
-                console.log("Export button hidden (no import summary)");
+                logger.debug("ui", "Export button hidden (no import summary)");
             }
         }
 
@@ -812,9 +812,9 @@ class ProgressModal {
             closeBtn.classList.remove("btn-secondary");
             closeBtn.classList.add("btn-success");
             
-            console.log("Close button shown with text:", closeBtn.innerHTML);
+            logger.debug("ui", "Close button shown with text:", closeBtn.innerHTML);
         } else {
-            console.error("Close button not found!");
+            logger.error("ui", "Close button not found!");
         }
     }
     
@@ -852,11 +852,11 @@ class ProgressModal {
         // ALWAYS trigger page refresh after successful import (with or without summary)
         // This ensures cache is busted and new data is loaded
         if (wasSuccessfulImport && window.refreshPageData) {
-            console.log("Progress modal closed: Triggering page refresh to bust cache");
+            logger.debug("ui", "Progress modal closed: Triggering page refresh to bust cache");
             window.refreshPageData("vulnerabilities");
         } else if (wasSuccessfulImport && window.vulnManager && typeof window.vulnManager.loadData === "function") {
             // Fallback: directly call loadData with cache bust
-            console.log("Progress modal closed: Triggering loadData with cache bust");
+            logger.debug("ui", "Progress modal closed: Triggering loadData with cache bust");
             window.vulnManager.loadData(true);
         }
     }
@@ -866,14 +866,14 @@ class ProgressModal {
      */
     async handleExport() {
         if (!this.progressData.importSummary) {
-            console.error("No import summary available for export");
+            logger.error("ui", "No import summary available for export");
             return;
         }
 
         try {
             await this.downloadImportReport();
         } catch (error) {
-            console.error("Export failed:", error);
+            logger.error("ui", "Export failed:", error);
 
             // Show error state on button
             const exportBtn = document.getElementById("progressExportBtn");
@@ -927,10 +927,10 @@ class ProgressModal {
                     combinedCSS += cssContent;
                     combinedCSS += "\n";
                 } else {
-                    console.warn(`Could not load CSS file: ${cssFile}`);
+                    logger.warn("ui", `Could not load CSS file: ${cssFile}`);
                 }
             } catch (error) {
-                console.warn(`Error loading CSS file ${cssFile}:`, error);
+                logger.warn("ui", `Error loading CSS file ${cssFile}:`, error);
             }
         }
 
@@ -1129,7 +1129,7 @@ ${embeddedCSS}
             }
 
             // Show success feedback
-            console.log(`Import report downloaded: ${filename}`);
+            logger.debug("ui", `Import report downloaded: ${filename}`);
 
         } catch (error) {
             // Restore button state on error
@@ -1138,7 +1138,7 @@ ${embeddedCSS}
                 exportBtn.innerHTML = originalBtnText;
             }
 
-            console.error("Failed to download import report:", error);
+            logger.error("ui", "Failed to download import report:", error);
             throw error; // Re-throw to be handled by handleExport
         }
     }
@@ -1226,7 +1226,7 @@ ${embeddedCSS}
         // Clear callbacks
         this.onCancelCallback = null;
         
-        console.log("Progress modal: Cleanup completed");
+        logger.debug("ui", "Progress modal: Cleanup completed");
     }
     
     /**
@@ -1245,7 +1245,7 @@ ${embeddedCSS}
             container.remove();
         }
         
-        console.log("Progress modal: Destroyed");
+        logger.debug("ui", "Progress modal: Destroyed");
     }
 }
 
