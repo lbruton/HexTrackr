@@ -55,7 +55,7 @@ class PreferencesService {
          */
         this.baseUrl = "/api/preferences";
 
-        console.log("✅ PreferencesService initialized");
+        console.log("PreferencesService initialized");
     }
 
     /**

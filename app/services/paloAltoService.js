@@ -76,9 +76,9 @@ class PaloAltoService {
             // No need to ALTER TABLE here - columns already exist from migration
 
             // sync_metadata table already exists from KEV/Cisco implementation
-            console.log("🗃️ Palo Alto advisory database tables initialized");
+            console.log("Palo Alto advisory database tables initialized");
         } catch (error) {
-            console.error("❌ Failed to initialize Palo Alto advisory tables:", error);
+            console.error("Failed to initialize Palo Alto advisory tables:", error);
         }
     }
 
@@ -218,7 +218,7 @@ class PaloAltoService {
             const data = await response.json();
             return data;
         } catch (error) {
-            console.error(`⚠️ Failed to fetch advisory for ${cveId}:`, error.message);
+            console.error(` Failed to fetch advisory for ${cveId}:`, error.message);
             return null;
         }
     }
@@ -231,7 +231,7 @@ class PaloAltoService {
      */
     parseAdvisoryData(advisoryData, queriedCveId) {
         if (!advisoryData || !advisoryData.cveMetadata) {
-            console.log(`⚠️ Invalid advisory data for ${queriedCveId}`);
+            console.log(` Invalid advisory data for ${queriedCveId}`);
             return null;
         }
 
@@ -263,11 +263,11 @@ class PaloAltoService {
         const cna = advisoryData.containers?.cna;
 
         if (!cna) {
-            console.log(`⚠️ No CNA container found for ${queriedCveId}`);
+            console.log(` No CNA container found for ${queriedCveId}`);
             return null;
         }
 
-        console.log(`📋 Processing advisory for CVE ${cveId}`);
+        console.log(` Processing advisory for CVE ${cveId}`);
 
         // Extract severity and CVSS score from metrics
         let severity = null;
@@ -312,10 +312,10 @@ class PaloAltoService {
             productName = cna.affected[0].product || "PAN-OS";
         }
 
-        console.log(`   Severity: ${severity || "unknown"}`);
-        console.log(`   CVSS Score: ${cvssScore || "unknown"}`);
-        console.log(`   Fixed versions: ${fixedVersions.length > 0 ? fixedVersions.slice(0, 3).join(", ") : "none"}${fixedVersions.length > 3 ? "..." : ""}`);
-        console.log(`   Affected versions: ${affectedVersions.length}`);
+        console.log(` Severity: ${severity || "unknown"}`);
+        console.log(` CVSS Score: ${cvssScore || "unknown"}`);
+        console.log(` Fixed versions: ${fixedVersions.length > 0 ? fixedVersions.slice(0, 3).join(", ") : "none"}${fixedVersions.length > 3 ? "..." : ""}`);
+        console.log(` Affected versions: ${affectedVersions.length}`);
 
         return {
             cve_id: cveId,
@@ -343,15 +343,15 @@ class PaloAltoService {
         }
 
         this.syncInProgress = true;
-        console.log("🔥 Starting Palo Alto Security Advisory data sync");
+        console.log("Starting Palo Alto Security Advisory data sync");
 
         try {
             // Get all Palo Alto CVE IDs needing sync (stale or never synced)
             const cveIds = await this.getAllCveIds();
-            console.log(`📊 Found ${cveIds.length} CVEs needing Palo Alto advisory sync`);
+            console.log(` Found ${cveIds.length} CVEs needing Palo Alto advisory sync`);
 
             if (cveIds.length === 0) {
-                console.log("✅ No CVEs need syncing");
+                console.log("No CVEs need syncing");
                 this.syncInProgress = false;
                 return {
                     success: true,
@@ -370,13 +370,13 @@ class PaloAltoService {
             for (let i = 0; i < cveIds.length; i++) {
                 const cveId = cveIds[i];
 
-                console.log(`🔍 [${i + 1}/${cveIds.length}] Fetching advisory for ${cveId}`);
+                console.log(` [${i + 1}/${cveIds.length}] Fetching advisory for ${cveId}`);
 
                 // Fetch advisory from Palo Alto API (no auth required)
                 const advisoryData = await this.fetchPaloAdvisoryForCve(cveId);
 
                 if (!advisoryData) {
-                    console.log(`   ⚠️ No advisory found for ${cveId}`);
+                    console.log(` No advisory found for ${cveId}`);
                     // Rate limiting: small delay even for 404s
                     if (i < cveIds.length - 1) {
                         await new Promise(resolve => setTimeout(resolve, delayBetweenCalls));
@@ -406,7 +406,7 @@ class PaloAltoService {
                             parsed.publication_url
                         ], (err) => {
                             if (err) {
-                                console.error(`❌ Insert failed for ${cveId}:`, err);
+                                console.error(` Insert failed for ${cveId}:`, err);
                                 reject(err);
                             } else {
                                 resolve();
@@ -424,7 +424,7 @@ class PaloAltoService {
                             WHERE cve = ?
                         `, [hasFixAvailable, cveId], (err) => {
                             if (err) {
-                                console.error(`❌ Update failed for ${cveId}:`, err);
+                                console.error(` Update failed for ${cveId}:`, err);
                                 reject(err);
                             } else {
                                 resolve();
@@ -437,7 +437,7 @@ class PaloAltoService {
                         matchedCount++;
                     }
 
-                    console.log(`   ✅ Processed ${cveId} (${hasFixAvailable ? "fix available" : "no fix"})`);
+                    console.log(` Processed ${cveId} (${hasFixAvailable ? "fix available" : "no fix"})`);
                 }
 
                 // Rate limiting: wait between calls
@@ -458,7 +458,7 @@ class PaloAltoService {
                 });
             });
 
-            console.log(`✅ Palo Alto advisory sync completed: ${advisoryCount} advisories processed (${actualDbCount} unique CVEs in DB), ${matchedCount} with fixes`);
+            console.log(` Palo Alto advisory sync completed: ${advisoryCount} advisories processed (${actualDbCount} unique CVEs in DB), ${matchedCount} with fixes`);
 
             this.syncInProgress = false;
 
@@ -471,7 +471,7 @@ class PaloAltoService {
             };
 
         } catch (error) {
-            console.error("❌ Palo Alto advisory sync failed:", error);
+            console.error("Palo Alto advisory sync failed:", error);
             this.syncInProgress = false;
             throw error;
         }

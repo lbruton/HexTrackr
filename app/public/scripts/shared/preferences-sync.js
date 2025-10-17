@@ -76,7 +76,7 @@ class PreferencesSync {
          */
         this.SYNC_DELAY = 1000; // 1 second debounce
 
-        console.log("✅ PreferencesSync initialized");
+        console.log("PreferencesSync initialized");
     }
 
     /**
@@ -136,7 +136,7 @@ class PreferencesSync {
                                     shouldUpdate = false;
                                 } else {
                                     // localStorage value is stale, use database value for cross-device sync
-                                    console.log(`🔄 Updating stale localStorage theme (${age}ms old) with database value`);
+                                    console.log(` Updating stale localStorage theme (${age}ms old) with database value`);
                                 }
                             }
                             // Store theme for reuse (handles both old and new JSON formats)
@@ -145,7 +145,7 @@ class PreferencesSync {
                             // BACKWARD COMPATIBILITY FIX: Legacy format stored plain strings like "dark" or "light"
                             // Don't throw error - just use the plain string value directly
                             cachedTheme = existingValue;
-                            console.log(`🔄 Migrating legacy theme format: "${existingValue}" → JSON`);
+                            console.log(` Migrating legacy theme format: "${existingValue}" → JSON`);
                         }
                     }
 
@@ -161,7 +161,7 @@ class PreferencesSync {
                     }
                 });
 
-                console.log(`✅ Synced ${result.data.count} preferences from database to localStorage`);
+                console.log(` Synced ${result.data.count} preferences from database to localStorage`);
 
                 // Apply theme immediately if loaded from database (prevents FOUC in new browsers)
                 if (themePreference) {
@@ -178,7 +178,7 @@ class PreferencesSync {
                         detail: { theme: themePreference, source: "database" }
                     }));
 
-                    console.log(`🎨 Applied theme from database: ${themePreference}`);
+                    console.log(` Applied theme from database: ${themePreference}`);
                 }
             }
 
@@ -276,7 +276,7 @@ class PreferencesSync {
             if (result.success) {
                 // Update localStorage cache
                 this.updateLocalStorageCache("theme", theme);
-                console.log(`🎨 Theme synced to database immediately: ${theme}`);
+                console.log(` Theme synced to database immediately: ${theme}`);
             } else {
                 console.warn("Failed to sync theme to database:", result.error);
             }
@@ -370,7 +370,7 @@ class PreferencesSync {
                 // Remove from localStorage after successful database save
                 try {
                     localStorage.removeItem("hextrackr-cisco-key");
-                    console.log("🗑️ Removed Cisco credentials from localStorage");
+                    console.log("Removed Cisco credentials from localStorage");
                 } catch (removeError) {
                     console.warn("Could not remove Cisco credentials from localStorage:", removeError);
                 }
@@ -428,7 +428,7 @@ class PreferencesSync {
             const result = await this.prefsService.setMultiplePreferences(preferences);
 
             if (result.success) {
-                console.log(`✅ Synced ${this.syncQueue.size} preferences to database`);
+                console.log(` Synced ${this.syncQueue.size} preferences to database`);
                 this.syncQueue.clear();
             } else {
                 console.warn("Failed to sync preferences to database:", result.error);
@@ -493,7 +493,7 @@ class PreferencesSync {
             const result = await this.prefsService.setPreference(preferenceKey, parsedValue);
 
             if (result.success) {
-                console.log(`✅ Migrated '${localStorageKey}' → '${preferenceKey}'`);
+                console.log(` Migrated '${localStorageKey}' → '${preferenceKey}'`);
                 return true;
             }
 

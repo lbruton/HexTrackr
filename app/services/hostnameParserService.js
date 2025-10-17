@@ -27,7 +27,7 @@ class HostnameParserService {
             const configData = fs.readFileSync(configPath, "utf8");
             this.config = JSON.parse(configData);
         } catch (error) {
-            console.error("❌ Failed to load device naming patterns config:", error.message);
+            console.error("Failed to load device naming patterns config:", error.message);
             // Fallback to minimal config
             this.config = {
                 deviceTypePatterns: [

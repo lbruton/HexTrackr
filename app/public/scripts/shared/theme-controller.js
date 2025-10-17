@@ -1780,7 +1780,7 @@ export class ThemeController {
       report.theme = theme;
       report.validatedBy = "ThemeController.generateThemeAccessibilityReport()";
       
-      console.log("🎯 Theme Accessibility Report Generated:", {
+      console.log("Theme Accessibility Report Generated:", {
         theme: report.theme,
         passRate: `${report.summary.passRate}%`,
         violations: report.violations.length,
@@ -1837,32 +1837,32 @@ export class ThemeController {
       const currentTheme = this.getTheme();
       const resolvedTheme = currentTheme === "system" ? "light" : currentTheme;
       
-      console.group("🎨 HexTrackr Theme Accessibility Report");
+      console.group("HexTrackr Theme Accessibility Report");
       console.log("Current theme:", currentTheme, resolvedTheme !== currentTheme ? `(resolved: ${resolvedTheme})` : "");
       
       if (resolvedTheme === "dark") {
         const report = this.generateThemeAccessibilityReport("dark");
         
-        console.log("📊 Summary:", `${report.summary.passed}/${report.summary.total} combinations pass WCAG AA (${report.summary.passRate}%)`);
+        console.log("Summary:", `${report.summary.passed}/${report.summary.total} combinations pass WCAG AA (${report.summary.passRate}%)`);
         
         if (report.violations.length > 0) {
-          console.warn("❌ Violations:", report.violations.length);
+          console.warn("Violations:", report.violations.length);
           if (verbose) {
             report.violations.forEach((violation, index) => {
-              console.log(`   ${index + 1}. ${violation.combination}: ${violation.ratio}:1 (needs ${violation.required}:1)`);
-              console.log(`      Colors: ${violation.foreground} on ${violation.background}`);
+              console.log(` ${index + 1}. ${violation.combination}: ${violation.ratio}:1 (needs ${violation.required}:1)`);
+              console.log(` Colors: ${violation.foreground} on ${violation.background}`);
             });
           }
         } else {
-          console.log("✅ All combinations pass WCAG AA standards!");
+          console.log("All combinations pass WCAG AA standards!");
         }
         
         if (verbose) {
           console.log("🕐 Report generated:", report.timestamp);
-          console.log("📋 Full report:", report);
+          console.log("Full report:", report);
         }
       } else {
-        console.log("💡 Light theme active - using system accessibility defaults");
+        console.log("Light theme active - using system accessibility defaults");
       }
       
       console.groupEnd();

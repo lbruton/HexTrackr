@@ -80,7 +80,7 @@
             this.monitoring.isMonitoring = true;
             
             if (this.config.enableDebugLogging) {
-                console.log("🔧 Modal Monitor initialized with configuration:", this.config);
+                console.log("Modal Monitor initialized with configuration:", this.config);
             }
         }
 
@@ -199,7 +199,7 @@
             };
 
             if (this.config.enableDebugLogging) {
-                console.log("⚡ Performance instrumentation enabled");
+                console.log("Performance instrumentation enabled");
             }
         }
 
@@ -248,7 +248,7 @@
             };
 
             if (this.config.enableDebugLogging) {
-                console.log("📊 Error tracking enabled");
+                console.log("Error tracking enabled");
             }
         }
 
@@ -270,7 +270,7 @@
             });
 
             if (this.config.enableDebugLogging) {
-                console.log(`🎯 Tracking ${operationType} operation: ${operationId}`);
+                console.log(` Tracking ${operationType} operation: ${operationId}`);
             }
 
             return operationId;
@@ -335,7 +335,7 @@
             this.trimMetricsArrays();
 
             if (this.config.enableDebugLogging) {
-                console.log(`✅ Operation ${operationId} completed in ${measure.duration.toFixed(2)}ms`);
+                console.log(` Operation ${operationId} completed in ${measure.duration.toFixed(2)}ms`);
             }
 
             return result;
@@ -407,7 +407,7 @@
             }, this.config.reportInterval);
 
             if (this.config.enableDebugLogging) {
-                console.log(`📊 Periodic reporting started (${this.config.reportInterval}ms interval)`);
+                console.log(` Periodic reporting started (${this.config.reportInterval}ms interval)`);
             }
         }
 
@@ -435,7 +435,7 @@
             this.dispatchEvent("modalPerformanceReport", report);
 
             if (this.config.enableDebugLogging) {
-                console.log("📊 Performance report generated:", report);
+                console.log("Performance report generated:", report);
             }
 
             return report;
@@ -604,7 +604,7 @@
             this.monitoring.activeOperations.clear();
             
             if (this.config.enableDebugLogging) {
-                console.log("🔧 Modal Monitor destroyed");
+                console.log("Modal Monitor destroyed");
             }
         }
     }
@@ -632,7 +632,7 @@
             this.wrapModalMethod("showModal", "open");
             this.wrapModalMethod("clearModalStateData", "cleanup");
 
-            console.log("🔧 Modal monitoring integration setup complete");
+            console.log("Modal monitoring integration setup complete");
         }
 
         wrapModalMethod(methodName, operationType) {
@@ -690,9 +690,9 @@
     // Auto-initialize if window.modalMonitorConfig exists
     if (global.modalMonitorConfig) {
         global.modalMonitor = new ModalMonitor(global.modalMonitorConfig);
-        console.log("🔧 Modal Monitor auto-initialized from global config");
+        console.log("Modal Monitor auto-initialized from global config");
     }
 
-    console.log("📊 Modal Monitoring system loaded and ready!");
+    console.log("Modal Monitoring system loaded and ready!");
 
 })(window);

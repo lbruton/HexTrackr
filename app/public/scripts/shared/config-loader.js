@@ -19,7 +19,7 @@
      */
     async function loadConfig() {
         try {
-            console.log("🔧 Loading HexTrackr configuration...");
+            console.log("Loading HexTrackr configuration...");
             
             // Fetch version and health info from server
             const response = await fetch("/health", {
@@ -46,7 +46,7 @@
                 loadTime: new Date().toISOString()
             };
             
-            console.log(`✅ HexTrackr configuration loaded: v${window.HexTrackrConfig.version}`);
+            console.log(` HexTrackr configuration loaded: v${window.HexTrackrConfig.version}`);
             
             // Dispatch custom event to notify other components that config is ready
             const configLoadedEvent = new CustomEvent("hextrackr:config:loaded", {
@@ -55,7 +55,7 @@
             document.dispatchEvent(configLoadedEvent);
             
         } catch (error) {
-            console.warn("⚠️ Failed to load HexTrackr configuration:", error.message);
+            console.warn("Failed to load HexTrackr configuration:", error.message);
             
             // Set fallback configuration
             window.HexTrackrConfig = {

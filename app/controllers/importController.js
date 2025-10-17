@@ -52,14 +52,14 @@ async function importVulnerabilities(req, res) {
         const scanDate = req.body.scanDate || extractedDate || new Date().toISOString().split("T")[0];
 
         console.log("📥 STANDARD IMPORT: Starting vulnerability CSV import");
-        console.log(`📊 File: ${filename}, Vendor: ${vendor}, Scan Date: ${scanDate}`);
+        console.log(` File: ${filename}, Vendor: ${vendor}, Scan Date: ${scanDate}`);
 
         // Parse CSV file
         const csvData = PathValidator.safeReadFileSync(req.file.path, "utf8");
         const results = await importService.parseCSV(csvData);
         const rows = results.data.filter(row => Object.values(row).some(val => val && val.trim()));
 
-        console.log(`📈 Parsed ${rows.length} rows from CSV`);
+        console.log(` Parsed ${rows.length} rows from CSV`);
 
         // Create import record
         const importRecord = await importService.createImportRecord({
@@ -156,9 +156,9 @@ async function importVulnerabilitiesStaging(req, res) {
                 currentStep: 0
             });
 
-        console.log("🚀 STAGING IMPORT: Starting high-performance CSV import");
-        console.log(`📊 File: ${filename}, Vendor: ${vendor}, Scan Date: ${scanDate}`);
-        console.log(`🔄 Progress Session: ${sessionId}`);
+        console.log("STAGING IMPORT: Starting high-performance CSV import");
+        console.log(` File: ${filename}, Vendor: ${vendor}, Scan Date: ${scanDate}`);
+        console.log(` Progress Session: ${sessionId}`);
 
         // Immediately return session ID to client
         res.json({

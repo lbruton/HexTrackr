@@ -120,7 +120,7 @@ const CRITICAL_COMBINATIONS = [
  * @returns {Object} Test results with summary and violations
  */
 export function testDarkThemeCompliance(verbose = false) {
-  console.log("🔍 Testing HexTrackr Dark Theme WCAG AA Compliance...\n");
+  console.log("Testing HexTrackr Dark Theme WCAG AA Compliance...\n");
   
   try {
     // Test all combinations
@@ -160,12 +160,12 @@ export function testDarkThemeCompliance(verbose = false) {
     };
     
     // Display results
-    console.log("📊 WCAG AA Compliance Summary:");
-    console.log(`   Total combinations tested: ${summary.total}`);
-    console.log(`   ✅ Passed: ${summary.passed} (${summary.passRate}%)`);
-    console.log(`   ❌ Failed: ${summary.failed}`);
-    console.log(`      🚨 Critical failures: ${summary.criticalFailures}`);
-    console.log(`      ⚠️  Non-critical failures: ${summary.nonCriticalFailures}`);
+    console.log("WCAG AA Compliance Summary:");
+    console.log(` Total combinations tested: ${summary.total}`);
+    console.log(` Passed: ${summary.passed} (${summary.passRate}%)`);
+    console.log(` Failed: ${summary.failed}`);
+    console.log(` 🚨 Critical failures: ${summary.criticalFailures}`);
+    console.log(` Non-critical failures: ${summary.nonCriticalFailures}`);
     console.log("");
     
     // Report critical failures
@@ -173,31 +173,31 @@ export function testDarkThemeCompliance(verbose = false) {
       console.log("🚨 CRITICAL ACCESSIBILITY VIOLATIONS:");
       criticalFailures.forEach((result, index) => {
         const validation = result.validations["AA_normal"];
-        console.log(`   ${index + 1}. ${result.label}`);
-        console.log(`      Ratio: ${result.ratio}:1 (requires ${validation.required}:1)`);
-        console.log(`      Colors: ${result.foreground} on ${result.background}`);
-        console.log(`      Deficit: ${Math.round((validation.required - result.ratio) * 100) / 100}:1`);
+        console.log(` ${index + 1}. ${result.label}`);
+        console.log(` Ratio: ${result.ratio}:1 (requires ${validation.required}:1)`);
+        console.log(` Colors: ${result.foreground} on ${result.background}`);
+        console.log(` Deficit: ${Math.round((validation.required - result.ratio) * 100) / 100}:1`);
         console.log("");
       });
     }
     
     // Report non-critical failures
     if (nonCriticalFailures.length > 0) {
-      console.log("⚠️  NON-CRITICAL ACCESSIBILITY ISSUES:");
+      console.log("NON-CRITICAL ACCESSIBILITY ISSUES:");
       nonCriticalFailures.forEach((result, index) => {
         const validation = result.validations["AA_normal"];
-        console.log(`   ${index + 1}. ${result.label}`);
-        console.log(`      Ratio: ${result.ratio}:1 (requires ${validation.required}:1)`);
-        console.log(`      Colors: ${result.foreground} on ${result.background}`);
+        console.log(` ${index + 1}. ${result.label}`);
+        console.log(` Ratio: ${result.ratio}:1 (requires ${validation.required}:1)`);
+        console.log(` Colors: ${result.foreground} on ${result.background}`);
         console.log("");
       });
     }
     
     // Show successful combinations if verbose
     if (verbose && passes.length > 0) {
-      console.log("✅ PASSED COMBINATIONS:");
+      console.log("PASSED COMBINATIONS:");
       passes.forEach((result, index) => {
-        console.log(`   ${index + 1}. ${result.label} (${result.ratio}:1)`);
+        console.log(` ${index + 1}. ${result.label} (${result.ratio}:1)`);
       });
       console.log("");
     }
@@ -213,7 +213,7 @@ export function testDarkThemeCompliance(verbose = false) {
     };
     
   } catch (error) {
-    console.error("❌ Error testing theme compliance:", error);
+    console.error("Error testing theme compliance:", error);
     return {
       summary: { total: 0, passed: 0, failed: 0, criticalFailures: 0, nonCriticalFailures: 0, passRate: 0 },
       criticalFailures: [],

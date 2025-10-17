@@ -441,21 +441,21 @@ function createTables(db) {
 
     console.log("Database initialized successfully!");
     console.log("Tables created:");
-    console.log("  - tickets (ticket management)");
-    console.log("  - vulnerability_imports (import tracking)");
-    console.log("  - vulnerabilities (legacy vulnerability data)");
-    console.log("  - ticket_vulnerabilities (cross-referencing)");
-    console.log("  - vulnerability_snapshots (historical data)");
-    console.log("  - vulnerabilities_current (active vulnerabilities)");
-    console.log("  - vulnerability_daily_totals (aggregated metrics)");
-    console.log("  - vulnerability_staging (import staging)");
-    console.log("  - email_templates (email templates)");
-    console.log("  - kev_status (CISA KEV data)");
-    console.log("  - sync_metadata (sync tracking)");
-    console.log("  - ticket_templates (ticket templates)");
-    console.log("  - vulnerability_templates (vulnerability templates)");
-    console.log("  - users (authentication and authorization)");
-    console.log("  - user_preferences (cross-device settings - HEX-138)");
+    console.log(" - tickets (ticket management)");
+    console.log(" - vulnerability_imports (import tracking)");
+    console.log(" - vulnerabilities (legacy vulnerability data)");
+    console.log(" - ticket_vulnerabilities (cross-referencing)");
+    console.log(" - vulnerability_snapshots (historical data)");
+    console.log(" - vulnerabilities_current (active vulnerabilities)");
+    console.log(" - vulnerability_daily_totals (aggregated metrics)");
+    console.log(" - vulnerability_staging (import staging)");
+    console.log(" - email_templates (email templates)");
+    console.log(" - kev_status (CISA KEV data)");
+    console.log(" - sync_metadata (sync tracking)");
+    console.log(" - ticket_templates (ticket templates)");
+    console.log(" - vulnerability_templates (vulnerability templates)");
+    console.log(" - users (authentication and authorization)");
+    console.log(" - user_preferences (cross-device settings - HEX-138)");
     console.log("All 15 tables and 37 indexes created successfully!");
 
     resolve();
@@ -512,12 +512,12 @@ async function seedInitialData(db) {
 
               console.log("");
               console.log("═══════════════════════════════════════════════════════");
-              console.log("🔐 INITIAL ADMIN CREDENTIALS (SAVE THESE!)");
+              console.log("INITIAL ADMIN CREDENTIALS (SAVE THESE!)");
               console.log("═══════════════════════════════════════════════════════");
               console.log("Username: admin");
               console.log(`Password: ${initialPassword}`);
               console.log("═══════════════════════════════════════════════════════");
-              console.log("⚠️  CHANGE THIS PASSWORD IMMEDIATELY AFTER FIRST LOGIN!");
+              console.log("CHANGE THIS PASSWORD IMMEDIATELY AFTER FIRST LOGIN!");
               console.log("═══════════════════════════════════════════════════════");
               console.log("");
 

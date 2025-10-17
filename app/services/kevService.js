@@ -77,9 +77,9 @@ class KevService {
 
             await this.db.run("CREATE INDEX IF NOT EXISTS idx_sync_metadata_type_time ON sync_metadata(sync_type, sync_time DESC)");
 
-            console.log("🗃️ KEV database tables initialized");
+            console.log("KEV database tables initialized");
         } catch (error) {
-            console.error("❌ Failed to initialize KEV tables:", error);
+            console.error("Failed to initialize KEV tables:", error);
         }
     }
 
@@ -126,7 +126,7 @@ class KevService {
         }
 
         this.syncInProgress = true;
-        console.log("🔥 Starting CISA KEV data sync");
+        console.log("Starting CISA KEV data sync");
 
         try {
             // Fetch KEV data from CISA
@@ -136,7 +136,7 @@ class KevService {
             }
 
             const kevData = await response.json();
-            console.log(`📊 Fetched ${kevData.vulnerabilities.length} KEV entries from CISA`);
+            console.log(` Fetched ${kevData.vulnerabilities.length} KEV entries from CISA`);
 
             // Use promise-based database operations
             await new Promise((resolve, reject) => {
@@ -154,7 +154,7 @@ class KevService {
                         else {resolve();}
                     });
                 });
-                console.log("🗑️ Cleared existing KEV data");
+                console.log("Cleared existing KEV data");
 
                 // Prepare insert statement
                 const insertStmt = await new Promise((resolve, reject) => {
@@ -185,7 +185,7 @@ class KevService {
                             kev.notes || null,
                             (err) => {
                                 if (err) {
-                                    console.error(`❌ Insert failed for ${kev.cveID}:`, err);
+                                    console.error(` Insert failed for ${kev.cveID}:`, err);
                                     reject(err);
                                 } else {
                                     resolve();
@@ -217,7 +217,7 @@ class KevService {
                 // Get match statistics
                 const matchedCount = await this.getMatchedVulnerabilitiesCount();
 
-                console.log(`✅ KEV sync completed: ${insertCount} KEVs imported, ${matchedCount} matched`);
+                console.log(` KEV sync completed: ${insertCount} KEVs imported, ${matchedCount} matched`);
 
                 return {
                     success: true,
@@ -238,7 +238,7 @@ class KevService {
             }
 
         } catch (error) {
-            console.error("❌ KEV sync failed:", error);
+            console.error("KEV sync failed:", error);
             throw error;
         } finally {
             this.syncInProgress = false;

@@ -71,7 +71,7 @@ class ProgressService {
             this.progressTracker.createSessionWithId(customSessionId, metadata) :
             this.progressTracker.createSession(metadata);
 
-        console.log(`📊 Import session started: ${sessionId} for ${filename} (${totalRows} rows)`);
+        console.log(` Import session started: ${sessionId} for ${filename} (${totalRows} rows)`);
         return sessionId;
     }
 
@@ -222,7 +222,7 @@ class ProgressService {
             this.progressTracker.createSessionWithId(customSessionId, metadata) :
             this.progressTracker.createSession(metadata);
 
-        console.log(`📤 Export session started: ${sessionId} for ${type} (${totalItems} items, ${format} format)`);
+        console.log(` Export session started: ${sessionId} for ${type} (${totalItems} items, ${format} format)`);
         return sessionId;
     }
 
@@ -333,7 +333,7 @@ class ProgressService {
         if (this.progressTracker.sessions.has(sessionId)) {
             this.progressTracker.sessions.delete(sessionId);
             this.progressTracker.eventThrottle.delete(sessionId);
-            console.log(`🧹 Manually cleaned up session: ${sessionId}`);
+            console.log(` Manually cleaned up session: ${sessionId}`);
             return true;
         }
         return false;

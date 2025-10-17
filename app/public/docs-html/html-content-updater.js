@@ -223,7 +223,7 @@ class HtmlContentUpdater {
             const rootPackageContent = JSON.parse(await fs.readFile(rootPackagePath, "utf8"));
             const currentVersion = rootPackageContent.version;
 
-            console.log(`🔄 Updating all version references to v${currentVersion}...`);
+            console.log(` Updating all version references to v${currentVersion}...`);
 
             let updatesApplied = 0;
 
@@ -235,11 +235,11 @@ class HtmlContentUpdater {
                 if (appPackageContent.version !== currentVersion) {
                     appPackageContent.version = currentVersion;
                     await fs.writeFile(appPackagePath, JSON.stringify(appPackageContent, null, 2) + "\n");
-                    console.log("  ✅ Updated app/public/package.json version");
+                    console.log(" Updated app/public/package.json version");
                     updatesApplied++;
                 }
             } catch (error) {
-                console.warn(`  ⚠️  Could not update app/public/package.json: ${error.message}`);
+                console.warn(` Could not update app/public/package.json: ${error.message}`);
             }
 
             // 2. Update footer.html version badge
@@ -253,11 +253,11 @@ class HtmlContentUpdater {
 
                 if (footerContent !== updatedFooter) {
                     await fs.writeFile(footerPath, updatedFooter);
-                    console.log("  ✅ Updated footer.html version badge");
+                    console.log(" Updated footer.html version badge");
                     updatesApplied++;
                 }
             } catch (error) {
-                console.warn(`  ⚠️  Could not update footer.html: ${error.message}`);
+                console.warn(` Could not update footer.html: ${error.message}`);
             }
 
             // 3. Update README.md version (supports both badge and text formats)
@@ -280,11 +280,11 @@ class HtmlContentUpdater {
 
                 if (readmeContent !== updatedReadme) {
                     await fs.writeFile(readmePath, updatedReadme);
-                    console.log("  ✅ Updated README.md version");
+                    console.log(" Updated README.md version");
                     updatesApplied++;
                 }
             } catch (error) {
-                console.warn(`  ⚠️  Could not update README.md: ${error.message}`);
+                console.warn(` Could not update README.md: ${error.message}`);
             }
 
             // 4. Update docker-compose.yml HEXTRACKR_VERSION
@@ -298,11 +298,11 @@ class HtmlContentUpdater {
 
                 if (dockerContent !== updatedDocker) {
                     await fs.writeFile(dockerComposePath, updatedDocker);
-                    console.log("  ✅ Updated docker-compose.yml HEXTRACKR_VERSION");
+                    console.log(" Updated docker-compose.yml HEXTRACKR_VERSION");
                     updatesApplied++;
                 }
             } catch (error) {
-                console.warn(`  ⚠️  Could not update docker-compose.yml: ${error.message}`);
+                console.warn(` Could not update docker-compose.yml: ${error.message}`);
             }
 
             // 5. Update server.js fallback version
@@ -316,11 +316,11 @@ class HtmlContentUpdater {
 
                 if (serverContent !== updatedServer) {
                     await fs.writeFile(serverPath, updatedServer);
-                    console.log("  ✅ Updated server.js fallback version");
+                    console.log(" Updated server.js fallback version");
                     updatesApplied++;
                 }
             } catch (error) {
-                console.warn(`  ⚠️  Could not update server.js: ${error.message}`);
+                console.warn(` Could not update server.js: ${error.message}`);
             }
 
             // 6. Update login.html version footer
@@ -334,21 +334,21 @@ class HtmlContentUpdater {
 
                 if (loginContent !== updatedLogin) {
                     await fs.writeFile(loginPath, updatedLogin);
-                    console.log("  ✅ Updated login.html version footer");
+                    console.log(" Updated login.html version footer");
                     updatesApplied++;
                 }
             } catch (error) {
-                console.warn(`  ⚠️  Could not update login.html: ${error.message}`);
+                console.warn(` Could not update login.html: ${error.message}`);
             }
 
             if (updatesApplied > 0) {
-                console.log(`✨ Version sync complete: ${updatesApplied} files updated to v${currentVersion}`);
+                console.log(` Version sync complete: ${updatesApplied} files updated to v${currentVersion}`);
             } else {
                 console.log(`✓ All files already at v${currentVersion}`);
             }
 
         } catch (error) {
-            console.warn("⚠️  Could not read root package.json:", error.message);
+            console.warn("Could not read root package.json:", error.message);
             // Non-fatal - continue with HTML generation
         }
     }
@@ -574,12 +574,12 @@ class HtmlContentUpdater {
             // Write the final HTML file
             await PathValidator.safeWriteFile(source.htmlPath, finalHtml);
             
-            console.log(`✅ Generated HTML: ${source.relativePath.replace(".md", ".html")}`);
+            console.log(` Generated HTML: ${source.relativePath.replace(".md", ".html")}`);
             this.stats.filesGenerated++;
             return true;
             
         } catch (error) {
-            console.error(`❌ Failed to generate ${source.relativePath}: ${error.message}`);
+            console.error(` Failed to generate ${source.relativePath}: ${error.message}`);
             this.stats.errors++;
             return false;
         }
@@ -695,7 +695,7 @@ class HtmlContentUpdater {
         const manifestPath = path.join(process.cwd(), "app", "public", "docs-html", "content-manifest.json");
         await PathValidator.safeWriteFile(manifestPath, JSON.stringify(manifest, null, 2));
         
-        console.log(`📝 Content manifest generated: ${Object.keys(manifest.sections).length} sections, ${manifest.totalFiles} total files`);
+        console.log(` Content manifest generated: ${Object.keys(manifest.sections).length} sections, ${manifest.totalFiles} total files`);
         return manifest;
     }
 
@@ -754,7 +754,7 @@ ${this.stats.filesRemoved > 0 ? `\nAdditionally, ${this.stats.filesRemoved} orph
 `;
 
         await PathValidator.safeWriteFile("logs/docs-source/html-update-report.md", report);
-        console.log("📋 HTML generation report saved: logs/docs-source/html-update-report.md");
+        console.log("HTML generation report saved: logs/docs-source/html-update-report.md");
     }
 
     /**
@@ -782,9 +782,9 @@ ${this.stats.filesRemoved > 0 ? `\nAdditionally, ${this.stats.filesRemoved} orph
                         if (remainingItems.length === 0) {
                             try {
                                 await fs.rmdir(fullPath);
-                                console.log(`🗑️  Removed empty directory: ${currentRelPath}`);
+                                console.log(` Removed empty directory: ${currentRelPath}`);
                             } catch (error) {
-                                console.error(`❌ Failed to remove directory ${currentRelPath}: ${error.message}`);
+                                console.error(` Failed to remove directory ${currentRelPath}: ${error.message}`);
                             }
                         }
                     } else if (item.name.endsWith(".html")) {
@@ -793,10 +793,10 @@ ${this.stats.filesRemoved > 0 ? `\nAdditionally, ${this.stats.filesRemoved} orph
                         if (!generatedFiles.includes(relativePosixPath)) {
                             try {
                                 await fs.unlink(fullPath);
-                                console.log(`🗑️  Removed orphaned HTML file: ${relativePosixPath}`);
+                                console.log(` Removed orphaned HTML file: ${relativePosixPath}`);
                                 this.stats.filesRemoved++;
                             } catch (error) {
-                                console.error(`❌ Failed to remove file ${relativePosixPath}: ${error.message}`);
+                                console.error(` Failed to remove file ${relativePosixPath}: ${error.message}`);
                             }
                         }
                     }
@@ -807,12 +807,12 @@ ${this.stats.filesRemoved > 0 ? `\nAdditionally, ${this.stats.filesRemoved} orph
             await checkDirectory(contentDir);
             
             if (this.stats.filesRemoved > 0) {
-                console.log(`🧹 Cleanup complete: removed ${this.stats.filesRemoved} orphaned HTML files`);
+                console.log(` Cleanup complete: removed ${this.stats.filesRemoved} orphaned HTML files`);
             } else {
                 console.log("✓ No orphaned HTML files found, nothing to clean up");
             }
         } catch (error) {
-            console.error(`❌ Cleanup process failed: ${error.message}`);
+            console.error(` Cleanup process failed: ${error.message}`);
         }
     }
 
@@ -833,10 +833,10 @@ ${this.stats.filesRemoved > 0 ? `\nAdditionally, ${this.stats.filesRemoved} orph
                 maxBuffer: 10 * 1024 * 1024 // 10MB buffer for large output
             });
 
-            console.log("✅ JSDoc HTML generation complete!");
+            console.log("JSDoc HTML generation complete!");
 
         } catch (error) {
-            console.warn(`⚠️  JSDoc generation encountered an issue: ${error.message}`);
+            console.warn(` JSDoc generation encountered an issue: ${error.message}`);
             // Non-fatal - continue with process
         }
     }
@@ -848,7 +848,7 @@ ${this.stats.filesRemoved > 0 ? `\nAdditionally, ${this.stats.filesRemoved} orph
      * 3. Generate JSDoc → HTML API reference
      */
     async run() {
-        console.log("🚀 Starting complete documentation generation workflow...\n");
+        console.log("Starting complete documentation generation workflow...\n");
 
         try {
             // Initialize marked library first
@@ -857,17 +857,17 @@ ${this.stats.filesRemoved > 0 ? `\nAdditionally, ${this.stats.filesRemoved} orph
             // STEP 1: Update version across all project files to maintain consistency
             await this.updateVersionsAcrossFiles();
 
-            console.log("\n📝 Generating markdown documentation...");
+            console.log("\nGenerating markdown documentation...");
 
             // Load the template first
             await this.loadTemplate();
 
             // Find all markdown source files
             const sources = await this.findAllMarkdownSources();
-            console.log(`📊 Found ${sources.length} markdown source files to convert.`);
+            console.log(` Found ${sources.length} markdown source files to convert.`);
 
             if (sources.length === 0) {
-                console.log("ℹ️ No markdown files found in docs-source. Nothing to generate.");
+                console.log("No markdown files found in docs-source. Nothing to generate.");
                 return;
             }
 
@@ -893,33 +893,33 @@ ${this.stats.filesRemoved > 0 ? `\nAdditionally, ${this.stats.filesRemoved} orph
             await this.generateUpdateReport(generatedFiles);
 
             const elapsed = (Date.now() - this.stats.startTime) / 1000;
-            console.log(`\n🎉 Markdown HTML generation complete!`);
-            console.log(`📈 Generated ${this.stats.filesGenerated} files in ${elapsed.toFixed(1)}s`);
+            console.log(`\n Markdown HTML generation complete!`);
+            console.log(` Generated ${this.stats.filesGenerated} files in ${elapsed.toFixed(1)}s`);
 
             if (this.stats.filesRemoved > 0) {
-                console.log(`🧹 Removed ${this.stats.filesRemoved} orphaned HTML files`);
+                console.log(` Removed ${this.stats.filesRemoved} orphaned HTML files`);
             }
 
             if (this.stats.errors > 0) {
-                console.log(`⚠️  ${this.stats.errors} errors encountered during markdown generation.`);
+                console.log(` ${this.stats.errors} errors encountered during markdown generation.`);
             }
 
             // STEP 2: Generate JSDoc HTML documentation
             await this.generateJSDoc();
 
-            console.log("\n✨ Complete documentation workflow finished successfully!\n");
+            console.log("\nComplete documentation workflow finished successfully!\n");
 
             // MANUAL STEP REMINDER
-            console.log("⚠️  MANUAL STEP REQUIRED:");
-            console.log("📝 Update app/public/docs-source/changelog/index.md with new version:");
-            console.log("   1. Current Version reference (line ~5)");
-            console.log("   2. Latest Releases list (line ~17)");
-            console.log("   3. Version History table (line ~60)");
-            console.log("   4. Navigation section (line ~118)");
-            console.log("\n🔄 Then run: npm run docs:generate && docker-compose restart\n");
+            console.log("MANUAL STEP REQUIRED:");
+            console.log("Update app/public/docs-source/changelog/index.md with new version:");
+            console.log(" 1. Current Version reference (line ~5)");
+            console.log(" 2. Latest Releases list (line ~17)");
+            console.log(" 3. Version History table (line ~60)");
+            console.log(" 4. Navigation section (line ~118)");
+            console.log("\nThen run: npm run docs:generate && docker-compose restart\n");
 
         } catch (error) {
-            console.error("❌ Documentation generation process failed:", error);
+            console.error("Documentation generation process failed:", error);
             process.exit(1);
         }
     }

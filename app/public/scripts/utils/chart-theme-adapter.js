@@ -469,7 +469,7 @@ class ChartThemeAdapter {
     try {
       // AG-Grid v33 requires theme to be set during grid creation, not after
       // This method should trigger a grid recreation with the new theme
-      console.warn("⚠️ AG-Grid v33 theme change requires grid recreation. Delegating to VulnerabilityGridManager.updateTheme()");
+      console.warn("AG-Grid v33 theme change requires grid recreation. Delegating to VulnerabilityGridManager.updateTheme()");
       
       // Register grid instance if ID provided
       if (gridId) {
@@ -520,7 +520,7 @@ class ChartThemeAdapter {
         gridApi.refreshCells({ force: true });
       }
       
-      console.log(`⚠️ AG-Grid theme updated to ${theme} using legacy CSS classes`);
+      console.log(` AG-Grid theme updated to ${theme} using legacy CSS classes`);
       return true;
     } catch (error) {
       console.error(`Error applying legacy grid theme to ${theme}:`, error);

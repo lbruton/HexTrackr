@@ -301,7 +301,7 @@ class CiscoAdvisoryHelper {
      */
     clearCache() {
         this.advisoryCache.clear();
-        console.log('✅ Cisco advisory cache cleared');
+        console.log('Cisco advisory cache cleared');
     }
 
     /**
@@ -320,4 +320,4 @@ class CiscoAdvisoryHelper {
 // Global instance - accessible from all vulnerability pages
 window.ciscoAdvisoryHelper = new CiscoAdvisoryHelper();
 
-console.log('✅ Cisco Advisory Helper initialized');
+console.log('Cisco Advisory Helper initialized');

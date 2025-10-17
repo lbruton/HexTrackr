@@ -162,7 +162,7 @@ function createRateLimitMiddleware() {
         trust: () => true,
         // Custom rate limit handler with logging
         handler: (req, res) => {
-            console.warn(`⚠️ Rate limit exceeded: ${req.ip} → ${req.method} ${req.path}`);
+            console.warn(` Rate limit exceeded: ${req.ip} → ${req.method} ${req.path}`);
             res.status(429).json({
                 error: "Too many requests from this IP, please try again later",
                 retryAfter: Math.ceil(RATE_LIMIT_WINDOW_MS / 1000)
@@ -173,7 +173,7 @@ function createRateLimitMiddleware() {
             // Check if response has X-Cache header indicating cache hit
             const cacheHeader = res.getHeader("X-Cache");
             if (cacheHeader && (cacheHeader.includes("HIT") || cacheHeader.includes("HIT-LARGE-QUERY"))) {
-                console.log(`✅ Cache HIT - skipping rate limit: ${req.method} ${req.path}`);
+                console.log(` Cache HIT - skipping rate limit: ${req.method} ${req.path}`);
                 return true;  // Don't count this request toward limit
             }
             return false;  // Count this request (cache MISS or uncached endpoint)

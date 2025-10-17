@@ -687,7 +687,7 @@ class DatabaseService {
 
             return daysSinceLastVacuum >= config.maintenance.vacuumIntervalDays;
         } catch (error) {
-            console.warn("⚠️  Error checking VACUUM status:", error.message);
+            console.warn("Error checking VACUUM status:", error.message);
             return false;
         }
     }
@@ -699,17 +699,17 @@ class DatabaseService {
     async runVacuum() {
         return new Promise((resolve, reject) => {
             const startTime = Date.now();
-            console.log("🔧 Starting database VACUUM operation...");
+            console.log("Starting database VACUUM operation...");
 
             this.db.run("VACUUM", async (vacuumErr) => {
                 if (vacuumErr) {
-                    console.error("❌ VACUUM failed:", vacuumErr.message);
+                    console.error("VACUUM failed:", vacuumErr.message);
                     reject(vacuumErr);
                     return;
                 }
 
                 const duration = ((Date.now() - startTime) / 1000).toFixed(2);
-                console.log(`✅ Database VACUUM complete in ${duration}s`);
+                console.log(` Database VACUUM complete in ${duration}s`);
 
                 // Record in sync_metadata
                 try {
@@ -719,7 +719,7 @@ class DatabaseService {
                     );
                     resolve({ success: true, duration });
                 } catch (metadataErr) {
-                    console.warn("⚠️  Failed to record VACUUM in sync_metadata:", metadataErr.message);
+                    console.warn("Failed to record VACUUM in sync_metadata:", metadataErr.message);
                     resolve({ success: true, duration }); // VACUUM succeeded even if metadata failed
                 }
             });
@@ -734,21 +734,21 @@ class DatabaseService {
         const { config } = require("../config/database");
 
         if (!config.maintenance.enableAutoVacuum) {
-            console.log("ℹ️  Auto-VACUUM disabled in config");
+            console.log("Auto-VACUUM disabled in config");
             return;
         }
 
-        console.log(`ℹ️  Auto-VACUUM enabled: every ${config.maintenance.vacuumIntervalDays} days`);
+        console.log(` Auto-VACUUM enabled: every ${config.maintenance.vacuumIntervalDays} days`);
 
         // Check immediately on startup
         try {
             const shouldRun = await this.shouldRunVacuum();
             if (shouldRun) {
-                console.log("🔧 Running startup VACUUM (overdue)...");
+                console.log("Running startup VACUUM (overdue)...");
                 await this.runVacuum();
             }
         } catch (error) {
-            console.error("❌ Startup VACUUM check failed:", error.message);
+            console.error("Startup VACUUM check failed:", error.message);
         }
 
         // Schedule periodic checks (daily at 2 AM)
@@ -759,12 +759,12 @@ class DatabaseService {
                 if (now.getHours() === 2) { // Run at 2 AM
                     const shouldRun = await this.shouldRunVacuum();
                     if (shouldRun) {
-                        console.log("🔧 Running scheduled VACUUM...");
+                        console.log("Running scheduled VACUUM...");
                         await this.runVacuum();
                     }
                 }
             } catch (error) {
-                console.error("❌ Scheduled VACUUM check failed:", error.message);
+                console.error("Scheduled VACUUM check failed:", error.message);
             }
         }, checkInterval);
     }

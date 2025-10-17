@@ -34,7 +34,7 @@ function preparePatterns(patterns = []) {
                     regex: new RegExp(entry.pattern, flags)
                 };
             } catch (error) {
-                console.warn(`⚠️  Invalid vendor pattern '${entry.pattern}': ${error.message}`);
+                console.warn(` Invalid vendor pattern '${entry.pattern}': ${error.message}`);
                 return null;
             }
         })
@@ -52,7 +52,7 @@ function loadConfigFromDisk(configPath) {
         };
     } catch (error) {
         if (error.code !== "ENOENT") {
-            console.warn(`⚠️  Unable to load import config from ${configPath}: ${error.message}`);
+            console.warn(` Unable to load import config from ${configPath}: ${error.message}`);
         }
 
         return {

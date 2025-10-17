@@ -16,13 +16,13 @@ class DocumentationTableConverter {
      */
     init() {
         if (typeof agGrid === "undefined") {
-            console.warn("⚠️ AG-Grid not available, keeping HTML tables");
+            console.warn("AG-Grid not available, keeping HTML tables");
             return;
         }
 
         this.convertAllTables();
         this.initialized = true;
-        console.log("✅ Documentation Table Converter initialized");
+        console.log("Documentation Table Converter initialized");
     }
 
     /**
@@ -49,7 +49,7 @@ class DocumentationTableConverter {
             const { columnDefs, rowData } = this.extractTableData(table);
 
             if (columnDefs.length === 0 || rowData.length === 0) {
-                console.log(`⚠️ Skipping empty table ${index}`);
+                console.log(` Skipping empty table ${index}`);
                 return;
             }
 
@@ -84,7 +84,7 @@ class DocumentationTableConverter {
                 suppressMovableColumns: false,
                 suppressMenuHide: true,
                 onGridReady: (params) => {
-                    console.log(`✅ Grid ${index} ready with ${rowData.length} rows`);
+                    console.log(` Grid ${index} ready with ${rowData.length} rows`);
                     // Ensure columns fill available width
                     setTimeout(() => {
                         if (params.api) {
@@ -109,10 +109,10 @@ class DocumentationTableConverter {
                 originalTable: table
             });
 
-            console.log(`📊 Converted table ${index} to AG-Grid (${rowData.length} rows, ${columnDefs.length} columns)`);
+            console.log(` Converted table ${index} to AG-Grid (${rowData.length} rows, ${columnDefs.length} columns)`);
 
         } catch (error) {
-            console.error(`❌ Failed to convert table ${index}:`, error);
+            console.error(` Failed to convert table ${index}:`, error);
         }
     }
 

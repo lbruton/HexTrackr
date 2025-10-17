@@ -416,7 +416,7 @@ async function seedTemplate(db, { table, name, description, defaultContent, vari
                 }
 
                 if (row) {
-                    console.log(`✅ Template '${name}' already exists in ${table}`);
+                    console.log(` Template '${name}' already exists in ${table}`);
                     return resolve();
                 }
 
@@ -447,7 +447,7 @@ async function seedTemplate(db, { table, name, description, defaultContent, vari
                             return reject(new Error(`Failed to insert template '${name}': ${insertErr.message}`));
                         }
 
-                        console.log(`✅ Seeded template '${name}' (ID: ${this.lastID}) in ${table}`);
+                        console.log(` Seeded template '${name}' (ID: ${this.lastID}) in ${table}`);
                         resolve();
                     }
                 );
@@ -553,9 +553,9 @@ async function resetTemplateToDefault(db, table, templateName) {
             }
 
             if (this.changes === 0) {
-                console.log("⚠️ No template found to reset");
+                console.log("No template found to reset");
             } else {
-                console.log(`✅ Template '${templateName}' reset to default`);
+                console.log(` Template '${templateName}' reset to default`);
             }
 
             resolve();

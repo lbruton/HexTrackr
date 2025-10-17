@@ -35,10 +35,10 @@
       // Initialize theme management
       await initThemeManagement();
       
-      console.log("✅ HexTrackr Header (shared) loaded successfully");
+      console.log("HexTrackr Header (shared) loaded successfully");
       
     } catch (error) {
-      console.error("❌ Failed to load shared header:", error);
+      console.error("Failed to load shared header:", error);
       // Fallback: show basic navigation if loading fails
       showFallbackHeader();
     }
@@ -96,9 +96,9 @@
       // Expose theme manager globally for access - T028
       window.headerThemeManager = themeManager;
       
-      console.log("✅ Theme management initialized");
+      console.log("Theme management initialized");
     } catch (error) {
-      console.error("❌ Failed to initialize theme management:", error);
+      console.error("Failed to initialize theme management:", error);
       // Graceful degradation - header still works without theme switching
     }
   }
@@ -126,7 +126,7 @@
       </header>
     `;
     
-    console.log("⚠️ HexTrackr Header fallback loaded");
+    console.log("HexTrackr Header fallback loaded");
   }
   
   // Load header when DOM is ready
