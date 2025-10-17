@@ -14,8 +14,7 @@ services:
       - /app/node_modules
       # Mount config directory for import patterns (HEX-241)
       - ./config:/app/config:ro
-      # Mount database directory for persistence (HEX-133: moved outside public root)
-      - ./app/data:/app/app/data:rw
+      # Database stays inside Docker container (not mounted from host)
       # Mount uploads directory for file persistence
       - ./app/uploads:/app/app/uploads:rw
       # Mount SSL certificates for HTTPS
