@@ -9,7 +9,7 @@
  */
 (function() {
     if (typeof HexagonTicketsManager === "undefined" || typeof agGrid === "undefined") {
-        console.warn("HexagonTicketsManager or AG Grid not available for tickets.html.");
+        logger.warn("ui", "HexagonTicketsManager or AG Grid not available for tickets.html.");
         return;
     }
 
@@ -34,10 +34,10 @@
                 throw new Error(`Failed to load config: ${response.status}`);
             }
             deviceNamingConfig = await response.json();
-            console.log("Loaded device naming config:", deviceNamingConfig.deviceTypePatterns.length, "patterns");
+            logger.debug("ui", "Loaded device naming config:", { patternCount: deviceNamingConfig.deviceTypePatterns.length });
             return deviceNamingConfig;
         } catch (error) {
-            console.error("Failed to load device naming config:", error);
+            logger.error("ui", "Failed to load device naming config:", { error: error.message });
             // Return fallback config
             deviceNamingConfig = {
                 deviceTypePatterns: [
@@ -81,7 +81,7 @@
                 }
             }
         } catch (error) {
-            console.debug("Theme detection fallback:", error);
+            logger.debug("ui", "Theme detection fallback:", { error: error.message });
         }
 
         return false;
@@ -801,12 +801,12 @@
 
         // Load device naming config for vendor detection
         loadDeviceNamingConfig().catch(err => {
-            console.warn("Config load failed, using fallback patterns:", err);
+            logger.warn("ui", "Config load failed, using fallback patterns:", { error: err.message });
         });
 
         const gridContainer = document.getElementById(GRID_ID);
         if (!gridContainer) {
-            console.warn("tickets-aggrid: container not found.");
+            logger.warn("ui", "tickets-aggrid: container not found.");
             return;
         }
 
@@ -876,7 +876,7 @@
                 try {
                     this.gridApi.sizeColumnsToFit();
                 } catch (error) {
-                    console.debug("tickets-aggrid: unable to size columns", error);
+                    logger.debug("ui", "tickets-aggrid: unable to size columns", { error: error.message });
                 }
             }
         });
@@ -1031,7 +1031,7 @@
                     state: [{ colId: column, sort: this.sortDirection }]
                 });
             } catch (error) {
-                console.debug("tickets-aggrid: unable to synchronize sort state", error);
+                logger.debug("ui", "tickets-aggrid: unable to synchronize sort state", { error: error.message });
             }
         }
     };
