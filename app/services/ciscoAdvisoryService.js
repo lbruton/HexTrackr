@@ -13,6 +13,9 @@
 function _log(level, message, data = {}) {
     if (global.logger && global.logger.integration && typeof global.logger.integration[level] === 'function') {
         global.logger.integration[level](message, data);
+    } else {
+        // Fallback to console for debugging HEX-272
+        console.log(`[cisco-advisory:${level}]`, message, data);
     }
 }
 
@@ -592,7 +595,7 @@ class CiscoAdvisoryService {
             let advisoryCount = 0;
             let matchedCount = 0;
             let queriesExecuted = 0;
-            const delayBetweenCalls = 3000; // 3 seconds between each query
+            const delayBetweenVersions = 10000; // 10 seconds between OS version queries to respect Cisco API rate limits (HEX-272: prevent 429 errors)
 
             // Process unique versions sequentially with delays to honor Cisco rate limits
             for (let i = 0; i < uniqueVersions.length; i++) {
@@ -644,15 +647,22 @@ class CiscoAdvisoryService {
                             continue;
                         }
 
-                        const fixedVersions = advisory.firstFixed || [];
-
-                        // Fetch advisory metadata for completeness
-                        const advisoryData = await this.fetchCiscoAdvisoryForCve(cveId, accessToken);
-                        const parsed = advisoryData ? this.parseAdvisoryData(advisoryData, cveId) : null;
+                        // HEX-272: Build advisory object directly from Software Checker batch response
+                        // This eliminates the need for individual fetchCiscoAdvisoryForCve() calls,
+                        // preventing API rate limiting (HTTP 429 errors)
+                        const parsed = {
+                            cve_id: cveId,
+                            advisory_id: advisory.advisoryId || null,
+                            advisory_title: advisory.advisoryTitle || null,
+                            severity: advisory.sir || null, // Security Impact Rating
+                            cvss_score: advisory.cvssBaseScore || null,
+                            first_fixed: JSON.stringify(advisory.firstFixed || []),
+                            affected_releases: JSON.stringify(advisory.iosRelease || []),
+                            product_names: JSON.stringify(advisory.productNames || []),
+                            publication_url: advisory.publicationUrl || advisory.csafUrl || null
+                        };
 
                         if (parsed) {
-                            // Override empty first_fixed with actual fixed versions from Software Checker
-                            parsed.first_fixed = JSON.stringify(fixedVersions);
 
                             // Insert or replace advisory data
                             await new Promise((resolve, reject) => {
@@ -682,7 +692,7 @@ class CiscoAdvisoryService {
                             });
 
                             // Update vulnerabilities_current with vendor-neutral fix flag
-                            const hasFixAvailable = (fixedVersions.length > 0) ? 1 : 0;
+                            const hasFixAvailable = (advisory.firstFixed && advisory.firstFixed.length > 0) ? 1 : 0;
                             await new Promise((resolve, reject) => {
                                 this.db.run(`
                                     UPDATE vulnerabilities_current
@@ -725,11 +735,14 @@ class CiscoAdvisoryService {
                     }
                 }
 
-                _log('info', ` Processed ${cvesProcessedFromThisVersion} CVEs from this version (total: ${advisoryCount})`);
+                _log('info', ` Processed ${cvesProcessedFromThisVersion} CVEs from this version (total matched: ${matchedCount})`);
 
                 // Rate limiting: wait between each query to honor Cisco API limits
                 if (i < uniqueVersions.length - 1) {
-                    await new Promise(resolve => setTimeout(resolve, delayBetweenCalls));
+                    const remainingVersions = uniqueVersions.length - i - 1;
+                    const estimatedMinutesRemaining = Math.ceil((remainingVersions * delayBetweenVersions) / 60000);
+                    _log('info', ` Rate limiting: waiting 10 seconds before next version query (${remainingVersions} versions remaining, ~${estimatedMinutesRemaining} min)`);
+                    await new Promise(resolve => setTimeout(resolve, delayBetweenVersions));
                 }
             }
 
