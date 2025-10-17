@@ -1,0 +1,135 @@
+{
+  "version": "1.0.0",
+  "description": "Centralized logging configuration for HexTrackr - controls frontend/backend logging and audit trail",
+
+  "global": {
+    "enabled": true,
+    "emojis": false,
+    "timestamps": true,
+    "auditEnabled": true,
+    "retentionDays": 30
+  },
+
+  "levels": {
+    "production": "warn",
+    "development": "debug",
+    "test": "error"
+  },
+
+  "frontend": {
+    "categories": {
+      "auth": {
+        "enabled": true,
+        "description": "Authentication, login/logout, session management"
+      },
+      "ui": {
+        "enabled": true,
+        "description": "UI interactions, modal events, button clicks"
+      },
+      "vulnerability": {
+        "enabled": true,
+        "description": "Vulnerability data loading, filtering, statistics"
+      },
+      "ticket": {
+        "enabled": true,
+        "description": "Ticket CRUD operations, form validation"
+      },
+      "websocket": {
+        "enabled": true,
+        "description": "WebSocket connection, real-time updates"
+      },
+      "import": {
+        "enabled": true,
+        "description": "CSV import progress, validation, errors"
+      },
+      "database": {
+        "enabled": true,
+        "description": "IndexedDB operations, cache management"
+      }
+    }
+  },
+
+  "backend": {
+    "categories": {
+      "auth": {
+        "enabled": true,
+        "description": "Authentication middleware, session validation"
+      },
+      "database": {
+        "enabled": true,
+        "description": "Database connections, queries, transactions"
+      },
+      "import": {
+        "enabled": true,
+        "description": "CSV import processing, vendor detection"
+      },
+      "api": {
+        "enabled": true,
+        "description": "API endpoint handlers, request/response"
+      },
+      "worker": {
+        "enabled": true,
+        "description": "Background workers (Cisco, Palo Alto, KEV sync)"
+      },
+      "ticket": {
+        "enabled": true,
+        "description": "Ticket service operations"
+      },
+      "backup": {
+        "enabled": true,
+        "description": "Backup/restore operations"
+      },
+      "vulnerability": {
+        "enabled": true,
+        "description": "Vulnerability service operations"
+      }
+    }
+  },
+
+  "audit": {
+    "description": "Events that trigger encrypted audit log entries (always logged when auditEnabled=true)",
+    "whitelist": [
+      "user.login",
+      "user.logout",
+      "user.failed_login",
+      "user.password_change",
+      "user.account_locked",
+      "ticket.create",
+      "ticket.update",
+      "ticket.delete",
+      "import.start",
+      "import.complete",
+      "import.failed",
+      "backup.create",
+      "backup.restore",
+      "settings.change",
+      "database.vacuum",
+      "sync.kev",
+      "sync.cisco",
+      "sync.palo_alto"
+    ]
+  },
+
+  "emojis": {
+    "debug": "🐛",
+    "info": "ℹ️",
+    "warn": "⚠️",
+    "error": "❌",
+    "success": "✅"
+  },
+
+  "performance": {
+    "slowQueryThreshold": 500,
+    "slowRequestThreshold": 2000,
+    "logMemoryUsage": false
+  },
+
+  "notes": [
+    "Frontend debug mode: localStorage.setItem('hextrackr_debug', 'true')",
+    "Backend log level: Controlled by NODE_ENV (production/development/test)",
+    "Audit logs: Encrypted with AES-256-GCM, 30-day retention by default",
+    "To disable all logging: Set global.enabled = false",
+    "To disable audit trail: Set global.auditEnabled = false",
+    "Category toggles: Set enabled=false to silence specific categories"
+  ]
+}
