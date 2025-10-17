@@ -760,6 +760,22 @@ class CiscoAdvisoryService {
 
             _log('info', ` Cisco advisory sync completed: ${queriesExecuted} versions queried, ${advisoryCount} advisories processed (${actualDbCount} unique CVEs in DB), ${matchedCount} CVEs matched`);
 
+            // HEX-272: Force WAL checkpoint to flush all changes to disk
+            // This ensures data survives Docker restarts immediately after sync
+            _log('info', "Flushing WAL to disk (checkpoint)...");
+            await new Promise((resolve, reject) => {
+                this.db.run("PRAGMA wal_checkpoint(FULL)", (err) => {
+                    if (err) {
+                        _log('error', "WAL checkpoint failed:", err);
+                        // Don't fail the sync, just log the error
+                        resolve();
+                    } else {
+                        _log('info', "WAL checkpoint completed - all advisory data persisted to disk");
+                        resolve();
+                    }
+                });
+            });
+
             this.syncInProgress = false;
 
             return {
