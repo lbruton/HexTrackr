@@ -1,0 +1,329 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Logging and Audit Trail</h1><p>HexTrackr features a comprehensive logging system with encrypted audit trail capabilities, providing visibility into system operations while maintaining security and compliance requirements.</p>
+<h2>Overview</h2><p>The HexTrackr logging system consists of three core components:</p>
+<ol>
+<li><strong>Frontend Logger</strong> - Category-aware browser console logging with debug mode support</li>
+<li><strong>Backend LoggingService</strong> - Centralized server-side logging with environment-aware log levels</li>
+<li><strong>Encrypted Audit Trail</strong> - AES-256-GCM encrypted storage of security-critical operations</li>
+</ol>
+<h2>Frontend Debug Mode</h2><h3>Enabling Debug Mode</h3><p>Debug mode shows verbose diagnostic information in the browser console, useful for troubleshooting and development.</p>
+<p><strong>Enable debug mode:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-variable language_">localStorage</span>.<span class="hljs-title function_">setItem</span>(<span class="hljs-string">&#x27;hextrackr_debug&#x27;</span>, <span class="hljs-string">&#x27;true&#x27;</span>);
+location.<span class="hljs-title function_">reload</span>();</code></pre><p><strong>Disable debug mode:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-variable language_">localStorage</span>.<span class="hljs-title function_">removeItem</span>(<span class="hljs-string">&#x27;hextrackr_debug&#x27;</span>);
+location.<span class="hljs-title function_">reload</span>();</code></pre><p><strong>Check if debug mode is active:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(logger.<span class="hljs-property">debugMode</span>); <span class="hljs-comment">// true or false</span></code></pre><h3>What Debug Mode Shows</h3><p>When enabled, debug mode displays:</p>
+<ul>
+<li>Detailed API request/response logging</li>
+<li>UI event traces (button clicks, modal opens/closes)</li>
+<li>WebSocket connection status and messages</li>
+<li>Data loading and transformation steps</li>
+<li>Performance timing information</li>
+<li>Cache hit/miss statistics</li>
+</ul>
+<h3>Frontend Log Categories</h3><p>The frontend logger supports seven categories:</p>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Purpose</th>
+<th>Example Use Cases</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>auth</code></td>
+<td>Authentication operations</td>
+<td>Login, logout, session validation</td>
+</tr>
+<tr>
+<td><code>ui</code></td>
+<td>User interface events</td>
+<td>Modal opens, tab switches, button clicks</td>
+</tr>
+<tr>
+<td><code>vulnerability</code></td>
+<td>Vulnerability data operations</td>
+<td>Loading CVE data, filtering, aggregation</td>
+</tr>
+<tr>
+<td><code>ticket</code></td>
+<td>Ticket operations</td>
+<td>Creating/updating tickets, validation</td>
+</tr>
+<tr>
+<td><code>websocket</code></td>
+<td>Real-time updates</td>
+<td>Connection status, message handling</td>
+</tr>
+<tr>
+<td><code>import</code></td>
+<td>CSV import operations</td>
+<td>Upload progress, validation errors</td>
+</tr>
+<tr>
+<td><code>database</code></td>
+<td>IndexedDB operations</td>
+<td>Cache reads/writes, quota checks</td>
+</tr>
+</tbody></table>
+<h3>Using the Frontend Logger</h3><pre><code class="language-javascript"><span class="hljs-comment">// Debug logging (only shown when debug mode enabled)</span>
+logger.<span class="hljs-title function_">debug</span>(<span class="hljs-string">&#x27;ui&#x27;</span>, <span class="hljs-string">&#x27;User clicked export button&#x27;</span>);
+logger.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;vulnerability&#x27;</span>, <span class="hljs-string">&#x27;Loaded 1,234 CVEs from cache&#x27;</span>);
+
+<span class="hljs-comment">// Info logging (always shown)</span>
+logger.<span class="hljs-title function_">info</span>(<span class="hljs-string">&#x27;websocket&#x27;</span>, <span class="hljs-string">&#x27;Connected to real-time updates&#x27;</span>);
+
+<span class="hljs-comment">// Warning logging (always shown)</span>
+logger.<span class="hljs-title function_">warn</span>(<span class="hljs-string">&#x27;import&#x27;</span>, <span class="hljs-string">&#x27;CSV file missing vendor column&#x27;</span>);
+
+<span class="hljs-comment">// Error logging (always shown)</span>
+logger.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;api&#x27;</span>, <span class="hljs-string">&#x27;Failed to fetch vulnerabilities:&#x27;</span>, error);</code></pre><h2>Backend Logging</h2><h3>Environment-Based Log Levels</h3><p>The backend automatically adjusts log verbosity based on environment:</p>
+<ul>
+<li><strong>Production</strong> (<code>NODE_ENV=production</code>): Only <code>warn</code> and <code>error</code> messages</li>
+<li><strong>Development</strong> (<code>NODE_ENV=development</code>): All messages including <code>debug</code></li>
+<li><strong>Test</strong> (<code>NODE_ENV=test</code>): Only <code>error</code> messages</li>
+</ul>
+<h3>Backend Log Categories</h3><p>The backend logger supports eight categories:</p>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Purpose</th>
+<th>Example Use Cases</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>auth</code></td>
+<td>Authentication middleware</td>
+<td>Session validation, token checks</td>
+</tr>
+<tr>
+<td><code>database</code></td>
+<td>Database operations</td>
+<td>Queries, transactions, connections</td>
+</tr>
+<tr>
+<td><code>import</code></td>
+<td>CSV import processing</td>
+<td>Vendor detection, data validation</td>
+</tr>
+<tr>
+<td><code>api</code></td>
+<td>API endpoint handlers</td>
+<td>Request processing, response formatting</td>
+</tr>
+<tr>
+<td><code>worker</code></td>
+<td>Background jobs</td>
+<td>Cisco/Palo Alto sync, KEV updates</td>
+</tr>
+<tr>
+<td><code>ticket</code></td>
+<td>Ticket service</td>
+<td>CRUD operations, email notifications</td>
+</tr>
+<tr>
+<td><code>backup</code></td>
+<td>Backup/restore</td>
+<td>Database snapshots, restoration</td>
+</tr>
+<tr>
+<td><code>vulnerability</code></td>
+<td>Vulnerability service</td>
+<td>CVE lookups, data aggregation</td>
+</tr>
+</tbody></table>
+<h3>Backend Log Format</h3><p>Backend logs include:</p>
+<ul>
+<li>Emoji indicator (configurable)</li>
+<li>ISO 8601 timestamp</li>
+<li>Log level (DEBUG/INFO/WARN/ERROR)</li>
+<li>Scope and category (<code>[backend:auth]</code>)</li>
+<li>Message</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-">✅ [2025-10-17T14:30:45.123Z] [INFO] [backend:auth] User authenticated: jsmith</code></pre><h2>Encrypted Audit Trail</h2><h3>Security Features</h3><p>The audit trail provides tamper-evident logging of security-critical operations:</p>
+<ul>
+<li><strong>Encryption</strong>: AES-256-GCM with randomly generated 256-bit key</li>
+<li><strong>Integrity</strong>: 16-byte authentication tag verifies data hasn&#39;t been tampered with</li>
+<li><strong>Uniqueness</strong>: 12-byte initialization vector (IV) unique to each log entry</li>
+<li><strong>Storage</strong>: Key stored in database, never exposed to clients</li>
+<li><strong>Retention</strong>: Automatic cleanup after 30 days (configurable)</li>
+</ul>
+<h3>What Gets Audited</h3><p>The following operations are automatically logged to the encrypted audit trail:</p>
+<p><strong>User Authentication:</strong></p>
+<ul>
+<li><code>user.login</code> - Successful login</li>
+<li><code>user.logout</code> - User logout</li>
+<li><code>user.failed_login</code> - Failed login attempt</li>
+<li><code>user.password_change</code> - Password changed</li>
+<li><code>user.account_locked</code> - Account locked due to failed attempts</li>
+</ul>
+<p><strong>Ticket Operations:</strong></p>
+<ul>
+<li><code>ticket.create</code> - New ticket created</li>
+<li><code>ticket.update</code> - Ticket modified</li>
+<li><code>ticket.delete</code> - Ticket deleted</li>
+</ul>
+<p><strong>Data Import:</strong></p>
+<ul>
+<li><code>import.start</code> - CSV import started</li>
+<li><code>import.complete</code> - Import finished successfully</li>
+<li><code>import.failed</code> - Import failed with errors</li>
+</ul>
+<p><strong>System Operations:</strong></p>
+<ul>
+<li><code>backup.create</code> - Database backup created</li>
+<li><code>backup.restore</code> - Database restored from backup</li>
+<li><code>settings.change</code> - System settings modified</li>
+<li><code>database.vacuum</code> - Database optimization performed</li>
+</ul>
+<p><strong>Vendor Synchronization:</strong></p>
+<ul>
+<li><code>sync.kev</code> - CISA KEV sync completed</li>
+<li><code>sync.cisco</code> - Cisco advisory sync completed</li>
+<li><code>sync.palo_alto</code> - Palo Alto advisory sync completed</li>
+</ul>
+<h3>Audit Log Structure</h3><p>Each audit log entry contains:</p>
+<p><strong>Indexed Fields</strong> (searchable, unencrypted):</p>
+<ul>
+<li>Category (e.g., <code>user.login</code>)</li>
+<li>Timestamp (ISO 8601)</li>
+<li>User ID and username</li>
+<li>IP address</li>
+<li>User agent (browser/client)</li>
+</ul>
+<p><strong>Encrypted Payload</strong> (AES-256-GCM encrypted):</p>
+<ul>
+<li>Human-readable message</li>
+<li>Additional structured data (varies by category)</li>
+</ul>
+<h3>Viewing Audit Logs (Admin Only)</h3><blockquote>
+<p><strong>Note</strong>: Audit log viewing interface will be available in HEX-254 Session 13.</p>
+</blockquote>
+<p>Administrators will be able to:</p>
+<ul>
+<li>Search audit logs by category, user, or date range</li>
+<li>Export logs for compliance reporting</li>
+<li>View decrypted log details (requires admin privileges)</li>
+<li>Monitor system activity patterns</li>
+</ul>
+<h3>Data Retention</h3><p><strong>Default retention period:</strong> 30 days</p>
+<p>Audit logs older than the retention period are automatically purged:</p>
+<ul>
+<li>Cleanup runs daily at 3 AM server time</li>
+<li>Purged log count is tracked in statistics</li>
+<li>Retention period configurable in <code>/app/config/logging.config.json</code></li>
+</ul>
+<p>To change retention period, edit <code>logging.config.json</code>:</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;global&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;retentionDays&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">90</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code></pre><h2>Configuration</h2><h3>Configuration File Location</h3><p><code>/app/config/logging.config.json</code></p>
+<h3>Global Settings</h3><pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;global&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;enabled&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>           <span class="hljs-comment">// Master toggle for all logging</span>
+    <span class="hljs-attr">&quot;emojis&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>            <span class="hljs-comment">// Show emoji indicators</span>
+    <span class="hljs-attr">&quot;timestamps&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>        <span class="hljs-comment">// Include timestamps in logs</span>
+    <span class="hljs-attr">&quot;auditEnabled&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>      <span class="hljs-comment">// Enable encrypted audit trail</span>
+    <span class="hljs-attr">&quot;retentionDays&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">30</span>        <span class="hljs-comment">// Audit log retention (days)</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code></pre><h3>Disabling Logging</h3><p><strong>Disable all logging:</strong></p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;global&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;enabled&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">false</span></span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code></pre><p><strong>Disable audit trail only:</strong></p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;global&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;auditEnabled&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">false</span></span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code></pre><p><strong>Disable specific category:</strong></p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;frontend&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;categories&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">&quot;websocket&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+        <span class="hljs-attr">&quot;enabled&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">false</span></span>
+      <span class="hljs-punctuation">}</span>
+    <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span></code></pre><h3>Environment Variables</h3><p>The logging system respects standard Node.js environment variables:</p>
+<ul>
+<li><code>NODE_ENV=production</code> - Minimal logging (warn/error only)</li>
+<li><code>NODE_ENV=development</code> - Verbose logging (all levels)</li>
+<li><code>NODE_ENV=test</code> - Minimal logging (error only)</li>
+</ul>
+<h2>Troubleshooting</h2><h3>Debug Mode Not Working</h3><ol>
+<li><p>Check localStorage is accessible (privacy mode may block):</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">try</span> {
+  <span class="hljs-variable language_">localStorage</span>.<span class="hljs-title function_">setItem</span>(<span class="hljs-string">&#x27;test&#x27;</span>, <span class="hljs-string">&#x27;1&#x27;</span>);
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;localStorage available&#x27;</span>);
+} <span class="hljs-keyword">catch</span> (e) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;localStorage blocked:&#x27;</span>, e);
+}</code></pre></li>
+<li><p>Verify debug flag is set:</p>
+<pre><code class="language-javascript"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">localStorage</span>.<span class="hljs-title function_">getItem</span>(<span class="hljs-string">&#x27;hextrackr_debug&#x27;</span>));</code></pre></li>
+<li><p>Ensure page was reloaded after setting flag</p>
+</li>
+</ol>
+<h3>Missing Audit Logs</h3><p>If audit logs are not being created:</p>
+<ol>
+<li><p>Check audit is enabled in config:</p>
+<pre><code class="language-bash"><span class="hljs-built_in">cat</span> /app/config/logging.config.json | grep auditEnabled</code></pre></li>
+<li><p>Verify category is in whitelist:</p>
+<pre><code class="language-bash"><span class="hljs-built_in">cat</span> /app/config/logging.config.json | grep -A 20 <span class="hljs-string">&#x27;&quot;audit&quot;&#x27;</span></code></pre></li>
+<li><p>Check database table exists:</p>
+<pre><code class="language-bash">sqlite3 data/hextrackr.db <span class="hljs-string">&quot;SELECT COUNT(*) FROM audit_logs;&quot;</span></code></pre></li>
+</ol>
+<h3>Performance Impact</h3><p>The logging system is designed for minimal performance impact:</p>
+<ul>
+<li>Frontend logs: Zero cost in production (unless debug mode enabled)</li>
+<li>Backend logs: Conditional checks short-circuit before formatting</li>
+<li>Audit logs: Asynchronous writes, non-blocking</li>
+<li>Encryption: Native Node.js crypto, optimized for performance</li>
+</ul>
+<h2>Security Considerations</h2><h3>Audit Log Encryption</h3><ul>
+<li>Encryption key never exposed to clients</li>
+<li>Key stored in database, accessible only to server process</li>
+<li>Each log entry uses unique IV (initialization vector)</li>
+<li>Authentication tag prevents tampering</li>
+<li>Future enhancement: Key rotation capability</li>
+</ul>
+<h3>What NOT to Log</h3><p>The audit system is designed to log operations, not sensitive data. Do not include:</p>
+<ul>
+<li>Passwords or password hashes</li>
+<li>Session tokens or API keys</li>
+<li>Credit card numbers or PII</li>
+<li>Raw database credentials</li>
+<li>Unencrypted sensitive user data</li>
+</ul>
+<h3>Compliance Notes</h3><p>The encrypted audit trail helps meet compliance requirements for:</p>
+<ul>
+<li><strong>GDPR</strong>: User action tracking, data processing logs</li>
+<li><strong>SOC 2</strong>: Access controls, change management</li>
+<li><strong>HIPAA</strong>: Audit controls, activity monitoring</li>
+<li><strong>PCI DSS</strong>: Audit trail requirements (if handling payment data)</li>
+</ul>
+<blockquote>
+<p><strong>Important</strong>: Always consult your compliance officer to ensure logging meets your specific regulatory requirements.</p>
+</blockquote>
+<h2>Developer Resources</h2><p>For developers implementing new features that require audit logging:</p>
+<ul>
+<li><strong>Developer Guide</strong>: <code>/docs/LOGGING_SYSTEM.md</code></li>
+<li><strong>Configuration Schema</strong>: <code>/app/config/logging.config.json</code></li>
+<li><strong>Database Schema</strong>: <code>/app/public/scripts/migrations/012-create-audit-logs.sql</code></li>
+<li><strong>Backend Service</strong>: <code>/app/services/loggingService.js</code></li>
+<li><strong>Frontend Logger</strong>: <code>/app/public/scripts/shared/logger.js</code></li>
+</ul>
+<h2>Related Documentation</h2><ul>
+<li><a href="#architecture/system-overview">System Architecture</a></li>
+<li><a href="#security/best-practices">Security Best Practices</a></li>
+<li><a href="#api/logging-api">Developer API Reference</a></li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
