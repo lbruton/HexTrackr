@@ -11,13 +11,13 @@ require("dotenv").config();
 
 // HEX-133 Task 1.3: Validate SESSION_SECRET exists at boot time
 if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) {
-    console.error("\n❌ CRITICAL: SESSION_SECRET is missing or too short!");
-    console.error("📋 Session security requires a cryptographically random secret (32+ characters)");
-    console.error("\n🔧 To generate a secure SESSION_SECRET, run:");
-    console.error("   node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\"");
-    console.error("\n📝 Add the generated value to your .env file:");
-    console.error("   SESSION_SECRET=<generated_secret_here>");
-    console.error("\n⚠️  Server startup aborted for security.\n");
+    console.error("\nCRITICAL: SESSION_SECRET is missing or too short!");
+    console.error("Session security requires a cryptographically random secret (32+ characters)");
+    console.error("\nTo generate a secure SESSION_SECRET, run:");
+    console.error(" node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\"");
+    console.error("\nAdd the generated value to your .env file:");
+    console.error(" SESSION_SECRET=<generated_secret_here>");
+    console.error("\nServer startup aborted for security.\n");
     process.exit(1);
 }
 
@@ -110,17 +110,17 @@ io.engine.use((req, res, next) => {
     // Apply session middleware during handshake
     sessionMiddleware(req, res, (err) => {
         if (err) {
-            console.error("❌ Socket session error:", err);
+            console.error("Socket session error:", err);
             return next(err);
         }
 
         // Check if user is authenticated
         if (!req.session || !req.session.userId) {
-            console.log("⚠️  Unauthenticated WebSocket connection attempt");
+            console.log("Unauthenticated WebSocket connection attempt");
             return next(new Error("Authentication required"));
         }
 
-        console.log(`✅ Authenticated WebSocket handshake: ${req.session.username}`);
+        console.log(` Authenticated WebSocket handshake: ${req.session.username}`);
         next();
     });
 });
@@ -194,7 +194,7 @@ async function initializeApplication() {
     try {
         await seedAllTemplates(db);
     } catch (seedError) {
-        console.error("⚠️ Failed to seed templates:", seedError.message);
+        console.error("Failed to seed templates:", seedError.message);
     }
 
     // Apply middleware configuration
@@ -407,23 +407,23 @@ async function initializeApplication() {
     });
 
     server.listen(PORT, "0.0.0.0", () => {
-        console.log(`🚀 HexTrackr server running on ${useHTTPS ? "https" : "http"}://localhost:${PORT}`);
-        console.log("📊 Modular backend initialized");
+        console.log(` HexTrackr server running on ${useHTTPS ? "https" : "http"}://localhost:${PORT}`);
+        console.log("Modular backend initialized");
         console.log("🔌 WebSocket progress tracking enabled");
         console.log("Available endpoints:");
-        console.log(`  - Tickets: ${useHTTPS ? "https" : "http"}://localhost:${PORT}/tickets.html`);
-        console.log(`  - Vulnerabilities: ${useHTTPS ? "https" : "http"}://localhost:${PORT}/vulnerabilities.html`);
-        console.log(`  - API Root: ${useHTTPS ? "https" : "http"}://localhost:${PORT}/api`);
+        console.log(` - Tickets: ${useHTTPS ? "https" : "http"}://localhost:${PORT}/tickets.html`);
+        console.log(` - Vulnerabilities: ${useHTTPS ? "https" : "http"}://localhost:${PORT}/vulnerabilities.html`);
+        console.log(` - API Root: ${useHTTPS ? "https" : "http"}://localhost:${PORT}/api`);
 
         // HEX-133 Task 1.6: Warn about HTTPS requirement for authentication
         if (!useHTTPS && process.env.NODE_ENV !== "test") {
-            console.log("\n⚠️  WARNING: Secure cookies enabled but server not using HTTPS!");
-            console.log("   Session cookies will be rejected by browsers over HTTP.");
-            console.log("   Login and authentication will NOT work without HTTPS.");
-            console.log("\n🔧 For local development, use Docker nginx reverse proxy:");
-            console.log("   docker-compose up -d");
-            console.log("   Access via https://localhost or https://dev.hextrackr.com");
-            console.log("   (Type 'thisisunsafe' to bypass self-signed cert warning)\n");
+            console.log("\nWARNING: Secure cookies enabled but server not using HTTPS!");
+            console.log(" Session cookies will be rejected by browsers over HTTP.");
+            console.log(" Login and authentication will NOT work without HTTPS.");
+            console.log("\nFor local development, use Docker nginx reverse proxy:");
+            console.log(" docker-compose up -d");
+            console.log(" Access via https://localhost or https://dev.hextrackr.com");
+            console.log(" (Type 'thisisunsafe' to bypass self-signed cert warning)\n");
         }
 
         // HEX-141: Start Cisco advisory background sync worker
@@ -456,10 +456,10 @@ function startCiscoBackgroundSync(db) {
             }
         })
         .then(() => {
-            console.log("✅ Cisco background sync preference initialized");
+            console.log("Cisco background sync preference initialized");
         })
         .catch(err => {
-            console.warn("⚠️  Failed to initialize Cisco background sync preference:", err.message);
+            console.warn("Failed to initialize Cisco background sync preference:", err.message);
         });
 
     /**
@@ -474,7 +474,7 @@ function startCiscoBackgroundSync(db) {
                 : true; // Default enabled if preference doesn't exist
 
             if (!isEnabled) {
-                console.log("ℹ️  Cisco background sync skipped: Disabled by user preference");
+                console.log("Cisco background sync skipped: Disabled by user preference");
                 return;
             }
 
@@ -482,23 +482,23 @@ function startCiscoBackgroundSync(db) {
             const { clientId } = await ciscoService.getCiscoCredentials(ADMIN_USER_ID);
 
             if (!clientId) {
-                console.log("ℹ️  Cisco background sync skipped: No API credentials configured");
+                console.log("Cisco background sync skipped: No API credentials configured");
                 return;
             }
 
-            console.log("🔄 Starting Cisco advisory background sync...");
+            console.log("Starting Cisco advisory background sync...");
             const result = await ciscoService.syncCiscoAdvisories(ADMIN_USER_ID);
 
-            console.log(`✅ Cisco background sync completed: ${result.matchedCount}/${result.totalCvesChecked} CVEs synced`);
+            console.log(` Cisco background sync completed: ${result.matchedCount}/${result.totalCvesChecked} CVEs synced`);
 
         } catch (error) {
-            console.error("❌ Cisco background sync failed:", error.message);
+            console.error("Cisco background sync failed:", error.message);
             // Don't crash the server on sync failure - just log and continue
         }
     }
 
     // Run initial sync on startup (5 minute delay to prevent database corruption on rapid restarts)
-    console.log("⏰ Cisco advisory background sync scheduled (runs 5 min after startup + every 24 hours)");
+    console.log("Cisco advisory background sync scheduled (runs 5 min after startup + every 24 hours)");
     setTimeout(() => {
         runSync();
     }, STARTUP_DELAY);
@@ -519,10 +519,10 @@ function startCiscoBackgroundSync(db) {
             }
         })
         .then(() => {
-            console.log("✅ Palo Alto background sync preference initialized");
+            console.log("Palo Alto background sync preference initialized");
         })
         .catch(err => {
-            console.warn("⚠️  Failed to initialize Palo Alto background sync preference:", err.message);
+            console.warn("Failed to initialize Palo Alto background sync preference:", err.message);
         });
 
     /**
@@ -538,24 +538,24 @@ function startCiscoBackgroundSync(db) {
                 : true; // Default enabled if preference doesn't exist
 
             if (!isEnabled) {
-                console.log("ℹ️  Palo Alto background sync skipped: Disabled by user preference");
+                console.log("Palo Alto background sync skipped: Disabled by user preference");
                 return;
             }
 
-            console.log("🔄 Starting Palo Alto advisory background sync...");
+            console.log("Starting Palo Alto advisory background sync...");
             const result = await paloService.syncPaloAdvisories(ADMIN_USER_ID);
 
-            console.log(`✅ Palo Alto background sync completed: ${result.matchedCount}/${result.totalCvesChecked} CVEs synced`);
+            console.log(` Palo Alto background sync completed: ${result.matchedCount}/${result.totalCvesChecked} CVEs synced`);
 
         } catch (error) {
-            console.error("❌ Palo Alto background sync failed:", error.message);
+            console.error("Palo Alto background sync failed:", error.message);
             // Don't crash the server on sync failure - just log and continue
         }
     }
 
     // Run initial sync on startup (5 min + 30s delay, staggered after Cisco to prevent overlap)
     const PALO_STARTUP_DELAY = STARTUP_DELAY + 30000; // 5 minutes 30 seconds
-    console.log("⏰ Palo Alto advisory background sync scheduled (runs 5.5 min after startup + every 24 hours)");
+    console.log("Palo Alto advisory background sync scheduled (runs 5.5 min after startup + every 24 hours)");
     setTimeout(() => {
         runPaloSync();
     }, PALO_STARTUP_DELAY);

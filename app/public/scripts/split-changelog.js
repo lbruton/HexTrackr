@@ -93,7 +93,7 @@ function writeVersionFiles(versions) {
         fs.writeFileSync(filepath, fileContent, "utf8");
         filesWritten++;
 
-        console.log(`✅ Created ${filename}`);
+        console.log(` Created ${filename}`);
     }
 
     return filesWritten;
@@ -103,26 +103,26 @@ function writeVersionFiles(versions) {
  * Main execution
  */
 function main() {
-    console.log("🚀 Splitting CHANGELOG.md into version files...\n");
+    console.log("Splitting CHANGELOG.md into version files...\n");
 
     try {
         // Parse the changelog
         const versions = parseChangelog();
-        console.log(`📊 Found ${versions.length} versions\n`);
+        console.log(` Found ${versions.length} versions\n`);
 
         // Write individual version files
         const filesWritten = writeVersionFiles(versions);
 
-        console.log(`\n✨ Successfully created ${filesWritten} version files in:`);
-        console.log(`   ${VERSIONS_DIR}`);
+        console.log(`\n Successfully created ${filesWritten} version files in:`);
+        console.log(` ${VERSIONS_DIR}`);
 
         // Summary
-        console.log("\n📋 Version Range:");
-        console.log(`   Newest: ${versions[0].version}`);
-        console.log(`   Oldest: ${versions[versions.length - 1].version}`);
+        console.log("\nVersion Range:");
+        console.log(` Newest: ${versions[0].version}`);
+        console.log(` Oldest: ${versions[versions.length - 1].version}`);
 
     } catch (error) {
-        console.error("❌ Error splitting changelog:", error.message);
+        console.error("Error splitting changelog:", error.message);
         process.exit(1);
     }
 }

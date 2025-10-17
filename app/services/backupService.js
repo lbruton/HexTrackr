@@ -197,7 +197,7 @@ class BackupService {
      */
     async exportAll() {
         try {
-            console.log("🔄 Starting comprehensive database backup...");
+            console.log("Starting comprehensive database backup...");
 
             // Get comprehensive data from both export functions plus user preferences
             const [vulnerabilityData, ticketData, preferencesData] = await Promise.all([
@@ -218,7 +218,7 @@ class BackupService {
                 .filter(key => key !== "type" && key !== "exported_at")
                 .reduce((sum, key) => sum + (ticketData[key]?.count || 0), 0);
 
-            console.log(`✅ Backup complete: ${totalVulnRecords} vulnerability records, ${totalTicketRecords} ticket/template records`);
+            console.log(`Backup complete: ${totalVulnRecords} vulnerability records, ${totalTicketRecords} ticket/template records`);
 
             return {
                 type: "complete_backup_enhanced",
@@ -239,7 +239,7 @@ class BackupService {
             };
 
         } catch (error) {
-            console.error("❌ Complete backup failed:", error.message);
+            console.error("Complete backup failed:", error.message);
             throw new Error("Complete backup failed: " + error.message);
         }
     }
@@ -567,7 +567,7 @@ class BackupService {
      */
     async exportAllAsZip() {
         try {
-            console.log("🔄 Creating comprehensive ZIP backup...");
+            console.log("Creating comprehensive ZIP backup...");
 
             // Get all data using the enhanced export
             const backupData = await this.exportAll();
@@ -618,12 +618,12 @@ class BackupService {
                 compressionOptions: { level: 6 }
             });
 
-            console.log(`✅ ZIP backup created: ${(zipBuffer.length / 1024 / 1024).toFixed(1)}MB`);
+            console.log(`ZIP backup created: ${(zipBuffer.length / 1024 / 1024).toFixed(1)}MB`);
 
             return zipBuffer;
 
         } catch (error) {
-            console.error("❌ ZIP backup creation failed:", error.message);
+            console.error("ZIP backup creation failed:", error.message);
             throw new Error(`ZIP backup failed: ${error.message}`);
         }
     }
@@ -635,7 +635,7 @@ class BackupService {
      */
     async exportVulnerabilitiesAsZip() {
         try {
-            console.log("🔄 Creating vulnerabilities ZIP backup...");
+            console.log("Creating vulnerabilities ZIP backup...");
 
             const vulnData = await this.exportVulnerabilities();
             const zip = new JSZip();
@@ -659,7 +659,7 @@ class BackupService {
                     if (recordCount > CHUNK_SIZE) {
                         // Split into chunks
                         const numChunks = Math.ceil(recordCount / CHUNK_SIZE);
-                        console.log(`📦 Splitting ${key} into ${numChunks} chunks (${recordCount} records)`);
+                        console.log(`Splitting ${key} into ${numChunks} chunks (${recordCount} records)`);
 
                         for (let i = 0; i < numChunks; i++) {
                             const start = i * CHUNK_SIZE;
@@ -686,12 +686,12 @@ class BackupService {
             });
 
             const zipBuffer = await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE" });
-            console.log(`✅ Vulnerabilities ZIP created: ${(zipBuffer.length / 1024 / 1024).toFixed(1)}MB`);
+            console.log(`Vulnerabilities ZIP created: ${(zipBuffer.length / 1024 / 1024).toFixed(1)}MB`);
 
             return zipBuffer;
 
         } catch (error) {
-            console.error("❌ Vulnerabilities ZIP backup failed:", error.message);
+            console.error("Vulnerabilities ZIP backup failed:", error.message);
             throw new Error(`Vulnerabilities ZIP backup failed: ${error.message}`);
         }
     }
@@ -703,7 +703,7 @@ class BackupService {
      */
     async exportTicketsAsZip() {
         try {
-            console.log("🔄 Creating tickets ZIP backup...");
+            console.log("Creating tickets ZIP backup...");
 
             const ticketData = await this.exportTickets();
             const zip = new JSZip();
@@ -724,12 +724,12 @@ class BackupService {
             });
 
             const zipBuffer = await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE" });
-            console.log(`✅ Tickets ZIP created: ${(zipBuffer.length / 1024 / 1024).toFixed(1)}MB`);
+            console.log(`Tickets ZIP created: ${(zipBuffer.length / 1024 / 1024).toFixed(1)}MB`);
 
             return zipBuffer;
 
         } catch (error) {
-            console.error("❌ Tickets ZIP backup failed:", error.message);
+            console.error("Tickets ZIP backup failed:", error.message);
             throw new Error(`Tickets ZIP backup failed: ${error.message}`);
         }
     }

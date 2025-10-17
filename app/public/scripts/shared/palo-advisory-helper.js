@@ -294,7 +294,7 @@ class PaloAdvisoryHelper {
      */
     clearCache() {
         this.advisoryCache.clear();
-        console.log('✅ Palo Alto advisory cache cleared');
+        console.log('Palo Alto advisory cache cleared');
     }
 
     /**
@@ -313,4 +313,4 @@ class PaloAdvisoryHelper {
 // Global instance - accessible from all vulnerability pages
 window.paloAdvisoryHelper = new PaloAdvisoryHelper();
 
-console.log('✅ Palo Alto Advisory Helper initialized');
+console.log('Palo Alto Advisory Helper initialized');

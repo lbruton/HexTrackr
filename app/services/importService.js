@@ -160,8 +160,8 @@ async function processVulnerabilitiesWithLifecycle(rows, importId, filePath, sca
         const currentDate = scanDate || new Date().toISOString().split("T")[0];
         const db = global.db;
 
-        console.log("🚀 PERFORMANCE: Starting enhanced rollover import");
-        console.log(`📊 PERFORMANCE: Scan date: ${currentDate}, Rows: ${rows.length}`);
+        console.log("PERFORMANCE: Starting enhanced rollover import");
+        console.log(` PERFORMANCE: Scan date: ${currentDate}, Rows: ${rows.length}`);
 
         // Step 1: Mark all active vulnerabilities as potentially stale (grace period)
         db.run("UPDATE vulnerabilities_current SET lifecycle_state = 'grace_period' WHERE lifecycle_state = 'active'", (err) => {
@@ -386,12 +386,12 @@ async function processVulnerabilitiesWithLifecycle(rows, importId, filePath, sca
                     const resolvedCount = this.changes || 0;
 
                     if (!resolveErr) {
-                        console.log(`✅ Resolved ${resolvedCount} vulnerabilities not present in current scan`);
+                        console.log(` Resolved ${resolvedCount} vulnerabilities not present in current scan`);
                     }
 
                     // Update daily totals
                     calculateAndStoreDailyTotalsEnhanced(currentDate, () => {
-                        console.log(`✅ Import complete: Inserted: ${stats.inserted}, Updated: ${stats.updated}, Resolved: ${resolvedCount}`);
+                        console.log(` Import complete: Inserted: ${stats.inserted}, Updated: ${stats.updated}, Resolved: ${resolvedCount}`);
 
                         // Clean up file
                         try {
@@ -424,7 +424,7 @@ async function processVulnerabilitiesWithLifecycle(rows, importId, filePath, sca
 async function bulkLoadToStagingTable(rows, importId, scanDate, filePath, responseData, sessionId, startTime, progressTracker) {
     return new Promise((resolve, reject) => {
         const loadStart = Date.now();
-        console.log(`🚀 BULK LOAD: Starting bulk insert of ${rows.length} rows to staging table`);
+        console.log(` BULK LOAD: Starting bulk insert of ${rows.length} rows to staging table`);
 
         const db = global.db;
 
@@ -450,7 +450,7 @@ async function bulkLoadToStagingTable(rows, importId, scanDate, filePath, respon
                     return;
                 }
 
-                console.log("💾 Transaction started - bulk inserting rows");
+                console.log("Transaction started - bulk inserting rows");
                 if (progressTracker && progressTracker.updateProgress) {
                     progressTracker.updateProgress(sessionId, 25, "Inserting rows into staging table...", { currentStep: 2 });
                 }
@@ -484,7 +484,7 @@ async function bulkLoadToStagingTable(rows, importId, scanDate, filePath, respon
                     }
                 });
 
-                console.log(`📊 CSV Processing: ${rows.length} rows → ${totalRecordsToInsert} vulnerability records`);
+                console.log(` CSV Processing: ${rows.length} rows → ${totalRecordsToInsert} vulnerability records`);
 
                 // Second pass: insert all mapped records
                 allMappedRecords.forEach((record, recordIndex) => {
@@ -559,7 +559,7 @@ async function bulkLoadToStagingTable(rows, importId, scanDate, filePath, respon
                         const loadTime = Date.now() - loadStart;
                         const rowsPerSecond = insertedCount / (loadTime / 1000);
 
-                        console.log(`✅ BULK LOAD COMPLETE: ${insertedCount} records inserted in ${loadTime}ms (${rowsPerSecond.toFixed(1)} records/sec)`);
+                        console.log(` BULK LOAD COMPLETE: ${insertedCount} records inserted in ${loadTime}ms (${rowsPerSecond.toFixed(1)} records/sec)`);
 
                         // Update progress: Staging complete
                         if (progressTracker && progressTracker.updateProgress) {
@@ -576,7 +576,7 @@ async function bulkLoadToStagingTable(rows, importId, scanDate, filePath, respon
                         try {
                             if (filePath && PathValidator.safeExistsSync(filePath)) {
                                 PathValidator.safeUnlinkSync(filePath);
-                                console.log("🗑️  Source file cleaned up");
+                                console.log("Source file cleaned up");
                             }
                         } catch (cleanupError) {
                             console.warn("File cleanup warning:", cleanupError.message);
@@ -611,8 +611,8 @@ function processStagingToFinalTables(importId, scanDate, responseData, sessionId
     const currentDate = scanDate;
     const db = global.db;
 
-    console.log("🔄 BATCH PROCESSOR: Starting batch processing from staging table");
-    console.log(`📊 Batch Size: ${batchSize}, Import ID: ${importId}, Scan Date: ${currentDate}`);
+    console.log("BATCH PROCESSOR: Starting batch processing from staging table");
+    console.log(` Batch Size: ${batchSize}, Import ID: ${importId}, Scan Date: ${currentDate}`);
 
     // Step 1: Mark all active vulnerabilities as potentially stale (grace period)
     const graceStart = Date.now();
@@ -645,7 +645,7 @@ function processStagingToFinalTables(importId, scanDate, responseData, sessionId
             const totalRows = countResult.total;
             const totalBatches = Math.ceil(totalRows / batchSize);
 
-            console.log(`📈 Processing ${totalRows} rows in ${totalBatches} batches`);
+            console.log(` Processing ${totalRows} rows in ${totalBatches} batches`);
 
             // Update progress: Starting batch processing
             if (progressTracker && progressTracker.updateProgress) {
@@ -726,7 +726,7 @@ function processNextBatch(importId, currentDate, batchSize, batchStats, response
             return;
         }
 
-        console.log(`🔄 Processing batch ${batchStats.currentBatch}/${batchStats.totalBatches} (${batchRows.length} rows)`);
+        console.log(` Processing batch ${batchStats.currentBatch}/${batchStats.totalBatches} (${batchRows.length} rows)`);
 
         // Process this batch using transaction
         db.serialize(() => {
@@ -898,7 +898,7 @@ function processNextBatch(importId, currentDate, batchSize, batchStats, response
                                     const batchRowsPerSec = batchRows.length / (batchTime / 1000);
                                     batchStats.processedRows += batchRows.length;
 
-                                    console.log(`✅ Batch ${batchStats.currentBatch} complete: ${batchRows.length} rows in ${batchTime}ms (${batchRowsPerSec.toFixed(1)} rows/sec)`);
+                                    console.log(` Batch ${batchStats.currentBatch} complete: ${batchRows.length} rows in ${batchTime}ms (${batchRowsPerSec.toFixed(1)} rows/sec)`);
 
                                     // Process next batch
                                     setTimeout(() => {
@@ -920,7 +920,7 @@ function processNextBatch(importId, currentDate, batchSize, batchStats, response
 function finalizeBatchProcessing(importId, currentDate, batchStats, responseData, sessionId, startTime, progressTracker) {
     const db = global.db;
 
-    console.log("🏁 FINALIZE: Starting batch processing finalization");
+    console.log("FINALIZE: Starting batch processing finalization");
 
     // Update progress: Starting finalization
     if (progressTracker && progressTracker.updateProgress) {
@@ -941,7 +941,7 @@ function finalizeBatchProcessing(importId, currentDate, batchStats, responseData
         if (err) {
             console.error("Error resolving stale vulnerabilities:", err);
         } else {
-            console.log(`✅ Resolved ${resolvedCount} vulnerabilities not present in current scan`);
+            console.log(` Resolved ${resolvedCount} vulnerabilities not present in current scan`);
         }
 
         // Step 2: Calculate and store enhanced daily totals
@@ -951,7 +951,7 @@ function finalizeBatchProcessing(importId, currentDate, batchStats, responseData
                 if (cleanupErr) {
                     console.error("Error cleaning up staging table:", cleanupErr);
                 } else {
-                    console.log(`🗑️  Staging cleanup: ${this.changes} records removed`);
+                    console.log(` Staging cleanup: ${this.changes} records removed`);
                 }
 
                 // Step 4: Update import record with final processing time
@@ -974,11 +974,11 @@ function finalizeBatchProcessing(importId, currentDate, batchStats, responseData
                         rowsPerSecond: batchStats.processedRows / (totalImportTime / 1000)
                     };
 
-                    console.log(`🎉 IMPORT COMPLETE: ${batchStats.processedRows} rows processed in ${totalImportTime}ms`);
-                    console.log(`   - Inserted to Current: ${batchStats.insertedToCurrent}`);
-                    console.log(`   - Updated in Current: ${batchStats.updatedInCurrent}`);
-                    console.log(`   - Resolved: ${resolvedCount}`);
-                    console.log(`   - Errors: ${batchStats.errors}`);
+                    console.log(` IMPORT COMPLETE: ${batchStats.processedRows} rows processed in ${totalImportTime}ms`);
+                    console.log(` - Inserted to Current: ${batchStats.insertedToCurrent}`);
+                    console.log(` - Updated in Current: ${batchStats.updatedInCurrent}`);
+                    console.log(` - Resolved: ${resolvedCount}`);
+                    console.log(` - Errors: ${batchStats.errors}`);
 
                     // Clear all caches after successful import
                     cacheService.clearAll();
@@ -989,7 +989,7 @@ function finalizeBatchProcessing(importId, currentDate, batchStats, responseData
 
                     // Generate import summary and complete progress tracking
                     if (progressTracker && progressTracker.completeSession) {
-                        console.log(`📊 Generating import summary for session: ${sessionId}`);
+                        console.log(` Generating import summary for session: ${sessionId}`);
                         // Generate comprehensive import summary
                         generateImportSummary(currentDate, responseData, finalStats)
                             .then(summary => {
@@ -998,25 +998,25 @@ function finalizeBatchProcessing(importId, currentDate, batchStats, responseData
                                     ...finalStats,
                                     importSummary: summary
                                 };
-                                console.log("✅ Import summary generated successfully for session", sessionId);
-                                console.log("📤 Sending completion event with summary:", {
+                                console.log("Import summary generated successfully for session", sessionId);
+                                console.log("Sending completion event with summary:", {
                                     sessionId,
                                     summarySize: JSON.stringify(summary).length,
                                     hasNewCves: summary.cveDiscovery?.totalNewCves || 0,
                                     hasResolvedCves: summary.cveDiscovery?.totalResolvedCves || 0
                                 });
                                 progressTracker.completeSession(sessionId, "Import completed successfully", enhancedStats);
-                                console.log(`✅ Completion event sent to WebSocket for session ${sessionId}`);
+                                console.log(` Completion event sent to WebSocket for session ${sessionId}`);
                             })
                             .catch(summaryErr => {
-                                console.error("❌ Error generating import summary:", summaryErr);
+                                console.error("Error generating import summary:", summaryErr);
                                 console.error("Stack trace:", summaryErr.stack);
                                 // Complete without summary if generation fails
-                                console.log(`⚠️ Completing session ${sessionId} WITHOUT summary due to error`);
+                                console.log(` Completing session ${sessionId} WITHOUT summary due to error`);
                                 progressTracker.completeSession(sessionId, "Import completed successfully", finalStats);
                             });
                     } else {
-                        console.warn(`⚠️ No progressTracker available for session ${sessionId}, cannot send completion event`);
+                        console.warn(` No progressTracker available for session ${sessionId}, cannot send completion event`);
                     }
                 });
             });
@@ -1036,7 +1036,7 @@ function calculateAndStoreDailyTotalsEnhanced(scanDate, callback) {
         return;
     }
 
-    console.log("📊 Calculating enhanced daily totals for:", scanDate);
+    console.log("Calculating enhanced daily totals for:", scanDate);
 
     const totalsQuery = `
         SELECT
@@ -1168,7 +1168,7 @@ function calculateAndStoreDailyTotalsEnhanced(scanDate, callback) {
                             return;
                         }
 
-                        console.log(`✅ Enhanced daily totals updated for ${scanDate}`);
+                        console.log(` Enhanced daily totals updated for ${scanDate}`);
 
                         // ALSO store vendor-specific daily totals (Migration 008)
                         // Query vendor-specific totals using same deduplication logic
@@ -1251,7 +1251,7 @@ function calculateAndStoreDailyTotalsEnhanced(scanDate, callback) {
                             // Insert vendor totals for each vendor
                             const vendors = Object.keys(vendorData);
                             if (vendors.length === 0) {
-                                console.log(`⚠️  No vendor data to store for ${scanDate}`);
+                                console.log(` No vendor data to store for ${scanDate}`);
                                 if (callback) {callback();}
                                 return;
                             }
@@ -1289,9 +1289,9 @@ function calculateAndStoreDailyTotalsEnhanced(scanDate, callback) {
 
                                         // Call callback after last vendor insert
                                         if (index === vendors.length - 1) {
-                                            console.log(`✅ Vendor daily totals updated: ${vendorInserts} vendors for ${scanDate}`);
+                                            console.log(` Vendor daily totals updated: ${vendorInserts} vendors for ${scanDate}`);
                                             if (vendorErrors > 0) {
-                                                console.warn(`⚠️  ${vendorErrors} vendor insert errors`);
+                                                console.warn(` ${vendorErrors} vendor insert errors`);
                                             }
                                             if (callback) {callback();}
                                         }
@@ -1339,7 +1339,7 @@ async function importCSV(filepath, filename, vendor, scanDate, _options = {}) {
             headers: results.meta.fields
         });
 
-        console.log(`📝 Import record created: ID ${importId}, Processing ${rows.length} rows`);
+        console.log(` Import record created: ID ${importId}, Processing ${rows.length} rows`);
 
         // Process vulnerabilities
         const result = await processVulnerabilitiesWithLifecycle(rows, importId, filepath, extractedDate);
@@ -1384,9 +1384,9 @@ async function importCsvStaging(filepath, filename, vendor, scanDate, sessionId,
             headers: results.meta.fields
         });
 
-        console.log("🚀 STAGING IMPORT: Starting high-performance CSV import");
-        console.log(`📊 File: ${filename}, Vendor: ${extractedVendor}, Scan Date: ${extractedDate}`);
-        console.log(`📝 Import record created: ID ${importId}`);
+        console.log("STAGING IMPORT: Starting high-performance CSV import");
+        console.log(` File: ${filename}, Vendor: ${extractedVendor}, Scan Date: ${extractedDate}`);
+        console.log(` Import record created: ID ${importId}`);
 
         // Update progress
         if (progressTracker && progressTracker.updateProgress) {
@@ -1444,7 +1444,7 @@ async function generateImportSummary(scanDate, importMetadata, processingStats) 
     return new Promise((resolve, reject) => {
         const db = global.db;
 
-        console.log("📊 Generating import summary for scan date:", scanDate);
+        console.log("Generating import summary for scan date:", scanDate);
 
         // Get current and previous daily totals for comparison
         const totalsQuery = `
@@ -1634,7 +1634,7 @@ async function generateImportSummary(scanDate, importMetadata, processingStats) 
                         }
                     };
 
-                    console.log("✅ Import summary generated:", {
+                    console.log("Import summary generated:", {
                         newCves: summary.cveDiscovery.totalNewCves,
                         resolvedCves: summary.cveDiscovery.totalResolvedCves,
                         totalChange: summary.comparison.netChange,
@@ -1659,7 +1659,7 @@ async function generateImportSummary(scanDate, importMetadata, processingStats) 
 function cleanupOldSnapshots(retainCount = 3) {
     const db = global.db;
 
-    console.log(`🧹 Starting automatic snapshot cleanup (retain last ${retainCount} scan dates)...`);
+    console.log(` Starting automatic snapshot cleanup (retain last ${retainCount} scan dates)...`);
 
     // Get distinct scan dates, ordered newest to oldest
     db.all(
@@ -1669,21 +1669,21 @@ function cleanupOldSnapshots(retainCount = 3) {
         [],
         (err, rows) => {
             if (err) {
-                console.error("❌ Error fetching scan dates for cleanup:", err);
+                console.error("Error fetching scan dates for cleanup:", err);
                 return;
             }
 
             if (rows.length <= retainCount) {
-                console.log(`✅ Snapshot cleanup: No action needed (${rows.length} scan dates <= ${retainCount} retention policy)`);
+                console.log(` Snapshot cleanup: No action needed (${rows.length} scan dates <= ${retainCount} retention policy)`);
                 return;
             }
 
             // Dates to delete: everything beyond the retention count
             const datesToDelete = rows.slice(retainCount).map(r => r.scan_date);
 
-            console.log(`🗑️  Snapshot cleanup: Deleting ${datesToDelete.length} old scan dates...`);
-            console.log(`   Keeping: ${rows.slice(0, retainCount).map(r => r.scan_date).join(", ")}`);
-            console.log(`   Deleting: ${datesToDelete.join(", ")}`);
+            console.log(` Snapshot cleanup: Deleting ${datesToDelete.length} old scan dates...`);
+            console.log(` Keeping: ${rows.slice(0, retainCount).map(r => r.scan_date).join(", ")}`);
+            console.log(` Deleting: ${datesToDelete.join(", ")}`);
 
             // Build DELETE query with parameterized IN clause
             const placeholders = datesToDelete.map(() => "?").join(",");
@@ -1691,16 +1691,16 @@ function cleanupOldSnapshots(retainCount = 3) {
 
             db.run(deleteQuery, datesToDelete, function(deleteErr) {
                 if (deleteErr) {
-                    console.error("❌ Error deleting old snapshots:", deleteErr);
+                    console.error("Error deleting old snapshots:", deleteErr);
                 } else {
-                    console.log("✅ Snapshot cleanup complete: Deleted", this.changes.toLocaleString(), "rows");
+                    console.log("Snapshot cleanup complete: Deleted", this.changes.toLocaleString(), "rows");
 
                     // Run VACUUM to reclaim disk space from deleted snapshots
                     db.run("VACUUM", (vacuumErr) => {
                         if (vacuumErr) {
-                            console.warn("⚠️  VACUUM failed after snapshot cleanup:", vacuumErr.message);
+                            console.warn("VACUUM failed after snapshot cleanup:", vacuumErr.message);
                         } else {
-                            console.log("✅ Database compacted - disk space reclaimed");
+                            console.log("Database compacted - disk space reclaimed");
                         }
                     });
                 }

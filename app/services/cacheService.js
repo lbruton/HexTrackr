@@ -338,7 +338,7 @@ class CacheService {
         this.clearStatsCache();
         this.clearTrendsCache();
         this.clearVulnerabilitiesCache();
-        console.log("🗑️  All caches cleared");
+        console.log("All caches cleared");
     }
 
     /**

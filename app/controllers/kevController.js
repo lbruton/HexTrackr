@@ -36,7 +36,7 @@ class KevController {
      */
     async syncKevData(req, res) {
         try {
-            console.log("🔥 KEV sync requested via API");
+            console.log("KEV sync requested via API");
 
             // Check if sync is already in progress
             const status = await this.kevService.getSyncStatus();
@@ -50,7 +50,7 @@ class KevController {
             // Perform sync
             const result = await this.kevService.syncKevData();
 
-            console.log(`✅ KEV sync completed: ${result.totalKevs} KEVs, ${result.matchedCount} matched`);
+            console.log(` KEV sync completed: ${result.totalKevs} KEVs, ${result.matchedCount} matched`);
 
             // Clear all caches after KEV sync (vulnerabilities may have new KEV flags)
             cacheService.clearAll();
@@ -65,7 +65,7 @@ class KevController {
             });
 
         } catch (error) {
-            console.error("❌ KEV sync failed:", error);
+            console.error("KEV sync failed:", error);
             res.status(500).json({
                 error: "Failed to sync KEV data",
                 message: error.message
@@ -85,7 +85,7 @@ class KevController {
             const status = await this.kevService.getSyncStatus();
             res.json(status);
         } catch (error) {
-            console.error("❌ Failed to get KEV status:", error);
+            console.error("Failed to get KEV status:", error);
             res.status(500).json({
                 error: "Failed to get KEV status",
                 message: error.message
@@ -121,7 +121,7 @@ class KevController {
             res.json(kevData);
 
         } catch (error) {
-            console.error(`❌ Failed to get KEV data for CVE ${req.params.cveId}:`, error);
+            console.error(` Failed to get KEV data for CVE ${req.params.cveId}:`, error);
             res.status(500).json({
                 error: "Failed to get KEV data",
                 message: error.message
@@ -144,7 +144,7 @@ class KevController {
                 kevs: kevs
             });
         } catch (error) {
-            console.error("❌ Failed to get all KEVs:", error);
+            console.error("Failed to get all KEVs:", error);
             res.status(500).json({
                 error: "Failed to get KEV list",
                 message: error.message
@@ -171,7 +171,7 @@ class KevController {
             });
 
         } catch (error) {
-            console.error("❌ Failed to get matched KEVs:", error);
+            console.error("Failed to get matched KEVs:", error);
             res.status(500).json({
                 error: "Failed to get matched KEVs",
                 message: error.message
@@ -191,7 +191,7 @@ class KevController {
             const stats = await this.kevService.getDashboardStats();
             res.json(stats);
         } catch (error) {
-            console.error("❌ Failed to get KEV stats:", error);
+            console.error("Failed to get KEV stats:", error);
             res.status(500).json({
                 error: "Failed to get KEV statistics",
                 message: error.message
@@ -217,7 +217,7 @@ class KevController {
             });
 
         } catch (error) {
-            console.error("❌ Failed to check auto-sync status:", error);
+            console.error("Failed to check auto-sync status:", error);
             res.status(500).json({
                 error: "Failed to check auto-sync status",
                 message: error.message

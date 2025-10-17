@@ -69,14 +69,14 @@ function getCurrentVersion() {
  * @description Updates version in package.json, HTML files, footer badge, CLAUDE.md, and roadmap.json
  */
 function updateVersion(newVersion) {
-    console.log(`🔧 Updating HexTrackr to version ${newVersion}`);
+    console.log(` Updating HexTrackr to version ${newVersion}`);
     
     // Update package.json
     const packagePath = path.join(__dirname, "..", "package.json");
     const packageContent = JSON.parse(PathValidator.safeReadFileSync(packagePath, "utf8"));
     packageContent.version = newVersion;
     PathValidator.safeWriteFileSync(packagePath, JSON.stringify(packageContent, null, 2) + "\n");
-    console.log("✅ Updated package.json");
+    console.log("Updated package.json");
     
     // Update HTML files with version spans
     const htmlFiles = ["tickets.html", "vulnerabilities.html"];
@@ -88,7 +88,7 @@ function updateVersion(newVersion) {
             `<span id="app-version">${newVersion}</span>`
         );
         PathValidator.safeWriteFileSync(filePath, content);
-        console.log(`✅ Updated ${file}`);
+        console.log(` Updated ${file}`);
     });
     
     // Update footer badge URL
@@ -99,7 +99,7 @@ function updateVersion(newVersion) {
         `HexTrackr-v${newVersion}$1`
     );
     PathValidator.safeWriteFileSync(footerPath, footerContent);
-    console.log("✅ Updated scripts/shared/footer.html");
+    console.log("Updated scripts/shared/footer.html");
     
     // Update CLAUDE.md header
     const claudePath = path.join(__dirname, "..", "..", "..", "CLAUDE.md");
@@ -110,7 +110,7 @@ function updateVersion(newVersion) {
             `**Version**: v${newVersion}`
         );
         PathValidator.safeWriteFileSync(claudePath, claudeContent);
-        console.log("✅ Updated CLAUDE.md");
+        console.log("Updated CLAUDE.md");
     }
     
     // Update roadmap.json
@@ -120,10 +120,10 @@ function updateVersion(newVersion) {
         roadmapContent.metadata.version = newVersion;
         roadmapContent.metadata.lastUpdated = new Date().toISOString();
         PathValidator.safeWriteFileSync(roadmapPath, JSON.stringify(roadmapContent, null, 2) + "\n");
-        console.log("✅ Updated hextrackr-specs/roadmap.json");
+        console.log("Updated hextrackr-specs/roadmap.json");
     }
     
-    console.log(`🎉 Version update complete: v${newVersion}`);
+    console.log(` Version update complete: v${newVersion}`);
 }
 
 /**
@@ -140,20 +140,20 @@ function validateVersion(version) {
 // CLI interface
 const args = process.argv.slice(2);
 if (args.length === 0) {
-    console.log(`📋 Current version: v${getCurrentVersion()}`);
+    console.log(` Current version: v${getCurrentVersion()}`);
     console.log("\nUsage:");
-    console.log("  node scripts/version-manager.js <new-version>");
-    console.log("  node scripts/version-manager.js 1.1.0");
+    console.log(" node scripts/version-manager.js <new-version>");
+    console.log(" node scripts/version-manager.js 1.1.0");
 } else if (args.length === 1) {
     const newVersion = args[0];
     if (!validateVersion(newVersion)) {
-        console.error(`❌ Invalid version format: ${newVersion}`);
-        console.error("   Expected format: X.Y.Z (e.g., 1.1.0)");
+        console.error(` Invalid version format: ${newVersion}`);
+        console.error(" Expected format: X.Y.Z (e.g., 1.1.0)");
         process.exit(1);
     }
     updateVersion(newVersion);
 } else {
-    console.error("❌ Too many arguments");
+    console.error("Too many arguments");
     console.error("Usage: node scripts/version-manager.js <new-version>");
     process.exit(1);
 }

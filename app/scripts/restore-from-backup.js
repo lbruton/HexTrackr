@@ -18,7 +18,7 @@ const TARGET_DB = path.join(__dirname, "../../app/data/hextrackr.db");
 const NEW_PASSWORD = "Magellan123!";
 
 async function restoreDatabase() {
-    console.log("🔄 Starting database restoration...\n");
+    console.log("Starting database restoration...\n");
 
     // Open both databases
     const backup = new Database(BACKUP_DB, { readonly: true });
@@ -34,7 +34,7 @@ async function restoreDatabase() {
             ORDER BY name
         `).all();
 
-        console.log(`📋 Found ${tables.length} tables to restore:\n`);
+        console.log(` Found ${tables.length} tables to restore:\n`);
 
         for (const { name } of tables) {
             try {
@@ -78,14 +78,14 @@ async function restoreDatabase() {
 
                 // Verify
                 const targetCount = target.prepare(`SELECT COUNT(*) as count FROM ${name}`).get();
-                console.log(`   ✅ Restored ${targetCount.count} rows\n`);
+                console.log(` Restored ${targetCount.count} rows\n`);
 
             } catch (error) {
-                console.error(`   ❌ Error restoring ${name}:`, error.message);
+                console.error(` Error restoring ${name}:`, error.message);
             }
         }
 
-        console.log("\n🔐 Setting admin password to Magellan123!...\n");
+        console.log("\nSetting admin password to Magellan123!...\n");
 
         // Hash the new password with Argon2id
         const passwordHash = await argon2.hash(NEW_PASSWORD, {
@@ -105,20 +105,20 @@ async function restoreDatabase() {
         `).run(passwordHash);
 
         if (updateResult.changes > 0) {
-            console.log("✅ Admin password updated successfully!\n");
+            console.log("Admin password updated successfully!\n");
         } else {
-            console.error("❌ Failed to update admin password - user not found\n");
+            console.error("Failed to update admin password - user not found\n");
         }
 
         // Verify admin user
         const admin = target.prepare("SELECT id, username, email, role FROM users WHERE username = ?").get("admin");
         console.log("👤 Admin User Details:");
-        console.log("   ID:", admin.id);
-        console.log("   Username:", admin.username);
-        console.log("   Email:", admin.email);
-        console.log("   Role:", admin.role);
+        console.log(" ID:", admin.id);
+        console.log(" Username:", admin.username);
+        console.log(" Email:", admin.email);
+        console.log(" Role:", admin.role);
         console.log("\n═══════════════════════════════════════════════════════");
-        console.log("🔑 NEW ADMIN CREDENTIALS");
+        console.log("NEW ADMIN CREDENTIALS");
         console.log("═══════════════════════════════════════════════════════");
         console.log("Username: admin");
         console.log("Password: Magellan123!");
@@ -127,11 +127,11 @@ async function restoreDatabase() {
     } finally {
         backup.close();
         target.close();
-        console.log("✅ Database restoration completed!\n");
+        console.log("Database restoration completed!\n");
     }
 }
 
 restoreDatabase().catch(error => {
-    console.error("❌ Restoration failed:", error);
+    console.error("Restoration failed:", error);
     process.exit(1);
 });

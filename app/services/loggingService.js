@@ -56,7 +56,7 @@ class LoggingService {
             this.info('backend', 'auth', 'LoggingService initialized successfully');
 
         } catch (error) {
-            console.error('❌ Failed to initialize LoggingService:', error.message);
+            console.error('Failed to initialize LoggingService:', error.message);
             throw error;
         }
     }
@@ -70,7 +70,7 @@ class LoggingService {
 
             fs.readFile(configPath, 'utf8', (err, data) => {
                 if (err) {
-                    console.error('❌ Failed to load logging.config.json:', err.message);
+                    console.error('Failed to load logging.config.json:', err.message);
                     // Fall back to defaults
                     this.config = this._getDefaultConfig();
                     resolve();
@@ -81,7 +81,7 @@ class LoggingService {
                     this.config = JSON.parse(data);
                     resolve();
                 } catch (parseError) {
-                    console.error('❌ Failed to parse logging.config.json:', parseError.message);
+                    console.error('Failed to parse logging.config.json:', parseError.message);
                     this.config = this._getDefaultConfig();
                     resolve();
                 }
@@ -289,7 +289,7 @@ class LoggingService {
             });
 
         } catch (error) {
-            console.error('❌ Audit log write failed:', error.message);
+            console.error('Audit log write failed:', error.message);
         }
     }
 
@@ -494,7 +494,7 @@ class LoggingService {
                         const deletedCount = this.changes;
 
                         if (deletedCount > 0) {
-                            console.log(`✅ Cleaned up ${deletedCount} old audit logs (retention: ${retentionDays} days)`);
+                            console.log(` Cleaned up ${deletedCount} old audit logs (retention: ${retentionDays} days)`);
                         }
 
                         // Update metadata (use db reference, not this.db)
@@ -514,7 +514,7 @@ class LoggingService {
             this.lastCleanup = new Date();
 
         } catch (error) {
-            console.error('❌ Audit log cleanup error:', error.message);
+            console.error('Audit log cleanup error:', error.message);
         }
     }
 

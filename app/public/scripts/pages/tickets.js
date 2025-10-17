@@ -2556,7 +2556,7 @@ class HexagonTicketsManager {
                                 if (vulnMarkdown) {
                                     const vulnBlob = new Blob([vulnMarkdown], { type: "text/markdown" });
                                     zip.file(`${baseFilename}_vulnerabilities.md`, vulnBlob);
-                                    console.log("[VulnBundle] ✅ Vulnerability report added to bundle");
+                                    console.log("[VulnBundle] Vulnerability report added to bundle");
                                 }
                             }
                         }
