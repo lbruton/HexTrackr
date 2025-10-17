@@ -14,7 +14,12 @@ services:
       - /app/node_modules
       # Mount config directory for import patterns (HEX-241)
       - ./config:/app/config:ro
-      # Database stays inside Docker container (not mounted from host)
+      # HEX-280: Database uses named volume (isolated from macOS filesystem)
+      # Named volume prevents corruption from macOS fcntl locking issues with SQLite
+      # Database is at /app/data/ (NOT /app/app/data/) to avoid bind mount conflicts
+      - hextrackr-database:/app/data
+      # Mount backups directory for automated backups (HEX-270)
+      - ./backups:/app/backups:rw
       # Mount uploads directory for file persistence
       - ./app/uploads:/app/app/uploads:rw
       # Mount SSL certificates for HTTPS
@@ -23,7 +28,7 @@ services:
       - NODE_ENV=${NODE_ENV:-development}
       - HEXTRACKR_VERSION=1.0.77
       - PORT=${PORT:-8080}
-      - DATABASE_PATH=${DATABASE_PATH:-app/data/hextrackr.db}
+      - DATABASE_PATH=${DATABASE_PATH:-data/hextrackr.db}
       - USE_HTTPS=${USE_HTTPS:-false}
       - SSL_KEY_PATH=/app/certs/key.pem
       - SSL_CERT_PATH=/app/certs/cert.pem
@@ -66,3 +71,7 @@ services:
 networks:
   hextrackr-network:
     driver: bridge
+
+volumes:
+  hextrackr-database:
+    driver: local
