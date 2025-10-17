@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             })
             .catch(error => {
-                console.warn("Failed to load shared footer:", error);
+                logger.warn("ui", "Failed to load shared footer:", error);
                 createFallbackFooter(footerContainer);
             });
     }

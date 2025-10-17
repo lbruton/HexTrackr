@@ -56,7 +56,7 @@ export class HeaderThemeManager {
         this.initializeToggles();
       }
     } catch (error) {
-      console.error("Error initializing header theme manager:", error);
+      logger.error("ui", "Error initializing header theme manager:", error);
     }
   }
 
@@ -72,7 +72,7 @@ export class HeaderThemeManager {
       this.lightToggle = document.querySelector(".hide-theme-light");
 
       if (!this.darkToggle || !this.lightToggle) {
-        console.warn("Theme toggle elements not found in header");
+        logger.warn("ui", "Theme toggle elements not found in header");
         return;
       }
 
@@ -105,7 +105,7 @@ export class HeaderThemeManager {
       
       this.initialized = true;
     } catch (error) {
-      console.error("Error initializing theme toggles:", error);
+      logger.error("ui", "Error initializing theme toggles:", error);
     }
   }
 
@@ -122,7 +122,7 @@ export class HeaderThemeManager {
       this.themeController.setTheme(currentTheme, "initial");
       this.updateToggleVisibility(currentTheme);
     } catch (error) {
-      console.error("Error applying initial theme:", error);
+      logger.error("ui", "Error applying initial theme:", error);
     }
   }
 
@@ -138,7 +138,7 @@ export class HeaderThemeManager {
         this.updateToggleVisibility("dark");
       }
     } catch (error) {
-      console.error("Error toggling to dark theme:", error);
+      logger.error("ui", "Error toggling to dark theme:", error);
     }
   }
 
@@ -154,7 +154,7 @@ export class HeaderThemeManager {
         this.updateToggleVisibility("light");
       }
     } catch (error) {
-      console.error("Error toggling to light theme:", error);
+      logger.error("ui", "Error toggling to light theme:", error);
     }
   }
 
@@ -181,7 +181,7 @@ export class HeaderThemeManager {
         this.lightToggle.style.display = "none";
       }
     } catch (error) {
-      console.error("Error updating toggle visibility:", error);
+      logger.error("ui", "Error updating toggle visibility:", error);
     }
   }
 

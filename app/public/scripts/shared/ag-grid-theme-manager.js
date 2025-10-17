@@ -31,7 +31,7 @@ class AGGridThemeManager {
         this.setupGlobalThemeListener();
 
         this.initialized = true;
-        console.log("AGGridThemeManager initialized with theme:", this.currentTheme);
+        logger.debug("ui", "AGGridThemeManager initialized with theme:", this.currentTheme);
     }
 
     /**
@@ -42,7 +42,7 @@ class AGGridThemeManager {
      */
     registerGrid(gridId, gridApi, gridElement) {
         if (this.grids.has(gridId)) {
-            console.warn(`Grid ${gridId} already registered, updating registration`);
+            logger.warn("ui", `Grid ${gridId} already registered, updating registration`);
         }
 
         const gridInfo = {
@@ -63,7 +63,7 @@ class AGGridThemeManager {
         // Apply current theme to newly registered grid
         this.applyThemeToGrid(gridId, this.currentTheme === "dark");
 
-        console.log(`Grid ${gridId} registered with AGGridThemeManager`);
+        logger.debug("ui", `Grid ${gridId} registered with AGGridThemeManager`);
     }
 
     /**
@@ -73,7 +73,7 @@ class AGGridThemeManager {
     unregisterGrid(gridId) {
         if (this.grids.has(gridId)) {
             this.grids.delete(gridId);
-            console.log(`Grid ${gridId} unregistered from AGGridThemeManager`);
+            logger.debug("ui", `Grid ${gridId} unregistered from AGGridThemeManager`);
         }
     }
 
@@ -89,7 +89,7 @@ class AGGridThemeManager {
             this.applyThemeToGrid(gridId, isDark);
         }
 
-        console.log(`AGGridThemeManager updated all grids to ${this.currentTheme} theme`);
+        logger.debug("ui", `AGGridThemeManager updated all grids to ${this.currentTheme} theme`);
     }
 
     /**
@@ -153,7 +153,7 @@ class AGGridThemeManager {
     applyThemeToGrid(gridId, isDark) {
         const gridInfo = this.grids.get(gridId);
         if (!gridInfo) {
-            console.warn(`Grid ${gridId} not found in registry`);
+            logger.warn("ui", `Grid ${gridId} not found in registry`);
             return;
         }
 
@@ -305,7 +305,7 @@ class AGGridThemeManager {
     destroy() {
         this.grids.clear();
         this.initialized = false;
-        console.log("AGGridThemeManager destroyed");
+        logger.debug("ui", "AGGridThemeManager destroyed");
     }
 }
 
