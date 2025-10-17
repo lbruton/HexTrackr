@@ -57,7 +57,7 @@ function escapeHtml(text) {
  */
 
 // 🚀 HEXTRACKR SETTINGS MODAL - SHARED COMPONENT
-console.log("✅ HexTrackr Settings Modal (shared) loaded successfully");
+console.log("HexTrackr Settings Modal (shared) loaded successfully");
 
 /**
  * Settings Modal State Management
@@ -108,10 +108,10 @@ console.log("✅ HexTrackr Settings Modal (shared) loaded successfully");
         // Get reference to the modal element for Bootstrap
         this.modal = document.getElementById("settingsModal");
         
-        console.log("✅ HexTrackr Settings Modal (shared) loaded successfully");
+        console.log("HexTrackr Settings Modal (shared) loaded successfully");
         
       } catch (error) {
-        console.error("❌ Failed to load shared settings modal:", error);
+        console.error("Failed to load shared settings modal:", error);
         throw error;
       }
     },
@@ -237,12 +237,12 @@ console.log("✅ HexTrackr Settings Modal (shared) loaded successfully");
                     }
                 });
 
-                console.log(`✅ Switched to ${sectionId} section`);
+                console.log(` Switched to ${sectionId} section`);
             } else {
-                console.warn(`❌ Section ${targetSectionId} not found`);
+                console.warn(` Section ${targetSectionId} not found`);
             }
         } else {
-            console.warn(`❌ Unknown section ID: ${sectionId}`);
+            console.warn(` Unknown section ID: ${sectionId}`);
         }
     }
 };
@@ -772,7 +772,7 @@ async function clearCiscoCredentials() {
             const result = await window.preferencesSync.prefsService.deletePreference("cisco_api_key");
 
             if (result.success) {
-                console.log("🗑️ Cisco credentials deleted from database");
+                console.log("Cisco credentials deleted from database");
 
                 // Update status in main settings card
                 const credentialButton = document.getElementById("manageCiscoCredentials");
@@ -1019,7 +1019,7 @@ async function toggleCiscoAutoSync() {
             );
 
             if (result.success) {
-                console.log(`✅ Cisco background sync ${isEnabled ? "enabled" : "disabled"}`);
+                console.log(` Cisco background sync ${isEnabled ? "enabled" : "disabled"}`);
                 showNotification(`Background sync ${isEnabled ? "enabled" : "disabled"}`, "success");
             } else {
                 throw new Error(result.error || "Failed to save preference");
@@ -1474,7 +1474,7 @@ async function loadSettings() {
                 enableApiAuth.checked = prefsMap.api_auth_enabled === true || prefsMap.api_auth_enabled === "true";
             }
 
-            console.log("✅ Settings loaded from preferences API");
+            console.log("Settings loaded from preferences API");
         }
     } catch (error) {
         console.error("Error loading settings:", error);
@@ -1512,7 +1512,7 @@ async function saveSettings() {
             const result = await window.preferencesService.setMultiplePreferences(settings);
 
             if (result.success) {
-                console.log("✅ Settings saved to database successfully");
+                console.log("Settings saved to database successfully");
             } else {
                 throw new Error(result.error || "Failed to save settings");
             }
@@ -1538,7 +1538,7 @@ async function saveSettings() {
         }
         
     } catch (error) {
-        console.error("❌ Error saving settings:", error);
+        console.error("Error saving settings:", error);
         showNotification("Error saving settings. Please try again.", "danger");
     }
 }

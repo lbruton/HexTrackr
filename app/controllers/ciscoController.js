@@ -35,7 +35,7 @@ class CiscoController {
      */
     async syncCiscoAdvisories(req, res) {
         try {
-            console.log("🔥 Cisco advisory sync requested via API");
+            console.log("Cisco advisory sync requested via API");
 
             // Check if sync is already in progress
             const status = await this.ciscoAdvisoryService.getSyncStatus();
@@ -49,7 +49,7 @@ class CiscoController {
             // Perform sync (pass userId from session for credential fetch)
             const result = await this.ciscoAdvisoryService.syncCiscoAdvisories(req.session.userId);
 
-            console.log(`✅ Cisco advisory sync completed: ${result.totalAdvisories} advisories, ${result.matchedCount} matched`);
+            console.log(` Cisco advisory sync completed: ${result.totalAdvisories} advisories, ${result.matchedCount} matched`);
 
             // Clear all caches after sync (vulnerabilities may have new fix data)
             cacheService.clearAll();
@@ -64,7 +64,7 @@ class CiscoController {
             });
 
         } catch (error) {
-            console.error("❌ Cisco advisory sync failed:", error);
+            console.error("Cisco advisory sync failed:", error);
             res.status(500).json({
                 error: "Failed to sync Cisco advisory data",
                 message: error.message
@@ -84,7 +84,7 @@ class CiscoController {
             const status = await this.ciscoAdvisoryService.getSyncStatus();
             res.json(status);
         } catch (error) {
-            console.error("❌ Failed to get Cisco advisory status:", error);
+            console.error("Failed to get Cisco advisory status:", error);
             res.status(500).json({
                 error: "Failed to get Cisco advisory status",
                 message: error.message
@@ -122,7 +122,7 @@ class CiscoController {
             }, 60);
 
         } catch (error) {
-            console.error(`❌ Failed to get Cisco advisory for CVE ${req.params.cveId}:`, error);
+            console.error(` Failed to get Cisco advisory for CVE ${req.params.cveId}:`, error);
             res.status(500).json({
                 error: "Failed to get Cisco advisory data",
                 message: error.message
@@ -148,7 +148,7 @@ class CiscoController {
             });
 
         } catch (error) {
-            console.error("❌ Failed to check Cisco auto-sync status:", error);
+            console.error("Failed to check Cisco auto-sync status:", error);
             res.status(500).json({
                 error: "Failed to check auto-sync status",
                 message: error.message

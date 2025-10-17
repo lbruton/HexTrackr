@@ -39,9 +39,9 @@ class Logger {
 
         // Log initialization (only once)
         if (this.debugMode) {
-            console.log('🐛 Debug mode enabled - verbose logging active');
+            console.log('Debug mode enabled - verbose logging active');
         } else if (!this.isDevelopment) {
-            console.log('📊 HexTrackr production mode - debug logs disabled');
+            console.log('HexTrackr production mode - debug logs disabled');
         }
     }
 
@@ -322,7 +322,7 @@ class Logger {
         try {
             localStorage.setItem('hextrackr_debug', 'true');
             this.debugMode = true;
-            console.log('🐛 Debug mode enabled');
+            console.log('Debug mode enabled');
         } catch (e) {
             console.warn('Could not enable debug mode:', e);
         }
@@ -336,7 +336,7 @@ class Logger {
             localStorage.removeItem('hextrackr_debug');
             sessionStorage.removeItem('hextrackr_debug');
             this.debugMode = false;
-            console.log('📊 Debug mode disabled');
+            console.log('Debug mode disabled');
         } catch (e) {
             console.warn('Could not disable debug mode:', e);
         }

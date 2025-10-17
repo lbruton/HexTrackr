@@ -349,7 +349,7 @@ class MarkdownFormatter {
             this.log(`✅ Formatted: ${filePath}`);
             
         } catch (error) {
-            console.error(`❌ Error processing ${filePath}:`, error.message);
+            console.error(` Error processing ${filePath}:`, error.message);
         }
     }
 
@@ -401,7 +401,7 @@ class MarkdownFormatter {
      * Print formatting statistics
      */
     printStats() {
-        console.log("\n📊 Markdown Formatting Results:");
+        console.log("\nMarkdown Formatting Results:");
         console.log(`Files processed: ${this.stats.filesProcessed}`);
         console.log(`Heading spacing fixes: ${this.stats.headingSpacingFixed}`);
         console.log(`List spacing fixes: ${this.stats.listSpacingFixed}`);
@@ -414,7 +414,7 @@ class MarkdownFormatter {
         console.log(`Total fixes applied: ${totalFixes}`);
         
         if (this.dryRun) {
-            console.log("\n⚠️  DRY RUN MODE - No files were modified");
+            console.log("\nDRY RUN MODE - No files were modified");
         }
     }
 }
@@ -430,7 +430,7 @@ function main() {
         dir: args.find(arg => arg.startsWith("--dir="))?.split("=")[1]
     };
 
-    console.log("🔧 HexTrackr Markdown Formatter");
+    console.log("HexTrackr Markdown Formatter");
     console.log("Fixing Codacy markdown violations...\n");
 
     const formatter = new MarkdownFormatter(options);
@@ -439,7 +439,7 @@ function main() {
     if (options.dir) {
         const targetDir = path.resolve(process.cwd(), options.dir);
         if (!PathValidator.safeExistsSync(targetDir) || !PathValidator.safeStatSync(targetDir).isDirectory()) {
-            console.error(`❌ Directory not found or not a directory: ${options.dir}`);
+            console.error(` Directory not found or not a directory: ${options.dir}`);
             process.exit(1);
         }
         if (options.verbose) {
@@ -451,7 +451,7 @@ function main() {
     if (options.file) {
         // Format single file
         if (!PathValidator.safeExistsSync(options.file)) {
-            console.error(`❌ File not found: ${options.file}`);
+            console.error(` File not found: ${options.file}`);
             process.exit(1);
         }
         formatter.formatFile(options.file);
@@ -463,11 +463,11 @@ function main() {
         markdownFiles.forEach(file => formatter.formatFile(file));
     } else {
         console.log("Usage:");
-        console.log("  node scripts/fix-markdown.js --file=path/to/file.md");
-        console.log("  node scripts/fix-markdown.js --all");
-        console.log("  node scripts/fix-markdown.js --dry-run --all");
-        console.log("  node scripts/fix-markdown.js --verbose --all");
-        console.log("  node scripts/fix-markdown.js --all --dir=docs-source");
+        console.log(" node scripts/fix-markdown.js --file=path/to/file.md");
+        console.log(" node scripts/fix-markdown.js --all");
+        console.log(" node scripts/fix-markdown.js --dry-run --all");
+        console.log(" node scripts/fix-markdown.js --verbose --all");
+        console.log(" node scripts/fix-markdown.js --all --dir=docs-source");
         process.exit(1);
     }
 

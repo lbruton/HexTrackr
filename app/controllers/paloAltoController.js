@@ -35,7 +35,7 @@ class PaloAltoController {
      */
     async syncPaloAdvisories(req, res) {
         try {
-            console.log("🔥 Palo Alto advisory sync requested via API");
+            console.log("Palo Alto advisory sync requested via API");
 
             // Check if sync is already in progress
             const status = await this.paloAdvisoryService.getSyncStatus();
@@ -49,7 +49,7 @@ class PaloAltoController {
             // Perform sync (pass userId from session for consistency, not used for Palo Alto)
             const result = await this.paloAdvisoryService.syncPaloAdvisories(req.session.userId);
 
-            console.log(`✅ Palo Alto advisory sync completed: ${result.totalAdvisories} advisories, ${result.matchedCount} matched`);
+            console.log(` Palo Alto advisory sync completed: ${result.totalAdvisories} advisories, ${result.matchedCount} matched`);
 
             // Clear all caches after sync (vulnerabilities may have new fix data)
             cacheService.clearAll();
@@ -64,7 +64,7 @@ class PaloAltoController {
             });
 
         } catch (error) {
-            console.error("❌ Palo Alto advisory sync failed:", error);
+            console.error("Palo Alto advisory sync failed:", error);
             res.status(500).json({
                 error: "Failed to sync Palo Alto advisory data",
                 message: error.message
@@ -84,7 +84,7 @@ class PaloAltoController {
             const status = await this.paloAdvisoryService.getSyncStatus();
             res.json(status);
         } catch (error) {
-            console.error("❌ Failed to get Palo Alto advisory status:", error);
+            console.error("Failed to get Palo Alto advisory status:", error);
             res.status(500).json({
                 error: "Failed to get Palo Alto advisory status",
                 message: error.message
@@ -122,7 +122,7 @@ class PaloAltoController {
             }, 60);
 
         } catch (error) {
-            console.error(`❌ Failed to get Palo Alto advisory for CVE ${req.params.cveId}:`, error);
+            console.error(` Failed to get Palo Alto advisory for CVE ${req.params.cveId}:`, error);
             res.status(500).json({
                 error: "Failed to get Palo Alto advisory data",
                 message: error.message
@@ -148,7 +148,7 @@ class PaloAltoController {
             });
 
         } catch (error) {
-            console.error("❌ Failed to check Palo Alto auto-sync status:", error);
+            console.error("Failed to check Palo Alto auto-sync status:", error);
             res.status(500).json({
                 error: "Failed to check auto-sync status",
                 message: error.message

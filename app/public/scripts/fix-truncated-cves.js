@@ -31,7 +31,7 @@ const mode = args[0] || "--analyze";
 const validModes = ["--analyze", "--dry-run", "--migrate", "--backup"];
 
 if (!validModes.includes(mode)) {
-    console.error(`❌ Invalid mode: ${mode}`);
+    console.error(` Invalid mode: ${mode}`);
     console.error(`Valid modes: ${validModes.join(", ")}`);
     process.exit(1);
 }
@@ -40,7 +40,7 @@ if (!validModes.includes(mode)) {
 const dbPath = path.join(__dirname, "..", "..", "data", "hextrackr.db");
 const backupPath = path.join(__dirname, "..", "..", "data", `hextrackr_backup_${Date.now()}.db`);
 
-console.log("🔍 CVE Data Migration Tool - Enhanced Version");
+console.log("CVE Data Migration Tool - Enhanced Version");
 console.log("=============================================");
 console.log(`Mode: ${mode}`);
 console.log(`Database: ${dbPath}`);
@@ -64,7 +64,7 @@ const stats = {
 function createBackup() {
     return new Promise((resolve, reject) => {
         if (mode === "--backup" || mode === "--migrate") {
-            console.log("📦 Creating database backup...");
+            console.log("Creating database backup...");
             
             const readStream = fs.createReadStream(dbPath);
             const writeStream = fs.createWriteStream(backupPath);
@@ -72,7 +72,7 @@ function createBackup() {
             readStream.on("error", reject);
             writeStream.on("error", reject);
             writeStream.on("finish", () => {
-                console.log(`✅ Backup created: ${backupPath}\n`);
+                console.log(` Backup created: ${backupPath}\n`);
                 resolve();
             });
             
@@ -86,10 +86,10 @@ function createBackup() {
 // Open database connection
 const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE, (err) => {
     if (err) {
-        console.error("❌ Error opening database:", err.message);
+        console.error("Error opening database:", err.message);
         process.exit(1);
     }
-    console.log("✅ Connected to HexTrackr database\n");
+    console.log("Connected to HexTrackr database\n");
 });
 
 // Enhanced CVE detection with pattern matching
@@ -105,7 +105,7 @@ function detectTruncatedCVEs() {
                 return;
             }
             stats.totalRecords = row.total;
-            console.log(`📊 Total vulnerability records: ${stats.totalRecords}`);
+            console.log(` Total vulnerability records: ${stats.totalRecords}`);
         });
         
         // Find records with evidence of truncation
@@ -177,13 +177,13 @@ function detectTruncatedCVEs() {
             });
             
             // Report findings
-            console.log("\n📈 Detection Results:");
-            console.log(`   • Single CVE records: ${stats.singleCVERecords}`);
-            console.log(`   • Multi-CVE records: ${stats.multiCVERecords}`);
-            console.log(`   • Suspected truncations: ${stats.truncatedRecords}`);
+            console.log("\nDetection Results:");
+            console.log(` • Single CVE records: ${stats.singleCVERecords}`);
+            console.log(` • Multi-CVE records: ${stats.multiCVERecords}`);
+            console.log(` • Suspected truncations: ${stats.truncatedRecords}`);
             
             if (truncatedCandidates.length > 0) {
-                console.log("\n⚠️  Truncated Records Found:\n");
+                console.log("\nTruncated Records Found:\n");
                 console.log("ID    | Hostname        | Stored CVE      | Missing CVEs");
                 console.log("------|-----------------|-----------------|------------------");
                 
@@ -202,7 +202,7 @@ function detectTruncatedCVEs() {
                 global.truncatedRecords = truncatedCandidates;
                 stats.fixableRecords = truncatedCandidates.length;
             } else {
-                console.log("\n✅ No truncated records detected!");
+                console.log("\nNo truncated records detected!");
             }
             
             resolve();
@@ -214,13 +214,13 @@ function detectTruncatedCVEs() {
 function performMigration(dryRun = true) {
     return new Promise((resolve, _reject) => {
         if (!global.truncatedRecords || global.truncatedRecords.length === 0) {
-            console.log("\n✅ No records to migrate");
+            console.log("\nNo records to migrate");
             resolve();
             return;
         }
         
         const modeText = dryRun ? "DRY RUN" : "ACTUAL MIGRATION";
-        console.log(`\n\n🔄 ${modeText} - Safe CVE Data Migration\n`);
+        console.log(`\n\n ${modeText} - Safe CVE Data Migration\n`);
         console.log(`Processing ${global.truncatedRecords.length} truncated records...\n`);
         
         let successCount = 0;
@@ -231,10 +231,10 @@ function performMigration(dryRun = true) {
         const processRecord = (index) => {
             if (index >= global.truncatedRecords.length) {
                 // Migration complete
-                console.log("\n📊 Migration Summary:");
-                console.log(`   • Records processed: ${global.truncatedRecords.length}`);
-                console.log(`   • Successful updates: ${successCount}`);
-                console.log(`   • Errors: ${errorCount}`);
+                console.log("\nMigration Summary:");
+                console.log(` • Records processed: ${global.truncatedRecords.length}`);
+                console.log(` • Successful updates: ${successCount}`);
+                console.log(` • Errors: ${errorCount}`);
                 
                 if (!dryRun) {
                     stats.fixedRecords = successCount;
@@ -247,7 +247,7 @@ function performMigration(dryRun = true) {
                         stats: stats,
                         migrationLog: migrationLog
                     }, null, 2));
-                    console.log(`\n📝 Migration log saved: ${logPath}`);
+                    console.log(`\n Migration log saved: ${logPath}`);
                 }
                 
                 resolve();
@@ -262,7 +262,7 @@ function performMigration(dryRun = true) {
             const allValid = record.allCVEs.every(cve => cveRegex.test(cve));
             
             if (!allValid) {
-                console.log(`⚠️  Skipping record ${record.id}: Invalid CVE format detected`);
+                console.log(` Skipping record ${record.id}: Invalid CVE format detected`);
                 errorCount++;
                 stats.errors.push(`Record ${record.id}: Invalid CVE format`);
                 processRecord(index + 1);
@@ -279,8 +279,8 @@ function performMigration(dryRun = true) {
             
             if (dryRun) {
                 console.log(`[DRY RUN] Would update record ${record.id}:`);
-                console.log(`   From: ${record.storedCVE}`);
-                console.log(`   To:   ${newCVEValue}`);
+                console.log(` From: ${record.storedCVE}`);
+                console.log(` To:   ${newCVEValue}`);
                 successCount++;
                 migrationLog.push({
                     id: record.id,
@@ -293,7 +293,7 @@ function performMigration(dryRun = true) {
             } else {
                 db.run(updateQuery, [newCVEValue, record.id], function(err) {
                     if (err) {
-                        console.error(`❌ Error updating record ${record.id}:`, err.message);
+                        console.error(` Error updating record ${record.id}:`, err.message);
                         errorCount++;
                         stats.errors.push(`Record ${record.id}: ${err.message}`);
                         migrationLog.push({
@@ -305,7 +305,7 @@ function performMigration(dryRun = true) {
                             error: err.message
                         });
                     } else {
-                        console.log(`✅ Updated record ${record.id}: ${record.storedCVE} → ${newCVEValue}`);
+                        console.log(` Updated record ${record.id}: ${record.storedCVE} → ${newCVEValue}`);
                         successCount++;
                         migrationLog.push({
                             id: record.id,
@@ -327,27 +327,27 @@ function performMigration(dryRun = true) {
 
 // Generate enhanced recommendations based on findings
 function generateRecommendations() {
-    console.log("\n\n📝 MIGRATION RECOMMENDATIONS");
+    console.log("\n\nMIGRATION RECOMMENDATIONS");
     console.log("============================\n");
     
     if (stats.truncatedRecords > 0) {
-        console.log(`⚠️  TRUNCATED DATA DETECTED: ${stats.truncatedRecords} records affected\n`);
+        console.log(` TRUNCATED DATA DETECTED: ${stats.truncatedRecords} records affected\n`);
         
         console.log("RECOMMENDED ACTIONS:");
         console.log("1. Create a backup first:");
-        console.log("   node fix-truncated-cves.js --backup\n");
+        console.log(" node fix-truncated-cves.js --backup\n");
         
         console.log("2. Test migration with dry-run:");
-        console.log("   node fix-truncated-cves.js --dry-run\n");
+        console.log(" node fix-truncated-cves.js --dry-run\n");
         
         console.log("3. If dry-run looks good, perform actual migration:");
-        console.log("   node fix-truncated-cves.js --migrate\n");
+        console.log(" node fix-truncated-cves.js --migrate\n");
         
         console.log("4. Alternative: Re-import from original CSV files");
-        console.log("   - This is the safest option if you have the original data");
-        console.log("   - The fixed import logic will preserve all CVEs\n");
+        console.log(" - This is the safest option if you have the original data");
+        console.log(" - The fixed import logic will preserve all CVEs\n");
     } else {
-        console.log("✅ NO TRUNCATED DATA DETECTED\n");
+        console.log("NO TRUNCATED DATA DETECTED\n");
         console.log("Your database appears to be clean. No migration needed.\n");
     }
     
@@ -365,7 +365,7 @@ function generateRecommendations() {
 // Enhanced main function with mode handling
 async function main() {
     try {
-        console.log("🚀 Starting CVE Data Migration Tool...\n");
+        console.log("Starting CVE Data Migration Tool...\n");
         
         // Always start with backup if migrating
         if (mode === "--backup" || mode === "--migrate") {
@@ -388,32 +388,32 @@ async function main() {
                 
             case "--migrate":
                 await performMigration(false);
-                console.log("\n✅ Migration completed successfully!");
+                console.log("\nMigration completed successfully!");
                 console.log("Please verify your data and test CVE functionality.");
                 break;
                 
             case "--backup":
-                console.log("✅ Backup completed. Run with --analyze to check for issues.");
+                console.log("Backup completed. Run with --analyze to check for issues.");
                 break;
         }
         
         // Display final statistics
-        console.log("\n📊 Final Statistics:");
-        console.log(`   Total Records: ${stats.totalRecords}`);
-        console.log(`   Single CVE: ${stats.singleCVERecords}`);
-        console.log(`   Multi-CVE: ${stats.multiCVERecords}`);
-        console.log(`   Truncated: ${stats.truncatedRecords}`);
-        console.log(`   Fixed: ${stats.fixedRecords}`);
+        console.log("\nFinal Statistics:");
+        console.log(` Total Records: ${stats.totalRecords}`);
+        console.log(` Single CVE: ${stats.singleCVERecords}`);
+        console.log(` Multi-CVE: ${stats.multiCVERecords}`);
+        console.log(` Truncated: ${stats.truncatedRecords}`);
+        console.log(` Fixed: ${stats.fixedRecords}`);
         
         if (stats.errors.length > 0) {
-            console.log("\n⚠️  Errors encountered:");
-            stats.errors.forEach(err => console.log(`   - ${err}`));
+            console.log("\nErrors encountered:");
+            stats.errors.forEach(err => console.log(` - ${err}`));
         }
         
-        console.log("\n✅ Operation complete!");
+        console.log("\nOperation complete!");
         
     } catch (error) {
-        console.error("❌ Fatal error:", error.message);
+        console.error("Fatal error:", error.message);
         console.error(error.stack);
     } finally {
         db.close((err) => {

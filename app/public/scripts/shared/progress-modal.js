@@ -35,7 +35,7 @@
  * });
  */
 
-console.log("✅ HexTrackr Progress Modal (shared) loaded successfully");
+console.log("HexTrackr Progress Modal (shared) loaded successfully");
 
 /**
  * Real-time Progress Modal Class
@@ -377,11 +377,11 @@ class ProgressModal {
         console.log("Modal state - isVisible:", this.isVisible, "currentSessionId:", this.currentSessionId, "data.sessionId:", data.sessionId);
         
         if (!this.isVisible || data.sessionId !== this.currentSessionId) {
-            console.warn("⚠️ Progress complete ignored - modal not visible or session mismatch");
+            console.warn("Progress complete ignored - modal not visible or session mismatch");
             return;
         }
 
-        console.log("✅ Progress complete event accepted for processing");
+        console.log("Progress complete event accepted for processing");
 
         // Update progress data to completion
         this.progressData.progress = 100;
@@ -391,16 +391,16 @@ class ProgressModal {
         // Store import summary if available
         if (data.metadata && data.metadata.importSummary) {
             this.progressData.importSummary = data.metadata.importSummary;
-            console.log("📊 Import summary received:", data.metadata.importSummary);
+            console.log("Import summary received:", data.metadata.importSummary);
         } else {
-            console.log("ℹ️ No import summary in metadata");
+            console.log("No import summary in metadata");
         }
 
         // Update UI to show 100% completion
         this.updateUI();
 
         // Show success state with summary
-        console.log("🎯 Calling showSuccess() from handleProgressComplete...");
+        console.log("Calling showSuccess() from handleProgressComplete...");
         this.showSuccess(this.progressData.message, data.metadata ? data.metadata.importSummary : null);
 
         // Modal will stay open until user manually closes it
@@ -472,7 +472,7 @@ class ProgressModal {
      * @param {Object} importSummary - Optional import summary data
      */
     showSuccess(message, importSummary = null) {
-        console.log("🎯 showSuccess() called with:", { message, hasImportSummary: !!importSummary });
+        console.log("showSuccess() called with:", { message, hasImportSummary: !!importSummary });
         
         // Hide spinner
         const spinner = this.modal.querySelector(".spinner-border");
@@ -484,7 +484,7 @@ class ProgressModal {
         const header = this.modal.querySelector(".modal-header");
         if (header) {
             header.className = "modal-header bg-success text-white";
-            console.log("✅ Modal header updated to success state");
+            console.log("Modal header updated to success state");
         }
 
         // Show success alert
@@ -493,14 +493,14 @@ class ProgressModal {
         if (successAlert && successMessage) {
             successMessage.textContent = message;
             successAlert.classList.remove("d-none");
-            console.log("✅ Success alert shown with message:", message);
+            console.log("Success alert shown with message:", message);
         }
 
         // Display import summary if available
         if (importSummary) {
             this.displayImportSummary(importSummary);
         } else {
-            console.log("ℹ️ No import summary to display");
+            console.log("No import summary to display");
         }
 
         // Update buttons
@@ -510,7 +510,7 @@ class ProgressModal {
         // Update progress bar to 100%
         this.update({ progress: 100 });
 
-        console.log("✅ showSuccess() completed", importSummary ? "with summary" : "without summary");
+        console.log("showSuccess() completed", importSummary ? "with summary" : "without summary");
     }
 
     /**
@@ -784,19 +784,19 @@ class ProgressModal {
 
         if (cancelBtn) {
             cancelBtn.classList.add("d-none");
-            console.log("✅ Cancel button hidden");
+            console.log("Cancel button hidden");
         } else {
-            console.error("❌ Cancel button not found!");
+            console.error("Cancel button not found!");
         }
 
         // Show export button only if import summary is present
         if (exportBtn) {
             if (this.progressData.importSummary) {
                 exportBtn.classList.remove("d-none");
-                console.log("✅ Export button shown (import summary present)");
+                console.log("Export button shown (import summary present)");
             } else {
                 exportBtn.classList.add("d-none");
-                console.log("ℹ️ Export button hidden (no import summary)");
+                console.log("Export button hidden (no import summary)");
             }
         }
 
@@ -812,9 +812,9 @@ class ProgressModal {
             closeBtn.classList.remove("btn-secondary");
             closeBtn.classList.add("btn-success");
             
-            console.log("✅ Close button shown with text:", closeBtn.innerHTML);
+            console.log("Close button shown with text:", closeBtn.innerHTML);
         } else {
-            console.error("❌ Close button not found!");
+            console.error("Close button not found!");
         }
     }
     

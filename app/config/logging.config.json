@@ -4,7 +4,7 @@
 
   "global": {
     "enabled": true,
-    "emojis": true,
+    "emojis": false,
     "timestamps": true,
     "auditEnabled": true,
     "retentionDays": 30
