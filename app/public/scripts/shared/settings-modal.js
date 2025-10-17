@@ -1408,10 +1408,12 @@ async function loadPaloSyncStatus() {
  */
 async function loadTenableImportStatus() {
     try {
-        // Fetch last import date from backend
+        // Fetch last import date and statistics from backend
         const response = await authState.authenticatedFetch("/api/vulnerabilities/last-import");
         if (response.ok) {
             const data = await response.json();
+
+            // Update last import date
             if (data.lastImport) {
                 const lastImportElement = document.getElementById("tenableLastImport");
                 if (lastImportElement) {
@@ -1421,6 +1423,14 @@ async function loadTenableImportStatus() {
                         day: "numeric",
                         year: "numeric"
                     });
+                }
+            }
+
+            // Update CSV vulnerabilities count
+            if (data.rowCount !== undefined) {
+                const csvVulnsElement = document.getElementById("tenableCsvVulns");
+                if (csvVulnsElement) {
+                    csvVulnsElement.textContent = data.rowCount.toLocaleString();
                 }
             }
         }
