@@ -208,6 +208,12 @@ class Logger {
             }
         }
 
+        // Guard against empty warnings (called with just category, no message)
+        if (args.length === 0) {
+            console.warn(`[${category || 'general'}] Warning logged with no message`);
+            return;
+        }
+
         console.warn(...args);
     }
 
