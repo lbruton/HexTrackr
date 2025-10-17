@@ -92,6 +92,8 @@ class DatabaseService {
                     this.db.run("PRAGMA foreign_keys = ON");
                     this.db.run("PRAGMA journal_mode = WAL");
                     this.db.run("PRAGMA synchronous = FULL");  // HEX-272: Guarantee data durability (prevent corruption on restart)
+                    this.db.run("PRAGMA busy_timeout = 5000");  // HEX-272: Wait 5s for locks instead of failing immediately
+                    this.db.run("PRAGMA wal_autocheckpoint = 1000");  // HEX-272: Checkpoint every 1000 pages to prevent WAL bloat
 
                     // Performance optimizations for large databases (858MB, 95K+ records)
                     // These pragmas dramatically improve query performance on production hardware
@@ -102,7 +104,14 @@ class DatabaseService {
 
                     // Initialize schema (from server.js initDb function lines 2785+)
                     this._initializeSchema()
-                        .then(() => resolve())
+                        .then(() => {
+                            // HEX-272: Check database integrity on startup
+                            return this.checkIntegrity();
+                        })
+                        .then(() => {
+                            this._log('info', "Database initialized successfully with integrity verified");
+                            resolve();
+                        })
                         .catch(reject);
                 });
 
@@ -725,6 +734,56 @@ class DatabaseService {
         }
 
         this.db.serialize(callback);
+    }
+
+    /**
+     * Force WAL checkpoint to flush all changes to main database file
+     * HEX-272: Prevents data loss during Docker restarts
+     * Call this after bulk operations or before graceful shutdown
+     */
+    async checkpoint() {
+        return new Promise((resolve, reject) => {
+            if (!this.isInitialized) {
+                reject(new Error("Database not initialized"));
+                return;
+            }
+
+            this.db.run("PRAGMA wal_checkpoint(FULL)", (err) => {
+                if (err) {
+                    this._log('error', "WAL checkpoint failed", { error: err.message });
+                    reject(err);
+                } else {
+                    this._log('info', "WAL checkpoint completed - all changes flushed to disk");
+                    resolve();
+                }
+            });
+        });
+    }
+
+    /**
+     * Check database integrity
+     * HEX-272: Run on startup to detect corruption early
+     */
+    async checkIntegrity() {
+        return new Promise((resolve, reject) => {
+            if (!this.isInitialized) {
+                reject(new Error("Database not initialized"));
+                return;
+            }
+
+            this.db.get("PRAGMA integrity_check", (err, row) => {
+                if (err) {
+                    this._log('error', "Database integrity check failed", { error: err.message });
+                    reject(err);
+                } else if (row && row.integrity_check === 'ok') {
+                    this._log('info', "Database integrity check passed");
+                    resolve(true);
+                } else {
+                    this._log('error', "Database integrity check failed", { result: row });
+                    reject(new Error(`Database integrity check failed: ${JSON.stringify(row)}`));
+                }
+            });
+        });
     }
 
     /**
