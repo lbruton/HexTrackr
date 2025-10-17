@@ -1,0 +1,81 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <hr>
+<h2>title: "Version 1.0.72 - Logging System Session 8: Migrate Import Service"
+date: "2025-10-17"
+version: "1.0.72"
+status: "In Progress"
+category: "Enhancement - Logging Migration"</h2><h1>Version 1.0.72 - Logging System Session 8: Migrate Import Service</h1><p><strong>Release Status</strong>: 🚧 In Progress<br><strong>Release Date</strong>: TBD<br><strong>Parent Issue</strong>: <a href="https://linear.app/hextrackr/issue/HEX-252">HEX-252</a><br><strong>Implementation</strong>: <a href="https://linear.app/hextrackr/issue/HEX-254">HEX-254</a> Session 8<br><strong>Session Issue</strong>: <a href="https://linear.app/hextrackr/issue/HEX-260">HEX-260</a></p>
+<h2>Overview</h2><p>Migrate import service to use the unified LoggingService for CSV processing, validation, database operations, and error handling. This establishes comprehensive logging patterns for the data import pipeline and provides audit trails for all import operations.</p>
+<h2>Implementation Tasks</h2><h3>Planned</h3><ul>
+<li><input disabled="" type="checkbox"> Analyze importService.js for console statements</li>
+<li><input disabled="" type="checkbox"> Add defensive logging helpers (_log, _audit)</li>
+<li><input disabled="" type="checkbox"> Migrate CSV import initialization logging</li>
+<li><input disabled="" type="checkbox"> Migrate CSV parsing and validation logging</li>
+<li><input disabled="" type="checkbox"> Migrate database insert operation logging</li>
+<li><input disabled="" type="checkbox"> Migrate background sync operation logging</li>
+<li><input disabled="" type="checkbox"> Add audit logging for import start/complete events</li>
+<li><input disabled="" type="checkbox"> Add error logging for import failures with context</li>
+<li><input disabled="" type="checkbox"> Test CSV import operations with new logging</li>
+<li><input disabled="" type="checkbox"> Verify audit trail captures import events</li>
+</ul>
+<h3>Completed</h3><ul>
+<li><input disabled="" type="checkbox"> TBD (updated during implementation)</li>
+</ul>
+<h2>Technical Details</h2><p><strong>File Modified</strong>: <code>app/services/importService.js</code></p>
+<p><strong>Console Statements Found</strong>: TBD (estimate: 20-30 instances based on service complexity)</p>
+<p><strong>Migration Pattern</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// BEFORE</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Processing CSV file:&quot;</span>, filename);
+
+<span class="hljs-comment">// AFTER</span>
+<span class="hljs-variable language_">this</span>.<span class="hljs-title function_">_log</span>(<span class="hljs-string">&#x27;info&#x27;</span>, <span class="hljs-string">&quot;Processing CSV file&quot;</span>, {
+    <span class="hljs-attr">filename</span>: filename,
+    <span class="hljs-attr">rowCount</span>: rows.<span class="hljs-property">length</span>,
+    <span class="hljs-attr">vendor</span>: vendor
+});</code></pre><p><strong>Defensive Logging Helpers</strong> (from Session 7 pattern):</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">_log</span>(<span class="hljs-params">level, message, data = {}</span>) {
+    <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">global</span>.<span class="hljs-property">logger</span> &amp;&amp; <span class="hljs-variable language_">global</span>.<span class="hljs-property">logger</span>.<span class="hljs-property">import</span> &amp;&amp; <span class="hljs-keyword">typeof</span> <span class="hljs-variable language_">global</span>.<span class="hljs-property">logger</span>.<span class="hljs-property">import</span>[level] === <span class="hljs-string">&#x27;function&#x27;</span>) {
+        <span class="hljs-variable language_">global</span>.<span class="hljs-property">logger</span>.<span class="hljs-property">import</span>[level](message, data);
+    }
+}
+
+<span class="hljs-title function_">_audit</span>(<span class="hljs-params">category, message, data = {}</span>) {
+    <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">global</span>.<span class="hljs-property">logger</span> &amp;&amp; <span class="hljs-keyword">typeof</span> <span class="hljs-variable language_">global</span>.<span class="hljs-property">logger</span>.<span class="hljs-property">audit</span> === <span class="hljs-string">&#x27;function&#x27;</span>) {
+        <span class="hljs-variable language_">global</span>.<span class="hljs-property">logger</span>.<span class="hljs-title function_">audit</span>(category, message, data, <span class="hljs-literal">null</span>, <span class="hljs-literal">null</span>);
+    }
+}</code></pre><p><strong>Audit Events Added</strong>:</p>
+<ul>
+<li><code>import.start</code> - CSV import operation started</li>
+<li><code>import.complete</code> - CSV import operation completed successfully</li>
+<li><code>import.failed</code> - CSV import operation failed with errors</li>
+</ul>
+<h2>Success Criteria</h2><ul>
+<li><input checked="" disabled="" type="checkbox"> Version bumped to v1.0.72 across 5 files</li>
+<li><input disabled="" type="checkbox"> All console statements replaced with category-based logging</li>
+<li><input disabled="" type="checkbox"> Import operations logged with progress tracking</li>
+<li><input disabled="" type="checkbox"> Background sync operations logged</li>
+<li><input disabled="" type="checkbox"> Audit trail captures import lifecycle events</li>
+<li><input disabled="" type="checkbox"> No console.log statements remain in importService.js</li>
+<li><input disabled="" type="checkbox"> Import operations tested and verified</li>
+<li><input disabled="" type="checkbox"> Logging output is clean and informative</li>
+</ul>
+<h2>Related Issues</h2><ul>
+<li>Parent: <a href="https://linear.app/hextrackr/issue/HEX-252">HEX-252</a> - Future: Research and Document Console Logging</li>
+<li>Implementation: <a href="https://linear.app/hextrackr/issue/HEX-254">HEX-254</a> - Implement Unified Logging System with Audit Trail</li>
+<li>Session: <a href="https://linear.app/hextrackr/issue/HEX-260">HEX-260</a> - Session 8: Backend Migration - Import &amp; Ticket Services</li>
+</ul>
+<h2>Progress</h2><p><strong>Sessions Complete</strong>: 7/14 (50%)</p>
+<ul>
+<li>✅ Session 1-3: Foundation (v1.0.67)</li>
+<li>✅ Session 4: Console cleanup (v1.0.68)</li>
+<li>✅ Session 5: Emoji removal (v1.0.69)</li>
+<li>✅ Session 6: Auth migration (v1.0.70)</li>
+<li>✅ Session 7: Database migration (v1.0.71)</li>
+<li>🚧 Session 8: Import migration (v1.0.72)</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
