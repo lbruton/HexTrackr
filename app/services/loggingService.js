@@ -214,7 +214,7 @@ class LoggingService {
      * @param {string} message - Human-readable message
      * @param {Object} data - Additional data to store (will be encrypted)
      * @param {string} userId - User ID (optional)
-     * @param {Object} req - Express request object (optional, for IP/user-agent)
+     * @param {Object} req - Express request object OR plain object with {username, ipAddress, userAgent}
      */
     async audit(category, message, data = null, userId = null, req = null) {
         if (!this.config.global.auditEnabled) {
@@ -238,11 +238,20 @@ class LoggingService {
             let username = null;
 
             if (req) {
-                ipAddress = req.ip || req.connection.remoteAddress;
-                userAgent = req.get('user-agent');
-                if (req.session && req.session.user) {
-                    username = req.session.user.username;
-                    userId = userId || req.session.user.id;
+                // Check if it's an Express request object or plain object
+                if (req.get && typeof req.get === 'function') {
+                    // Express request object
+                    ipAddress = req.ip || req.connection?.remoteAddress || null;
+                    userAgent = req.get('user-agent') || null;
+                    if (req.session && req.session.user) {
+                        username = req.session.user.username;
+                        userId = userId || req.session.user.id;
+                    }
+                } else {
+                    // Plain object with metadata
+                    ipAddress = req.ipAddress || null;
+                    userAgent = req.userAgent || null;
+                    username = req.username || null;
                 }
             }
 
