@@ -1,0 +1,111 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.75</h1><hr>
+<h2>[1.0.75]</h2><h3>Changed</h3><h4>Frontend UI & Page Scripts Migration (HEX-254/HEX-274) - 2025-10-17</h4><p><strong>Description</strong>: Migrated frontend UI components and page scripts (vulnerabilities.js, tickets.js, grid/card views, modals) to use the unified logging system with category-aware logging.</p>
+<p><strong>Key Changes</strong>:</p>
+<ul>
+<li>Migrated <code>vulnerabilities.js</code> page controller to use enhanced logger with &#39;ui&#39; category</li>
+<li>Migrated <code>tickets.js</code> page controller to use enhanced logger with &#39;ui&#39; category</li>
+<li>Migrated <code>vulnerability-grid.js</code> AG-Grid integration to use enhanced logger</li>
+<li>Migrated <code>vulnerability-cards.js</code> card view to use enhanced logger</li>
+<li>Migrated modal components (vulnerability-modals.js, device-security-modal.js) to enhanced logger</li>
+<li>Migrated <code>tickets-aggrid.js</code> tickets grid to use enhanced logger</li>
+<li>Replaced all raw console statements with category-aware logger methods</li>
+<li>Enhanced frontend UI logging consistency across all page controllers and components</li>
+</ul>
+<p><strong>Technical Implementation</strong>:</p>
+<ul>
+<li>Replaced <code>console.log()</code> calls with <code>logger.debug(&#39;ui&#39;, message, data)</code></li>
+<li>Replaced <code>console.warn()</code> calls with <code>logger.warn(&#39;ui&#39;, message, data)</code></li>
+<li>Replaced <code>console.error()</code> calls with <code>logger.error(&#39;ui&#39;, message, data)</code></li>
+<li>All UI logging now respects configuration from <code>/config/logging.config.json</code></li>
+<li>Category-based filtering enables targeted debugging of UI interactions</li>
+</ul>
+<p><strong>Use Case</strong>: Frontend developers can now filter UI interaction logs, page load events, and component lifecycle events using the same category-based system as backend services. This provides a unified debugging experience across the entire application.</p>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/pages/vulnerabilities.js</code>: Migrated console statements to logger with &#39;ui&#39; category</li>
+<li><code>app/public/scripts/pages/tickets.js</code>: Migrated console statements to logger with &#39;ui&#39; category</li>
+<li><code>app/public/scripts/shared/vulnerability-grid.js</code>: Migrated AG-Grid logging to logger with &#39;ui&#39; category</li>
+<li><code>app/public/scripts/shared/vulnerability-cards.js</code>: Migrated card view logging to logger with &#39;ui&#39; category</li>
+<li><code>app/public/scripts/shared/vulnerability-modals.js</code>: Migrated modal logging to logger with &#39;ui&#39; category</li>
+<li><code>app/public/scripts/shared/device-security-modal.js</code>: Migrated device details modal to logger with &#39;ui&#39; category</li>
+<li><code>app/public/scripts/pages/tickets-aggrid.js</code>: Migrated tickets grid logging to logger with &#39;ui&#39; category</li>
+</ul>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li><input disabled="" type="checkbox"> Vulnerabilities page loads correctly at <a href="https://dev.hextrackr.com">https://dev.hextrackr.com</a></li>
+<li><input disabled="" type="checkbox"> Tickets page loads correctly</li>
+<li><input disabled="" type="checkbox"> AG-Grid table view works as expected</li>
+<li><input disabled="" type="checkbox"> Card view works as expected</li>
+<li><input disabled="" type="checkbox"> Modals open and display data correctly</li>
+<li><input disabled="" type="checkbox"> Device details modal functions properly</li>
+<li><input disabled="" type="checkbox"> Browser console shows categorized logger output</li>
+<li><input disabled="" type="checkbox"> No raw console statements remain in migrated files</li>
+<li><input disabled="" type="checkbox"> Logger configuration controls output levels</li>
+<li><input disabled="" type="checkbox"> Docker restart successful</li>
+<li><input disabled="" type="checkbox"> Application logs show clean category-based output</li>
+</ul>
+<p><strong>Issues</strong>:</p>
+<ul>
+<li><a href="https://linear.app/hextrackr/issue/HEX-254">HEX-254</a> - Parent: Implement Unified Logging System with Audit Trail</li>
+<li><a href="https://linear.app/hextrackr/issue/HEX-274">HEX-274</a> - Session 11: Frontend UI &amp; Page Scripts Migration to LoggingService</li>
+</ul>
+<hr>
+<h2>Progress Tracker</h2><p><strong>Logging System Migration</strong> (HEX-254):</p>
+<ul>
+<li><strong>Completed</strong>: 11 / 14 sessions (79%)</li>
+<li><strong>Session 11</strong>: Frontend UI &amp; page scripts (vulnerabilities.js, tickets.js, grids, cards, modals)</li>
+<li><strong>Previous Sessions</strong>:<ul>
+<li>✅ Session 1-3: Foundation (config, backend service, frontend enhancement)</li>
+<li>✅ Session 4-5: Cleanup (HEX references, emojis)</li>
+<li>✅ Session 6: Auth services migration</li>
+<li>✅ Session 7: Database service migration</li>
+<li>✅ Session 8: Import service migration</li>
+<li>✅ Session 9: Priority backend services migration</li>
+<li>✅ Session 10: Frontend core data layer</li>
+<li>✅ Session 11: Frontend UI &amp; page scripts</li>
+</ul>
+</li>
+<li><strong>Remaining Sessions</strong>:<ul>
+<li>Session 12: Frontend shared utilities</li>
+<li>Session 13: Admin UI - Audit log viewer</li>
+<li>Session 14: Final testing &amp; documentation</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2>Notes</h2><h3>Migration Pattern</h3><p><strong>Frontend UI Logging Pattern</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// BEFORE</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Loading vulnerabilities page...&#x27;</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">warn</span>(<span class="hljs-string">&#x27;Grid initialization delayed:&#x27;</span>, delay);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;Modal failed to open:&#x27;</span>, error);
+
+<span class="hljs-comment">// AFTER</span>
+logger.<span class="hljs-title function_">debug</span>(<span class="hljs-string">&#x27;ui&#x27;</span>, <span class="hljs-string">&#x27;Loading vulnerabilities page...&#x27;</span>);
+logger.<span class="hljs-title function_">warn</span>(<span class="hljs-string">&#x27;ui&#x27;</span>, <span class="hljs-string">&#x27;Grid initialization delayed:&#x27;</span>, { delay });
+logger.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;ui&#x27;</span>, <span class="hljs-string">&#x27;Modal failed to open:&#x27;</span>, { <span class="hljs-attr">error</span>: error.<span class="hljs-property">message</span> });</code></pre><p><strong>Component Lifecycle Logging</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Page initialization</span>
+logger.<span class="hljs-title function_">info</span>(<span class="hljs-string">&#x27;ui&#x27;</span>, <span class="hljs-string">&#x27;Vulnerabilities page initialized&#x27;</span>);
+
+<span class="hljs-comment">// User interaction</span>
+logger.<span class="hljs-title function_">debug</span>(<span class="hljs-string">&#x27;ui&#x27;</span>, <span class="hljs-string">&#x27;View switched to cards&#x27;</span>, { <span class="hljs-attr">previousView</span>: <span class="hljs-string">&#x27;table&#x27;</span> });
+
+<span class="hljs-comment">// Error handling</span>
+logger.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;ui&#x27;</span>, <span class="hljs-string">&#x27;Failed to load data&#x27;</span>, { <span class="hljs-attr">error</span>: err.<span class="hljs-property">message</span>, <span class="hljs-attr">context</span>: <span class="hljs-string">&#x27;grid&#x27;</span> });</code></pre><h3>Frontend Logger Categories</h3><p>Available categories for frontend logging:</p>
+<ul>
+<li><code>ui</code> - User interface interactions (Session 11 ✅)</li>
+<li><code>websocket</code> - WebSocket connections (Session 10 ✅)</li>
+<li><code>vulnerability</code> - Vulnerability data operations (Session 10 ✅)</li>
+<li><code>ticket</code> - Ticket operations</li>
+<li><code>api</code> - API calls</li>
+<li><code>import</code> - Import operations</li>
+<li><code>auth</code> - Authentication</li>
+</ul>
+<hr>
+<p><em>Changelog Version: 1.0.75 | Session 11 | HEX-254 Unified Logging System</em></p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
