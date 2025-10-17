@@ -1,0 +1,63 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <hr>
+<h2>title: "Version 1.0.73 - Logging System Session 9: Migrate Remaining Backend Services"
+date: "2025-10-17"
+version: "1.0.73"
+status: "In Progress"
+category: "Enhancement - Logging Migration"</h2><h1>Version 1.0.73 - Logging System Session 9: Migrate Remaining Backend Services</h1><p><strong>Release Status</strong>: 🚧 In Progress<br><strong>Release Date</strong>: TBD<br><strong>Parent Issue</strong>: <a href="https://linear.app/hextrackr/issue/HEX-252">HEX-252</a><br><strong>Implementation</strong>: <a href="https://linear.app/hextrackr/issue/HEX-254">HEX-254</a> Session 9</p>
+<h2>Overview</h2><p>Migrate remaining backend services to use the unified LoggingService. This includes vulnerability service, ticket service, backup service, and other supporting services that haven&#39;t been migrated yet.</p>
+<h2>Implementation Tasks</h2><h3>Planned</h3><ul>
+<li><input disabled="" type="checkbox"> Identify remaining backend services with console statements</li>
+<li><input disabled="" type="checkbox"> Migrate vulnerabilityService.js</li>
+<li><input disabled="" type="checkbox"> Migrate ticketService.js (if not done in Session 8)</li>
+<li><input disabled="" type="checkbox"> Migrate backupService.js</li>
+<li><input disabled="" type="checkbox"> Migrate cacheService.js</li>
+<li><input disabled="" type="checkbox"> Migrate other supporting services</li>
+<li><input disabled="" type="checkbox"> Add audit logging for critical operations</li>
+<li><input disabled="" type="checkbox"> Test all migrated services</li>
+</ul>
+<h3>Completed</h3><ul>
+<li><input disabled="" type="checkbox"> TBD</li>
+</ul>
+<h2>Technical Details</h2><p><strong>Files to Migrate</strong>: TBD (to be identified)</p>
+<p><strong>Console Statements Found</strong>: TBD</p>
+<p><strong>Migration Pattern</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Add defensive helpers at top of each service</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">_log</span>(<span class="hljs-params">level, message, data = {}</span>) {
+    <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">global</span>.<span class="hljs-property">logger</span> &amp;&amp; <span class="hljs-variable language_">global</span>.<span class="hljs-property">logger</span>.[category] &amp;&amp; <span class="hljs-keyword">typeof</span> <span class="hljs-variable language_">global</span>.<span class="hljs-property">logger</span>[category][level] === <span class="hljs-string">&#x27;function&#x27;</span>) {
+        <span class="hljs-variable language_">global</span>.<span class="hljs-property">logger</span>.[category][level](message, data);
+    }
+}
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">_audit</span>(<span class="hljs-params">category, message, data = {}</span>) {
+    <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">global</span>.<span class="hljs-property">logger</span> &amp;&amp; <span class="hljs-keyword">typeof</span> <span class="hljs-variable language_">global</span>.<span class="hljs-property">logger</span>.<span class="hljs-property">audit</span> === <span class="hljs-string">&#x27;function&#x27;</span>) {
+        <span class="hljs-variable language_">global</span>.<span class="hljs-property">logger</span>.<span class="hljs-title function_">audit</span>(category, message, data, <span class="hljs-literal">null</span>, <span class="hljs-literal">null</span>);
+    }
+}</code></pre><h2>Success Criteria</h2><ul>
+<li><input checked="" disabled="" type="checkbox"> Version bumped to v1.0.73 across 5 files</li>
+<li><input disabled="" type="checkbox"> All remaining backend services migrated to LoggingService</li>
+<li><input disabled="" type="checkbox"> Critical operations have audit logging</li>
+<li><input disabled="" type="checkbox"> No console statements remain in backend services</li>
+<li><input disabled="" type="checkbox"> All services tested and verified</li>
+<li><input disabled="" type="checkbox"> Application running successfully</li>
+</ul>
+<h2>Related Issues</h2><ul>
+<li>Parent: <a href="https://linear.app/hextrackr/issue/HEX-252">HEX-252</a> - Future: Research and Document Console Logging</li>
+<li>Implementation: <a href="https://linear.app/hextrackr/issue/HEX-254">HEX-254</a> - Implement Unified Logging System with Audit Trail</li>
+</ul>
+<h2>Progress</h2><p><strong>Sessions Complete</strong>: 8/14 (57%)</p>
+<ul>
+<li>✅ Session 1-3: Foundation (v1.0.67)</li>
+<li>✅ Session 4: Console cleanup (v1.0.68)</li>
+<li>✅ Session 5: Emoji removal (v1.0.69)</li>
+<li>✅ Session 6: Auth migration (v1.0.70)</li>
+<li>✅ Session 7: Database migration (v1.0.71)</li>
+<li>✅ Session 8: Import migration (v1.0.72)</li>
+<li>🚧 Session 9: Remaining backend services (v1.0.73)</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
