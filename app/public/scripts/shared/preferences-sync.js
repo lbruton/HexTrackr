@@ -76,7 +76,7 @@ class PreferencesSync {
          */
         this.SYNC_DELAY = 1000; // 1 second debounce
 
-        console.log("PreferencesSync initialized");
+        logger.debug("ui", "PreferencesSync initialized");
     }
 
     /**
@@ -93,7 +93,7 @@ class PreferencesSync {
         try {
             // Check if preferences service is available
             if (!window.preferencesService) {
-                console.warn("PreferencesService not available, sync disabled");
+                logger.warn("ui", "PreferencesService not available, sync disabled");
                 return false;
             }
 
@@ -103,7 +103,7 @@ class PreferencesSync {
             const result = await this.prefsService.getAllPreferences();
 
             if (!result.success) {
-                console.warn("Failed to load preferences from database:", result.error);
+                logger.warn("ui", "Failed to load preferences from database:", result.error);
                 // Continue with localStorage-only mode
                 this.initialized = true;
                 return false;
@@ -132,11 +132,11 @@ class PreferencesSync {
                                 const age = Date.now() - cached.timestamp;
                                 if (age < 500) {
                                     // localStorage value is very fresh, preserve it (prevents race condition)
-                                    console.log(`🔒 Preserving fresh localStorage theme (${age}ms old): ${cached.theme}`);
+                                    logger.debug("ui", `🔒 Preserving fresh localStorage theme (${age}ms old): ${cached.theme}`);
                                     shouldUpdate = false;
                                 } else {
                                     // localStorage value is stale, use database value for cross-device sync
-                                    console.log(` Updating stale localStorage theme (${age}ms old) with database value`);
+                                    logger.debug("ui", ` Updating stale localStorage theme (${age}ms old) with database value`);
                                 }
                             }
                             // Store theme for reuse (handles both old and new JSON formats)
@@ -145,7 +145,7 @@ class PreferencesSync {
                             // BACKWARD COMPATIBILITY FIX: Legacy format stored plain strings like "dark" or "light"
                             // Don't throw error - just use the plain string value directly
                             cachedTheme = existingValue;
-                            console.log(` Migrating legacy theme format: "${existingValue}" → JSON`);
+                            logger.debug("ui", ` Migrating legacy theme format: "${existingValue}" → JSON`);
                         }
                     }
 
@@ -161,7 +161,7 @@ class PreferencesSync {
                     }
                 });
 
-                console.log(` Synced ${result.data.count} preferences from database to localStorage`);
+                logger.debug("ui", ` Synced ${result.data.count} preferences from database to localStorage`);
 
                 // Apply theme immediately if loaded from database (prevents FOUC in new browsers)
                 if (themePreference) {
@@ -178,7 +178,7 @@ class PreferencesSync {
                         detail: { theme: themePreference, source: "database" }
                     }));
 
-                    console.log(` Applied theme from database: ${themePreference}`);
+                    logger.debug("ui", ` Applied theme from database: ${themePreference}`);
                 }
             }
 
@@ -186,7 +186,7 @@ class PreferencesSync {
             return true;
 
         } catch (error) {
-            console.error("Error initializing preferences sync:", error);
+            logger.error("ui", "Error initializing preferences sync:", error);
             this.initialized = true; // Still mark as initialized to allow localStorage-only mode
             return false;
         }
@@ -223,7 +223,7 @@ class PreferencesSync {
             }
 
         } catch (error) {
-            console.warn(`Failed to update localStorage cache for '${key}':`, error);
+            logger.warn("ui", `Failed to update localStorage cache for '${key}':`, error);
         }
     }
 
@@ -276,13 +276,13 @@ class PreferencesSync {
             if (result.success) {
                 // Update localStorage cache
                 this.updateLocalStorageCache("theme", theme);
-                console.log(` Theme synced to database immediately: ${theme}`);
+                logger.debug("ui", ` Theme synced to database immediately: ${theme}`);
             } else {
-                console.warn("Failed to sync theme to database:", result.error);
+                logger.warn("ui", "Failed to sync theme to database:", result.error);
             }
 
         } catch (error) {
-            console.error("Error syncing theme to database:", error);
+            logger.error("ui", "Error syncing theme to database:", error);
         }
     }
 
@@ -304,7 +304,7 @@ class PreferencesSync {
             this.queueSync(key, template);
 
         } catch (error) {
-            console.error(`Error syncing ${type} template to database:`, error);
+            logger.error("ui", `Error syncing ${type} template to database:`, error);
         }
     }
 
@@ -324,7 +324,7 @@ class PreferencesSync {
             this.queueSync("pagination_enabled", enabled);
 
         } catch (error) {
-            console.error("Error syncing pagination enabled to database:", error);
+            logger.error("ui", "Error syncing pagination enabled to database:", error);
         }
     }
 
@@ -344,7 +344,7 @@ class PreferencesSync {
             this.queueSync("kev_auto_refresh", enabled);
 
         } catch (error) {
-            console.error("Error syncing KEV auto-refresh to database:", error);
+            logger.error("ui", "Error syncing KEV auto-refresh to database:", error);
         }
     }
 
@@ -365,19 +365,19 @@ class PreferencesSync {
             const result = await this.prefsService.setPreference("cisco_api_key", apiKey);
 
             if (result.success) {
-                console.log("🔒 Cisco API credentials synced to secure database storage");
+                logger.debug("ui", "🔒 Cisco API credentials synced to secure database storage");
 
                 // Remove from localStorage after successful database save
                 try {
                     localStorage.removeItem("hextrackr-cisco-key");
-                    console.log("Removed Cisco credentials from localStorage");
+                    logger.debug("ui", "Removed Cisco credentials from localStorage");
                 } catch (removeError) {
-                    console.warn("Could not remove Cisco credentials from localStorage:", removeError);
+                    logger.warn("ui", "Could not remove Cisco credentials from localStorage:", removeError);
                 }
             }
 
         } catch (error) {
-            console.error("Error syncing Cisco credentials to database:", error);
+            logger.error("ui", "Error syncing Cisco credentials to database:", error);
         }
     }
 
@@ -428,15 +428,15 @@ class PreferencesSync {
             const result = await this.prefsService.setMultiplePreferences(preferences);
 
             if (result.success) {
-                console.log(` Synced ${this.syncQueue.size} preferences to database`);
+                logger.debug("ui", ` Synced ${this.syncQueue.size} preferences to database`);
                 this.syncQueue.clear();
             } else {
-                console.warn("Failed to sync preferences to database:", result.error);
+                logger.warn("ui", "Failed to sync preferences to database:", result.error);
                 // Keep in queue for retry
             }
 
         } catch (error) {
-            console.error("Error flushing sync queue:", error);
+            logger.error("ui", "Error flushing sync queue:", error);
         }
 
         this.syncTimeout = null;
@@ -493,14 +493,14 @@ class PreferencesSync {
             const result = await this.prefsService.setPreference(preferenceKey, parsedValue);
 
             if (result.success) {
-                console.log(` Migrated '${localStorageKey}' → '${preferenceKey}'`);
+                logger.debug("ui", ` Migrated '${localStorageKey}' → '${preferenceKey}'`);
                 return true;
             }
 
             return false;
 
         } catch (error) {
-            console.error(`Error migrating '${localStorageKey}':`, error);
+            logger.error("ui", `Error migrating '${localStorageKey}':`, error);
             return false;
         }
     }

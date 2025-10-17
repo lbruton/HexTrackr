@@ -138,7 +138,7 @@ class PaloAdvisoryHelper {
         }
 
         // No match found for this major.minor family
-        console.warn(`No ${installedKey}.x fix found for ${installedVersion}. Available: ${fixedVersionsArray.join(', ')}`);
+        logger.warn("ui", `No ${installedKey}.x fix found for ${installedVersion}. Available: ${fixedVersionsArray.join(', ')}`);
         return null;
     }
 
@@ -158,7 +158,7 @@ class PaloAdvisoryHelper {
 
         // Validate CVE ID
         if (!cveId || !cveId.startsWith('CVE-')) {
-            console.warn(`Invalid CVE ID: ${cveId}`);
+            logger.warn("ui", `Invalid CVE ID: ${cveId}`);
             return null;
         }
 
@@ -181,7 +181,7 @@ class PaloAdvisoryHelper {
 
             // Check for HTTP errors
             if (!response.ok) {
-                console.warn(`API error for ${cveId}: ${response.status} ${response.statusText}`);
+                logger.warn("ui", `API error for ${cveId}: ${response.status} ${response.statusText}`);
                 // Cache empty result to prevent repeated failures
                 this.advisoryCache.set(cveId, {
                     fixedVersionsArray: [],
@@ -207,7 +207,7 @@ class PaloAdvisoryHelper {
                 try {
                     firstFixed = JSON.parse(advisory.first_fixed);
                 } catch (e) {
-                    console.warn(`Failed to parse first_fixed for ${cveId}:`, e);
+                    logger.warn("ui", `Failed to parse first_fixed for ${cveId}:`, e);
                 }
             }
 
@@ -230,7 +230,7 @@ class PaloAdvisoryHelper {
             return fixedVersion;
 
         } catch (error) {
-            console.warn(`Failed to fetch advisory for ${cveId}:`, error.message);
+            logger.warn("ui", `Failed to fetch advisory for ${cveId}:`, error.message);
 
             // Cache empty result to prevent repeated failures
             this.advisoryCache.set(cveId, {
@@ -294,7 +294,7 @@ class PaloAdvisoryHelper {
      */
     clearCache() {
         this.advisoryCache.clear();
-        console.log('Palo Alto advisory cache cleared');
+        logger.debug("ui", 'Palo Alto advisory cache cleared');
     }
 
     /**
@@ -313,4 +313,4 @@ class PaloAdvisoryHelper {
 // Global instance - accessible from all vulnerability pages
 window.paloAdvisoryHelper = new PaloAdvisoryHelper();
 
-console.log('Palo Alto Advisory Helper initialized');
+logger.debug("ui", 'Palo Alto Advisory Helper initialized');

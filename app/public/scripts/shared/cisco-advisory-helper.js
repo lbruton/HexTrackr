@@ -129,7 +129,7 @@ class CiscoAdvisoryHelper {
 
         if (installedOS === 'Unknown') {
             // Can't match - return first version as fallback
-            console.warn(`Could not determine OS type from: ${installedVersion}`);
+            logger.warn("ui", `Could not determine OS type from: ${installedVersion}`);
             return fixedVersionsArray[0];
         }
 
@@ -144,7 +144,7 @@ class CiscoAdvisoryHelper {
         }
 
         // No match found - log warning and return null
-        console.warn(`No ${installedOS} fix found for ${installedVersion}. Available: ${fixedVersionsArray.join(', ')}`);
+        logger.warn("ui", `No ${installedOS} fix found for ${installedVersion}. Available: ${fixedVersionsArray.join(', ')}`);
         return null;
     }
 
@@ -164,7 +164,7 @@ class CiscoAdvisoryHelper {
 
         // Validate CVE ID
         if (!cveId || !cveId.startsWith('CVE-')) {
-            console.warn(`Invalid CVE ID: ${cveId}`);
+            logger.warn("ui", `Invalid CVE ID: ${cveId}`);
             return null;
         }
 
@@ -187,7 +187,7 @@ class CiscoAdvisoryHelper {
 
             // Check for HTTP errors
             if (!response.ok) {
-                console.warn(`API error for ${cveId}: ${response.status} ${response.statusText}`);
+                logger.warn("ui", `API error for ${cveId}: ${response.status} ${response.statusText}`);
                 // Cache empty result to prevent repeated failures
                 this.advisoryCache.set(cveId, {
                     fixedVersionsArray: [],
@@ -214,7 +214,7 @@ class CiscoAdvisoryHelper {
                 try {
                     firstFixed = JSON.parse(advisory.first_fixed);
                 } catch (e) {
-                    console.warn(`Failed to parse first_fixed for ${cveId}:`, e);
+                    logger.warn("ui", `Failed to parse first_fixed for ${cveId}:`, e);
                 }
             }
 
@@ -237,7 +237,7 @@ class CiscoAdvisoryHelper {
             return fixedVersion;
 
         } catch (error) {
-            console.warn(`Failed to fetch advisory for ${cveId}:`, error.message);
+            logger.warn("ui", `Failed to fetch advisory for ${cveId}:`, error.message);
 
             // Cache empty result to prevent repeated failures
             this.advisoryCache.set(cveId, {
@@ -301,7 +301,7 @@ class CiscoAdvisoryHelper {
      */
     clearCache() {
         this.advisoryCache.clear();
-        console.log('Cisco advisory cache cleared');
+        logger.debug("ui", 'Cisco advisory cache cleared');
     }
 
     /**
@@ -320,4 +320,4 @@ class CiscoAdvisoryHelper {
 // Global instance - accessible from all vulnerability pages
 window.ciscoAdvisoryHelper = new CiscoAdvisoryHelper();
 
-console.log('Cisco Advisory Helper initialized');
+logger.debug("ui", 'Cisco Advisory Helper initialized');
