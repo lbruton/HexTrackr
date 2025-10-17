@@ -39,6 +39,7 @@ const LoggingService = require("../services/loggingService"); // HEX-254: Centra
 const CiscoAdvisoryService = require("../services/ciscoAdvisoryService");
 const PaloAltoService = require("../services/paloAltoService"); // HEX-209: Palo Alto advisory sync
 const PreferencesService = require("../services/preferencesService");
+const BackupService = require("../services/backupService"); // HEX-270: Automated backups
 
 // Authentication middleware
 const { sessionMiddleware } = require("../middleware/auth");
@@ -428,6 +429,9 @@ async function initializeApplication() {
 
         // HEX-141: Start Cisco advisory background sync worker
         startCiscoBackgroundSync(db);
+
+        // HEX-270: Start automated backups
+        startAutomatedBackups(db);
     });
 }
 
@@ -562,6 +566,85 @@ function startCiscoBackgroundSync(db) {
 
     // Schedule recurring sync every 24 hours
     setInterval(runPaloSync, SYNC_INTERVAL);
+}
+
+// ========================================
+// HEX-270: Automated Backup Scheduler
+// ========================================
+
+/**
+ * Start automated backup scheduler
+ * Runs 4 hours after startup + every 24 hours
+ * Creates both JSON ZIP and database file backups
+ */
+function startAutomatedBackups(db) {
+    const SYNC_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours
+    const STARTUP_DELAY = 4 * 60 * 60 * 1000; // 4 hours - avoid accidental reboots during dev
+    const ADMIN_USER_ID = "00000000-0000-0000-0000-000000000001"; // Default admin user UUID
+
+    const preferencesService = new PreferencesService();
+    preferencesService.initialize(db);
+    const backupService = new BackupService();
+    backupService.initialize(db);
+
+    // Initialize preference with default value if it doesn't exist
+    preferencesService.getPreference(ADMIN_USER_ID, "automated_backups_enabled")
+        .then(result => {
+            if (!result.success) {
+                // Preference doesn't exist - create it with default value "true"
+                return preferencesService.setPreference(ADMIN_USER_ID, "automated_backups_enabled", "true");
+            }
+        })
+        .then(() => {
+            console.log("Automated backup preference initialized");
+        })
+        .catch(err => {
+            console.warn("Failed to initialize automated backup preference:", err.message);
+        });
+
+    /**
+     * Execute automated backup if enabled
+     */
+    async function runBackup() {
+        try {
+            // Check if automated backups are enabled (default: true)
+            const bgBackupPref = await preferencesService.getPreference(ADMIN_USER_ID, "automated_backups_enabled");
+            const isEnabled = bgBackupPref.success && bgBackupPref.data
+                ? (bgBackupPref.data.value === "true" || bgBackupPref.data.value === true)
+                : true; // Default enabled if preference doesn't exist
+
+            if (!isEnabled) {
+                console.log("Automated backup skipped: Disabled by user preference");
+                return;
+            }
+
+            console.log("Starting automated backup...");
+            const result = await backupService.createScheduledBackup();
+
+            console.log(` Automated backup completed: ${result.total_size_mb}MB total`);
+            console.log(`  - JSON ZIP: ${result.backups.json_zip.size_mb}MB`);
+            console.log(`  - Database: ${result.backups.database.size_mb}MB`);
+
+            // Run cleanup to maintain 7-day retention
+            const cleanupResult = await backupService.cleanupOldBackups();
+            if (cleanupResult.deleted > 0) {
+                console.log(` Backup cleanup: ${cleanupResult.deleted} old backups deleted, ${cleanupResult.freed_mb}MB freed`);
+            }
+
+        } catch (error) {
+            console.error("Automated backup failed:", error.message);
+            // Don't crash the server on backup failure - just log and continue
+        }
+    }
+
+    // Run initial backup on startup (4 hour delay to avoid dev restarts)
+    console.log("Automated backups scheduled (runs 4h after startup + every 24 hours)");
+    setTimeout(() => {
+        runBackup();
+    }, STARTUP_DELAY);
+
+    // Schedule recurring backup every 24 hours
+    setInterval(runBackup, SYNC_INTERVAL);
 }
 
 // HEX-272: Graceful shutdown handler to prevent database corruption on Docker restart

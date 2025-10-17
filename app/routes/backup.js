@@ -61,5 +61,10 @@ router.delete("/clear/:type", requireAuth, BackupController.clearData);
 // Restore endpoint
 router.post("/restore", requireAuth, upload.single("file"), BackupController.restoreBackup);
 
+// HEX-270: Backup history and manual backup endpoints
+router.get("/history", requireAuth, BackupController.getBackupHistory);
+router.get("/download/:filename", requireAuth, BackupController.downloadBackupFile);
+router.post("/save-to-disk", requireAuth, BackupController.saveBackupToDisk);
+router.post("/trigger-manual", requireAuth, BackupController.triggerManualBackup);
 
 module.exports = router;

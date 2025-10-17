@@ -14,6 +14,7 @@ const FileService = require("./fileService");
 const PathValidator = require("../utils/PathValidator");
 const JSZip = require("jszip");
 const path = require("path");
+const fs = require("fs");
 
 /**
  * Defensive logging helpers
@@ -747,6 +748,395 @@ class BackupService {
         } catch (error) {
             _log('error', "Tickets ZIP backup failed:", error.message);
             throw new Error(`Tickets ZIP backup failed: ${error.message}`);
+        }
+    }
+
+    /**
+     * HEX-270: Create scheduled backup (JSON ZIP + Database file)
+     * Saves both backup types to /backups directory with timestamps
+     * @returns {Promise<Object>} Backup result with file paths and sizes
+     */
+    async createScheduledBackup() {
+        try {
+            _log('info', "Starting scheduled backup...");
+
+            // Ensure backup directory exists
+            if (!fs.existsSync(this.backupDir)) {
+                fs.mkdirSync(this.backupDir, { recursive: true });
+                _log('info', "Created backup directory", { path: this.backupDir });
+            }
+
+            const timestamp = new Date().toISOString().replace(/[:.]/g, "-").split(".")[0]; // YYYY-MM-DDTHH-MM-SS
+
+            // 1. Create JSON ZIP backup
+            _log('info', "Creating JSON ZIP backup...");
+            const zipBuffer = await this.exportAllAsZip();
+            const zipPath = path.join(this.backupDir, `hextrackr_data_${timestamp}.zip`);
+            fs.writeFileSync(zipPath, zipBuffer);
+            const zipSize = (zipBuffer.length / 1024 / 1024).toFixed(2);
+            _log('info', `JSON ZIP backup saved: ${zipSize}MB`, { path: zipPath });
+
+            // 2. Create database file backup using VACUUM INTO
+            _log('info', "Creating database file backup...");
+            const dbBackupPath = path.join(this.backupDir, `hextrackr_db_${timestamp}.db`);
+
+            await new Promise((resolve, reject) => {
+                // VACUUM INTO creates a clean, compacted copy of the database
+                // Safe to use while database is in use (no locks required)
+                this.db.run(`VACUUM INTO ?`, [dbBackupPath], (err) => {
+                    if (err) {
+                        _log('error', "Database backup failed", { error: err.message });
+                        reject(new Error(`Database backup failed: ${err.message}`));
+                    } else {
+                        const dbStats = fs.statSync(dbBackupPath);
+                        const dbSize = (dbStats.size / 1024 / 1024).toFixed(2);
+                        _log('info', `Database backup saved: ${dbSize}MB`, { path: dbBackupPath });
+                        resolve();
+                    }
+                });
+            });
+
+            // Get final statistics
+            const zipStats = fs.statSync(zipPath);
+            const dbStats = fs.statSync(dbBackupPath);
+
+            const result = {
+                success: true,
+                timestamp: timestamp,
+                backups: {
+                    json_zip: {
+                        path: zipPath,
+                        size_mb: (zipStats.size / 1024 / 1024).toFixed(2)
+                    },
+                    database: {
+                        path: dbBackupPath,
+                        size_mb: (dbStats.size / 1024 / 1024).toFixed(2)
+                    }
+                },
+                total_size_mb: ((zipStats.size + dbStats.size) / 1024 / 1024).toFixed(2)
+            };
+
+            _audit('backup.scheduled', "Scheduled backup completed", result);
+
+            return result;
+
+        } catch (error) {
+            _log('error', "Scheduled backup failed", { error: error.message });
+            throw new Error(`Scheduled backup failed: ${error.message}`);
+        }
+    }
+
+    /**
+     * HEX-270: Get backup history from disk
+     * Lists all available backups (JSON ZIP and database files)
+     * @returns {Promise<Object>} List of backups with metadata
+     */
+    async getBackupHistory() {
+        try {
+            _log('info', "Retrieving backup history...");
+
+            if (!fs.existsSync(this.backupDir)) {
+                return {
+                    success: true,
+                    backups: [],
+                    message: "No backups directory found"
+                };
+            }
+
+            const files = fs.readdirSync(this.backupDir);
+            const backups = [];
+
+            for (const file of files) {
+                // Only process backup files (ZIP and DB)
+                if (!file.startsWith("hextrackr_") || (!file.endsWith(".zip") && !file.endsWith(".db"))) {
+                    continue;
+                }
+
+                const filePath = path.join(this.backupDir, file);
+                const stats = fs.statSync(filePath);
+
+                // Parse filename to extract timestamp and type
+                // Supports multiple filename formats:
+                // - hextrackr_data_YYYY-MM-DDTHH-MM-SS.zip (scheduled backups)
+                // - hextrackr_db_YYYY-MM-DDTHH-MM-SS.db (database backups)
+                // - hextrackr_tickets_backup_YYYY-MM-DD_HH-MM-SS_manual.zip (manual ticket backups)
+                // - hextrackr_vulnerabilities_backup_YYYY-MM-DD_HH-MM-SS_manual.zip (manual vuln backups)
+                // - hextrackr_pre-migration-XXX_YYYYMMDD-HHMMSS.db (pre-migration backups)
+
+                let backupType, timestamp, isManual;
+
+                // Try legacy format first: hextrackr_(data|db)_timestamp.(zip|db)
+                let match = file.match(/^hextrackr_(data|db)_(.+)\.(zip|db)$/);
+                if (match) {
+                    const [, type, ts] = match;
+                    backupType = type === "data" ? "JSON ZIP" : "Database";
+                    timestamp = ts.replace("_manual", "");
+                    isManual = ts.includes("_manual");
+                }
+                // Try new format: hextrackr_(tickets|vulnerabilities)_backup_timestamp_manual.zip
+                else {
+                    match = file.match(/^hextrackr_(tickets|vulnerabilities)_backup_(.+)\.(zip)$/);
+                    if (match) {
+                        const [, type, ts] = match;
+                        backupType = type === "tickets" ? "Tickets" : "Vulnerabilities";
+                        timestamp = ts.replace("_manual", "");
+                        isManual = ts.includes("_manual");
+                    }
+                    // Try database backup format: hextrackr_pre-migration-XXX_timestamp.db
+                    else {
+                        match = file.match(/^hextrackr_pre-migration-[^_]+_(.+)\.db$/);
+                        if (match) {
+                            backupType = "Database";
+                            timestamp = match[1];
+                            isManual = false; // Pre-migration backups are automated
+                        } else {
+                            continue; // Skip files that don't match any pattern
+                        }
+                    }
+                }
+
+                backups.push({
+                    filename: file,
+                    type: backupType,
+                    timestamp: timestamp,
+                    size_bytes: stats.size,
+                    size_mb: (stats.size / 1024 / 1024).toFixed(2),
+                    created_at: stats.mtime,
+                    age_days: ((Date.now() - stats.mtimeMs) / 86400000).toFixed(1),
+                    is_manual: isManual,
+                    is_automated: !isManual
+                });
+            }
+
+            // Sort by creation time (newest first)
+            backups.sort((a, b) => b.created_at - a.created_at);
+
+            _log('info', `Found ${backups.length} backups in history`);
+
+            return {
+                success: true,
+                backups: backups,
+                total_count: backups.length,
+                total_size_mb: backups.reduce((sum, b) => sum + parseFloat(b.size_mb), 0).toFixed(2)
+            };
+
+        } catch (error) {
+            _log('error', "Failed to retrieve backup history", { error: error.message });
+            throw new Error(`Failed to retrieve backup history: ${error.message}`);
+        }
+    }
+
+    /**
+     * HEX-270: Download specific backup file from disk
+     * @param {string} filename - Backup filename
+     * @returns {Promise<Buffer>} File buffer
+     */
+    async downloadBackupFile(filename) {
+        try {
+            // Security: Validate filename to prevent path traversal
+            if (!filename.startsWith("hextrackr_") || (!filename.endsWith(".zip") && !filename.endsWith(".db"))) {
+                throw new Error("Invalid backup filename");
+            }
+
+            if (filename.includes("..") || filename.includes("/") || filename.includes("\\")) {
+                throw new Error("Path traversal attempt detected");
+            }
+
+            const filePath = path.join(this.backupDir, filename);
+
+            if (!fs.existsSync(filePath)) {
+                throw new Error("Backup file not found");
+            }
+
+            _log('info', `Downloading backup file: ${filename}`);
+
+            const fileBuffer = fs.readFileSync(filePath);
+
+            _audit('backup.download', "Backup file downloaded", {
+                filename: filename,
+                size_mb: (fileBuffer.length / 1024 / 1024).toFixed(2)
+            });
+
+            return fileBuffer;
+
+        } catch (error) {
+            _log('error', "Backup download failed", { error: error.message, filename });
+            throw new Error(`Backup download failed: ${error.message}`);
+        }
+    }
+
+    /**
+     * HEX-270: Save ZIP backup to disk (manual trigger)
+     * Similar to createScheduledBackup but triggered manually from UI
+     * @param {string} type - Backup type: "all", "vulnerabilities", or "tickets"
+     * @returns {Promise<Object>} Backup result with file path and size
+     */
+    async saveBackupToDisk(type = "all") {
+        try {
+            _log('info', `Saving ${type} backup to disk (manual trigger)...`);
+
+            // Ensure backup directory exists
+            if (!fs.existsSync(this.backupDir)) {
+                fs.mkdirSync(this.backupDir, { recursive: true });
+                _log('info', "Created backup directory", { path: this.backupDir });
+            }
+
+            const timestamp = new Date().toISOString().replace(/[:.]/g, "-").split(".")[0];
+            const manualSuffix = "_manual"; // Distinguish manual from automated backups
+
+            let zipBuffer;
+            let filename;
+
+            // Generate appropriate backup based on type
+            switch (type) {
+                case "all":
+                    zipBuffer = await this.exportAllAsZip();
+                    filename = `hextrackr_data_${timestamp}${manualSuffix}.zip`;
+                    break;
+                case "vulnerabilities":
+                    zipBuffer = await this.exportVulnerabilitiesAsZip();
+                    filename = `hextrackr_data_${timestamp}${manualSuffix}.zip`;
+                    break;
+                case "tickets":
+                    zipBuffer = await this.exportTicketsAsZip();
+                    filename = `hextrackr_data_${timestamp}${manualSuffix}.zip`;
+                    break;
+                default:
+                    throw new Error(`Invalid backup type: ${type}`);
+            }
+
+            // Save to disk
+            const filePath = path.join(this.backupDir, filename);
+            fs.writeFileSync(filePath, zipBuffer);
+
+            const result = {
+                success: true,
+                filename: filename,
+                path: filePath,
+                size_mb: (zipBuffer.length / 1024 / 1024).toFixed(2),
+                type: type,
+                timestamp: timestamp,
+                is_manual: true
+            };
+
+            _audit('backup.manual', "Manual backup saved to disk", result);
+            _log('info', `Manual backup saved: ${filename} (${result.size_mb}MB)`);
+
+            // Run cleanup to maintain 7-day retention
+            await this.cleanupOldBackups();
+
+            return result;
+
+        } catch (error) {
+            _log('error', "Manual backup failed", { error: error.message, type });
+            throw new Error(`Manual backup failed: ${error.message}`);
+        }
+    }
+
+    /**
+     * HEX-270: Clean up old backups (smart retention policy)
+     * Retention policy per backup type:
+     * - Keep 7 most recent automated backups
+     * - Keep 3 most recent manual backups
+     * - Total maximum: 10 backups per type
+     * @returns {Promise<Object>} Cleanup result with deleted file count
+     */
+    async cleanupOldBackups() {
+        try {
+            _log('info', "Starting backup cleanup (7 automated + 3 manual per type)...");
+
+            if (!fs.existsSync(this.backupDir)) {
+                _log('info', "Backup directory does not exist, skipping cleanup");
+                return { success: true, deleted: 0, message: "No backups to clean" };
+            }
+
+            const files = fs.readdirSync(this.backupDir);
+            const backupsByType = {
+                tickets: { manual: [], automated: [] },
+                vulnerabilities: { manual: [], automated: [] },
+                database: { manual: [], automated: [] }
+            };
+
+            // Categorize backups by type and source
+            for (const file of files) {
+                if (!file.startsWith("hextrackr_") || (!file.endsWith(".zip") && !file.endsWith(".db"))) {
+                    continue;
+                }
+
+                const filePath = path.join(this.backupDir, file);
+                const stats = fs.statSync(filePath);
+                const isManual = file.includes("_manual");
+
+                // Determine backup type
+                let backupType = null;
+                if (file.includes("tickets_backup")) {
+                    backupType = "tickets";
+                } else if (file.includes("vulnerabilities_backup")) {
+                    backupType = "vulnerabilities";
+                } else if (file.endsWith(".db")) {
+                    backupType = "database";
+                }
+
+                if (backupType) {
+                    const category = isManual ? "manual" : "automated";
+                    backupsByType[backupType][category].push({
+                        file,
+                        filePath,
+                        stats,
+                        mtime: stats.mtimeMs
+                    });
+                }
+            }
+
+            let deletedCount = 0;
+            let deletedSize = 0;
+
+            // Apply retention policy to each type
+            for (const [type, categories] of Object.entries(backupsByType)) {
+                // Keep 7 most recent automated backups
+                categories.automated.sort((a, b) => b.mtime - a.mtime);
+                const automatedToDelete = categories.automated.slice(7);
+
+                for (const backup of automatedToDelete) {
+                    _log('info', `Deleting old automated ${type} backup: ${backup.file}`);
+                    deletedSize += backup.stats.size;
+                    fs.unlinkSync(backup.filePath);
+                    deletedCount++;
+                }
+
+                // Keep 3 most recent manual backups
+                categories.manual.sort((a, b) => b.mtime - a.mtime);
+                const manualToDelete = categories.manual.slice(3);
+
+                for (const backup of manualToDelete) {
+                    _log('info', `Deleting old manual ${type} backup: ${backup.file}`);
+                    deletedSize += backup.stats.size;
+                    fs.unlinkSync(backup.filePath);
+                    deletedCount++;
+                }
+
+                _log('info', `${type}: Keeping ${Math.min(categories.automated.length - automatedToDelete.length, 7)} automated + ${Math.min(categories.manual.length - manualToDelete.length, 3)} manual`);
+            }
+
+            const result = {
+                success: true,
+                deleted: deletedCount,
+                freed_mb: (deletedSize / 1024 / 1024).toFixed(2),
+                retention_policy: "7 automated + 3 manual per type"
+            };
+
+            if (deletedCount > 0) {
+                _audit('backup.cleanup', "Old backups cleaned up", result);
+                _log('info', `Cleanup complete: ${deletedCount} files deleted, ${result.freed_mb}MB freed`);
+            } else {
+                _log('info', "No old backups to delete");
+            }
+
+            return result;
+
+        } catch (error) {
+            _log('error', "Backup cleanup failed", { error: error.message });
+            throw new Error(`Backup cleanup failed: ${error.message}`);
         }
     }
 }

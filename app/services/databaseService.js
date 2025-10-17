@@ -82,7 +82,7 @@ class DatabaseService {
 
                     this._log('info', "Database connection established", {
                         path: this.dbPath,
-                        journalMode: "DELETE",  // HEX-272: macOS Docker compatibility
+                        journalMode: "WAL",  // HEX-280: WAL mode with named volume (not macOS bind mount)
                         cacheSize: "64MB"
                     });
                     this.connectionPool.currentConnections = 1;
@@ -90,11 +90,12 @@ class DatabaseService {
 
                     // Enable foreign keys and other pragmas (MUST be inside connection callback)
                     this.db.run("PRAGMA foreign_keys = ON");
-                    // HEX-272: Use DELETE mode instead of WAL for macOS Docker bind mount compatibility
-                    // WAL mode has fcntl locking issues on macOS filesystem mounts in Docker
-                    this.db.run("PRAGMA journal_mode = DELETE");
-                    this.db.run("PRAGMA synchronous = FULL");  // HEX-272: Guarantee data durability (prevent corruption on restart)
-                    this.db.run("PRAGMA busy_timeout = 5000");  // HEX-272: Wait 5s for locks instead of failing immediately
+                    // HEX-280: WAL mode with Docker named volume (isolated from macOS filesystem)
+                    // Named volumes don't have fcntl locking issues, WAL allows concurrent reads during writes
+                    this.db.run("PRAGMA journal_mode = WAL");
+                    this.db.run("PRAGMA synchronous = NORMAL");  // NORMAL is safe with WAL mode
+                    this.db.run("PRAGMA busy_timeout = 10000");  // Wait 10s for locks
+                    this.db.run("PRAGMA wal_autocheckpoint = 1000");  // Checkpoint every 1000 pages
 
                     // Performance optimizations for large databases (858MB, 95K+ records)
                     // These pragmas dramatically improve query performance on production hardware
