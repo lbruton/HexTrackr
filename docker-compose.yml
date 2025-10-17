@@ -32,6 +32,7 @@ services:
     env_file:
       - .env
     restart: unless-stopped
+    stop_grace_period: 30s  # HEX-272: Give app 30 seconds to close DB connection cleanly
     healthcheck:
       test: ["CMD", "node", "-e", "const protocol = process.env.USE_HTTPS === 'true' ? 'https' : 'http'; const https = require(protocol); const options = protocol === 'https' ? {rejectUnauthorized: false} : {}; https.get(protocol + '://localhost:' + (process.env.PORT || 8080) + '/health', options, (res) => process.exit(res.statusCode === 200 ? 0 : 1))"]
       interval: 30s
