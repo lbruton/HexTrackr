@@ -35,6 +35,33 @@ These rules are mandatory and must be followed every session:
 
 ---
 
+## Reference Conventions
+
+**HEX-XXX Issue Numbers** (Internal Use Only):
+- ✅ **Development**: Code comments, commit messages, Linear issues
+- ✅ **Internal Docs**: `/docs/*.md` files, developer guides, architecture notes
+- ✅ **Debugging**: Console logs during development (removed before release)
+
+**Version Numbers** (Public/Production Use):
+- ✅ **Public Documentation**: `/app/public/docs-source/**/*.md` user guides
+- ✅ **Application Logging**: LoggingService, audit trails, error messages shown to users
+- ✅ **Changelogs**: `CHANGELOG.md`, release notes, version history
+- ✅ **User-Facing UI**: Error messages, notifications, help text
+
+**Cleanup Strategy** (HEX-254 Session 4+):
+- Remove `[HEX-XXX]` prefixes from console logs (use logger categories instead)
+- Replace issue references with version numbers in user-facing docs
+- Keep HEX references in git history, Linear, and internal documentation
+- Use semantic versioning (v1.0.66) for public-facing references
+
+**Example Conversions**:
+- ❌ Console: `console.log('[HEX-241] Vendor detected:', vendor)`
+- ✅ Logger: `logger.debug('vulnerability', 'Vendor detected:', { vendor })`
+- ❌ User Doc: "Fixed in HEX-247"
+- ✅ User Doc: "Fixed in v1.0.66"
+
+---
+
 ### ANTI-PATTERNS TO AVOID
 
 ❌ **Creating database endpoints for data mapping problems**
@@ -118,6 +145,8 @@ These rules are mandatory and must be followed every session:
 ### 1. claude-context (MANDATORY Code Search)
 
 **Rule**: ALL code searches MUST use claude-context - never grep/find/manual file reading.
+
+**Markdown Files**: All markdown files (`*.md`) in the repository are indexed by claude-context and can be searched semantically. This includes documentation in `/docs/`, `/app/public/docs-source/`, `CLAUDE.md`, `TAXONOMY.md`, `README.md`, and all guide/reference files.
 
 **Session Start Workflow** (every session):
 ```javascript
@@ -250,6 +279,22 @@ mcp__codacy__codacy_cli_analyze({
 **Workflow Guides**:
 - SRPI Process: `/docs/SRPI_PROCESS.md`
 
+**Logging & Audit Trail** (HEX-254):
+- User Guide: `/app/public/docs-source/guides/logging-and-audit-trail.md`
+- Developer Guide: `/docs/LOGGING_SYSTEM.md`
+- Configuration: `/app/config/logging.config.json`
+- Database Schema: `/app/public/scripts/migrations/012-create-audit-logs.sql`
+
+**Changelogs**:
+- Location: `/app/public/docs-source/changelog/versions/`
+- Format: Each version gets its own file (e.g., `1.0.67.md`)
+- Index: `/app/public/docs-source/changelog/index.md` (links to all versions)
+- Template: `/docs/SRPI/TEMPLATE_CHANGELOG.md`
+- **Version Strategy**: Each HEX-254 session gets a new patch version
+  - Session 3 → v1.0.67
+  - Session 4 → v1.0.68
+  - Session 5 → v1.0.69 (etc.)
+
 ---
 
-**Last Updated**: 2025-10-16
+**Last Updated**: 2025-10-17
