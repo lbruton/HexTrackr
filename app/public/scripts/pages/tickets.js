@@ -2993,7 +2993,10 @@ class HexagonTicketsManager {
                 ticket.return_zip || ticket.returnZip
             ) || "N/A",
             "[TRACKING_NUMBER]": ticket.outbound_tracking || ticket.outboundTracking || ticket.tracking_number || "N/A",
-            "[RETURN_TRACKING]": ticket.return_tracking || ticket.returnTracking || "N/A"
+            "[RETURN_TRACKING]": ticket.return_tracking || ticket.returnTracking || "N/A",
+            // Software versions and mitigation details for job-specific templates
+            "[SOFTWARE_VERSIONS]": ticket.software_versions || ticket.softwareVersions || "N/A",
+            "[MITIGATION_DETAILS]": ticket.mitigation_details || ticket.mitigationDetails || "N/A"
         };
 
         // Handle vulnerabilities array (backward compatibility)
