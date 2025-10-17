@@ -88,23 +88,23 @@ class DatabaseService {
                     this.connectionPool.currentConnections = 1;
                     this.isInitialized = true;
 
+                    // Enable foreign keys and other pragmas (MUST be inside connection callback)
+                    this.db.run("PRAGMA foreign_keys = ON");
+                    this.db.run("PRAGMA journal_mode = WAL");
+                    this.db.run("PRAGMA synchronous = FULL");  // HEX-272: Guarantee data durability (prevent corruption on restart)
+
+                    // Performance optimizations for large databases (858MB, 95K+ records)
+                    // These pragmas dramatically improve query performance on production hardware
+                    this.db.run("PRAGMA cache_size = -64000");      // 64MB cache (default ~2MB) - 32x improvement
+                    this.db.run("PRAGMA mmap_size = 268435456");    // 256MB memory-mapped I/O - reduces syscalls
+                    this.db.run("PRAGMA temp_store = MEMORY");      // Keep temp tables in RAM - faster aggregations
+                    this.db.run("PRAGMA page_size = 4096");         // Optimal page size for most systems
+
                     // Initialize schema (from server.js initDb function lines 2785+)
                     this._initializeSchema()
                         .then(() => resolve())
                         .catch(reject);
                 });
-
-                // Enable foreign keys and other pragmas
-                this.db.run("PRAGMA foreign_keys = ON");
-                this.db.run("PRAGMA journal_mode = WAL");
-                this.db.run("PRAGMA synchronous = NORMAL");
-
-                // Performance optimizations for large databases (858MB, 95K+ records)
-                // These pragmas dramatically improve query performance on production hardware
-                this.db.run("PRAGMA cache_size = -64000");      // 64MB cache (default ~2MB) - 32x improvement
-                this.db.run("PRAGMA mmap_size = 268435456");    // 256MB memory-mapped I/O - reduces syscalls
-                this.db.run("PRAGMA temp_store = MEMORY");      // Keep temp tables in RAM - faster aggregations
-                this.db.run("PRAGMA page_size = 4096");         // Optimal page size for most systems
 
             } catch (error) {
                 reject(error);
