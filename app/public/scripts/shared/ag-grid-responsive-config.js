@@ -538,7 +538,7 @@ function handleGridCreateTicket(event, link) {
     const hostname = link.dataset.hostname;
     const isKev = link.dataset.isKev === "true";
 
-    console.log(`[Grid Create Ticket] hostname=${hostname}, isKev=${isKev}`);
+    logger.debug("ui", `[Grid Create Ticket] hostname=${hostname}, isKev=${isKev}`);
 
     // Parse hostname to extract SITE and Location (ALL CAPS)
     const site = hostname.substring(0, 4).toUpperCase();
@@ -561,9 +561,9 @@ function handleGridCreateTicket(event, link) {
                 .filter(device => device.hostname.toLowerCase().startsWith(location.toLowerCase()) && device.hasKev === true)
                 .map(device => device.hostname.toUpperCase());
 
-            console.log(`[Grid Power Tool] KEV mode - found ${deviceList.length} KEV devices at ${location}`);
+            logger.debug("ui", `[Grid Power Tool] KEV mode - found ${deviceList.length} KEV devices at ${location}`);
         } else {
-            console.error("[Grid Power Tool] vulnManager.dataManager not available");
+            logger.error("ui", "[Grid Power Tool] vulnManager.dataManager not available");
         }
     }
     // Mode 3: All devices at location (Alt + Shift)
@@ -579,18 +579,18 @@ function handleGridCreateTicket(event, link) {
                 .filter(device => device.hostname.toLowerCase().startsWith(location.toLowerCase()))
                 .map(device => device.hostname.toUpperCase());
 
-            console.log(`[Grid Power Tool] All devices mode - found ${deviceList.length} devices at ${location}`);
+            logger.debug("ui", `[Grid Power Tool] All devices mode - found ${deviceList.length} devices at ${location}`);
         } else {
-            console.error("[Grid Power Tool] vulnManager.dataManager not available");
+            logger.error("ui", "[Grid Power Tool] vulnManager.dataManager not available");
         }
     }
     // Mode 1: Single device (default - no modifiers)
 
-    console.log("[Grid Power Tool] Mode:", mode);
-    console.log("[Grid Power Tool] Site:", site);
-    console.log("[Grid Power Tool] Location:", location);
-    console.log("[Grid Power Tool] Devices:", deviceList);
-    console.log("[Grid Power Tool] Total Count:", deviceList.length);
+    logger.debug("ui", "[Grid Power Tool] Mode:", mode);
+    logger.debug("ui", "[Grid Power Tool] Site:", site);
+    logger.debug("ui", "[Grid Power Tool] Location:", location);
+    logger.debug("ui", "[Grid Power Tool] Devices:", deviceList);
+    logger.debug("ui", "[Grid Power Tool] Total Count:", deviceList.length);
 
     // Build ticket data object
     const ticketData = {
@@ -641,7 +641,7 @@ async function handleGridViewTickets(event, link) {
     const hostname = link.dataset.hostname;
     const ticketCount = parseInt(link.dataset.ticketCount) || 0;
 
-    console.log(`[Grid View Tickets] hostname=${hostname}, count=${ticketCount}`);
+    logger.debug("ui", `[Grid View Tickets] hostname=${hostname}, count=${ticketCount}`);
 
     // Fetch tickets for this device
     try {
@@ -650,17 +650,17 @@ async function handleGridViewTickets(event, link) {
         });
 
         if (!response.ok) {
-            console.error("[Grid View Tickets] Failed to fetch tickets:", response.statusText);
+            logger.error("ui", "[Grid View Tickets] Failed to fetch tickets:", response.statusText);
             return;
         }
 
         const result = await response.json();
         const tickets = result.tickets || [];
 
-        console.log(`[Grid View Tickets] Fetched ${tickets.length} tickets:`, tickets);
+        logger.debug("ui", `[Grid View Tickets] Fetched ${tickets.length} tickets:`, tickets);
 
         if (tickets.length === 0) {
-            console.warn(`[Grid View Tickets] No tickets found for ${hostname}`);
+            logger.warn("ui", `[Grid View Tickets] No tickets found for ${hostname}`);
             return;
         }
 
@@ -668,7 +668,7 @@ async function handleGridViewTickets(event, link) {
         showGridTicketPickerModal(hostname, tickets);
 
     } catch (error) {
-        console.error("[Grid View Tickets] Error fetching tickets:", error);
+        logger.error("ui", "[Grid View Tickets] Error fetching tickets:", error);
     }
 }
 
@@ -681,20 +681,20 @@ async function handleGridViewTickets(event, link) {
  * @global
  */
 function showGridTicketPickerModal(hostname, tickets) {
-    console.log(`[Grid Ticket Picker] Opening picker for ${hostname} with ${tickets.length} tickets`);
+    logger.debug("ui", `[Grid Ticket Picker] Opening picker for ${hostname} with ${tickets.length} tickets`);
 
     const validTickets = tickets.filter(t => t !== null && t.id);
-    console.log(`[Grid Ticket Picker] Valid tickets: ${validTickets.length}`, validTickets);
+    logger.debug("ui", `[Grid Ticket Picker] Valid tickets: ${validTickets.length}`, validTickets);
 
     if (validTickets.length === 0) {
-        console.error(`[Grid Ticket Picker] No valid tickets found for ${hostname}`);
+        logger.error("ui", `[Grid Ticket Picker] No valid tickets found for ${hostname}`);
         return;
     }
 
     // Build modal content - reuses existing modal structure
     const modalBody = document.getElementById("ticketPickerModalBody");
     if (!modalBody) {
-        console.error(`[Grid Ticket Picker] Modal body element not found!`);
+        logger.error("ui", `[Grid Ticket Picker] Modal body element not found!`);
         return;
     }
 
@@ -733,19 +733,19 @@ function showGridTicketPickerModal(hostname, tickets) {
     // Show the modal
     const modalElement = document.getElementById("ticketPickerModal");
     if (!modalElement) {
-        console.error(`[Grid Ticket Picker] Modal element not found!`);
+        logger.error("ui", `[Grid Ticket Picker] Modal element not found!`);
         return;
     }
 
-    console.log(`[Grid Ticket Picker] Showing modal...`);
+    logger.debug("ui", `[Grid Ticket Picker] Showing modal...`);
     if (typeof bootstrap === "undefined") {
-        console.error(`[Grid Ticket Picker] Bootstrap is not loaded!`);
+        logger.error("ui", `[Grid Ticket Picker] Bootstrap is not loaded!`);
         return;
     }
 
     const modal = new bootstrap.Modal(modalElement);
     modal.show();
-    console.log(`[Grid Ticket Picker] Modal shown successfully`);
+    logger.debug("ui", `[Grid Ticket Picker] Modal shown successfully`);
 }
 
 // Export functions for module usage

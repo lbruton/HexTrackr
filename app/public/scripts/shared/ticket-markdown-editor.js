@@ -95,7 +95,7 @@ class TicketMarkdownEditor {
 
                 this.showToast("Ticket template edit mode enabled", "info");
             } catch (error) {
-                console.error("Error entering ticket template edit mode:", error);
+                logger.error("ui", "Error entering ticket template edit mode:", error);
                 this.showToast("Failed to enter ticket template edit mode", "error");
             }
         } else {
@@ -115,18 +115,18 @@ class TicketMarkdownEditor {
         try {
             // Determine template name based on current variant
             const templateName = `markdown_${this.currentVariant}`;
-            console.log(`[TicketMarkdownEditor] Loading template: ${templateName}`);
+            logger.debug("ui", `[TicketMarkdownEditor] Loading template: ${templateName}`);
 
             // If forceRefresh is true, always fetch from API
             if (forceRefresh) {
-                console.log("[TicketMarkdownEditor] Force refresh requested, fetching from API");
+                logger.debug("ui", "[TicketMarkdownEditor] Force refresh requested, fetching from API");
                 const response = await authState.authenticatedFetch(`/api/templates/by-name/${templateName}`);
                 if (response.ok) {
                     const result = await response.json();
                     if (result.success) {
                         this.currentTemplate = result.data;
                         this.cacheTemplate(this.currentTemplate);
-                        console.log("[TicketMarkdownEditor] Template refreshed from API");
+                        logger.debug("ui", "[TicketMarkdownEditor] Template refreshed from API");
                     }
                 }
             } else {
@@ -134,7 +134,7 @@ class TicketMarkdownEditor {
                 const cached = this.getCachedTemplate(templateName);
                 if (cached) {
                     this.currentTemplate = cached;
-                    console.log("[TicketMarkdownEditor] Using cached template");
+                    logger.debug("ui", "[TicketMarkdownEditor] Using cached template");
                 } else if (!this.currentTemplate) {
                     const response = await authState.authenticatedFetch(`/api/templates/by-name/${templateName}`);
                     if (response.ok) {
@@ -142,7 +142,7 @@ class TicketMarkdownEditor {
                         if (result.success) {
                             this.currentTemplate = result.data;
                             this.cacheTemplate(this.currentTemplate);
-                            console.log("[TicketMarkdownEditor] Template loaded from API");
+                            logger.debug("ui", "[TicketMarkdownEditor] Template loaded from API");
                         }
                     }
                 }
@@ -156,8 +156,8 @@ class TicketMarkdownEditor {
             // Temporarily disable aggressive template validation to prevent unwanted restoration
             // TODO: Implement more robust template validation that doesn't interfere with user edits
             if (!this.isRestoring && !this.isTemplateContentValid(this.currentTemplate.template_content)) {
-                console.warn("Template content validation failed, but allowing user content to load for editing.");
-                console.log("Template content preview:", this.currentTemplate.template_content.substring(0, 100));
+                logger.warn("ui", "Template content validation failed, but allowing user content to load for editing.");
+                logger.debug("ui", "Template content preview:", this.currentTemplate.template_content.substring(0, 100));
             }
 
             const editor = document.getElementById("ticketTemplateEditor");
@@ -166,7 +166,7 @@ class TicketMarkdownEditor {
                 this.validateTemplate();
             }
         } catch (error) {
-            console.error("Error loading ticket template:", error);
+            logger.error("ui", "Error loading ticket template:", error);
             await this.createDefaultTemplate();
         }
     }
@@ -255,7 +255,7 @@ Generated: [GENERATED_TIME]`;
 
             this.cacheTemplate(this.currentTemplate);
         } catch (error) {
-            console.error("Error ensuring default ticket template:", error);
+            logger.error("ui", "Error ensuring default ticket template:", error);
             const editor = document.getElementById("ticketTemplateEditor");
             if (editor) {
                 editor.value = defaultContent;
@@ -379,7 +379,7 @@ Generated: [GENERATED_TIME]`;
             // Show preview in a modal
             this.showPreviewModal(processedContent);
         } catch (error) {
-            console.error("Error previewing ticket template:", error);
+            logger.error("ui", "Error previewing ticket template:", error);
             this.showToast("Failed to generate preview", "error");
         }
     }
@@ -665,8 +665,8 @@ Generated: [GENERATED_TIME]`;
                 await this.createDefaultTemplate();
             }
 
-            console.log(`[TicketMarkdownEditor] Saving template with ID: ${this.currentTemplate.id}, category: 'ticket', name: 'default_ticket'`);
-            console.log(`[TicketMarkdownEditor] Template content preview: ${templateContent.substring(0, 100)}...`);
+            logger.debug("ui", `[TicketMarkdownEditor] Saving template with ID: ${this.currentTemplate.id}, category: 'ticket', name: 'default_ticket'`);
+            logger.debug("ui", `[TicketMarkdownEditor] Template content preview: ${templateContent.substring(0, 100)}...`);
 
             const response = await authState.authenticatedFetch(`/api/templates/${this.currentTemplate.id}`, {
                 method: "PUT",
@@ -707,7 +707,7 @@ Generated: [GENERATED_TIME]`;
                 throw new Error(result.error || "Save failed");
             }
         } catch (error) {
-            console.error("Error saving ticket template:", error);
+            logger.error("ui", "Error saving ticket template:", error);
             this.showToast("Failed to save ticket template", "error");
         }
     }
@@ -743,7 +743,7 @@ Generated: [GENERATED_TIME]`;
             await this.loadTemplateForEditing(true);
             this.showToast("Ticket template reset to default", "success");
         } catch (error) {
-            console.error("Error resetting ticket template:", error);
+            logger.error("ui", "Error resetting ticket template:", error);
             this.showToast("Failed to reset ticket template", "error");
         } finally {
             this.isRestoring = false;
@@ -765,9 +765,9 @@ Generated: [GENERATED_TIME]`;
                 category: "ticket"
             };
             localStorage.setItem(cacheKey, JSON.stringify(cacheData));
-            console.log(`[TicketMarkdownEditor] Cached template with key: ${cacheKey}`);
+            logger.debug("ui", `[TicketMarkdownEditor] Cached template with key: ${cacheKey}`);
         } catch (error) {
-            console.warn("Failed to cache ticket template:", error);
+            logger.warn("ui", "Failed to cache ticket template:", error);
         }
     }
 
@@ -781,21 +781,21 @@ Generated: [GENERATED_TIME]`;
             const cacheKey = `hextrackr_ticket_template_${templateName}`;
             const cached = localStorage.getItem(cacheKey);
             if (!cached) {
-                console.log(`[TicketMarkdownEditor] No cached template found for key: ${cacheKey}`);
+                logger.debug("ui", `[TicketMarkdownEditor] No cached template found for key: ${cacheKey}`);
                 return null;
             }
 
             const cacheData = JSON.parse(cached);
             if (cacheData.expires < Date.now()) {
-                console.log(`[TicketMarkdownEditor] Cached template expired for key: ${cacheKey}`);
+                logger.debug("ui", `[TicketMarkdownEditor] Cached template expired for key: ${cacheKey}`);
                 localStorage.removeItem(cacheKey);
                 return null;
             }
 
-            console.log(`[TicketMarkdownEditor] Retrieved cached template for key: ${cacheKey}`);
+            logger.debug("ui", `[TicketMarkdownEditor] Retrieved cached template for key: ${cacheKey}`);
             return cacheData.template;
         } catch (error) {
-            console.warn("Failed to load cached ticket template:", error);
+            logger.warn("ui", "Failed to load cached ticket template:", error);
             return null;
         }
     }
@@ -809,18 +809,18 @@ Generated: [GENERATED_TIME]`;
             if (templateName) {
                 const cacheKey = `hextrackr_ticket_template_${templateName}`;
                 localStorage.removeItem(cacheKey);
-                console.log(`[TicketMarkdownEditor] Cleared cache for key: ${cacheKey}`);
+                logger.debug("ui", `[TicketMarkdownEditor] Cleared cache for key: ${cacheKey}`);
                 return;
             }
 
             Object.keys(localStorage).forEach(key => {
                 if (key.startsWith("hextrackr_ticket_template_")) {
                     localStorage.removeItem(key);
-                    console.log(`[TicketMarkdownEditor] Cleared cache for key: ${key}`);
+                    logger.debug("ui", `[TicketMarkdownEditor] Cleared cache for key: ${key}`);
                 }
             });
         } catch (error) {
-            console.warn("Failed to clear ticket template cache:", error);
+            logger.warn("ui", "Failed to clear ticket template cache:", error);
         }
     }
 
@@ -850,7 +850,7 @@ Generated: [GENERATED_TIME]`;
                 await authState.authenticatedFetch(`/api/templates/${this.currentTemplate.id}/reset`, { method: "POST" });
             }
         } catch (resetError) {
-            console.warn("Failed to reset ticket template on server:", resetError.message);
+            logger.warn("ui", "Failed to reset ticket template on server:", resetError.message);
         } finally {
             this.clearTemplateCache("default_ticket");
             this.currentTemplate = null;
@@ -902,7 +902,7 @@ Generated: [GENERATED_TIME]`;
             const validation = await this.validateTemplateContent(content);
             this.displayValidationResults(validation);
         } catch (error) {
-            console.error("Validation error:", error);
+            logger.error("ui", "Validation error:", error);
         }
     }
 
@@ -993,7 +993,7 @@ Generated: [GENERATED_TIME]`;
         // Determine variant based on job type
         if (ticketData && ticketData.jobType) {
             this.currentVariant = this.getTemplateVariant(ticketData.jobType);
-            console.log(`[TicketMarkdownEditor] Set variant to '${this.currentVariant}' based on job type '${ticketData.jobType}'`);
+            logger.debug("ui", `[TicketMarkdownEditor] Set variant to '${this.currentVariant}' based on job type '${ticketData.jobType}'`);
         }
     }
 
@@ -1007,7 +1007,7 @@ Generated: [GENERATED_TIME]`;
         if (window.ticketManager && window.ticketManager.showToast) {
             window.ticketManager.showToast(message, type);
         } else {
-            console.log(`[${type.toUpperCase()}] ${message}`);
+            logger.debug("ui", `[${type.toUpperCase()}] ${message}`);
         }
     }
 }

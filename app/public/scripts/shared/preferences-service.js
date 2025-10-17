@@ -55,7 +55,7 @@ class PreferencesService {
          */
         this.baseUrl = "/api/preferences";
 
-        console.log("PreferencesService initialized");
+        logger.debug("ui", "PreferencesService initialized");
     }
 
     /**
@@ -73,7 +73,7 @@ class PreferencesService {
             const data = await response.json();
             return data.success ? data.csrfToken : null;
         } catch (error) {
-            console.warn("Failed to fetch CSRF token:", error);
+            logger.warn("ui", "Failed to fetch CSRF token:", error);
             return null;
         }
     }
@@ -124,7 +124,7 @@ class PreferencesService {
 
             // Handle 401 Unauthorized - redirect to login
             if (response.status === 401) {
-                console.warn("Authentication required - redirecting to login");
+                logger.warn("ui", "Authentication required - redirecting to login");
                 window.location.href = "/login.html";
                 return { success: false, error: "Authentication required" };
             }
@@ -132,7 +132,7 @@ class PreferencesService {
             // Return parsed response
             return data;
         } catch (error) {
-            console.error("Response parse error:", error);
+            logger.error("ui", "Response parse error:", error);
             return {
                 success: false,
                 error: "Failed to parse server response"
@@ -150,7 +150,7 @@ class PreferencesService {
      * @example
      * const result = await prefsService.getPreference('theme');
      * if (result.success) {
-     *   console.log('Theme:', result.data.value);
+     *   logger.debug("ui", 'Theme:', result.data.value);
      * }
      */
     async getPreference(key) {
@@ -158,7 +158,7 @@ class PreferencesService {
             const response = await this.authenticatedFetch(`${this.baseUrl}/${encodeURIComponent(key)}`);
             return await this.parseResponse(response);
         } catch (error) {
-            console.error(`Error fetching preference '${key}':`, error);
+            logger.error("ui", `Error fetching preference '${key}':`, error);
             return {
                 success: false,
                 error: error.message || "Network error"
@@ -176,7 +176,7 @@ class PreferencesService {
      * const result = await prefsService.getAllPreferences();
      * if (result.success) {
      *   result.data.preferences.forEach(pref => {
-     *     console.log(`${pref.key}: ${pref.value}`);
+     *     logger.debug("ui", `${pref.key}: ${pref.value}`);
      *   });
      * }
      */
@@ -185,7 +185,7 @@ class PreferencesService {
             const response = await this.authenticatedFetch(this.baseUrl);
             return await this.parseResponse(response);
         } catch (error) {
-            console.error("Error fetching all preferences:", error);
+            logger.error("ui", "Error fetching all preferences:", error);
             return {
                 success: false,
                 error: error.message || "Network error"
@@ -204,7 +204,7 @@ class PreferencesService {
      * @example
      * const result = await prefsService.setPreference('theme', 'dark');
      * if (result.success) {
-     *   console.log('Preference saved:', result.data.message);
+     *   logger.debug("ui", 'Preference saved:', result.data.message);
      * }
      */
     async setPreference(key, value) {
@@ -218,7 +218,7 @@ class PreferencesService {
             });
             return await this.parseResponse(response);
         } catch (error) {
-            console.error(`Error setting preference '${key}':`, error);
+            logger.error("ui", `Error setting preference '${key}':`, error);
             return {
                 success: false,
                 error: error.message || "Network error"
@@ -240,7 +240,7 @@ class PreferencesService {
      *   kev_auto_refresh: true
      * });
      * if (result.success) {
-     *   console.log(`Saved ${result.data.count} preferences`);
+     *   logger.debug("ui", `Saved ${result.data.count} preferences`);
      * }
      */
     async setMultiplePreferences(preferences) {
@@ -254,7 +254,7 @@ class PreferencesService {
             });
             return await this.parseResponse(response);
         } catch (error) {
-            console.error("Error setting multiple preferences:", error);
+            logger.error("ui", "Error setting multiple preferences:", error);
             return {
                 success: false,
                 error: error.message || "Network error"
@@ -272,7 +272,7 @@ class PreferencesService {
      * @example
      * const result = await prefsService.deletePreference('old_setting');
      * if (result.success) {
-     *   console.log('Preference deleted');
+     *   logger.debug("ui", 'Preference deleted');
      * }
      */
     async deletePreference(key) {
@@ -282,7 +282,7 @@ class PreferencesService {
             });
             return await this.parseResponse(response);
         } catch (error) {
-            console.error(`Error deleting preference '${key}':`, error);
+            logger.error("ui", `Error deleting preference '${key}':`, error);
             return {
                 success: false,
                 error: error.message || "Network error"
@@ -299,7 +299,7 @@ class PreferencesService {
      * @example
      * const result = await prefsService.deleteAllPreferences();
      * if (result.success) {
-     *   console.log('All preferences cleared');
+     *   logger.debug("ui", 'All preferences cleared');
      * }
      */
     async deleteAllPreferences() {
@@ -309,7 +309,7 @@ class PreferencesService {
             });
             return await this.parseResponse(response);
         } catch (error) {
-            console.error("Error deleting all preferences:", error);
+            logger.error("ui", "Error deleting all preferences:", error);
             return {
                 success: false,
                 error: error.message || "Network error"
@@ -327,7 +327,7 @@ class PreferencesService {
      * @example
      * const exists = await prefsService.hasPreference('theme');
      * if (exists) {
-     *   console.log('Theme preference is set');
+     *   logger.debug("ui", 'Theme preference is set');
      * }
      */
     async hasPreference(key) {
@@ -337,7 +337,7 @@ class PreferencesService {
             });
             return response.status === 200;
         } catch (error) {
-            console.error(`Error checking preference '${key}':`, error);
+            logger.error("ui", `Error checking preference '${key}':`, error);
             return false;
         }
     }
@@ -350,7 +350,7 @@ class PreferencesService {
      *
      * @example
      * const count = await prefsService.getPreferenceCount();
-     * console.log(`User has ${count} preferences`);
+     * logger.debug("ui", `User has ${count} preferences`);
      */
     async getPreferenceCount() {
         try {
@@ -358,7 +358,7 @@ class PreferencesService {
             const data = await this.parseResponse(response);
             return data.success ? data.data.count : 0;
         } catch (error) {
-            console.error("Error getting preference count:", error);
+            logger.error("ui", "Error getting preference count:", error);
             return 0;
         }
     }

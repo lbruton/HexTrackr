@@ -37,9 +37,9 @@ export class ThemeController {
       this.storageType = "localStorage";
     } catch (e) {
       if (e.name === "QuotaExceededError") {
-        console.warn("localStorage quota exceeded, using sessionStorage fallback");
+        logger.warn("ui", "localStorage quota exceeded, using sessionStorage fallback");
       } else {
-        console.warn("localStorage unavailable (private browsing?), using sessionStorage fallback");
+        logger.warn("ui", "localStorage unavailable (private browsing?), using sessionStorage fallback");
       }
       this.storage = sessionStorage;
       this.storageType = "sessionStorage";
@@ -100,7 +100,7 @@ export class ThemeController {
         this.chartThemeAdapter = null; // Not needed on this page
       }
     } catch (error) {
-      console.debug("ChartThemeAdapter not available on this page (non-critical):", error);
+      logger.debug("ui", "ChartThemeAdapter not available on this page (non-critical):", error);
       this.chartThemeAdapter = null;
     }
     
@@ -166,14 +166,14 @@ export class ThemeController {
             this.updateStorageHealthStatus("degraded");
           }
           
-          console.log("Storage quota:", {
+          logger.debug("ui", "Storage quota:", {
             quota: Math.round(estimate.quota / 1024 / 1024) + " MB",
             used: Math.round(estimate.usage / 1024 / 1024) + " MB",
             available: Math.round((estimate.quota - estimate.usage) / 1024 / 1024) + " MB",
             usagePercentage: Math.round(usagePercentage) + "%"
           });
         }).catch(quotaError => {
-          console.warn("Could not estimate storage quota:", quotaError);
+          logger.warn("ui", "Could not estimate storage quota:", quotaError);
           healthReport.testResults.push(`Quota estimation: FAIL - ${quotaError.message}`);
         });
       }
@@ -196,10 +196,10 @@ export class ThemeController {
         }
       }
 
-      console.log("Storage health check completed:", healthReport);
+      logger.debug("ui", "Storage health check completed:", healthReport);
       return healthReport;
     } catch (error) {
-      console.error("Storage health check failed:", error);
+      logger.error("ui", "Storage health check failed:", error);
       this.updateStorageHealthStatus("failed");
       return { available: false, error: error.message };
     }
@@ -216,7 +216,7 @@ export class ThemeController {
     this.storageHealthStatus = status;
     
     if (previousStatus !== status) {
-      console.log(`Storage health status changed: ${previousStatus} → ${status}`);
+      logger.debug("ui", `Storage health status changed: ${previousStatus} → ${status}`);
       
       // Notify listeners of storage health changes
       this.notifyListeners("storage-health-changed", {
@@ -245,7 +245,7 @@ export class ThemeController {
   initCrossTabSync() {
     try {
       if (typeof window === "undefined") {
-        console.log("Cross-tab sync not available in non-browser environment");
+        logger.debug("ui", "Cross-tab sync not available in non-browser environment");
         return;
       }
 
@@ -265,9 +265,9 @@ export class ThemeController {
         }
       });
 
-      console.log(`Cross-tab synchronization initialized for tab: ${this.tabId}`);
+      logger.debug("ui", `Cross-tab synchronization initialized for tab: ${this.tabId}`);
     } catch (error) {
-      console.error("Failed to initialize cross-tab synchronization:", error);
+      logger.error("ui", "Failed to initialize cross-tab synchronization:", error);
       this.crossTabSyncEnabled = false;
     }
   }
@@ -295,7 +295,7 @@ export class ThemeController {
 
       // Validate event data
       if (!event.newValue) {
-        console.log("Theme cleared in another tab - applying light default");
+        logger.debug("ui", "Theme cleared in another tab - applying light default");
         this.applyCrossTabTheme("light", "cross-tab-clear");
         return;
       }
@@ -315,14 +315,14 @@ export class ThemeController {
 
       // Validate theme data structure
       if (!themeData || typeof themeData !== "object" || !themeData.theme) {
-        console.warn("Invalid cross-tab theme data received");
+        logger.warn("ui", "Invalid cross-tab theme data received");
         return;
       }
 
       // Validate the theme value
       const newTheme = this.validateTheme(themeData.theme);
       if (!newTheme) {
-        console.warn("Invalid theme value in cross-tab sync:", themeData.theme);
+        logger.warn("ui", "Invalid theme value in cross-tab sync:", themeData.theme);
         return;
       }
 
@@ -330,7 +330,7 @@ export class ThemeController {
       const now = Date.now();
       if (this.syncMetrics.lastSyncTime && (now - this.syncMetrics.lastSyncTime) < 100) {
         this.syncMetrics.syncConflicts++;
-        console.log("Cross-tab sync conflict detected - debouncing");
+        logger.debug("ui", "Cross-tab sync conflict detected - debouncing");
         
         // Use debouncing to handle rapid changes
         if (this.crossTabDebounceTimeout) {
@@ -348,7 +348,7 @@ export class ThemeController {
       this.applyCrossTabTheme(newTheme, "cross-tab");
       
     } catch (error) {
-      console.error("Error handling cross-tab storage event:", error);
+      logger.error("ui", "Error handling cross-tab storage event:", error);
     }
   }
 
@@ -365,7 +365,7 @@ export class ThemeController {
       // Validate theme
       const validatedTheme = this.validateTheme(theme);
       if (!validatedTheme) {
-        console.warn(`Invalid cross-tab theme '${theme}', ignoring`);
+        logger.warn("ui", `Invalid cross-tab theme '${theme}', ignoring`);
         return;
       }
 
@@ -377,7 +377,7 @@ export class ThemeController {
         const previousTheme = document.documentElement.getAttribute("data-bs-theme") || "light";
         accessibilityAnnouncer.announceThemeChange(validatedTheme, previousTheme, source);
       } catch (announcementError) {
-        console.warn("Cross-tab screen reader announcement failed:", announcementError);
+        logger.warn("ui", "Cross-tab screen reader announcement failed:", announcementError);
       }
       
       // Notify listeners of the cross-tab change
@@ -387,9 +387,9 @@ export class ThemeController {
       this.syncMetrics.eventsProcessed++;
       this.syncMetrics.lastSyncTime = Date.now();
       
-      console.log(`Cross-tab theme sync applied: ${validatedTheme} (source: ${source})`);
+      logger.debug("ui", `Cross-tab theme sync applied: ${validatedTheme} (source: ${source})`);
     } catch (error) {
-      console.error("Error applying cross-tab theme:", error);
+      logger.error("ui", "Error applying cross-tab theme:", error);
     }
   }
 
@@ -405,7 +405,7 @@ export class ThemeController {
       this.crossTabSyncEnabled = !!enabled;
       
       if (wasEnabled !== this.crossTabSyncEnabled) {
-        console.log(`Cross-tab synchronization ${this.crossTabSyncEnabled ? "enabled" : "disabled"}`);
+        logger.debug("ui", `Cross-tab synchronization ${this.crossTabSyncEnabled ? "enabled" : "disabled"}`);
         
         // Notify listeners of sync status change
         this.notifyListeners("cross-tab-sync-changed", {
@@ -415,7 +415,7 @@ export class ThemeController {
         });
       }
     } catch (error) {
-      console.error("Error setting cross-tab sync status:", error);
+      logger.error("ui", "Error setting cross-tab sync status:", error);
     }
   }
 
@@ -444,7 +444,7 @@ export class ThemeController {
     try {
       // Check if we're in a browser environment
       if (typeof window === "undefined" || !window.CSS) {
-        console.warn("CSS API not available, assuming CSS custom properties not supported");
+        logger.warn("ui", "CSS API not available, assuming CSS custom properties not supported");
         return false;
       }
 
@@ -452,7 +452,7 @@ export class ThemeController {
       if (window.CSS.supports) {
         const supported = window.CSS.supports("--test-var", "red") || window.CSS.supports("(--test-var: red)");
         if (supported) {
-          console.log("CSS custom properties supported via CSS.supports()");
+          logger.debug("ui", "CSS custom properties supported via CSS.supports()");
           return true;
         }
       }
@@ -466,14 +466,14 @@ export class ThemeController {
       const isSupported = testValue === "test-value";
       
       if (isSupported) {
-        console.log("CSS custom properties supported via element test");
+        logger.debug("ui", "CSS custom properties supported via element test");
       } else {
-        console.warn("CSS custom properties not supported - legacy fallback will be used");
+        logger.warn("ui", "CSS custom properties not supported - legacy fallback will be used");
       }
       
       return isSupported;
     } catch (error) {
-      console.error("Error detecting CSS custom properties support:", error);
+      logger.error("ui", "Error detecting CSS custom properties support:", error);
       // Fail safe - assume not supported if we can't detect
       return false;
     }
@@ -490,7 +490,7 @@ export class ThemeController {
     try {
       // Ensure theme is a string
       if (typeof theme !== "string") {
-        console.warn("Theme must be a string, got:", typeof theme);
+        logger.warn("ui", "Theme must be a string, got:", typeof theme);
         return null;
       }
 
@@ -499,13 +499,13 @@ export class ThemeController {
       
       // Check against whitelist of allowed values
       if (!THEME_VALUES.includes(sanitizedTheme)) {
-        console.warn(`Invalid theme value '${sanitizedTheme}'. Allowed values:`, THEME_VALUES);
+        logger.warn("ui", `Invalid theme value '${sanitizedTheme}'. Allowed values:`, THEME_VALUES);
         return null;
       }
 
       return sanitizedTheme;
     } catch (error) {
-      console.error("Error validating theme:", error);
+      logger.error("ui", "Error validating theme:", error);
       return null;
     }
   }
@@ -529,7 +529,7 @@ export class ThemeController {
       
       return THEME_VALUES.includes(sanitized) ? sanitized : DEFAULT_THEME;
     } catch (error) {
-      console.error("Error sanitizing theme for storage:", error);
+      logger.error("ui", "Error sanitizing theme for storage:", error);
       return DEFAULT_THEME;
     }
   }
@@ -552,7 +552,7 @@ export class ThemeController {
       
       return allowedSources.includes(sanitizedSource) ? sanitizedSource : "unknown";
     } catch (error) {
-      console.error("Error validating theme source:", error);
+      logger.error("ui", "Error validating theme source:", error);
       return "unknown";
     }
   }
@@ -591,7 +591,7 @@ export class ThemeController {
 
       // T031: Validate the parsed theme data structure
       if (!themeData || typeof themeData !== "object") {
-        console.warn("Invalid theme data structure, using light default");
+        logger.warn("ui", "Invalid theme data structure, using light default");
         return "light";
       }
 
@@ -604,10 +604,10 @@ export class ThemeController {
       }
 
       // Invalid stored theme, use light default
-      console.warn(`Invalid stored theme '${storedTheme}', using light default`);
+      logger.warn("ui", `Invalid stored theme '${storedTheme}', using light default`);
       return "light";
     } catch (error) {
-      console.error("Error retrieving theme:", error);
+      logger.error("ui", "Error retrieving theme:", error);
       // T031: Secure fallback on any error
       return "light";
     }
@@ -631,7 +631,7 @@ export class ThemeController {
       // T036: Debounce user-initiated theme changes
       return this.setThemeDebounced(theme, source);
     } catch (error) {
-      console.error("Error in setTheme:", error);
+      logger.error("ui", "Error in setTheme:", error);
       return false;
     }
   }
@@ -650,13 +650,13 @@ export class ThemeController {
       const validatedSource = this.validateThemeSource(source);
       
       if (!validatedTheme) {
-        console.warn(`Invalid theme '${theme}', using default theme`);
+        logger.warn("ui", `Invalid theme '${theme}', using default theme`);
         return false;
       }
       
       // Only allow 'light' and 'dark' for setTheme (not 'system')
       if (!["light", "dark"].includes(validatedTheme)) {
-        console.warn(`setTheme only accepts 'light' or 'dark', got '${validatedTheme}'`);
+        logger.warn("ui", `setTheme only accepts 'light' or 'dark', got '${validatedTheme}'`);
         return false;
       }
       // T020: Store theme preference with proper key and validation - T029 security enhanced
@@ -671,7 +671,7 @@ export class ThemeController {
       // T040: Enhanced storage with quota handling and recovery
       const storageSuccess = this.attemptStorageWrite(THEME_KEY, themeData);
       if (!storageSuccess) {
-        console.warn("Theme preference could not be saved after recovery attempts");
+        logger.warn("ui", "Theme preference could not be saved after recovery attempts");
         // Continue execution - storage failure shouldn't prevent theme application
       }
       
@@ -694,14 +694,14 @@ export class ThemeController {
           accessibilityAnnouncer.announceAccessibilityStatus(accessibilityReport, sanitizedTheme);
         }
       } catch (announcementError) {
-        console.warn("Screen reader announcement failed:", announcementError);
+        logger.warn("ui", "Screen reader announcement failed:", announcementError);
         // Don't fail the theme change if announcements fail
       }
       
       this.notifyListeners(sanitizedTheme, validatedSource);
       return true;
     } catch (error) {
-      console.error("Error setting theme:", error);
+      logger.error("ui", "Error setting theme:", error);
       return false; // Graceful failure
     }
   }
@@ -738,16 +738,16 @@ export class ThemeController {
           this.pendingSource = null;
 
           if (!success) {
-            console.warn("Debounced theme application failed");
+            logger.warn("ui", "Debounced theme application failed");
           }
         } catch (error) {
-          console.error("Error in debounced theme application:", error);
+          logger.error("ui", "Error in debounced theme application:", error);
         }
       }, this.DEBOUNCE_DELAY);
 
       return true; // Successfully queued
     } catch (error) {
-      console.error("Error setting debounced theme:", error);
+      logger.error("ui", "Error setting debounced theme:", error);
       return false;
     }
   }
@@ -776,7 +776,7 @@ export class ThemeController {
       }
       return true; // No pending theme to flush
     } catch (error) {
-      console.error("Error flushing pending theme:", error);
+      logger.error("ui", "Error flushing pending theme:", error);
       return false;
     }
   }
@@ -796,7 +796,7 @@ export class ThemeController {
       const darkModeQuery = window.matchMedia("(prefers-color-scheme: dark)");
       return darkModeQuery.matches ? "dark" : "light";
     } catch (error) {
-      console.error("Error detecting system preference:", error);
+      logger.error("ui", "Error detecting system preference:", error);
       return "light"; // Safe default
     }
   }
@@ -815,7 +815,7 @@ export class ThemeController {
       // T022: Add callback to listeners array and handle removal if needed
       this.listeners.push(callback);
     } catch (error) {
-      console.error("Error adding theme listener:", error);
+      logger.error("ui", "Error adding theme listener:", error);
     }
   }
 
@@ -828,7 +828,7 @@ export class ThemeController {
   removeThemeChangeListener(callback) {
     try {
       if (typeof callback !== "function") {
-        console.warn("Callback must be a function");
+        logger.warn("ui", "Callback must be a function");
         return false;
       }
       
@@ -840,7 +840,7 @@ export class ThemeController {
       
       return false;
     } catch (error) {
-      console.error("Error removing theme listener:", error);
+      logger.error("ui", "Error removing theme listener:", error);
       return false;
     }
   }
@@ -859,7 +859,7 @@ export class ThemeController {
         // T030: Validate and sanitize theme before DOM manipulation
         const safeTheme = this.validateTheme(theme);
         if (!safeTheme || !["light", "dark"].includes(safeTheme)) {
-          console.warn(`Unsafe theme value '${theme}', applying default theme`);
+          logger.warn("ui", `Unsafe theme value '${theme}', applying default theme`);
           this.applyTheme(DEFAULT_THEME === "system" ? "light" : DEFAULT_THEME);
           return;
         }
@@ -868,7 +868,7 @@ export class ThemeController {
         const currentTheme = document.documentElement.getAttribute("data-bs-theme");
         if (currentTheme === safeTheme) {
           // Theme already applied by inline script, just update classes
-          console.debug(`Theme '${safeTheme}' already applied by inline script, syncing classes`);
+          logger.debug("ui", `Theme '${safeTheme}' already applied by inline script, syncing classes`);
         }
 
         // T030: XSS-safe attribute setting using HexTrackr security patterns
@@ -894,7 +894,7 @@ export class ThemeController {
             document.body.classList.add(newClassName);
           }
         } else {
-          console.warn(`Invalid theme class name '${newClassName}', skipping class update`);
+          logger.warn("ui", `Invalid theme class name '${newClassName}', skipping class update`);
         }
 
         // T039: Apply legacy fallback for browsers without CSS custom properties
@@ -907,12 +907,12 @@ export class ThemeController {
           try {
             this.chartThemeAdapter.updateAllComponents(sanitizedTheme);
           } catch (chartError) {
-            console.warn("Error updating chart/grid themes:", chartError);
+            logger.warn("ui", "Error updating chart/grid themes:", chartError);
           }
         }
       }
     } catch (error) {
-      console.error("Error applying theme to document:", error);
+      logger.error("ui", "Error applying theme to document:", error);
       // T030: Fallback to safe default on error
       try {
         if (document && document.documentElement) {
@@ -927,7 +927,7 @@ export class ThemeController {
           }
         }
       } catch (fallbackError) {
-        console.error("Error applying fallback theme:", fallbackError);
+        logger.error("ui", "Error applying fallback theme:", fallbackError);
       }
     }
   }
@@ -942,7 +942,7 @@ export class ThemeController {
   applyLegacyTheme(theme) {
     try {
       if (!this.legacyFallbackActive) {
-        console.log("Activating legacy theme fallback for CSS custom properties");
+        logger.debug("ui", "Activating legacy theme fallback for CSS custom properties");
         this.legacyFallbackActive = true;
       }
 
@@ -978,7 +978,7 @@ export class ThemeController {
 
       const themeValues = legacyThemes[theme];
       if (!themeValues) {
-        console.warn(`No legacy theme values defined for '${theme}'`);
+        logger.warn("ui", `No legacy theme values defined for '${theme}'`);
         return;
       }
 
@@ -996,7 +996,7 @@ export class ThemeController {
             document.body.style.color = value;
           }
         } catch (propertyError) {
-          console.warn(`Failed to set legacy property ${property}:`, propertyError);
+          logger.warn("ui", `Failed to set legacy property ${property}:`, propertyError);
         }
       });
 
@@ -1004,7 +1004,7 @@ export class ThemeController {
       this.applyLegacyElementStyles(theme);
 
     } catch (error) {
-      console.error("Error applying legacy theme:", error);
+      logger.error("ui", "Error applying legacy theme:", error);
     }
   }
 
@@ -1043,7 +1043,7 @@ export class ThemeController {
       });
 
     } catch (error) {
-      console.error("Error applying legacy element styles:", error);
+      logger.error("ui", "Error applying legacy element styles:", error);
     }
   }
 
@@ -1061,11 +1061,11 @@ export class ThemeController {
         try {
           callback(newTheme, source);
         } catch (callbackError) {
-          console.error("Error in theme change callback:", callbackError);
+          logger.error("ui", "Error in theme change callback:", callbackError);
         }
       });
     } catch (error) {
-      console.error("Error notifying theme listeners:", error);
+      logger.error("ui", "Error notifying theme listeners:", error);
     }
   }
 
@@ -1080,7 +1080,7 @@ export class ThemeController {
   initSystemListener() {
     try {
       if (typeof window === "undefined" || !window.matchMedia) {
-        console.log("System preference detection not available in this environment");
+        logger.debug("ui", "System preference detection not available in this environment");
         return;
       }
 
@@ -1115,7 +1115,7 @@ export class ThemeController {
       // Initialize current system preference
       this.systemPreferences.currentPreference = this.detectSystemPreference();
       
-      console.log("System preference monitoring initialized:", {
+      logger.debug("ui", "System preference monitoring initialized:", {
         darkMode: this.systemPreferences.darkModeQuery.matches,
         lightMode: this.systemPreferences.lightModeQuery.matches,
         highContrast: this.systemPreferences.contrastQuery.matches,
@@ -1123,7 +1123,7 @@ export class ThemeController {
       });
 
     } catch (error) {
-      console.error("Error initializing system listener:", error);
+      logger.error("ui", "Error initializing system listener:", error);
     }
   }
 
@@ -1145,7 +1145,7 @@ export class ThemeController {
         if (query) {
           // Create specific handler for this query
           const handler = (e) => {
-            console.log(`System ${name} preference changed:`, e.matches);
+            logger.debug("ui", `System ${name} preference changed:`, e.matches);
             this.systemChangeHandler(e);
           };
 
@@ -1166,14 +1166,14 @@ export class ThemeController {
                 query.removeListener(handler);
               }
             } catch (cleanupError) {
-              console.warn(`Error cleaning up ${name} listener:`, cleanupError);
+              logger.warn("ui", `Error cleaning up ${name} listener:`, cleanupError);
             }
           });
         }
       });
 
     } catch (error) {
-      console.error("Error setting up system preference listeners:", error);
+      logger.error("ui", "Error setting up system preference listeners:", error);
     }
   }
 
@@ -1198,7 +1198,7 @@ export class ThemeController {
 
       // Log preference change for debugging
       if (previousPreference !== newSystemPreference) {
-        console.log(`System preference changed: ${previousPreference} → ${newSystemPreference}`);
+        logger.debug("ui", `System preference changed: ${previousPreference} → ${newSystemPreference}`);
       }
 
       // Only apply if user has system preference set
@@ -1217,7 +1217,7 @@ export class ThemeController {
             newTheme = "light"; // Safe fallback
         }
 
-        console.log(`Applying system theme: ${newTheme} (preference: ${newSystemPreference})`);
+        logger.debug("ui", `Applying system theme: ${newTheme} (preference: ${newSystemPreference})`);
         
         // T036: Use immediate theme application for system changes
         this.setTheme(newTheme, "system", true);
@@ -1230,11 +1230,11 @@ export class ThemeController {
           changeCount: this.systemPreferences.changeCount
         });
       } else {
-        console.log(`System preference changed to ${newSystemPreference}, but user theme is ${currentTheme} - no change applied`);
+        logger.debug("ui", `System preference changed to ${newSystemPreference}, but user theme is ${currentTheme} - no change applied`);
       }
 
     } catch (error) {
-      console.error("Error handling system preference change:", error);
+      logger.error("ui", "Error handling system preference change:", error);
     }
   }
 
@@ -1270,7 +1270,7 @@ export class ThemeController {
         }
       };
     } catch (error) {
-      console.error("Error getting system preferences:", error);
+      logger.error("ui", "Error getting system preferences:", error);
       return { available: false, error: error.message };
     }
   }
@@ -1310,7 +1310,7 @@ export class ThemeController {
             this.systemMediaQuery.removeListener(this.systemChangeHandler);
           }
         } catch (listenerError) {
-          console.warn("Error removing system preference listener:", listenerError);
+          logger.warn("ui", "Error removing system preference listener:", listenerError);
         }
         
         this.systemMediaQuery = null;
@@ -1327,16 +1327,16 @@ export class ThemeController {
             handler();
           }
         } catch (handlerError) {
-          console.warn("Error in cleanup handler:", handlerError);
+          logger.warn("ui", "Error in cleanup handler:", handlerError);
         }
       });
 
       // Clear cleanup handlers array
       this.cleanupHandlers = [];
 
-      console.log("ThemeController cleanup completed successfully");
+      logger.debug("ui", "ThemeController cleanup completed successfully");
     } catch (error) {
-      console.error("Error during ThemeController cleanup:", error);
+      logger.error("ui", "Error during ThemeController cleanup:", error);
     }
   }
 
@@ -1352,10 +1352,10 @@ export class ThemeController {
       if (typeof handler === "function") {
         this.cleanupHandlers.push(handler);
       } else {
-        console.warn("Cleanup handler must be a function");
+        logger.warn("ui", "Cleanup handler must be a function");
       }
     } catch (error) {
-      console.error("Error registering cleanup handler:", error);
+      logger.error("ui", "Error registering cleanup handler:", error);
     }
   }
 
@@ -1397,7 +1397,7 @@ export class ThemeController {
       
       // Reset recovery attempts on success
       if (this.storageRecoveryAttempts > 0) {
-        console.log("Storage write succeeded after recovery attempts");
+        logger.debug("ui", "Storage write succeeded after recovery attempts");
         this.storageRecoveryAttempts = 0;
         this.storageQuotaExceeded = false;
         this.updateStorageHealthStatus("healthy");
@@ -1413,7 +1413,7 @@ export class ThemeController {
         attempt: this.storageRecoveryAttempts + 1
       };
       
-      console.warn(`Storage write failed (attempt ${this.storageRecoveryAttempts + 1}):`, error);
+      logger.warn("ui", `Storage write failed (attempt ${this.storageRecoveryAttempts + 1}):`, error);
       
       // Handle quota exceeded specifically
       if (error.name === "QuotaExceededError") {
@@ -1437,11 +1437,11 @@ export class ThemeController {
    * @returns {boolean} True if recovery succeeded
    */
   handleQuotaExceeded(key, value) {
-    console.warn("Storage quota exceeded, attempting recovery...");
+    logger.warn("ui", "Storage quota exceeded, attempting recovery...");
     this.updateStorageHealthStatus("critical");
     
     if (this.storageRecoveryAttempts >= this.maxRecoveryAttempts) {
-      console.error("Maximum storage recovery attempts reached, falling back to memory-only");
+      logger.error("ui", "Maximum storage recovery attempts reached, falling back to memory-only");
       return this.fallbackToMemoryStorage(key, value);
     }
     
@@ -1474,7 +1474,7 @@ export class ThemeController {
    */
   clearOldThemeData(key, value) {
     try {
-      console.log("Recovery attempt 1: Clearing old theme data");
+      logger.debug("ui", "Recovery attempt 1: Clearing old theme data");
       
       // Look for old theme-related keys
       const keysToRemove = [];
@@ -1496,14 +1496,14 @@ export class ThemeController {
         }
       });
       
-      console.log(`Removed ${keysToRemove.length} old theme keys`);
+      logger.debug("ui", `Removed ${keysToRemove.length} old theme keys`);
       
       // Retry write
       this.storage.setItem(key, value);
-      console.log("Recovery attempt 1: SUCCESS");
+      logger.debug("ui", "Recovery attempt 1: SUCCESS");
       return true;
     } catch (retryError) {
-      console.warn("Recovery attempt 1: FAILED -", retryError);
+      logger.warn("ui", "Recovery attempt 1: FAILED -", retryError);
       return false;
     }
   }
@@ -1517,7 +1517,7 @@ export class ThemeController {
    */
   clearHexTrackrStorage(key, value) {
     try {
-      console.log("Recovery attempt 2: Clearing all HexTrackr storage");
+      logger.debug("ui", "Recovery attempt 2: Clearing all HexTrackr storage");
       
       const keysToRemove = [];
       for (let i = 0; i < this.storage.length; i++) {
@@ -1534,14 +1534,14 @@ export class ThemeController {
         }
       });
       
-      console.log(`Removed ${keysToRemove.length} HexTrackr keys`);
+      logger.debug("ui", `Removed ${keysToRemove.length} HexTrackr keys`);
       
       // Retry write
       this.storage.setItem(key, value);
-      console.log("Recovery attempt 2: SUCCESS");
+      logger.debug("ui", "Recovery attempt 2: SUCCESS");
       return true;
     } catch (retryError) {
-      console.warn("Recovery attempt 2: FAILED -", retryError);
+      logger.warn("ui", "Recovery attempt 2: FAILED -", retryError);
       return false;
     }
   }
@@ -1555,7 +1555,7 @@ export class ThemeController {
    */
   emergencyStorageCleanup(key, value) {
     try {
-      console.log("Recovery attempt 3: Emergency cleanup of oldest entries");
+      logger.debug("ui", "Recovery attempt 3: Emergency cleanup of oldest entries");
       
       // Get all storage keys with timestamps if possible
       const allKeys = [];
@@ -1574,14 +1574,14 @@ export class ThemeController {
         }
       });
       
-      console.log(`Emergency cleanup: Removed ${keysToRemove.length} entries`);
+      logger.debug("ui", `Emergency cleanup: Removed ${keysToRemove.length} entries`);
       
       // Retry write
       this.storage.setItem(key, value);
-      console.log("Recovery attempt 3: SUCCESS");
+      logger.debug("ui", "Recovery attempt 3: SUCCESS");
       return true;
     } catch (retryError) {
-      console.error("Recovery attempt 3: FAILED -", retryError);
+      logger.error("ui", "Recovery attempt 3: FAILED -", retryError);
       return false;
     }
   }
@@ -1594,7 +1594,7 @@ export class ThemeController {
    * @returns {boolean} Always returns false to indicate storage failure
    */
   fallbackToMemoryStorage(key, value) {
-    console.warn("Falling back to memory-only storage - theme will not persist across sessions");
+    logger.warn("ui", "Falling back to memory-only storage - theme will not persist across sessions");
     
     // Initialize memory storage if not exists
     if (!this.memoryStorage) {
@@ -1617,17 +1617,17 @@ export class ThemeController {
    * @returns {boolean} True if error was handled successfully
    */
   handleStorageError(error, key, value) {
-    console.error("Storage error encountered:", error);
+    logger.error("ui", "Storage error encountered:", error);
     
     // Handle specific error types
     if (error.name === "SecurityError") {
-      console.warn("Security error - likely private browsing mode");
+      logger.warn("ui", "Security error - likely private browsing mode");
       this.updateStorageHealthStatus("degraded");
       return this.fallbackToMemoryStorage(key, value);
     }
     
     if (error.name === "InvalidAccessError") {
-      console.warn("Invalid access error - storage may be corrupted");
+      logger.warn("ui", "Invalid access error - storage may be corrupted");
       this.updateStorageHealthStatus("critical");
       return this.fallbackToMemoryStorage(key, value);
     }
@@ -1699,7 +1699,7 @@ export class ThemeController {
         mobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua)
       };
     } catch (error) {
-      console.error("Error getting browser info:", error);
+      logger.error("ui", "Error getting browser info:", error);
       return { userAgent: "Error", version: "unknown" };
     }
   }
@@ -1721,7 +1721,7 @@ export class ThemeController {
         label: label
       });
     } catch (error) {
-      console.error("Error validating color accessibility:", error);
+      logger.error("ui", "Error validating color accessibility:", error);
       return {
         passes: false,
         ratio: 0,
@@ -1785,7 +1785,7 @@ export class ThemeController {
       report.theme = theme;
       report.validatedBy = "ThemeController.generateThemeAccessibilityReport()";
       
-      console.log("Theme Accessibility Report Generated:", {
+      logger.debug("ui", "Theme Accessibility Report Generated:", {
         theme: report.theme,
         passRate: `${report.summary.passRate}%`,
         violations: report.violations.length,
@@ -1795,7 +1795,7 @@ export class ThemeController {
       return report;
       
     } catch (error) {
-      console.error("Error generating theme accessibility report:", error);
+      logger.error("ui", "Error generating theme accessibility report:", error);
       return {
         theme: theme,
         timestamp: new Date().toISOString(),
@@ -1826,7 +1826,7 @@ export class ThemeController {
       return report.summary.criticalFailures === 0;
       
     } catch (error) {
-      console.error("Error checking theme accessibility:", error);
+      logger.error("ui", "Error checking theme accessibility:", error);
       return false; // Conservative approach: assume not accessible if error occurs
     }
   }
@@ -1842,37 +1842,37 @@ export class ThemeController {
       const currentTheme = this.getTheme();
       const resolvedTheme = currentTheme === "system" ? "light" : currentTheme;
       
-      console.group("HexTrackr Theme Accessibility Report");
-      console.log("Current theme:", currentTheme, resolvedTheme !== currentTheme ? `(resolved: ${resolvedTheme})` : "");
+      logger.debug("ui", "=== HexTrackr Theme Accessibility Report ===");
+      logger.debug("ui", "Current theme:", currentTheme, resolvedTheme !== currentTheme ? `(resolved: ${resolvedTheme})` : "");
       
       if (resolvedTheme === "dark") {
         const report = this.generateThemeAccessibilityReport("dark");
         
-        console.log("Summary:", `${report.summary.passed}/${report.summary.total} combinations pass WCAG AA (${report.summary.passRate}%)`);
+        logger.debug("ui", "Summary:", `${report.summary.passed}/${report.summary.total} combinations pass WCAG AA (${report.summary.passRate}%)`);
         
         if (report.violations.length > 0) {
-          console.warn("Violations:", report.violations.length);
+          logger.warn("ui", "Violations:", report.violations.length);
           if (verbose) {
             report.violations.forEach((violation, index) => {
-              console.log(` ${index + 1}. ${violation.combination}: ${violation.ratio}:1 (needs ${violation.required}:1)`);
-              console.log(` Colors: ${violation.foreground} on ${violation.background}`);
+              logger.debug("ui", ` ${index + 1}. ${violation.combination}: ${violation.ratio}:1 (needs ${violation.required}:1)`);
+              logger.debug("ui", ` Colors: ${violation.foreground} on ${violation.background}`);
             });
           }
         } else {
-          console.log("All combinations pass WCAG AA standards!");
+          logger.debug("ui", "All combinations pass WCAG AA standards!");
         }
         
         if (verbose) {
-          console.log("🕐 Report generated:", report.timestamp);
-          console.log("Full report:", report);
+          logger.debug("ui", "🕐 Report generated:", report.timestamp);
+          logger.debug("ui", "Full report:", report);
         }
       } else {
-        console.log("Light theme active - using system accessibility defaults");
+        logger.debug("ui", "Light theme active - using system accessibility defaults");
       }
-      
-      console.groupEnd();
+
+      logger.debug("ui", "=== End Accessibility Report ===");
     } catch (error) {
-      console.error("Error logging accessibility report:", error);
+      logger.error("ui", "Error logging accessibility report:", error);
     }
   }
 }

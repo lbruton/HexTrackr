@@ -96,7 +96,7 @@ class TemplateEditor {
 
                 this.showToast("Email template edit mode enabled", "info");
             } catch (error) {
-                console.error("Error entering edit mode:", error);
+                logger.error("ui", "Error entering edit mode:", error);
                 this.showToast("Failed to enter email template edit mode", "error");
             }
         } else {
@@ -117,16 +117,16 @@ class TemplateEditor {
         try {
             // Determine template name based on current variant
             const templateName = `email_${this.currentVariant}`;
-            console.log(`[TemplateEditor] Loading template: ${templateName}`);
+            logger.debug("ui", `[TemplateEditor] Loading template: ${templateName}`);
 
             // If forceRefresh is true, always fetch from API
             if (forceRefresh) {
-                console.log("[TemplateEditor] Force refresh requested, fetching from API");
+                logger.debug("ui", "[TemplateEditor] Force refresh requested, fetching from API");
                 const response = await authState.authenticatedFetch(`/api/templates/by-name/${templateName}`);
 
                 if (!response.ok) {
                     if (response.status === 404) {
-                        console.warn("Email template not found in database, creating default template");
+                        logger.warn("ui", "Email template not found in database, creating default template");
                         await this.createDefaultTemplate();
                         return;
                     }
@@ -137,7 +137,7 @@ class TemplateEditor {
                 if (result.success) {
                     this.currentTemplate = result.data;
                     this.cacheTemplate(this.currentTemplate);
-                    console.log("[TemplateEditor] Template refreshed from API");
+                    logger.debug("ui", "[TemplateEditor] Template refreshed from API");
                 } else {
                     throw new Error(result.error || "Failed to load template");
                 }
@@ -146,13 +146,13 @@ class TemplateEditor {
                 const cachedTemplate = this.getCachedTemplate(templateName);
                 if (cachedTemplate) {
                     this.currentTemplate = cachedTemplate;
-                    console.log("[TemplateEditor] Using cached template");
+                    logger.debug("ui", "[TemplateEditor] Using cached template");
                 } else if (!this.currentTemplate) {
                     const response = await authState.authenticatedFetch(`/api/templates/by-name/${templateName}`);
 
                     if (!response.ok) {
                         if (response.status === 404) {
-                            console.warn("Email template not found in database, creating default template");
+                            logger.warn("ui", "Email template not found in database, creating default template");
                             await this.createDefaultTemplate();
                             return;
                         }
@@ -163,7 +163,7 @@ class TemplateEditor {
                     if (result.success) {
                         this.currentTemplate = result.data;
                         this.cacheTemplate(this.currentTemplate);
-                        console.log("[TemplateEditor] Template loaded from API");
+                        logger.debug("ui", "[TemplateEditor] Template loaded from API");
                     } else {
                         throw new Error(result.error || "Failed to load template");
                     }
@@ -173,8 +173,8 @@ class TemplateEditor {
             // Temporarily disable aggressive template validation to prevent unwanted restoration
             // TODO: Implement more robust template validation that doesn't interfere with user edits
             if (!this.isRestoring && this.currentTemplate && !this.isTemplateContentValid(this.currentTemplate.template_content)) {
-                console.warn("Template content validation failed, but allowing user content to load for editing.");
-                console.log("Template content preview:", this.currentTemplate.template_content.substring(0, 100));
+                logger.warn("ui", "Template content validation failed, but allowing user content to load for editing.");
+                logger.debug("ui", "Template content preview:", this.currentTemplate.template_content.substring(0, 100));
             }
 
             const editor = document.getElementById("templateEditor");
@@ -183,12 +183,12 @@ class TemplateEditor {
                 this.validateTemplate();
             }
         } catch (error) {
-            console.error("Error loading template:", error);
+            logger.error("ui", "Error loading template:", error);
             try {
                 await this.createDefaultTemplate();
                 this.showToast("Created default email template", "info");
             } catch (createError) {
-                console.error("Failed to create default template:", createError);
+                logger.error("ui", "Failed to create default template:", createError);
                 this.showToast("Failed to load template for editing", "error");
                 throw error;
             }
@@ -322,7 +322,7 @@ class TemplateEditor {
                         }
                     }
                 } catch (serverError) {
-                    console.warn("Server-side preview failed, using client-side processing:", serverError);
+                    logger.warn("ui", "Server-side preview failed, using client-side processing:", serverError);
                 }
             }
 
@@ -331,7 +331,7 @@ class TemplateEditor {
             this.showPreviewModal(processedContent);
 
         } catch (error) {
-            console.error("Error previewing template:", error);
+            logger.error("ui", "Error previewing template:", error);
             this.showToast("Failed to generate preview", "error");
         }
     }
@@ -411,8 +411,8 @@ class TemplateEditor {
                 }
             }
 
-            console.log(`[TemplateEditor] Saving template with ID: ${this.currentTemplate.id}, category: 'email', name: 'default_email'`);
-            console.log(`[TemplateEditor] Template content preview: ${templateContent.substring(0, 100)}...`);
+            logger.debug("ui", `[TemplateEditor] Saving template with ID: ${this.currentTemplate.id}, category: 'email', name: 'default_email'`);
+            logger.debug("ui", `[TemplateEditor] Template content preview: ${templateContent.substring(0, 100)}...`);
 
             const response = await authState.authenticatedFetch(`/api/templates/${this.currentTemplate.id}`, {
                 method: "PUT",
@@ -448,7 +448,7 @@ class TemplateEditor {
                 throw new Error(result.error || "Save failed");
             }
         } catch (error) {
-            console.error("Error saving template:", error);
+            logger.error("ui", "Error saving template:", error);
             this.showToast("Failed to save email template", "error");
         }
     }
@@ -484,7 +484,7 @@ class TemplateEditor {
                 throw new Error(result.error || "Reset failed");
             }
         } catch (error) {
-            console.error("Error resetting template:", error);
+            logger.error("ui", "Error resetting template:", error);
             this.showToast("Failed to reset template", "error");
         } finally {
             this.isRestoring = false;
@@ -535,7 +535,7 @@ class TemplateEditor {
             const validation = await this.validateTemplateContent(content);
             this.displayValidationResults(validation);
         } catch (error) {
-            console.error("Validation error:", error);
+            logger.error("ui", "Validation error:", error);
         }
     }
 
@@ -629,7 +629,7 @@ class TemplateEditor {
         // Determine variant based on job type
         if (ticketData && ticketData.jobType) {
             this.currentVariant = this.getTemplateVariant(ticketData.jobType);
-            console.log(`[TemplateEditor] Set variant to '${this.currentVariant}' based on job type '${ticketData.jobType}'`);
+            logger.debug("ui", `[TemplateEditor] Set variant to '${this.currentVariant}' based on job type '${ticketData.jobType}'`);
         }
     }
 
@@ -643,7 +643,7 @@ class TemplateEditor {
         if (window.ticketManager && window.ticketManager.showToast) {
             window.ticketManager.showToast(message, type);
         } else {
-            console.log(`[${type.toUpperCase()}] ${message}`);
+            logger.debug("ui", `[${type.toUpperCase()}] ${message}`);
         }
     }
 
@@ -827,9 +827,9 @@ class TemplateEditor {
                 category: "email"
             };
             localStorage.setItem(cacheKey, JSON.stringify(cacheData));
-            console.log(`[TemplateEditor] Cached template with key: ${cacheKey}`);
+            logger.debug("ui", `[TemplateEditor] Cached template with key: ${cacheKey}`);
         } catch (error) {
-            console.warn("Failed to cache template:", error);
+            logger.warn("ui", "Failed to cache template:", error);
         }
     }
 
@@ -844,7 +844,7 @@ class TemplateEditor {
             const cached = localStorage.getItem(cacheKey);
 
             if (!cached) {
-                console.log(`[TemplateEditor] No cached template found for key: ${cacheKey}`);
+                logger.debug("ui", `[TemplateEditor] No cached template found for key: ${cacheKey}`);
                 return null;
             }
 
@@ -852,15 +852,15 @@ class TemplateEditor {
 
             // Check if cache is expired
             if (cacheData.expires < Date.now()) {
-                console.log(`[TemplateEditor] Cached template expired for key: ${cacheKey}`);
+                logger.debug("ui", `[TemplateEditor] Cached template expired for key: ${cacheKey}`);
                 localStorage.removeItem(cacheKey);
                 return null;
             }
 
-            console.log(`[TemplateEditor] Retrieved cached template for key: ${cacheKey}`);
+            logger.debug("ui", `[TemplateEditor] Retrieved cached template for key: ${cacheKey}`);
             return cacheData.template;
         } catch (error) {
-            console.warn("Failed to retrieve cached template:", error);
+            logger.warn("ui", "Failed to retrieve cached template:", error);
             return null;
         }
     }
@@ -874,19 +874,19 @@ class TemplateEditor {
             if (templateName) {
                 const cacheKey = `hextrackr_email_template_${templateName}`;
                 localStorage.removeItem(cacheKey);
-                console.log(`[TemplateEditor] Cleared cache for key: ${cacheKey}`);
+                logger.debug("ui", `[TemplateEditor] Cleared cache for key: ${cacheKey}`);
             } else {
                 // Clear all email template caches
                 const keys = Object.keys(localStorage);
                 keys.forEach(key => {
                     if (key.startsWith("hextrackr_email_template_")) {
                         localStorage.removeItem(key);
-                        console.log(`[TemplateEditor] Cleared cache for key: ${key}`);
+                        logger.debug("ui", `[TemplateEditor] Cleared cache for key: ${key}`);
                     }
                 });
             }
         } catch (error) {
-            console.warn("Failed to clear template cache:", error);
+            logger.warn("ui", "Failed to clear template cache:", error);
         }
     }
 
@@ -916,7 +916,7 @@ class TemplateEditor {
                 await authState.authenticatedFetch(`/api/templates/${this.currentTemplate.id}/reset`, { method: "POST" });
             }
         } catch (resetError) {
-            console.warn("Failed to reset email template on server:", resetError.message);
+            logger.warn("ui", "Failed to reset email template on server:", resetError.message);
         } finally {
             this.clearTemplateCache("default_email");
             this.currentTemplate = null;
@@ -1006,7 +1006,7 @@ Ticket ID: [XT_NUMBER]`;
                 throw new Error(result.error || "Failed to create default template");
             }
         } catch (error) {
-            console.error("Error creating default template:", error);
+            logger.error("ui", "Error creating default template:", error);
             throw error;
         }
     }
