@@ -116,8 +116,8 @@ class PaloAdvisoryHelper {
         // Extract major.minor from installed version
         const installedMatch = normalized.match(/^(\d+)\.(\d+)/);
         if (!installedMatch) {
-            // Can't parse version - return first as fallback
-            console.warn(`Could not parse installed version: ${installedVersion}`);
+            // Can't parse version (expected for non-standard formats like hotfixes)
+            // Return first fixed version as safe fallback
             return fixedVersionsArray[0];
         }
 
