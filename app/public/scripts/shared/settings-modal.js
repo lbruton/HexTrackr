@@ -397,84 +397,85 @@ function downloadFile(blob, filename) {
 }
 
 /**
- * Create ZIP backup of specified data type with JSON content
- * @param {string} type - Type of data to backup
+ * Create backup ZIP and download with progress modal (HEX-270)
+ * Uses existing export ZIP endpoints
+ * @param {string} type - Type of data to backup ('tickets', 'vulnerabilities')
  * @returns {Promise<void>}
  */
 async function backupData(type) {
     try {
-        const zip = new JSZip();
-        const timestamp = new Date().toISOString().split("T")[0];
-        
-        // Create metadata
-        const metadata = {
-            backup_type: type,
-            created_at: new Date().toISOString(),
-            schema_version: "1.0",
-            application: "HexTrackr",
-            version: "2.3"
-        };
-        
-        if (type === "all") {
-            // Fetch all data types
-            const [ticketsRes, vulnsRes, statsRes] = await Promise.all([
-                authState.authenticatedFetch("/api/backup/tickets"),
-                authState.authenticatedFetch("/api/backup/vulnerabilities"),
-                authState.authenticatedFetch("/api/backup/stats")
-            ]);
-            
-            if (ticketsRes.ok && vulnsRes.ok && statsRes.ok) {
-                const ticketsData = await ticketsRes.json();
-                const vulnsData = await vulnsRes.json();
-                const statsData = await statsRes.json();
-                
-                // Add files to ZIP
-                zip.file("tickets.json", JSON.stringify(ticketsData, null, 2));
-                zip.file("vulnerabilities.json", JSON.stringify(vulnsData, null, 2));
-                zip.file("statistics.json", JSON.stringify(statsData, null, 2));
-                zip.file("metadata.json", JSON.stringify(metadata, null, 2));
-                
-                metadata.contents = {
-                    tickets: ticketsData.count || 0,
-                    vulnerabilities: vulnsData.count || 0,
-                    total_records: (ticketsData.count || 0) + (vulnsData.count || 0)
-                };
-            }
+        logger.info('ui', `Creating ${type} backup ZIP...`);
+
+        // For vulnerabilities (large backup), show progress modal
+        // For tickets (small backup), show simple notification
+        const isLargeBackup = type === 'vulnerabilities';
+
+        if (isLargeBackup && window.progressModal) {
+            window.progressModal.show(
+                'Creating vulnerabilities backup...',
+                'This may take a moment for large datasets (800MB+). The backup will be downloaded to your browser and saved to disk.'
+            );
         } else {
-            // Single data type backup
-            const response = await authState.authenticatedFetch(`/api/backup/${type}`);
-            if (response.ok) {
-                const data = await response.json();
-                zip.file(`${type}.json`, JSON.stringify(data, null, 2));
-                metadata.contents = { [type]: data.count || 0 };
-            } else {
-                throw new Error(`Failed to fetch ${type} data`);
-            }
+            showNotification(`Creating ${type} backup... This may take a moment.`, 'info');
         }
-        
-        // Update metadata and add to ZIP
-        zip.file("metadata.json", JSON.stringify(metadata, null, 2));
-        
-        // Generate ZIP file
-        const zipBlob = await zip.generateAsync({ type: "blob" });
-        
-        // Create download
-        const filename = `hextrackr_backup_${type}_${timestamp}.zip`;
-        const url = URL.createObjectURL(zipBlob);
-        
-        const a = document.createElement("a");
+
+        // Use the existing export ZIP endpoints
+        logger.info('ui', `Fetching backup from /api/backup/export/${type}`);
+        const response = await authState.authenticatedFetch(`/api/backup/export/${type}`);
+
+        logger.info('ui', `Response status: ${response.status}`);
+        if (!response.ok) {
+            const errorText = await response.text();
+            logger.error('ui', `Backup failed: ${response.status} - ${errorText}`);
+
+            // Hide progress modal on error
+            if (isLargeBackup && window.progressModal) {
+                window.progressModal.hide();
+            }
+
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        // Get the filename from headers
+        const contentDisposition = response.headers.get('Content-Disposition');
+        logger.info('ui', `Content-Disposition header: ${contentDisposition}`);
+        const filenameMatch = contentDisposition?.match(/filename="(.+)"/);
+        const filename = filenameMatch ? filenameMatch[1] : `hextrackr_${type}_backup.zip`;
+        logger.info('ui', `Filename: ${filename}`);
+
+        // Download the file
+        logger.info('ui', 'Creating blob...');
+        const blob = await response.blob();
+        logger.info('ui', `Blob size: ${blob.size} bytes`);
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
         a.href = url;
         a.download = filename;
         document.body.appendChild(a);
+        logger.info('ui', 'Triggering download...');
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        
-        showNotification(`ZIP backup created: ${filename}`, "success");
-        
+        logger.info('ui', 'Download triggered successfully');
+
+        // Hide progress modal on success
+        if (isLargeBackup && window.progressModal) {
+            window.progressModal.hide();
+        }
+
+        const sizeMB = (blob.size / 1024 / 1024).toFixed(2);
+        showNotification(`✅ Backup created and saved to disk: ${filename} (${sizeMB}MB)`, 'success');
+
     } catch (error) {
-        logger.error("ui", "Error creating ZIP backup:", error);
-        showNotification(`ZIP backup failed: ${error.message}`, "danger");
+        logger.error("ui", "Error creating backup:", error);
+
+        // Ensure progress modal is hidden on error
+        if (window.progressModal) {
+            window.progressModal.hide();
+        }
+
+        showNotification(`❌ Backup failed: ${error.message}`, "danger");
     }
 }
 
@@ -2043,6 +2044,64 @@ async function exportAllDataAsCSV() {
     } catch (error) {
         logger.error("ui", "Error creating all data CSV export:", error);
         showNotification(`All data CSV export failed: ${error.message}`, "danger");
+    }
+}
+
+/**
+ * Create database backup with progress modal (HEX-270)
+ * Creates full database backup and saves to disk + downloads
+ * @returns {Promise<void>}
+ */
+async function openDatabaseBackupModal() {
+    try {
+        logger.info('ui', 'Creating full database backup...');
+
+        // Show progress modal
+        if (window.progressModal) {
+            window.progressModal.show(
+                'Creating database backup...',
+                'This may take several minutes for large databases. The backup will be saved to disk and downloaded to your browser.'
+            );
+        }
+
+        // Trigger manual backup (creates both JSON ZIP and database file)
+        const csrfResponse = await window.authState.authenticatedFetch('/api/auth/csrf');
+        const csrfData = await csrfResponse.json();
+        const csrfToken = csrfData.csrfToken;
+
+        const response = await window.authState.authenticatedFetch('/api/backup/trigger-manual', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-Token': csrfToken
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        if (!data.success) {
+            throw new Error(data.error || 'Database backup failed');
+        }
+
+        // Hide progress modal
+        if (window.progressModal) {
+            window.progressModal.hide();
+        }
+
+        showNotification(`Database backup created successfully (${data.total_size_mb}MB). Files saved to disk.`, 'success');
+
+    } catch (error) {
+        logger.error("ui", "Error creating database backup:", error);
+
+        // Hide progress modal on error
+        if (window.progressModal) {
+            window.progressModal.hide();
+        }
+
+        showNotification(`Database backup failed: ${error.message}`, "danger");
     }
 }
 

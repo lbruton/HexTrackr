@@ -378,11 +378,8 @@
                                             </div>
                                             <div class="card-body">
                                                 <div class="d-grid gap-2">
-                                                    <button type="button" class="btn btn-outline-warning" onclick="backupData('tickets')">
-                                                        <i class="fas fa-file-archive me-2"></i>Backup Tickets ZIP
-                                                    </button>
-                                                    <button type="button" class="btn btn-outline-secondary" onclick="restoreData('tickets')">
-                                                        <i class="fas fa-file-import me-2"></i>Restore Tickets ZIP
+                                                    <button type="button" class="btn btn-outline-primary" onclick="window.backupModalManager.showTicketsBackupModal()">
+                                                        <i class="fas fa-archive me-2"></i>Ticket Backups
                                                     </button>
                                                     <button type="button" class="btn btn-outline-danger" onclick="clearData('tickets')">
                                                         <i class="fas fa-trash me-2"></i>Clear Tickets
@@ -402,11 +399,8 @@
                                             </div>
                                             <div class="card-body">
                                                 <div class="d-grid gap-2">
-                                                    <button type="button" class="btn btn-outline-warning" onclick="backupData('vulnerabilities')">
-                                                        <i class="fas fa-file-archive me-2"></i>Backup Vulnerabilities ZIP
-                                                    </button>
-                                                    <button type="button" class="btn btn-outline-secondary" onclick="restoreData('vulnerabilities')">
-                                                        <i class="fas fa-file-import me-2"></i>Restore Vulnerabilities ZIP
+                                                    <button type="button" class="btn btn-outline-primary" onclick="window.backupModalManager.showVulnerabilitiesBackupModal()">
+                                                        <i class="fas fa-archive me-2"></i>Vulnerability Backups
                                                     </button>
                                                     <button type="button" class="btn btn-outline-danger" onclick="clearData('vulnerabilities')">
                                                         <i class="fas fa-trash me-2"></i>Clear Vulnerabilities
@@ -432,12 +426,12 @@
                                                 </div>
                                                 <div class="row g-2">
                                                     <div class="col-md-3">
-                                                        <button type="button" class="btn btn-success w-100" onclick="exportAllDataAsCSV()">
+                                                        <button type="button" class="btn btn-success w-100" onclick="openDatabaseBackupModal()">
                                                             <i class="fas fa-download me-2"></i>Export All Data
                                                         </button>
                                                     </div>
                                                     <div class="col-md-3">
-                                                        <button type="button" class="btn btn-primary w-100" onclick="restoreFullSystemBackup()">
+                                                        <button type="button" class="btn btn-primary w-100" onclick="window.backupModalManager.showDatabaseBackupModal()">
                                                             <i class="fas fa-upload me-2"></i>Restore Full System Backup
                                                         </button>
                                                     </div>
@@ -561,6 +555,112 @@
                 </button>
                 <button type="button" class="btn btn-primary" id="saveCiscoCredentialsBtn">
                     <i class="fas fa-save me-2"></i>Save Credentials
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- HEX-270: Backup Modals -->
+
+<!-- Tickets Backup Modal -->
+<div class="modal fade" id="ticketsBackupModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success-subtle">
+                <h5 class="modal-title">
+                    <i class="fas fa-ticket-alt me-2 text-success"></i>
+                    Tickets Backup Management
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="ticketsBackupModalBody">
+                <!-- Content dynamically generated by BackupModalManager -->
+            </div>
+            <div class="modal-footer d-flex justify-content-between align-items-start">
+                <!-- Left side: Queue Backup button with status above -->
+                <div>
+                    <div class="mb-2">
+                        <small class="text-muted" id="ticketsBackupStatus">Ready to create backup</small>
+                    </div>
+                    <button type="button" class="btn btn-warning" id="queueTicketsBackup" onclick="window.backupModalManager.queueBackup('tickets')">
+                        <i class="fas fa-plus-circle me-1"></i>Queue Backup
+                    </button>
+                </div>
+
+                <!-- Right side: Restore buttons with Close at far right -->
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-primary" onclick="window.backupModalManager.restoreFromFile('tickets')">
+                        <i class="fas fa-upload me-1"></i>Restore from File
+                    </button>
+                    <button type="button" class="btn btn-primary" id="restoreTicketsFromServer" onclick="window.backupModalManager.restoreFromServer('tickets')" disabled>
+                        <i class="fas fa-cloud-download-alt me-1"></i>Restore from Server
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Vulnerabilities Backup Modal -->
+<div class="modal fade" id="vulnerabilitiesBackupModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-danger-subtle">
+                <h5 class="modal-title">
+                    <i class="fas fa-shield-virus me-2 text-danger"></i>
+                    Vulnerabilities Backup Management
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="vulnerabilitiesBackupModalBody">
+                <!-- Content dynamically generated by BackupModalManager -->
+            </div>
+            <div class="modal-footer d-flex justify-content-between align-items-start">
+                <!-- Left side: Queue Backup button with status above -->
+                <div>
+                    <div class="mb-2">
+                        <small class="text-muted" id="vulnerabilitiesBackupStatus">Ready to create backup</small>
+                    </div>
+                    <button type="button" class="btn btn-warning" id="queueVulnerabilitiesBackup" onclick="window.backupModalManager.queueBackup('vulnerabilities')">
+                        <i class="fas fa-plus-circle me-1"></i>Queue Backup
+                    </button>
+                </div>
+
+                <!-- Right side: Restore buttons with Close at far right -->
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-primary" onclick="window.backupModalManager.restoreFromFile('vulnerabilities')">
+                        <i class="fas fa-upload me-1"></i>Restore from File
+                    </button>
+                    <button type="button" class="btn btn-primary" id="restoreVulnerabilitiesFromServer" onclick="window.backupModalManager.restoreFromServer('vulnerabilities')" disabled>
+                        <i class="fas fa-cloud-download-alt me-1"></i>Restore from Server
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Database Backup Modal -->
+<div class="modal fade" id="databaseBackupModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-warning-subtle">
+                <h5 class="modal-title">
+                    <i class="fas fa-database me-2 text-warning"></i>
+                    Database Backup Management
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="databaseBackupModalBody">
+                <!-- Content dynamically generated by BackupModalManager -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="window.backupModalManager.uploadBackup('all')">
+                    <i class="fas fa-upload me-1"></i>Restore Database
                 </button>
             </div>
         </div>
