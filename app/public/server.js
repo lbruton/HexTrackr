@@ -35,6 +35,7 @@ const fs = require("fs");
 const middlewareConfig = require("../config/middleware");
 const ProgressTracker = require("../utils/ProgressTracker");
 const DatabaseService = require("../services/databaseService");
+const LoggingService = require("../services/loggingService"); // HEX-254: Centralized logging
 const CiscoAdvisoryService = require("../services/ciscoAdvisoryService");
 const PaloAltoService = require("../services/paloAltoService"); // HEX-209: Palo Alto advisory sync
 const PreferencesService = require("../services/preferencesService");
@@ -168,6 +169,11 @@ async function initializeApplication() {
     await databaseService.initialize();
     const db = databaseService.db; // underlying sqlite3.Database instance
     global.db = db; // maintain compatibility with legacy services
+
+    // Initialize logging service (HEX-254: Centralized logging with audit trail)
+    await LoggingService.initialize(db);
+    const logger = LoggingService.getInstance();
+    global.logger = logger; // Make available to all services
 
     // Start auto-VACUUM scheduler (HEX-250: Database bloat prevention)
     await databaseService.startAutoVacuum();

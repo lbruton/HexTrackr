@@ -34,6 +34,10 @@ Please see the attached notes for more information. If you have any questions or
 
 [DEVICE_LIST]
 
+**SOFTWARE VERSIONS:**
+
+[SOFTWARE_VERSIONS]
+
 **ACTION REQUIRED:**
 
 • Schedule a maintenance window of at least 4 hours
@@ -163,6 +167,10 @@ There are critical security patches that must be applied within 30 days at the [
 The following [DEVICE_COUNT] device(s) require security patches and will need to be rebooted:
 
 [DEVICE_LIST]
+
+**Software Versions:**
+
+[SOFTWARE_VERSIONS]
 
 **Action Required:**
 - Schedule a maintenance window of at least 4 hours
@@ -319,6 +327,7 @@ const emailTemplateVariables = [
     { name: "[SITE_ADDRESS]", description: "Physical shipping address", required: false, fallback: "[SITE ADDRESS - TBD]" },
     { name: "[RETURN_ADDRESS]", description: "Return shipping address", required: false, fallback: "[RETURN ADDRESS - TBD]" },
     { name: "[TRACKING_NUMBER]", description: "Shipping tracking number", required: false, fallback: "[TRACKING NUMBER - TBD]" },
+    { name: "[SOFTWARE_VERSIONS]", description: "Software versions for upgrade", required: false, fallback: "N/A" },
     { name: "[MITIGATION_DETAILS]", description: "Mitigation details", required: false, fallback: "[MITIGATION DETAILS - TBD]" }
 ];
 
@@ -343,6 +352,7 @@ const ticketTemplateVariables = [
     { name: "[SITE_ADDRESS]", description: "Physical shipping address", required: false, fallback: "[SITE ADDRESS - TBD]" },
     { name: "[RETURN_ADDRESS]", description: "Return shipping address", required: false, fallback: "[RETURN ADDRESS - TBD]" },
     { name: "[TRACKING_NUMBER]", description: "Shipping tracking number", required: false, fallback: "[TRACKING NUMBER - TBD]" },
+    { name: "[SOFTWARE_VERSIONS]", description: "Software versions for upgrade", required: false, fallback: "N/A" },
     { name: "[MITIGATION_DETAILS]", description: "Mitigation details", required: false, fallback: "[MITIGATION DETAILS - TBD]" }
 ];
 
