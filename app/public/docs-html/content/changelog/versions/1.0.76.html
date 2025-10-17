@@ -20,19 +20,29 @@
 <p><strong>Use Case</strong>: Frontend developers can now filter utility script logs (modals, progress tracking, settings) using the same category-based system as page controllers and backend services. This completes the frontend migration phase.</p>
 <p><strong>Files Modified</strong>:</p>
 <ul>
-<li>TBD (to be updated during implementation)</li>
+<li><code>app/public/scripts/shared/progress-modal.js</code>: 36 statements → logger.debug/warn/error (&#39;ui&#39;)</li>
+<li><code>app/public/scripts/shared/settings-modal.js</code>: 50 statements → logger.debug/warn/error (&#39;ui&#39;)</li>
+<li><code>app/public/scripts/shared/modal-monitoring.js</code>: 18 statements → logger.debug/warn/error (&#39;ui&#39;)</li>
+<li><code>app/public/scripts/shared/config-loader.js</code>: 3 statements → logger.debug/warn (&#39;ui&#39;)</li>
+<li><code>app/public/scripts/shared/crypto-utils.js</code>: 1 statement → logger.warn (&#39;ui&#39;)</li>
+</ul>
+<p><strong>Scope Adjustment</strong>:<br>Analysis revealed 458 console statements across 23 shared utility files (3x larger than estimated). Session 12 focused on priority user-facing utilities (108 statements, 23.5% of total). Remaining 350 statements (76.5%) deferred to Session 12B:</p>
+<ul>
+<li>Theme &amp; UI Systems (130 statements): theme-controller.js, ag-grid-theme-manager.js, header.js</li>
+<li>Editors &amp; Templates (87 statements): template-editor.js, markdown editors</li>
+<li>Data &amp; Integration Utilities (133 statements): preferences, statistics, charts, advisories</li>
 </ul>
 <p><strong>Validation</strong>:</p>
 <ul>
-<li><input disabled="" type="checkbox"> Application loads correctly at <a href="https://dev.hextrackr.com">https://dev.hextrackr.com</a></li>
-<li><input disabled="" type="checkbox"> Modals open and display data correctly</li>
-<li><input disabled="" type="checkbox"> Progress tracking functional</li>
-<li><input disabled="" type="checkbox"> Settings modal works as expected</li>
-<li><input disabled="" type="checkbox"> Browser console shows categorized logger output</li>
-<li><input disabled="" type="checkbox"> No raw console statements remain in migrated files</li>
-<li><input disabled="" type="checkbox"> Logger configuration controls output levels</li>
-<li><input disabled="" type="checkbox"> Docker restart successful</li>
-<li><input disabled="" type="checkbox"> Application logs show clean category-based output</li>
+<li><input checked="" disabled="" type="checkbox"> Application loads correctly at <a href="https://dev.hextrackr.com">https://dev.hextrackr.com</a></li>
+<li><input checked="" disabled="" type="checkbox"> Modals open and display data correctly</li>
+<li><input checked="" disabled="" type="checkbox"> Progress tracking functional</li>
+<li><input checked="" disabled="" type="checkbox"> Settings modal works as expected</li>
+<li><input checked="" disabled="" type="checkbox"> Browser console shows categorized logger output</li>
+<li><input checked="" disabled="" type="checkbox"> No raw console statements remain in 5 migrated files (108 statements)</li>
+<li><input checked="" disabled="" type="checkbox"> Logger configuration controls output levels</li>
+<li><input checked="" disabled="" type="checkbox"> Docker restart successful</li>
+<li><input checked="" disabled="" type="checkbox"> Application logs show clean category-based output</li>
 </ul>
 <p><strong>Issues</strong>:</p>
 <ul>
