@@ -7,6 +7,22 @@
  */
 
 /**
+ * Defensive logging helpers
+ * Safely log to LoggingService with fallback for initialization
+ */
+function _log(level, message, data = {}) {
+    if (global.logger && global.logger.integration && typeof global.logger.integration[level] === 'function') {
+        global.logger.integration[level](message, data);
+    }
+}
+
+function _audit(category, message, data = {}) {
+    if (global.logger && typeof global.logger.audit === 'function') {
+        global.logger.audit(category, message, data, null, null);
+    }
+}
+
+/**
  * Cisco PSIRT Advisory Service
  * @class CiscoAdvisoryService
  * @description Handles synchronization with Cisco PSIRT API and database operations for advisory data
@@ -77,9 +93,9 @@ class CiscoAdvisoryService {
             // No need to ALTER TABLE here - columns already exist from migration
 
             // sync_metadata table already exists from KEV implementation
-            console.log("Cisco advisory database tables initialized");
+            _log('info', "Cisco advisory database tables initialized");
         } catch (error) {
-            console.error("Failed to initialize Cisco advisory tables:", error);
+            _log('error', "Failed to initialize Cisco advisory tables:", error);
         }
     }
 
@@ -144,8 +160,8 @@ class CiscoAdvisoryService {
      */
     async getCiscoAccessToken(clientId, clientSecret) {
         try {
-            console.log(`OAuth2 request to ${this.ciscoTokenUrl}`);
-            console.log(`Client ID: ${clientId.substring(0, 8)}...`);
+            _log('info', `OAuth2 request to ${this.ciscoTokenUrl}`);
+            _log('info', `Client ID: ${clientId.substring(0, 8)}...`);
 
             const tokenResponse = await this.fetch(this.ciscoTokenUrl, {
                 method: "POST",
@@ -161,7 +177,7 @@ class CiscoAdvisoryService {
                 let errorDetails = `status ${tokenResponse.status}`;
                 try {
                     const errorBody = await tokenResponse.text();
-                    console.error(`Cisco OAuth2 error response: ${errorBody}`);
+                    _log('error', `Cisco OAuth2 error response: ${errorBody}`);
                     errorDetails = `${errorDetails}: ${errorBody}`;
                 } catch (e) {
                     // Ignore JSON parse errors
@@ -170,10 +186,10 @@ class CiscoAdvisoryService {
             }
 
             const tokenData = await tokenResponse.json();
-            console.log("OAuth2 token acquired successfully");
+            _log('info', "OAuth2 token acquired successfully");
             return tokenData.access_token;
         } catch (error) {
-            console.error("Failed to get Cisco access token:", error);
+            _log('error', "Failed to get Cisco access token:", error);
             throw new Error(`OAuth2 authentication failed: ${error.message}`);
         }
     }
@@ -356,7 +372,7 @@ class CiscoAdvisoryService {
             const data = await response.json();
             return data;
         } catch (error) {
-            console.error(` Failed to fetch advisory for ${cveId}:`, error.message);
+            _log('error', ` Failed to fetch advisory for ${cveId}:`, error.message);
             return null;
         }
     }
@@ -369,16 +385,16 @@ class CiscoAdvisoryService {
      */
     parseAdvisoryData(advisoryData, queriedCveId) {
         if (!advisoryData || !advisoryData.advisories || advisoryData.advisories.length === 0) {
-            console.log(` No advisories found in response for ${queriedCveId}`);
+            _log('info', ` No advisories found in response for ${queriedCveId}`);
             return null;
         }
 
         const advisory = advisoryData.advisories[0]; // Use first advisory
 
-        console.log(` Processing advisory: ${advisory.advisoryId} for CVE ${queriedCveId}`);
-        console.log(` CVEs in advisory: ${advisory.cves ? advisory.cves.join(', ') : 'none'}`);
-        console.log(` CSAF URL: ${advisory.csafUrl || 'none'}`);
-        console.log(` Publication URL: ${advisory.publicationUrl || 'none'}`);
+        _log('info', ` Processing advisory: ${advisory.advisoryId} for CVE ${queriedCveId}`);
+        _log('info', ` CVEs in advisory: ${advisory.cves ? advisory.cves.join(', ') : 'none'}`);
+        _log('info', ` CSAF URL: ${advisory.csafUrl || 'none'}`);
+        _log('info', ` Publication URL: ${advisory.publicationUrl || 'none'}`);
 
         // NOTE: Cisco PSIRT API v2 does not include fixed version data in the lightweight CVE endpoint.
         // Fixed versions are in the CSAF JSON (advisory.csafUrl), which can be parsed if needed.
@@ -388,7 +404,7 @@ class CiscoAdvisoryService {
         const productCount = (advisory.productNames && Array.isArray(advisory.productNames))
             ? advisory.productNames.length
             : 0;
-        console.log(` Affected products: ${productCount}`);
+        _log('info', ` Affected products: ${productCount}`);
 
         return {
             cve_id: queriedCveId, // Use the CVE we queried for, not advisory.cveId
@@ -441,7 +457,7 @@ class CiscoAdvisoryService {
             }
         }
 
-        console.log(` Could not parse OS type from products: ${productNames.slice(0, 3).join(', ')}...`);
+        _log('info', ` Could not parse OS type from products: ${productNames.slice(0, 3).join(', ')}...`);
         return null;
     }
 
@@ -483,7 +499,7 @@ class CiscoAdvisoryService {
             }
         }
 
-        console.log(` Could not parse installed version: ${installedVersion}`);
+        _log('info', ` Could not parse installed version: ${installedVersion}`);
         return null;
     }
 
@@ -498,7 +514,7 @@ class CiscoAdvisoryService {
     async fetchFixedVersions(osType, version, accessToken) {
         try {
             const url = `${this.ciscoPsirtBaseUrl}/OSType/${osType}?version=${encodeURIComponent(version)}`;
-            console.log(` Querying Software Checker: ${osType} ${version}`);
+            _log('info', ` Querying Software Checker: ${osType} ${version}`);
 
             const response = await this.fetch(url, {
                 method: "GET",
@@ -509,7 +525,7 @@ class CiscoAdvisoryService {
             });
 
             if (!response.ok) {
-                console.log(` Software Checker returned ${response.status} for ${osType} ${version}`);
+                _log('info', ` Software Checker returned ${response.status} for ${osType} ${version}`);
                 return [];
             }
 
@@ -530,13 +546,13 @@ class CiscoAdvisoryService {
                 }
 
                 const fixedArray = Array.from(allFixedVersions);
-                console.log(` Found ${fixedArray.length} fixed versions: ${fixedArray.slice(0, 3).join(', ')}${fixedArray.length > 3 ? '...' : ''}`);
+                _log('info', ` Found ${fixedArray.length} fixed versions: ${fixedArray.slice(0, 3).join(', ')}${fixedArray.length > 3 ? '...' : ''}`);
                 return fixedArray;
             }
 
             return [];
         } catch (error) {
-            console.error(` Failed to fetch fixed versions for ${osType} ${version}:`, error.message);
+            _log('error', ` Failed to fetch fixed versions for ${osType} ${version}:`, error.message);
             return [];
         }
     }
@@ -554,23 +570,23 @@ class CiscoAdvisoryService {
         }
 
         this.syncInProgress = true;
-        console.log("Starting Cisco PSIRT advisory data sync");
+        _log('info', "Starting Cisco PSIRT advisory data sync");
 
         try {
             // Get credentials from preferences
             const { clientId, clientSecret } = await this.getCiscoCredentials(userId);
 
             // Get OAuth2 access token
-            console.log("Authenticating with Cisco Identity Services...");
+            _log('info', "Authenticating with Cisco Identity Services...");
             const accessToken = await this.getCiscoAccessToken(clientId, clientSecret);
 
             // Get unique OS versions from our device inventory (batch optimization)
             const uniqueVersions = await this.getUniqueDeviceVersions();
-            console.log(` Found ${uniqueVersions.length} unique OS versions to query (batch mode)`);
+            _log('info', ` Found ${uniqueVersions.length} unique OS versions to query (batch mode)`);
 
             // Get all Cisco CVE IDs in our database (for filtering responses)
             const allCiscoCveIds = await this.getAllCiscoCveIds();
-            console.log(` Database contains ${allCiscoCveIds.size} unique Cisco CVEs`);
+            _log('info', ` Database contains ${allCiscoCveIds.size} unique Cisco CVEs`);
 
             // No transaction wrapper - each advisory commits individually for resilience
             let advisoryCount = 0;
@@ -583,18 +599,18 @@ class CiscoAdvisoryService {
                 const installedVersion = uniqueVersions[i];
                 queriesExecuted++;
 
-                console.log(` [${i + 1}/${uniqueVersions.length}] Querying version: ${installedVersion}`);
+                _log('info', ` [${i + 1}/${uniqueVersions.length}] Querying version: ${installedVersion}`);
 
                 // Parse installed version to get OS type and version for Software Checker
                 const osInfo = this.parseInstalledVersion(installedVersion);
 
                 if (!osInfo) {
-                    console.log(` Could not parse installed version: ${installedVersion}`);
+                    _log('info', ` Could not parse installed version: ${installedVersion}`);
                     continue;
                 }
 
                 // Query Software Checker - returns ALL CVEs affecting this version
-                console.log(` Software Checker: ${osInfo.osType} ${osInfo.version}`);
+                _log('info', ` Software Checker: ${osInfo.osType} ${osInfo.version}`);
                 const response = await this.fetch(
                     `${this.ciscoPsirtBaseUrl}/OSType/${osInfo.osType}?version=${encodeURIComponent(osInfo.version)}`,
                     {
@@ -606,13 +622,13 @@ class CiscoAdvisoryService {
                 );
 
                 if (!response.ok) {
-                    console.log(` Software Checker returned ${response.status}`);
+                    _log('info', ` Software Checker returned ${response.status}`);
                     continue;
                 }
 
                 const data = await response.json();
                 const advisories = data.advisories || [];
-                console.log(` Received ${advisories.length} advisories for this version`);
+                _log('info', ` Received ${advisories.length} advisories for this version`);
 
                 // Process ALL advisories from this response (batch optimization!)
                 let cvesProcessedFromThisVersion = 0;
@@ -657,7 +673,7 @@ class CiscoAdvisoryService {
                                     parsed.publication_url
                                 ], (err) => {
                                     if (err) {
-                                        console.error(` Insert failed for ${cveId}:`, err);
+                                        _log('error', ` Insert failed for ${cveId}:`, err);
                                         reject(err);
                                     } else {
                                         resolve();
@@ -674,7 +690,7 @@ class CiscoAdvisoryService {
                                     WHERE cve = ?
                                 `, [hasFixAvailable, cveId], (err) => {
                                     if (err) {
-                                        console.error(` Update failed for ${cveId}:`, err);
+                                        _log('error', ` Update failed for ${cveId}:`, err);
                                         reject(err);
                                     } else {
                                         resolve();
@@ -694,7 +710,7 @@ class CiscoAdvisoryService {
                                     ) VALUES (?, ?, CURRENT_TIMESTAMP)
                                 `, [cveId, JSON.stringify(fixedVersions)], (err) => {
                                     if (err) {
-                                        console.error(` Insert failed for ${cveId}:`, err);
+                                        _log('error', ` Insert failed for ${cveId}:`, err);
                                         reject(err);
                                     } else {
                                         resolve();
@@ -709,7 +725,7 @@ class CiscoAdvisoryService {
                     }
                 }
 
-                console.log(` Processed ${cvesProcessedFromThisVersion} CVEs from this version (total: ${advisoryCount})`);
+                _log('info', ` Processed ${cvesProcessedFromThisVersion} CVEs from this version (total: ${advisoryCount})`);
 
                 // Rate limiting: wait between each query to honor Cisco API limits
                 if (i < uniqueVersions.length - 1) {
@@ -729,7 +745,7 @@ class CiscoAdvisoryService {
                 });
             });
 
-            console.log(` Cisco advisory sync completed: ${queriesExecuted} versions queried, ${advisoryCount} advisories processed (${actualDbCount} unique CVEs in DB), ${matchedCount} CVEs matched`);
+            _log('info', ` Cisco advisory sync completed: ${queriesExecuted} versions queried, ${advisoryCount} advisories processed (${actualDbCount} unique CVEs in DB), ${matchedCount} CVEs matched`);
 
             this.syncInProgress = false;
 
@@ -744,7 +760,7 @@ class CiscoAdvisoryService {
             };
 
         } catch (error) {
-            console.error("Cisco advisory sync failed:", error);
+            _log('error', "Cisco advisory sync failed:", error);
             this.syncInProgress = false;
             throw error;
         }

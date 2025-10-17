@@ -2,7 +2,7 @@
 
 Welcome to the HexTrackr changelog! This page tracks all notable changes, features, and fixes across all versions of HexTrackr.
 
-**Current Version**: [v1.0.73](#changelog/versions/1.0.73) 🚧 In Progress
+**Current Version**: [v1.0.73](#changelog/versions/1.0.73) - In Progress
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
@@ -14,8 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### Latest Releases
 
-- [**v1.0.73**](#changelog/versions/1.0.73) - 2025-10-17 - 🚧 Logging System Session 9: Remaining Backend Services
-- [**v1.0.72**](#changelog/versions/1.0.72) - 2025-10-17 - ✅ Logging System Session 8: Import Service Migration
+- [**v1.0.73**](#changelog/versions/1.0.73) - 2025-10-17 - Logging System Session 9: Remaining Backend Services (In Progress)
+- [**v1.0.72**](#changelog/versions/1.0.72) - 2025-10-17 - Logging System Session 8: Import Service Migration
 - [**v1.0.71**](#changelog/versions/1.0.71) - 2025-10-17 - Logging System Session 7: Database Service Migration
 - [**v1.0.70**](#changelog/versions/1.0.70) - 2025-10-17 - Logging System Session 6: Migrate Authentication Service
 - [**v1.0.69**](#changelog/versions/1.0.69) - 2025-10-17 - Logging System Session 5: Remove Emoji Usage
