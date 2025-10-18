@@ -2,7 +2,7 @@
 
 Welcome to the HexTrackr changelog! This page tracks all notable changes, features, and fixes across all versions of HexTrackr.
 
-**Current Version**: [v1.0.77](#changelog/versions/1.0.77) - In Progress
+**Current Version**: [v1.0.78](#changelog/versions/1.0.78) - Released 2025-10-17
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
@@ -14,7 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### Latest Releases
 
-- [**v1.0.77**](#changelog/versions/1.0.77) - 2025-10-17 - Logging System Session 12B: Frontend Utilities Complete (In Progress)
+- [**v1.0.78**](#changelog/versions/1.0.78) - 2025-10-17 - Bug Fixes: Template Truncation, Backup Retention, KEV Sync, Advisory Cache
+- [**v1.0.77**](#changelog/versions/1.0.77) - 2025-10-17 - Logging System Session 12B: Frontend Utilities Complete
 - [**v1.0.76**](#changelog/versions/1.0.76) - 2025-10-17 - Logging System Session 12: Priority Frontend Utilities
 - [**v1.0.75**](#changelog/versions/1.0.75) - 2025-10-17 - Logging System Session 11: Frontend UI & Page Scripts
 - [**v1.0.74**](#changelog/versions/1.0.74) - 2025-10-17 - Logging System Session 10: Frontend Core Data Layer
