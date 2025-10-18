@@ -333,13 +333,18 @@
                                             </select>
                                         </div>
                                         
-                                        <!-- Right side: Vendor filter and Import button -->
+                                        <!-- Right side: Vendor and Location filters -->
                                         <div class="d-flex gap-2">
                                             <select class="form-select vendor-filter" id="vendorFilter" aria-label="Filter by vendor">
                                                 <option value="">All Vendors</option>
                                                 <option value="CISCO">CISCO</option>
                                                 <option value="Palo Alto">Palo Alto</option>
                                                 <option value="Other">Other</option>
+                                            </select>
+
+                                            <select class="form-select location-filter" id="locationFilter" aria-label="Filter by location">
+                                                <option value="">All Locations</option>
+                                                <!-- Populated dynamically from /api/locations/stats -->
                                             </select>
                                             <!-- Import moved to Third Party Integrations > Tenable Card (HEX-233) -->
                                         </div>
