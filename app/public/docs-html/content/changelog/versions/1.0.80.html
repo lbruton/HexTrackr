@@ -1,0 +1,173 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <hr>
+<h2>title: "Version 1.0.80 - Location Cards: Backend Service Implementation"
+date: "2025-10-18"
+version: "1.0.80"
+status: "Released"
+category: "Enhancement"</h2><h1>Version 1.0.80 - Location Cards: Backend Service Implementation</h1><p><strong>Release Status</strong>: ✅ Released<br><strong>Release Date</strong>: 2025-10-18<br><strong>Parent Issue</strong>: <a href="https://linear.app/hextrackr/issue/HEX-288">HEX-288</a><br><strong>Implementation</strong>: <a href="https://linear.app/hextrackr/issue/HEX-292">HEX-292</a> Task 1 - Backend Service</p>
+<h2>Overview</h2><p>Implemented the backend foundation for the Location Cards feature (HEX-288), which provides site-level security visibility by aggregating vulnerabilities based on physical location extracted from device hostnames.</p>
+<p>This is <strong>Task 1 of 4</strong> in the Location Cards MVP implementation. Created <code>locationService.js</code> with full aggregation logic, multi-vendor support, and ticket correlation.</p>
+<h2>What's New</h2><h3>locationService.js - Location Aggregation Engine</h3><p><strong>File</strong>: <code>app/services/locationService.js</code> (NEW - 368 lines)</p>
+<p><strong>Key Features</strong>:</p>
+<ul>
+<li><strong>Multi-vendor aggregation</strong>: Combines CISCO, Palo Alto, and Other devices by location</li>
+<li><strong>Hostname parsing integration</strong>: Uses <code>hostnameParserService.parseHostname()</code> for config-driven location extraction</li>
+<li><strong>VPR score calculations</strong>: Aggregates vulnerability priority ratings by location</li>
+<li><strong>Severity breakdowns</strong>: Counts and VPR totals for Critical/High/Medium/Low</li>
+<li><strong>KEV detection</strong>: Identifies Known Exploited Vulnerabilities at each location</li>
+<li><strong>Ticket correlation</strong>: Counts open/in-progress/pending tickets per location</li>
+<li><strong>Vendor distribution</strong>: Tracks device counts per vendor (for colored icon display)</li>
+<li><strong>Primary vendor detection</strong>: Identifies most common vendor at each location</li>
+</ul>
+<p><strong>Core Method</strong>: <code>getLocationStats()</code></p>
+<p>Returns standardized <code>{success, data, error}</code> response with location array:</p>
+<pre><code class="language-javascript">{
+  <span class="hljs-attr">success</span>: <span class="hljs-literal">true</span>,
+  <span class="hljs-attr">data</span>: [
+    {
+      <span class="hljs-attr">location</span>: <span class="hljs-string">&quot;wtulsa&quot;</span>,
+      <span class="hljs-attr">location_display</span>: <span class="hljs-string">&quot;WTULSA&quot;</span>,
+      <span class="hljs-attr">device_count</span>: <span class="hljs-number">42</span>,
+      <span class="hljs-attr">primary_vendor</span>: <span class="hljs-string">&quot;CISCO&quot;</span>,
+      <span class="hljs-attr">vendor_breakdown</span>: {
+        <span class="hljs-attr">CISCO</span>: <span class="hljs-number">35</span>,
+        <span class="hljs-string">&quot;Palo Alto&quot;</span>: <span class="hljs-number">5</span>,
+        <span class="hljs-title class_">Other</span>: <span class="hljs-number">2</span>
+      },
+      <span class="hljs-attr">total_vpr</span>: <span class="hljs-number">1847.3</span>,
+      <span class="hljs-attr">severity_breakdown</span>: {
+        <span class="hljs-title class_">Critical</span>: { <span class="hljs-attr">count</span>: <span class="hljs-number">12</span>, <span class="hljs-attr">vpr</span>: <span class="hljs-number">456.2</span> },
+        <span class="hljs-title class_">High</span>: { <span class="hljs-attr">count</span>: <span class="hljs-number">28</span>, <span class="hljs-attr">vpr</span>: <span class="hljs-number">892.1</span> },
+        <span class="hljs-title class_">Medium</span>: { <span class="hljs-attr">count</span>: <span class="hljs-number">15</span>, <span class="hljs-attr">vpr</span>: <span class="hljs-number">398.0</span> },
+        <span class="hljs-title class_">Low</span>: { <span class="hljs-attr">count</span>: <span class="hljs-number">8</span>, <span class="hljs-attr">vpr</span>: <span class="hljs-number">101.0</span> }
+      },
+      <span class="hljs-attr">kev_count</span>: <span class="hljs-number">3</span>,
+      <span class="hljs-attr">open_tickets</span>: <span class="hljs-number">2</span>,
+      <span class="hljs-attr">confidence</span>: <span class="hljs-number">0.85</span>
+    }
+  ],
+  <span class="hljs-attr">error</span>: <span class="hljs-literal">null</span>
+}</code></pre><p><strong>Sorting</strong>: Locations sorted by <code>total_vpr</code> descending (highest risk first)</p>
+<p><strong>Confidence Filtering</strong>: Skips hostname parses with confidence &lt;0.5 (unreliable patterns)</p>
+<h2>Technical Implementation</h2><h3>Architecture Decisions</h3><ol>
+<li><p><strong>Config-Driven Pattern Matching</strong>: Uses <code>/config/device-naming-patterns.json</code> (18+ patterns)</p>
+<ul>
+<li>No code changes needed for new hostname patterns</li>
+<li>Add patterns via JSON config with precedence ordering</li>
+</ul>
+</li>
+<li><p><strong>Multi-Vendor Normalization</strong>: Standardizes vendor names</p>
+<ul>
+<li><code>&quot;cisco&quot;</code> → <code>&quot;CISCO&quot;</code></li>
+<li><code>&quot;palo&quot;</code>, <code>&quot;pan&quot;</code> → <code>&quot;Palo Alto&quot;</code></li>
+<li>Everything else → <code>&quot;Other&quot;</code></li>
+</ul>
+</li>
+<li><p><strong>Server-Side Aggregation</strong>: All calculations in backend service</p>
+<ul>
+<li>Follows HEX-101 pattern (server-side aggregation, client-side caching)</li>
+<li>Prepares for 5-minute cache TTL in Task 2 (API endpoint)</li>
+</ul>
+</li>
+<li><p><strong>Singleton Pattern</strong>: <code>getLocationService()</code> returns shared instance</p>
+<ul>
+<li>Consistent with other services (<code>vulnerabilityService</code>, <code>ciscoAdvisoryService</code>, etc.)</li>
+<li>Database initialized via <code>initialize(db)</code> method</li>
+</ul>
+</li>
+</ol>
+<h3>Data Flow</h3><pre><code class="language-">1. Query vulnerabilities_current table
+   ↓
+2. Parse each hostname → extract location (hostnameParserService)
+   ↓
+3. Group by location (Map data structure)
+   ↓
+4. Aggregate metrics:
+   - Unique hostnames (device count)
+   - Vendor breakdown (CISCO/Palo/Other)
+   - VPR totals and severity counts
+   - KEV CVE tracking
+   ↓
+5. Correlate with tickets table (location field)
+   ↓
+6. Transform to array, sort by total_vpr DESC
+   ↓
+7. Return {success, data, error} response</code></pre><h3>Database Queries</h3><p><strong>Vulnerabilities Query</strong>:</p>
+<pre><code class="language-sql"><span class="hljs-keyword">SELECT</span> hostname, vendor, severity, vpr_score, cve, isKev
+<span class="hljs-keyword">FROM</span> vulnerabilities_current
+<span class="hljs-keyword">WHERE</span> hostname <span class="hljs-keyword">IS</span> <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">AND</span> hostname <span class="hljs-operator">!=</span> <span class="hljs-string">&#x27;&#x27;</span>
+<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> hostname</code></pre><p><strong>Tickets Query</strong>:</p>
+<pre><code class="language-sql"><span class="hljs-keyword">SELECT</span> <span class="hljs-built_in">LOWER</span>(location) <span class="hljs-keyword">as</span> location, <span class="hljs-built_in">COUNT</span>(<span class="hljs-operator">*</span>) <span class="hljs-keyword">as</span> ticket_count
+<span class="hljs-keyword">FROM</span> tickets
+<span class="hljs-keyword">WHERE</span> state <span class="hljs-keyword">IN</span> (<span class="hljs-string">&#x27;Open&#x27;</span>, <span class="hljs-string">&#x27;In Progress&#x27;</span>, <span class="hljs-string">&#x27;Pending&#x27;</span>)
+  <span class="hljs-keyword">AND</span> location <span class="hljs-keyword">IS</span> <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">AND</span> location <span class="hljs-operator">!=</span> <span class="hljs-string">&#x27;&#x27;</span>
+<span class="hljs-keyword">GROUP</span> <span class="hljs-keyword">BY</span> <span class="hljs-built_in">LOWER</span>(location)</code></pre><h2>Files Modified</h2><h3>New Files</h3><ul>
+<li><code>app/services/locationService.js</code> (NEW - 368 lines)<ul>
+<li><code>getLocationStats()</code> - Main aggregation method</li>
+<li><code>_getTicketCountsByLocation()</code> - Ticket correlation</li>
+<li><code>_normalizeVendor()</code> - Vendor standardization</li>
+<li><code>_determinePrimaryVendor()</code> - Primary vendor detection</li>
+<li><code>_queryDatabase()</code> - Promise-wrapped SQLite query</li>
+</ul>
+</li>
+</ul>
+<h3>Configuration Files (Referenced)</h3><ul>
+<li><code>/config/device-naming-patterns.json</code> (existing - used for hostname parsing)<ul>
+<li>18 device type patterns (nswan, nfpan, rtr, etc.)</li>
+<li>Vendor mappings (CISCO, Palo Alto)</li>
+<li>Precedence ordering for pattern matching</li>
+</ul>
+</li>
+</ul>
+<h2>Success Criteria</h2><ul>
+<li><input checked="" disabled="" type="checkbox"> Version bumped to 1.0.80</li>
+<li><input checked="" disabled="" type="checkbox"> <code>locationService.js</code> created with full aggregation logic</li>
+<li><input checked="" disabled="" type="checkbox"> Multi-vendor support (CISCO, Palo Alto, Other)</li>
+<li><input checked="" disabled="" type="checkbox"> Hostname parsing integration via <code>hostnameParserService</code></li>
+<li><input checked="" disabled="" type="checkbox"> VPR score aggregation by location</li>
+<li><input checked="" disabled="" type="checkbox"> Severity breakdown (Critical/High/Medium/Low)</li>
+<li><input checked="" disabled="" type="checkbox"> KEV detection and counting</li>
+<li><input checked="" disabled="" type="checkbox"> Ticket correlation by location</li>
+<li><input checked="" disabled="" type="checkbox"> Vendor breakdown tracking (for UI icon display)</li>
+<li><input checked="" disabled="" type="checkbox"> Primary vendor detection (for badge display)</li>
+<li><input checked="" disabled="" type="checkbox"> Confidence filtering (&lt;0.5 rejected)</li>
+<li><input checked="" disabled="" type="checkbox"> Standardized <code>{success, data, error}</code> response format</li>
+<li><input checked="" disabled="" type="checkbox"> Singleton pattern with <code>initialize(db)</code> method</li>
+<li><input checked="" disabled="" type="checkbox"> JavaScript syntax validation passed</li>
+</ul>
+<h2>Next Steps (Task 2)</h2><p><strong>Task 2: Backend API Endpoint</strong> (v1.0.81)</p>
+<ul>
+<li>Create <code>app/routes/locations.js</code></li>
+<li>Create location controller</li>
+<li>Implement <code>GET /api/locations/stats</code> endpoint</li>
+<li>Add <code>requireAuth</code> middleware</li>
+<li>Wire up <code>cacheService</code> with 5-minute TTL</li>
+<li>Register route in <code>server.js</code></li>
+<li>Test with curl/Postman</li>
+</ul>
+<h2>Related Issues</h2><ul>
+<li>Parent: <a href="https://linear.app/hextrackr/issue/HEX-288">HEX-288</a> - Location Cards View</li>
+<li>Spec: <a href="https://linear.app/hextrackr/issue/HEX-289">HEX-289</a> - Requirements &amp; Design</li>
+<li>Research: <a href="https://linear.app/hextrackr/issue/HEX-290">HEX-290</a> - Technical Analysis</li>
+<li>Plan: <a href="https://linear.app/hextrackr/issue/HEX-291">HEX-291</a> - Implementation Breakdown</li>
+<li>Implement: <a href="https://linear.app/hextrackr/issue/HEX-292">HEX-292</a> - Phase 1 MVP (this task)</li>
+</ul>
+<h2>Patterns Followed</h2><ul>
+<li><strong>Service Pattern</strong>: Class with <code>initialize(db)</code> method (from <code>vulnerabilityStatsService.js</code>)</li>
+<li><strong>Response Format</strong>: <code>{success, data, error}</code> (from <code>vulnerabilityService.js</code>)</li>
+<li><strong>Singleton Pattern</strong>: <code>getInstance()</code> function (from <code>hostnameParserService.js</code>)</li>
+<li><strong>Config-Driven</strong>: Hostname patterns via JSON (from <code>device-naming-patterns.json</code>)</li>
+</ul>
+<h2>Breaking Changes</h2><p>None. This is a new service with no existing dependencies.</p>
+<h2>Known Issues</h2><p>None.</p>
+<h2>Testing Notes</h2><p>Service is unit-testable with mock database:</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> { getLocationService } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./locationService&#x27;</span>);
+<span class="hljs-keyword">const</span> service = <span class="hljs-title function_">getLocationService</span>();
+service.<span class="hljs-title function_">initialize</span>(mockDb);
+<span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> service.<span class="hljs-title function_">getLocationStats</span>();</code></pre><p>Will be integration-tested in Task 2 when API endpoint is created.</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

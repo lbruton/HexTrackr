@@ -1,0 +1,204 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <hr>
+<h2>title: "Version 1.0.79 - Cisco Advisory: Fix Multi-OS-Family Data Corruption"
+date: "2025-10-17"
+version: "1.0.79"
+status: "Released"
+category: "Bug Fix"</h2><h1>Version 1.0.79 - Cisco Advisory: Fix Multi-OS-Family Data Corruption</h1><p><strong>Release Status</strong>: ✅ Released<br><strong>Release Date</strong>: 2025-10-17<br><strong>Parent Issue</strong>: <a href="https://linear.app/hextrackr/issue/HEX-287">HEX-287</a><br><strong>Implementation</strong>: <a href="https://linear.app/hextrackr/issue/HEX-287">HEX-287</a> Session 1</p>
+<h2>Overview</h2><p>Fixed critical bug where Cisco advisory data was being overwritten during sync, causing multi-OS-family CVEs (affecting both IOS and IOS XE) to lose fixed version data. Implemented normalized database schema to prevent data loss and added proper train family filtering.</p>
+<h2>Critical Bug Fixed</h2><h3>Problem</h3><ul>
+<li><strong>Symptom</strong>: Cisco advisory fixed versions disappearing after sync</li>
+<li><strong>Impact</strong>: IOS devices showing IOS XE fixed versions (wrong OS type)</li>
+<li><strong>Root Cause</strong>: Multi-OS-family CVEs stored in denormalized JSON array, causing last-write-wins overwrites</li>
+</ul>
+<p><strong>Example</strong>:</p>
+<pre><code class="language-json"><span class="hljs-comment">// Before fix - denormalized (BAD)</span>
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;cve_id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;CVE-2025-20352&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;first_fixed&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;15.2(8)E8&quot;</span><span class="hljs-punctuation">]</span>  <span class="hljs-comment">// After IOS sync</span>
+<span class="hljs-punctuation">}</span>
+<span class="hljs-comment">// After IOS XE sync - IOS data LOST!</span>
+<span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;cve_id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;CVE-2025-20352&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;first_fixed&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;17.12.6&quot;</span><span class="hljs-punctuation">]</span>  <span class="hljs-comment">// IOS data overwritten</span>
+<span class="hljs-punctuation">}</span></code></pre><h3>Solution</h3><p><strong>Normalized Schema</strong> (Third Normal Form):</p>
+<pre><code class="language-sql"><span class="hljs-comment">-- One row per CVE (metadata only)</span>
+<span class="hljs-keyword">CREATE TABLE</span> cisco_advisories (
+    cve_id TEXT <span class="hljs-keyword">PRIMARY KEY</span>,
+    advisory_id TEXT,
+    advisory_title TEXT,
+    ...
+);
+
+<span class="hljs-comment">-- Many rows per CVE (one per OS family + version)</span>
+<span class="hljs-keyword">CREATE TABLE</span> cisco_fixed_versions (
+    id <span class="hljs-type">INTEGER</span> <span class="hljs-keyword">PRIMARY KEY</span>,
+    cve_id TEXT <span class="hljs-keyword">NOT NULL</span>,
+    os_family TEXT <span class="hljs-keyword">NOT NULL</span>,      <span class="hljs-comment">-- &quot;ios&quot;, &quot;iosxe&quot;, &quot;iosxr&quot;, &quot;nxos&quot;</span>
+    fixed_version TEXT <span class="hljs-keyword">NOT NULL</span>,
+    <span class="hljs-keyword">FOREIGN KEY</span> (cve_id) <span class="hljs-keyword">REFERENCES</span> cisco_advisories(cve_id),
+    <span class="hljs-keyword">UNIQUE</span>(cve_id, os_family, fixed_version)
+);</code></pre><p><strong>Result</strong>: CVE-2025-20352 now has multiple preserved rows:</p>
+<pre><code class="language-">cve_id            | os_family | fixed_version
+------------------|-----------|---------------
+CVE-2025-20352    | ios       | 15.2(8)E8
+CVE-2025-20352    | ios       | 15.9(3)M11
+CVE-2025-20352    | iosxe     | 17.12.6</code></pre><h2>Implementation Details</h2><h3>Backend Changes</h3><p><strong>Migration 007</strong> (<code>app/public/scripts/migrations/007-normalize-cisco-fixed-versions.sql</code>):</p>
+<ul>
+<li>Created <code>cisco_fixed_versions</code> table with proper foreign key constraints</li>
+<li>Migrated existing data from JSON arrays to normalized rows</li>
+<li>Added unique constraint to prevent duplicate entries</li>
+</ul>
+<p><strong>Service Layer</strong> (<code>app/services/ciscoAdvisoryService.js</code> lines 665-743):</p>
+<ul>
+<li><strong>Three-step sync process</strong>:<ol>
+<li>Insert/update advisory metadata (one row per CVE)</li>
+<li>Insert fixed versions (many rows per CVE)</li>
+<li>Update flags (is_cisco_advisory, etc.)</li>
+</ol>
+</li>
+<li>Changed from <code>INSERT OR REPLACE</code> to <code>INSERT ... ON CONFLICT DO UPDATE</code></li>
+<li>Added <code>getFixedVersions(cveId, osFamily)</code> method for querying by OS family</li>
+</ul>
+<p><strong>API Endpoint</strong> (<code>app/routes/cisco.js</code> line 39-41):</p>
+<pre><code class="language-javascript"><span class="hljs-variable constant_">GET</span> /api/cisco/fixed-versions/:cveId?os_family=ios</code></pre><h3>Frontend Changes</h3><p><strong>Train Family Normalization</strong> (<code>app/public/scripts/shared/cisco-advisory-helper.js</code>):</p>
+<p>Fixed critical bug where SE-train devices matched Service Provider (S) fixes instead of Enterprise (E) fixes.</p>
+<p><strong>Train Family Mapping</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Enterprise family variants</span>
+<span class="hljs-string">&quot;E&quot;</span>   → <span class="hljs-string">&quot;E&quot;</span>
+<span class="hljs-string">&quot;EA&quot;</span>  → <span class="hljs-string">&quot;E&quot;</span>  <span class="hljs-comment">// Early Adoption</span>
+<span class="hljs-string">&quot;ED&quot;</span>  → <span class="hljs-string">&quot;E&quot;</span>  <span class="hljs-comment">// Extended Delivery</span>
+<span class="hljs-string">&quot;SE&quot;</span>  → <span class="hljs-string">&quot;E&quot;</span>  <span class="hljs-comment">// Switching Enterprise (NOT Service Provider!)</span>
+<span class="hljs-string">&quot;SG&quot;</span>  → <span class="hljs-string">&quot;E&quot;</span>  <span class="hljs-comment">// Security Gateway</span>
+
+<span class="hljs-comment">// Mainline family variants</span>
+<span class="hljs-string">&quot;M&quot;</span>   → <span class="hljs-string">&quot;M&quot;</span>
+<span class="hljs-string">&quot;MA&quot;</span>  → <span class="hljs-string">&quot;M&quot;</span>
+
+<span class="hljs-comment">// Service Provider family variants</span>
+<span class="hljs-string">&quot;S&quot;</span>   → <span class="hljs-string">&quot;S&quot;</span>  <span class="hljs-comment">// NOT &quot;SE&quot; or &quot;SG&quot;!</span>
+<span class="hljs-string">&quot;SA&quot;</span>  → <span class="hljs-string">&quot;S&quot;</span></code></pre><p><strong>Updated Methods</strong>:</p>
+<ul>
+<li><code>matchFixedVersion()</code> - Now uses train family normalization instead of first-letter matching</li>
+<li><code>normalizeTrainFamily()</code> - Maps train variants to base families</li>
+<li><code>compareVersions()</code> - Enhanced to handle both IOS train notation and IOS XE clean format</li>
+</ul>
+<h3>Version Matching Workflow</h3><p><strong>Example</strong>: Device with <code>&quot;CISCO IOS 15.2(4)SE5&quot;</code> affected by <code>CVE-2025-20352</code></p>
+<ol>
+<li><strong>Parse OS Type</strong>: <code>&quot;CISCO IOS 15.2(4)SE5&quot;</code> → OS family = <code>&quot;ios&quot;</code></li>
+<li><strong>Fetch from API</strong>: <code>GET /api/cisco/fixed-versions/CVE-2025-20352?os_family=ios</code></li>
+<li><strong>Response</strong>: <code>[&quot;15.2(8)E8&quot;, &quot;15.9(3)M11&quot;, &quot;15.1(2)SG8&quot;]</code></li>
+<li><strong>Extract Train</strong>: <code>&quot;15.2(4)SE5&quot;</code> → train = <code>&quot;SE&quot;</code></li>
+<li><strong>Normalize Train</strong>: <code>&quot;SE&quot;</code> → family = <code>&quot;E&quot;</code> (Enterprise)</li>
+<li><strong>Filter Array</strong>:<ul>
+<li><code>&quot;15.2(8)E8&quot;</code> → train=<code>&quot;E&quot;</code>, family=<code>&quot;E&quot;</code> → ✅ MATCH</li>
+<li><code>&quot;15.9(3)M11&quot;</code> → train=<code>&quot;M&quot;</code>, family=<code>&quot;M&quot;</code> → ❌ NO MATCH</li>
+<li><code>&quot;15.1(2)SG8&quot;</code> → train=<code>&quot;SG&quot;</code>, family=<code>&quot;E&quot;</code> → ✅ MATCH</li>
+</ul>
+</li>
+<li><strong>Result</strong>: <code>[&quot;15.2(8)E8&quot;, &quot;15.1(2)SG8&quot;]</code> (E-family only)</li>
+<li><strong>Return</strong>: <code>&quot;15.2(8)E8&quot;</code> (highest E-family version)</li>
+</ol>
+<h2>Files Modified</h2><h3>Backend</h3><ul>
+<li><code>app/services/ciscoAdvisoryService.js</code> (lines 665-860)<ul>
+<li>Three-step sync process</li>
+<li><code>getFixedVersions()</code> method</li>
+</ul>
+</li>
+<li><code>app/controllers/ciscoController.js</code><ul>
+<li><code>getFixedVersions()</code> endpoint handler</li>
+</ul>
+</li>
+<li><code>app/routes/cisco.js</code> (lines 39-41)<ul>
+<li>New <code>/fixed-versions/:cveId</code> route</li>
+</ul>
+</li>
+<li><code>app/public/scripts/migrations/007-normalize-cisco-fixed-versions.sql</code> (NEW)<ul>
+<li>Normalized schema migration</li>
+</ul>
+</li>
+</ul>
+<h3>Frontend</h3><ul>
+<li><code>app/public/scripts/shared/cisco-advisory-helper.js</code> (lines 199-270)<ul>
+<li><code>normalizeTrainFamily()</code> - Train family mapping</li>
+<li><code>matchFixedVersion()</code> - Updated to use train normalization</li>
+<li><code>getFixedVersion()</code> - Updated to use new API endpoint</li>
+</ul>
+</li>
+</ul>
+<h3>Documentation</h3><ul>
+<li><code>docs/CISCO_ADVISORY_ARCHITECTURE.md</code> (NEW - 600+ lines)<ul>
+<li>Complete architecture documentation</li>
+<li>Train family reference guide</li>
+<li>Common pitfalls and solutions</li>
+<li>Testing checklist</li>
+</ul>
+</li>
+</ul>
+<h2>Database Schema</h2><h3>Before (Denormalized)</h3><pre><code class="language-sql"><span class="hljs-keyword">CREATE TABLE</span> cisco_advisories (
+    cve_id TEXT <span class="hljs-keyword">PRIMARY KEY</span>,
+    first_fixed TEXT  <span class="hljs-comment">-- JSON array: [&quot;15.2(8)E8&quot;, &quot;17.12.6&quot;]</span>
+);</code></pre><p><strong>Problem</strong>: Multi-OS-family CVEs overwrite each other.</p>
+<h3>After (Normalized)</h3><pre><code class="language-sql"><span class="hljs-keyword">CREATE TABLE</span> cisco_advisories (
+    cve_id TEXT <span class="hljs-keyword">PRIMARY KEY</span>,
+    advisory_id TEXT,
+    advisory_title TEXT,
+    severity TEXT,
+    ...
+);
+
+<span class="hljs-keyword">CREATE TABLE</span> cisco_fixed_versions (
+    id <span class="hljs-type">INTEGER</span> <span class="hljs-keyword">PRIMARY KEY</span> AUTOINCREMENT,
+    cve_id TEXT <span class="hljs-keyword">NOT NULL</span>,
+    os_family TEXT <span class="hljs-keyword">NOT NULL</span>,
+    fixed_version TEXT <span class="hljs-keyword">NOT NULL</span>,
+    affected_version TEXT,
+    last_synced <span class="hljs-type">TIMESTAMP</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-built_in">CURRENT_TIMESTAMP</span>,
+    <span class="hljs-keyword">FOREIGN KEY</span> (cve_id) <span class="hljs-keyword">REFERENCES</span> cisco_advisories(cve_id) <span class="hljs-keyword">ON</span> <span class="hljs-keyword">DELETE</span> CASCADE,
+    <span class="hljs-keyword">UNIQUE</span>(cve_id, os_family, fixed_version)
+);</code></pre><p><strong>Result</strong>: No more overwrites. Each OS family&#39;s data preserved independently.</p>
+<h2>Success Criteria</h2><ul>
+<li><input checked="" disabled="" type="checkbox"> Version bumped to 1.0.79 across 5 files</li>
+<li><input checked="" disabled="" type="checkbox"> Migration 007 creates normalized table successfully</li>
+<li><input checked="" disabled="" type="checkbox"> Backend sync preserves multi-OS-family data (no overwrites)</li>
+<li><input checked="" disabled="" type="checkbox"> Frontend filters by OS family via API parameter</li>
+<li><input checked="" disabled="" type="checkbox"> Frontend filters by train family via normalization</li>
+<li><input checked="" disabled="" type="checkbox"> SE-train devices show E-family fixes (not S-family)</li>
+<li><input checked="" disabled="" type="checkbox"> IOS devices show IOS fixes (not IOS XE)</li>
+<li><input checked="" disabled="" type="checkbox"> IOS XE devices show IOS XE fixes (not IOS)</li>
+<li><input checked="" disabled="" type="checkbox"> Comprehensive architecture documentation created</li>
+</ul>
+<h2>Testing Verified</h2><h3>Test 1: Multi-OS-Family CVE</h3><ul>
+<li>✅ IOS device shows IOS fixed version</li>
+<li>✅ IOS XE device shows IOS XE fixed version</li>
+<li>✅ Data persists after re-sync (no overwrites)</li>
+</ul>
+<h3>Test 2: Multi-Train CVE (IOS only)</h3><ul>
+<li>✅ E-train device shows E-family version</li>
+<li>✅ M-train device shows M-family version</li>
+<li>✅ SE-train device shows E-family version (NOT S-family)</li>
+</ul>
+<h3>Test 3: Version Sorting</h3><ul>
+<li>✅ Highest version returned after semantic sort</li>
+<li>✅ IOS XE clean format handled correctly (<code>17.12.6</code>)</li>
+<li>✅ IOS train notation handled correctly (<code>15.2(8)E8</code>)</li>
+</ul>
+<h2>Related Issues</h2><ul>
+<li>Parent: <a href="https://linear.app/hextrackr/issue/HEX-287">HEX-287</a> - Cisco advisory data corruption</li>
+<li>Related: <a href="https://linear.app/hextrackr/issue/HEX-282">HEX-282</a> - Database corruption prevention</li>
+<li>Related: <a href="https://linear.app/hextrackr/issue/HEX-204">HEX-204</a> - Cisco advisory caching</li>
+<li>Related: <a href="https://linear.app/hextrackr/issue/HEX-141">HEX-141</a> - Cisco advisory batch optimization</li>
+</ul>
+<h2>Breaking Changes</h2><p>None. Migration automatically converts existing data to normalized schema.</p>
+<h2>Known Issues</h2><p>None.</p>
+<h2>Documentation</h2><ul>
+<li><strong>Architecture Guide</strong>: <code>docs/CISCO_ADVISORY_ARCHITECTURE.md</code></li>
+<li><strong>User Guide</strong>: <code>app/public/docs-source/guides/cisco-psirt-integration.md</code></li>
+<li><strong>Migration</strong>: <code>app/public/scripts/migrations/007-normalize-cisco-fixed-versions.sql</code></li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

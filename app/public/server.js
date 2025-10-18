@@ -55,6 +55,7 @@ const DocsController = require("../controllers/docsController");
 const AuthController = require("../controllers/authController");
 const PreferencesController = require("../controllers/preferencesController");
 const AuditLogController = require("../controllers/auditLogController"); // HEX-254: Audit log API
+const LocationController = require("../controllers/locationController"); // HEX-292: Location Cards API
 
 // Route modules
 const vulnerabilityRoutes = require("../routes/vulnerabilities");
@@ -70,6 +71,7 @@ const deviceRoutes = require("../routes/devices"); // HEX-101: Device statistics
 const authRoutes = require("../routes/auth");
 const preferencesRoutes = require("../routes/preferences"); // HEX-138: User preferences API
 const auditLogRoutes = require("../routes/auditLogs"); // HEX-254: Audit log API
+const locationRoutes = require("../routes/locations"); // HEX-292: Location Cards API
 
 // Express application & HTTP/HTTPS server
 const app = express();
@@ -193,6 +195,7 @@ async function initializeApplication() {
     AuthController.initialize(db);
     PreferencesController.initialize(db); // HEX-138: User preferences
     AuditLogController.initialize(); // HEX-254: Audit log API (uses global logger)
+    LocationController.initialize(db); // HEX-292: Location Cards API
 
     // Seed email templates (v1.0.21 feature)
     const { seedAllTemplates } = require("../utils/seedEmailTemplates");
@@ -293,6 +296,7 @@ async function initializeApplication() {
     app.use("/api/auth", authRoutes);
     app.use("/api/preferences", preferencesRoutes); // HEX-138: User preferences
     app.use("/api/audit-logs", auditLogRoutes); // HEX-254: Audit log API
+    app.use("/api/locations", locationRoutes); // HEX-292: Location Cards API
 
     // Legacy lightweight endpoints retained from monolith
     app.get("/api/sites", (req, res) => {
