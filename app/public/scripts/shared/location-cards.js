@@ -45,23 +45,86 @@ class LocationCardsManager {
     /**
      * Setup search bar event listener for location cards
      * Filters by location name and network address
+     *
+     * IMPORTANT: Does NOT clone search input to preserve other views' listeners
+     * Instead, applies current search value immediately and lets existing listener handle changes
      */
     setupSearchListener() {
         const searchInput = document.getElementById('searchInput');
         if (searchInput) {
-            // Remove any existing listeners to avoid duplicates
-            const newSearchInput = searchInput.cloneNode(true);
-            searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+            // Get current search value
+            const currentValue = searchInput.value || '';
 
-            // Add new listener for location cards
-            newSearchInput.addEventListener('input', (e) => {
-                this.applySearchFilter(e.target.value);
-            });
+            // Apply current search value immediately if present
+            // The global search listener (vulnerability-search.js) will handle future changes
+            if (currentValue.trim()) {
+                this.applySearchFilter(currentValue);
+                logger.debug('search', 'Applied existing search term to location cards', { searchTerm: currentValue });
+            }
 
-            logger.debug('search', 'Location cards search listener attached');
+            logger.debug('search', 'Location cards search initialized with current value');
         } else {
             logger.warn('search', 'Search input not found - search functionality unavailable');
         }
+    }
+
+    /**
+     * Apply location dropdown filter to location cards
+     * Filters by exact location match (normalized to lowercase)
+     * @param {string} selectedLocation - Selected location from dropdown (lowercase)
+     */
+    applyLocationFilter(selectedLocation) {
+        // Get current search term to combine filters
+        const searchInput = document.getElementById('searchInput');
+        const searchTerm = searchInput ? searchInput.value : '';
+
+        // Start with all locations
+        let filtered = [...this.locationData];
+
+        // Apply location filter if selected
+        if (selectedLocation && selectedLocation.trim() !== '') {
+            // Match against display name (case-insensitive) - what user sees in dropdown
+            const selectedDisplayName = selectedLocation.toUpperCase().trim();
+            logger.debug('location-filter', 'Applying location filter', {
+                selectedLocation,
+                selectedDisplayName,
+                totalLocations: this.locationData.length
+            });
+            filtered = filtered.filter(location => {
+                // Compare against location_display (uppercase) or fallback to uppercase location
+                const displayName = (location.location_display || location.location || '').toUpperCase();
+                const matches = displayName === selectedDisplayName;
+                if (matches) {
+                    logger.debug('location-filter', 'Location matched', {
+                        displayName,
+                        selectedDisplayName
+                    });
+                }
+                return matches;
+            });
+            logger.debug('location-filter', 'Location filter applied', {
+                matchedCount: filtered.length
+            });
+        }
+
+        // Apply search filter on top of location filter
+        if (searchTerm && searchTerm.trim() !== '') {
+            const term = searchTerm.toLowerCase().trim();
+            filtered = filtered.filter(location => {
+                const locationMatch = (location.location_display || '').toLowerCase().includes(term);
+                const network = this.calculateNetwork24(location.device_ips || []);
+                const networkMatch = network.toLowerCase().includes(term);
+                const keyMatch = (location.location || '').toLowerCase().includes(term);
+                return locationMatch || networkMatch || keyMatch;
+            });
+        }
+
+        this.filteredData = filtered;
+
+        // Update pagination and re-render
+        this.pagination.setTotalItems(this.filteredData.length);
+        this.pagination.setCurrentPage(1);
+        this.render();
     }
 
     /**
@@ -70,26 +133,36 @@ class LocationCardsManager {
      * @param {string} searchTerm - Search term to filter by
      */
     applySearchFilter(searchTerm) {
-        if (!searchTerm || searchTerm.trim() === '') {
-            // No search term, show all locations
-            this.filteredData = [...this.locationData];
-        } else {
+        // Get current location filter to combine filters
+        const locationFilter = document.getElementById('locationFilter');
+        const selectedLocation = locationFilter ? locationFilter.value : '';
+
+        // Start with all locations
+        let filtered = [...this.locationData];
+
+        // Apply location filter first if selected
+        if (selectedLocation && selectedLocation.trim() !== '') {
+            // Match against display name (case-insensitive)
+            const selectedDisplayName = selectedLocation.toUpperCase().trim();
+            filtered = filtered.filter(location => {
+                const displayName = (location.location_display || location.location || '').toUpperCase();
+                return displayName === selectedDisplayName;
+            });
+        }
+
+        // Apply search filter on top of location filter
+        if (searchTerm && searchTerm.trim() !== '') {
             const term = searchTerm.toLowerCase().trim();
-
-            this.filteredData = this.locationData.filter(location => {
-                // Search by location display name
+            filtered = filtered.filter(location => {
                 const locationMatch = (location.location_display || '').toLowerCase().includes(term);
-
-                // Search by network address (calculated)
                 const network = this.calculateNetwork24(location.device_ips || []);
                 const networkMatch = network.toLowerCase().includes(term);
-
-                // Search by raw location key
                 const keyMatch = (location.location || '').toLowerCase().includes(term);
-
                 return locationMatch || networkMatch || keyMatch;
             });
         }
+
+        this.filteredData = filtered;
 
         // Update pagination and re-render
         this.pagination.setTotalItems(this.filteredData.length);

@@ -96,18 +96,42 @@ class HostnameParserService {
 
         for (const patternDef of patterns) {
             const pattern = patternDef.pattern.toLowerCase();
-            const index = hostname.indexOf(pattern);
+            let index = -1;
+            let matchedPattern = null;
+
+            // Try regex matching first (for patterns with special chars like \d+)
+            if (pattern.includes("\\")) {
+                try {
+                    const regex = new RegExp(pattern, "i");
+                    const match = hostname.match(regex);
+                    if (match) {
+                        index = match.index;
+                        matchedPattern = match[0];
+                    }
+                } catch (e) {
+                    // If regex fails, fall back to literal string matching
+                    index = hostname.indexOf(pattern);
+                    matchedPattern = pattern;
+                }
+            } else {
+                // Simple literal string matching
+                index = hostname.indexOf(pattern);
+                matchedPattern = pattern;
+            }
 
             if (index > 0) {
                 // Found device type pattern!
                 const location = hostname.substring(0, index);
-                
+
                 // Try to find site code mapping
                 const siteCodeMapping = this.findSiteCodeForLocation(location);
 
+                // Normalize location (wtuls → wtulsa, etc.)
+                const normalizedLocation = this.normalizeLocation(location);
+
                 return {
                     hostname: hostname,
-                    location: location,
+                    location: normalizedLocation,  // Use normalized location
                     site_code: siteCodeMapping ? siteCodeMapping.site_code : this.deriveSiteCode(location),
                     device_type: patternDef.type || null,
                     parsing_method: "regex_pattern",
@@ -337,6 +361,37 @@ class HostnameParserService {
      */
     getSiteCodeMappings() {
         return this.config.siteCodeMappings?.mappings || [];
+    }
+
+    /**
+     * Normalize a location string to its canonical form
+     *
+     * Handles variations and aliases to return the standard location name.
+     * Examples:
+     * - "wtuls" → "wtulsa" (alias match)
+     * - "wtulsa" → "wtulsa" (exact match)
+     * - "strou" → "stroud" (alias match)
+     *
+     * @param {string} location - Raw location string extracted from hostname
+     * @returns {string} - Normalized canonical location, or original if no mapping found
+     */
+    normalizeLocation(location) {
+        if (!location || typeof location !== "string") {
+            return location;
+        }
+
+        const lower = location.toLowerCase().trim();
+
+        // Try to find a site code mapping for this location
+        const mapping = this.findSiteCodeForLocation(lower);
+
+        if (mapping && mapping.location) {
+            // Return the canonical location from the mapping
+            return mapping.location.toLowerCase();
+        }
+
+        // No mapping found - return original location as-is
+        return lower;
     }
 
     /**
