@@ -16,7 +16,8 @@
  */
 class LocationCardsManager {
     constructor() {
-        this.sortBy = 'vpr'; // vpr, device_count, location_name
+        // Default to KEV Priority (matches device/vulnerability cards)
+        this.sortBy = 'kev_device_count';
         this.sortOrder = 'desc';
         this.locationData = [];
         this.filteredData = [];
@@ -34,7 +35,72 @@ class LocationCardsManager {
         this.filteredData = [...this.locationData];
         this.pagination.setTotalItems(this.filteredData.length);
         this.pagination.setCurrentPage(1);
+
+        // Wire up search bar event listener
+        this.setupSearchListener();
+
         this.render();
+    }
+
+    /**
+     * Setup search bar event listener for location cards
+     * Filters by location name and network address
+     */
+    setupSearchListener() {
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            // Remove any existing listeners to avoid duplicates
+            const newSearchInput = searchInput.cloneNode(true);
+            searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+
+            // Add new listener for location cards
+            newSearchInput.addEventListener('input', (e) => {
+                this.applySearchFilter(e.target.value);
+            });
+
+            logger.debug('search', 'Location cards search listener attached');
+        } else {
+            logger.warn('search', 'Search input not found - search functionality unavailable');
+        }
+    }
+
+    /**
+     * Apply search filter to location cards
+     * Searches location name, location key, and network address
+     * @param {string} searchTerm - Search term to filter by
+     */
+    applySearchFilter(searchTerm) {
+        if (!searchTerm || searchTerm.trim() === '') {
+            // No search term, show all locations
+            this.filteredData = [...this.locationData];
+        } else {
+            const term = searchTerm.toLowerCase().trim();
+
+            this.filteredData = this.locationData.filter(location => {
+                // Search by location display name
+                const locationMatch = (location.location_display || '').toLowerCase().includes(term);
+
+                // Search by network address (calculated)
+                const network = this.calculateNetwork24(location.device_ips || []);
+                const networkMatch = network.toLowerCase().includes(term);
+
+                // Search by raw location key
+                const keyMatch = (location.location || '').toLowerCase().includes(term);
+
+                return locationMatch || networkMatch || keyMatch;
+            });
+        }
+
+        // Update pagination and re-render
+        this.pagination.setTotalItems(this.filteredData.length);
+        this.pagination.setCurrentPage(1);
+        this.render();
+
+        logger.debug('search', 'Location cards filtered', {
+            searchTerm,
+            totalLocations: this.locationData.length,
+            filteredLocations: this.filteredData.length
+        });
     }
 
     /**
@@ -60,11 +126,14 @@ class LocationCardsManager {
         container.innerHTML = this.generateLocationCardsHTML(paginatedLocations);
 
         // Render top controls (sort + items per page)
+        // Standardized to match device/vulnerability cards naming
         const sortOptions = [
-            { value: 'vpr', label: 'Total VPR' },
-            { value: 'device_count', label: 'Device Count' },
-            { value: 'kev_device_count', label: 'KEV Devices' },
-            { value: 'location_name', label: 'Location Name' }
+            { value: 'kev_device_count', label: 'KEV Priority' },
+            { value: 'vpr', label: 'VPR Priority' },
+            { value: 'location_name_asc', label: 'Name A-Z' },
+            { value: 'location_name_desc', label: 'Name Z-A' },
+            { value: 'device_count', label: 'Device Count (High-Low)' },
+            { value: 'device_count_low', label: 'Device Count (Low-High)' }
         ];
 
         this.pagination.renderTopControls(
@@ -90,37 +159,59 @@ class LocationCardsManager {
 
     /**
      * Sort location data based on current sort settings
+     * Standardized to match device/vulnerability cards naming
      */
     sortData() {
         this.filteredData.sort((a, b) => {
             let aVal, bVal;
+            let isString = false;
 
             switch (this.sortBy) {
-                case 'vpr':
-                    aVal = a.total_vpr || 0;
-                    bVal = b.total_vpr || 0;
-                    break;
-                case 'device_count':
-                    aVal = a.device_count || 0;
-                    bVal = b.device_count || 0;
-                    break;
                 case 'kev_device_count':
+                    // KEV Priority: KEV device count (high→low)
                     aVal = (a.kev_devices || []).length;
                     bVal = (b.kev_devices || []).length;
-                    break;
-                case 'location_name':
-                    aVal = (a.location_display || '').toLowerCase();
-                    bVal = (b.location_display || '').toLowerCase();
-                    break;
-                default:
+                    // Descending (high first)
+                    return bVal - aVal;
+
+                case 'vpr':
+                    // VPR Priority: Total VPR (high→low)
                     aVal = a.total_vpr || 0;
                     bVal = b.total_vpr || 0;
-            }
+                    // Descending (high first)
+                    return bVal - aVal;
 
-            if (this.sortOrder === 'asc') {
-                return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
-            } else {
-                return aVal < bVal ? 1 : aVal > bVal ? -1 : 0;
+                case 'location_name_asc':
+                    // Name A-Z
+                    aVal = (a.location_display || '').toLowerCase();
+                    bVal = (b.location_display || '').toLowerCase();
+                    return aVal.localeCompare(bVal);
+
+                case 'location_name_desc':
+                    // Name Z-A
+                    aVal = (a.location_display || '').toLowerCase();
+                    bVal = (b.location_display || '').toLowerCase();
+                    return bVal.localeCompare(aVal);
+
+                case 'device_count':
+                    // Device Count (High-Low)
+                    aVal = a.device_count || 0;
+                    bVal = b.device_count || 0;
+                    // Descending (high first)
+                    return bVal - aVal;
+
+                case 'device_count_low':
+                    // Device Count (Low-High)
+                    aVal = a.device_count || 0;
+                    bVal = b.device_count || 0;
+                    // Ascending (low first)
+                    return aVal - bVal;
+
+                default:
+                    // Default to KEV Priority
+                    aVal = (a.kev_devices || []).length;
+                    bVal = (b.kev_devices || []).length;
+                    return bVal - aVal;
             }
         });
     }
@@ -386,16 +477,12 @@ class LocationCardsManager {
 
     /**
      * Change sort order
-     * @param {string} sortBy - Sort field (vpr, device_count, location_name)
+     * @param {string} sortBy - Sort field (kev_device_count, vpr, location_name_asc, location_name_desc, device_count, device_count_low)
      */
     changeSort(sortBy) {
         this.sortBy = sortBy;
-        // Auto-determine sort order based on field
-        if (sortBy === 'location_name') {
-            this.sortOrder = 'asc'; // A-Z for names
-        } else {
-            this.sortOrder = 'desc'; // Highest first for numbers
-        }
+        // Sort order is now encoded in the sort value itself (e.g., location_name_asc vs location_name_desc)
+        // No need to set this.sortOrder separately
         this.pagination.setCurrentPage(1);
         this.render();
     }
