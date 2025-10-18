@@ -79,6 +79,7 @@ class LocationService {
         try {
             // Query all current vulnerabilities with hostname and vendor info
             // Join with kev_status to determine KEV presence (pattern from vulnerabilityService.js:128-150)
+            // CRITICAL: Filter by lifecycle_state to show only active vulnerabilities (not resolved/historical)
             const query = `
                 SELECT
                     v.hostname,
@@ -92,6 +93,7 @@ class LocationService {
                 LEFT JOIN kev_status k ON v.cve = k.cve_id
                 WHERE v.hostname IS NOT NULL
                   AND v.hostname != ''
+                  AND v.lifecycle_state IN ('active', 'reopened')
                 ORDER BY v.hostname
             `;
 

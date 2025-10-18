@@ -434,7 +434,11 @@
 }
 
 .vendor-filter {
-    min-width: 120px;
+    min-width: 140px;
+}
+
+.location-filter {
+    min-width: 140px;
 }
 
 /* Search bar card should have no margin-top for symmetric spacing */
