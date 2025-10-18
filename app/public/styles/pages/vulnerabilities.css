@@ -711,3 +711,50 @@ button.back-to-top .icon {
     width: 24px !important;
     height: 24px !important;
 }
+
+/* ===========================
+   Vendor Mini-Cards - Location Cards
+   =========================== */
+.device-card .vendor-mini-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    padding: 0.75rem 0;
+}
+
+.device-card .vendor-mini-card {
+    background: var(--tblr-bg-surface);
+    border: 1px solid var(--tblr-border-color);
+    border-radius: var(--tblr-border-radius);
+    padding: 0.75rem 0.5rem;
+    text-align: center;
+    transition: all 0.2s ease;
+    min-height: 4rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
+.device-card .vendor-mini-card:hover {
+    border-color: var(--hextrackr-primary);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgb(32, 107, 196, 0.15);
+}
+
+.device-card .vendor-mini-card .vendor-label {
+    font-size: 0.75rem;
+    color: var(--tblr-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.device-card .vendor-mini-card .vendor-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.device-card .vendor-mini-card .vendor-count {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
