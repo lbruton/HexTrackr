@@ -86,6 +86,7 @@ class LocationService {
                     v.severity,
                     v.vpr_score,
                     v.cve,
+                    v.ip_address,
                     CASE WHEN k.cve_id IS NOT NULL THEN 'Yes' ELSE 'No' END as isKev
                 FROM vulnerabilities_current v
                 LEFT JOIN kev_status k ON v.cve = k.cve_id
@@ -125,6 +126,8 @@ class LocationService {
                         location: location,
                         location_display: location.toUpperCase(),
                         hostnames: new Set(),
+                        device_ips: [],
+                        kev_devices: new Map(), // Map of hostname -> Set of KEV CVEs
                         vendor_devices: {
                             CISCO: new Set(),
                             "Palo Alto": new Set(),
@@ -148,6 +151,11 @@ class LocationService {
                 // Track unique hostnames (for device count)
                 locationData.hostnames.add(vuln.hostname);
 
+                // Track device IP addresses
+                if (vuln.ip_address && !locationData.device_ips.includes(vuln.ip_address)) {
+                    locationData.device_ips.push(vuln.ip_address);
+                }
+
                 // Track vendor-specific device counts
                 locationData.vendor_devices[vendor].add(vuln.hostname);
 
@@ -162,9 +170,15 @@ class LocationService {
                     locationData.severity_breakdown[severity].vpr += vprScore;
                 }
 
-                // Track KEV vulnerabilities
+                // Track KEV vulnerabilities and devices
                 if (vuln.isKev === "Yes" && vuln.cve) {
                     locationData.kev_cves.add(vuln.cve);
+
+                    // Track which devices have KEV vulnerabilities
+                    if (!locationData.kev_devices.has(vuln.hostname)) {
+                        locationData.kev_devices.set(vuln.hostname, new Set());
+                    }
+                    locationData.kev_devices.get(vuln.hostname).add(vuln.cve);
                 }
 
                 // Accumulate confidence scores for averaging
@@ -192,10 +206,19 @@ class LocationService {
                     ? loc.confidence_sum / loc.confidence_count
                     : 0.5;
 
+                // Convert KEV devices Map to array of objects for frontend
+                const kev_devices = Array.from(loc.kev_devices.entries()).map(([hostname, cves]) => ({
+                    hostname,
+                    cves: Array.from(cves),
+                    cve_count: cves.size
+                }));
+
                 return {
                     location: loc.location,
                     location_display: loc.location_display,
                     device_count: loc.hostnames.size,
+                    device_ips: loc.device_ips,
+                    kev_devices: kev_devices,
                     primary_vendor: primary_vendor,
                     vendor_breakdown: vendor_breakdown,
                     total_vpr: Math.round(loc.total_vpr * 10) / 10, // Round to 1 decimal
@@ -238,7 +261,7 @@ class LocationService {
                     LOWER(location) as location,
                     COUNT(*) as ticket_count
                 FROM tickets
-                WHERE state IN ('Open', 'In Progress', 'Pending')
+                WHERE status IN ('Open', 'In Progress', 'Pending')
                   AND location IS NOT NULL
                   AND location != ''
                 GROUP BY LOWER(location)
