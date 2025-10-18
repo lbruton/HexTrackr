@@ -109,17 +109,17 @@ class CiscoController {
                 });
             }
 
-            // Use caching for advisory lookups (5 minute server TTL, 1 minute browser TTL)
-            // Advisory data is static (syncs every 24 hours), so 5-minute cache is conservative
-            // Note: 404s (null responses) are also cached to reduce database load
-            const cacheKey = `cisco-advisory:${cveId}`;
-            await cacheService.withCaching(res, "stats", cacheKey, 300, async () => {
-                const advisoryData = await this.ciscoAdvisoryService.getCiscoAdvisory(cveId);
+            // HEX-282: Query database directly - no cache needed
+            // Database IS the cache - advisory data is persisted from sync operations
+            // Frontend has 5-minute cache (cisco-advisory-helper.js) to reduce requests
+            const advisoryData = await this.ciscoAdvisoryService.getCiscoAdvisory(cveId);
 
-                // Return null for 404s (frontend handles this gracefully)
-                // Both null and valid data are cached for 5 minutes
-                return advisoryData || null;
-            }, 60);
+            // Set browser cache header (60 seconds) for moderate caching
+            // This allows updates to appear quickly after sync operations
+            res.setHeader("Cache-Control", "public, max-age=60, must-revalidate");
+
+            // Return null for 404s (frontend handles this gracefully)
+            return res.json(advisoryData || null);
 
         } catch (error) {
             console.error(` Failed to get Cisco advisory for CVE ${req.params.cveId}:`, error);

@@ -35,6 +35,67 @@ These rules are mandatory and must be followed every session:
 
 ---
 
+## ⚠️ CRITICAL: DATABASE CORRUPTION PREVENTION (HEX-280, HEX-282)
+
+**NEVER BIND MOUNT THE DATABASE FROM macOS FILESYSTEM**
+
+**The Problem:**
+- macOS fcntl locking is incompatible with SQLite WAL mode
+- Bind mounting `./app/data` from macOS WILL corrupt the database on every Docker restart
+- This causes: data loss, Cisco advisory disappearance, ticket save failures, soft delete failures
+
+**The Solution:**
+- Database MUST live in Docker named volume: `hextrackr-database:/app/data`
+- The bind mount `./app:/app/app` MUST exclude `/app/app/data` (line 17 of docker-compose.yml)
+- DATABASE_PATH environment variable MUST be `/app/data/hextrackr.db` (absolute path inside container)
+- server.js MUST use `process.env.DATABASE_PATH` NOT hardcoded paths (line 169)
+
+**Docker Volume Configuration (docker-compose.yml):**
+```yaml
+volumes:
+  - ./app:/app/app                    # App code (hot reload)
+  - /app/node_modules                 # Exclude node_modules
+  - /app/app/data                     # CRITICAL: Exclude database directory
+  - hextrackr-database:/app/data      # Named volume for database (SAFE)
+```
+
+**Environment Variable (.env):**
+```bash
+DATABASE_PATH=/app/data/hextrackr.db  # Absolute path to named volume
+```
+
+**Server Initialization (server.js line 169):**
+```javascript
+const dbPath = process.env.DATABASE_PATH
+    ? path.resolve(process.env.DATABASE_PATH)
+    : path.join(__dirname, "..", "data", "hextrackr.db");
+```
+
+**If You Break This Rule:**
+- Database corruption on every Docker restart
+- Cisco/Palo advisory data disappears
+- Tickets fail to save/edit
+- Soft deletes stop working
+- WAL file corruption
+- Users will be very angry
+
+**Verification Commands:**
+```bash
+# Check database path is correct
+docker-compose logs hextrackr | grep "DATABASE"
+# Should show: [DATABASE] Using database path: /app/data/hextrackr.db
+
+# Verify database is in named volume (NOT bind mount)
+docker exec hextrackr-app ls -lah /app/data/
+# Should show: hextrackr.db (owned by root/app user)
+
+# Verify bind mount is excluded
+docker exec hextrackr-app ls -lah /app/app/data/ 2>&1
+# Should show: "No such file or directory" (GOOD - excluded from bind mount)
+```
+
+---
+
 ## Reference Conventions
 
 **HEX-XXX Issue Numbers** (Internal Use Only):

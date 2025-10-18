@@ -12,6 +12,9 @@ services:
       - ./app:/app/app
       # Exclude node_modules to use container's version
       - /app/node_modules
+      # CRITICAL: Exclude app/data directory - NEVER bind mount database files from macOS
+      # macOS fcntl locking WILL corrupt SQLite databases on Docker restart
+      - /app/app/data
       # Mount config directory for import patterns (HEX-241)
       - ./config:/app/config:ro
       # HEX-280: Database uses named volume (isolated from macOS filesystem)

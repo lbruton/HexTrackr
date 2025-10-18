@@ -69,8 +69,11 @@ class BackupService {
                     const ticketCount = ticketRow.tickets;
 
                     // Get database file size
+                    // HEX-280: Use DATABASE_PATH environment variable (same pattern as server.js:169-171)
                     try {
-                        const dbPath = path.join(__dirname, "..", "data", "hextrackr.db");
+                        const dbPath = process.env.DATABASE_PATH
+                            ? path.resolve(process.env.DATABASE_PATH)
+                            : path.join(__dirname, "..", "data", "hextrackr.db");
                         const dbSize = PathValidator.safeStatSync(dbPath).size;
 
                         resolve({
@@ -270,9 +273,8 @@ class BackupService {
             if (type === "all") {
                 // Clear all tables in parallel (no foreign key dependencies between these groups)
                 // SECURITY: Preserves users, user_preferences, sessions (authentication)
+                // HEX-270: Preserves cisco_advisories, palo_alto_advisories (not in backups, managed by sync services)
                 const clearPromises = [
-                    new Promise((res, rej) => this.db.run("DELETE FROM cisco_advisories", err => err ? rej(err) : res())),
-                    new Promise((res, rej) => this.db.run("DELETE FROM palo_alto_advisories", err => err ? rej(err) : res())),
                     new Promise((res, rej) => this.db.run("DELETE FROM vulnerability_imports", err => err ? rej(err) : res())),
                     new Promise((res, rej) => this.db.run("DELETE FROM kev_status", err => err ? rej(err) : res())),
                     new Promise((res, rej) => this.db.run("DELETE FROM ticket_templates", err => err ? rej(err) : res())),
@@ -287,59 +289,48 @@ class BackupService {
 
                 Promise.all(clearPromises)
                     .then(() => resolve({
-                        message: "All data cleared successfully (authentication preserved)",
+                        message: "All data cleared successfully (authentication and vendor advisories preserved)",
                         clearedCount: "all"
                     }))
                     .catch(err => reject(new Error("Failed to clear all data: " + err.message)));
 
             } else if (type === "vulnerabilities") {
                 // Clear vulnerability tables in dependency order (cascade deletes)
-                this.db.run("DELETE FROM cisco_advisories", (ciscoErr) => {
-                    if (ciscoErr) {
-                        return reject(new Error("Failed to clear Cisco advisories"));
+                // HEX-270: Preserve cisco_advisories, palo_alto_advisories (not in backups, managed by sync services)
+                this.db.run("DELETE FROM vulnerability_imports", (importErr) => {
+                    if (importErr) {
+                        return reject(new Error("Failed to clear vulnerability imports"));
                     }
 
-                    this.db.run("DELETE FROM palo_alto_advisories", (paloErr) => {
-                        if (paloErr) {
-                            return reject(new Error("Failed to clear Palo Alto advisories"));
+                    this.db.run("DELETE FROM kev_status", (kevErr) => {
+                        if (kevErr) {
+                            return reject(new Error("Failed to clear KEV status"));
                         }
 
-                        this.db.run("DELETE FROM vulnerability_imports", (importErr) => {
-                            if (importErr) {
-                                return reject(new Error("Failed to clear vulnerability imports"));
+                        // Then clear core vulnerability tables
+                        this.db.run("DELETE FROM vulnerability_snapshots", (snapErr) => {
+                            if (snapErr) {
+                                return reject(new Error("Failed to clear vulnerability snapshots"));
                             }
 
-                            this.db.run("DELETE FROM kev_status", (kevErr) => {
-                                if (kevErr) {
-                                    return reject(new Error("Failed to clear KEV status"));
+                            this.db.run("DELETE FROM vulnerabilities_current", (currentErr) => {
+                                if (currentErr) {
+                                    return reject(new Error("Failed to clear current vulnerabilities"));
                                 }
 
-                                // Then clear core vulnerability tables
-                                this.db.run("DELETE FROM vulnerability_snapshots", (snapErr) => {
-                                    if (snapErr) {
-                                        return reject(new Error("Failed to clear vulnerability snapshots"));
+                                this.db.run("DELETE FROM vulnerability_daily_totals", (dailyErr) => {
+                                    if (dailyErr) {
+                                        return reject(new Error("Failed to clear daily totals"));
                                     }
 
-                                    this.db.run("DELETE FROM vulnerabilities_current", (currentErr) => {
-                                        if (currentErr) {
-                                            return reject(new Error("Failed to clear current vulnerabilities"));
+                                    this.db.run("DELETE FROM vendor_daily_totals", (vendorErr) => {
+                                        if (vendorErr) {
+                                            return reject(new Error("Failed to clear vendor daily totals"));
                                         }
 
-                                        this.db.run("DELETE FROM vulnerability_daily_totals", (dailyErr) => {
-                                            if (dailyErr) {
-                                                return reject(new Error("Failed to clear daily totals"));
-                                            }
-
-                                            this.db.run("DELETE FROM vendor_daily_totals", (vendorErr) => {
-                                                if (vendorErr) {
-                                                    return reject(new Error("Failed to clear vendor daily totals"));
-                                                }
-
-                                                resolve({
-                                                    message: "Vulnerability data cleared successfully (including advisories)",
-                                                    clearedCount: "vulnerabilities"
-                                                });
-                                            });
+                                        resolve({
+                                            message: "Vulnerability data cleared successfully (vendor advisories preserved)",
+                                            clearedCount: "vulnerabilities"
                                         });
                                     });
                                 });
@@ -419,8 +410,9 @@ class BackupService {
                             await this._executeQuery("DELETE FROM tickets");
                         }
 
-                        // Insert tickets data
+                        // Insert tickets data (HEX-270: preserve ALL columns including soft-delete metadata)
                         const ticketValues = ticketsArray.map(ticket => [
+                            ticket.id || null,  // CRITICAL: Preserve ticket ID to prevent NULL corruption
                             ticket.xt_number || "",
                             ticket.date_submitted || "",
                             ticket.date_due || "",
@@ -430,18 +422,52 @@ class BackupService {
                             ticket.devices || "",
                             ticket.supervisor || "",
                             ticket.tech || "",
-                            ticket.status || "",
+                            ticket.status || "Open",
                             ticket.notes || "",
+                            ticket.attachments || null,
                             ticket.created_at || new Date().toISOString(),
-                            ticket.updated_at || new Date().toISOString()
+                            ticket.updated_at || new Date().toISOString(),
+                            ticket.site || "",
+                            ticket.site_id || "",
+                            ticket.location_id || "",
+                            ticket.deleted || 0,  // CRITICAL: Preserve soft-delete state
+                            ticket.deleted_at || null,
+                            ticket.job_type || "Upgrade",
+                            ticket.tracking_number || "",
+                            ticket.software_versions || "",
+                            ticket.mitigation_details || "",
+                            ticket.shipping_line1 || "",
+                            ticket.shipping_line2 || "",
+                            ticket.shipping_city || "",
+                            ticket.shipping_state || "",
+                            ticket.shipping_zip || "",
+                            ticket.return_line1 || "",
+                            ticket.return_line2 || "",
+                            ticket.return_city || "",
+                            ticket.return_state || "",
+                            ticket.return_zip || "",
+                            ticket.outbound_tracking || "",
+                            ticket.return_tracking || "",
+                            ticket.deletion_reason || "",
+                            ticket.deleted_by || "",
+                            ticket.site_address || "",
+                            ticket.return_address || "",
+                            ticket.installed_versions || "",
+                            ticket.device_status || ""
                         ]);
 
                         for (const values of ticketValues) {
+                            // Use INSERT OR IGNORE to skip duplicates (HEX-270)
                             await this._executeQuery(`
-                                INSERT INTO tickets
-                                (xt_number, date_submitted, date_due, hexagon_ticket, service_now_ticket,
-                                location, devices, supervisor, tech, status, notes, created_at, updated_at)
-                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                INSERT OR IGNORE INTO tickets
+                                (id, xt_number, date_submitted, date_due, hexagon_ticket, service_now_ticket,
+                                location, devices, supervisor, tech, status, notes, attachments, created_at, updated_at,
+                                site, site_id, location_id, deleted, deleted_at, job_type, tracking_number,
+                                software_versions, mitigation_details, shipping_line1, shipping_line2, shipping_city,
+                                shipping_state, shipping_zip, return_line1, return_line2, return_city, return_state,
+                                return_zip, outbound_tracking, return_tracking, deletion_reason, deleted_by,
+                                site_address, return_address, installed_versions, device_status)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                             `, values);
                             restoredCount++;
                         }
