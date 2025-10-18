@@ -652,6 +652,22 @@ function startAutomatedBackups(db) {
     const backupService = new BackupService();
     backupService.initialize(db);
 
+    // HEX-283/284: Run cleanup on startup to enforce retention policy
+    // Manual backups created before Docker restart won't be cleaned until this runs
+    setTimeout(async () => {
+        try {
+            console.log("Running startup backup cleanup...");
+            const cleanupResult = await backupService.cleanupOldBackups();
+            if (cleanupResult.deleted > 0) {
+                console.log(` Startup cleanup: ${cleanupResult.deleted} old backups deleted, ${cleanupResult.freed_mb}MB freed`);
+            } else {
+                console.log(" Startup cleanup: No old backups to delete");
+            }
+        } catch (error) {
+            console.warn("Startup backup cleanup failed:", error.message);
+        }
+    }, 5000); // Run 5 seconds after startup
+
     // Initialize preference with default value if it doesn't exist
     preferencesService.getPreference(ADMIN_USER_ID, "automated_backups_enabled")
         .then(result => {
