@@ -78,18 +78,20 @@ class LocationService {
     async getLocationStats() {
         try {
             // Query all current vulnerabilities with hostname and vendor info
+            // Join with kev_status to determine KEV presence (pattern from vulnerabilityService.js:128-150)
             const query = `
                 SELECT
-                    hostname,
-                    vendor,
-                    severity,
-                    vpr_score,
-                    cve,
-                    isKev
-                FROM vulnerabilities_current
-                WHERE hostname IS NOT NULL
-                  AND hostname != ''
-                ORDER BY hostname
+                    v.hostname,
+                    v.vendor,
+                    v.severity,
+                    v.vpr_score,
+                    v.cve,
+                    CASE WHEN k.cve_id IS NOT NULL THEN 'Yes' ELSE 'No' END as isKev
+                FROM vulnerabilities_current v
+                LEFT JOIN kev_status k ON v.cve = k.cve_id
+                WHERE v.hostname IS NOT NULL
+                  AND v.hostname != ''
+                ORDER BY v.hostname
             `;
 
             const vulnerabilities = await this._queryDatabase(query);
