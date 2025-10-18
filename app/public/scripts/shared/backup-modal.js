@@ -246,26 +246,24 @@ class BackupModalManager {
                              style="cursor: pointer;"
                              onclick="window.backupModalManager.selectBackup('${backupType}', '${backup.filename}')"
                              id="backup-item-${backup.filename.replace(/[^a-zA-Z0-9]/g, '-')}">
-                            <div class="row align-items-center">
-                                <div class="col-auto">
+                            <div class="row align-items-center g-2">
+                                <div class="col-auto d-flex align-items-center">
                                     <input type="radio" name="selected-${backupType}-backup"
                                            class="form-check-input"
                                            value="${backup.filename}"
                                            onclick="event.stopPropagation();">
                                 </div>
-                                <div class="col">
-                                    <div class="d-flex align-items-center">
-                                        <div>
-                                            <strong>${backup.filename}</strong>${sourceBadge}
-                                            <div class="text-muted small mt-1">
-                                                <i class="fas fa-clock me-1"></i>${formattedDate} •
-                                                <i class="fas fa-hdd me-1"></i>${backup.size_mb} MB •
-                                                ${backup.age_days} days ago
-                                            </div>
+                                <div class="col d-flex align-items-center">
+                                    <div>
+                                        <strong>${backup.filename}</strong>${sourceBadge}
+                                        <div class="text-muted small mt-1">
+                                            <i class="fas fa-clock me-1"></i>${formattedDate} •
+                                            <i class="fas fa-hdd me-1"></i>${backup.size_mb} MB •
+                                            ${backup.age_days} days ago
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-auto">
+                                <div class="col-auto d-flex align-items-center">
                                     <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="event.stopPropagation(); window.backupModalManager.downloadBackup('${backup.filename}')">
                                         <i class="fas fa-download me-1"></i>Download
