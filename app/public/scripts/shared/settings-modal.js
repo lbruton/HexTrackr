@@ -1563,7 +1563,7 @@ function showNotification(message, type) {
     // Fallback notification system
     // This will be replaced with proper toast notifications later
     logger.debug("ui", `${type.toUpperCase()}: ${message}`);
-    
+
     // Try to use page-specific toast if available
     if (window.showToast) {
         window.showToast(message, type);
@@ -1574,6 +1574,9 @@ function showNotification(message, type) {
         alert(`${type.toUpperCase()}: ${message}`);
     }
 }
+
+// Attach to window for global access from backup-modal.js and other modules
+window.showNotification = showNotification;
 
 // ServiceNow Integration Functions
 

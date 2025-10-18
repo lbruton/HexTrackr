@@ -712,13 +712,26 @@ class CiscoAdvisoryService {
                             matchedCount++;
                             cvesProcessedFromThisVersion++;
                         } else if (fixedVersions.length > 0) {
-                            // Even without full advisory metadata, store the fixed versions
+                            // HEX-282: Update only first_fixed and last_synced, preserve other columns if they exist
+                            // Use INSERT OR REPLACE with subquery to preserve existing columns
                             await new Promise((resolve, reject) => {
                                 this.db.run(`
                                     INSERT OR REPLACE INTO cisco_advisories (
-                                        cve_id, first_fixed, last_synced
-                                    ) VALUES (?, ?, CURRENT_TIMESTAMP)
-                                `, [cveId, JSON.stringify(fixedVersions)], (err) => {
+                                        cve_id, advisory_id, advisory_title, severity, cvss_score,
+                                        first_fixed, affected_releases, product_names, publication_url, last_synced
+                                    ) VALUES (
+                                        ?,
+                                        COALESCE((SELECT advisory_id FROM cisco_advisories WHERE cve_id = ?), NULL),
+                                        COALESCE((SELECT advisory_title FROM cisco_advisories WHERE cve_id = ?), NULL),
+                                        COALESCE((SELECT severity FROM cisco_advisories WHERE cve_id = ?), NULL),
+                                        COALESCE((SELECT cvss_score FROM cisco_advisories WHERE cve_id = ?), NULL),
+                                        ?,
+                                        COALESCE((SELECT affected_releases FROM cisco_advisories WHERE cve_id = ?), NULL),
+                                        COALESCE((SELECT product_names FROM cisco_advisories WHERE cve_id = ?), NULL),
+                                        COALESCE((SELECT publication_url FROM cisco_advisories WHERE cve_id = ?), NULL),
+                                        CURRENT_TIMESTAMP
+                                    )
+                                `, [cveId, cveId, cveId, cveId, cveId, JSON.stringify(fixedVersions), cveId, cveId, cveId], (err) => {
                                     if (err) {
                                         _log('error', ` Insert failed for ${cveId}:`, err);
                                         reject(err);
@@ -905,18 +918,26 @@ class CiscoAdvisoryService {
      * @returns {Promise<void>}
      */
     async updateSyncMetadata(recordCount) {
-        await new Promise((resolve, reject) => {
-            this.db.run(`
-                INSERT INTO sync_metadata (sync_type, sync_time, version, record_count)
-                VALUES ('cisco', ?, NULL, ?)
-            `, [this.lastSyncTime, recordCount], (err) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve();
-                }
+        _log('info', ` Updating sync metadata: ${this.lastSyncTime}, ${recordCount} records`);
+        try {
+            await new Promise((resolve, reject) => {
+                this.db.run(`
+                    INSERT INTO sync_metadata (sync_type, sync_time, version, record_count)
+                    VALUES ('cisco', ?, NULL, ?)
+                `, [this.lastSyncTime, recordCount], (err) => {
+                    if (err) {
+                        _log('error', " Sync metadata update FAILED:", err);
+                        reject(err);
+                    } else {
+                        _log('info', " Sync metadata updated successfully");
+                        resolve();
+                    }
+                });
             });
-        });
+        } catch (error) {
+            _log('error', " Exception in updateSyncMetadata:", error);
+            throw error;
+        }
     }
 
     /**

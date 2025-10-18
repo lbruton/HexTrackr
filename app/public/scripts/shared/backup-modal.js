@@ -123,7 +123,7 @@ class BackupModalManager {
 
         } catch (error) {
             logger.error('backup', 'Failed to show tickets backup modal:', error);
-            showNotification(`Failed to load backup history: ${error.message}`, 'danger');
+            window.window.showNotification(`Failed to load backup history: ${error.message}`, 'danger');
         }
     }
 
@@ -160,7 +160,7 @@ class BackupModalManager {
 
         } catch (error) {
             logger.error('backup', 'Failed to show vulnerabilities backup modal:', error);
-            showNotification(`Failed to load backup history: ${error.message}`, 'danger');
+            window.window.showNotification(`Failed to load backup history: ${error.message}`, 'danger');
         }
     }
 
@@ -197,7 +197,7 @@ class BackupModalManager {
 
         } catch (error) {
             logger.error('backup', 'Failed to show database backup modal:', error);
-            showNotification(`Failed to load backup history: ${error.message}`, 'danger');
+            window.window.showNotification(`Failed to load backup history: ${error.message}`, 'danger');
         }
     }
 
@@ -290,11 +290,11 @@ class BackupModalManager {
             // Use window.location for file download
             window.location.href = `/api/backup/download/${filename}`;
 
-            showNotification(`Downloading backup: ${filename}`, 'success');
+            window.showNotification(`Downloading backup: ${filename}`, 'success');
 
         } catch (error) {
             logger.error('backup', 'Failed to download backup:', error);
-            showNotification(`Failed to download backup: ${error.message}`, 'danger');
+            window.showNotification(`Failed to download backup: ${error.message}`, 'danger');
         }
     }
 
@@ -331,7 +331,7 @@ class BackupModalManager {
                 throw new Error(data.error || 'Backup creation failed');
             }
 
-            showNotification(`Fresh backup created successfully (${data.total_size_mb}MB)`, 'success');
+            window.showNotification(`Fresh backup created successfully (${data.total_size_mb}MB)`, 'success');
 
             // Reload the current modal
             if (type === 'tickets') {
@@ -344,7 +344,7 @@ class BackupModalManager {
 
         } catch (error) {
             logger.error('backup', 'Fresh backup failed:', error);
-            showNotification(`Failed to create backup: ${error.message}`, 'danger');
+            window.showNotification(`Failed to create backup: ${error.message}`, 'danger');
         } finally {
             if (btn) {
                 btn.disabled = false;
@@ -424,7 +424,7 @@ class BackupModalManager {
                 statusElement.className = 'mt-2 small text-success';
             }
 
-            showNotification(`${type.charAt(0).toUpperCase() + type.slice(1)} backup queued successfully`, 'success');
+            window.showNotification(`${type.charAt(0).toUpperCase() + type.slice(1)} backup queued successfully`, 'success');
 
             // Reload backup history after short delay
             setTimeout(async () => {
@@ -483,7 +483,7 @@ class BackupModalManager {
                 queueBtn.disabled = false;
             }
 
-            showNotification(`Failed to queue backup: ${error.message}`, 'danger');
+            window.showNotification(`Failed to queue backup: ${error.message}`, 'danger');
         }
     }
 
@@ -508,7 +508,7 @@ class BackupModalManager {
                     logger.info('backup', `Uploading file: ${file.name}`);
 
                     const formData = new FormData();
-                    formData.append('backup', file);
+                    formData.append('file', file);  // Must be 'file' to match multer config
                     formData.append('type', type);
                     formData.append('clearExisting', 'false'); // Don't clear by default
 
@@ -531,11 +531,11 @@ class BackupModalManager {
                         throw new Error(data.error || 'Restore failed');
                     }
 
-                    showNotification(`✅ Restored ${data.count} ${type} from backup`, 'success');
+                    window.showNotification(`✅ Restored ${data.count} ${type} from backup`, 'success');
 
                 } catch (error) {
                     logger.error('backup', 'Restore from file failed:', error);
-                    showNotification(`❌ Restore failed: ${error.message}`, 'danger');
+                    window.showNotification(`❌ Restore failed: ${error.message}`, 'danger');
                 }
             };
 
@@ -543,7 +543,7 @@ class BackupModalManager {
 
         } catch (error) {
             logger.error('backup', 'Failed to restore from file:', error);
-            showNotification(`Failed to restore from file: ${error.message}`, 'danger');
+            window.showNotification(`Failed to restore from file: ${error.message}`, 'danger');
         }
     }
 
@@ -555,7 +555,7 @@ class BackupModalManager {
         const selectedFilename = this.selectedBackup[type];
 
         if (!selectedFilename) {
-            showNotification('Please select a backup from the list first', 'warning');
+            window.showNotification('Please select a backup from the list first', 'warning');
             return;
         }
 
@@ -576,7 +576,7 @@ class BackupModalManager {
 
             // Upload it to restore endpoint
             const formData = new FormData();
-            formData.append('backup', file);
+            formData.append('file', file);  // Must be 'file' to match multer config
             formData.append('type', type);
             formData.append('clearExisting', 'false');
 
@@ -599,11 +599,11 @@ class BackupModalManager {
                 throw new Error(data.error || 'Restore failed');
             }
 
-            showNotification(`✅ Restored ${data.count} ${type} from ${selectedFilename}`, 'success');
+            window.showNotification(`✅ Restored ${data.count} ${type} from ${selectedFilename}`, 'success');
 
         } catch (error) {
             logger.error('backup', 'Restore from server failed:', error);
-            showNotification(`❌ Restore failed: ${error.message}`, 'danger');
+            window.showNotification(`❌ Restore failed: ${error.message}`, 'danger');
         }
     }
 }

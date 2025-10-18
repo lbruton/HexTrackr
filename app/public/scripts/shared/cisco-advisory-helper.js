@@ -88,15 +88,19 @@ class CiscoAdvisoryHelper {
      * @returns {number} - Negative if a > b, positive if a < b, 0 if equal
      */
     compareVersions(a, b) {
-        // Extract version components: major.minor(maintenance)train
+        // Extract version components: major.minor(maintenance[letter])TRAIN[subrelease]
+        // Examples: 15.2(7)E3, 15.2(8)E, 15.2(7b)E0b, 17.6.7
         const parseVersion = (ver) => {
-            const match = ver.match(/^(\d+)\.(\d+)\((\d+)\)([A-Z]*)/);
-            if (!match) return { major: 0, minor: 0, maint: 0, train: '' };
+            // Match: major.minor(maint[letter])TRAIN[subrelease]
+            const match = ver.match(/^(\d+)\.(\d+)\((\d+)([a-z]?)\)([A-Z]*)(.*)$/);
+            if (!match) return { major: 0, minor: 0, maint: 0, maintLetter: '', train: '', subrelease: '' };
             return {
                 major: parseInt(match[1], 10),
                 minor: parseInt(match[2], 10),
                 maint: parseInt(match[3], 10),
-                train: match[4] || ''
+                maintLetter: match[4] || '',
+                train: match[5] || '',
+                subrelease: match[6] || ''
             };
         };
 
@@ -108,8 +112,21 @@ class CiscoAdvisoryHelper {
         if (vA.minor !== vB.minor) return vB.minor - vA.minor;
         if (vA.maint !== vB.maint) return vB.maint - vA.maint;
 
+        // Compare maintenance letter (e.g., 7b vs 7)
+        if (vA.maintLetter !== vB.maintLetter) {
+            return vB.maintLetter.localeCompare(vA.maintLetter);
+        }
+
         // Train identifiers compared alphabetically (descending)
-        return vB.train.localeCompare(vA.train);
+        if (vA.train !== vB.train) {
+            return vB.train.localeCompare(vA.train);
+        }
+
+        // Compare subrelease (e.g., E3 vs E)
+        // Extract numeric portion of subrelease if present
+        const subA = parseInt(vA.subrelease, 10) || 0;
+        const subB = parseInt(vB.subrelease, 10) || 0;
+        return subB - subA;
     }
 
     /**

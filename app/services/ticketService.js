@@ -148,17 +148,19 @@ class TicketService {
 
         return new Promise((resolve, reject) => {
             const sql = `INSERT INTO tickets (
-                id, date_submitted, date_due, hexagon_ticket, service_now_ticket, location,
-                devices, supervisor, tech, status, job_type, notes, attachments,
-                created_at, updated_at, site, xt_number, site_id, location_id,
+                id, xt_number, date_submitted, date_due, hexagon_ticket, service_now_ticket, location,
+                devices, supervisor, tech, status, notes, attachments,
+                created_at, updated_at, site, site_id, location_id, deleted, deleted_at,
+                job_type, tracking_number, software_versions, mitigation_details,
                 shipping_line1, shipping_line2, shipping_city, shipping_state, shipping_zip,
                 return_line1, return_line2, return_city, return_state, return_zip,
-                outbound_tracking, return_tracking, site_address, return_address,
-                software_versions, mitigation_details
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                outbound_tracking, return_tracking, deletion_reason, deleted_by,
+                site_address, return_address, installed_versions, device_status
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
             const params = [
                 payload.id,
+                payload.xt_number,
                 payload.dateSubmitted,
                 payload.dateDue,
                 payload.hexagonTicket,
@@ -168,15 +170,19 @@ class TicketService {
                 payload.supervisor,
                 payload.tech,
                 payload.status,
-                payload.jobType || payload.job_type || "Upgrade",
                 payload.notes,
                 JSON.stringify(payload.attachments || []),
                 payload.createdAt,
                 payload.updatedAt,
                 payload.site,
-                payload.xt_number,
                 payload.site_id,
                 payload.location_id,
+                payload.deleted || 0,
+                payload.deleted_at || null,
+                payload.jobType || payload.job_type || "Upgrade",
+                payload.trackingNumber || payload.tracking_number || null,
+                payload.softwareVersions || payload.software_versions || null,
+                payload.mitigationDetails || payload.mitigation_details || null,
                 // Shipping address fields
                 payload.shippingLine1 || payload.shipping_line1 || null,
                 payload.shippingLine2 || payload.shipping_line2 || null,
@@ -192,6 +198,9 @@ class TicketService {
                 // Tracking numbers
                 payload.outboundTracking || payload.outbound_tracking || null,
                 payload.returnTracking || payload.return_tracking || null,
+                // Soft delete fields
+                payload.deletionReason || payload.deletion_reason || null,
+                payload.deletedBy || payload.deleted_by || null,
                 // Legacy formatted address fields
                 this._formatAddress(
                     payload.shippingLine1 || payload.shipping_line1,
@@ -207,9 +216,9 @@ class TicketService {
                     payload.returnState || payload.return_state,
                     payload.returnZip || payload.return_zip
                 ),
-                // Job-specific fields
-                payload.softwareVersions || payload.software_versions || null,
-                payload.mitigationDetails || payload.mitigation_details || null
+                // Additional fields
+                payload.installedVersions || payload.installed_versions || null,
+                payload.deviceStatus || payload.device_status || null
             ];
 
             this.db.run(sql, params, function(err) {
