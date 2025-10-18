@@ -663,27 +663,35 @@ class CiscoAdvisoryService {
                         };
 
                         if (parsed) {
+                            // HEX-287: Normalized schema - separate advisory metadata from fixed versions
 
-                            // Insert or replace advisory data
+                            // 1. Insert/update advisory metadata (one row per CVE)
                             await new Promise((resolve, reject) => {
                                 this.db.run(`
-                                    INSERT OR REPLACE INTO cisco_advisories (
+                                    INSERT INTO cisco_advisories (
                                         cve_id, advisory_id, advisory_title, severity, cvss_score,
                                         first_fixed, affected_releases, product_names, publication_url, last_synced
                                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                                    ON CONFLICT(cve_id) DO UPDATE SET
+                                        advisory_id = COALESCE(excluded.advisory_id, cisco_advisories.advisory_id),
+                                        advisory_title = COALESCE(excluded.advisory_title, cisco_advisories.advisory_title),
+                                        severity = COALESCE(excluded.severity, cisco_advisories.severity),
+                                        cvss_score = COALESCE(excluded.cvss_score, cisco_advisories.cvss_score),
+                                        publication_url = COALESCE(excluded.publication_url, cisco_advisories.publication_url),
+                                        last_synced = CURRENT_TIMESTAMP
                                 `, [
                                     parsed.cve_id,
                                     parsed.advisory_id,
                                     parsed.advisory_title,
                                     parsed.severity,
                                     parsed.cvss_score,
-                                    parsed.first_fixed,
+                                    parsed.first_fixed,  // Keep for backward compatibility (will remove in Migration 008)
                                     parsed.affected_releases,
                                     parsed.product_names,
                                     parsed.publication_url
                                 ], (err) => {
                                     if (err) {
-                                        _log('error', ` Insert failed for ${cveId}:`, err);
+                                        _log('error', ` Advisory insert failed for ${cveId}:`, err);
                                         reject(err);
                                     } else {
                                         resolve();
@@ -691,8 +699,29 @@ class CiscoAdvisoryService {
                                 });
                             });
 
-                            // Update vulnerabilities_current with vendor-neutral fix flag
-                            const hasFixAvailable = (advisory.firstFixed && advisory.firstFixed.length > 0) ? 1 : 0;
+                            // 2. Insert fixed versions (one row per OS family + version)
+                            const fixedVersionsArray = advisory.firstFixed || [];
+                            for (const version of fixedVersionsArray) {
+                                await new Promise((resolve, reject) => {
+                                    this.db.run(`
+                                        INSERT INTO cisco_fixed_versions (
+                                            cve_id, os_family, fixed_version, affected_version, last_synced
+                                        ) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+                                        ON CONFLICT(cve_id, os_family, fixed_version) DO UPDATE SET
+                                            last_synced = CURRENT_TIMESTAMP
+                                    `, [cveId, osInfo.osType, version, osInfo.version], (err) => {
+                                        if (err) {
+                                            _log('error', ` Fixed version insert failed for ${cveId} ${osInfo.osType} ${version}:`, err);
+                                            reject(err);
+                                        } else {
+                                            resolve();
+                                        }
+                                    });
+                                });
+                            }
+
+                            // 3. Update vulnerabilities_current with vendor-neutral fix flag
+                            const hasFixAvailable = fixedVersionsArray.length > 0 ? 1 : 0;
                             await new Promise((resolve, reject) => {
                                 this.db.run(`
                                     UPDATE vulnerabilities_current
@@ -701,39 +730,6 @@ class CiscoAdvisoryService {
                                 `, [hasFixAvailable, cveId], (err) => {
                                     if (err) {
                                         _log('error', ` Update failed for ${cveId}:`, err);
-                                        reject(err);
-                                    } else {
-                                        resolve();
-                                    }
-                                });
-                            });
-
-                            advisoryCount++;
-                            matchedCount++;
-                            cvesProcessedFromThisVersion++;
-                        } else if (fixedVersions.length > 0) {
-                            // HEX-282: Update only first_fixed and last_synced, preserve other columns if they exist
-                            // Use INSERT OR REPLACE with subquery to preserve existing columns
-                            await new Promise((resolve, reject) => {
-                                this.db.run(`
-                                    INSERT OR REPLACE INTO cisco_advisories (
-                                        cve_id, advisory_id, advisory_title, severity, cvss_score,
-                                        first_fixed, affected_releases, product_names, publication_url, last_synced
-                                    ) VALUES (
-                                        ?,
-                                        COALESCE((SELECT advisory_id FROM cisco_advisories WHERE cve_id = ?), NULL),
-                                        COALESCE((SELECT advisory_title FROM cisco_advisories WHERE cve_id = ?), NULL),
-                                        COALESCE((SELECT severity FROM cisco_advisories WHERE cve_id = ?), NULL),
-                                        COALESCE((SELECT cvss_score FROM cisco_advisories WHERE cve_id = ?), NULL),
-                                        ?,
-                                        COALESCE((SELECT affected_releases FROM cisco_advisories WHERE cve_id = ?), NULL),
-                                        COALESCE((SELECT product_names FROM cisco_advisories WHERE cve_id = ?), NULL),
-                                        COALESCE((SELECT publication_url FROM cisco_advisories WHERE cve_id = ?), NULL),
-                                        CURRENT_TIMESTAMP
-                                    )
-                                `, [cveId, cveId, cveId, cveId, cveId, JSON.stringify(fixedVersions), cveId, cveId, cveId], (err) => {
-                                    if (err) {
-                                        _log('error', ` Insert failed for ${cveId}:`, err);
                                         reject(err);
                                     } else {
                                         resolve();
@@ -825,6 +821,39 @@ class CiscoAdvisoryService {
                     reject(err);
                 } else {
                     resolve(row);
+                }
+            });
+        });
+    }
+
+    /**
+     * Get fixed versions for a specific CVE and OS family (HEX-287)
+     * @async
+     * @param {string} cveId - CVE identifier
+     * @param {string} osFamily - OS family filter (optional): "ios", "iosxe", "iosxr", "nxos", etc.
+     * @returns {Promise<Array>} Array of fixed version objects
+     */
+    async getFixedVersions(cveId, osFamily = null) {
+        if (!cveId) {
+            return [];
+        }
+
+        return await new Promise((resolve, reject) => {
+            let query = "SELECT * FROM cisco_fixed_versions WHERE cve_id = ?";
+            const params = [cveId];
+
+            if (osFamily) {
+                query += " AND os_family = ?";
+                params.push(osFamily);
+            }
+
+            query += " ORDER BY fixed_version ASC";
+
+            this.db.all(query, params, (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(rows || []);
                 }
             });
         });

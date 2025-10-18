@@ -75,6 +75,17 @@ function createCiscoRouter(db, preferencesService) {
         await ciscoController.getCiscoAdvisoryByCve(req, res);
     });
 
+    /**
+     * GET /api/cisco/fixed-versions/:cveId
+     * @description Get fixed versions for specific CVE (HEX-287)
+     * @param {string} cveId - CVE identifier
+     * @query {string} os_family - Optional OS family filter (ios, iosxe, iosxr, nxos)
+     * @returns {Array} Array of fixed version objects
+     */
+    router.get("/fixed-versions/:cveId", requireAuth, async (req, res) => {
+        await ciscoController.getFixedVersions(req, res);
+    });
+
     return router;
 }
 

@@ -9,9 +9,10 @@
  * - Vendor filtering (only queries Cisco advisories for Cisco devices)
  * - Graceful degradation on API errors
  * - Parallel advisory fetching for multiple CVEs
+ * - OS family-aware queries for multi-OS-family CVEs (HEX-287)
  *
- * @version 1.0.64
- * @date 2025-10-12
+ * @version 1.0.79
+ * @date 2025-10-18
  */
 
 class CiscoAdvisoryHelper {
@@ -80,6 +81,29 @@ class CiscoAdvisoryHelper {
     }
 
     /**
+     * Map OS type to API format (HEX-287)
+     *
+     * Converts UI-friendly OS type strings to database format
+     * for querying the normalized cisco_fixed_versions table
+     *
+     * @param {string} osType - OS type from parseOSType (e.g., "IOS XE", "IOS", "IOS XR")
+     * @returns {string|null} API format OS family (e.g., "iosxe", "ios", "iosxr") or null
+     */
+    mapOSToAPIFormat(osType) {
+        const osMap = {
+            'IOS XE': 'iosxe',
+            'IOS': 'ios',
+            'IOS XR': 'iosxr',
+            'NX-OS': 'nxos',
+            'ASA': 'asa',
+            'FTD': 'ftd',
+            'FX-OS': 'fxos'
+        };
+
+        return osMap[osType] || null;
+    }
+
+    /**
      * Compare two Cisco IOS version strings for sorting (descending order)
      * Returns highest/most recent version first
      *
@@ -88,20 +112,38 @@ class CiscoAdvisoryHelper {
      * @returns {number} - Negative if a > b, positive if a < b, 0 if equal
      */
     compareVersions(a, b) {
-        // Extract version components: major.minor(maintenance[letter])TRAIN[subrelease]
-        // Examples: 15.2(7)E3, 15.2(8)E, 15.2(7b)E0b, 17.6.7
+        // Extract version components
+        // IOS format: major.minor(maintenance[letter])TRAIN[subrelease] (e.g., 15.2(7)E3)
+        // IOS XE format: major.minor.patch[letter] (e.g., 17.12.6, 17.12.4a)
         const parseVersion = (ver) => {
-            // Match: major.minor(maint[letter])TRAIN[subrelease]
-            const match = ver.match(/^(\d+)\.(\d+)\((\d+)([a-z]?)\)([A-Z]*)(.*)$/);
-            if (!match) return { major: 0, minor: 0, maint: 0, maintLetter: '', train: '', subrelease: '' };
-            return {
-                major: parseInt(match[1], 10),
-                minor: parseInt(match[2], 10),
-                maint: parseInt(match[3], 10),
-                maintLetter: match[4] || '',
-                train: match[5] || '',
-                subrelease: match[6] || ''
-            };
+            // Try IOS format first: major.minor(maint[letter])TRAIN[subrelease]
+            let match = ver.match(/^(\d+)\.(\d+)\((\d+)([a-z]?)\)([A-Z]*)(.*)$/);
+            if (match) {
+                return {
+                    major: parseInt(match[1], 10),
+                    minor: parseInt(match[2], 10),
+                    maint: parseInt(match[3], 10),
+                    maintLetter: match[4] || '',
+                    train: match[5] || '',
+                    subrelease: match[6] || ''
+                };
+            }
+
+            // Try IOS XE format: major.minor.patch[letter]
+            match = ver.match(/^(\d+)\.(\d+)\.(\d+)([a-z]?)(.*)$/);
+            if (match) {
+                return {
+                    major: parseInt(match[1], 10),
+                    minor: parseInt(match[2], 10),
+                    maint: parseInt(match[3], 10),
+                    maintLetter: match[4] || '',
+                    train: '',
+                    subrelease: match[5] || ''
+                };
+            }
+
+            // Couldn't parse - return zeros
+            return { major: 0, minor: 0, maint: 0, maintLetter: '', train: '', subrelease: '' };
         };
 
         const vA = parseVersion(a);
@@ -130,10 +172,63 @@ class CiscoAdvisoryHelper {
     }
 
     /**
-     * Match fixed version from array based on installed OS type
+     * Extract train designation from Cisco version string
      *
-     * @param {string} installedVersion - Installed version (e.g., "CISCO IOS XE 16.9.2")
-     * @param {Array<string>} fixedVersionsArray - Array of fixed versions from advisory
+     * @param {string} versionString - Version string (e.g., "15.2(8)E8", "15.9(3)M11")
+     * @returns {string|null} Train letter (E, M, S, etc.) or null
+     */
+    extractTrain(versionString) {
+        if (!versionString) return null;
+
+        // Match train letter: 15.2(8)E8 → "E", 15.9(3)M11 → "M"
+        const match = versionString.match(/\d+\.\d+\([^)]+\)([A-Z]+)/);
+        return match ? match[1] : null;
+    }
+
+    /**
+     * Normalize train designation to base family (HEX-287)
+     *
+     * Cisco has multiple train variants within same product family:
+     * - E, EA, ED, SE, SG → All Enterprise family (compatible)
+     * - M, MA → All Mainline family (compatible)
+     * - S, SA (not SE/SG) → Service Provider family (compatible)
+     *
+     * @param {string} train - Train designation (E, EA, ED, SE, SG, M, MA, S, SA, etc.)
+     * @returns {string} Normalized train family (E, M, S, etc.)
+     */
+    normalizeTrainFamily(train) {
+        if (!train) return null;
+
+        // Enterprise family variants (check specific patterns first)
+        // SE = Switching Enterprise (Catalyst switches)
+        // SG = Security Gateway
+        // EA = Early Adoption
+        // ED = Extended Delivery
+        if (train === 'SE' || train === 'SG' || train === 'E' || train.startsWith('EA') || train.startsWith('ED')) {
+            return 'E';
+        }
+
+        // Mainline family: M, MA
+        if (train.startsWith('M')) return 'M';
+
+        // Service Provider family: S, SA (but NOT SE/SG which are Enterprise)
+        if (train === 'S' || train === 'SA') return 'S';
+
+        // Others: T (Throttle), etc. - return as-is
+        return train;
+    }
+
+    /**
+     * Match fixed version from array based on installed train (HEX-287)
+     *
+     * Filters by normalized train family extracted from installed version.
+     * Uses train family normalization to handle variants:
+     * - E family: E, EA, ED, SE, SG (Enterprise/Switching Enterprise)
+     * - M family: M, MA (Mainline)
+     * - S family: S, SA (Service Provider, NOT SE/SG)
+     *
+     * @param {string} installedVersion - Installed version (e.g., "CISCO IOS 15.2(2)E8")
+     * @param {Array<string>} fixedVersionsArray - Array of fixed versions (already OS-filtered and sorted)
      * @returns {string|null} Best matching fixed version or null
      */
     matchFixedVersion(installedVersion, fixedVersionsArray) {
@@ -141,32 +236,44 @@ class CiscoAdvisoryHelper {
             return null;
         }
 
-        // Parse OS type from installed version
-        const installedOS = this.parseOSType(installedVersion);
+        // Extract train from installed version: "15.2(4)E8" → "E", "15.2(4)SE5" → "SE"
+        const installedTrain = this.extractTrain(installedVersion);
 
-        if (installedOS === 'Unknown') {
-            // Can't match - return first version as fallback
-            logger.warn("ui", `Could not determine OS type from: ${installedVersion}`);
+        if (!installedTrain) {
+            // No train in installed version - return highest version
             return fixedVersionsArray[0];
         }
 
-        // Filter fixed versions to match installed OS type
-        const matchingVersions = fixedVersionsArray.filter(v =>
-            this.parseOSType(v) === installedOS
-        );
+        // Normalize installed train to base family: SE → E, EA → E, M → M, etc.
+        const installedFamily = this.normalizeTrainFamily(installedTrain);
 
-        if (matchingVersions.length > 0) {
-            // Return first matching version (minimum fixed version)
-            return matchingVersions[0];
+        // Filter to versions with matching train family
+        const trainMatches = fixedVersionsArray.filter(v => {
+            const fixTrain = this.extractTrain(v);
+            if (!fixTrain) return false;
+
+            // Normalize fixed version train to base family
+            const fixFamily = this.normalizeTrainFamily(fixTrain);
+
+            // Match normalized families: E matches E/EA/ED/SE/SG, M matches M/MA
+            return fixFamily === installedFamily;
+        });
+
+        if (trainMatches.length > 0) {
+            // Return first match (already sorted highest first)
+            return trainMatches[0];
         }
 
-        // No match found - log warning and return null
-        logger.warn("ui", `No ${installedOS} fix found for ${installedVersion}. Available: ${fixedVersionsArray.join(', ')}`);
-        return null;
+        // No train match - return highest version as fallback
+        logger.debug("ui", `No ${installedFamily}-family match for ${installedVersion} (train: ${installedTrain}), using highest version`);
+        return fixedVersionsArray[0];
     }
 
     /**
-     * Get fixed version for a specific CVE from Cisco advisory
+     * Get fixed version for a specific CVE from Cisco advisory (HEX-287)
+     *
+     * Uses normalized cisco_fixed_versions table with OS family filtering
+     * to correctly handle multi-OS-family CVEs (e.g., IOS + IOS XE)
      *
      * @param {string} cveId - CVE identifier (e.g., "CVE-2017-3881")
      * @param {string} vendor - Vendor name for filtering
@@ -185,10 +292,20 @@ class CiscoAdvisoryHelper {
             return null;
         }
 
+        // Parse OS type from installed version
+        let osFamily = null;
+        if (installedVersion) {
+            const osType = this.parseOSType(installedVersion);
+            osFamily = this.mapOSToAPIFormat(osType);
+        }
+
+        // Build cache key with OS family for normalized lookups
+        const cacheKey = osFamily ? `${cveId}:${osFamily}` : cveId;
+
         // Check cache first
-        const cached = this.advisoryCache.get(cveId);
+        const cached = this.advisoryCache.get(cacheKey);
         if (cached && (Date.now() - cached.timestamp) < this.cacheTTL) {
-            // Apply OS-aware matching if installed version provided
+            // Apply train matching if installed version provided (HEX-287)
             if (installedVersion && cached.fixedVersionsArray && cached.fixedVersionsArray.length > 0) {
                 return this.matchFixedVersion(installedVersion, cached.fixedVersionsArray);
             }
@@ -198,66 +315,65 @@ class CiscoAdvisoryHelper {
                 : null;
         }
 
-        // Fetch from API
+        // Fetch from API (HEX-287: Use normalized endpoint)
         try {
-            const response = await fetch(`/api/cisco/advisory/${cveId}`);
+            // Build API URL with optional OS family filter
+            let apiUrl = `/api/cisco/fixed-versions/${cveId}`;
+            if (osFamily) {
+                apiUrl += `?os_family=${osFamily}`;
+            }
+
+            const response = await fetch(apiUrl);
 
             // Check for HTTP errors
             if (!response.ok) {
                 logger.warn("ui", `API error for ${cveId}: ${response.status} ${response.statusText}`);
                 // Cache empty result to prevent repeated failures
-                this.advisoryCache.set(cveId, {
+                this.advisoryCache.set(cacheKey, {
                     fixedVersionsArray: [],
                     timestamp: Date.now()
                 });
                 return null;
             }
 
-            const advisory = await response.json();
+            const versions = await response.json();
 
-            // Handle null responses (no advisory exists for this CVE)
-            // Backend caching returns null instead of 404 status
-            if (!advisory) {
-                this.advisoryCache.set(cveId, {
+            // Handle empty array (no fixes for this CVE/OS family)
+            if (!versions || versions.length === 0) {
+                this.advisoryCache.set(cacheKey, {
                     fixedVersionsArray: [],
                     timestamp: Date.now()
                 });
                 return null;
             }
 
-            // Parse first_fixed JSON array
-            let firstFixed = [];
-            if (advisory.first_fixed) {
-                try {
-                    firstFixed = JSON.parse(advisory.first_fixed);
-                } catch (e) {
-                    logger.warn("ui", `Failed to parse first_fixed for ${cveId}:`, e);
-                }
-            }
+            // Extract fixed_version strings from normalized table rows
+            // Each row: { id, cve_id, os_family, fixed_version, affected_version, last_synced }
+            const fixedVersionStrings = versions.map(v => v.fixed_version);
 
-            // Cache the full array (not just first element)
-            // We'll apply OS matching at lookup time based on installed version
-            this.advisoryCache.set(cveId, {
-                fixedVersionsArray: firstFixed,
+            // Sort versions semantically (descending - newest first)
+            // Backend uses ASCII sort which doesn't handle Cisco versions correctly
+            fixedVersionStrings.sort((a, b) => this.compareVersions(a, b));
+
+            // Cache the sorted version strings
+            this.advisoryCache.set(cacheKey, {
+                fixedVersionsArray: fixedVersionStrings,
                 timestamp: Date.now()
             });
 
-            // Apply OS-aware matching if installed version provided
-            let fixedVersion = null;
-            if (installedVersion && firstFixed.length > 0) {
-                fixedVersion = this.matchFixedVersion(installedVersion, firstFixed);
-            } else if (firstFixed.length > 0) {
-                // Fallback: return first version if no installed version provided
-                fixedVersion = firstFixed[0];
+            // Filter by train if we have installed version (HEX-287)
+            if (installedVersion && fixedVersionStrings.length > 1) {
+                return this.matchFixedVersion(installedVersion, fixedVersionStrings);
             }
 
-            return fixedVersion;
+            // Return first version (highest/newest version after sorting)
+            return fixedVersionStrings.length > 0 ? fixedVersionStrings[0] : null;
 
         } catch (error) {
-            logger.warn("ui", `Failed to fetch advisory for ${cveId}:`, error.message);
+            logger.warn("ui", `Failed to fetch fixed versions for ${cveId}:`, error.message);
 
             // Cache empty result to prevent repeated failures
-            this.advisoryCache.set(cveId, {
+            this.advisoryCache.set(cacheKey, {
                 fixedVersionsArray: [],
                 timestamp: Date.now()
             });
@@ -267,15 +383,15 @@ class CiscoAdvisoryHelper {
     }
 
     /**
-     * Get fixed version for a device (checks all CVEs affecting the device)
+     * Get fixed version for a device (checks all CVEs affecting the device) - HEX-287
      *
      * Strategy:
      * - Fetches advisories for all unique CVEs on the device (parallel)
-     * - Returns first available fixed version found
-     * - Future enhancement: Prioritize by VPR score or criticality
+     * - Filters by OS family (no train filtering - too many edge cases)
+     * - Returns highest version for quick "go/no-go" comparison
      *
      * @param {Object} device - Device object with vendor and vulnerabilities array
-     * @returns {Promise<string|null>} Fixed version string or null
+     * @returns {Promise<string|null>} Highest fixed version or null
      */
     async getDeviceFixedVersion(device) {
         if (!device || !device.vulnerabilities) {
@@ -302,14 +418,10 @@ class CiscoAdvisoryHelper {
             return null;
         }
 
-        if (validVersions.length === 1) {
-            return validVersions[0];
-        }
-
-        // Sort versions (highest/most recent first) - HEX-246
+        // Sort versions (highest first) and return top version
         validVersions.sort((a, b) => this.compareVersions(a, b));
 
-        // Return highest version
+        // Return highest version for quick comparison to gold images
         return validVersions[0];
     }
 
