@@ -1,0 +1,138 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <hr>
+<h2>title: "Version 1.0.85 - Location Cards: Search & Sort Standardization"
+date: "2025-10-18"
+version: "1.0.85"
+status: "Released"
+category: "Enhancement"</h2><h1>Version 1.0.85 - Location Cards: Search & Sort Standardization</h1><p><strong>Release Status</strong>: ✅ Released<br><strong>Release Date</strong>: 2025-10-18<br><strong>Parent Issue</strong>: <a href="https://linear.app/hextrackr/issue/HEX-293">HEX-293</a> - Location Cards UI Refinement Complete<br><strong>Implementation</strong>: Search bar fix + sort standardization</p>
+<h2>Overview</h2><p>Added search functionality to location cards view and standardized sort options across all card views (Device Cards, Vulnerability Cards, Location Cards) for consistent user experience.</p>
+<h2>Implementation Tasks</h2><h3>Completed</h3><ul>
+<li><input checked="" disabled="" type="checkbox"> Added search event listener to location cards view</li>
+<li><input checked="" disabled="" type="checkbox"> Implemented <code>applySearchFilter()</code> method for location filtering</li>
+<li><input checked="" disabled="" type="checkbox"> Standardized sort dropdown to match device/vulnerability card naming</li>
+<li><input checked="" disabled="" type="checkbox"> Updated sort logic to support 6 sort options</li>
+<li><input checked="" disabled="" type="checkbox"> Set default sort to KEV Priority (matches other views)</li>
+<li><input checked="" disabled="" type="checkbox"> Tested search by location name and network address</li>
+</ul>
+<h2>Technical Details</h2><p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/location-cards.js</code> - Search &amp; sort enhancements (116 insertions, 29 deletions)</li>
+</ul>
+<h3>Search Implementation</h3><p><strong>Method Added</strong>: <code>applySearchFilter(searchTerm)</code></p>
+<ul>
+<li>Filters locations by:<ul>
+<li>Location display name (e.g., &quot;HOUSTN&quot;, &quot;GALENA&quot;, &quot;PASADT&quot;)</li>
+<li>Network address (e.g., &quot;10.95.97.0/24&quot;, &quot;10.95&quot;)</li>
+<li>Raw location key (lowercase comparison)</li>
+</ul>
+</li>
+<li>Updates pagination and re-renders results in real-time</li>
+<li>Clears filter when search term is empty</li>
+</ul>
+<p><strong>Event Listener Pattern</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">setupSearchListener</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-keyword">const</span> searchInput = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&#x27;searchInput&#x27;</span>);
+    <span class="hljs-keyword">if</span> (searchInput) {
+        <span class="hljs-comment">// Clone and replace to avoid duplicate listeners</span>
+        <span class="hljs-keyword">const</span> newSearchInput = searchInput.<span class="hljs-title function_">cloneNode</span>(<span class="hljs-literal">true</span>);
+        searchInput.<span class="hljs-property">parentNode</span>.<span class="hljs-title function_">replaceChild</span>(newSearchInput, searchInput);
+
+        newSearchInput.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;input&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">e</span>) =&gt;</span> {
+            <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">applySearchFilter</span>(e.<span class="hljs-property">target</span>.<span class="hljs-property">value</span>);
+        });
+    }
+}</code></pre><h3>Sort Standardization</h3><p><strong>Before (v1.0.84)</strong>:</p>
+<ul>
+<li>Total VPR</li>
+<li>Device Count</li>
+<li>KEV Devices</li>
+<li>Location Name</li>
+</ul>
+<p><strong>After (v1.0.85)</strong> - Matches Device/Vulnerability Cards:</p>
+<ul>
+<li><strong>KEV Priority</strong> (default) - KEV device count, high→low</li>
+<li><strong>VPR Priority</strong> - Total VPR, high→low</li>
+<li><strong>Name A-Z</strong> - Location name, ascending</li>
+<li><strong>Name Z-A</strong> - Location name, descending</li>
+<li><strong>Device Count (High-Low)</strong> - Device count, descending</li>
+<li><strong>Device Count (Low-High)</strong> - Device count, ascending</li>
+</ul>
+<p><strong>Sort Logic Pattern</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">sortData</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-variable language_">this</span>.<span class="hljs-property">filteredData</span>.<span class="hljs-title function_">sort</span>(<span class="hljs-function">(<span class="hljs-params">a, b</span>) =&gt;</span> {
+        <span class="hljs-keyword">switch</span> (<span class="hljs-variable language_">this</span>.<span class="hljs-property">sortBy</span>) {
+            <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;kev_device_count&#x27;</span>:
+                <span class="hljs-keyword">return</span> (b.<span class="hljs-property">kev_devices</span> || []).<span class="hljs-property">length</span> - (a.<span class="hljs-property">kev_devices</span> || []).<span class="hljs-property">length</span>;
+            <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;vpr&#x27;</span>:
+                <span class="hljs-keyword">return</span> (b.<span class="hljs-property">total_vpr</span> || <span class="hljs-number">0</span>) - (a.<span class="hljs-property">total_vpr</span> || <span class="hljs-number">0</span>);
+            <span class="hljs-keyword">case</span> <span class="hljs-string">&#x27;location_name_asc&#x27;</span>:
+                <span class="hljs-keyword">return</span> (a.<span class="hljs-property">location_display</span> || <span class="hljs-string">&#x27;&#x27;</span>).<span class="hljs-title function_">toLowerCase</span>()
+                    .<span class="hljs-title function_">localeCompare</span>((b.<span class="hljs-property">location_display</span> || <span class="hljs-string">&#x27;&#x27;</span>).<span class="hljs-title function_">toLowerCase</span>());
+            <span class="hljs-comment">// ... etc</span>
+        }
+    });
+}</code></pre><h2>Success Criteria</h2><ul>
+<li><input checked="" disabled="" type="checkbox"> Version bumped to 1.0.85 across 5 files</li>
+<li><input checked="" disabled="" type="checkbox"> Search bar filters location cards by name and network</li>
+<li><input checked="" disabled="" type="checkbox"> Sort options match device/vulnerability cards naming</li>
+<li><input checked="" disabled="" type="checkbox"> Default sort is KEV Priority (consistent across all views)</li>
+<li><input checked="" disabled="" type="checkbox"> No JavaScript syntax errors</li>
+<li><input checked="" disabled="" type="checkbox"> 110 HTML documentation files regenerated</li>
+</ul>
+<h2>Testing Verification</h2><p><strong>Search Functionality</strong>:</p>
+<ul>
+<li>✅ Search by location name (e.g., &quot;HOUSTN&quot;)</li>
+<li>✅ Search by partial location (e.g., &quot;HOUS&quot;)</li>
+<li>✅ Search by network address (e.g., &quot;10.95&quot;)</li>
+<li>✅ Search by full network (e.g., &quot;10.95.97.0/24&quot;)</li>
+<li>✅ Clear search shows all locations</li>
+<li>✅ Pagination updates with filtered results</li>
+</ul>
+<p><strong>Sort Functionality</strong>:</p>
+<ul>
+<li>✅ KEV Priority: Sorts by KEV device count (high→low)</li>
+<li>✅ VPR Priority: Sorts by total VPR (high→low)</li>
+<li>✅ Name A-Z: Alphabetical ascending</li>
+<li>✅ Name Z-A: Alphabetical descending</li>
+<li>✅ Device Count (High-Low): Numeric descending</li>
+<li>✅ Device Count (Low-High): Numeric ascending</li>
+</ul>
+<h2>Related Issues</h2><ul>
+<li>Parent: <a href="https://linear.app/hextrackr/issue/HEX-293">HEX-293</a> - Location Cards UI Refinement Complete</li>
+<li>Precedes: <a href="https://linear.app/hextrackr/issue/HEX-288">HEX-288</a> - Location Cards MVP (v1.0.80-84)</li>
+</ul>
+<h2>Progress</h2><p><strong>Location Cards Feature (HEX-288) - 100% Complete</strong> ✅:</p>
+<ul>
+<li>✅ Task 1 (v1.0.80): Backend locationService.js</li>
+<li>✅ Task 2 (v1.0.81): API endpoint with caching</li>
+<li>✅ Task 3 (v1.0.82): Frontend location cards UI</li>
+<li>✅ Task 4 (v1.0.83): Bug fixes &amp; testing</li>
+<li>✅ Task 5 (v1.0.84): UI refinement &amp; KEV integration</li>
+<li>✅ <strong>Task 6 (v1.0.85): Search &amp; sort standardization</strong> ← <strong>COMPLETE</strong></li>
+</ul>
+<h2>Key Learnings</h2><p><strong>1. Search Event Listener Management</strong></p>
+<ul>
+<li>Clone-and-replace pattern prevents duplicate listeners</li>
+<li>Each view (devices, vulnerabilities, locations) needs its own listener</li>
+<li>Search bar element is shared (<code>#searchInput</code>) but event handling is view-specific</li>
+</ul>
+<p><strong>2. Sort Naming Consistency</strong></p>
+<ul>
+<li>User experience improves dramatically with consistent terminology</li>
+<li>&quot;KEV Priority&quot; and &quot;VPR Priority&quot; are clearer than &quot;KEV Devices&quot; and &quot;Total VPR&quot;</li>
+<li>Explicit direction labels (A-Z, High-Low) eliminate ambiguity</li>
+</ul>
+<p><strong>3. Default Sort Strategy</strong></p>
+<ul>
+<li>KEV Priority as default aligns with security-first workflow</li>
+<li>Users can quickly identify highest-risk locations</li>
+<li>Matches pattern from device and vulnerability cards (consistent UX)</li>
+</ul>
+<hr>
+<p><strong>End of v1.0.85 Changelog</strong></p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

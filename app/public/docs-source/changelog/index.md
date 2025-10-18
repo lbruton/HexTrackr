@@ -2,7 +2,7 @@
 
 Welcome to the HexTrackr changelog! This page tracks all notable changes, features, and fixes across all versions of HexTrackr.
 
-**Current Version**: [v1.0.84](#changelog/versions/1.0.84) - ✅ Released 2025-10-18
+**Current Version**: [v1.0.85](#changelog/versions/1.0.85) - ✅ Released 2025-10-18
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
@@ -14,7 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### Latest Releases
 
-- [**v1.0.84**](#changelog/versions/1.0.84) - 2025-10-18 - ✅ Location Cards: UI Refinement & KEV Integration (HEX-293) **MVP COMPLETE**
+- [**v1.0.85**](#changelog/versions/1.0.85) - 2025-10-18 - ✅ Location Cards: Search & Sort Standardization **FEATURE COMPLETE**
+- [**v1.0.84**](#changelog/versions/1.0.84) - 2025-10-18 - ✅ Location Cards: UI Refinement & KEV Integration (HEX-293) MVP COMPLETE
 - [**v1.0.83**](#changelog/versions/1.0.83) - 2025-10-18 - ✅ Location Cards: Bug Fix & Testing (HEX-292 Task 4)
 - [**v1.0.82**](#changelog/versions/1.0.82) - 2025-10-18 - ✅ Location Cards: Frontend UI Component (HEX-292 Task 3)
 - [**v1.0.81**](#changelog/versions/1.0.81) - 2025-10-18 - ✅ Location Cards: Backend API Endpoint (HEX-292 Task 2)
