@@ -1,5 +1,5 @@
 {
-  "generated": "2025-10-18T06:39:21.923Z",
+  "generated": "2025-10-18T07:06:44.153Z",
   "sections": {
     "api-reference": {
       "title": "Api Reference",
@@ -70,6 +70,16 @@
       "icon": "fas fa-list",
       "indexFile": "changelog/index",
       "children": {
+        "1.0.83": {
+          "file": "changelog/versions/1.0.83",
+          "title": "1.0.83",
+          "path": "changelog/versions/1.0.83.html"
+        },
+        "1.0.82": {
+          "file": "changelog/versions/1.0.82",
+          "title": "1.0.82",
+          "path": "changelog/versions/1.0.82.html"
+        },
         "1.0.81": {
           "file": "changelog/versions/1.0.81",
           "title": "1.0.81",
@@ -546,5 +556,5 @@
       "path": "overview.html"
     }
   },
-  "totalFiles": 107
+  "totalFiles": 109
 }
