@@ -368,6 +368,11 @@
                                         <i class="fas fa-bug me-1"></i>Vulnerabilities
                                     </label>
 
+                                    <input type="radio" class="btn-check" name="view-options" id="view-locations" autocomplete="off">
+                                    <label class="btn btn-outline-primary" for="view-locations" data-view="locations">
+                                        <i class="fas fa-map-marker-alt me-1"></i>Locations
+                                    </label>
+
                                     <input type="radio" class="btn-check" name="view-options" id="view-table" autocomplete="off">
                                     <label class="btn btn-outline-primary" for="view-table" data-view="table">
                                         <i class="fas fa-table me-1"></i>Table
@@ -426,6 +431,28 @@
                                     </div>
                                     <div id="vulnerabilityPaginationInfo" class="mt-2 text-center">
                                         <span class="text-muted">Loading vulnerabilities...</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Location Cards View (HEX-292) -->
+                            <div id="locationsView" class="view-content d-none">
+                                <div class="p-3">
+                                    <!-- Top controls row (sort + items per page) -->
+                                    <div id="locationControlsTop" class="d-flex justify-content-between align-items-center mb-3">
+                                        <!-- Sort and items per page controls will be populated here -->
+                                    </div>
+
+                                    <div class="row row-cards" id="locationCards">
+                                        <!-- Location cards will be populated here -->
+                                    </div>
+
+                                    <!-- Bottom pagination (arrows/numbers + showing text) -->
+                                    <div id="locationPaginationControls" class="mt-4">
+                                        <!-- Pagination arrows/numbers will be populated here -->
+                                    </div>
+                                    <div id="locationPaginationInfo" class="mt-2 text-center">
+                                        <span class="text-muted">Loading location data...</span>
                                     </div>
                                 </div>
                             </div>
@@ -884,9 +911,10 @@
     <script src="scripts/shared/cisco-advisory-helper.js"></script>
     <script src="scripts/shared/palo-advisory-helper.js"></script>
     <script src="scripts/shared/vulnerability-cards.js"></script>
+    <script src="scripts/shared/location-cards.js"></script>
     <script src="scripts/shared/device-security-modal.js"></script>
     <script src="scripts/shared/vulnerability-details-modal.js"></script>
-    
+
     <!-- Module Scripts (loaded last, in dependency order) -->
     <script type="module" src="scripts/shared/vulnerability-chart-manager.js"></script>
     <script type="module" src="scripts/shared/vulnerability-core.js"></script>
