@@ -2,7 +2,7 @@
 
 Welcome to the HexTrackr changelog! This page tracks all notable changes, features, and fixes across all versions of HexTrackr.
 
-**Current Version**: [v1.0.79](#changelog/versions/1.0.79) - Released 2025-10-17
+**Current Version**: [v1.0.81](#changelog/versions/1.0.81) - Released 2025-10-18
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
@@ -14,6 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### Latest Releases
 
+- [**v1.0.81**](#changelog/versions/1.0.81) - 2025-10-18 - Location Cards: Backend API Endpoint (HEX-292 Task 2)
+- [**v1.0.80**](#changelog/versions/1.0.80) - 2025-10-18 - Location Cards: Backend Service Implementation (HEX-292 Task 1)
 - [**v1.0.79**](#changelog/versions/1.0.79) - 2025-10-17 - Cisco Advisory: Fix Multi-OS-Family Data Corruption (HEX-287)
 - [**v1.0.78**](#changelog/versions/1.0.78) - 2025-10-17 - Bug Fixes: Template Truncation, Backup Retention, KEV Sync, Advisory Cache
 - [**v1.0.77**](#changelog/versions/1.0.77) - 2025-10-17 - Logging System Session 12B: Frontend Utilities Complete

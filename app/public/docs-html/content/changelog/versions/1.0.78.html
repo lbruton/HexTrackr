@@ -1,0 +1,194 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.78</h1><hr>
+<h2>[1.0.78] - 2025-10-17</h2><h3>Bug Fixes</h3><h4>Critical Template Truncation Fix (HEX-286) - 2025-10-17</h4><p><strong>Description</strong>: Fixed major bug where ticket markdown templates were truncated in the database, causing incomplete template rendering in ticket details modal.</p>
+<p><strong>Problem</strong>:</p>
+<ul>
+<li>Ticket details modal displayed truncated markdown templates</li>
+<li><code>markdown_replacement</code> template cut off at &quot;Tracking: [TRACKIN&quot; (392 chars instead of 1133)</li>
+<li>Missing sections: Return Address, Equipment details, Action Required, Timeline, Personnel, Notes</li>
+<li>Affected all 3 markdown templates: <code>markdown_upgrade</code>, <code>markdown_replacement</code>, <code>markdown_mitigate</code></li>
+<li><code>default_content</code> field completely empty (0 bytes)</li>
+</ul>
+<p><strong>Root Cause</strong>:<br>Migration 008 used <code>SELECT...FROM</code> pattern to create job-type-specific templates, which propagated already-truncated data from source template, causing cascading corruption.</p>
+<p><strong>Solution</strong>:</p>
+<ul>
+<li>Created Migration 013 to restore all 3 templates from canonical source (<code>seedEmailTemplates.js</code>)</li>
+<li>Updated both <code>template_content</code> AND <code>default_content</code> fields</li>
+<li>Verified template lengths: markdown_mitigate (947 chars), markdown_replacement (1133 chars), markdown_upgrade (982 chars)</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><strong>Created</strong>: <code>app/public/scripts/migrations/013-fix-truncated-markdown-templates.sql</code></li>
+</ul>
+<p><strong>Commit</strong>: <code>fix(HEX-286): Restore truncated markdown ticket templates</code> (bfddcb1b)</p>
+<p><strong>Verification</strong>:</p>
+<ul>
+<li>✅ Database verification: Templates show correct lengths and full content</li>
+<li>✅ Browser test: Ticket 0039 (REFRESH job type) displays complete template</li>
+<li>✅ All sections now render correctly</li>
+</ul>
+<hr>
+<h4>Backup Retention Policy Enforcement (HEX-283/284) - 2025-10-17</h4><p><strong>Description</strong>: Fixed backup retention policy not being enforced, allowing manual backups to accumulate beyond configured limits.</p>
+<p><strong>Problem</strong>:</p>
+<ul>
+<li>Vulnerability backups: 5 manual backups displayed (expected max 3)</li>
+<li>Tickets backups: 4 manual backups displayed (expected max 3)</li>
+<li>Old backups accumulated across Docker restarts</li>
+</ul>
+<p><strong>Root Cause</strong>:<br>Backup cleanup only executed AFTER creating new manual backups, not on application startup. When Docker container restarted, old backups persisted until next manual backup triggered cleanup.</p>
+<p><strong>Solution</strong>:<br>Added startup backup cleanup scheduler in <code>server.js</code> (lines 655-669):</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// HEX-283/284: Enforce backup retention on startup (5 second delay)</span>
+<span class="hljs-built_in">setTimeout</span>(<span class="hljs-title function_">async</span> () =&gt; {
+    <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> backupService.<span class="hljs-title function_">cleanupOldBackups</span>();
+    <span class="hljs-keyword">if</span> (result.<span class="hljs-property">deleted</span> &gt; <span class="hljs-number">0</span>) {
+        logger.<span class="hljs-title function_">info</span>(<span class="hljs-string">&quot;system&quot;</span>, <span class="hljs-string">&quot;Startup cleanup: X old backups deleted, Y MB freed&quot;</span>);
+    }
+}, <span class="hljs-number">5000</span>);</code></pre><p><strong>Retention Policy Enforced</strong>:</p>
+<ul>
+<li>Automated backups: Keep 7 most recent</li>
+<li>Manual backups: Keep 3 most recent</li>
+<li>Per type: Vulnerabilities, Tickets, Database</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/server.js</code> - Startup cleanup scheduler</li>
+</ul>
+<p><strong>Commit</strong>: <code>fix(HEX-283/284/285): Enforce backup retention policy + fix modal button alignment</code> (71a73f6c)</p>
+<p><strong>Verification</strong>:</p>
+<ul>
+<li>✅ Docker restart triggered startup cleanup</li>
+<li>✅ Deleted 3 old backups (134.54MB freed)</li>
+<li>✅ Verified: 3 vulnerability + 3 tickets manual backups remain (within limits)</li>
+</ul>
+<hr>
+<h4>Backup Modal Button Alignment (HEX-285) - 2025-10-17</h4><p><strong>Description</strong>: Fixed vertical misalignment of download buttons in Backup Management modals.</p>
+<p><strong>Problem</strong>:</p>
+<ul>
+<li>Download buttons vertically misaligned with backup list items</li>
+<li>Radio buttons, backup info, and download buttons not on same horizontal line</li>
+<li>Affected both Vulnerability and Tickets backup modals</li>
+</ul>
+<p><strong>Root Cause</strong>:<br>Missing flexbox alignment classes on column containers. Bootstrap <code>col-auto</code> divs lacked vertical centering.</p>
+<p><strong>Solution</strong>:<br>Applied consistent flexbox alignment in <code>backup-modal.js</code> (lines 249-272):</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Added d-flex align-items-center to all col-auto divs</span>
+&lt;div <span class="hljs-keyword">class</span>=<span class="hljs-string">&quot;col-auto d-flex align-items-center&quot;</span>&gt;
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;btn btn-sm btn-primary&quot;</span>&gt;</span>Download<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span></span>
+&lt;/div&gt;</code></pre><p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/backup-modal.js</code> - Button alignment fix</li>
+</ul>
+<p><strong>Commit</strong>: <code>fix(HEX-283/284/285): Enforce backup retention policy + fix modal button alignment</code> (71a73f6c)</p>
+<p><strong>Verification</strong>:</p>
+<ul>
+<li>✅ Visual inspection: All buttons align with backup list items</li>
+<li>✅ Tested both Vulnerability and Tickets modals</li>
+<li>✅ Alignment consistent across all backup types (manual/auto)</li>
+</ul>
+<hr>
+<h4>KEV Background Sync Scheduler Restored (HEX-282) - 2025-10-17</h4><p><strong>Description</strong>: Restored missing KEV (CISA Known Exploited Vulnerabilities) background sync scheduler and removed redundant Cisco advisory caching layer.</p>
+<p><strong>Problem 1: KEV Background Sync Missing</strong>:</p>
+<ul>
+<li>KEV auto-sync toggle in UI saved preference but had no effect</li>
+<li>Documentation claimed &quot;Every 24 hours&quot; sync but it never ran</li>
+<li>Manual &quot;Sync Now&quot; worked, hiding the silent feature loss</li>
+<li>Background scheduler code was lost (likely in merge conflict)</li>
+</ul>
+<p><strong>Problem 2: Cisco Advisory Cache Issues</strong>:</p>
+<ul>
+<li>Server cached null responses for 5 minutes when frontend requested advisory before sync</li>
+<li>Stale &quot;not found&quot; results persisted even after successful sync</li>
+<li>Redundant caching layer (database IS the cache for persisted advisory data)</li>
+</ul>
+<p><strong>Solution 1: KEV Background Sync</strong>:<br>Added KEV background sync scheduler in <code>server.js</code> (lines 574-634):</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// CISA KEV background sync scheduler (HEX-282)</span>
+<span class="hljs-built_in">setTimeout</span>(<span class="hljs-title function_">async</span> () =&gt; {
+    <span class="hljs-keyword">if</span> (kevBackgroundSyncEnabled) {
+        logger.<span class="hljs-title function_">info</span>(<span class="hljs-string">&quot;system&quot;</span>, <span class="hljs-string">&quot;CISA KEV background sync scheduled (every 24 hours)&quot;</span>);
+        <span class="hljs-built_in">setInterval</span>(<span class="hljs-title function_">async</span> () =&gt; {
+            <span class="hljs-keyword">await</span> kevService.<span class="hljs-title function_">syncKevData</span>();
+        }, <span class="hljs-number">24</span> * <span class="hljs-number">60</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>);
+    }
+}, <span class="hljs-number">6</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>); <span class="hljs-comment">// 6 min after startup</span></code></pre><p><strong>Features</strong>:</p>
+<ul>
+<li>Mirrors Cisco/Palo Alto pattern (startup delay + 24hr interval)</li>
+<li>Staggered timing: KEV runs 6min after startup (prevents database lock contention)</li>
+<li>Respects <code>kev_background_sync_enabled</code> preference</li>
+</ul>
+<p><strong>Background Sync Schedule</strong> (All Staggered):</p>
+<ul>
+<li>Cisco: 5.0 min after startup + every 24 hours</li>
+<li>Palo Alto: 5.5 min after startup + every 24 hours</li>
+<li>KEV: 6.0 min after startup + every 24 hours</li>
+</ul>
+<p><strong>Solution 2: Cisco Advisory Cache Removal</strong>:<br>Removed redundant caching layer in <code>ciscoController.js</code> (lines 112-122):</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// HEX-282: Query database directly - no cache needed</span>
+<span class="hljs-comment">// Database IS the cache - advisory data is persisted from sync operations</span>
+<span class="hljs-keyword">const</span> advisoryData = <span class="hljs-keyword">await</span> <span class="hljs-variable language_">this</span>.<span class="hljs-property">ciscoAdvisoryService</span>.<span class="hljs-title function_">getCiscoAdvisory</span>(cveId);
+
+<span class="hljs-comment">// Set browser cache header (60 seconds) for moderate caching</span>
+res.<span class="hljs-title function_">setHeader</span>(<span class="hljs-string">&quot;Cache-Control&quot;</span>, <span class="hljs-string">&quot;public, max-age=60, must-revalidate&quot;</span>);
+
+<span class="hljs-comment">// Return null for 404s (frontend handles this gracefully)</span>
+<span class="hljs-keyword">return</span> res.<span class="hljs-title function_">json</span>(advisoryData || <span class="hljs-literal">null</span>);</code></pre><p><strong>Caching Strategy</strong>:</p>
+<ul>
+<li>Database: Persistent storage (primary cache)</li>
+<li>Browser: 60-second Cache-Control header</li>
+<li>Frontend: 5-minute cache in <code>cisco-advisory-helper.js</code></li>
+<li>Eliminated: Server-side null response caching (caused stale data)</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/server.js</code> - KEV background sync scheduler restored</li>
+<li><code>app/controllers/ciscoController.js</code> - Removed redundant cache layer</li>
+<li><code>app/public/scripts/shared/cisco-advisory-helper.js</code> - Frontend cache documentation</li>
+<li><code>app/services/ciscoAdvisoryService.js</code> - Service layer updates</li>
+</ul>
+<p><strong>Commit</strong>: <code>fix(HEX-282): Restore KEV background sync scheduler + remove redundant Cisco advisory cache</code> (f162c80f)</p>
+<p><strong>Verification</strong>:</p>
+<ul>
+<li>✅ Docker restart triggers all three syncs in sequence</li>
+<li>✅ KEV preference initialization confirmed in logs</li>
+<li>✅ No database lock contention with staggered timing</li>
+<li>✅ Cisco advisory queries return fresh data (no stale nulls)</li>
+<li>✅ Browser cache headers set correctly (60 seconds)</li>
+</ul>
+<hr>
+<h2>Summary</h2><p><strong>Total Issues Fixed</strong>: 4 major bugs (HEX-282, HEX-283, HEX-284, HEX-285, HEX-286)</p>
+<p><strong>Categories</strong>:</p>
+<ul>
+<li>Database corruption: 1 (template truncation)</li>
+<li>Background scheduling: 2 (backup retention, KEV sync)</li>
+<li>Caching issues: 1 (Cisco advisory stale data)</li>
+<li>UI alignment: 1 (backup modal buttons)</li>
+</ul>
+<p><strong>Impact</strong>:</p>
+<ul>
+<li>✅ Ticket templates now render completely (1133 chars vs 392 truncated)</li>
+<li>✅ Backup retention enforced automatically on startup (freed 134.54MB)</li>
+<li>✅ KEV background sync restored (24-hour automated updates)</li>
+<li>✅ Cisco advisory cache eliminated (no more stale null responses)</li>
+<li>✅ Backup modal UI properly aligned</li>
+</ul>
+<p><strong>Technical Debt Addressed</strong>:</p>
+<ul>
+<li>Migration pattern improved (avoid SELECT...FROM for critical data)</li>
+<li>Eliminated redundant caching layers (database as single source of truth)</li>
+<li>Startup initialization now enforces data retention policies</li>
+<li>Staggered background sync prevents database lock contention</li>
+</ul>
+<hr>
+<h2>Related Issues</h2><ul>
+<li><a href="https://linear.app/hextrackr/issue/HEX-282">HEX-282</a> - KEV background sync scheduler missing + Cisco advisory cache issues</li>
+<li><a href="https://linear.app/hextrackr/issue/HEX-283">HEX-283</a> - Manual backup retention policy not enforced (Vulnerability backups)</li>
+<li><a href="https://linear.app/hextrackr/issue/HEX-284">HEX-284</a> - Manual backup retention policy not enforced (Tickets backups)</li>
+<li><a href="https://linear.app/hextrackr/issue/HEX-285">HEX-285</a> - Backup modal buttons vertically misaligned</li>
+<li><a href="https://linear.app/hextrackr/issue/HEX-286">HEX-286</a> - Ticket markdown templates truncated in database</li>
+</ul>
+<hr>
+<p><em>Changelog Version: 1.0.78 | Bug Fixes | 2025-10-17</em></p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
