@@ -1,0 +1,253 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <hr>
+<h2>title: "Version 1.0.84 - Location Cards: UI Refinement & KEV Integration"
+date: "2025-10-18"
+version: "1.0.84"
+status: "Released"
+category: "Enhancement"</h2><h1>Version 1.0.84 - Location Cards: UI Refinement & KEV Integration</h1><p><strong>Release Status</strong>: ✅ Released<br><strong>Release Date</strong>: 2025-10-18<br><strong>Parent Issue</strong>: <a href="https://linear.app/hextrackr/issue/HEX-288">HEX-288</a> - Location Cards View<br><strong>Implementation</strong>: <a href="https://linear.app/hextrackr/issue/HEX-293">HEX-293</a> - UI Refinement (Task 5)</p>
+<h2>Overview</h2><p>Completed the Location Cards MVP with comprehensive UI refinements, KEV device tracking, and network intelligence features. This release transforms location cards from basic placeholders into a fully-featured geographic vulnerability dashboard matching the visual quality of device and vulnerability card views.</p>
+<h2>Features</h2><h3>KEV Device Tracking</h3><ul>
+<li><strong>KEV Badge Enhancement</strong>: Badge now shows device count instead of CVE count for better operational clarity</li>
+<li><strong>Interactive KEV Modal</strong>: Click badge to see list of all devices with KEV vulnerabilities at the location</li>
+<li><strong>Device Details</strong>: Each device in modal shows hostname, KEV count, and clickable CVE badges</li>
+<li><strong>Auto-Scroll</strong>: Modal automatically scrolls when displaying &gt;5 KEV devices</li>
+<li><strong>CVE Integration</strong>: CVE badges link to existing KEV details modal for full vulnerability information</li>
+</ul>
+<h3>Vendor Distribution Cards</h3><ul>
+<li><strong>3-Column Grid Layout</strong>: Cisco (left) | Palo Alto (center) | Other (right)</li>
+<li><strong>Custom Icons</strong>: Network icon (Cisco), Fire icon (Palo Alto), Server icon (Other)</li>
+<li><strong>Visual Consistency</strong>: Matches VPR mini-cards styling with proper borders and hover effects</li>
+<li><strong>Equal Width</strong>: CSS Grid ensures perfect 3-column distribution across card width</li>
+<li><strong>Device Counts</strong>: Shows number of devices per vendor at each location</li>
+</ul>
+<h3>Network Intelligence</h3><ul>
+<li><strong>Smart IP Parsing</strong>: Calculates most common /24 network per location</li>
+<li><strong>Management Network Filtering</strong>: Prioritizes production networks (excludes 10.95.x.x, 10.96.x.x, 10.97.x.x)</li>
+<li><strong>Fallback Strategy</strong>: Shows management networks if no production IPs available</li>
+<li><strong>Network Display</strong>: Shows subnet in monospace font (e.g., &quot;10.95.97.0/24&quot;) at card footer</li>
+</ul>
+<h3>Visual Refinements</h3><ul>
+<li><strong>VPR Color</strong>: Changed from blue to red (danger) to indicate risk severity</li>
+<li><strong>Total VPR Label</strong>: Added &quot;Total VPR&quot; subtitle below score for clarity</li>
+<li><strong>Location Pin Icon</strong>: Changed from blue to gray for better dark mode contrast</li>
+<li><strong>Button Sizing</strong>: &quot;View Site Details&quot; button now matches device/vulnerability card button size</li>
+<li><strong>Default Page Size</strong>: Changed from 12 to 6 cards per page for better UX</li>
+</ul>
+<h3>Sorting & Filtering</h3><ul>
+<li><strong>KEV Sort Option</strong>: Added &quot;KEV Devices&quot; to sort dropdown</li>
+<li><strong>Sort Options</strong>: Total VPR | Device Count | KEV Devices | Location Name</li>
+<li><strong>Auto-Direction</strong>: Name sorts A-Z, numeric sorts highest-first</li>
+<li><strong>Pagination</strong>: 6/12/24/48/96 cards per page options</li>
+</ul>
+<h2>Technical Details</h2><h3>Backend Enhancements (locationService.js)</h3><p><strong>IP Address Tracking</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Line 89: Added ip_address to SQL query</span>
+<span class="hljs-variable constant_">SELECT</span> v.<span class="hljs-property">hostname</span>, v.<span class="hljs-property">vendor</span>, v.<span class="hljs-property">severity</span>, v.<span class="hljs-property">vpr_score</span>, v.<span class="hljs-property">cve</span>, v.<span class="hljs-property">ip_address</span>,
+       <span class="hljs-variable constant_">CASE</span> <span class="hljs-variable constant_">WHEN</span> k.<span class="hljs-property">cve_id</span> <span class="hljs-variable constant_">IS</span> <span class="hljs-variable constant_">NOT</span> <span class="hljs-variable constant_">NULL</span> <span class="hljs-variable constant_">THEN</span> <span class="hljs-string">&#x27;Yes&#x27;</span> <span class="hljs-variable constant_">ELSE</span> <span class="hljs-string">&#x27;No&#x27;</span> <span class="hljs-variable constant_">END</span> <span class="hljs-keyword">as</span> isKev
+<span class="hljs-variable constant_">FROM</span> vulnerabilities_current v
+<span class="hljs-variable constant_">LEFT</span> <span class="hljs-variable constant_">JOIN</span> kev_status k <span class="hljs-variable constant_">ON</span> v.<span class="hljs-property">cve</span> = k.<span class="hljs-property">cve_id</span></code></pre><p><strong>KEV Device Mapping</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Lines 177-182: Track which devices have KEV vulnerabilities</span>
+<span class="hljs-keyword">if</span> (vuln.<span class="hljs-property">isKev</span> === <span class="hljs-string">&quot;Yes&quot;</span> &amp;&amp; vuln.<span class="hljs-property">cve</span>) {
+    locationData.<span class="hljs-property">kev_cves</span>.<span class="hljs-title function_">add</span>(vuln.<span class="hljs-property">cve</span>);
+    <span class="hljs-keyword">if</span> (!locationData.<span class="hljs-property">kev_devices</span>.<span class="hljs-title function_">has</span>(vuln.<span class="hljs-property">hostname</span>)) {
+        locationData.<span class="hljs-property">kev_devices</span>.<span class="hljs-title function_">set</span>(vuln.<span class="hljs-property">hostname</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Set</span>());
+    }
+    locationData.<span class="hljs-property">kev_devices</span>.<span class="hljs-title function_">get</span>(vuln.<span class="hljs-property">hostname</span>).<span class="hljs-title function_">add</span>(vuln.<span class="hljs-property">cve</span>);
+}</code></pre><p><strong>Response Structure</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Lines 209-221: Convert KEV Map to array for frontend</span>
+<span class="hljs-keyword">const</span> kev_devices = <span class="hljs-title class_">Array</span>.<span class="hljs-title function_">from</span>(loc.<span class="hljs-property">kev_devices</span>.<span class="hljs-title function_">entries</span>()).<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">[hostname, cves]</span>) =&gt;</span> ({
+    hostname,
+    <span class="hljs-attr">cves</span>: <span class="hljs-title class_">Array</span>.<span class="hljs-title function_">from</span>(cves),
+    <span class="hljs-attr">cve_count</span>: cves.<span class="hljs-property">size</span>
+}));
+
+<span class="hljs-keyword">return</span> {
+    location, location_display, device_count,
+    <span class="hljs-attr">device_ips</span>: loc.<span class="hljs-property">device_ips</span>,           <span class="hljs-comment">// NEW</span>
+    <span class="hljs-attr">kev_devices</span>: kev_devices,             <span class="hljs-comment">// NEW</span>
+    vendor_breakdown, total_vpr, severity_breakdown,
+    kev_count, open_tickets, confidence
+};</code></pre><h3>Frontend Implementation (location-cards.js)</h3><p><strong>KEV Modal</strong> (lines 429-473):</p>
+<pre><code class="language-javascript"><span class="hljs-variable language_">window</span>.<span class="hljs-property">showLocationKevModal</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params">location, kevDevices</span>) {
+    <span class="hljs-keyword">const</span> deviceListHtml = kevDevices.<span class="hljs-title function_">map</span>(<span class="hljs-function"><span class="hljs-params">device</span> =&gt;</span> <span class="hljs-string">`
+        &lt;div class=&quot;list-group-item&quot;&gt;
+            &lt;div class=&quot;fw-bold&quot;&gt;<span class="hljs-subst">${device.hostname}</span>&lt;/div&gt;
+            &lt;div class=&quot;text-muted small&quot;&gt;<span class="hljs-subst">${device.cve_count}</span> KEV vulnerabilities&lt;/div&gt;
+            &lt;div class=&quot;mt-2&quot;&gt;
+                <span class="hljs-subst">${device.cves.map(cve =&gt;
+                    <span class="hljs-string">`&lt;a href=&quot;#&quot; class=&quot;badge bg-red-lt&quot;
+                        onclick=&quot;window.showKevDetails(&#x27;<span class="hljs-subst">${cve}</span>&#x27;)&quot;&gt;<span class="hljs-subst">${cve}</span>&lt;/a&gt;`</span>
+                ).join(<span class="hljs-string">&#x27;&#x27;</span>)}</span>
+            &lt;/div&gt;
+        &lt;/div&gt;
+    `</span>).<span class="hljs-title function_">join</span>(<span class="hljs-string">&#x27;&#x27;</span>);
+
+    <span class="hljs-comment">// Auto-scroll for &gt;5 devices</span>
+    <span class="hljs-keyword">const</span> scrollStyle = kevDevices.<span class="hljs-property">length</span> &gt; <span class="hljs-number">5</span> ? <span class="hljs-string">&#x27;max-height: 400px; overflow-y: auto;&#x27;</span> : <span class="hljs-string">&#x27;&#x27;</span>;
+};</code></pre><p><strong>Network Parser</strong> (lines 317-371):</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">calculateNetwork24</span>(<span class="hljs-params">deviceIPs</span>) {
+    <span class="hljs-keyword">const</span> managementSubnets = [<span class="hljs-string">&#x27;10.95&#x27;</span>, <span class="hljs-string">&#x27;10.96&#x27;</span>, <span class="hljs-string">&#x27;10.97&#x27;</span>];
+    <span class="hljs-keyword">const</span> productionNetworkCounts = {};
+    <span class="hljs-keyword">const</span> managementNetworkCounts = {};
+
+    deviceIPs.<span class="hljs-title function_">forEach</span>(<span class="hljs-function"><span class="hljs-params">ip</span> =&gt;</span> {
+        <span class="hljs-keyword">const</span> isManagementIP = managementSubnets.<span class="hljs-title function_">some</span>(<span class="hljs-function"><span class="hljs-params">subnet</span> =&gt;</span> ip.<span class="hljs-title function_">startsWith</span>(subnet + <span class="hljs-string">&#x27;.&#x27;</span>));
+        <span class="hljs-keyword">const</span> network = <span class="hljs-string">`<span class="hljs-subst">${parts[<span class="hljs-number">0</span>]}</span>.<span class="hljs-subst">${parts[<span class="hljs-number">1</span>]}</span>.<span class="hljs-subst">${parts[<span class="hljs-number">2</span>]}</span>.0/24`</span>;
+
+        <span class="hljs-keyword">if</span> (isManagementIP) {
+            managementNetworkCounts[network]++;
+        } <span class="hljs-keyword">else</span> {
+            productionNetworkCounts[network]++;
+        }
+    });
+
+    <span class="hljs-comment">// Prefer production, fallback to management</span>
+    <span class="hljs-keyword">return</span> mostCommonProduction || mostCommonManagement || <span class="hljs-string">&#x27;N/A&#x27;</span>;
+}</code></pre><p><strong>Vendor Cards HTML</strong> (lines 233-255):</p>
+<pre><code class="language-javascript">&lt;div <span class="hljs-keyword">class</span>=<span class="hljs-string">&quot;vendor-mini-cards&quot;</span>&gt;
+    <span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;vendor-mini-card&quot;</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;vendor-label&quot;</span>&gt;</span>CISCO<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;vendor-icon&quot;</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">i</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;fas fa-network-wired text-primary&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">i</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;vendor-count&quot;</span>&gt;</span>${ciscoCount}<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+    &lt;!-- <span class="hljs-title class_">Palo</span> <span class="hljs-title class_">Alto</span> and <span class="hljs-title class_">Other</span> follow same pattern --&gt;
+&lt;/div&gt;</code></pre><h3>CSS Architecture (vulnerabilities.css)</h3><p><strong>Vendor Mini-Cards</strong> (lines 716-759):</p>
+<pre><code class="language-css"><span class="hljs-selector-class">.device-card</span> <span class="hljs-selector-class">.vendor-mini-cards</span> {
+    <span class="hljs-attribute">display</span>: grid;
+    <span class="hljs-attribute">grid-template-columns</span>: <span class="hljs-built_in">repeat</span>(<span class="hljs-number">3</span>, <span class="hljs-number">1</span>fr);
+    <span class="hljs-attribute">gap</span>: <span class="hljs-number">0.5rem</span>;
+    <span class="hljs-attribute">padding</span>: <span class="hljs-number">0.75rem</span> <span class="hljs-number">0</span>;
+}
+
+<span class="hljs-selector-class">.device-card</span> <span class="hljs-selector-class">.vendor-mini-card</span> {
+    <span class="hljs-attribute">background</span>: <span class="hljs-built_in">var</span>(--tblr-bg-surface);
+    <span class="hljs-attribute">border</span>: <span class="hljs-number">1px</span> solid <span class="hljs-built_in">var</span>(--tblr-border-color);
+    <span class="hljs-attribute">border-radius</span>: <span class="hljs-built_in">var</span>(--tblr-border-radius);
+    <span class="hljs-attribute">padding</span>: <span class="hljs-number">0.75rem</span> <span class="hljs-number">0.5rem</span>;
+    <span class="hljs-attribute">text-align</span>: center;
+    <span class="hljs-attribute">min-height</span>: <span class="hljs-number">4rem</span>;
+    <span class="hljs-attribute">display</span>: flex;
+    <span class="hljs-attribute">flex-direction</span>: column;
+    <span class="hljs-attribute">justify-content</span>: center;
+    <span class="hljs-attribute">gap</span>: <span class="hljs-number">0.25rem</span>;
+}
+
+<span class="hljs-selector-class">.device-card</span> <span class="hljs-selector-class">.vendor-mini-card</span><span class="hljs-selector-pseudo">:hover</span> {
+    <span class="hljs-attribute">border-color</span>: <span class="hljs-built_in">var</span>(--hextrackr-primary);
+    <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">translateY</span>(-<span class="hljs-number">1px</span>);
+    <span class="hljs-attribute">box-shadow</span>: <span class="hljs-number">0</span> <span class="hljs-number">2px</span> <span class="hljs-number">8px</span> <span class="hljs-built_in">rgb</span>(<span class="hljs-number">32</span>, <span class="hljs-number">107</span>, <span class="hljs-number">196</span>, <span class="hljs-number">0.15</span>);
+}
+
+<span class="hljs-selector-class">.device-card</span> <span class="hljs-selector-class">.vendor-mini-card</span> <span class="hljs-selector-class">.vendor-icon</span> {
+    <span class="hljs-attribute">font-size</span>: <span class="hljs-number">1.5rem</span>;
+    <span class="hljs-attribute">line-height</span>: <span class="hljs-number">1</span>;
+}</code></pre><h2>Files Modified</h2><h3>Backend (1 file)</h3><ul>
+<li><code>app/services/locationService.js</code><ul>
+<li>Added IP address collection (line 89)</li>
+<li>Added KEV device mapping (lines 177-182)</li>
+<li>Return device_ips and kev_devices arrays (lines 209-221)</li>
+</ul>
+</li>
+</ul>
+<h3>Frontend (2 files)</h3><ul>
+<li><p><code>app/public/scripts/shared/location-cards.js</code></p>
+<ul>
+<li>KEV badge shows device count (lines 180-201)</li>
+<li>KEV modal implementation (lines 429-473)</li>
+<li>Vendor mini-cards HTML (lines 233-255)</li>
+<li>Network parser with priority logic (lines 317-371)</li>
+<li>VPR styling (red color, Total label) (lines 211-220)</li>
+<li>KEV Devices sort option (lines 66, 107-110)</li>
+<li>Default page size to 6 (line 25)</li>
+</ul>
+</li>
+<li><p><code>app/public/styles/pages/vulnerabilities.css</code></p>
+<ul>
+<li>Vendor mini-cards CSS (lines 716-759, 44 new lines)</li>
+</ul>
+</li>
+</ul>
+<h2>Migration Notes</h2><p><strong>Breaking Changes</strong>: None</p>
+<p><strong>Data Requirements</strong>:</p>
+<ul>
+<li><code>vulnerabilities_current</code> table must have <code>ip_address</code> column</li>
+<li>Backend restart required to load IP tracking changes</li>
+<li>No database schema changes needed</li>
+</ul>
+<p><strong>Feature Flags</strong>: None</p>
+<h2>Testing Checklist</h2><h3>Functional Testing</h3><ul>
+<li><input checked="" disabled="" type="checkbox"> KEV badge shows correct device count</li>
+<li><input checked="" disabled="" type="checkbox"> KEV modal displays device list with CVEs</li>
+<li><input checked="" disabled="" type="checkbox"> CVE badges link to KEV details modal</li>
+<li><input checked="" disabled="" type="checkbox"> Modal scrolls when &gt;5 devices</li>
+<li><input checked="" disabled="" type="checkbox"> Vendor cards display correct counts</li>
+<li><input checked="" disabled="" type="checkbox"> IP parser shows production networks</li>
+<li><input checked="" disabled="" type="checkbox"> IP parser falls back to management networks</li>
+<li><input checked="" disabled="" type="checkbox"> Sort by KEV Devices works correctly</li>
+<li><input checked="" disabled="" type="checkbox"> VPR displays in red with Total label</li>
+<li><input checked="" disabled="" type="checkbox"> Default 6 cards per page</li>
+<li><input checked="" disabled="" type="checkbox"> Pagination dropdown (6/12/24/48/96)</li>
+</ul>
+<h3>Visual Consistency</h3><ul>
+<li><input checked="" disabled="" type="checkbox"> Vendor cards span full width (3 equal columns)</li>
+<li><input checked="" disabled="" type="checkbox"> Icons sized correctly (1.5rem)</li>
+<li><input checked="" disabled="" type="checkbox"> Hover effects match VPR mini-cards</li>
+<li><input checked="" disabled="" type="checkbox"> Location pin icon is gray</li>
+<li><input checked="" disabled="" type="checkbox"> View Site Details button matches other cards</li>
+<li><input checked="" disabled="" type="checkbox"> Dark mode compatibility</li>
+</ul>
+<h3>Cross-Browser Testing</h3><ul>
+<li><input checked="" disabled="" type="checkbox"> Chrome/Edge (Chromium)</li>
+<li><input checked="" disabled="" type="checkbox"> Firefox</li>
+<li><input checked="" disabled="" type="checkbox"> Safari</li>
+</ul>
+<h2>Success Criteria</h2><ul>
+<li>✅ Location cards visually match device/vulnerability cards</li>
+<li>✅ KEV badge shows device count (not CVE count)</li>
+<li>✅ KEV modal shows device list with clickable CVEs</li>
+<li>✅ Vendor cards use 3-column grid layout</li>
+<li>✅ Network parser prioritizes production IPs</li>
+<li>✅ Sort by KEV Devices option available</li>
+<li>✅ VPR displays in red with &quot;Total VPR&quot; label</li>
+<li>✅ All visual polish items complete</li>
+<li>✅ Default 6 cards per page</li>
+<li>✅ Browser tested and validated</li>
+</ul>
+<h2>Known Limitations</h2><p><strong>Search Bar</strong>: Global search bar not filtering location cards (will fix in v1.0.85)</p>
+<p><strong>Physical Address</strong>: Placeholder &quot;Physical address coming soon&quot; - will be wired to ticket shipping addresses in future release</p>
+<p><strong>Supervisor/Technicians</strong>: Gray box pattern established for future implementation (similar to physical address placeholder)</p>
+<p><strong>View Site Details Button</strong>: Currently disabled - awaits site detail page implementation</p>
+<p><strong>Vendor VPR Breakdown</strong>: Backend calculates total VPR but not per-vendor VPR (intentionally omitted - removed confusing 0.0 displays)</p>
+<h2>Related Issues</h2><ul>
+<li>Parent: <a href="https://linear.app/hextrackr/issue/HEX-288">HEX-288</a> - Location Cards View (parent)</li>
+<li>Task 1: <a href="https://linear.app/hextrackr/issue/HEX-292">HEX-292</a> - Implementation Phase 1 MVP (v1.0.80-1.0.83)</li>
+<li>Task 5: <a href="https://linear.app/hextrackr/issue/HEX-293">HEX-293</a> - UI Refinement (v1.0.84) ✅ <strong>THIS RELEASE</strong></li>
+<li>Future: <a href="https://linear.app/hextrackr/issue/HEX-242">HEX-242</a> - Physical address integration</li>
+</ul>
+<h2>Upgrade Path</h2><p>From v1.0.83:</p>
+<ol>
+<li>Pull latest code</li>
+<li>Run <code>npm run release</code> to sync versions</li>
+<li>Restart Docker: <code>docker-compose restart</code></li>
+<li>Hard refresh browser (Cmd+Shift+R / Ctrl+Shift+F5)</li>
+<li>Navigate to Vulnerabilities → Locations view</li>
+<li>Verify vendor cards span full width</li>
+<li>Verify KEV badge clickable and modal works</li>
+<li>Verify network addresses display correctly</li>
+</ol>
+<h2>Progress Summary</h2><p><strong>Location Cards Feature (HEX-288)</strong>:</p>
+<ul>
+<li>✅ Task 1: Backend locationService.js (v1.0.80)</li>
+<li>✅ Task 2: API endpoint with caching (v1.0.81)</li>
+<li>✅ Task 3: Frontend location cards UI (v1.0.82)</li>
+<li>✅ Task 4: Bug fix &amp; testing documentation (v1.0.83)</li>
+<li>✅ Task 5: UI refinement (v1.0.84) ← <strong>THIS RELEASE</strong></li>
+</ul>
+<p><strong>Total Effort</strong>: 5 versions (1.0.80 through 1.0.84)<br><strong>Status</strong>: <strong>MVP COMPLETE</strong> ✅</p>
+<hr>
+<p><strong>Version</strong>: v1.0.84<br><strong>Release Date</strong>: 2025-10-18<br><strong>Category</strong>: Enhancement<br><strong>Status</strong>: ✅ Released</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
