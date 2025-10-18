@@ -165,7 +165,11 @@ io.on("connection", (socket) => {
 
 // Database bootstrap using the extracted DatabaseService
 // HEX-133: Database moved outside public root for security
-const dbPath = path.join(__dirname, "..", "data", "hextrackr.db");
+// HEX-280: Use DATABASE_PATH environment variable (defaults to data/hextrackr.db for named volume)
+const dbPath = process.env.DATABASE_PATH
+    ? path.resolve(process.env.DATABASE_PATH)
+    : path.join(__dirname, "..", "data", "hextrackr.db");
+console.log(`[DATABASE] Using database path: ${dbPath}`);
 const databaseService = new DatabaseService(dbPath);
 
 async function initializeApplication() {
@@ -566,6 +570,67 @@ function startCiscoBackgroundSync(db) {
 
     // Schedule recurring sync every 24 hours
     setInterval(runPaloSync, SYNC_INTERVAL);
+
+    // ========================================
+    // CISA KEV Background Sync
+    // ========================================
+
+    // Initialize KEV service
+    const KEVService = require("../services/kevService");
+    const kevService = new KEVService(db);
+
+    // Initialize KEV background sync preference (default: true)
+    preferencesService.getPreference(ADMIN_USER_ID, "kev_background_sync_enabled")
+        .then(result => {
+            if (!result.success) {
+                // Preference doesn't exist - create it with default value "true"
+                return preferencesService.setPreference(ADMIN_USER_ID, "kev_background_sync_enabled", "true");
+            }
+        })
+        .then(() => {
+            console.log("KEV background sync preference initialized");
+        })
+        .catch(err => {
+            console.warn("Failed to initialize KEV background sync preference:", err.message);
+        });
+
+    /**
+     * Execute CISA KEV sync if enabled
+     * Note: No credentials check needed - CISA KEV API is public
+     */
+    async function runKevSync() {
+        try {
+            // Check if background sync is enabled (default: true)
+            const bgSyncPref = await preferencesService.getPreference(ADMIN_USER_ID, "kev_background_sync_enabled");
+            const isEnabled = bgSyncPref.success && bgSyncPref.data
+                ? (bgSyncPref.data.value === "true" || bgSyncPref.data.value === true)
+                : true; // Default enabled if preference doesn't exist
+
+            if (!isEnabled) {
+                console.log("KEV background sync skipped: Disabled by user preference");
+                return;
+            }
+
+            console.log("Starting CISA KEV background sync...");
+            const result = await kevService.syncKevData();
+
+            console.log(` KEV background sync completed: ${result.totalRecords} KEVs synced, ${result.matchedCount} matched`);
+
+        } catch (error) {
+            console.error("KEV background sync failed:", error.message);
+            // Don't crash the server on sync failure - just log and continue
+        }
+    }
+
+    // Run initial sync on startup (6 min delay, staggered after Palo Alto)
+    const KEV_STARTUP_DELAY = PALO_STARTUP_DELAY + 30000; // 6 minutes
+    console.log("CISA KEV background sync scheduled (runs 6 min after startup + every 24 hours)");
+    setTimeout(() => {
+        runKevSync();
+    }, KEV_STARTUP_DELAY);
+
+    // Schedule recurring sync every 24 hours
+    setInterval(runKevSync, SYNC_INTERVAL);
 }
 
 // ========================================
