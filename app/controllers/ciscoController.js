@@ -155,6 +155,41 @@ class CiscoController {
             });
         }
     }
+
+    /**
+     * Get fixed versions for a specific CVE (HEX-287)
+     * Supports OS family filtering for multi-family CVEs
+     * @async
+     * @param {Object} req - Express request object
+     * @param {Object} res - Express response object
+     * @returns {Promise<void>}
+     */
+    async getFixedVersions(req, res) {
+        try {
+            const { cveId } = req.params;
+            const { os_family } = req.query;
+
+            if (!cveId) {
+                return res.status(400).json({
+                    error: "CVE ID is required"
+                });
+            }
+
+            const versions = await this.ciscoAdvisoryService.getFixedVersions(cveId, os_family);
+
+            // Set browser cache header (60 seconds)
+            res.setHeader("Cache-Control", "public, max-age=60, must-revalidate");
+
+            res.json(versions);
+
+        } catch (error) {
+            console.error(` Failed to get fixed versions for ${req.params.cveId}:`, error);
+            res.status(500).json({
+                error: "Failed to get fixed versions",
+                message: error.message
+            });
+        }
+    }
 }
 
 module.exports = CiscoController;
