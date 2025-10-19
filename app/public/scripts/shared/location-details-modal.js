@@ -96,7 +96,7 @@ class LocationDetailsModal {
             // KEV badge
             const kevBadge = kevCount > 0
                 ? `<span class="badge bg-red">${kevCount}</span>`
-                : '<span class="text-muted">0</span>';
+                : "<span class=\"text-muted\">0</span>";
 
             // Calculate network subnet
             const networkSubnet = this.calculateNetworkSubnet(location.device_ips || []);
@@ -197,14 +197,14 @@ class LocationDetailsModal {
             document.getElementById("locationInfo").innerHTML = infoHtml;
 
             // Initialize tooltips
-            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll("[data-bs-toggle=\"tooltip\"]"));
             tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
 
         } catch (error) {
             console.error("[LocationDetailsModal] Error populating location info:", error);
-            document.getElementById("locationInfo").innerHTML = '<p class="text-danger">Error loading location information</p>';
+            document.getElementById("locationInfo").innerHTML = "<p class=\"text-danger\">Error loading location information</p>";
         }
     }
 
@@ -219,11 +219,11 @@ class LocationDetailsModal {
      */
     calculateNetworkSubnet(ipAddresses) {
         if (!ipAddresses || ipAddresses.length === 0) {
-            return 'N/A';
+            return "N/A";
         }
 
         // Management subnets to deprioritize (out-of-band management networks)
-        const managementSubnets = ['10.95', '10.96', '10.97'];
+        const managementSubnets = ["10.95", "10.96", "10.97"];
 
         // Count frequency of production networks (excluding management)
         const productionNetworkCounts = {};
@@ -234,12 +234,12 @@ class LocationDetailsModal {
             if (!ip) {return;}
 
             // Extract first 3 octets
-            const parts = ip.split('.');
+            const parts = ip.split(".");
             if (parts.length >= 3) {
                 const network = `${parts[0]}.${parts[1]}.${parts[2]}.0/24`;
 
                 // Check if this IP is in a management subnet
-                const isManagementIP = managementSubnets.some(subnet => ip.startsWith(subnet + '.'));
+                const isManagementIP = managementSubnets.some(subnet => ip.startsWith(subnet + "."));
 
                 if (isManagementIP) {
                     managementNetworkCounts[network] = (managementNetworkCounts[network] || 0) + 1;
@@ -250,7 +250,7 @@ class LocationDetailsModal {
         });
 
         // Find most common production network first
-        let mostCommon = 'N/A';
+        let mostCommon = "N/A";
         let maxCount = 0;
 
         for (const [network, count] of Object.entries(productionNetworkCounts)) {
@@ -261,7 +261,7 @@ class LocationDetailsModal {
         }
 
         // If no production networks found, fall back to management networks
-        if (mostCommon === 'N/A') {
+        if (mostCommon === "N/A") {
             for (const [network, count] of Object.entries(managementNetworkCounts)) {
                 if (count > maxCount) {
                     maxCount = count;
@@ -412,12 +412,13 @@ class LocationDetailsModal {
     /**
      * Create and configure the location devices grid with 7 columns
      * Aggregates device data from vulnerabilities and displays in AG-Grid
+     * Session 3: Now async to support ticket count integration
      *
      * Pattern source: device-security-modal.js:420-731 (AG-Grid setup and theming)
      *
      * @param {Object} location - Location data with device_ips and vulnerabilities
      */
-    createLocationDevicesGrid(location) {
+    async createLocationDevicesGrid(location) {
         try {
             // Get container and clear existing content
             const gridContainer = document.getElementById("locationDevicesGridContainer");
@@ -433,8 +434,8 @@ class LocationDetailsModal {
                 this.gridApi = null;
             }
 
-            // Aggregate device data from vulnerabilities
-            const deviceData = this.aggregateDeviceData(location);
+            // Aggregate device data from vulnerabilities (now async with ticket counts)
+            const deviceData = await this.aggregateDeviceData(location);
             this.allDevices = deviceData; // Store for filtering
 
             // Define 7 column structure
@@ -646,13 +647,63 @@ Low: ${breakdown.Low.count} (${breakdown.Low.vpr.toFixed(1)})`;
     }
 
     /**
+     * Check ticket state for multiple devices in a single batch request
+     * Pattern source: vulnerability-grid.js:51-98 (HEX-216 batch optimization)
+     * @param {Array<string>} hostnames - Array of device hostnames
+     * @returns {Promise<Object>} Map of hostname to ticket summary {count, status, jobType, tickets}
+     * @since v1.0.89
+     */
+    async checkTicketStateBatch(hostnames) {
+        try {
+            // Get CSRF token first (required for POST requests)
+            const csrfResponse = await fetch("/api/auth/csrf", {
+                credentials: "include"
+            });
+            const { csrfToken } = await csrfResponse.json();
+
+            // Make batch request with CSRF token
+            const response = await fetch("/api/tickets/batch-device-lookup", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-csrf-token": csrfToken
+                },
+                credentials: "include",
+                body: JSON.stringify({ hostnames })
+            });
+
+            if (!response.ok) {
+                console.error("[LocationDetailsModal] Failed to fetch batch ticket data:", response.statusText);
+                // Return empty map on error
+                const emptyMap = {};
+                hostnames.forEach(hostname => {
+                    emptyMap[hostname.toLowerCase()] = { count: 0, status: null, jobType: null, tickets: [] };
+                });
+                return emptyMap;
+            }
+
+            const result = await response.json();
+            return result.data || {};
+        } catch (error) {
+            console.error("[LocationDetailsModal] Error checking ticket state batch:", error);
+            // Return empty map on error
+            const emptyMap = {};
+            hostnames.forEach(hostname => {
+                emptyMap[hostname.toLowerCase()] = { count: 0, status: null, jobType: null, tickets: [] };
+            });
+            return emptyMap;
+        }
+    }
+
+    /**
      * Aggregate device data from vulnerabilities for grid display
      * Groups vulnerabilities by hostname and calculates totals/breakdowns
+     * Session 3: Now async to support ticket count integration
      *
      * @param {Object} location - Location data
-     * @returns {Array<Object>} Array of device objects for grid
+     * @returns {Promise<Array<Object>>} Array of device objects for grid
      */
-    aggregateDeviceData(location) {
+    async aggregateDeviceData(location) {
         try {
             // Get all vulnerabilities (use dataManager if available, otherwise empty array)
             const allVulnerabilities = this.dataManager?.vulnerabilities || [];
@@ -737,6 +788,22 @@ Low: ${breakdown.Low.count} (${breakdown.Low.vpr.toFixed(1)})`;
                 return device;
             });
 
+            // Session 3: Fetch ticket counts in batch (HEX-216 pattern)
+            const hostnames = devices.map(d => d.hostname);
+            if (hostnames.length > 0) {
+                const ticketMap = await this.checkTicketStateBatch(hostnames);
+
+                // Enrich devices with ticket data
+                devices.forEach(device => {
+                    const ticketData = ticketMap[device.hostname.toLowerCase()] || { count: 0, status: null, jobType: null, tickets: [] };
+                    device.ticketCount = ticketData.count;
+                    device.ticketStatus = ticketData.status;
+                    device.tickets = ticketData.tickets || [];
+                });
+
+                console.log(`[LocationDetailsModal] Enriched ${devices.length} devices with ticket counts`);
+            }
+
             return devices;
 
         } catch (error) {
@@ -762,21 +829,88 @@ Low: ${breakdown.Low.count} (${breakdown.Low.vpr.toFixed(1)})`;
     }
 
     /**
-     * Create ticket for device (placeholder for Session 3)
+     * Create ticket for device
+     * Pattern source: device-security-modal.js:947-987 (ticket creation flow)
      * @param {string} hostname - Device hostname
+     * @since v1.0.89
      */
     createTicket(hostname) {
-        console.log(`[LocationDetailsModal] Create ticket for: ${hostname} (Session 3)`);
-        // TODO: Implement in Session 3
+        console.log(`[LocationDetailsModal] Creating ticket for device: ${hostname}`);
+
+        // Parse hostname to extract SITE and Location (ALL CAPS)
+        const site = hostname.substring(0, 4).toUpperCase();       // First 4 characters
+        const location = hostname.substring(0, 5).toUpperCase();   // First 5 characters
+
+        // Prepare ticket data for single device creation
+        const ticketData = {
+            devices: [hostname],
+            site: site,
+            location: location,
+            mode: "single"
+        };
+
+        // Store data in sessionStorage for tickets.html to consume
+        sessionStorage.setItem("autoOpenModal", "true");
+        sessionStorage.setItem("createTicketData", JSON.stringify(ticketData));
+
+        // Navigate to tickets page (modal will auto-open via tickets.js)
+        window.location.href = "/tickets.html";
     }
 
     /**
-     * View tickets for device (placeholder for Session 3)
+     * View tickets for device
+     * Pattern source: device-security-modal.js:989-1003 (ticket navigation)
      * @param {string} hostname - Device hostname
+     * @since v1.0.89
      */
     viewTickets(hostname) {
-        console.log(`[LocationDetailsModal] View tickets for: ${hostname} (Session 3)`);
-        // TODO: Implement in Session 3
+        console.log(`[LocationDetailsModal] Viewing tickets for device: ${hostname}`);
+
+        // Find device data to get ticket info
+        const device = this.allDevices?.find(d => d.hostname === hostname);
+        if (!device) {
+            console.error("[LocationDetailsModal] Device not found:", hostname);
+            return;
+        }
+
+        const ticketCount = device.ticketCount || 0;
+        const tickets = device.tickets || [];
+
+        if (ticketCount === 0) {
+            console.log("[LocationDetailsModal] No tickets found, showing create instead");
+            this.createTicket(hostname);
+            return;
+        } else if (ticketCount === 1) {
+            // Navigate directly to single ticket
+            const ticketId = tickets[0].id;
+            console.log(`[LocationDetailsModal] Opening single ticket: ${ticketId}`);
+            window.location.href = `/tickets.html?openTicket=${ticketId}`;
+            return;
+        } else {
+            // Show picker modal for multiple tickets
+            console.log(`[LocationDetailsModal] Showing picker for ${ticketCount} tickets`);
+            this.showTicketPickerModal(hostname, tickets);
+        }
+    }
+
+    /**
+     * Show ticket picker modal for device with multiple tickets
+     * Pattern source: vulnerability-cards.js:269-312 (ticket picker modal)
+     * @param {string} hostname - Device hostname
+     * @param {Array} tickets - Array of ticket objects
+     * @since v1.0.89
+     */
+    showTicketPickerModal(hostname, tickets) {
+        console.log(`[LocationDetailsModal] Showing ticket picker for ${hostname}: ${tickets.length} tickets`);
+
+        // Use existing ticket picker modal if available
+        if (window.ticketPickerModal && typeof window.ticketPickerModal.show === "function") {
+            window.ticketPickerModal.show(hostname, tickets);
+        } else {
+            console.error("[LocationDetailsModal] ticketPickerModal not available");
+            // Fallback: Navigate to tickets page filtered by device
+            window.location.href = `/tickets.html?device=${encodeURIComponent(hostname)}`;
+        }
     }
 
     /**
@@ -789,10 +923,11 @@ Low: ${breakdown.Low.count} (${breakdown.Low.vpr.toFixed(1)})`;
 
     /**
      * Show modal with theme propagation
+     * Session 3: Now async to support ticket count loading
      *
      * Pattern source: device-security-modal.js:768-795 (theme propagation)
      */
-    showModal() {
+    async showModal() {
         try {
             // Detect current theme and propagate to modal
             const currentTheme = document.documentElement.getAttribute("data-bs-theme") || "light";
@@ -806,8 +941,8 @@ Low: ${breakdown.Low.count} (${breakdown.Low.vpr.toFixed(1)})`;
             // Populate VPR summary cards
             this.populateVprSummary(this.currentLocation);
 
-            // Create device grid
-            this.createLocationDevicesGrid(this.currentLocation);
+            // Create device grid (now async with ticket count integration)
+            await this.createLocationDevicesGrid(this.currentLocation);
 
             // Initialize Bootstrap modal
             this.modal = new bootstrap.Modal(modalElement);
@@ -850,7 +985,7 @@ Low: ${breakdown.Low.count} (${breakdown.Low.vpr.toFixed(1)})`;
         this.activeFilter = null;
 
         // Dispose tooltips
-        const tooltips = document.querySelectorAll('#locationInfo [data-bs-toggle="tooltip"]');
+        const tooltips = document.querySelectorAll("#locationInfo [data-bs-toggle=\"tooltip\"]");
         tooltips.forEach(tooltipEl => {
             const tooltip = bootstrap.Tooltip.getInstance(tooltipEl);
             if (tooltip) {
