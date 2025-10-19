@@ -117,6 +117,30 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
 
 ---
 
+## Specialized Subagents
+
+**Purpose**: Offload complex searches to isolated context windows - preserves main session tokens for actual implementation work
+
+**Search Strategy** (use in this order to avoid assumptions):
+1. `/codebase-search` - Fast semantic search (if codebase indexed) - USE FIRST
+2. **Explore agent** - Grep/glob-based keyword search (fallback if index unavailable)
+3. **codebase-navigator** - Custom agent combining claude-context semantic search + file reads for comprehensive architectural analysis
+
+**Available Agents**:
+- **Explore** ⭐ (Claude Code built-in): Keyword/pattern search via Grep/Glob/Read (thoroughness: quick/medium/"very thorough")
+- **codebase-navigator** ⭐ (HexTrackr custom): claude-context semantic search + targeted file reads - prevents building features on assumptions
+- **linear-librarian**: Cross-team Linear issue research, status intelligence
+- **memento-oracle**: Historical pattern mining from knowledge graph
+- **hextrackr-fullstack-dev**: Feature implementation with Five Whys, JSDoc standards, pattern reuse
+
+**CRITICAL**: Never assume code exists or works a certain way - always search first using one of the above strategies
+
+**Why Use Agents**: Offload 20-50K token searches to isolated context windows - preserve main session for actual implementation
+
+**Usage**: `Task(subagent_type: "Explore", prompt: "Find all WebSocket event handlers, thoroughness: medium")`
+
+---
+
 ## MCP Tools & Slash Commands
 
 ### Codebase Indexing & Search (claude-context MCP)
