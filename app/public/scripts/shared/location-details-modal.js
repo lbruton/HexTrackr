@@ -302,41 +302,37 @@ class LocationDetailsModal {
                 Low: { count: 0, vpr: 0 }
             };
 
-            // Build HTML for 4 severity filter cards
+            // Build HTML for 4 severity filter cards - show ONLY Total VPR per severity
             document.getElementById("vprSummaryCards").innerHTML = `
                 <div class="col-lg-3 col-6">
                     <div class="card card-sm bg-red-lt vpr-filter-card" style="cursor: pointer;" data-severity="Critical" onclick="window.locationDetailsModal.filterBySeverity('Critical')">
                         <div class="card-body text-center">
-                            <div class="text-red h3 mb-1">${severityBreakdown.Critical.count}</div>
                             <div class="text-muted small">Critical</div>
-                            <div class="text-red fw-bold">${(severityBreakdown.Critical.vpr || 0).toFixed(1)}</div>
+                            <div class="text-red h3 fw-bold">${(severityBreakdown.Critical.vpr || 0).toFixed(1)}</div>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-6">
                     <div class="card card-sm bg-orange-lt vpr-filter-card" style="cursor: pointer;" data-severity="High" onclick="window.locationDetailsModal.filterBySeverity('High')">
                         <div class="card-body text-center">
-                            <div class="text-orange h3 mb-1">${severityBreakdown.High.count}</div>
                             <div class="text-muted small">High</div>
-                            <div class="text-orange fw-bold">${(severityBreakdown.High.vpr || 0).toFixed(1)}</div>
+                            <div class="text-orange h3 fw-bold">${(severityBreakdown.High.vpr || 0).toFixed(1)}</div>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-6">
                     <div class="card card-sm bg-yellow-lt vpr-filter-card" style="cursor: pointer;" data-severity="Medium" onclick="window.locationDetailsModal.filterBySeverity('Medium')">
                         <div class="card-body text-center">
-                            <div class="text-yellow h3 mb-1">${severityBreakdown.Medium.count}</div>
                             <div class="text-muted small">Medium</div>
-                            <div class="text-yellow fw-bold">${(severityBreakdown.Medium.vpr || 0).toFixed(1)}</div>
+                            <div class="text-yellow h3 fw-bold">${(severityBreakdown.Medium.vpr || 0).toFixed(1)}</div>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-6">
                     <div class="card card-sm bg-green-lt vpr-filter-card" style="cursor: pointer;" data-severity="Low" onclick="window.locationDetailsModal.filterBySeverity('Low')">
                         <div class="card-body text-center">
-                            <div class="text-green h3 mb-1">${severityBreakdown.Low.count}</div>
                             <div class="text-muted small">Low</div>
-                            <div class="text-green fw-bold">${(severityBreakdown.Low.vpr || 0).toFixed(1)}</div>
+                            <div class="text-green h3 fw-bold">${(severityBreakdown.Low.vpr || 0).toFixed(1)}</div>
                         </div>
                     </div>
                 </div>
