@@ -76,12 +76,13 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
 
 ---
 
-### RSPI (Research → Specification → Plan → Implement)
+### SRPI (Specification → Research → Plan → Implement)
 **Use for**: New features, user-facing enhancements, cross-system changes
-- Start with RESEARCH and SPECIFICATION (the WHY) - learn what exists today, and what we are building for tomorrow
-- Then Plan the technical details.
-- Then Implement by breaking the task into smaller subtasks that can be completed in 1-3 hour chunks.
-- Templates: `/docs/TEMPLATE_SPECIFICATION.md`, `TEMPLATE_RESEARCH.md`, `TEMPLATE_PLAN.md`, `TEMPLATE_IMPLEMENT.md`
+- **Specification + Research** (combined phase): Define WHY (user requirements) + discover WHAT (codebase integration points, risks)
+- **Plan**: Define HOW using Context7 standards, Codacy linting, proper frameworks
+- **Implement**: Break into bite-sized sessions, use specialized agents, checkpoint/rewind workflow
+- Full process guide: `/docs/SRPI/SRPI_PROCESS.md`
+- Templates: `/docs/SRPI/TEMPLATE_*.md` (Specification, Research, Plan, Implement, Changelog)
 
 ---
 
@@ -104,6 +105,15 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
   - Session 3 → v1.0.67
   - Session 4 → v1.0.68
   - Session 5 → v1.0.69 (etc.)
+
+---
+
+## Linear Issue Tracking
+
+**Team**: HexTrackr-Dev (primary development team)
+**Workflow**: Use Linear MCP (`mcp__linear-server__*`) to track all planning, tasks, and implementations
+**When to Use**: Check Linear for current work context, update issue status during sessions, link commits to issue IDs (e.g., `HEX-297`)
+**Status Flow**: Backlog → Todo → In Progress → In Review → Done
 
 ---
 
