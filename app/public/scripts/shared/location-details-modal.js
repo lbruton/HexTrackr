@@ -667,7 +667,7 @@ class LocationDetailsModal {
                                 );
 
                                 if (fixedVersion) {
-                                    cell.innerHTML = `<span class=\"font-monospace text-success\">${DOMPurify.sanitize(fixedVersion)}+</span>`;
+                                    cell.innerHTML = `<span class=\"font-monospace text-success\">${DOMPurify.sanitize(fixedVersion)}</span>`;
                                     params.node.setDataValue("fixedVersion", fixedVersion);
                                 } else {
                                     cell.innerHTML = "<span class=\"font-monospace text-muted\">No Fix</span>";

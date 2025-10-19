@@ -182,7 +182,7 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
                         );
 
                         if (fixedVersion) {
-                            cell.innerHTML = `<span class="font-monospace text-success small">${DOMPurify.sanitize(fixedVersion)}+</span>`;
+                            cell.innerHTML = `<span class="font-monospace text-success small">${DOMPurify.sanitize(fixedVersion)}</span>`;
                             params.node.setDataValue("fixed_version", fixedVersion);  // Update AG-Grid data model
                             params.data.fixed_version = fixedVersion;  // HEX-234: Update source data for search
                         } else {

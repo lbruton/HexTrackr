@@ -230,7 +230,7 @@ class DeviceSecurityModal {
                 validVersions.sort((a, b) => window.ciscoAdvisoryHelper.compareVersions(a, b));
 
                 // Display all unique versions, comma-separated
-                const versionList = validVersions.map(v => DOMPurify.sanitize(v) + "+").join(", ");
+                const versionList = validVersions.map(v => DOMPurify.sanitize(v)).join(", ");
                 fixedVersionElement.innerHTML = `<span class="font-monospace text-success">${versionList}</span>`;
             } else {
                 fixedVersionElement.innerHTML = "<span class=\"font-monospace text-muted\">No Fix</span>";
@@ -480,7 +480,7 @@ class DeviceSecurityModal {
                             );
 
                             if (fixedVersion) {
-                                cell.innerHTML = `<span class="font-monospace text-success">${DOMPurify.sanitize(fixedVersion)}+</span>`;
+                                cell.innerHTML = `<span class="font-monospace text-success">${DOMPurify.sanitize(fixedVersion)}</span>`;
                                 params.node.setDataValue("fixed_version", fixedVersion);
                             } else {
                                 cell.innerHTML = "<span class=\"font-monospace text-muted\">No Fix</span>";
