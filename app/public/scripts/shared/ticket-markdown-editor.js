@@ -20,7 +20,7 @@ class TicketMarkdownEditor {
         this.isEditMode = false;
         this.currentTemplate = null;
         this.currentTicketData = null;
-        this.currentVariant = 'upgrade';  // Default variant
+        this.currentVariant = "upgrade";  // Default variant
         this.validationTimeout = null;
         this.isRestoring = false;
 
@@ -37,19 +37,19 @@ class TicketMarkdownEditor {
      */
     getTemplateVariant(jobType) {
         if (!jobType) {
-            return 'upgrade';  // Default fallback
+            return "upgrade";  // Default fallback
         }
 
         switch (jobType.toLowerCase()) {
-            case 'replace':
-            case 'refresh':
-                return 'replacement';  // Both use same template (equipment swap workflow)
-            case 'mitigate':
-                return 'mitigate';     // KEV emergency patching
-            case 'upgrade':
-            case 'other':
+            case "replace":
+            case "refresh":
+                return "replacement";  // Both use same template (equipment swap workflow)
+            case "mitigate":
+                return "mitigate";     // KEV emergency patching
+            case "upgrade":
+            case "other":
             default:
-                return 'upgrade';      // Default for Upgrade and Other job types
+                return "upgrade";      // Default for Upgrade and Other job types
         }
     }
 
@@ -480,14 +480,14 @@ Generated: [GENERATED_TIME]`;
     formatAddress(line1, line2, city, state, zip) {
         const parts = [];
 
-        if (line1) parts.push(line1);
-        if (line2) parts.push(line2);
+        if (line1) {parts.push(line1);}
+        if (line2) {parts.push(line2);}
         if (city && state && zip) {
             parts.push(`${city}, ${state} ${zip}`);
         } else if (city || state || zip) {
             // Handle partial city/state/zip
             const cityStateZip = [city, state, zip].filter(Boolean).join(" ");
-            if (cityStateZip) parts.push(cityStateZip);
+            if (cityStateZip) {parts.push(cityStateZip);}
         }
 
         return parts.length > 0 ? parts.join("\n") : null;

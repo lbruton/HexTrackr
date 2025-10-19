@@ -54,7 +54,7 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
             maxWidth: 150,
             resizable: true,
             cellRenderer: (params) => {
-                if (params.value && typeof params.value === 'string' && params.value.trim() !== "") {
+                if (params.value && typeof params.value === "string" && params.value.trim() !== "") {
                     return new Date(params.value).toLocaleDateString();
                 }
                 return "-";
@@ -157,21 +157,21 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
                 // Async lookup in setTimeout (non-blocking)
                 setTimeout(async () => {
                     const cell = document.getElementById(cellId);
-                    if (!cell) return;
+                    if (!cell) {return;}
 
                     // Determine which advisory helper to use based on vendor
                     let advisoryHelper = null;
-                    if (vendor?.toLowerCase().includes('cisco')) {
+                    if (vendor?.toLowerCase().includes("cisco")) {
                         advisoryHelper = window.ciscoAdvisoryHelper;
-                    } else if (vendor?.toLowerCase().includes('palo')) {
+                    } else if (vendor?.toLowerCase().includes("palo")) {
                         advisoryHelper = window.paloAdvisoryHelper;
                     }
 
                     // Unsupported vendor or helper not loaded
                     if (!advisoryHelper) {
-                        cell.innerHTML = `<span class="font-monospace text-muted small">N/A</span>`;
-                        params.node.setDataValue('fixed_version', 'N/A');  // Update AG-Grid data model for search
-                        params.data.fixed_version = 'N/A';  // HEX-234: Update source data for search
+                        cell.innerHTML = "<span class=\"font-monospace text-muted small\">N/A</span>";
+                        params.node.setDataValue("fixed_version", "N/A");  // Update AG-Grid data model for search
+                        params.data.fixed_version = "N/A";  // HEX-234: Update source data for search
                         return;
                     }
 
@@ -183,17 +183,17 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
 
                         if (fixedVersion) {
                             cell.innerHTML = `<span class="font-monospace text-success small">${DOMPurify.sanitize(fixedVersion)}+</span>`;
-                            params.node.setDataValue('fixed_version', fixedVersion);  // Update AG-Grid data model
+                            params.node.setDataValue("fixed_version", fixedVersion);  // Update AG-Grid data model
                             params.data.fixed_version = fixedVersion;  // HEX-234: Update source data for search
                         } else {
-                            cell.innerHTML = `<span class="font-monospace text-muted small">No Fix</span>`;
-                            params.node.setDataValue('fixed_version', 'No Fix');
-                            params.data.fixed_version = 'No Fix';  // HEX-234: Update source data for search
+                            cell.innerHTML = "<span class=\"font-monospace text-muted small\">No Fix</span>";
+                            params.node.setDataValue("fixed_version", "No Fix");
+                            params.data.fixed_version = "No Fix";  // HEX-234: Update source data for search
                         }
                     } catch (error) {
-                        cell.innerHTML = `<span class="font-monospace text-muted small">Error</span>`;
-                        params.node.setDataValue('fixed_version', 'Error');
-                        params.data.fixed_version = 'Error';  // HEX-234: Update source data for search
+                        cell.innerHTML = "<span class=\"font-monospace text-muted small\">Error</span>";
+                        params.node.setDataValue("fixed_version", "Error");
+                        params.data.fixed_version = "Error";  // HEX-234: Update source data for search
                     }
                 }, 0);
 
@@ -339,7 +339,7 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
 
                 // Has tickets - show colored indicator based on status
                 let colorClass = "text-secondary";  // Gray for unknown
-                let icon = "fas fa-ticket-alt";
+                const icon = "fas fa-ticket-alt";
 
                 if (ticketStatus === "Overdue") {
                     colorClass = "text-danger";     // Red
@@ -694,7 +694,7 @@ function showGridTicketPickerModal(hostname, tickets) {
     // Build modal content - reuses existing modal structure
     const modalBody = document.getElementById("ticketPickerModalBody");
     if (!modalBody) {
-        logger.error("ui", `[Grid Ticket Picker] Modal body element not found!`);
+        logger.error("ui", "[Grid Ticket Picker] Modal body element not found!");
         return;
     }
 
@@ -733,19 +733,19 @@ function showGridTicketPickerModal(hostname, tickets) {
     // Show the modal
     const modalElement = document.getElementById("ticketPickerModal");
     if (!modalElement) {
-        logger.error("ui", `[Grid Ticket Picker] Modal element not found!`);
+        logger.error("ui", "[Grid Ticket Picker] Modal element not found!");
         return;
     }
 
-    logger.debug("ui", `[Grid Ticket Picker] Showing modal...`);
+    logger.debug("ui", "[Grid Ticket Picker] Showing modal...");
     if (typeof bootstrap === "undefined") {
-        logger.error("ui", `[Grid Ticket Picker] Bootstrap is not loaded!`);
+        logger.error("ui", "[Grid Ticket Picker] Bootstrap is not loaded!");
         return;
     }
 
     const modal = new bootstrap.Modal(modalElement);
     modal.show();
-    logger.debug("ui", `[Grid Ticket Picker] Modal shown successfully`);
+    logger.debug("ui", "[Grid Ticket Picker] Modal shown successfully");
 }
 
 // Export functions for module usage

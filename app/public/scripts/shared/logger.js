@@ -24,9 +24,9 @@ class Logger {
         this.debugMode = this._isDebugMode();
 
         // Check if we're in development environment
-        this.isDevelopment = window.location.hostname === 'localhost' ||
-                             window.location.hostname === '127.0.0.1' ||
-                             window.location.hostname === 'dev.hextrackr.com';
+        this.isDevelopment = window.location.hostname === "localhost" ||
+                             window.location.hostname === "127.0.0.1" ||
+                             window.location.hostname === "dev.hextrackr.com";
 
         // Configuration cache
         this.config = null;
@@ -34,14 +34,14 @@ class Logger {
 
         // Load configuration asynchronously (non-blocking)
         this.loadConfig().catch(err => {
-            console.warn('Failed to load logging config, using defaults:', err.message);
+            console.warn("Failed to load logging config, using defaults:", err.message);
         });
 
         // Log initialization (only once)
         if (this.debugMode) {
-            console.log('Debug mode enabled - verbose logging active');
+            console.log("Debug mode enabled - verbose logging active");
         } else if (!this.isDevelopment) {
-            console.log('HexTrackr production mode - debug logs disabled');
+            console.log("HexTrackr production mode - debug logs disabled");
         }
     }
 
@@ -51,7 +51,7 @@ class Logger {
      */
     async loadConfig() {
         try {
-            const response = await fetch('/config/logging.config.json');
+            const response = await fetch("/config/logging.config.json");
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
             }
@@ -83,7 +83,7 @@ class Logger {
                     database: { enabled: true }
                 }
             },
-            emojis: { debug: '🐛', info: 'ℹ️', warn: '⚠️', error: '❌', success: '✅' }
+            emojis: { debug: "🐛", info: "ℹ️", warn: "⚠️", error: "❌", success: "✅" }
         };
     }
 
@@ -94,8 +94,8 @@ class Logger {
      */
     _isDebugMode() {
         try {
-            return localStorage.getItem('hextrackr_debug') === 'true' ||
-                   sessionStorage.getItem('hextrackr_debug') === 'true';
+            return localStorage.getItem("hextrackr_debug") === "true" ||
+                   sessionStorage.getItem("hextrackr_debug") === "true";
         } catch (e) {
             return false;
         }
@@ -136,8 +136,8 @@ class Logger {
      */
     log(category, ...args) {
         // Support legacy usage without category
-        if (typeof category !== 'string' || !this._shouldLog('debug', category)) {
-            if (typeof category !== 'string') {
+        if (typeof category !== "string" || !this._shouldLog("debug", category)) {
+            if (typeof category !== "string") {
                 args.unshift(category);
                 category = null;
             } else {
@@ -157,8 +157,8 @@ class Logger {
      */
     debug(category, ...args) {
         // Support legacy usage without category
-        if (typeof category !== 'string' || !this._shouldLog('debug', category)) {
-            if (typeof category !== 'string') {
+        if (typeof category !== "string" || !this._shouldLog("debug", category)) {
+            if (typeof category !== "string") {
                 args.unshift(category);
                 category = null;
             } else {
@@ -179,8 +179,8 @@ class Logger {
      */
     info(category, ...args) {
         // Support legacy usage without category
-        if (typeof category !== 'string' || !this._shouldLog('info', category)) {
-            if (typeof category !== 'string') {
+        if (typeof category !== "string" || !this._shouldLog("info", category)) {
+            if (typeof category !== "string") {
                 args.unshift(category);
                 category = null;
             } else {
@@ -199,8 +199,8 @@ class Logger {
      */
     warn(category, ...args) {
         // Support legacy usage without category
-        if (typeof category !== 'string' || !this._shouldLog('warn', category)) {
-            if (typeof category !== 'string') {
+        if (typeof category !== "string" || !this._shouldLog("warn", category)) {
+            if (typeof category !== "string") {
                 args.unshift(category);
                 category = null;
             } else {
@@ -210,7 +210,7 @@ class Logger {
 
         // Guard against empty warnings (called with just category, no message)
         if (args.length === 0) {
-            console.warn(`[${category || 'general'}] Warning logged with no message`);
+            console.warn(`[${category || "general"}] Warning logged with no message`);
             return;
         }
 
@@ -225,8 +225,8 @@ class Logger {
      */
     error(category, ...args) {
         // Support legacy usage without category
-        if (typeof category !== 'string' || !this._shouldLog('error', category)) {
-            if (typeof category !== 'string') {
+        if (typeof category !== "string" || !this._shouldLog("error", category)) {
+            if (typeof category !== "string") {
                 args.unshift(category);
                 category = null;
             } else {
@@ -252,10 +252,10 @@ class Logger {
             }
 
             // Send to backend audit endpoint
-            const response = await fetch('/api/audit-logs', {
-                method: 'POST',
+            const response = await fetch("/api/audit-logs", {
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json'
+                    "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
                     category,
@@ -265,10 +265,10 @@ class Logger {
             });
 
             if (!response.ok) {
-                console.warn('Failed to write audit log:', response.statusText);
+                console.warn("Failed to write audit log:", response.statusText);
             }
         } catch (error) {
-            console.warn('Audit log failed:', error.message);
+            console.warn("Audit log failed:", error.message);
         }
     }
 
@@ -326,11 +326,11 @@ class Logger {
      */
     enableDebug() {
         try {
-            localStorage.setItem('hextrackr_debug', 'true');
+            localStorage.setItem("hextrackr_debug", "true");
             this.debugMode = true;
-            console.log('Debug mode enabled');
+            console.log("Debug mode enabled");
         } catch (e) {
-            console.warn('Could not enable debug mode:', e);
+            console.warn("Could not enable debug mode:", e);
         }
     }
 
@@ -339,12 +339,12 @@ class Logger {
      */
     disableDebug() {
         try {
-            localStorage.removeItem('hextrackr_debug');
-            sessionStorage.removeItem('hextrackr_debug');
+            localStorage.removeItem("hextrackr_debug");
+            sessionStorage.removeItem("hextrackr_debug");
             this.debugMode = false;
-            console.log('Debug mode disabled');
+            console.log("Debug mode disabled");
         } catch (e) {
-            console.warn('Could not disable debug mode:', e);
+            console.warn("Could not disable debug mode:", e);
         }
     }
 }
@@ -353,11 +353,11 @@ class Logger {
 const logger = new Logger();
 
 // Export for ES6 modules and CommonJS
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
     module.exports = { logger };
 }
 
 // Global access for non-module scripts
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
     window.logger = logger;
 }

@@ -19,9 +19,9 @@
  * Issue: HEX-254 (Session 2)
  */
 
-const fs = require('fs');
-const path = require('path');
-const crypto = require('crypto');
+const fs = require("fs");
+const path = require("path");
+const crypto = require("crypto");
 
 class LoggingService {
     constructor() {
@@ -53,10 +53,10 @@ class LoggingService {
             this._scheduleCleanup();
 
             this.isInitialized = true;
-            this.info('backend', 'auth', 'LoggingService initialized successfully');
+            this.info("backend", "auth", "LoggingService initialized successfully");
 
         } catch (error) {
-            console.error('Failed to initialize LoggingService:', error.message);
+            console.error("Failed to initialize LoggingService:", error.message);
             throw error;
         }
     }
@@ -66,11 +66,11 @@ class LoggingService {
      */
     async loadConfig() {
         return new Promise((resolve, reject) => {
-            const configPath = path.join(__dirname, '..', 'config', 'logging.config.json');
+            const configPath = path.join(__dirname, "..", "config", "logging.config.json");
 
-            fs.readFile(configPath, 'utf8', (err, data) => {
+            fs.readFile(configPath, "utf8", (err, data) => {
                 if (err) {
-                    console.error('Failed to load logging.config.json:', err.message);
+                    console.error("Failed to load logging.config.json:", err.message);
                     // Fall back to defaults
                     this.config = this._getDefaultConfig();
                     resolve();
@@ -81,7 +81,7 @@ class LoggingService {
                     this.config = JSON.parse(data);
                     resolve();
                 } catch (parseError) {
-                    console.error('Failed to parse logging.config.json:', parseError.message);
+                    console.error("Failed to parse logging.config.json:", parseError.message);
                     this.config = this._getDefaultConfig();
                     resolve();
                 }
@@ -97,11 +97,11 @@ class LoggingService {
         return new Promise((resolve, reject) => {
             // Check if encryption key exists in database
             this.db.get(
-                'SELECT encryption_key FROM audit_log_config WHERE id = 1',
+                "SELECT encryption_key FROM audit_log_config WHERE id = 1",
                 [],
                 (err, row) => {
                     if (err) {
-                        reject(new Error('Failed to query encryption key: ' + err.message));
+                        reject(new Error("Failed to query encryption key: " + err.message));
                         return;
                     }
 
@@ -123,7 +123,7 @@ class LoggingService {
                             [this.encryptionKey],
                             (updateErr) => {
                                 if (updateErr) {
-                                    reject(new Error('Failed to store encryption key: ' + updateErr.message));
+                                    reject(new Error("Failed to store encryption key: " + updateErr.message));
                                     return;
                                 }
                                 resolve();
@@ -142,20 +142,20 @@ class LoggingService {
      */
     encrypt(data) {
         if (!this.encryptionKey) {
-            throw new Error('Encryption key not initialized');
+            throw new Error("Encryption key not initialized");
         }
 
         // Convert to string if object
-        const plaintext = typeof data === 'object' ? JSON.stringify(data) : String(data);
+        const plaintext = typeof data === "object" ? JSON.stringify(data) : String(data);
 
         // Generate random IV (12 bytes recommended for GCM)
         const iv = crypto.randomBytes(12);
 
         // Create cipher
-        const cipher = crypto.createCipheriv('aes-256-gcm', this.encryptionKey, iv);
+        const cipher = crypto.createCipheriv("aes-256-gcm", this.encryptionKey, iv);
 
         // Encrypt data
-        let encrypted = cipher.update(plaintext, 'utf8');
+        let encrypted = cipher.update(plaintext, "utf8");
         encrypted = Buffer.concat([encrypted, cipher.final()]);
 
         // Get auth tag (provides integrity verification)
@@ -178,7 +178,7 @@ class LoggingService {
      */
     decrypt(encryptedData, iv) {
         if (!this.encryptionKey) {
-            throw new Error('Encryption key not initialized');
+            throw new Error("Encryption key not initialized");
         }
 
         try {
@@ -187,14 +187,14 @@ class LoggingService {
             const ciphertext = encryptedData.slice(0, -16);
 
             // Create decipher
-            const decipher = crypto.createDecipheriv('aes-256-gcm', this.encryptionKey, iv);
+            const decipher = crypto.createDecipheriv("aes-256-gcm", this.encryptionKey, iv);
             decipher.setAuthTag(authTag);
 
             // Decrypt
             let decrypted = decipher.update(ciphertext);
             decrypted = Buffer.concat([decrypted, decipher.final()]);
 
-            const plaintext = decrypted.toString('utf8');
+            const plaintext = decrypted.toString("utf8");
 
             // Try to parse as JSON, return string if it fails
             try {
@@ -204,7 +204,7 @@ class LoggingService {
             }
 
         } catch (error) {
-            throw new Error('Decryption failed: ' + error.message);
+            throw new Error("Decryption failed: " + error.message);
         }
     }
 
@@ -223,7 +223,7 @@ class LoggingService {
 
         // Check if category is in whitelist
         if (!this.config.audit.whitelist.includes(category)) {
-            this.warn('backend', 'auth', `Audit category not in whitelist: ${category}`);
+            this.warn("backend", "auth", `Audit category not in whitelist: ${category}`);
             return;
         }
 
@@ -239,10 +239,10 @@ class LoggingService {
 
             if (req) {
                 // Check if it's an Express request object or plain object
-                if (req.get && typeof req.get === 'function') {
+                if (req.get && typeof req.get === "function") {
                     // Express request object
                     ipAddress = req.ip || req.connection?.remoteAddress || null;
-                    userAgent = req.get('user-agent') || null;
+                    userAgent = req.get("user-agent") || null;
                     if (req.session && req.session.user) {
                         username = req.session.user.username;
                         userId = userId || req.session.user.id;
@@ -274,13 +274,13 @@ class LoggingService {
                     ],
                     (err) => {
                         if (err) {
-                            reject(new Error('Failed to write audit log: ' + err.message));
+                            reject(new Error("Failed to write audit log: " + err.message));
                             return;
                         }
 
                         // Increment counter
                         this.db.run(
-                            'UPDATE audit_log_config SET total_logs_written = total_logs_written + 1 WHERE id = 1'
+                            "UPDATE audit_log_config SET total_logs_written = total_logs_written + 1 WHERE id = 1"
                         );
 
                         resolve();
@@ -289,7 +289,7 @@ class LoggingService {
             });
 
         } catch (error) {
-            console.error('Audit log write failed:', error.message);
+            console.error("Audit log write failed:", error.message);
         }
     }
 
@@ -319,8 +319,8 @@ class LoggingService {
         }
 
         // Check environment-based log level
-        const env = process.env.NODE_ENV || 'development';
-        const minLevel = this.config.levels[env] || 'debug';
+        const env = process.env.NODE_ENV || "development";
+        const minLevel = this.config.levels[env] || "debug";
 
         const levelHierarchy = { debug: 0, info: 1, warn: 2, error: 3 };
         const shouldLog = levelHierarchy[level] >= levelHierarchy[minLevel];
@@ -342,7 +342,7 @@ class LoggingService {
 
         // Add emoji if enabled
         if (this.config.global.emojis) {
-            parts.push(this.config.emojis[level] || '');
+            parts.push(this.config.emojis[level] || "");
         }
 
         // Add timestamp if enabled
@@ -358,7 +358,7 @@ class LoggingService {
         // Add message
         parts.push(message);
 
-        return parts.join(' ');
+        return parts.join(" ");
     }
 
     /**
@@ -369,11 +369,11 @@ class LoggingService {
      * @param {any} data - Additional data (optional)
      */
     debug(scope, category, message, data = null) {
-        if (!this._shouldLog(scope, category, 'debug')) {
+        if (!this._shouldLog(scope, category, "debug")) {
             return;
         }
 
-        const formatted = this._formatMessage('debug', scope, category, message);
+        const formatted = this._formatMessage("debug", scope, category, message);
         if (data) {
             console.log(formatted, data);
         } else {
@@ -389,11 +389,11 @@ class LoggingService {
      * @param {any} data - Additional data (optional)
      */
     info(scope, category, message, data = null) {
-        if (!this._shouldLog(scope, category, 'info')) {
+        if (!this._shouldLog(scope, category, "info")) {
             return;
         }
 
-        const formatted = this._formatMessage('info', scope, category, message);
+        const formatted = this._formatMessage("info", scope, category, message);
         if (data) {
             console.log(formatted, data);
         } else {
@@ -409,11 +409,11 @@ class LoggingService {
      * @param {any} data - Additional data (optional)
      */
     warn(scope, category, message, data = null) {
-        if (!this._shouldLog(scope, category, 'warn')) {
+        if (!this._shouldLog(scope, category, "warn")) {
             return;
         }
 
-        const formatted = this._formatMessage('warn', scope, category, message);
+        const formatted = this._formatMessage("warn", scope, category, message);
         if (data) {
             console.warn(formatted, data);
         } else {
@@ -429,11 +429,11 @@ class LoggingService {
      * @param {any} data - Additional data (optional)
      */
     error(scope, category, message, data = null) {
-        if (!this._shouldLog(scope, category, 'error')) {
+        if (!this._shouldLog(scope, category, "error")) {
             return;
         }
 
-        const formatted = this._formatMessage('error', scope, category, message);
+        const formatted = this._formatMessage("error", scope, category, message);
         if (data) {
             console.error(formatted, data);
         } else {
@@ -487,7 +487,7 @@ class LoggingService {
                     [retentionDays],
                     function(err) {
                         if (err) {
-                            reject(new Error('Audit log cleanup failed: ' + err.message));
+                            reject(new Error("Audit log cleanup failed: " + err.message));
                             return;
                         }
 
@@ -514,7 +514,7 @@ class LoggingService {
             this.lastCleanup = new Date();
 
         } catch (error) {
-            console.error('Audit log cleanup error:', error.message);
+            console.error("Audit log cleanup error:", error.message);
         }
     }
 
@@ -525,11 +525,11 @@ class LoggingService {
     _getDefaultConfig() {
         return {
             global: { enabled: true, emojis: true, timestamps: true, auditEnabled: true, retentionDays: 30 },
-            levels: { production: 'warn', development: 'debug', test: 'error' },
+            levels: { production: "warn", development: "debug", test: "error" },
             frontend: { categories: {} },
             backend: { categories: {} },
             audit: { whitelist: [] },
-            emojis: { debug: '🐛', info: 'ℹ️', warn: '⚠️', error: '❌', success: '✅' },
+            emojis: { debug: "🐛", info: "ℹ️", warn: "⚠️", error: "❌", success: "✅" },
             performance: { slowQueryThreshold: 500, slowRequestThreshold: 2000, logMemoryUsage: false }
         };
     }

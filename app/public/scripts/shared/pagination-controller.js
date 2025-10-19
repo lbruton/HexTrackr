@@ -155,7 +155,7 @@ class PaginationController {
         `;
 
         // Add event listeners for page size dropdown items
-        const pageSizeItems = container.querySelectorAll(`[data-page-size]`);
+        const pageSizeItems = container.querySelectorAll("[data-page-size]");
         pageSizeItems.forEach(item => {
             item.addEventListener("click", (e) => {
                 e.preventDefault();
@@ -167,7 +167,7 @@ class PaginationController {
 
         // Add event listeners for sort dropdown items
         if (sortOptions.length > 0) {
-            const sortItems = container.querySelectorAll(`[data-sort-value]`);
+            const sortItems = container.querySelectorAll("[data-sort-value]");
             sortItems.forEach(item => {
                 item.addEventListener("click", (e) => {
                     e.preventDefault();

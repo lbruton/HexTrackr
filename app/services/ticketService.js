@@ -6,13 +6,13 @@ const { normalizeXtNumber } = require("../utils/helpers");
  * Safely log to LoggingService with fallback for initialization
  */
 function _log(level, message, data = {}) {
-    if (global.logger && global.logger.ticket && typeof global.logger.ticket[level] === 'function') {
+    if (global.logger && global.logger.ticket && typeof global.logger.ticket[level] === "function") {
         global.logger.ticket[level](message, data);
     }
 }
 
 function _audit(category, message, data = {}) {
-    if (global.logger && typeof global.logger.audit === 'function') {
+    if (global.logger && typeof global.logger.audit === "function") {
         global.logger.audit(category, message, data, null, null);
     }
 }
@@ -61,7 +61,7 @@ class TicketService {
 
                 // Log the structure of the first row for debugging
                 if (rows.length > 0) {
-                    _log('info', "Sample ticket row:", Object.keys(rows[0]));
+                    _log("info", "Sample ticket row:", Object.keys(rows[0]));
                 }
 
                 // Transform the rows to ensure each ticket has an id (use xt_number if id is null)
@@ -81,7 +81,7 @@ class TicketService {
                                 [normalizedXt, row.id],
                                 (updateErr) => {
                                     if (updateErr) {
-                                        _log('error', "Failed to normalize xt_number for ticket", row.id, updateErr);
+                                        _log("error", "Failed to normalize xt_number for ticket", row.id, updateErr);
                                     }
                                 }
                             );
@@ -95,7 +95,7 @@ class TicketService {
                         try {
                             row.devices = JSON.parse(row.devices);
                         } catch (e) {
-                            _log('error', "Failed to parse devices JSON for ticket", row.id, e);
+                            _log("error", "Failed to parse devices JSON for ticket", row.id, e);
                             row.devices = [];
                         }
                     } else if (!row.devices) {
@@ -141,7 +141,7 @@ class TicketService {
                 const status = existingTicket.deleted ? "deleted" : "active";
                 throw new Error(
                     `CRITICAL: XT# ${normalizedXt} already exists (${status} ticket ${existingTicket.id}). ` +
-                    `This indicates frontend failed to call /api/tickets/next-xt-number correctly.`
+                    "This indicates frontend failed to call /api/tickets/next-xt-number correctly."
                 );
             }
         }
@@ -455,7 +455,7 @@ class TicketService {
                         await this.createTicket(mappedTicket);
                         imported++;
                     } catch (err) {
-                        _log('error', "Error importing ticket:", err);
+                        _log("error", "Error importing ticket:", err);
                         skipped++;
                     }
                 }
@@ -506,7 +506,7 @@ class TicketService {
 
                 this.db.run(sql, params, function(err) {
                     if (err) {
-                        _log('error', "Error migrating ticket:", err);
+                        _log("error", "Error migrating ticket:", err);
                         errorCount++;
                     } else {
                         successCount++;
@@ -565,7 +565,7 @@ class TicketService {
                         mapped.deletedBy || null
                     ], (err) => {
                         if (err) {
-                            _log('error', `Error importing ticket row ${index + 1}:`, err);
+                            _log("error", `Error importing ticket row ${index + 1}:`, err);
                             errors.push(`Row ${index + 1}: ${err.message}`);
                         } else {
                             imported++;
@@ -736,7 +736,7 @@ class TicketService {
                     try {
                         row.devices = JSON.parse(row.devices);
                     } catch (parseError) {
-                        _log('error', `Failed to parse devices for ticket ${row.id}:`, parseError);
+                        _log("error", `Failed to parse devices for ticket ${row.id}:`, parseError);
                         row.devices = [];
                     }
                     return row;
@@ -922,14 +922,14 @@ class TicketService {
         // Filter out empty/null/undefined values
         const parts = [];
 
-        if (line1) parts.push(line1);
-        if (line2) parts.push(line2);
+        if (line1) {parts.push(line1);}
+        if (line2) {parts.push(line2);}
         if (city && state && zip) {
             parts.push(`${city}, ${state} ${zip}`);
         } else if (city || state || zip) {
             // Handle partial city/state/zip
             const cityStateZip = [city, state, zip].filter(Boolean).join(" ");
-            if (cityStateZip) parts.push(cityStateZip);
+            if (cityStateZip) {parts.push(cityStateZip);}
         }
 
         return parts.length > 0 ? parts.join("\n") : null;

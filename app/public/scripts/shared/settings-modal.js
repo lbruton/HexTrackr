@@ -176,17 +176,17 @@ logger.debug("ui", "HexTrackr Settings Modal (shared) loaded successfully");
 
         // Settings section navigation buttons
         const self = this;
-        document.querySelectorAll('#settingsSectionButtons .btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const section = this.getAttribute('data-section');
+        document.querySelectorAll("#settingsSectionButtons .btn").forEach(button => {
+            button.addEventListener("click", function() {
+                const section = this.getAttribute("data-section");
 
                 // Update active button styling
-                document.querySelectorAll('#settingsSectionButtons .btn').forEach(btn => {
-                    btn.classList.remove('active', 'btn-primary');
-                    btn.classList.add('btn-outline-primary');
+                document.querySelectorAll("#settingsSectionButtons .btn").forEach(btn => {
+                    btn.classList.remove("active", "btn-primary");
+                    btn.classList.add("btn-outline-primary");
                 });
-                this.classList.remove('btn-outline-primary');
-                this.classList.add('active', 'btn-primary');
+                this.classList.remove("btn-outline-primary");
+                this.classList.add("active", "btn-primary");
 
                 // Switch to the selected section
                 self.switchToTab(section);
@@ -202,38 +202,38 @@ logger.debug("ui", "HexTrackr Settings Modal (shared) loaded successfully");
      */
     switchToTab(sectionId) {
         // Hide all sections
-        const sections = ['thirdPartyContent', 'dataManagementContent', 'systemConfigContent'];
+        const sections = ["thirdPartyContent", "dataManagementContent", "systemConfigContent"];
         sections.forEach(id => {
             const element = document.getElementById(id);
             if (element) {
-                element.style.display = 'none';
+                element.style.display = "none";
             }
         });
 
         // Show requested section
         const sectionMap = {
-            'third-party': 'thirdPartyContent',
-            'api-config': 'thirdPartyContent', // Legacy support
-            'data-mgmt': 'dataManagementContent',
-            'data-management': 'dataManagementContent', // Legacy support
-            'system-config': 'systemConfigContent'
+            "third-party": "thirdPartyContent",
+            "api-config": "thirdPartyContent", // Legacy support
+            "data-mgmt": "dataManagementContent",
+            "data-management": "dataManagementContent", // Legacy support
+            "system-config": "systemConfigContent"
         };
 
         const targetSectionId = sectionMap[sectionId];
         if (targetSectionId) {
             const targetSection = document.getElementById(targetSectionId);
             if (targetSection) {
-                targetSection.style.display = 'block';
+                targetSection.style.display = "block";
 
                 // Update button active state to match section
-                document.querySelectorAll('#settingsSectionButtons .btn').forEach(btn => {
-                    const btnSection = btn.getAttribute('data-section');
+                document.querySelectorAll("#settingsSectionButtons .btn").forEach(btn => {
+                    const btnSection = btn.getAttribute("data-section");
                     if (btnSection === sectionId || sectionMap[btnSection] === targetSectionId) {
-                        btn.classList.remove('btn-outline-primary');
-                        btn.classList.add('active', 'btn-primary');
+                        btn.classList.remove("btn-outline-primary");
+                        btn.classList.add("active", "btn-primary");
                     } else {
-                        btn.classList.remove('active', 'btn-primary');
-                        btn.classList.add('btn-outline-primary');
+                        btn.classList.remove("active", "btn-primary");
+                        btn.classList.add("btn-outline-primary");
                     }
                 });
 
@@ -404,29 +404,29 @@ function downloadFile(blob, filename) {
  */
 async function backupData(type) {
     try {
-        logger.info('ui', `Creating ${type} backup ZIP...`);
+        logger.info("ui", `Creating ${type} backup ZIP...`);
 
         // For vulnerabilities (large backup), show progress modal
         // For tickets (small backup), show simple notification
-        const isLargeBackup = type === 'vulnerabilities';
+        const isLargeBackup = type === "vulnerabilities";
 
         if (isLargeBackup && window.progressModal) {
             window.progressModal.show(
-                'Creating vulnerabilities backup...',
-                'This may take a moment for large datasets (800MB+). The backup will be downloaded to your browser and saved to disk.'
+                "Creating vulnerabilities backup...",
+                "This may take a moment for large datasets (800MB+). The backup will be downloaded to your browser and saved to disk."
             );
         } else {
-            showNotification(`Creating ${type} backup... This may take a moment.`, 'info');
+            showNotification(`Creating ${type} backup... This may take a moment.`, "info");
         }
 
         // Use the existing export ZIP endpoints
-        logger.info('ui', `Fetching backup from /api/backup/export/${type}`);
+        logger.info("ui", `Fetching backup from /api/backup/export/${type}`);
         const response = await authState.authenticatedFetch(`/api/backup/export/${type}`);
 
-        logger.info('ui', `Response status: ${response.status}`);
+        logger.info("ui", `Response status: ${response.status}`);
         if (!response.ok) {
             const errorText = await response.text();
-            logger.error('ui', `Backup failed: ${response.status} - ${errorText}`);
+            logger.error("ui", `Backup failed: ${response.status} - ${errorText}`);
 
             // Hide progress modal on error
             if (isLargeBackup && window.progressModal) {
@@ -437,27 +437,27 @@ async function backupData(type) {
         }
 
         // Get the filename from headers
-        const contentDisposition = response.headers.get('Content-Disposition');
-        logger.info('ui', `Content-Disposition header: ${contentDisposition}`);
+        const contentDisposition = response.headers.get("Content-Disposition");
+        logger.info("ui", `Content-Disposition header: ${contentDisposition}`);
         const filenameMatch = contentDisposition?.match(/filename="(.+)"/);
         const filename = filenameMatch ? filenameMatch[1] : `hextrackr_${type}_backup.zip`;
-        logger.info('ui', `Filename: ${filename}`);
+        logger.info("ui", `Filename: ${filename}`);
 
         // Download the file
-        logger.info('ui', 'Creating blob...');
+        logger.info("ui", "Creating blob...");
         const blob = await response.blob();
-        logger.info('ui', `Blob size: ${blob.size} bytes`);
+        logger.info("ui", `Blob size: ${blob.size} bytes`);
 
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
+        const a = document.createElement("a");
         a.href = url;
         a.download = filename;
         document.body.appendChild(a);
-        logger.info('ui', 'Triggering download...');
+        logger.info("ui", "Triggering download...");
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        logger.info('ui', 'Download triggered successfully');
+        logger.info("ui", "Download triggered successfully");
 
         // Hide progress modal on success
         if (isLargeBackup && window.progressModal) {
@@ -465,7 +465,7 @@ async function backupData(type) {
         }
 
         const sizeMB = (blob.size / 1024 / 1024).toFixed(2);
-        showNotification(`✅ Backup created and saved to disk: ${filename} (${sizeMB}MB)`, 'success');
+        showNotification(`✅ Backup created and saved to disk: ${filename} (${sizeMB}MB)`, "success");
 
     } catch (error) {
         logger.error("ui", "Error creating backup:", error);
@@ -714,7 +714,7 @@ async function saveCiscoCredentials() {
             const credentialButtonText = document.getElementById("ciscoCredentialButtonText");
             if (credentialButton && credentialButtonText) {
                 credentialButton.className = "btn btn-outline-success";
-                credentialButton.innerHTML = '<i class="fas fa-check me-2"></i><span id="ciscoCredentialButtonText">Credentials Configured</span>';
+                credentialButton.innerHTML = "<i class=\"fas fa-check me-2\"></i><span id=\"ciscoCredentialButtonText\">Credentials Configured</span>";
             }
 
             // Enable sync button
@@ -780,7 +780,7 @@ async function clearCiscoCredentials() {
                 const credentialButtonText = document.getElementById("ciscoCredentialButtonText");
                 if (credentialButton && credentialButtonText) {
                     credentialButton.className = "btn btn-outline-primary";
-                    credentialButton.innerHTML = '<i class="fas fa-key me-2"></i><span id="ciscoCredentialButtonText">Manage Credentials</span>';
+                    credentialButton.innerHTML = "<i class=\"fas fa-key me-2\"></i><span id=\"ciscoCredentialButtonText\">Manage Credentials</span>";
                 }
 
                 // Disable sync button
@@ -845,7 +845,7 @@ async function loadCiscoSyncStatus() {
                 // Credentials exist
                 if (credentialButton && credentialButtonText) {
                     credentialButton.className = "btn btn-outline-success";
-                    credentialButton.innerHTML = '<i class="fas fa-check me-2"></i><span id="ciscoCredentialButtonText">Credentials Configured</span>';
+                    credentialButton.innerHTML = "<i class=\"fas fa-check me-2\"></i><span id=\"ciscoCredentialButtonText\">Credentials Configured</span>";
                 }
                 if (syncButton) {
                     syncButton.disabled = false;
@@ -854,7 +854,7 @@ async function loadCiscoSyncStatus() {
                 // No credentials
                 if (credentialButton && credentialButtonText) {
                     credentialButton.className = "btn btn-outline-primary";
-                    credentialButton.innerHTML = '<i class="fas fa-key me-2"></i><span id="ciscoCredentialButtonText">Manage Credentials</span>';
+                    credentialButton.innerHTML = "<i class=\"fas fa-key me-2\"></i><span id=\"ciscoCredentialButtonText\">Manage Credentials</span>";
                 }
                 if (syncButton) {
                     syncButton.disabled = true;
@@ -2057,25 +2057,25 @@ async function exportAllDataAsCSV() {
  */
 async function openDatabaseBackupModal() {
     try {
-        logger.info('ui', 'Creating full database backup...');
+        logger.info("ui", "Creating full database backup...");
 
         // Show progress modal
         if (window.progressModal) {
             window.progressModal.show(
-                'Creating database backup...',
-                'This may take several minutes for large databases. The backup will be saved to disk and downloaded to your browser.'
+                "Creating database backup...",
+                "This may take several minutes for large databases. The backup will be saved to disk and downloaded to your browser."
             );
         }
 
         // Trigger manual backup (creates both JSON ZIP and database file)
-        const csrfResponse = await window.authState.authenticatedFetch('/api/auth/csrf');
+        const csrfResponse = await window.authState.authenticatedFetch("/api/auth/csrf");
         const csrfData = await csrfResponse.json();
         const csrfToken = csrfData.csrfToken;
 
-        const response = await window.authState.authenticatedFetch('/api/backup/trigger-manual', {
-            method: 'POST',
+        const response = await window.authState.authenticatedFetch("/api/backup/trigger-manual", {
+            method: "POST",
             headers: {
-                'X-CSRF-Token': csrfToken
+                "X-CSRF-Token": csrfToken
             }
         });
 
@@ -2086,7 +2086,7 @@ async function openDatabaseBackupModal() {
         const data = await response.json();
 
         if (!data.success) {
-            throw new Error(data.error || 'Database backup failed');
+            throw new Error(data.error || "Database backup failed");
         }
 
         // Hide progress modal
@@ -2094,7 +2094,7 @@ async function openDatabaseBackupModal() {
             window.progressModal.hide();
         }
 
-        showNotification(`Database backup created successfully (${data.total_size_mb}MB). Files saved to disk.`, 'success');
+        showNotification(`Database backup created successfully (${data.total_size_mb}MB). Files saved to disk.`, "success");
 
     } catch (error) {
         logger.error("ui", "Error creating database backup:", error);

@@ -41,7 +41,7 @@ class WebSocketClient {
      * Debug logging method - uses enhanced logger with 'websocket' category
      */
     debug(message, data = {}) {
-        logger.debug('websocket', message, data);
+        logger.debug("websocket", message, data);
     }
 
     /**
@@ -105,13 +105,13 @@ class WebSocketClient {
                 
                 this.socket.on("connect_error", (error) => {
                     window.clearTimeout(timeout);
-                    logger.error('websocket', "WebSocket connection error", { error: error.message });
+                    logger.error("websocket", "WebSocket connection error", { error: error.message });
                     this.handleConnectionError();
                     reject(error);
                 });
 
             } catch (error) {
-                logger.error('websocket', "WebSocket connection failed", { error: error.message });
+                logger.error("websocket", "WebSocket connection failed", { error: error.message });
                 reject(error);
             }
         });
@@ -125,7 +125,7 @@ class WebSocketClient {
             this.reconnectAttempts++;
             this.attemptReconnection();
         } else {
-            logger.error('websocket', "Max reconnection attempts reached", { attempts: this.reconnectAttempts });
+            logger.error("websocket", "Max reconnection attempts reached", { attempts: this.reconnectAttempts });
             this.triggerCallback("connectionFailed", { attempts: this.reconnectAttempts });
         }
     }
@@ -238,7 +238,7 @@ class WebSocketClient {
                 try {
                     callback(data);
                 } catch (error) {
-                    logger.error('websocket', `Error in ${event} callback`, { error: error.message, event });
+                    logger.error("websocket", `Error in ${event} callback`, { error: error.message, event });
                 }
             });
         }

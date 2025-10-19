@@ -39,7 +39,7 @@ class DatabaseService {
      * @param {Object} data - Additional data to log
      */
     _log(level, message, data = {}) {
-        if (global.logger && global.logger.database && typeof global.logger.database[level] === 'function') {
+        if (global.logger && global.logger.database && typeof global.logger.database[level] === "function") {
             global.logger.database[level](message, data);
         }
     }
@@ -51,7 +51,7 @@ class DatabaseService {
      * @param {Object} data - Audit data
      */
     _audit(category, message, data = {}) {
-        if (global.logger && typeof global.logger.audit === 'function') {
+        if (global.logger && typeof global.logger.audit === "function") {
             global.logger.audit(category, message, data, null, null);
         }
     }
@@ -72,7 +72,7 @@ class DatabaseService {
                 // Create database connection (from server.js line 1934)
                 this.db = new sqlite3.Database(this.dbPath, (err) => {
                     if (err) {
-                        this._log('error', "Failed to connect to database", {
+                        this._log("error", "Failed to connect to database", {
                             error: err.message,
                             path: this.dbPath
                         });
@@ -80,7 +80,7 @@ class DatabaseService {
                         return;
                     }
 
-                    this._log('info', "Database connection established", {
+                    this._log("info", "Database connection established", {
                         path: this.dbPath,
                         journalMode: "WAL",  // HEX-280: WAL mode with named volume (not macOS bind mount)
                         cacheSize: "64MB"
@@ -111,7 +111,7 @@ class DatabaseService {
                             return this.checkIntegrity();
                         })
                         .then(() => {
-                            this._log('info', "Database initialized successfully with integrity verified");
+                            this._log("info", "Database initialized successfully with integrity verified");
                             resolve();
                         })
                         .catch(reject);
@@ -153,7 +153,7 @@ class DatabaseService {
                 alterStatements.forEach(sql => {
                     this.db.run(sql, (err) => {
                         if (err && !err.message.includes("duplicate column")) {
-                            this._log('error', "Schema update failed", {
+                            this._log("error", "Schema update failed", {
                                 error: err.message,
                                 sql: sql.substring(0, 100)
                             });
@@ -504,7 +504,7 @@ class DatabaseService {
                 const duration = Date.now() - startTime;
 
                 if (err) {
-                    this._log('error', "Database query error", {
+                    this._log("error", "Database query error", {
                         error: err.message,
                         sql: sql.substring(0, 200),
                         params: params,
@@ -514,7 +514,7 @@ class DatabaseService {
                 } else {
                     // Log slow queries (>500ms)
                     if (duration > 500) {
-                        this._log('warn', "Slow query detected", {
+                        this._log("warn", "Slow query detected", {
                             duration: `${duration}ms`,
                             sql: sql.substring(0, 200),
                             params: params,
@@ -544,7 +544,7 @@ class DatabaseService {
                 const duration = Date.now() - startTime;
 
                 if (err) {
-                    this._log('error', "Database query error", {
+                    this._log("error", "Database query error", {
                         error: err.message,
                         sql: sql.substring(0, 200),
                         params: params,
@@ -554,7 +554,7 @@ class DatabaseService {
                 } else {
                     // Log slow queries (>500ms)
                     if (duration > 500) {
-                        this._log('warn', "Slow query detected", {
+                        this._log("warn", "Slow query detected", {
                             duration: `${duration}ms`,
                             sql: sql.substring(0, 200),
                             params: params
@@ -583,7 +583,7 @@ class DatabaseService {
                 const duration = Date.now() - startTime;
 
                 if (err) {
-                    this._log('error', "Database execution error", {
+                    this._log("error", "Database execution error", {
                         error: err.message,
                         sql: sql.substring(0, 200),
                         params: params,
@@ -593,7 +593,7 @@ class DatabaseService {
                 } else {
                     // Log slow operations (>500ms)
                     if (duration > 500) {
-                        this._log('warn', "Slow database operation detected", {
+                        this._log("warn", "Slow database operation detected", {
                             duration: `${duration}ms`,
                             sql: sql.substring(0, 200),
                             params: params,
@@ -752,10 +752,10 @@ class DatabaseService {
 
             this.db.run("PRAGMA wal_checkpoint(FULL)", (err) => {
                 if (err) {
-                    this._log('error', "WAL checkpoint failed", { error: err.message });
+                    this._log("error", "WAL checkpoint failed", { error: err.message });
                     reject(err);
                 } else {
-                    this._log('info', "WAL checkpoint completed - all changes flushed to disk");
+                    this._log("info", "WAL checkpoint completed - all changes flushed to disk");
                     resolve();
                 }
             });
@@ -775,13 +775,13 @@ class DatabaseService {
 
             this.db.get("PRAGMA integrity_check", (err, row) => {
                 if (err) {
-                    this._log('error', "Database integrity check failed", { error: err.message });
+                    this._log("error", "Database integrity check failed", { error: err.message });
                     reject(err);
-                } else if (row && row.integrity_check === 'ok') {
-                    this._log('info', "Database integrity check passed");
+                } else if (row && row.integrity_check === "ok") {
+                    this._log("info", "Database integrity check passed");
                     resolve(true);
                 } else {
-                    this._log('error', "Database integrity check failed", { result: row });
+                    this._log("error", "Database integrity check failed", { result: row });
                     reject(new Error(`Database integrity check failed: ${JSON.stringify(row)}`));
                 }
             });
@@ -829,7 +829,7 @@ class DatabaseService {
 
             return daysSinceLastVacuum >= config.maintenance.vacuumIntervalDays;
         } catch (error) {
-            this._log('warn', "Error checking VACUUM status", {
+            this._log("warn", "Error checking VACUUM status", {
                 error: error.message
             });
             return false;
@@ -843,11 +843,11 @@ class DatabaseService {
     async runVacuum() {
         return new Promise((resolve, reject) => {
             const startTime = Date.now();
-            this._log('info', "Starting database VACUUM operation");
+            this._log("info", "Starting database VACUUM operation");
 
             this.db.run("VACUUM", async (vacuumErr) => {
                 if (vacuumErr) {
-                    this._log('error', "VACUUM operation failed", {
+                    this._log("error", "VACUUM operation failed", {
                         error: vacuumErr.message
                     });
                     reject(vacuumErr);
@@ -855,7 +855,7 @@ class DatabaseService {
                 }
 
                 const duration = ((Date.now() - startTime) / 1000).toFixed(2);
-                this._log('info', "Database VACUUM completed successfully", {
+                this._log("info", "Database VACUUM completed successfully", {
                     duration: `${duration}s`
                 });
 
@@ -873,7 +873,7 @@ class DatabaseService {
                     );
                     resolve({ success: true, duration });
                 } catch (metadataErr) {
-                    this._log('warn', "Failed to record VACUUM in sync_metadata", {
+                    this._log("warn", "Failed to record VACUUM in sync_metadata", {
                         error: metadataErr.message
                     });
                     resolve({ success: true, duration }); // VACUUM succeeded even if metadata failed
@@ -890,11 +890,11 @@ class DatabaseService {
         const { config } = require("../config/database");
 
         if (!config.maintenance.enableAutoVacuum) {
-            this._log('info', "Auto-VACUUM disabled in configuration");
+            this._log("info", "Auto-VACUUM disabled in configuration");
             return;
         }
 
-        this._log('info', "Auto-VACUUM scheduler started", {
+        this._log("info", "Auto-VACUUM scheduler started", {
             intervalDays: config.maintenance.vacuumIntervalDays
         });
 
@@ -902,11 +902,11 @@ class DatabaseService {
         try {
             const shouldRun = await this.shouldRunVacuum();
             if (shouldRun) {
-                this._log('info', "Running startup VACUUM (overdue)");
+                this._log("info", "Running startup VACUUM (overdue)");
                 await this.runVacuum();
             }
         } catch (error) {
-            this._log('error', "Startup VACUUM check failed", {
+            this._log("error", "Startup VACUUM check failed", {
                 error: error.message
             });
         }
@@ -919,12 +919,12 @@ class DatabaseService {
                 if (now.getHours() === 2) { // Run at 2 AM
                     const shouldRun = await this.shouldRunVacuum();
                     if (shouldRun) {
-                        this._log('info', "Running scheduled VACUUM");
+                        this._log("info", "Running scheduled VACUUM");
                         await this.runVacuum();
                     }
                 }
             } catch (error) {
-                this._log('error', "Scheduled VACUUM check failed", {
+                this._log("error", "Scheduled VACUUM check failed", {
                     error: error.message
                 });
             }
@@ -943,7 +943,7 @@ class DatabaseService {
 
             // Wait for active transactions to complete
             if (this.activeTransactions.size > 0) {
-                this._log('info', "Waiting for active transactions to complete", {
+                this._log("info", "Waiting for active transactions to complete", {
                     activeTransactions: this.activeTransactions.size
                 });
                 setTimeout(() => this.close().then(resolve).catch(reject), 1000);
@@ -952,12 +952,12 @@ class DatabaseService {
 
             this.db.close((err) => {
                 if (err) {
-                    this._log('error', "Error closing database connection", {
+                    this._log("error", "Error closing database connection", {
                         error: err.message
                     });
                     reject(err);
                 } else {
-                    this._log('info', "Database connection closed successfully");
+                    this._log("info", "Database connection closed successfully");
                     this.isInitialized = false;
                     this.connectionPool.currentConnections = 0;
                     resolve();
