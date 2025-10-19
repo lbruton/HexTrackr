@@ -642,7 +642,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title">
                         <i class="fas fa-map-marker-alt me-2 text-primary"></i>
-                        Location Details
+                        Location Details Overview
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -666,13 +666,13 @@
                         <!-- RIGHT: Risk Cards + Grid -->
                         <div class="col-lg-8">
                             <div class="row g-3">
-                                <!-- VPR Risk Breakdown Cards -->
+                                <!-- Location Breakdown Cards -->
                                 <div class="col-12">
                                     <div class="card">
                                         <div class="card-header">
                                             <h3 class="card-title">
-                                                <i class="fas fa-chart-bar me-2"></i>
-                                                VPR Risk Breakdown
+                                                <i class="fas fa-chart-pie me-2"></i>
+                                                Location Breakdown
                                             </h3>
                                         </div>
                                         <div class="card-body">
@@ -700,6 +700,14 @@
                     </div>
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary" id="exportLocationCsvBtn">
+                        <i class="fas fa-file-csv me-2"></i>
+                        Export CSV
+                    </button>
+                    <button type="button" class="btn btn-outline-success" id="createLocationTicketBtn">
+                        <i class="fas fa-ticket-alt me-2"></i>
+                        Create Ticket
+                    </button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         Close
                     </button>

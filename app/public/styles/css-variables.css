@@ -140,6 +140,39 @@
     --vpr-low-contrast-border: rgb(22, 163, 74, 0.3);
 
     /* =================
+       Vendor Colors - Semantic Tokens
+       Used by: Vendor filter cards, vendor badges
+       ================= */
+
+    /* Cisco - Blue */
+    --vendor-cisco: #2563eb;
+    --vendor-cisco-rgb: 37, 99, 235;
+    --vendor-cisco-bg: rgb(37, 99, 235, 0.1);
+    --vendor-cisco-bg-active: rgb(37, 99, 235, 0.25);
+    --vendor-cisco-shadow: rgb(37, 99, 235, 0.4);
+
+    /* Palo Alto - Amber/Orange */
+    --vendor-palo: #b45309;
+    --vendor-palo-rgb: 180, 83, 9;
+    --vendor-palo-bg: rgb(180, 83, 9, 0.1);
+    --vendor-palo-bg-active: rgb(180, 83, 9, 0.25);
+    --vendor-palo-shadow: rgb(180, 83, 9, 0.4);
+
+    /* Other Vendors - Gray */
+    --vendor-other: #6b7280;
+    --vendor-other-rgb: 107, 114, 128;
+    --vendor-other-bg: rgb(107, 114, 128, 0.1);
+    --vendor-other-bg-active: rgb(107, 114, 128, 0.25);
+    --vendor-other-shadow: rgb(107, 114, 128, 0.4);
+
+    /* KEV (Known Exploited Vulnerabilities) - Red */
+    --vendor-kev: #dc2626;
+    --vendor-kev-rgb: 220, 38, 38;
+    --vendor-kev-bg: rgb(220, 38, 38, 0.1);
+    --vendor-kev-bg-active: rgb(220, 38, 38, 0.25);
+    --vendor-kev-shadow: rgb(220, 38, 38, 0.4);
+
+    /* =================
        Typography
        ================= */
     --hextrackr-font-family: -apple-system, blinkmacsystemfont, "Segoe UI", roboto, "Helvetica Neue", arial, sans-serif;
@@ -413,6 +446,39 @@
     --vpr-low-contrast-rgb: 21, 128, 61;
     --vpr-low-contrast-bg: rgb(21, 128, 61, 0.2);
     --vpr-low-contrast-border: rgb(21, 128, 61, 0.4);
+
+    /* =================
+       Vendor Colors - Semantic Tokens (Dark Mode)
+       Used by: Vendor filter cards, vendor badges
+       ================= */
+
+    /* Cisco - Blue (brighter for dark backgrounds) */
+    --vendor-cisco: #3b82f6;
+    --vendor-cisco-rgb: 59, 130, 246;
+    --vendor-cisco-bg: rgb(37, 99, 235, 0.15);
+    --vendor-cisco-bg-active: rgb(37, 99, 235, 0.3);
+    --vendor-cisco-shadow: rgb(59, 130, 246, 0.4);
+
+    /* Palo Alto - Amber/Orange (brighter for dark backgrounds) */
+    --vendor-palo: #fb923c;
+    --vendor-palo-rgb: 251, 146, 60;
+    --vendor-palo-bg: rgb(217, 119, 6, 0.15);
+    --vendor-palo-bg-active: rgb(217, 119, 6, 0.3);
+    --vendor-palo-shadow: rgb(251, 146, 60, 0.4);
+
+    /* Other Vendors - Gray (brighter for dark backgrounds) */
+    --vendor-other: #94a3b8;
+    --vendor-other-rgb: 148, 163, 184;
+    --vendor-other-bg: rgb(107, 114, 128, 0.15);
+    --vendor-other-bg-active: rgb(107, 114, 128, 0.3);
+    --vendor-other-shadow: rgb(148, 163, 184, 0.4);
+
+    /* KEV (Known Exploited Vulnerabilities) - Red (brighter for dark backgrounds) */
+    --vendor-kev: #f87171;
+    --vendor-kev-rgb: 248, 113, 113;
+    --vendor-kev-bg: rgb(220, 38, 38, 0.15);
+    --vendor-kev-bg-active: rgb(220, 38, 38, 0.3);
+    --vendor-kev-shadow: rgb(248, 113, 113, 0.4);
 
     /* =================
        Shadows (darker for dark mode)

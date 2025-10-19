@@ -27,6 +27,15 @@ class LocationDetailsModal {
         this.modal = null;
         this.gridApi = null;
         this.activeFilter = null;
+
+        // Multi-select filter state
+        this.activeFilters = {
+            cisco: false,
+            palo: false,
+            other: false,
+            kev: false
+        };
+        this.allDevices = []; // Store unfiltered device data for filtering
     }
 
     /**
@@ -81,11 +90,16 @@ class LocationDetailsModal {
                                   vprSeverityClass === "medium" ? "bg-yellow" :
                                   "bg-green";
 
-            // Risk level badge
+            // Risk level badge and severity breakdown data
             const severityBreakdown = location.severity_breakdown || {};
             const criticalCount = severityBreakdown.Critical?.count || 0;
+            const criticalVpr = severityBreakdown.Critical?.vpr || 0;
             const highCount = severityBreakdown.High?.count || 0;
+            const highVpr = severityBreakdown.High?.vpr || 0;
             const mediumCount = severityBreakdown.Medium?.count || 0;
+            const mediumVpr = severityBreakdown.Medium?.vpr || 0;
+            const lowCount = severityBreakdown.Low?.count || 0;
+            const lowVpr = severityBreakdown.Low?.vpr || 0;
 
             let riskBadge = "";
             if (criticalCount > 0) {
@@ -188,6 +202,31 @@ class LocationDetailsModal {
                         </div>
                     </div>
                 </div>
+                <div class="mb-3">
+                    <div class="text-muted mb-2">Severity Breakdown:</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <div style="padding: 8px; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; text-align: center;">
+                            <div style="font-size: 0.75rem; text-transform: uppercase; opacity: 0.7; margin-bottom: 4px;">CRITICAL</div>
+                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--vpr-critical);">${criticalCount}</div>
+                            <div style="font-size: 0.75rem; opacity: 0.7; margin-top: 2px;">${criticalVpr.toFixed(1)} VPR</div>
+                        </div>
+                        <div style="padding: 8px; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; text-align: center;">
+                            <div style="font-size: 0.75rem; text-transform: uppercase; opacity: 0.7; margin-bottom: 4px;">HIGH</div>
+                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--vpr-high);">${highCount}</div>
+                            <div style="font-size: 0.75rem; opacity: 0.7; margin-top: 2px;">${highVpr.toFixed(1)} VPR</div>
+                        </div>
+                        <div style="padding: 8px; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; text-align: center;">
+                            <div style="font-size: 0.75rem; text-transform: uppercase; opacity: 0.7; margin-bottom: 4px;">MEDIUM</div>
+                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--vpr-medium);">${mediumCount}</div>
+                            <div style="font-size: 0.75rem; opacity: 0.7; margin-top: 2px;">${mediumVpr.toFixed(1)} VPR</div>
+                        </div>
+                        <div style="padding: 8px; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; text-align: center;">
+                            <div style="font-size: 0.75rem; text-transform: uppercase; opacity: 0.7; margin-bottom: 4px;">LOW</div>
+                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--vpr-low);">${lowCount}</div>
+                            <div style="font-size: 0.75rem; opacity: 0.7; margin-top: 2px;">${lowVpr.toFixed(1)} VPR</div>
+                        </div>
+                    </div>
+                </div>
             `;
 
             // Inject HTML into modal
@@ -286,120 +325,204 @@ class LocationDetailsModal {
     }
 
     /**
-     * Populate VPR summary cards with interactive filtering
-     * Creates 4 clickable severity cards that filter the device grid
+     * Populate vendor breakdown cards with multi-select filtering
+     * Creates 4 cards showing device counts by vendor (Cisco, Palo Alto, Other, KEV)
      *
-     * Pattern source: device-security-modal.js:311-356 (VPR filter cards)
-     *
-     * @param {Object} location - Location data with severity_breakdown
+     * Pattern source: location-cards.js:337-340 (vendor breakdown from API)
      */
-    populateVprSummary(location) {
+    populateVendorBreakdownCards() {
         try {
-            const severityBreakdown = location.severity_breakdown || {
-                Critical: { count: 0, vpr: 0 },
-                High: { count: 0, vpr: 0 },
-                Medium: { count: 0, vpr: 0 },
-                Low: { count: 0, vpr: 0 }
-            };
+            // Use pre-aggregated vendor breakdown from location object (matches location-cards.js)
+            const vendorBreakdown = this.currentLocation.vendor_breakdown || {};
+            const ciscoCount = vendorBreakdown["CISCO"] || 0;
+            const paloCount = vendorBreakdown["Palo Alto"] || 0;
+            const otherCount = vendorBreakdown["Other"] || 0;
 
-            // Build HTML for 4 severity filter cards - show ONLY Total VPR per severity
+            // KEV count - count devices in allDevices with hasKev
+            const kevCount = this.allDevices.filter(d => d.hasKev === true).length;
+
+            // Build HTML for 4 vendor breakdown cards (clickable filters)
             document.getElementById("vprSummaryCards").innerHTML = `
-                <div class="col-lg-3 col-6">
-                    <div class="card card-sm bg-red-lt vpr-filter-card" style="cursor: pointer;" data-severity="Critical" onclick="window.locationDetailsModal.filterBySeverity('Critical')">
+                <div class="col-md-3">
+                    <div class="card vendor-filter-card" data-filter="cisco" onclick="window.locationDetailsModal.toggleFilter('cisco')">
                         <div class="card-body text-center">
-                            <div class="text-muted small">Critical</div>
-                            <div class="text-red h3 fw-bold">${(severityBreakdown.Critical.vpr || 0).toFixed(1)}</div>
+                            <div class="mb-2">
+                                <i class="fas fa-network-wired fa-2x text-primary"></i>
+                            </div>
+                            <div class="text-muted small text-uppercase">CISCO</div>
+                            <div class="h3 mb-0">${ciscoCount}</div>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-3 col-6">
-                    <div class="card card-sm bg-orange-lt vpr-filter-card" style="cursor: pointer;" data-severity="High" onclick="window.locationDetailsModal.filterBySeverity('High')">
+                <div class="col-md-3">
+                    <div class="card vendor-filter-card" data-filter="palo" onclick="window.locationDetailsModal.toggleFilter('palo')">
                         <div class="card-body text-center">
-                            <div class="text-muted small">High</div>
-                            <div class="text-orange h3 fw-bold">${(severityBreakdown.High.vpr || 0).toFixed(1)}</div>
+                            <div class="mb-2">
+                                <i class="fas fa-fire fa-2x text-orange"></i>
+                            </div>
+                            <div class="text-muted small text-uppercase">PALO ALTO</div>
+                            <div class="h3 mb-0">${paloCount}</div>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-3 col-6">
-                    <div class="card card-sm bg-yellow-lt vpr-filter-card" style="cursor: pointer;" data-severity="Medium" onclick="window.locationDetailsModal.filterBySeverity('Medium')">
+                <div class="col-md-3">
+                    <div class="card vendor-filter-card" data-filter="other" onclick="window.locationDetailsModal.toggleFilter('other')">
                         <div class="card-body text-center">
-                            <div class="text-muted small">Medium</div>
-                            <div class="text-yellow h3 fw-bold">${(severityBreakdown.Medium.vpr || 0).toFixed(1)}</div>
+                            <div class="mb-2">
+                                <i class="fas fa-server fa-2x text-secondary"></i>
+                            </div>
+                            <div class="text-muted small text-uppercase">OTHER</div>
+                            <div class="h3 mb-0">${otherCount}</div>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-3 col-6">
-                    <div class="card card-sm bg-green-lt vpr-filter-card" style="cursor: pointer;" data-severity="Low" onclick="window.locationDetailsModal.filterBySeverity('Low')">
+                <div class="col-md-3">
+                    <div class="card vendor-filter-card" data-filter="kev" onclick="window.locationDetailsModal.toggleFilter('kev')">
                         <div class="card-body text-center">
-                            <div class="text-muted small">Low</div>
-                            <div class="text-green h3 fw-bold">${(severityBreakdown.Low.vpr || 0).toFixed(1)}</div>
+                            <div class="mb-2">
+                                <i class="fas fa-shield-alt fa-2x text-danger"></i>
+                            </div>
+                            <div class="text-muted small text-uppercase">KEV</div>
+                            <div class="h3 mb-0 text-danger">${kevCount}</div>
                         </div>
                     </div>
                 </div>
             `;
         } catch (error) {
-            console.error("[LocationDetailsModal] Error populating VPR summary:", error);
+            console.error("[LocationDetailsModal] Error populating vendor breakdown cards:", error);
         }
     }
 
     /**
-     * Filter device grid by severity with toggle behavior
-     * Clicking an active filter clears it; clicking a new severity applies that filter
-     *
-     * Pattern source: device-security-modal.js:358-414 (severity filtering with toggle)
-     *
-     * @param {string} severity - Severity level to filter by (Critical, High, Medium, Low)
+     * Toggle vendor/KEV filter on card click
+     * Uses CSS classes from cards.css for visual feedback (no inline styles)
+     * Pattern source: Centralized theme engine approach (cards.css:475-522)
+     * @param {string} filterName - Filter to toggle (cisco|palo|other|kev)
      */
-    filterBySeverity(severity) {
+    toggleFilter(filterName) {
+        // Toggle filter state
+        this.activeFilters[filterName] = !this.activeFilters[filterName];
+
+        // Update card visual state using CSS classes
+        const card = document.querySelector(`[data-filter="${filterName}"]`);
+        if (card) {
+            const activeClass = `active-${filterName}`;
+
+            if (this.activeFilters[filterName]) {
+                // Add vendor-specific active class (e.g., "active-cisco")
+                card.classList.add(activeClass);
+            } else {
+                // Remove active class
+                card.classList.remove(activeClass);
+            }
+        }
+
+        // Apply filters to grid
+        this.applyFilters();
+    }
+
+    /**
+     * Apply active filters using AG-Grid's external filter API
+     * External filters are registered in gridOptions (isExternalFilterPresent, doesExternalFilterPass)
+     * Vendor filters use OR logic, KEV filter uses AND logic
+     */
+    applyFilters() {
         if (!this.gridApi) {
-            console.warn("[LocationDetailsModal] Grid API not available for filtering");
             return;
         }
 
-        // Toggle behavior: if clicking the same severity, clear the filter
-        if (this.activeFilter === severity) {
-            // Clear filter - show all rows using native AG-Grid API
-            this.gridApi.setFilterModel(null);
-            this.activeFilter = null;
+        // Trigger AG-Grid to re-run external filter on all rows
+        this.gridApi.onFilterChanged();
 
-            // Reset all card styles
-            document.querySelectorAll(".vpr-filter-card").forEach(card => {
-                card.style.opacity = "1";
-                card.style.border = "";
-                card.style.transform = "";
-            });
+        // Count filtered rows for display
+        let filteredCount = 0;
+        this.gridApi.forEachNodeAfterFilter(node => {
+            filteredCount++;
+        });
 
-            console.log("[LocationDetailsModal] Filter cleared");
-        } else {
-            // Apply new filter using native AG-Grid API (HEX-296 Fix #3)
-            this.activeFilter = severity;
+        this.updateFilterCountDisplay(filteredCount, this.allDevices.length);
+    }
 
-            // Use AG-Grid's native filtering instead of manual row data replacement
-            this.gridApi.setFilterModel({
-                highestSeverity: {
-                    filterType: "text",
-                    type: "equals",
-                    filter: severity
-                }
-            });
+    /**
+     * Check if external filter is present (required by AG-Grid)
+     * @returns {boolean} True if any filter is active
+     */
+    isExternalFilterPresent() {
+        return this.activeFilters.cisco ||
+               this.activeFilters.palo ||
+               this.activeFilters.other ||
+               this.activeFilters.kev;
+    }
 
-            // Update card visual states
-            document.querySelectorAll(".vpr-filter-card").forEach(card => {
-                const cardSeverity = card.getAttribute("data-severity");
-                if (cardSeverity === severity) {
-                    // Highlight active card
-                    card.style.opacity = "1";
-                    card.style.border = "2px solid var(--hextrackr-primary)";
-                    card.style.transform = "translateY(-2px)";
-                } else {
-                    // Dim inactive cards
-                    card.style.opacity = "0.5";
-                    card.style.border = "";
-                    card.style.transform = "";
-                }
-            });
+    /**
+     * External filter logic (called by AG-Grid for each row)
+     * @param {Object} node - AG-Grid row node
+     * @returns {boolean} True if row should be shown
+     */
+    doesExternalFilterPass(node) {
+        const device = node.data;
 
-            console.log(`[LocationDetailsModal] Filtered by ${severity} severity`);
+        // Step 1: Check vendor filters (OR logic)
+        const vendorActive = this.activeFilters.cisco ||
+                             this.activeFilters.palo ||
+                             this.activeFilters.other;
+
+        if (vendorActive) {
+            const vendor = device.vendor || "";
+            const vendorUpper = vendor.toUpperCase();
+            const isCisco = vendorUpper === "CISCO";
+            const isPalo = vendor === "Palo Alto" || vendorUpper.includes("PALO");
+            const isOther = !isCisco && !isPalo;
+
+            const vendorMatches = (this.activeFilters.cisco && isCisco) ||
+                                 (this.activeFilters.palo && isPalo) ||
+                                 (this.activeFilters.other && isOther);
+
+            if (!vendorMatches) {
+                return false; // Vendor doesn't match, filter out
+            }
+        }
+
+        // Step 2: Check KEV filter (AND logic on top of vendor filter)
+        if (this.activeFilters.kev) {
+            if (device.hasKev !== true) {
+                return false; // Not a KEV device, filter out
+            }
+        }
+
+        return true; // Row passes all filters
+    }
+
+    /**
+     * Update filter count display above grid
+     * @param {number} filteredCount - Number of filtered devices
+     * @param {number} totalCount - Total devices
+     */
+    updateFilterCountDisplay(filteredCount, totalCount) {
+        const activeFilterNames = Object.keys(this.activeFilters)
+            .filter(key => this.activeFilters[key])
+            .map(key => key.toUpperCase());
+
+        let message = `Showing ${filteredCount} of ${totalCount} devices`;
+        if (activeFilterNames.length > 0) {
+            message += ` (Filters: ${activeFilterNames.join(", ")})`;
+        }
+
+        // Find or create filter count element
+        let filterCountEl = document.getElementById("filterCountDisplay");
+        if (!filterCountEl) {
+            // Create and insert before grid
+            const gridContainer = document.querySelector(".ag-theme-quartz");
+            if (gridContainer) {
+                filterCountEl = document.createElement("div");
+                filterCountEl.id = "filterCountDisplay";
+                filterCountEl.className = "text-muted mb-2";
+                gridContainer.parentNode.insertBefore(filterCountEl, gridContainer);
+            }
+        }
+
+        if (filterCountEl) {
+            filterCountEl.textContent = message;
         }
     }
 
@@ -432,7 +555,7 @@ class LocationDetailsModal {
             const deviceData = await this.aggregateDeviceData(location);
             this.allDevices = deviceData; // Store for filtering
 
-            // Define 7 column structure
+            // Define column structure (matches Device Security Modal patterns)
             const columnDefs = [
                 {
                     headerName: "Hostname",
@@ -444,79 +567,173 @@ class LocationDetailsModal {
                         const linkColor = isKev ? "#dc3545" : "#3b82f6"; // Red for KEV, blue for normal
                         const fontWeight = "700";
 
-                        return `<a href="#" style="color: ${linkColor}; font-weight: ${fontWeight}; text-decoration: none;"
+                        return `<a href="#" style="color: ${linkColor} !important; font-weight: ${fontWeight} !important; text-decoration: none;"
                                    onclick="window.locationDetailsModal.navigateToDevice('${hostname}'); return false;">
                                    ${hostname}
                                 </a>`;
                     }
                 },
                 {
-                    headerName: "Total Vuln",
+                    headerName: "CVE",
                     field: "vulnerabilityCount",
-                    width: 110,
+                    width: 100,
                     cellRenderer: (params) => {
-                        return `<span class="badge bg-secondary">${params.value}</span>`;
+                        const count = params.value || 0;
+                        return `<span class="fw-bold">${count}</span>`;
                     }
                 },
                 {
-                    headerName: "Total VPR",
+                    headerName: "VPR",
                     field: "totalVpr",
-                    width: 110,
+                    width: 100,
                     cellRenderer: (params) => {
                         const vpr = params.value || 0;
-                        const severityClass = this.getVprSeverityClass(vpr);
-                        const badgeClass = severityClass === "critical" ? "bg-red" :
-                                          severityClass === "high" ? "bg-orange" :
-                                          severityClass === "medium" ? "bg-yellow" : "bg-green";
-
-                        // Build tooltip with C/H/M/L breakdown
-                        const breakdown = params.data.severityBreakdown;
-                        const tooltip = `Critical: ${breakdown.Critical.count} (${breakdown.Critical.vpr.toFixed(1)})
-High: ${breakdown.High.count} (${breakdown.High.vpr.toFixed(1)})
-Medium: ${breakdown.Medium.count} (${breakdown.Medium.vpr.toFixed(1)})
-Low: ${breakdown.Low.count} (${breakdown.Low.vpr.toFixed(1)})`;
-
-                        return `<span class="badge ${badgeClass}" title="${tooltip}" style="cursor: help;">
-                                    ${vpr.toFixed(1)}
-                                </span>`;
+                        // Colored text based on VPR score (matches Device Modal pattern)
+                        let color = "#16a34a";  // Green for low (0-3.9)
+                        if (vpr >= 9.0) {
+                            color = "#dc2626";   // Red for critical (9-10)
+                        } else if (vpr >= 7.0) {
+                            color = "#f76707";   // Orange for high (7-8.9)
+                        } else if (vpr >= 4.0) {
+                            color = "#d97706";   // Yellow for medium (4-6.9)
+                        }
+                        return `<span style="color: ${color}; font-weight: 700;">${vpr.toFixed(1)}</span>`;
                     }
                 },
                 {
-                    headerName: "Installed Version",
+                    headerName: "Installed",
                     field: "installedVersion",
-                    width: 150,
+                    width: 130,
                     cellRenderer: (params) => {
-                        return params.value ? `<span class="font-monospace">${params.value}</span>` : "N/A";
+                        const os = params.value;
+                        if (!os || os === "N/A") {
+                            return "<span class=\"font-monospace text-muted\">N/A</span>";
+                        }
+
+                        // Extract version number from OS string (matches main table pattern)
+                        // Remove prefixes like "Cisco IOS", "IOS XE", "PAN-OS", etc.
+                        let displayVersion = os;
+                        const versionMatch = os.match(/(\d+\.\d+(?:\.\d+)?(?:\(\d+\))?[A-Z]*)/);
+                        if (versionMatch) {
+                            displayVersion = versionMatch[1];
+                        }
+
+                        return `<span class=\"font-monospace text-info\">${displayVersion}</span>`;
                     }
                 },
                 {
-                    headerName: "Fixed Version",
+                    headerName: "Fixed",
                     field: "fixedVersion",
                     width: 150,
                     cellRenderer: (params) => {
-                        return params.value ? `<span class="font-monospace text-success">${params.value}+</span>` : "N/A";
+                        const cellId = `fixed-version-cell-${params.node.id}`;
+
+                        // Return placeholder with unique ID for async update
+                        setTimeout(async () => {
+                            const cell = document.getElementById(cellId);
+                            if (!cell) {return;}
+
+                            // Get the first vulnerability for this device to determine vendor
+                            const device = params.data;
+                            if (!device.vulnerabilities || device.vulnerabilities.length === 0) {
+                                cell.innerHTML = "<span class=\"font-monospace text-muted\">N/A</span>";
+                                return;
+                            }
+
+                            // Use first vulnerability's vendor and CVE
+                            const firstVuln = device.vulnerabilities[0];
+                            const vendor = firstVuln.vendor;
+                            const cveId = firstVuln.cve;
+
+                            // Determine which advisory helper to use
+                            let advisoryHelper = null;
+                            if (vendor?.toLowerCase().includes("cisco")) {
+                                advisoryHelper = window.ciscoAdvisoryHelper;
+                            } else if (vendor?.toLowerCase().includes("palo")) {
+                                advisoryHelper = window.paloAdvisoryHelper;
+                            }
+
+                            // Unsupported vendor or helper not loaded
+                            if (!advisoryHelper) {
+                                cell.innerHTML = "<span class=\"font-monospace text-muted\">N/A</span>";
+                                params.node.setDataValue("fixedVersion", "N/A");
+                                return;
+                            }
+
+                            try {
+                                const installedVersion = device.installedVersion;
+                                const fixedVersion = await advisoryHelper.getFixedVersion(
+                                    cveId, vendor, installedVersion
+                                );
+
+                                if (fixedVersion) {
+                                    cell.innerHTML = `<span class=\"font-monospace text-success\">${DOMPurify.sanitize(fixedVersion)}+</span>`;
+                                    params.node.setDataValue("fixedVersion", fixedVersion);
+                                } else {
+                                    cell.innerHTML = "<span class=\"font-monospace text-muted\">No Fix</span>";
+                                    params.node.setDataValue("fixedVersion", "No Fix");
+                                }
+                            } catch (error) {
+                                console.error("[LocationDetailsModal] Fixed version lookup failed:", error);
+                                cell.innerHTML = "<span class=\"font-monospace text-muted\">Error</span>";
+                                params.node.setDataValue("fixedVersion", "Error");
+                            }
+                        }, 0);
+
+                        return `<span id=\"${cellId}\" class=\"font-monospace text-muted\">Loading...</span>`;
                     }
                 },
                 {
-                    headerName: "Ticket Status",
+                    headerName: "",  // Empty header - will show icon via CSS
+                    headerClass: "ticket-header-icon",  // Custom class for icon styling
                     field: "ticketStatus",
-                    width: 110,
+                    width: 80,
+                    sortable: true,
+                    filter: false,
                     cellStyle: { textAlign: "center" },
                     cellRenderer: (params) => {
                         const ticketCount = params.data.ticketCount || 0;
+                        const ticketStatus = params.data.ticketStatus;
                         const hostname = params.data.hostname;
+                        const isKev = params.data.hasKev;
+                        const allTickets = params.data.tickets || [];
 
-                        // No tickets - show "Create" button
+                        // No open tickets - check for closed tickets in history
                         if (ticketCount === 0) {
-                            return `<button class="btn btn-sm btn-outline-primary" onclick="window.locationDetailsModal.createTicket('${hostname}'); return false;">
-                                        <i class="fas fa-plus me-1"></i>Create
-                                    </button>`;
+                            const closedTickets = allTickets.filter(t => ["Completed", "Closed"].includes(t.status));
+                            const closedCount = closedTickets.length;
+
+                            let tooltipText = `Create ticket for ${hostname}`;
+                            if (closedCount > 0) {
+                                tooltipText = `${closedCount} closed ticket${closedCount > 1 ? "s" : ""} - click to create new`;
+                            }
+
+                            return `<a href="#" class="text-muted"
+                                       onclick="window.locationDetailsModal.createTicket('${hostname}', ${isKev}); return false;"
+                                       title="${tooltipText}">
+                                       <i class="fas fa-ticket-alt" style="opacity: 0.6;"></i>
+                                    </a>`;
                         }
 
-                        // Has tickets - show "View" button
-                        return `<button class="btn btn-sm btn-primary" onclick="window.locationDetailsModal.viewTickets('${hostname}'); return false;">
-                                    <i class="fas fa-eye me-1"></i>View (${ticketCount})
-                                </button>`;
+                        // Has open tickets - show colored icon based on status
+                        let colorClass = "text-secondary";  // Gray for unknown
+                        if (ticketStatus === "Overdue") {
+                            colorClass = "text-danger";     // Red
+                        } else if (ticketStatus === "Pending") {
+                            colorClass = "text-warning";    // Yellow
+                        } else if (ticketStatus === "Open") {
+                            colorClass = "text-primary";    // Blue
+                        } else if (ticketStatus === "Completed" || ticketStatus === "Closed") {
+                            colorClass = "text-success";    // Green
+                        }
+
+                        const tooltipText = `${ticketStatus} - ${ticketCount} ticket${ticketCount > 1 ? "s" : ""} - click to view/edit`;
+
+                        return `<a href="#" class="${colorClass}"
+                                   onclick="window.locationDetailsModal.viewTickets('${hostname}'); return false;"
+                                   title="${tooltipText}">
+                                   <i class="fas fa-ticket-alt"></i>
+                                </a>`;
                     }
                 }
             ];
@@ -583,6 +800,9 @@ Low: ${breakdown.Low.count} (${breakdown.Low.vpr.toFixed(1)})`;
                 domLayout: "normal",
                 animateRows: true,
                 pagination: false,
+                // External filter callbacks for vendor/KEV filtering
+                isExternalFilterPresent: () => this.isExternalFilterPresent(),
+                doesExternalFilterPass: (node) => this.doesExternalFilterPass(node),
                 initialState: {
                     sort: {
                         sortModel: [{ colId: "totalVpr", sort: "desc" }]
@@ -697,63 +917,70 @@ Low: ${breakdown.Low.count} (${breakdown.Low.vpr.toFixed(1)})`;
                 return vulnLocation === searchLocation;
             });
 
-            // Group by hostname
+            // Group by hostname (each vulnerability has ONE hostname, not an array)
             const deviceMap = new Map();
 
             locationVulns.forEach(vuln => {
-                const hostnames = vuln.affectedDevices || [];
+                const hostname = vuln.hostname;
+                if (!hostname) {
+                    return; // Skip vulnerabilities without hostname
+                }
 
-                hostnames.forEach(hostname => {
-                    if (!deviceMap.has(hostname)) {
-                        deviceMap.set(hostname, {
-                            hostname: hostname,
-                            vulnerabilities: [],
-                            totalVpr: 0,
-                            vulnerabilityCount: 0,
-                            severityBreakdown: {
-                                Critical: { count: 0, vpr: 0 },
-                                High: { count: 0, vpr: 0 },
-                                Medium: { count: 0, vpr: 0 },
-                                Low: { count: 0, vpr: 0 }
-                            },
-                            hasKev: false,
-                            installedVersion: null,
-                            fixedVersion: null,
-                            ticketCount: 0,
-                            ticketStatus: null,
-                            highestSeverity: "Low"
-                        });
-                    }
+                if (!deviceMap.has(hostname)) {
+                    deviceMap.set(hostname, {
+                        hostname: hostname,
+                        vendor: null, // Will be set from first vulnerability
+                        vulnerabilities: [],
+                        totalVpr: 0,
+                        vulnerabilityCount: 0,
+                        severityBreakdown: {
+                            Critical: { count: 0, vpr: 0 },
+                            High: { count: 0, vpr: 0 },
+                            Medium: { count: 0, vpr: 0 },
+                            Low: { count: 0, vpr: 0 }
+                        },
+                        hasKev: false,
+                        installedVersion: null,
+                        fixedVersion: null,
+                        ticketCount: 0,
+                        ticketStatus: null,
+                        highestSeverity: "Low"
+                    });
+                }
 
-                    const device = deviceMap.get(hostname);
-                    device.vulnerabilities.push(vuln);
-                    device.vulnerabilityCount++;
-                    device.totalVpr += vuln.vprScore || 0;
+                const device = deviceMap.get(hostname);
+                device.vulnerabilities.push(vuln);
+                device.vulnerabilityCount++;
+                device.totalVpr += vuln.vpr_score || 0;
 
-                    // Update severity breakdown
-                    const severity = vuln.severity || "Low";
-                    if (device.severityBreakdown[severity]) {
-                        device.severityBreakdown[severity].count++;
-                        device.severityBreakdown[severity].vpr += vuln.vprScore || 0;
-                    }
+                // Extract vendor from first vulnerability (all vulns for same device have same vendor)
+                if (!device.vendor && vuln.vendor) {
+                    device.vendor = vuln.vendor;
+                }
 
-                    // Track KEV status
-                    if (vuln.isKev === "Yes") {
-                        device.hasKev = true;
-                    }
+                // Update severity breakdown
+                const severity = vuln.severity || "Low";
+                if (device.severityBreakdown[severity]) {
+                    device.severityBreakdown[severity].count++;
+                    device.severityBreakdown[severity].vpr += vuln.vpr_score || 0;
+                }
 
-                    // Extract version info (use first available)
-                    if (!device.installedVersion && vuln.operating_system) {
-                        device.installedVersion = vuln.operating_system;
+                // Track KEV status
+                if (vuln.isKev === "Yes") {
+                    device.hasKev = true;
+                }
+
+                // Extract version info (use first available)
+                if (!device.installedVersion && vuln.operating_system) {
+                    device.installedVersion = vuln.operating_system;
+                }
+                if (!device.fixedVersion && vuln.solution) {
+                    // Extract version from solution field (simplified - Session 3 will improve)
+                    const versionMatch = vuln.solution.match(/\d+\.\d+\.\d+/);
+                    if (versionMatch) {
+                        device.fixedVersion = versionMatch[0];
                     }
-                    if (!device.fixedVersion && vuln.solution) {
-                        // Extract version from solution field (simplified - Session 3 will improve)
-                        const versionMatch = vuln.solution.match(/\d+\.\d+\.\d+/);
-                        if (versionMatch) {
-                            device.fixedVersion = versionMatch[0];
-                        }
-                    }
-                });
+                }
             });
 
             // Convert map to array and calculate highest severity
@@ -865,10 +1092,16 @@ Low: ${breakdown.Low.count} (${breakdown.Low.vpr.toFixed(1)})`;
             this.createTicket(hostname);
             return;
         } else if (ticketCount === 1) {
-            // Navigate directly to single ticket
+            // Open ticket edit modal directly (not navigation)
             const ticketId = tickets[0].id;
-            console.log(`[LocationDetailsModal] Opening single ticket: ${ticketId}`);
-            window.location.href = `/tickets.html?openTicket=${ticketId}`;
+            console.log(`[LocationDetailsModal] Opening single ticket modal: ${ticketId}`);
+
+            if (window.ticketManager && typeof window.ticketManager.editTicket === "function") {
+                window.ticketManager.editTicket(ticketId);
+            } else {
+                console.error("[LocationDetailsModal] ticketManager.editTicket not available, falling back to navigation");
+                window.location.href = `/tickets.html?openTicket=${ticketId}`;
+            }
             return;
         } else {
             // Show picker modal for multiple tickets
@@ -922,14 +1155,23 @@ Low: ${breakdown.Low.count} (${breakdown.Low.vpr.toFixed(1)})`;
                 modalElement.setAttribute("data-bs-theme", currentTheme);
             }
 
-            // Populate VPR summary cards
-            this.populateVprSummary(this.currentLocation);
+            // Aggregate device data first (needed for vendor breakdown cards)
+            const deviceData = await this.aggregateDeviceData(this.currentLocation);
+
+            // Store unfiltered devices for filtering
+            this.allDevices = deviceData;
+
+            // Populate vendor breakdown cards (reads from this.currentLocation.vendor_breakdown)
+            this.populateVendorBreakdownCards();
 
             // Create device grid (now async with ticket count integration)
             await this.createLocationDevicesGrid(this.currentLocation);
 
             // Initialize Bootstrap modal
             this.modal = new bootstrap.Modal(modalElement);
+
+            // Initialize footer buttons
+            this.initializeFooterButtons();
 
             // Add cleanup listener for modal close
             modalElement.addEventListener("hidden.bs.modal", () => {
@@ -942,6 +1184,62 @@ Low: ${breakdown.Low.count} (${breakdown.Low.vpr.toFixed(1)})`;
         } catch (error) {
             console.error("[LocationDetailsModal] Error showing modal:", error);
         }
+    }
+
+    /**
+     * Initialize footer button event listeners
+     */
+    initializeFooterButtons() {
+        const exportBtn = document.getElementById("exportLocationCsvBtn");
+        const createTicketBtn = document.getElementById("createLocationTicketBtn");
+
+        if (exportBtn) {
+            exportBtn.addEventListener("click", () => this.exportLocationCsv());
+        }
+
+        if (createTicketBtn) {
+            createTicketBtn.addEventListener("click", () => this.createLocationTicket());
+        }
+    }
+
+    /**
+     * Export location grid data to CSV (stub)
+     */
+    exportLocationCsv() {
+        console.log("[LocationDetailsModal] Export CSV clicked - feature coming soon");
+        if (window.vulnManager && typeof window.vulnManager.showToast === "function") {
+            window.vulnManager.showToast("Export CSV feature coming soon", "info");
+        }
+    }
+
+    /**
+     * Create ticket for all devices at this location
+     */
+    createLocationTicket() {
+        const location = this.currentLocation.location?.toUpperCase() || "UNKNOWN";
+        const site = location.substring(0, 4);
+
+        // Get all device hostnames at this location
+        const deviceList = this.allDevices.map(d => d.hostname.toUpperCase());
+
+        const ticketData = {
+            devices: deviceList,
+            site: site,
+            location: location,
+            mode: "bulk-all",
+            timestamp: Date.now()
+        };
+
+        sessionStorage.setItem("createTicketData", JSON.stringify(ticketData));
+        sessionStorage.setItem("autoOpenModal", "true");
+
+        if (window.vulnManager && typeof window.vulnManager.showToast === "function") {
+            window.vulnManager.showToast(`Creating ticket for ${deviceList.length} devices at ${location}...`, "info");
+        }
+
+        setTimeout(() => {
+            window.location.href = "/tickets.html";
+        }, 300);
     }
 
     /**
