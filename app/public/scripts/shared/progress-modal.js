@@ -648,7 +648,7 @@ class ProgressModal {
 
                 topResolved.forEach(cve => {
                     const severityClass = cve.severity.toLowerCase();
-                    const lastSeenDate = new Date(cve.lastSeen + 'T00:00:00').toLocaleDateString();
+                    const lastSeenDate = new Date(cve.lastSeen + "T00:00:00").toLocaleDateString();
                     html += `
                         <tr>
                             <td><code>${cve.cve}</code></td>

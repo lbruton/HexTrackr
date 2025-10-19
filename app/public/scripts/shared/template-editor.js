@@ -21,7 +21,7 @@ class TemplateEditor {
         this.isEditMode = false;
         this.currentTemplate = null;
         this.currentTicketData = null;
-        this.currentVariant = 'upgrade';  // Default variant
+        this.currentVariant = "upgrade";  // Default variant
         this.validationTimeout = null;
         this.isRestoring = false;
 
@@ -38,19 +38,19 @@ class TemplateEditor {
      */
     getTemplateVariant(jobType) {
         if (!jobType) {
-            return 'upgrade';  // Default fallback
+            return "upgrade";  // Default fallback
         }
 
         switch (jobType.toLowerCase()) {
-            case 'replace':
-            case 'refresh':
-                return 'replacement';  // Both use same template (equipment swap workflow)
-            case 'mitigate':
-                return 'mitigate';     // KEV emergency patching
-            case 'upgrade':
-            case 'other':
+            case "replace":
+            case "refresh":
+                return "replacement";  // Both use same template (equipment swap workflow)
+            case "mitigate":
+                return "mitigate";     // KEV emergency patching
+            case "upgrade":
+            case "other":
             default:
-                return 'upgrade';      // Default for Upgrade and Other job types
+                return "upgrade";      // Default for Upgrade and Other job types
         }
     }
 

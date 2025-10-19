@@ -71,7 +71,7 @@ class AuthController {
                         username,
                         reason: "Invalid credentials",
                         ip: req.ip,
-                        userAgent: req.headers['user-agent']
+                        userAgent: req.headers["user-agent"]
                     }, null, req);
                 }
 
@@ -99,7 +99,7 @@ class AuthController {
                         userId: result.userId,
                         lockoutMinutes: 15,
                         ip: req.ip,
-                        userAgent: req.headers['user-agent']
+                        userAgent: req.headers["user-agent"]
                     }, result.userId, req);
                 }
 
@@ -155,7 +155,7 @@ class AuthController {
                         username: result.username,
                         rememberMe: !!rememberMe,
                         ip: req.ip,
-                        userAgent: req.headers['user-agent']
+                        userAgent: req.headers["user-agent"]
                     }, result.id, req);
                 }
 

@@ -296,8 +296,8 @@
                     return span;
                 },
                 comparator: (dateA, dateB) => {
-                    const a = dateA ? new Date(dateA + 'T00:00:00').getTime() : 0;
-                    const b = dateB ? new Date(dateB + 'T00:00:00').getTime() : 0;
+                    const a = dateA ? new Date(dateA + "T00:00:00").getTime() : 0;
+                    const b = dateB ? new Date(dateB + "T00:00:00").getTime() : 0;
                     return a - b;
                 }
             },
@@ -316,8 +316,8 @@
                     return span;
                 },
                 comparator: (dateA, dateB) => {
-                    const a = dateA ? new Date(dateA + 'T00:00:00').getTime() : 0;
-                    const b = dateB ? new Date(dateB + 'T00:00:00').getTime() : 0;
+                    const a = dateA ? new Date(dateA + "T00:00:00").getTime() : 0;
+                    const b = dateB ? new Date(dateB + "T00:00:00").getTime() : 0;
                     return a - b;
                 }
             },
@@ -517,7 +517,7 @@
                 valueFormatter: (params) => {
                     // Suppress AG Grid warning about object data type
                     const devices = Array.isArray(params.value) ? params.value : [];
-                    return devices.length > 0 ? `${devices.length} device${devices.length > 1 ? 's' : ''}` : 'N/A';
+                    return devices.length > 0 ? `${devices.length} device${devices.length > 1 ? "s" : ""}` : "N/A";
                 },
                 filterValueGetter: (params) => {
                     // Make filter searchable by device names (HEX-241)
@@ -737,7 +737,7 @@
             animateRows: true,
             rowHeight: 42,
             domLayout: "autoHeight",
-            rowSelection: { mode: 'singleRow', checkboxes: false, enableClickSelection: true },
+            rowSelection: { mode: "singleRow", checkboxes: false, enableClickSelection: true },
             rowClassRules: {
                 "ticket-row-overdue": (params) => {
                     if (!params.data) {return false;}

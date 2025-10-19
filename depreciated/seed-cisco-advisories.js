@@ -71,7 +71,7 @@ async function main() {
             FROM cisco_advisories
         `).get();
 
-        console.log(`\n📈 Database statistics:`);
+        console.log("\n📈 Database statistics:");
         console.log(`   Total advisories: ${stats.total}`);
         console.log(`   With fixed versions: ${stats.with_fixes}`);
         console.log(`   Without fixes: ${stats.total - stats.with_fixes}`);

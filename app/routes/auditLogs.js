@@ -11,15 +11,15 @@
  * 3. Mount routes: app.use('/api/audit-logs', auditLogRoutes);
  */
 
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const AuditLogController = require('../controllers/auditLogController');
+const AuditLogController = require("../controllers/auditLogController");
 
 /**
  * POST /api/audit-logs
  * Create encrypted audit log entry
  * Body: { category, message, data }
  */
-router.post('/', AuditLogController.createAuditLog);
+router.post("/", AuditLogController.createAuditLog);
 
 module.exports = router;

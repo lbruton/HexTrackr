@@ -91,7 +91,7 @@ class HexagonTicketsManager {
     transformTicketData(rawTicket) {
         // Calculate if the ticket is overdue based on due date
         const dueDate = rawTicket.date_due || rawTicket.dateDue;
-        const isOverdue = dueDate ? new Date(dueDate + 'T00:00:00') < new Date() : false;
+        const isOverdue = dueDate ? new Date(dueDate + "T00:00:00") < new Date() : false;
         let status = rawTicket.status || "";
         
         // Auto-update status to "Overdue" if conditions are met
@@ -374,9 +374,9 @@ class HexagonTicketsManager {
         });
 
         // Delete confirmation modal (HEX-248)
-        const confirmDeleteBtn = document.getElementById('confirmDeleteTicket');
+        const confirmDeleteBtn = document.getElementById("confirmDeleteTicket");
         if (confirmDeleteBtn) {
-            confirmDeleteBtn.addEventListener('click', () => {
+            confirmDeleteBtn.addEventListener("click", () => {
                 this.confirmDeleteTicket();
             });
         }
@@ -1283,8 +1283,8 @@ class HexagonTicketsManager {
         }
 
         const parts = [];
-        if (line1) parts.push(line1);
-        if (line2) parts.push(line2);
+        if (line1) {parts.push(line1);}
+        if (line2) {parts.push(line2);}
         if (city || state || zip) {
             const cityStateZip = [city, state, zip].filter(Boolean).join(" ");
             parts.push(cityStateZip);
@@ -1338,13 +1338,13 @@ class HexagonTicketsManager {
         }
 
         // Populate modal
-        document.getElementById('deleteTicketNumber').textContent =
+        document.getElementById("deleteTicketNumber").textContent =
             ticket.xt_number || ticket.id;
-        document.getElementById('deletionReasonInput').value = '';
-        document.getElementById('deletionReasonInput').classList.remove('is-invalid');
+        document.getElementById("deletionReasonInput").value = "";
+        document.getElementById("deletionReasonInput").classList.remove("is-invalid");
 
         // Show modal
-        const modal = new bootstrap.Modal(document.getElementById('deleteTicketModal'));
+        const modal = new bootstrap.Modal(document.getElementById("deleteTicketModal"));
         modal.show();
     }
 
@@ -1353,11 +1353,11 @@ class HexagonTicketsManager {
      * Called when user clicks "Delete Ticket" button in modal
      */
     async confirmDeleteTicket() {
-        const reasonInput = document.getElementById('deletionReasonInput');
+        const reasonInput = document.getElementById("deletionReasonInput");
         const reason = reasonInput.value.trim();
 
         if (!reason) {
-            reasonInput.classList.add('is-invalid');
+            reasonInput.classList.add("is-invalid");
             this.showToast("Please provide a reason for deletion", "warning");
             return;
         }
@@ -1376,7 +1376,7 @@ class HexagonTicketsManager {
             if (response.ok) {
                 // Hide modal
                 const modal = bootstrap.Modal.getInstance(
-                    document.getElementById('deleteTicketModal')
+                    document.getElementById("deleteTicketModal")
                 );
                 modal.hide();
 
@@ -2110,7 +2110,7 @@ class HexagonTicketsManager {
         }
         
         // Fallback for other date formats
-        return new Date(dateString + 'T00:00:00').toLocaleDateString("en-US", {
+        return new Date(dateString + "T00:00:00").toLocaleDateString("en-US", {
             year: "numeric",
             month: "short",
             day: "numeric"
@@ -2437,8 +2437,8 @@ class HexagonTicketsManager {
                 const desc = (vuln.plugin_name || vuln.description || "N/A").substring(0, 50);
                 const severity = vuln.severity || "N/A";
                 const vpr = vuln.vpr_score ? vuln.vpr_score.toFixed(1) : "N/A";
-                const firstSeen = vuln.first_seen ? new Date(vuln.first_seen + 'T00:00:00').toLocaleDateString() : "N/A";
-                const lastSeen = vuln.last_seen ? new Date(vuln.last_seen + 'T00:00:00').toLocaleDateString() : "N/A";
+                const firstSeen = vuln.first_seen ? new Date(vuln.first_seen + "T00:00:00").toLocaleDateString() : "N/A";
+                const lastSeen = vuln.last_seen ? new Date(vuln.last_seen + "T00:00:00").toLocaleDateString() : "N/A";
 
                 markdown += `| ${id} | ${desc} | ${severity} | ${vpr} | ${firstSeen} | ${lastSeen} |\n`;
             });
@@ -3289,10 +3289,10 @@ class HexagonTicketsManager {
         const addressLines = [];
 
         // Add address line 1
-        if (line1) addressLines.push(line1);
+        if (line1) {addressLines.push(line1);}
 
         // Add address line 2
-        if (line2) addressLines.push(line2);
+        if (line2) {addressLines.push(line2);}
 
         // Add city, state, zip on one line
         if (city && state && zip) {
@@ -3300,7 +3300,7 @@ class HexagonTicketsManager {
         } else if (city || state || zip) {
             // Handle partial city/state/zip
             const cityStateZip = [city, state, zip].filter(Boolean).join(" ");
-            if (cityStateZip) addressLines.push(cityStateZip);
+            if (cityStateZip) {addressLines.push(cityStateZip);}
         }
 
         // Join with newlines for multi-line display in markdown
@@ -3320,19 +3320,19 @@ class HexagonTicketsManager {
      */
     getTemplateVariant(jobType) {
         if (!jobType) {
-            return 'upgrade';  // Default fallback
+            return "upgrade";  // Default fallback
         }
 
         switch (jobType.toLowerCase()) {
-            case 'replace':
-            case 'refresh':
-                return 'replacement';  // Both use same template (equipment swap workflow)
-            case 'mitigate':
-                return 'mitigate';     // KEV emergency patching
-            case 'upgrade':
-            case 'other':
+            case "replace":
+            case "refresh":
+                return "replacement";  // Both use same template (equipment swap workflow)
+            case "mitigate":
+                return "mitigate";     // KEV emergency patching
+            case "upgrade":
+            case "other":
             default:
-                return 'upgrade';      // Default for Upgrade and Other job types
+                return "upgrade";      // Default for Upgrade and Other job types
         }
     }
 

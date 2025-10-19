@@ -175,8 +175,8 @@ class DeviceSecurityModal {
      */
 
     async loadDeviceFixedVersion(device) {
-        const fixedVersionElement = document.getElementById('deviceFixedVersion');
-        if (!fixedVersionElement) return;
+        const fixedVersionElement = document.getElementById("deviceFixedVersion");
+        if (!fixedVersionElement) {return;}
 
         // Use same vendor detection as populateDeviceInfo (with fallback to vulnerabilities)
         const vendor = device.vendor ||
@@ -185,26 +185,26 @@ class DeviceSecurityModal {
 
         // Determine which advisory helper to use based on vendor
         let advisoryHelper = null;
-        if (vendor?.toLowerCase().includes('cisco')) {
+        if (vendor?.toLowerCase().includes("cisco")) {
             advisoryHelper = window.ciscoAdvisoryHelper;
-        } else if (vendor?.toLowerCase().includes('palo')) {
+        } else if (vendor?.toLowerCase().includes("palo")) {
             advisoryHelper = window.paloAdvisoryHelper;
         }
 
         // Unsupported vendor or helper not loaded
         if (!advisoryHelper) {
-            fixedVersionElement.innerHTML = `<span class="font-monospace text-muted">N/A</span>`;
+            fixedVersionElement.innerHTML = "<span class=\"font-monospace text-muted\">N/A</span>";
             return;
         }
 
         try {
             // Get unique CVEs from device vulnerabilities
             const uniqueCves = [...new Set(device.vulnerabilities
-                .filter(v => v.cve && v.cve.startsWith('CVE-'))
+                .filter(v => v.cve && v.cve.startsWith("CVE-"))
                 .map(v => v.cve))];
 
             if (uniqueCves.length === 0) {
-                fixedVersionElement.innerHTML = `<span class="font-monospace text-muted">No CVEs</span>`;
+                fixedVersionElement.innerHTML = "<span class=\"font-monospace text-muted\">No CVEs</span>";
                 return;
             }
 
@@ -223,21 +223,21 @@ class DeviceSecurityModal {
             const fixedVersions = await Promise.all(fixedVersionPromises);
 
             // Filter out nulls and deduplicate
-            const validVersions = [...new Set(fixedVersions.filter(v => v !== null && v !== 'No Fix'))];
+            const validVersions = [...new Set(fixedVersions.filter(v => v !== null && v !== "No Fix"))];
 
             if (validVersions.length > 0) {
                 // Sort versions (highest/most recent first) using shared function - HEX-246
                 validVersions.sort((a, b) => window.ciscoAdvisoryHelper.compareVersions(a, b));
 
                 // Display all unique versions, comma-separated
-                const versionList = validVersions.map(v => DOMPurify.sanitize(v) + '+').join(', ');
+                const versionList = validVersions.map(v => DOMPurify.sanitize(v) + "+").join(", ");
                 fixedVersionElement.innerHTML = `<span class="font-monospace text-success">${versionList}</span>`;
             } else {
-                fixedVersionElement.innerHTML = `<span class="font-monospace text-muted">No Fix</span>`;
+                fixedVersionElement.innerHTML = "<span class=\"font-monospace text-muted\">No Fix</span>";
             }
         } catch (error) {
-            logger.error('Failed to load device fixed version:', error);
-            fixedVersionElement.innerHTML = `<span class="font-monospace text-danger">Error</span>`;
+            logger.error("Failed to load device fixed version:", error);
+            fixedVersionElement.innerHTML = "<span class=\"font-monospace text-danger\">Error</span>";
         }
     }
 
@@ -362,7 +362,7 @@ class DeviceSecurityModal {
      */
     filterBySeverity(severity) {
         if (!this.deviceGridApi) {
-            logger.warn('Grid API not available for filtering');
+            logger.warn("Grid API not available for filtering");
             return;
         }
 
@@ -373,13 +373,13 @@ class DeviceSecurityModal {
             this.activeFilter = null;
 
             // Reset all card styles
-            document.querySelectorAll('.vpr-filter-card').forEach(card => {
-                card.style.opacity = '1';
-                card.style.border = '';
-                card.style.transform = '';
+            document.querySelectorAll(".vpr-filter-card").forEach(card => {
+                card.style.opacity = "1";
+                card.style.border = "";
+                card.style.transform = "";
             });
 
-            logger.debug('Filter cleared');
+            logger.debug("Filter cleared");
         } else {
             // Apply new filter
             this.activeFilter = severity;
@@ -387,25 +387,25 @@ class DeviceSecurityModal {
             // Set AG-Grid filter
             this.deviceGridApi.setFilterModel({
                 severity: {
-                    filterType: 'text',
-                    type: 'equals',
+                    filterType: "text",
+                    type: "equals",
                     filter: severity
                 }
             });
 
             // Update card visual states
-            document.querySelectorAll('.vpr-filter-card').forEach(card => {
-                const cardSeverity = card.getAttribute('data-severity');
+            document.querySelectorAll(".vpr-filter-card").forEach(card => {
+                const cardSeverity = card.getAttribute("data-severity");
                 if (cardSeverity === severity) {
                     // Highlight active card
-                    card.style.opacity = '1';
-                    card.style.border = '2px solid var(--hextrackr-primary)';
-                    card.style.transform = 'translateY(-2px)';
+                    card.style.opacity = "1";
+                    card.style.border = "2px solid var(--hextrackr-primary)";
+                    card.style.transform = "translateY(-2px)";
                 } else {
                     // Dim inactive cards
-                    card.style.opacity = '0.5';
-                    card.style.border = '';
-                    card.style.transform = '';
+                    card.style.opacity = "0.5";
+                    card.style.border = "";
+                    card.style.transform = "";
                 }
             });
 
@@ -437,7 +437,7 @@ class DeviceSecurityModal {
                 colId: "first_seen",
                 width: 120,
                 cellRenderer: (params) => {
-                    if (params.value && typeof params.value === 'string' && params.value.trim() !== "") {
+                    if (params.value && typeof params.value === "string" && params.value.trim() !== "") {
                         return new Date(params.value).toLocaleDateString();
                     }
                     return "N/A";
@@ -456,20 +456,20 @@ class DeviceSecurityModal {
                     // Return placeholder with unique ID for async update
                     setTimeout(async () => {
                         const cell = document.getElementById(cellId);
-                        if (!cell) return;
+                        if (!cell) {return;}
 
                         // Determine which advisory helper to use based on vendor
                         let advisoryHelper = null;
-                        if (vendor?.toLowerCase().includes('cisco')) {
+                        if (vendor?.toLowerCase().includes("cisco")) {
                             advisoryHelper = window.ciscoAdvisoryHelper;
-                        } else if (vendor?.toLowerCase().includes('palo')) {
+                        } else if (vendor?.toLowerCase().includes("palo")) {
                             advisoryHelper = window.paloAdvisoryHelper;
                         }
 
                         // Unsupported vendor or helper not loaded
                         if (!advisoryHelper) {
-                            cell.innerHTML = `<span class="font-monospace text-muted">N/A</span>`;
-                            params.node.setDataValue('fixed_version', 'N/A');
+                            cell.innerHTML = "<span class=\"font-monospace text-muted\">N/A</span>";
+                            params.node.setDataValue("fixed_version", "N/A");
                             return;
                         }
 
@@ -481,15 +481,15 @@ class DeviceSecurityModal {
 
                             if (fixedVersion) {
                                 cell.innerHTML = `<span class="font-monospace text-success">${DOMPurify.sanitize(fixedVersion)}+</span>`;
-                                params.node.setDataValue('fixed_version', fixedVersion);
+                                params.node.setDataValue("fixed_version", fixedVersion);
                             } else {
-                                cell.innerHTML = `<span class="font-monospace text-muted">No Fix</span>`;
-                                params.node.setDataValue('fixed_version', 'No Fix');
+                                cell.innerHTML = "<span class=\"font-monospace text-muted\">No Fix</span>";
+                                params.node.setDataValue("fixed_version", "No Fix");
                             }
                         } catch (error) {
-                            logger.error('Fixed version lookup failed:', error);
-                            cell.innerHTML = `<span class="font-monospace text-muted">Error</span>`;
-                            params.node.setDataValue('fixed_version', 'Error');
+                            logger.error("Fixed version lookup failed:", error);
+                            cell.innerHTML = "<span class=\"font-monospace text-muted\">Error</span>";
+                            params.node.setDataValue("fixed_version", "Error");
                         }
                     }, 0);
 
@@ -508,8 +508,8 @@ class DeviceSecurityModal {
 
                     // KEV indicator with inline styles to override AG-Grid defaults
                     // Must use inline styles because AG-Grid applies its own styling that overrides Bootstrap classes
-                    const linkColor = isKev ? '#dc3545' : '#3b82f6'; // Red for KEV, blue for normal
-                    const fontWeight = isKev ? '700' : '400';
+                    const linkColor = isKev ? "#dc3545" : "#3b82f6"; // Red for KEV, blue for normal
+                    const fontWeight = isKev ? "700" : "400";
                     const kevTitle = isKev ? "Known Exploited Vulnerability - " : "";
 
                     // Create unique ID for vulnerability modal data storage
@@ -625,7 +625,7 @@ class DeviceSecurityModal {
                     }
 
                     // For non-CVE/non-Cisco entries, show disabled info icon
-                    return `<i class="fas fa-info-circle text-muted" title="No external reference available"></i>`;
+                    return "<i class=\"fas fa-info-circle text-muted\" title=\"No external reference available\"></i>";
                 }
             }
         ];
@@ -688,7 +688,7 @@ class DeviceSecurityModal {
                 wrapHeaderText: false,
                 autoHeaderHeight: false
             },
-            domLayout: 'normal', // Enable vertical scrolling for all rows
+            domLayout: "normal", // Enable vertical scrolling for all rows
             animateRows: true,
             // Default sort: VPR Score descending (highest risk first)
             initialState: {
@@ -957,7 +957,7 @@ class DeviceSecurityModal {
             window.location.href = `/tickets.html?openTicket=${ticketId}`;
             return;
         } else if (ticketCount > 1) {
-            logger.debug(`[Device Modal] Multiple tickets - showing picker modal`);
+            logger.debug("[Device Modal] Multiple tickets - showing picker modal");
             this.showTicketPickerModal(hostname, tickets);
             return;
         }
@@ -1066,7 +1066,7 @@ class DeviceSecurityModal {
         // Build modal content - reuses existing modal structure
         const modalBody = document.getElementById("ticketPickerModalBody");
         if (!modalBody) {
-            logger.error(`[Device Modal] Modal body element not found!`);
+            logger.error("[Device Modal] Modal body element not found!");
             return;
         }
 
@@ -1098,19 +1098,19 @@ class DeviceSecurityModal {
         // Show the modal
         const modalElement = document.getElementById("ticketPickerModal");
         if (!modalElement) {
-            logger.error(`[Device Modal] Modal element not found!`);
+            logger.error("[Device Modal] Modal element not found!");
             return;
         }
 
-        logger.debug(`[Device Modal] Showing modal...`);
+        logger.debug("[Device Modal] Showing modal...");
         if (typeof bootstrap === "undefined") {
-            logger.error(`[Device Modal] Bootstrap is not loaded!`);
+            logger.error("[Device Modal] Bootstrap is not loaded!");
             return;
         }
 
         const modal = new bootstrap.Modal(modalElement);
         modal.show();
-        logger.debug(`[Device Modal] Modal shown successfully`);
+        logger.debug("[Device Modal] Modal shown successfully");
     }
 
     /**

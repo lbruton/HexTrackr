@@ -20,13 +20,13 @@ const cacheService = CacheService.getInstance();
  * Use these instead of direct global.logger access
  */
 function _log(level, message, data = {}) {
-    if (global.logger && global.logger.import && typeof global.logger.import[level] === 'function') {
+    if (global.logger && global.logger.import && typeof global.logger.import[level] === "function") {
         global.logger.import[level](message, data);
     }
 }
 
 function _audit(category, message, data = {}) {
-    if (global.logger && typeof global.logger.audit === 'function') {
+    if (global.logger && typeof global.logger.audit === "function") {
         global.logger.audit(category, message, data, null, null);
     }
 }
@@ -176,13 +176,13 @@ async function processVulnerabilitiesWithLifecycle(rows, importId, filePath, sca
         const currentDate = scanDate || new Date().toISOString().split("T")[0];
         const db = global.db;
 
-        _log('info', "PERFORMANCE: Starting enhanced rollover import");
-        _log('info', ` PERFORMANCE: Scan date: ${currentDate}, Rows: ${rows.length}`);
+        _log("info", "PERFORMANCE: Starting enhanced rollover import");
+        _log("info", ` PERFORMANCE: Scan date: ${currentDate}, Rows: ${rows.length}`);
 
         // Step 1: Mark all active vulnerabilities as potentially stale (grace period)
         db.run("UPDATE vulnerabilities_current SET lifecycle_state = 'grace_period' WHERE lifecycle_state = 'active'", (err) => {
             if (err) {
-                _log('error', "Error marking vulnerabilities as stale:", err);
+                _log("error", "Error marking vulnerabilities as stale:", err);
                 reject(new Error("Failed to prepare for import"));
                 return;
             }
@@ -259,14 +259,14 @@ async function processVulnerabilitiesWithLifecycle(rows, importId, filePath, sca
                         mapped.solutionText      // NEW (Migration 006)
                     ], function(snapshotErr) {
                         if (snapshotErr) {
-                            _log('error', "Error inserting to vulnerabilities:", snapshotErr);
+                            _log("error", "Error inserting to vulnerabilities:", snapshotErr);
                         }
 
                         // Check if vulnerability exists in current table using ENHANCED key
                         db.get("SELECT * FROM vulnerabilities_current WHERE enhanced_unique_key = ? OR unique_key = ?",
                             [enhancedKey, legacyKey], (currentErr, existing) => {
                             if (currentErr) {
-                                _log('error', "Error checking current vulnerability:", currentErr);
+                                _log("error", "Error checking current vulnerability:", currentErr);
                             } else if (existing) {
                                 // Update existing vulnerability
                                 // NEW (Migration 006): Added COALESCE for operating_system and solution_text
@@ -402,12 +402,12 @@ async function processVulnerabilitiesWithLifecycle(rows, importId, filePath, sca
                     const resolvedCount = this.changes || 0;
 
                     if (!resolveErr) {
-                        _log('info', ` Resolved ${resolvedCount} vulnerabilities not present in current scan`);
+                        _log("info", ` Resolved ${resolvedCount} vulnerabilities not present in current scan`);
                     }
 
                     // Update daily totals
                     calculateAndStoreDailyTotalsEnhanced(currentDate, () => {
-                        _log('info', ` Import complete: Inserted: ${stats.inserted}, Updated: ${stats.updated}, Resolved: ${resolvedCount}`);
+                        _log("info", ` Import complete: Inserted: ${stats.inserted}, Updated: ${stats.updated}, Resolved: ${resolvedCount}`);
 
                         // Clean up file
                         try {
@@ -415,7 +415,7 @@ async function processVulnerabilitiesWithLifecycle(rows, importId, filePath, sca
                                 PathValidator.safeUnlinkSync(filePath);
                             }
                         } catch (unlinkError) {
-                            _log('error', "Error cleaning up file:", unlinkError);
+                            _log("error", "Error cleaning up file:", unlinkError);
                         }
 
                         resolve({
@@ -440,7 +440,7 @@ async function processVulnerabilitiesWithLifecycle(rows, importId, filePath, sca
 async function bulkLoadToStagingTable(rows, importId, scanDate, filePath, responseData, sessionId, startTime, progressTracker) {
     return new Promise((resolve, reject) => {
         const loadStart = Date.now();
-        _log('info', ` BULK LOAD: Starting bulk insert of ${rows.length} rows to staging table`);
+        _log("info", ` BULK LOAD: Starting bulk insert of ${rows.length} rows to staging table`);
 
         const db = global.db;
 
@@ -458,7 +458,7 @@ async function bulkLoadToStagingTable(rows, importId, scanDate, filePath, respon
         db.serialize(() => {
             db.run("BEGIN TRANSACTION", (err) => {
                 if (err) {
-                    _log('error', "Error starting transaction:", err);
+                    _log("error", "Error starting transaction:", err);
                     if (progressTracker && progressTracker.errorSession) {
                         progressTracker.errorSession(sessionId, "Transaction start failed", { error: err });
                     }
@@ -466,7 +466,7 @@ async function bulkLoadToStagingTable(rows, importId, scanDate, filePath, respon
                     return;
                 }
 
-                _log('info', "Transaction started - bulk inserting rows");
+                _log("info", "Transaction started - bulk inserting rows");
                 if (progressTracker && progressTracker.updateProgress) {
                     progressTracker.updateProgress(sessionId, 25, "Inserting rows into staging table...", { currentStep: 2 });
                 }
@@ -495,12 +495,12 @@ async function bulkLoadToStagingTable(rows, importId, scanDate, filePath, respon
                             });
                         });
                     } catch (error) {
-                        _log('error', `Row ${index + 1} mapping error:`, error);
+                        _log("error", `Row ${index + 1} mapping error:`, error);
                         errorCount++;
                     }
                 });
 
-                _log('info', ` CSV Processing: ${rows.length} rows → ${totalRecordsToInsert} vulnerability records`);
+                _log("info", ` CSV Processing: ${rows.length} rows → ${totalRecordsToInsert} vulnerability records`);
 
                 // Second pass: insert all mapped records
                 allMappedRecords.forEach((record, recordIndex) => {
@@ -528,7 +528,7 @@ async function bulkLoadToStagingTable(rows, importId, scanDate, filePath, respon
                         mapped.solutionText
                     ], function(err) {
                         if (err) {
-                            _log('error', `Record ${recordIndex + 1} insert error:`, err);
+                            _log("error", `Record ${recordIndex + 1} insert error:`, err);
                             errorCount++;
                         } else {
                             insertedCount++;
@@ -552,7 +552,7 @@ async function bulkLoadToStagingTable(rows, importId, scanDate, filePath, respon
                 // Finalize the prepared statement and commit transaction
                 stmt.finalize((err) => {
                     if (err) {
-                        _log('error', "Error finalizing statement:", err);
+                        _log("error", "Error finalizing statement:", err);
                         db.run("ROLLBACK", () => {
                             if (progressTracker && progressTracker.errorSession) {
                                 progressTracker.errorSession(sessionId, "Staging insert failed", { error: err, errorCount });
@@ -564,7 +564,7 @@ async function bulkLoadToStagingTable(rows, importId, scanDate, filePath, respon
 
                     db.run("COMMIT", (err) => {
                         if (err) {
-                            _log('error', "Error committing transaction:", err);
+                            _log("error", "Error committing transaction:", err);
                             if (progressTracker && progressTracker.errorSession) {
                                 progressTracker.errorSession(sessionId, "Transaction commit failed", { error: err });
                             }
@@ -575,7 +575,7 @@ async function bulkLoadToStagingTable(rows, importId, scanDate, filePath, respon
                         const loadTime = Date.now() - loadStart;
                         const rowsPerSecond = insertedCount / (loadTime / 1000);
 
-                        _log('info', ` BULK LOAD COMPLETE: ${insertedCount} records inserted in ${loadTime}ms (${rowsPerSecond.toFixed(1)} records/sec)`);
+                        _log("info", ` BULK LOAD COMPLETE: ${insertedCount} records inserted in ${loadTime}ms (${rowsPerSecond.toFixed(1)} records/sec)`);
 
                         // Update progress: Staging complete
                         if (progressTracker && progressTracker.updateProgress) {
@@ -592,10 +592,10 @@ async function bulkLoadToStagingTable(rows, importId, scanDate, filePath, respon
                         try {
                             if (filePath && PathValidator.safeExistsSync(filePath)) {
                                 PathValidator.safeUnlinkSync(filePath);
-                                _log('info', "Source file cleaned up");
+                                _log("info", "Source file cleaned up");
                             }
                         } catch (cleanupError) {
-                            _log('warn', "File cleanup warning:", cleanupError.message);
+                            _log("warn", "File cleanup warning:", cleanupError.message);
                         }
 
                         // NOW PROCESS FROM STAGING TO FINAL TABLES WITH BATCH PROCESSING
@@ -627,8 +627,8 @@ function processStagingToFinalTables(importId, scanDate, responseData, sessionId
     const currentDate = scanDate;
     const db = global.db;
 
-    _log('info', "BATCH PROCESSOR: Starting batch processing from staging table");
-    _log('info', ` Batch Size: ${batchSize}, Import ID: ${importId}, Scan Date: ${currentDate}`);
+    _log("info", "BATCH PROCESSOR: Starting batch processing from staging table");
+    _log("info", ` Batch Size: ${batchSize}, Import ID: ${importId}, Scan Date: ${currentDate}`);
 
     // Step 1: Mark all active vulnerabilities as potentially stale (grace period)
     const graceStart = Date.now();
@@ -638,20 +638,20 @@ function processStagingToFinalTables(importId, scanDate, responseData, sessionId
 
     db.run("UPDATE vulnerabilities_current SET lifecycle_state = 'grace_period' WHERE lifecycle_state = 'active'", (err) => {
         if (err) {
-            _log('error', "Error marking vulnerabilities as stale:", err);
+            _log("error", "Error marking vulnerabilities as stale:", err);
             if (progressTracker && progressTracker.errorSession) {
                 progressTracker.errorSession(sessionId, "Failed to prepare for batch processing", { error: err });
             }
             return;
         }
 
-        _log('info', `⏱️  Grace period update took ${Date.now() - graceStart}ms`);
+        _log("info", `⏱️  Grace period update took ${Date.now() - graceStart}ms`);
 
         // Step 2: Get total count for batch processing
         db.get("SELECT COUNT(*) as total FROM vulnerability_staging WHERE import_id = ? AND processed = 0",
             [importId], (err, countResult) => {
             if (err) {
-                _log('error', "Error counting staging records:", err);
+                _log("error", "Error counting staging records:", err);
                 if (progressTracker && progressTracker.errorSession) {
                     progressTracker.errorSession(sessionId, "Failed to count staging records", { error: err });
                 }
@@ -661,7 +661,7 @@ function processStagingToFinalTables(importId, scanDate, responseData, sessionId
             const totalRows = countResult.total;
             const totalBatches = Math.ceil(totalRows / batchSize);
 
-            _log('info', ` Processing ${totalRows} rows in ${totalBatches} batches`);
+            _log("info", ` Processing ${totalRows} rows in ${totalBatches} batches`);
 
             // Update progress: Starting batch processing
             if (progressTracker && progressTracker.updateProgress) {
@@ -730,7 +730,7 @@ function processNextBatch(importId, currentDate, batchSize, batchStats, response
 
     db.all(selectBatchSQL, [importId, batchSize], (err, batchRows) => {
         if (err) {
-            _log('error', "Error selecting batch:", err);
+            _log("error", "Error selecting batch:", err);
             batchStats.errors++;
             processNextBatch(importId, currentDate, batchSize, batchStats, responseData, sessionId, startTime, progressTracker);
             return;
@@ -742,13 +742,13 @@ function processNextBatch(importId, currentDate, batchSize, batchStats, response
             return;
         }
 
-        _log('info', ` Processing batch ${batchStats.currentBatch}/${batchStats.totalBatches} (${batchRows.length} rows)`);
+        _log("info", ` Processing batch ${batchStats.currentBatch}/${batchStats.totalBatches} (${batchRows.length} rows)`);
 
         // Process this batch using transaction
         db.serialize(() => {
             db.run("BEGIN TRANSACTION", (txErr) => {
                 if (txErr) {
-                    _log('error', "Batch transaction error:", txErr);
+                    _log("error", "Batch transaction error:", txErr);
                     batchStats.errors++;
                     processNextBatch(importId, currentDate, batchSize, batchStats, responseData, sessionId, startTime, progressTracker);
                     return;
@@ -806,7 +806,7 @@ function processNextBatch(importId, currentDate, batchSize, batchStats, response
                         row.operating_system, row.solution_text
                     ], function(snapErr) {
                         if (snapErr) {
-                            _log('error', `Snapshot insert error for row ${row.id}:`, snapErr);
+                            _log("error", `Snapshot insert error for row ${row.id}:`, snapErr);
                             batchStats.errors++;
                         } else {
                             batchStats.insertedToSnapshots++;
@@ -820,7 +820,7 @@ function processNextBatch(importId, currentDate, batchSize, batchStats, response
 
                         db.get(checkExisting, [enhancedKey, legacyKey], (checkErr, existing) => {
                             if (checkErr) {
-                                _log('error', `Check existing error for row ${row.id}:`, checkErr);
+                                _log("error", `Check existing error for row ${row.id}:`, checkErr);
                                 batchStats.errors++;
                             } else if (existing) {
                                 // Update existing
@@ -849,7 +849,7 @@ function processNextBatch(importId, currentDate, batchSize, batchStats, response
                                     row.operating_system, row.solution_text, existing.id
                                 ], (updateErr) => {
                                     if (updateErr) {
-                                        _log('error', `Current update error for row ${row.id}:`, updateErr);
+                                        _log("error", `Current update error for row ${row.id}:`, updateErr);
                                         batchStats.errors++;
                                     } else {
                                         batchStats.updatedInCurrent++;
@@ -880,7 +880,7 @@ function processNextBatch(importId, currentDate, batchSize, batchStats, response
                                     row.operating_system, row.solution_text
                                 ], (insertErr) => {
                                     if (insertErr) {
-                                        _log('error', `Current insert error for row ${row.id}:`, insertErr);
+                                        _log("error", `Current insert error for row ${row.id}:`, insertErr);
                                         batchStats.errors++;
                                     } else {
                                         batchStats.insertedToCurrent++;
@@ -900,13 +900,13 @@ function processNextBatch(importId, currentDate, batchSize, batchStats, response
                             const updateProcessed = `UPDATE vulnerability_staging SET processed = 1, processed_at = ? WHERE id IN (${processedIds.map(() => "?").join(",")})`;
                             db.run(updateProcessed, [new Date().toISOString(), ...processedIds], (markErr) => {
                                 if (markErr) {
-                                    _log('error', "Error marking batch as processed:", markErr);
+                                    _log("error", "Error marking batch as processed:", markErr);
                                 }
 
                                 // Commit batch transaction
                                 db.run("COMMIT", (commitErr) => {
                                     if (commitErr) {
-                                        _log('error', "Batch commit error:", commitErr);
+                                        _log("error", "Batch commit error:", commitErr);
                                         batchStats.errors++;
                                     }
 
@@ -914,7 +914,7 @@ function processNextBatch(importId, currentDate, batchSize, batchStats, response
                                     const batchRowsPerSec = batchRows.length / (batchTime / 1000);
                                     batchStats.processedRows += batchRows.length;
 
-                                    _log('info', ` Batch ${batchStats.currentBatch} complete: ${batchRows.length} rows in ${batchTime}ms (${batchRowsPerSec.toFixed(1)} rows/sec)`);
+                                    _log("info", ` Batch ${batchStats.currentBatch} complete: ${batchRows.length} rows in ${batchTime}ms (${batchRowsPerSec.toFixed(1)} rows/sec)`);
 
                                     // Process next batch
                                     setTimeout(() => {
@@ -936,7 +936,7 @@ function processNextBatch(importId, currentDate, batchSize, batchStats, response
 function finalizeBatchProcessing(importId, currentDate, batchStats, responseData, sessionId, startTime, progressTracker) {
     const db = global.db;
 
-    _log('info', "FINALIZE: Starting batch processing finalization");
+    _log("info", "FINALIZE: Starting batch processing finalization");
 
     // Update progress: Starting finalization
     if (progressTracker && progressTracker.updateProgress) {
@@ -955,9 +955,9 @@ function finalizeBatchProcessing(importId, currentDate, batchStats, responseData
 
         const resolvedCount = this.changes || 0;
         if (err) {
-            _log('error', "Error resolving stale vulnerabilities:", err);
+            _log("error", "Error resolving stale vulnerabilities:", err);
         } else {
-            _log('info', ` Resolved ${resolvedCount} vulnerabilities not present in current scan`);
+            _log("info", ` Resolved ${resolvedCount} vulnerabilities not present in current scan`);
         }
 
         // Step 2: Calculate and store enhanced daily totals
@@ -965,9 +965,9 @@ function finalizeBatchProcessing(importId, currentDate, batchStats, responseData
             // Step 3: Clean up staging table for this import
             db.run("DELETE FROM vulnerability_staging WHERE import_id = ?", [importId], function(cleanupErr) {
                 if (cleanupErr) {
-                    _log('error', "Error cleaning up staging table:", cleanupErr);
+                    _log("error", "Error cleaning up staging table:", cleanupErr);
                 } else {
-                    _log('info', ` Staging cleanup: ${this.changes} records removed`);
+                    _log("info", ` Staging cleanup: ${this.changes} records removed`);
                 }
 
                 // Step 4: Update import record with final processing time
@@ -975,7 +975,7 @@ function finalizeBatchProcessing(importId, currentDate, batchStats, responseData
                 db.run("UPDATE vulnerability_imports SET processing_time = ? WHERE id = ?",
                     [totalImportTime, importId], (updateErr) => {
                     if (updateErr) {
-                        _log('error', "Error updating import record:", updateErr);
+                        _log("error", "Error updating import record:", updateErr);
                     }
 
                     // Complete the import session
@@ -990,11 +990,11 @@ function finalizeBatchProcessing(importId, currentDate, batchStats, responseData
                         rowsPerSecond: batchStats.processedRows / (totalImportTime / 1000)
                     };
 
-                    _log('info', ` IMPORT COMPLETE: ${batchStats.processedRows} rows processed in ${totalImportTime}ms`);
-                    _log('info', ` - Inserted to Current: ${batchStats.insertedToCurrent}`);
-                    _log('info', ` - Updated in Current: ${batchStats.updatedInCurrent}`);
-                    _log('info', ` - Resolved: ${resolvedCount}`);
-                    _log('info', ` - Errors: ${batchStats.errors}`);
+                    _log("info", ` IMPORT COMPLETE: ${batchStats.processedRows} rows processed in ${totalImportTime}ms`);
+                    _log("info", ` - Inserted to Current: ${batchStats.insertedToCurrent}`);
+                    _log("info", ` - Updated in Current: ${batchStats.updatedInCurrent}`);
+                    _log("info", ` - Resolved: ${resolvedCount}`);
+                    _log("info", ` - Errors: ${batchStats.errors}`);
 
                     // Audit: Import completed successfully
                     _audit("import.complete", "Batch CSV import operation completed successfully", {
@@ -1019,7 +1019,7 @@ function finalizeBatchProcessing(importId, currentDate, batchStats, responseData
 
                     // Generate import summary and complete progress tracking
                     if (progressTracker && progressTracker.completeSession) {
-                        _log('info', ` Generating import summary for session: ${sessionId}`);
+                        _log("info", ` Generating import summary for session: ${sessionId}`);
                         // Generate comprehensive import summary
                         generateImportSummary(currentDate, responseData, finalStats)
                             .then(summary => {
@@ -1028,25 +1028,25 @@ function finalizeBatchProcessing(importId, currentDate, batchStats, responseData
                                     ...finalStats,
                                     importSummary: summary
                                 };
-                                _log('info', "Import summary generated successfully for session", sessionId);
-                                _log('info', "Sending completion event with summary:", {
+                                _log("info", "Import summary generated successfully for session", sessionId);
+                                _log("info", "Sending completion event with summary:", {
                                     sessionId,
                                     summarySize: JSON.stringify(summary).length,
                                     hasNewCves: summary.cveDiscovery?.totalNewCves || 0,
                                     hasResolvedCves: summary.cveDiscovery?.totalResolvedCves || 0
                                 });
                                 progressTracker.completeSession(sessionId, "Import completed successfully", enhancedStats);
-                                _log('info', ` Completion event sent to WebSocket for session ${sessionId}`);
+                                _log("info", ` Completion event sent to WebSocket for session ${sessionId}`);
                             })
                             .catch(summaryErr => {
-                                _log('error', "Error generating import summary:", summaryErr);
-                                _log('error', "Stack trace:", summaryErr.stack);
+                                _log("error", "Error generating import summary:", summaryErr);
+                                _log("error", "Stack trace:", summaryErr.stack);
                                 // Complete without summary if generation fails
-                                _log('info', ` Completing session ${sessionId} WITHOUT summary due to error`);
+                                _log("info", ` Completing session ${sessionId} WITHOUT summary due to error`);
                                 progressTracker.completeSession(sessionId, "Import completed successfully", finalStats);
                             });
                     } else {
-                        _log('warn', ` No progressTracker available for session ${sessionId}, cannot send completion event`);
+                        _log("warn", ` No progressTracker available for session ${sessionId}, cannot send completion event`);
                     }
                 });
             });
@@ -1061,12 +1061,12 @@ function calculateAndStoreDailyTotalsEnhanced(scanDate, callback) {
     const db = global.db;
 
     if (!scanDate) {
-        _log('warn', "calculateAndStoreDailyTotalsEnhanced called without scanDate");
+        _log("warn", "calculateAndStoreDailyTotalsEnhanced called without scanDate");
         if (callback) {callback();}
         return;
     }
 
-    _log('info', "Calculating enhanced daily totals for:", scanDate);
+    _log("info", "Calculating enhanced daily totals for:", scanDate);
 
     const totalsQuery = `
         SELECT
@@ -1090,7 +1090,7 @@ function calculateAndStoreDailyTotalsEnhanced(scanDate, callback) {
 
     db.all(totalsQuery, [scanDate], (err, results = []) => {
         if (err) {
-            _log('error', "Error calculating enhanced daily totals:", err);
+            _log("error", "Error calculating enhanced daily totals:", err);
             if (callback) {callback();}
             return;
         }
@@ -1107,7 +1107,7 @@ function calculateAndStoreDailyTotalsEnhanced(scanDate, callback) {
             [scanDate],
             (resolvedErr, resolvedRow) => {
                 if (resolvedErr) {
-                    _log('error', "Error getting resolved count for daily totals:", resolvedErr);
+                    _log("error", "Error getting resolved count for daily totals:", resolvedErr);
                     if (callback) {callback();}
                     return;
                 }
@@ -1193,12 +1193,12 @@ function calculateAndStoreDailyTotalsEnhanced(scanDate, callback) {
                     ],
                     (storeErr) => {
                         if (storeErr) {
-                            _log('error', "Error storing enhanced daily totals:", storeErr);
+                            _log("error", "Error storing enhanced daily totals:", storeErr);
                             if (callback) {callback();}
                             return;
                         }
 
-                        _log('info', ` Enhanced daily totals updated for ${scanDate}`);
+                        _log("info", ` Enhanced daily totals updated for ${scanDate}`);
 
                         // ALSO store vendor-specific daily totals (Migration 008)
                         // Query vendor-specific totals using same deduplication logic
@@ -1225,7 +1225,7 @@ function calculateAndStoreDailyTotalsEnhanced(scanDate, callback) {
 
                         db.all(vendorTotalsQuery, [scanDate], (vendorErr, vendorResults = []) => {
                             if (vendorErr) {
-                                _log('error', "Error calculating vendor daily totals:", vendorErr);
+                                _log("error", "Error calculating vendor daily totals:", vendorErr);
                                 if (callback) {callback();}
                                 return;
                             }
@@ -1281,7 +1281,7 @@ function calculateAndStoreDailyTotalsEnhanced(scanDate, callback) {
                             // Insert vendor totals for each vendor
                             const vendors = Object.keys(vendorData);
                             if (vendors.length === 0) {
-                                _log('info', ` No vendor data to store for ${scanDate}`);
+                                _log("info", ` No vendor data to store for ${scanDate}`);
                                 if (callback) {callback();}
                                 return;
                             }
@@ -1311,7 +1311,7 @@ function calculateAndStoreDailyTotalsEnhanced(scanDate, callback) {
                                     ],
                                     (insertErr) => {
                                         if (insertErr) {
-                                            _log('error', `Error storing vendor totals for ${vendor}:`, insertErr);
+                                            _log("error", `Error storing vendor totals for ${vendor}:`, insertErr);
                                             vendorErrors++;
                                         } else {
                                             vendorInserts++;
@@ -1319,9 +1319,9 @@ function calculateAndStoreDailyTotalsEnhanced(scanDate, callback) {
 
                                         // Call callback after last vendor insert
                                         if (index === vendors.length - 1) {
-                                            _log('info', ` Vendor daily totals updated: ${vendorInserts} vendors for ${scanDate}`);
+                                            _log("info", ` Vendor daily totals updated: ${vendorInserts} vendors for ${scanDate}`);
                                             if (vendorErrors > 0) {
-                                                _log('warn', ` ${vendorErrors} vendor insert errors`);
+                                                _log("warn", ` ${vendorErrors} vendor insert errors`);
                                             }
                                             if (callback) {callback();}
                                         }
@@ -1369,7 +1369,7 @@ async function importCSV(filepath, filename, vendor, scanDate, _options = {}) {
             headers: results.meta.fields
         });
 
-        _log('info', ` Import record created: ID ${importId}, Processing ${rows.length} rows`);
+        _log("info", ` Import record created: ID ${importId}, Processing ${rows.length} rows`);
 
         // Audit: Import started
         _audit("import.start", "CSV import operation started", {
@@ -1404,7 +1404,7 @@ async function importCSV(filepath, filename, vendor, scanDate, _options = {}) {
             ...result
         };
     } catch (error) {
-        _log('error', "Import failed:", error);
+        _log("error", "Import failed:", error);
 
         // Audit: Import failed
         _audit("import.failed", "CSV import operation failed", {
@@ -1445,9 +1445,9 @@ async function importCsvStaging(filepath, filename, vendor, scanDate, sessionId,
             headers: results.meta.fields
         });
 
-        _log('info', "STAGING IMPORT: Starting high-performance CSV import");
-        _log('info', ` File: ${filename}, Vendor: ${extractedVendor}, Scan Date: ${extractedDate}`);
-        _log('info', ` Import record created: ID ${importId}`);
+        _log("info", "STAGING IMPORT: Starting high-performance CSV import");
+        _log("info", ` File: ${filename}, Vendor: ${extractedVendor}, Scan Date: ${extractedDate}`);
+        _log("info", ` Import record created: ID ${importId}`);
 
         // Audit: Staging import started
         _audit("import.start", "Staging CSV import operation started", {
@@ -1499,7 +1499,7 @@ async function importCsvStaging(filepath, filename, vendor, scanDate, sessionId,
             ...result
         };
     } catch (error) {
-        _log('error', "Staging import failed:", error);
+        _log("error", "Staging import failed:", error);
 
         // Audit: Staging import failed
         _audit("import.failed", "Staging CSV import operation failed", {
@@ -1529,7 +1529,7 @@ async function generateImportSummary(scanDate, importMetadata, processingStats) 
     return new Promise((resolve, reject) => {
         const db = global.db;
 
-        _log('info', "Generating import summary for scan date:", scanDate);
+        _log("info", "Generating import summary for scan date:", scanDate);
 
         // Get current and previous daily totals for comparison
         const totalsQuery = `
@@ -1548,7 +1548,7 @@ async function generateImportSummary(scanDate, importMetadata, processingStats) 
 
         db.all(totalsQuery, [], (err, totalsRows) => {
             if (err) {
-                _log('error', "Error fetching daily totals for summary:", err);
+                _log("error", "Error fetching daily totals for summary:", err);
                 return reject(err);
             }
 
@@ -1628,7 +1628,7 @@ async function generateImportSummary(scanDate, importMetadata, processingStats) 
 
             db.all(newCvesQuery, [scanDate, scanDate], (cveErr, newCveRows) => {
                 if (cveErr) {
-                    _log('error', "Error finding new CVEs:", cveErr);
+                    _log("error", "Error finding new CVEs:", cveErr);
                     // Continue without CVE discovery data
                 }
 
@@ -1639,7 +1639,7 @@ async function generateImportSummary(scanDate, importMetadata, processingStats) 
                 // Query for resolved CVEs
                 db.all(resolvedCvesQuery, [scanDate, scanDate], (resolvedErr, resolvedCveRows) => {
                     if (resolvedErr) {
-                        _log('error', "Error finding resolved CVEs:", resolvedErr);
+                        _log("error", "Error finding resolved CVEs:", resolvedErr);
                         // Continue without resolved CVE data
                     }
 
@@ -1662,7 +1662,7 @@ async function generateImportSummary(scanDate, importMetadata, processingStats) 
 
                     db.get(hostsQuery, [scanDate], (hostsErr, hostsResult) => {
                         if (hostsErr) {
-                            _log('error', "Error counting unique hosts:", hostsErr);
+                            _log("error", "Error counting unique hosts:", hostsErr);
                         }
 
                         const uniqueHosts = hostsResult ? hostsResult.uniqueHosts : 0;
@@ -1719,7 +1719,7 @@ async function generateImportSummary(scanDate, importMetadata, processingStats) 
                         }
                     };
 
-                    _log('info', "Import summary generated:", {
+                    _log("info", "Import summary generated:", {
                         newCves: summary.cveDiscovery.totalNewCves,
                         resolvedCves: summary.cveDiscovery.totalResolvedCves,
                         totalChange: summary.comparison.netChange,
@@ -1744,7 +1744,7 @@ async function generateImportSummary(scanDate, importMetadata, processingStats) 
 function cleanupOldSnapshots(retainCount = 3) {
     const db = global.db;
 
-    _log('info', ` Starting automatic snapshot cleanup (retain last ${retainCount} scan dates)...`);
+    _log("info", ` Starting automatic snapshot cleanup (retain last ${retainCount} scan dates)...`);
 
     // Get distinct scan dates, ordered newest to oldest
     db.all(
@@ -1754,21 +1754,21 @@ function cleanupOldSnapshots(retainCount = 3) {
         [],
         (err, rows) => {
             if (err) {
-                _log('error', "Error fetching scan dates for cleanup:", err);
+                _log("error", "Error fetching scan dates for cleanup:", err);
                 return;
             }
 
             if (rows.length <= retainCount) {
-                _log('info', ` Snapshot cleanup: No action needed (${rows.length} scan dates <= ${retainCount} retention policy)`);
+                _log("info", ` Snapshot cleanup: No action needed (${rows.length} scan dates <= ${retainCount} retention policy)`);
                 return;
             }
 
             // Dates to delete: everything beyond the retention count
             const datesToDelete = rows.slice(retainCount).map(r => r.scan_date);
 
-            _log('info', ` Snapshot cleanup: Deleting ${datesToDelete.length} old scan dates...`);
-            _log('info', ` Keeping: ${rows.slice(0, retainCount).map(r => r.scan_date).join(", ")}`);
-            _log('info', ` Deleting: ${datesToDelete.join(", ")}`);
+            _log("info", ` Snapshot cleanup: Deleting ${datesToDelete.length} old scan dates...`);
+            _log("info", ` Keeping: ${rows.slice(0, retainCount).map(r => r.scan_date).join(", ")}`);
+            _log("info", ` Deleting: ${datesToDelete.join(", ")}`);
 
             // Build DELETE query with parameterized IN clause
             const placeholders = datesToDelete.map(() => "?").join(",");
@@ -1776,16 +1776,16 @@ function cleanupOldSnapshots(retainCount = 3) {
 
             db.run(deleteQuery, datesToDelete, function(deleteErr) {
                 if (deleteErr) {
-                    _log('error', "Error deleting old snapshots:", deleteErr);
+                    _log("error", "Error deleting old snapshots:", deleteErr);
                 } else {
-                    _log('info', "Snapshot cleanup complete: Deleted", this.changes.toLocaleString(), "rows");
+                    _log("info", "Snapshot cleanup complete: Deleted", this.changes.toLocaleString(), "rows");
 
                     // Run VACUUM to reclaim disk space from deleted snapshots
                     db.run("VACUUM", (vacuumErr) => {
                         if (vacuumErr) {
-                            _log('warn', "VACUUM failed after snapshot cleanup:", vacuumErr.message);
+                            _log("warn", "VACUUM failed after snapshot cleanup:", vacuumErr.message);
                         } else {
-                            _log('info', "Database compacted - disk space reclaimed");
+                            _log("info", "Database compacted - disk space reclaimed");
                         }
                     });
                 }
