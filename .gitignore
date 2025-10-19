@@ -30,6 +30,9 @@ app/public/data/
 app/data/*.backup*
 app/data/*.bak
 
+# Deprecated database files (corrupt/recovery files - too large for GitHub)
+app/data/deprecated/
+
 # Log files
 logs/
 *.log
