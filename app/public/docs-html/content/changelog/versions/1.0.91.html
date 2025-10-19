@@ -1,0 +1,88 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <hr>
+<h2>title: "Version 1.0.91 - Fixed Version Display Accuracy Fix (HEX-299)"
+date: "2025-10-19"
+version: "1.0.91"
+status: "Released"
+category: "Bug Fix"</h2><h1>Version 1.0.91 - Fixed Version Display Accuracy Fix (HEX-299)</h1><p><strong>Release Status</strong>: ✅ Released<br><strong>Release Date</strong>: 2025-10-19<br><strong>Bug Fix</strong>: <a href="https://linear.app/hextrackr/issue/HEX-299">HEX-299</a> (Remove &quot;+&quot; suffix from Fixed Version displays)</p>
+<h2>Overview</h2><p>Removed outdated &quot;+&quot; suffix from all Fixed Version displays throughout the application. The &quot;+&quot; was originally added to indicate &quot;this version or higher&quot; when displaying the first fixed version, but became misleading after the system evolved to display the latest/matched fixed version based on installed OS using major.minor family matching.</p>
+<h2>Bug Fixed</h2><h3>Outdated "+" Suffix in Fixed Version Displays</h3><p><strong>Root Cause</strong>: Display layer still appended &quot;+&quot; suffix from original implementation when system showed minimum fix version<br><strong>Current Behavior</strong>: System now displays specific recommended version (e.g., &quot;10.2.0-h3&quot;) using intelligent version matching<br><strong>Issue</strong>: The &quot;+&quot; suffix (e.g., &quot;10.2.0-h3+&quot;) implied &quot;any version 10.2.0-h3 or later&quot;, causing potential confusion<br><strong>Fix</strong>: Removed &quot;+&quot; suffix from all 8 display locations across 5 frontend files<br><strong>Impact</strong>: Fixed version displays now show clean, specific version numbers matching database storage format</p>
+<h2>Implementation Tasks</h2><h3>Completed</h3><ul>
+<li><input checked="" disabled="" type="checkbox"> Remove &quot;+&quot; from main vulnerabilities table Fixed Version column</li>
+<li><input checked="" disabled="" type="checkbox"> Remove &quot;+&quot; from Vulnerability Details Modal (3 locations: cached, async, summary)</li>
+<li><input checked="" disabled="" type="checkbox"> Remove &quot;+&quot; from Device Security Modal (2 locations: info card, grid)</li>
+<li><input checked="" disabled="" type="checkbox"> Remove &quot;+&quot; from Location Details Modal devices grid</li>
+<li><input checked="" disabled="" type="checkbox"> Remove &quot;+&quot; from Vulnerability Cards device display</li>
+<li><input checked="" disabled="" type="checkbox"> Remove explanatory comment &quot;to indicate &#39;or higher&#39;&quot; from vulnerability-cards.js</li>
+<li><input checked="" disabled="" type="checkbox"> Version bumped to v1.0.91</li>
+</ul>
+<h2>Technical Details</h2><p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/ag-grid-responsive-config.js</code> - Main table Fixed Version column (1 change)</li>
+<li><code>app/public/scripts/shared/vulnerability-details-modal.js</code> - Modal displays (3 changes: cached, async, summary)</li>
+<li><code>app/public/scripts/shared/device-security-modal.js</code> - Device modal displays (2 changes: info card, grid)</li>
+<li><code>app/public/scripts/shared/location-details-modal.js</code> - Location devices grid (1 change)</li>
+<li><code>app/public/scripts/shared/vulnerability-cards.js</code> - Card display + comment removal (1 change)</li>
+</ul>
+<h3>Pattern Changed (8 instances)</h3><p><strong>BEFORE</strong> (misleading):</p>
+<pre><code class="language-javascript"><span class="hljs-string">`&lt;span class=&quot;text-success&quot;&gt;<span class="hljs-subst">${fixedVersion}</span>+&lt;/span&gt;`</span></code></pre><p><strong>AFTER</strong> (accurate):</p>
+<pre><code class="language-javascript"><span class="hljs-string">`&lt;span class=&quot;text-success&quot;&gt;<span class="hljs-subst">${fixedVersion}</span>&lt;/span&gt;`</span></code></pre><h3>Comment Removed (vulnerability-cards.js:920)</h3><p><strong>BEFORE</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Add &quot;+&quot; to indicate &quot;or higher&quot;</span>
+<span class="hljs-string">`&lt;span class=&quot;text-success&quot;&gt;<span class="hljs-subst">${fixedVersion}</span>+&lt;/span&gt;`</span></code></pre><p><strong>AFTER</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-string">`&lt;span class=&quot;text-success&quot;&gt;<span class="hljs-subst">${fixedVersion}</span>&lt;/span&gt;`</span></code></pre><h2>Display Locations Verified</h2><p><strong>Main Application</strong>:</p>
+<ul>
+<li>✅ Main vulnerabilities table Fixed Version column</li>
+<li>✅ Vulnerability Details Modal affected devices grid</li>
+<li>✅ Vulnerability Details Modal Fixed Versions summary list</li>
+<li>✅ Device Security Modal info card Fixed Version field</li>
+<li>✅ Device Security Modal affected vulnerabilities grid</li>
+<li>✅ Location Details Modal devices grid</li>
+<li>✅ Vulnerability Cards device cards display</li>
+</ul>
+<h2>Success Criteria</h2><ul>
+<li><input checked="" disabled="" type="checkbox"> All fixed version displays show clean versions without &quot;+&quot;</li>
+<li><input checked="" disabled="" type="checkbox"> Visual styling preserved (green text for valid versions)</li>
+<li><input checked="" disabled="" type="checkbox"> Grid filtering/sorting functionality unchanged</li>
+<li><input checked="" disabled="" type="checkbox"> No console errors in browser DevTools</li>
+<li><input checked="" disabled="" type="checkbox"> Database storage format (clean versions) now matches display format</li>
+<li><input checked="" disabled="" type="checkbox"> No functional regressions</li>
+</ul>
+<h2>Testing Results</h2><p><strong>Manual Testing</strong>:</p>
+<ul>
+<li>✅ All 7 display locations verified showing clean version numbers</li>
+<li>✅ Green text styling preserved for fixed versions</li>
+<li>✅ AG-Grid filtering and sorting work correctly</li>
+<li>✅ No console errors during testing</li>
+<li>✅ Dark/light theme compatibility confirmed</li>
+</ul>
+<p><strong>User Impact</strong>:</p>
+<ul>
+<li>✅ Clear, specific version recommendations without ambiguity</li>
+<li>✅ Consistent display format matching database storage</li>
+<li>✅ Eliminates potential confusion about version requirements</li>
+</ul>
+<h2>Key Insights</h2><p><code>★ Insight ─────────────────────────────────────</code></p>
+<ol>
+<li><p><strong>Display vs. Data Semantics</strong>: The database always stored clean version numbers. The &quot;+&quot; was purely a display artifact from an earlier implementation pattern that became obsolete when the version matching logic evolved.</p>
+</li>
+<li><p><strong>Pattern Search Efficiency</strong>: Finding all 8 instances required searching for the specific pattern <code>fixedVersion}+</code> in template literals across the shared scripts directory. This targeted search was more effective than trying to manually review each file.</p>
+</li>
+<li><p><strong>Comment Archaeology</strong>: The explanatory comment in vulnerability-cards.js (&quot;to indicate &#39;or higher&#39;&quot;) provided historical context - it showed the original intent of the &quot;+&quot; suffix before the system evolved to use intelligent version matching.<br><code>─────────────────────────────────────────────────</code></p>
+</li>
+</ol>
+<h2>Related Issues</h2><ul>
+<li><a href="https://linear.app/hextrackr/issue/HEX-299">HEX-299</a> - Remove &quot;+&quot; suffix from Fixed Version displays ✅ Complete</li>
+</ul>
+<h2>Migration Notes</h2><p><strong>No Migration Required</strong>: This is a display-only change affecting template literals in frontend JavaScript files.</p>
+<p><strong>Affected Components</strong>:</p>
+<ul>
+<li>All Fixed Version displays across the application (8 locations)</li>
+</ul>
+<p><strong>Rollback</strong>: Revert to v1.0.90 if issues occur (though this is a purely cosmetic fix with no functional changes)</p>
+<p><strong>Breaking Changes</strong>: None - this improves accuracy and consistency without changing behavior</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
