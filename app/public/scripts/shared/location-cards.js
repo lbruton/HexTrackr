@@ -17,8 +17,8 @@
 class LocationCardsManager {
     constructor() {
         // Default to KEV Priority (matches device/vulnerability cards)
-        this.sortBy = 'kev_device_count';
-        this.sortOrder = 'desc';
+        this.sortBy = "kev_device_count";
+        this.sortOrder = "desc";
         this.locationData = [];
         this.filteredData = [];
 
@@ -50,21 +50,21 @@ class LocationCardsManager {
      * Instead, applies current search value immediately and lets existing listener handle changes
      */
     setupSearchListener() {
-        const searchInput = document.getElementById('searchInput');
+        const searchInput = document.getElementById("searchInput");
         if (searchInput) {
             // Get current search value
-            const currentValue = searchInput.value || '';
+            const currentValue = searchInput.value || "";
 
             // Apply current search value immediately if present
             // The global search listener (vulnerability-search.js) will handle future changes
             if (currentValue.trim()) {
                 this.applySearchFilter(currentValue);
-                logger.debug('search', 'Applied existing search term to location cards', { searchTerm: currentValue });
+                logger.debug("search", "Applied existing search term to location cards", { searchTerm: currentValue });
             }
 
-            logger.debug('search', 'Location cards search initialized with current value');
+            logger.debug("search", "Location cards search initialized with current value");
         } else {
-            logger.warn('search', 'Search input not found - search functionality unavailable');
+            logger.warn("search", "Search input not found - search functionality unavailable");
         }
     }
 
@@ -75,46 +75,46 @@ class LocationCardsManager {
      */
     applyLocationFilter(selectedLocation) {
         // Get current search term to combine filters
-        const searchInput = document.getElementById('searchInput');
-        const searchTerm = searchInput ? searchInput.value : '';
+        const searchInput = document.getElementById("searchInput");
+        const searchTerm = searchInput ? searchInput.value : "";
 
         // Start with all locations
         let filtered = [...this.locationData];
 
         // Apply location filter if selected
-        if (selectedLocation && selectedLocation.trim() !== '') {
+        if (selectedLocation && selectedLocation.trim() !== "") {
             // Match against display name (case-insensitive) - what user sees in dropdown
             const selectedDisplayName = selectedLocation.toUpperCase().trim();
-            logger.debug('location-filter', 'Applying location filter', {
+            logger.debug("location-filter", "Applying location filter", {
                 selectedLocation,
                 selectedDisplayName,
                 totalLocations: this.locationData.length
             });
             filtered = filtered.filter(location => {
                 // Compare against location_display (uppercase) or fallback to uppercase location
-                const displayName = (location.location_display || location.location || '').toUpperCase();
+                const displayName = (location.location_display || location.location || "").toUpperCase();
                 const matches = displayName === selectedDisplayName;
                 if (matches) {
-                    logger.debug('location-filter', 'Location matched', {
+                    logger.debug("location-filter", "Location matched", {
                         displayName,
                         selectedDisplayName
                     });
                 }
                 return matches;
             });
-            logger.debug('location-filter', 'Location filter applied', {
+            logger.debug("location-filter", "Location filter applied", {
                 matchedCount: filtered.length
             });
         }
 
         // Apply search filter on top of location filter
-        if (searchTerm && searchTerm.trim() !== '') {
+        if (searchTerm && searchTerm.trim() !== "") {
             const term = searchTerm.toLowerCase().trim();
             filtered = filtered.filter(location => {
-                const locationMatch = (location.location_display || '').toLowerCase().includes(term);
+                const locationMatch = (location.location_display || "").toLowerCase().includes(term);
                 const network = this.calculateNetwork24(location.device_ips || []);
                 const networkMatch = network.toLowerCase().includes(term);
-                const keyMatch = (location.location || '').toLowerCase().includes(term);
+                const keyMatch = (location.location || "").toLowerCase().includes(term);
                 return locationMatch || networkMatch || keyMatch;
             });
         }
@@ -134,30 +134,30 @@ class LocationCardsManager {
      */
     applySearchFilter(searchTerm) {
         // Get current location filter to combine filters
-        const locationFilter = document.getElementById('locationFilter');
-        const selectedLocation = locationFilter ? locationFilter.value : '';
+        const locationFilter = document.getElementById("locationFilter");
+        const selectedLocation = locationFilter ? locationFilter.value : "";
 
         // Start with all locations
         let filtered = [...this.locationData];
 
         // Apply location filter first if selected
-        if (selectedLocation && selectedLocation.trim() !== '') {
+        if (selectedLocation && selectedLocation.trim() !== "") {
             // Match against display name (case-insensitive)
             const selectedDisplayName = selectedLocation.toUpperCase().trim();
             filtered = filtered.filter(location => {
-                const displayName = (location.location_display || location.location || '').toUpperCase();
+                const displayName = (location.location_display || location.location || "").toUpperCase();
                 return displayName === selectedDisplayName;
             });
         }
 
         // Apply search filter on top of location filter
-        if (searchTerm && searchTerm.trim() !== '') {
+        if (searchTerm && searchTerm.trim() !== "") {
             const term = searchTerm.toLowerCase().trim();
             filtered = filtered.filter(location => {
-                const locationMatch = (location.location_display || '').toLowerCase().includes(term);
+                const locationMatch = (location.location_display || "").toLowerCase().includes(term);
                 const network = this.calculateNetwork24(location.device_ips || []);
                 const networkMatch = network.toLowerCase().includes(term);
-                const keyMatch = (location.location || '').toLowerCase().includes(term);
+                const keyMatch = (location.location || "").toLowerCase().includes(term);
                 return locationMatch || networkMatch || keyMatch;
             });
         }
@@ -169,7 +169,7 @@ class LocationCardsManager {
         this.pagination.setCurrentPage(1);
         this.render();
 
-        logger.debug('search', 'Location cards filtered', {
+        logger.debug("search", "Location cards filtered", {
             searchTerm,
             totalLocations: this.locationData.length,
             filteredLocations: this.filteredData.length
@@ -180,9 +180,9 @@ class LocationCardsManager {
      * Render location cards with pagination
      */
     render() {
-        const container = document.getElementById('locationCards');
+        const container = document.getElementById("locationCards");
         if (!container) {
-            logger.error('ui', 'Location cards container not found');
+            logger.error("ui", "Location cards container not found");
             return;
         }
 
@@ -201,27 +201,27 @@ class LocationCardsManager {
         // Render top controls (sort + items per page)
         // Standardized to match device/vulnerability cards naming
         const sortOptions = [
-            { value: 'kev_device_count', label: 'KEV Priority' },
-            { value: 'vpr', label: 'VPR Priority' },
-            { value: 'location_name_asc', label: 'Name A-Z' },
-            { value: 'location_name_desc', label: 'Name Z-A' },
-            { value: 'device_count', label: 'Device Count (High-Low)' },
-            { value: 'device_count_low', label: 'Device Count (Low-High)' }
+            { value: "kev_device_count", label: "KEV Priority" },
+            { value: "vpr", label: "VPR Priority" },
+            { value: "location_name_asc", label: "Name A-Z" },
+            { value: "location_name_desc", label: "Name Z-A" },
+            { value: "device_count", label: "Device Count (High-Low)" },
+            { value: "device_count_low", label: "Device Count (Low-High)" }
         ];
 
         this.pagination.renderTopControls(
-            'locationControlsTop',
+            "locationControlsTop",
             () => this.render(),
             {
                 sortOptions: sortOptions,
                 currentSort: this.sortBy,
                 onSortChange: (sortValue) => this.changeSort(sortValue),
-                itemType: 'Locations'
+                itemType: "Locations"
             }
         );
 
         // Render pagination controls (arrows/numbers)
-        this.pagination.renderPaginationControls('locationPaginationControls', () => this.render());
+        this.pagination.renderPaginationControls("locationPaginationControls", () => this.render());
 
         // Update pagination info text
         this.updatePaginationInfo();
@@ -237,43 +237,43 @@ class LocationCardsManager {
     sortData() {
         this.filteredData.sort((a, b) => {
             let aVal, bVal;
-            let isString = false;
+            const isString = false;
 
             switch (this.sortBy) {
-                case 'kev_device_count':
+                case "kev_device_count":
                     // KEV Priority: KEV device count (high→low)
                     aVal = (a.kev_devices || []).length;
                     bVal = (b.kev_devices || []).length;
                     // Descending (high first)
                     return bVal - aVal;
 
-                case 'vpr':
+                case "vpr":
                     // VPR Priority: Total VPR (high→low)
                     aVal = a.total_vpr || 0;
                     bVal = b.total_vpr || 0;
                     // Descending (high first)
                     return bVal - aVal;
 
-                case 'location_name_asc':
+                case "location_name_asc":
                     // Name A-Z
-                    aVal = (a.location_display || '').toLowerCase();
-                    bVal = (b.location_display || '').toLowerCase();
+                    aVal = (a.location_display || "").toLowerCase();
+                    bVal = (b.location_display || "").toLowerCase();
                     return aVal.localeCompare(bVal);
 
-                case 'location_name_desc':
+                case "location_name_desc":
                     // Name Z-A
-                    aVal = (a.location_display || '').toLowerCase();
-                    bVal = (b.location_display || '').toLowerCase();
+                    aVal = (a.location_display || "").toLowerCase();
+                    bVal = (b.location_display || "").toLowerCase();
                     return bVal.localeCompare(aVal);
 
-                case 'device_count':
+                case "device_count":
                     // Device Count (High-Low)
                     aVal = a.device_count || 0;
                     bVal = b.device_count || 0;
                     // Descending (high first)
                     return bVal - aVal;
 
-                case 'device_count_low':
+                case "device_count_low":
                     // Device Count (Low-High)
                     aVal = a.device_count || 0;
                     bVal = b.device_count || 0;
@@ -309,8 +309,8 @@ class LocationCardsManager {
         return locations.map(location => {
             const totalVPR = location.total_vpr || 0;
             const deviceCount = location.device_count || 0;
-            const locationDisplay = location.location_display || location.location || 'Unknown';
-            const locationKey = location.location || '';
+            const locationDisplay = location.location_display || location.location || "Unknown";
+            const locationKey = location.location || "";
 
             // Severity breakdown
             const severityBreakdown = location.severity_breakdown || {
@@ -331,7 +331,7 @@ class LocationCardsManager {
             const lowVPR = severityBreakdown.Low?.vpr || 0;
 
             // Escape location for JavaScript (MUST be defined BEFORE use in KEV badge)
-            const escapedLocation = locationKey.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/"/g, '\\"');
+            const escapedLocation = locationKey.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/"/g, "\\\"");
 
             // Vendor breakdown (Cisco, Other, Palo Alto)
             const vendorBreakdown = location.vendor_breakdown || {};
@@ -348,11 +348,11 @@ class LocationCardsManager {
             // KEV badge (top-left, outside card) - shows DEVICE count not KEV count
             const kevDeviceCount = (location.kev_devices || []).length;
             const kevDevices = location.kev_devices || [];
-            let kevBadge = '';
+            let kevBadge = "";
 
             if (kevDeviceCount > 0) {
                 // Store KEV devices data for modal
-                const kevDataId = `kev-location-${locationKey.replace(/[^a-zA-Z0-9]/g, '')}-${Date.now()}`;
+                const kevDataId = `kev-location-${locationKey.replace(/[^a-zA-Z0-9]/g, "")}-${Date.now()}`;
                 if (!window.locationKevData) {
                     window.locationKevData = {};
                 }
@@ -364,7 +364,7 @@ class LocationCardsManager {
                           onclick="event.stopPropagation(); window.showLocationKevModal('${escapedLocation}', window.locationKevData['${kevDataId}'])"
                           onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); event.stopPropagation(); window.showLocationKevModal('${escapedLocation}', window.locationKevData['${kevDataId}']); }">
                         <i class="fas fa-shield-halved me-1"></i>
-                        KEV${kevDeviceCount > 1 ? ` (${kevDeviceCount})` : ''}
+                        KEV${kevDeviceCount > 1 ? ` (${kevDeviceCount})` : ""}
                     </span>
                 `;
             }
@@ -372,9 +372,14 @@ class LocationCardsManager {
             // Calculate most common /24 network
             const network = this.calculateNetwork24(location.device_ips || []);
 
+            // Serialize location data for modal (Session 3: HEX-295)
+            const locationDataForModal = JSON.stringify(location).replace(/'/g, "&#39;").replace(/"/g, "&quot;");
+
             return `
             <div class="col-lg-4 col-md-6 mb-3 fade-in">
-                <div class="card device-card" style="cursor: pointer; position: relative;" onclick="window.filterByLocation('${escapedLocation}')">
+                <div class="card device-card" style="cursor: pointer; position: relative;"
+                     onclick="window.locationDetailsModal?.showLocationDetails(JSON.parse(this.dataset.location), window.vulnManager?.dataManager)"
+                     data-location='${locationDataForModal}'>
                     ${kevBadge}
                     <div class="card-body">
                         <div class="device-hostname" style="display: flex; justify-content: space-between; align-items: center;">
@@ -443,8 +448,8 @@ class LocationCardsManager {
 
                         <div class="card-actions">
                             <span class="text-info font-monospace" style="font-size: 0.875rem;">${network}</span>
-                            <button class="btn btn-outline-secondary" style="font-size: 0.875rem; padding: 0.375rem 0.75rem;" disabled
-                                    onclick="event.stopPropagation()">
+                            <button class="btn btn-outline-info" style="font-size: 0.875rem; padding: 0.375rem 0.75rem;"
+                                    onclick="event.stopPropagation(); window.locationDetailsModal?.showLocationDetails(JSON.parse(this.closest('.card').dataset.location), window.vulnManager?.dataManager)">
                                 <i class="fas fa-eye me-1"></i>View Site Details
                             </button>
                         </div>
@@ -452,7 +457,7 @@ class LocationCardsManager {
                 </div>
             </div>
             `;
-        }).join('');
+        }).join("");
     }
 
     /**
@@ -478,11 +483,11 @@ class LocationCardsManager {
      */
     calculateNetwork24(deviceIPs) {
         if (!deviceIPs || deviceIPs.length === 0) {
-            return 'N/A';
+            return "N/A";
         }
 
         // Management subnets to deprioritize (out-of-band management networks)
-        const managementSubnets = ['10.95', '10.96', '10.97'];
+        const managementSubnets = ["10.95", "10.96", "10.97"];
 
         // Count frequency of production networks (excluding management)
         const productionNetworkCounts = {};
@@ -490,15 +495,15 @@ class LocationCardsManager {
         const managementNetworkCounts = {};
 
         deviceIPs.forEach(ip => {
-            if (!ip) return;
+            if (!ip) {return;}
 
             // Extract first 3 octets
-            const parts = ip.split('.');
+            const parts = ip.split(".");
             if (parts.length >= 3) {
                 const network = `${parts[0]}.${parts[1]}.${parts[2]}.0/24`;
 
                 // Check if this IP is in a management subnet
-                const isManagementIP = managementSubnets.some(subnet => ip.startsWith(subnet + '.'));
+                const isManagementIP = managementSubnets.some(subnet => ip.startsWith(subnet + "."));
 
                 if (isManagementIP) {
                     managementNetworkCounts[network] = (managementNetworkCounts[network] || 0) + 1;
@@ -509,7 +514,7 @@ class LocationCardsManager {
         });
 
         // Find most common production network first
-        let mostCommon = 'N/A';
+        let mostCommon = "N/A";
         let maxCount = 0;
 
         for (const [network, count] of Object.entries(productionNetworkCounts)) {
@@ -520,7 +525,7 @@ class LocationCardsManager {
         }
 
         // If no production networks found, fall back to management networks
-        if (mostCommon === 'N/A') {
+        if (mostCommon === "N/A") {
             for (const [network, count] of Object.entries(managementNetworkCounts)) {
                 if (count > maxCount) {
                     maxCount = count;
@@ -537,13 +542,13 @@ class LocationCardsManager {
      * Update pagination info text
      */
     updatePaginationInfo() {
-        const container = document.getElementById('locationPaginationInfo');
-        if (!container) return;
+        const container = document.getElementById("locationPaginationInfo");
+        if (!container) {return;}
 
         const info = this.pagination.getPageInfo();
         container.innerHTML = `
             <span class="text-muted">
-                Showing ${info.startItem}-${info.endItem} of ${info.totalItems} location${info.totalItems !== 1 ? 's' : ''}
+                Showing ${info.startItem}-${info.endItem} of ${info.totalItems} location${info.totalItems !== 1 ? "s" : ""}
             </span>
         `;
     }
@@ -566,23 +571,23 @@ window.locationCardsManager = new LocationCardsManager();
 
 // Global function for filtering by location (called from card click)
 window.filterByLocation = function(location) {
-    logger.info('ui', 'Filtering by location:', { location });
+    logger.info("ui", "Filtering by location:", { location });
 
     // Store filter in sessionStorage
-    sessionStorage.setItem('activeFilters', JSON.stringify({
+    sessionStorage.setItem("activeFilters", JSON.stringify({
         location: location,
         vendor: null,
         severity: null
     }));
 
     // Switch to table view
-    const tableViewButton = document.getElementById('view-table');
+    const tableViewButton = document.getElementById("view-table");
     if (tableViewButton) {
         tableViewButton.click();
     }
 
     // Apply filters (vulnerability-core.js will handle this)
-    if (window.vulnManager && typeof window.vulnManager.applyStoredFilters === 'function') {
+    if (window.vulnManager && typeof window.vulnManager.applyStoredFilters === "function") {
         setTimeout(() => {
             window.vulnManager.applyStoredFilters();
         }, 100);
@@ -591,23 +596,23 @@ window.filterByLocation = function(location) {
 
 // Global function for showing KEV modal for a location
 window.showLocationKevModal = function(location, kevDevices) {
-    logger.info('ui', 'Showing KEV modal for location:', { location, deviceCount: kevDevices.length });
+    logger.info("ui", "Showing KEV modal for location:", { location, deviceCount: kevDevices.length });
 
     if (!kevDevices || kevDevices.length === 0) {
-        logger.warn('ui', 'No KEV devices found for location:', { location });
+        logger.warn("ui", "No KEV devices found for location:", { location });
         return;
     }
 
     // Create modal HTML
-    const modalId = 'locationKevModal';
+    const modalId = "locationKevModal";
     let modal = document.getElementById(modalId);
 
     if (!modal) {
-        modal = document.createElement('div');
+        modal = document.createElement("div");
         modal.id = modalId;
-        modal.className = 'modal fade';
-        modal.setAttribute('tabindex', '-1');
-        modal.setAttribute('aria-hidden', 'true');
+        modal.className = "modal fade";
+        modal.setAttribute("tabindex", "-1");
+        modal.setAttribute("aria-hidden", "true");
         document.body.appendChild(modal);
     }
 
@@ -615,7 +620,7 @@ window.showLocationKevModal = function(location, kevDevices) {
     const deviceListHtml = kevDevices.map(device => {
         const cveList = device.cves.map(cve =>
             `<a href="#" class="badge bg-red-lt me-1 mb-1" onclick="event.preventDefault(); window.showKevDetails('${cve}')">${cve}</a>`
-        ).join('');
+        ).join("");
 
         return `
             <div class="list-group-item">
@@ -625,7 +630,7 @@ window.showLocationKevModal = function(location, kevDevices) {
                     </div>
                     <div class="col">
                         <div class="fw-bold">${device.hostname}</div>
-                        <div class="text-muted small">${device.cve_count} KEV ${device.cve_count === 1 ? 'vulnerability' : 'vulnerabilities'}</div>
+                        <div class="text-muted small">${device.cve_count} KEV ${device.cve_count === 1 ? "vulnerability" : "vulnerabilities"}</div>
                     </div>
                 </div>
                 <div class="mt-2">
@@ -633,7 +638,7 @@ window.showLocationKevModal = function(location, kevDevices) {
                 </div>
             </div>
         `;
-    }).join('');
+    }).join("");
 
     modal.innerHTML = `
         <div class="modal-dialog modal-lg">
@@ -648,10 +653,10 @@ window.showLocationKevModal = function(location, kevDevices) {
                 <div class="modal-body">
                     <div class="alert alert-warning">
                         <i class="fas fa-exclamation-triangle me-2"></i>
-                        <strong>${kevDevices.length} device${kevDevices.length === 1 ? '' : 's'}</strong> at this location ${kevDevices.length === 1 ? 'has' : 'have'} Known Exploited Vulnerabilities (KEV).
+                        <strong>${kevDevices.length} device${kevDevices.length === 1 ? "" : "s"}</strong> at this location ${kevDevices.length === 1 ? "has" : "have"} Known Exploited Vulnerabilities (KEV).
                         These should be prioritized for immediate remediation.
                     </div>
-                    <div class="list-group" style="${kevDevices.length > 5 ? 'max-height: 400px; overflow-y: auto;' : ''}">
+                    <div class="list-group" style="${kevDevices.length > 5 ? "max-height: 400px; overflow-y: auto;" : ""}">
                         ${deviceListHtml}
                     </div>
                 </div>
