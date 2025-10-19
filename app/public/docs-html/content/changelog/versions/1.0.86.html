@@ -1,0 +1,234 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <hr>
+<h2>title: "Version 1.0.86 - Location Filter: Backend-Driven Filtering Across All Views"
+date: "2025-10-18"
+version: "1.0.86"
+status: "Released"
+category: "Enhancement"</h2><h1>Version 1.0.86 - Location Filter: Backend-Driven Filtering Across All Views</h1><p><strong>Release Status</strong>: ✅ Released<br><strong>Release Date</strong>: 2025-10-18<br><strong>Category</strong>: Enhancement</p>
+<h2>Overview</h2><p>Implements a comprehensive location filtering system with backend-driven hostname parsing and normalized location matching. The location filter dropdown works seamlessly across all 4 views (Devices, Vulnerabilities, Table, Locations) with improved data quality and edge case handling.</p>
+<h2>New Features</h2><h3>Location Filter Dropdown</h3><ul>
+<li><strong>Global Filter Control</strong>: New location dropdown in the filter bar (next to Severity and Vendor filters)</li>
+<li><strong>Backend-Driven</strong>: Populated from <code>/api/locations/stats</code> with only locations that have active vulnerabilities</li>
+<li><strong>Normalized Display</strong>: Location aliases automatically normalized (wtuls → WTULSA, strou → STROUD)</li>
+<li><strong>Cross-View Filtering</strong>: Filters all 4 views simultaneously when a location is selected</li>
+<li><strong>State Persistence</strong>: Selected location persists when switching between views</li>
+</ul>
+<h3>Improved Hostname Parsing</h3><h4>Regex Pattern Support</h4><ul>
+<li>Added support for complex regex patterns in device type matching</li>
+<li>Pattern <code>ns\d+com01</code> now correctly matches VLAN interfaces like <code>tulns27com01-vlan27</code></li>
+<li>Enables more precise hostname parsing for edge cases</li>
+</ul>
+<h4>Location Normalization</h4><ul>
+<li>New <code>normalizeLocation()</code> method handles location aliases</li>
+<li>Aliases automatically mapped to canonical names:<ul>
+<li><code>wtuls</code> → <code>wtulsa</code></li>
+<li><code>strou</code> → <code>stroud</code></li>
+<li><code>tulsatwr</code> → <code>tulsatower</code></li>
+</ul>
+</li>
+<li>Case-insensitive matching across all filters</li>
+</ul>
+<h3>Enhanced API Responses</h3><ul>
+<li>Added <code>normalized_location</code> field to vulnerability API (<code>/api/vulnerabilities</code>)</li>
+<li>Each vulnerability now includes parsed and normalized location for client-side filtering</li>
+<li>Consistent location data across all views</li>
+</ul>
+<h2>Bug Fixes</h2><h3>Data Quality Issues</h3><ul>
+<li><p><strong>Fixed</strong>: Location cards showing devices with no active vulnerabilities</p>
+<ul>
+<li>Added <code>lifecycle_state IN (&#39;active&#39;, &#39;reopened&#39;)</code> filter to location aggregation</li>
+<li>Ensures only active/reopened vulnerabilities contribute to location statistics</li>
+<li>Eliminates &quot;ghost locations&quot; from resolved vulnerabilities</li>
+</ul>
+</li>
+<li><p><strong>Fixed</strong>: TULNS appearing as separate location</p>
+<ul>
+<li>Was: <code>tulns27com01</code> → location=&quot;tulns&quot; (incorrect)</li>
+<li>Now: <code>tulns27com01</code> → location=&quot;tul&quot; (correct via regex pattern)</li>
+</ul>
+</li>
+</ul>
+<h3>Hostname Parsing Edge Cases</h3><ul>
+<li><p><strong>Fixed</strong>: <code>barnsdnfpan01</code> parsing as &quot;bar&quot; instead of &quot;barns&quot;</p>
+<ul>
+<li>Removed dangerous generic &quot;ns&quot; pattern (precedence 5)</li>
+<li>Added specific &quot;dnfpan&quot; pattern (precedence 7)</li>
+<li>Result: Correctly extracts location=&quot;barns&quot;</li>
+</ul>
+</li>
+<li><p><strong>Fixed</strong>: <code>tulnfdevpan01</code> parsing as &quot;tulnf&quot; instead of &quot;tul&quot;</p>
+<ul>
+<li>Added specific &quot;nfdevpan&quot; pattern (precedence 9)</li>
+<li>Pattern matches before generic &quot;devpan&quot; (precedence 14)</li>
+<li>Result: Correctly extracts location=&quot;tul&quot;</li>
+</ul>
+</li>
+</ul>
+<h3>UI/UX Issues</h3><ul>
+<li><p><strong>Fixed</strong>: Location dropdown resets when switching to Locations view</p>
+<ul>
+<li>Dropdown selection now preserved during lazy loading</li>
+<li>Current filter automatically applied after location cards data loads</li>
+</ul>
+</li>
+<li><p><strong>Fixed</strong>: Case sensitivity issues in location filtering</p>
+<ul>
+<li>All comparisons now use uppercase normalization</li>
+<li>Dropdown values match display names (ELPASO, ALLEN, etc.)</li>
+<li>Consistent filtering across all views</li>
+</ul>
+</li>
+<li><p><strong>Fixed</strong>: Filter dropdowns different sizes</p>
+<ul>
+<li>All three filter dropdowns now uniform 140px width</li>
+<li>Severity, Vendor, and Location filters visually balanced</li>
+</ul>
+</li>
+</ul>
+<h2>Technical Details</h2><h3>Backend Changes</h3><p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/services/hostnameParserService.js</code> - Regex matching, location normalization</li>
+<li><code>app/services/vulnerabilityService.js</code> - API enrichment with normalized_location</li>
+<li><code>app/services/locationService.js</code> - Added lifecycle_state filter</li>
+<li><code>config/device-naming-patterns.json</code> - Removed generic patterns, added specific ones</li>
+</ul>
+<p><strong>Device Naming Pattern Updates</strong>:</p>
+<pre><code class="language-json"><span class="hljs-comment">// Removed (Too Generic - Caused False Matches):</span>
+<span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;pattern&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;ns&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;precedence&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">5</span> <span class="hljs-punctuation">}</span>   <span class="hljs-comment">// ❌ Removed</span>
+<span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;pattern&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;com&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;precedence&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">6</span> <span class="hljs-punctuation">}</span>  <span class="hljs-comment">// ❌ Removed</span>
+
+<span class="hljs-comment">// Added (Specific - Correct Matches):</span>
+<span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;pattern&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;ns\\d+com01&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;precedence&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">5</span> <span class="hljs-punctuation">}</span>  <span class="hljs-comment">// ✅ VLAN interfaces</span>
+<span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;pattern&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;dnfpan&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;precedence&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">7</span> <span class="hljs-punctuation">}</span>       <span class="hljs-comment">// ✅ Dev firewalls</span>
+<span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;pattern&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;nfdevpan&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;precedence&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">9</span> <span class="hljs-punctuation">}</span>     <span class="hljs-comment">// ✅ Network FW dev</span></code></pre><h3>Frontend Changes</h3><p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/vulnerabilities.html</code> - Added location filter dropdown</li>
+<li><code>app/public/scripts/shared/vulnerability-data.js</code> - Location filtering logic</li>
+<li><code>app/public/scripts/shared/vulnerability-search.js</code> - Event coordination</li>
+<li><code>app/public/scripts/shared/vulnerability-core.js</code> - Dropdown population, state management</li>
+<li><code>app/public/scripts/shared/location-cards.js</code> - Location card filtering</li>
+<li><code>app/public/styles/pages/vulnerabilities.css</code> - Filter dropdown sizing</li>
+</ul>
+<p><strong>Key Implementation Details</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Location filter dropdown populated on page load</span>
+<span class="hljs-keyword">async</span> <span class="hljs-title function_">loadLocationFilterData</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> authState.<span class="hljs-title function_">authenticatedFetch</span>(<span class="hljs-string">&quot;/api/locations/stats&quot;</span>);
+    <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> response.<span class="hljs-title function_">json</span>();
+    <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">populateLocationFilter</span>(result.<span class="hljs-property">data</span>);
+}
+
+<span class="hljs-comment">// Filter preserves selection when switching views</span>
+<span class="hljs-keyword">if</span> (locationFilter &amp;&amp; locationFilter.<span class="hljs-property">value</span>) {
+    locationCardsManager.<span class="hljs-title function_">applyLocationFilter</span>(locationFilter.<span class="hljs-property">value</span>);
+}
+
+<span class="hljs-comment">// Case-insensitive comparison</span>
+<span class="hljs-keyword">const</span> vulnLocation = (vuln.<span class="hljs-property">normalized_location</span> || <span class="hljs-string">&#x27;&#x27;</span>).<span class="hljs-title function_">toUpperCase</span>();
+<span class="hljs-keyword">const</span> filterLocation = currentLocationFilter.<span class="hljs-title function_">toUpperCase</span>();
+matchesLocation = vulnLocation === filterLocation;</code></pre><h2>Database Schema</h2><p>No database schema changes in this release.</p>
+<h2>Migration Notes</h2><h3>Automatic</h3><ul>
+<li>No manual migration required</li>
+<li>Hostname parsing improvements apply automatically on page load</li>
+<li>Existing data re-parsed with new patterns</li>
+</ul>
+<h3>Configuration</h3><p>The following device naming patterns were updated in <code>config/device-naming-patterns.json</code>:</p>
+<ul>
+<li>Generic patterns &quot;ns&quot; and &quot;com&quot; removed</li>
+<li>Specific patterns added for edge cases</li>
+<li>Precedence values renumbered (1-18)</li>
+</ul>
+<p>If you have custom hostname patterns, review the updated configuration file.</p>
+<h2>API Changes</h2><h3>Modified Endpoints</h3><p><strong>GET /api/vulnerabilities</strong></p>
+<ul>
+<li><strong>Added Field</strong>: <code>normalized_location</code> (string)</li>
+<li><strong>Purpose</strong>: Normalized location extracted from hostname for filtering</li>
+<li><strong>Example</strong>:<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;hostname&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;wtulnswan01&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;normalized_location&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;wtulsa&quot;</span>
+<span class="hljs-punctuation">}</span></code></pre></li>
+</ul>
+<p><strong>GET /api/locations/stats</strong></p>
+<ul>
+<li><strong>Modified</strong>: Now filters by <code>lifecycle_state IN (&#39;active&#39;, &#39;reopened&#39;)</code></li>
+<li><strong>Impact</strong>: Only locations with active vulnerabilities appear in response</li>
+<li><strong>Breaking</strong>: Previously included resolved vulnerabilities</li>
+</ul>
+<h2>Testing</h2><h3>Verified Functionality</h3><ul>
+<li>✅ Location dropdown populates on page load</li>
+<li>✅ Selecting location filters all 4 views (Devices, Vulnerabilities, Table, Locations)</li>
+<li>✅ Filter persists when switching between views</li>
+<li>✅ Works in combination with search box, severity, and vendor filters</li>
+<li>✅ Case-insensitive matching (ALLEN, allen, Allen all work)</li>
+<li>✅ Location normalization (selecting WTULSA shows wtuls and wtulsa hostnames)</li>
+</ul>
+<h3>Hostname Parsing Test Cases</h3><table>
+<thead>
+<tr>
+<th>Hostname</th>
+<th>Before</th>
+<th>After</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>barnsdnfpan01</code></td>
+<td>location=&quot;bar&quot; ❌</td>
+<td>location=&quot;barns&quot; ✅</td>
+<td>Fixed</td>
+</tr>
+<tr>
+<td><code>tulnfdevpan01</code></td>
+<td>location=&quot;tulnf&quot; ❌</td>
+<td>location=&quot;tul&quot; ✅</td>
+<td>Fixed</td>
+</tr>
+<tr>
+<td><code>tulns27com01-vlan27</code></td>
+<td>location=&quot;tulns&quot; ❌</td>
+<td>location=&quot;tul&quot; ✅</td>
+<td>Fixed</td>
+</tr>
+<tr>
+<td><code>wtulnswan01</code></td>
+<td>location=&quot;wtuls&quot; → &quot;wtulsa&quot; ✅</td>
+<td>location=&quot;wtulsa&quot; ✅</td>
+<td>Improved</td>
+</tr>
+<tr>
+<td><code>stroudnrwan01</code></td>
+<td>location=&quot;strou&quot; → &quot;stroud&quot; ✅</td>
+<td>location=&quot;stroud&quot; ✅</td>
+<td>Improved</td>
+</tr>
+</tbody></table>
+<h2>Performance Impact</h2><ul>
+<li><strong>Minimal</strong>: Location dropdown populated once on page load (cached)</li>
+<li><strong>Efficient</strong>: Client-side filtering using pre-computed normalized_location field</li>
+<li><strong>Optimized</strong>: Location cards use display name matching (no complex parsing)</li>
+</ul>
+<h2>Known Issues</h2><p>None reported.</p>
+<h2>Upgrade Instructions</h2><h3>Standard Deployment</h3><ol>
+<li>Pull latest code from <code>dev</code> branch</li>
+<li>Restart Docker container: <code>docker-compose restart hextrackr</code></li>
+<li>Clear browser cache and hard refresh (Ctrl+Shift+R)</li>
+</ol>
+<h3>Verify Installation</h3><ol>
+<li>Navigate to Vulnerabilities page</li>
+<li>Check that location dropdown appears next to Vendor filter</li>
+<li>Select a location from dropdown</li>
+<li>Verify all 4 views (Devices, Vulnerabilities, Table, Locations) filter correctly</li>
+<li>Switch between views and confirm filter persists</li>
+</ol>
+<h2>Related Issues</h2><p><strong>Git Commit</strong>: <code>bada4650</code> - feat: Add location filter dropdown with normalized hostname parsing</p>
+<h2>Contributors</h2><ul>
+<li>Implementation: Claude Code</li>
+<li>Testing &amp; Requirements: User</li>
+</ul>
+<h2>Notes</h2><p>This release focuses on improving data quality and user experience for location-based filtering. The backend-driven architecture ensures consistent filtering across all views while maintaining performance.</p>
+<p>The hostname parsing improvements fix long-standing edge cases that caused incorrect location extraction for specific device naming patterns.</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
