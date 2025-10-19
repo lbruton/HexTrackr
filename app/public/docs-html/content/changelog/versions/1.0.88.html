@@ -1,0 +1,74 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <hr>
+<h2>title: "Version 1.0.88 - Location Details Modal: Grid & Filters (Session 2)"
+date: "2025-10-18"
+version: "1.0.88"
+status: "In Progress"
+category: "Enhancement"</h2><h1>Version 1.0.88 - Location Details Modal: Grid & Filters (Session 2)</h1><p><strong>Release Status</strong>: 🚧 In Progress<br><strong>Release Date</strong>: TBD<br><strong>Parent Issue</strong>: <a href="https://linear.app/hextrackr/issue/HEX-288">HEX-288</a> (Location Cards)<br><strong>Implementation</strong>: <a href="https://linear.app/hextrackr/issue/HEX-295">HEX-295</a> Session 2 of 4</p>
+<h2>Overview</h2><p>Session 2 adds interactive grid and filtering to the Location Details Modal. Implements 4 clickable severity filter cards, AG-Grid with 7 columns, KEV hostname coloring, and VPR breakdown tooltips. Follows device-security-modal.js patterns for consistency.</p>
+<h2>Implementation Tasks</h2><h3>Planned</h3><ul>
+<li><input disabled="" type="checkbox"> Implement <code>populateVprSummary(location)</code> with 4 clickable severity cards</li>
+<li><input disabled="" type="checkbox"> Implement <code>filterBySeverity(severity)</code> toggle logic (active/inactive states)</li>
+<li><input disabled="" type="checkbox"> Implement <code>createLocationDevicesGrid(location)</code> with 7 columns (AG-Grid)</li>
+<li><input disabled="" type="checkbox"> Add KEV hostname coloring (red if KEV, blue otherwise)</li>
+<li><input disabled="" type="checkbox"> Add VPR tooltip with C/H/M/L breakdown on hover</li>
+</ul>
+<h3>Completed</h3><ul>
+<li><input disabled="" type="checkbox"> TBD (updated during implementation)</li>
+</ul>
+<h2>Technical Details</h2><p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/location-details-modal.js</code> - Add grid + filter methods</li>
+</ul>
+<p><strong>Pattern Sources</strong>:</p>
+<ul>
+<li>Risk cards: <code>device-security-modal.js:311-422</code></li>
+<li>Grid setup: <code>device-security-modal.js:422-733</code></li>
+<li>Filter toggle: <code>device-security-modal.js:358-422</code></li>
+</ul>
+<p><strong>Grid Columns</strong> (7 total):</p>
+<ol>
+<li><strong>Hostname</strong>: Clickable link to Device Modal (KEV=red, Other=blue)</li>
+<li><strong>Total Vuln</strong>: Count of vulnerabilities</li>
+<li><strong>Total VPR</strong>: Score with severity color + C/H/M/L tooltip</li>
+<li><strong>Installed Version</strong>: OS/firmware version</li>
+<li><strong>Fixed Version</strong>: Advisory-based fix version</li>
+<li><strong>Ticket Status</strong>: Icon with &quot;Create&quot;/&quot;View&quot; button</li>
+<li><strong>Actions</strong>: Device modal navigation</li>
+</ol>
+<p><strong>Filter Behavior</strong>:</p>
+<ul>
+<li>Click severity card → Filter grid to that severity</li>
+<li>Click same card again → Clear filter (show all)</li>
+<li>Active card: Border + full opacity</li>
+<li>Inactive cards: 50% opacity</li>
+</ul>
+<h2>Success Criteria</h2><ul>
+<li><input disabled="" type="checkbox"> Version bumped to 1.0.88 across 5 files</li>
+<li><input disabled="" type="checkbox"> Risk cards filter device grid on click</li>
+<li><input disabled="" type="checkbox"> Device grid shows 7 columns with proper theming</li>
+<li><input disabled="" type="checkbox"> KEV devices display in red, others in blue</li>
+<li><input disabled="" type="checkbox"> VPR tooltip shows C/H/M/L breakdown on hover</li>
+<li><input disabled="" type="checkbox"> Filter toggle works (click twice to clear)</li>
+</ul>
+<h2>Related Issues</h2><ul>
+<li>Parent: <a href="https://linear.app/hextrackr/issue/HEX-288">HEX-288</a> - Location Cards</li>
+<li>Implementation: <a href="https://linear.app/hextrackr/issue/HEX-295">HEX-295</a> - Location Details Modal</li>
+<li>Session 1: v1.0.87 (Core modal structure)</li>
+<li>Session 2: v1.0.88 (Grid + filters) 🚧</li>
+<li>Session 3: v1.0.89 (Integration + navigation)</li>
+<li>Session 4: v1.0.90 (Enhancements)</li>
+</ul>
+<h2>Progress</h2><p><strong>Sessions Complete</strong>: 1/4 (25%)</p>
+<ul>
+<li>✅ Session 1: Core modal structure (v1.0.87)</li>
+<li>🚧 Session 2: Grid + filters implementation (v1.0.88)</li>
+<li>⏳ Session 3: Integration + navigation (v1.0.89)</li>
+<li>⏳ Session 4: Enhancements (v1.0.90)</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
