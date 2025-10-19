@@ -2,7 +2,7 @@
 
 Welcome to the HexTrackr changelog! This page tracks all notable changes, features, and fixes across all versions of HexTrackr.
 
-**Current Version**: [v1.0.90](#changelog/versions/1.0.90) - ✅ Released 2025-10-18
+**Current Version**: [v1.0.91](#changelog/versions/1.0.91) - ✅ Released 2025-10-19
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### Latest Releases
 
+- [**v1.0.91**](#changelog/versions/1.0.91) - 2025-10-19 - ✅ Fixed Version Display Accuracy Fix (HEX-299)
 - [**v1.0.90**](#changelog/versions/1.0.90) - 2025-10-18 - ✅ Location Details Modal: Critical Fixes (HEX-296)
 - [**v1.0.89**](#changelog/versions/1.0.89) - 2025-10-18 - ✅ Location Details Modal: Integration & Navigation (Session 3)
 - [**v1.0.88**](#changelog/versions/1.0.88) - 2025-10-18 - ✅ Location Details Modal: Grid & Filters (Session 2)
@@ -90,6 +91,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 | Version | Release Date | Highlights |
 |---------|--------------|------------|
+| [1.0.91](#changelog/versions/1.0.91) | 2025-10-19 | Fixed Version Display Accuracy |
+| [1.0.90](#changelog/versions/1.0.90) | 2025-10-18 | Location Details Modal Critical Fixes |
 | [1.0.65](#changelog/versions/1.0.65) | 2025-10-13 | Palo Alto Advisory Integration |
 | [1.0.64](#changelog/versions/1.0.64) | 2025-10-12 | UI Polish & Cisco Advisory Fix |
 | [1.0.63](#changelog/versions/1.0.63) | 2025-10-11 | Cisco PSIRT Advisory Sync |
@@ -156,7 +159,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Navigation
 
-- **[Latest Version (1.0.65)](#changelog/versions/1.0.65)** - Most recent changes
+- **[Latest Version (1.0.91)](#changelog/versions/1.0.91)** - Most recent changes
 - **[Version 1.0.50](#changelog/versions/1.0.50)** - Authentication system milestone
 - **[Version 1.0.0](#changelog/versions/1.0.0)** - Initial release
 
