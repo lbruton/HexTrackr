@@ -486,26 +486,26 @@
 /* Baseline vendor colors (always visible, not just when active) */
 .modal-body .vendor-filter-card[data-filter="cisco"],
 .vendor-filter-card[data-filter="cisco"] {
-    border-color: var(--vendor-cisco);
-    background-color: var(--vendor-cisco-bg);
+    border-color: var(--vendor-cisco) !important;
+    background-color: var(--vendor-cisco-bg) !important;
 }
 
 .modal-body .vendor-filter-card[data-filter="palo"],
 .vendor-filter-card[data-filter="palo"] {
-    border-color: var(--vendor-palo);
-    background-color: var(--vendor-palo-bg);
+    border-color: var(--vendor-palo) !important;
+    background-color: var(--vendor-palo-bg) !important;
 }
 
 .modal-body .vendor-filter-card[data-filter="other"],
 .vendor-filter-card[data-filter="other"] {
-    border-color: var(--vendor-other);
-    background-color: var(--vendor-other-bg);
+    border-color: var(--vendor-other) !important;
+    background-color: var(--vendor-other-bg) !important;
 }
 
 .modal-body .vendor-filter-card[data-filter="kev"],
 .vendor-filter-card[data-filter="kev"] {
-    border-color: var(--vendor-kev);
-    background-color: var(--vendor-kev-bg);
+    border-color: var(--vendor-kev) !important;
+    background-color: var(--vendor-kev-bg) !important;
 }
 
 /* Active state - Cisco (Blue) */
