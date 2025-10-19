@@ -9,7 +9,7 @@
  * - POST /api/audit-logs - Write encrypted audit log (frontend and backend)
  */
 
-const LoggingService = require('../services/loggingService');
+const LoggingService = require("../services/loggingService");
 
 class AuditLogController {
     constructor() {
@@ -34,7 +34,7 @@ class AuditLogController {
      */
     static getInstance() {
         if (!AuditLogController.instance) {
-            throw new Error('AuditLogController not initialized. Call initialize() first.');
+            throw new Error("AuditLogController not initialized. Call initialize() first.");
         }
         return AuditLogController.instance;
     }
@@ -58,17 +58,17 @@ class AuditLogController {
             if (!category || !message) {
                 return res.status(400).json({
                     success: false,
-                    error: 'Category and message are required'
+                    error: "Category and message are required"
                 });
             }
 
             // Get user info from session (if authenticated)
             const userId = req.session?.userId || null;
-            const username = req.session?.username || 'anonymous';
+            const username = req.session?.username || "anonymous";
 
             // Get request metadata
             const ipAddress = req.ip || req.connection?.remoteAddress || null;
-            const userAgent = req.get('user-agent') || null;
+            const userAgent = req.get("user-agent") || null;
 
             const controller = AuditLogController.getInstance();
 
@@ -83,14 +83,14 @@ class AuditLogController {
 
             res.json({
                 success: true,
-                message: 'Audit log created'
+                message: "Audit log created"
             });
 
         } catch (error) {
-            console.error('Error creating audit log:', error);
+            console.error("Error creating audit log:", error);
             res.status(500).json({
                 success: false,
-                error: 'Failed to create audit log',
+                error: "Failed to create audit log",
                 details: error.message
             });
         }

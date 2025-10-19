@@ -3,6 +3,17 @@
  * @class
  *
  * HEX-295 Session 1: Core Modal Structure (v1.0.87)
+ * HEX-295 Session 2: Grid & Filters (v1.0.88)
+ * HEX-295 Session 3: Ticket Integration (v1.0.89)
+ * HEX-296 Session 4: UI Polish & Bug Fixes (v1.0.90)
+ *
+ * Session 4 Fixes (HEX-296):
+ * - Removed Primary Vendor field (meaningless for locations)
+ * - Added "Devices" and "Total VPR" labels to severity cards
+ * - Fixed empty grid with case-insensitive location matching
+ * - Removed pagination (enabled scrolling)
+ * - Removed Actions column (redundant with hostname link)
+ *
  * Pattern source: device-security-modal.js (modal structure and theme propagation)
  * Pattern source: location-cards.js (network subnet calculation)
  */
@@ -59,15 +70,9 @@ class LocationDetailsModal {
             // Extract location data with fallbacks
             const locationDisplay = location.location_display || location.location?.toUpperCase() || "N/A";
             const deviceCount = location.device_count || 0;
-            const primaryVendor = location.primary_vendor || "Other";
             const totalVPR = location.total_vpr || 0;
             const kevCount = location.kev_count || 0;
             const openTickets = location.open_tickets || 0;
-
-            // Vendor badge color logic (matches device-security-modal.js:92-95)
-            const vendorBadgeClass = primaryVendor === "CISCO" ? "bg-primary" :
-                                     primaryVendor === "Palo Alto" ? "bg-warning" :
-                                     "bg-secondary";
 
             // VPR severity badge
             const vprSeverityClass = this.getVprSeverityClass(totalVPR);
@@ -114,14 +119,6 @@ class LocationDetailsModal {
                         <div class="col-sm-5 text-muted">Device Count:</div>
                         <div class="col-sm-7">
                             <span class="badge bg-secondary">${deviceCount} devices</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <div class="row">
-                        <div class="col-sm-5 text-muted">Primary Vendor:</div>
-                        <div class="col-sm-7">
-                            <span class="badge ${vendorBadgeClass}">${primaryVendor}</span>
                         </div>
                     </div>
                 </div>
@@ -365,8 +362,8 @@ class LocationDetailsModal {
 
         // Toggle behavior: if clicking the same severity, clear the filter
         if (this.activeFilter === severity) {
-            // Clear filter - show all rows
-            this.gridApi.setGridOption("rowData", this.allDevices);
+            // Clear filter - show all rows using native AG-Grid API
+            this.gridApi.setFilterModel(null);
             this.activeFilter = null;
 
             // Reset all card styles
@@ -378,16 +375,17 @@ class LocationDetailsModal {
 
             console.log("[LocationDetailsModal] Filter cleared");
         } else {
-            // Apply new filter
+            // Apply new filter using native AG-Grid API (HEX-296 Fix #3)
             this.activeFilter = severity;
 
-            // Filter devices by highest severity matching the selected severity
-            const filteredDevices = this.allDevices.filter(device => {
-                return device.highestSeverity === severity;
+            // Use AG-Grid's native filtering instead of manual row data replacement
+            this.gridApi.setFilterModel({
+                highestSeverity: {
+                    filterType: "text",
+                    type: "equals",
+                    filter: severity
+                }
             });
-
-            // Update grid with filtered data
-            this.gridApi.setGridOption("rowData", filteredDevices);
 
             // Update card visual states
             document.querySelectorAll(".vpr-filter-card").forEach(card => {
@@ -405,7 +403,7 @@ class LocationDetailsModal {
                 }
             });
 
-            console.log(`[LocationDetailsModal] Filtered by ${severity} severity (${filteredDevices.length} devices)`);
+            console.log(`[LocationDetailsModal] Filtered by ${severity} severity`);
         }
     }
 
@@ -524,20 +522,6 @@ Low: ${breakdown.Low.count} (${breakdown.Low.vpr.toFixed(1)})`;
                                     <i class="fas fa-eye me-1"></i>View (${ticketCount})
                                 </button>`;
                     }
-                },
-                {
-                    headerName: "Actions",
-                    field: "actions",
-                    width: 130,
-                    cellStyle: { textAlign: "center" },
-                    sortable: false,
-                    filter: false,
-                    cellRenderer: (params) => {
-                        const hostname = params.data.hostname;
-                        return `<button class="btn btn-sm btn-info" onclick="window.locationDetailsModal.navigateToDevice('${hostname}'); return false;">
-                                    <i class="fas fa-search me-1"></i>View Details
-                                </button>`;
-                    }
                 }
             ];
 
@@ -602,8 +586,7 @@ Low: ${breakdown.Low.count} (${breakdown.Low.vpr.toFixed(1)})`;
                 },
                 domLayout: "normal",
                 animateRows: true,
-                pagination: true,
-                paginationPageSize: 25,
+                pagination: false,
                 initialState: {
                     sort: {
                         sortModel: [{ colId: "totalVpr", sort: "desc" }]
@@ -708,10 +691,15 @@ Low: ${breakdown.Low.count} (${breakdown.Low.vpr.toFixed(1)})`;
             // Get all vulnerabilities (use dataManager if available, otherwise empty array)
             const allVulnerabilities = this.dataManager?.vulnerabilities || [];
 
-            // Filter vulnerabilities for this location
-            const locationVulns = allVulnerabilities.filter(vuln =>
-                vuln.affectedLocations?.includes(location.location)
-            );
+            // Filter vulnerabilities for this location (case-insensitive match - HEX-296 Fix #2)
+            const locationVulns = allVulnerabilities.filter(vuln => {
+                if (!vuln.normalized_location) {
+                    return false;
+                }
+                const searchLocation = location.location.toLowerCase();
+                const vulnLocation = vuln.normalized_location.toLowerCase();
+                return vulnLocation === searchLocation;
+            });
 
             // Group by hostname
             const deviceMap = new Map();

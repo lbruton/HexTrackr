@@ -94,7 +94,7 @@ export class ThemeController {
     // T028: Initialize ChartThemeAdapter for AG-Grid and ApexCharts theme management
     // (Only available on pages with charts - gracefully degrades if not present)
     try {
-      if (typeof window.ChartThemeAdapter === 'function') {
+      if (typeof window.ChartThemeAdapter === "function") {
         this.chartThemeAdapter = new window.ChartThemeAdapter();
       } else {
         this.chartThemeAdapter = null; // Not needed on this page

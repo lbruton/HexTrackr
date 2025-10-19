@@ -21,13 +21,13 @@ const fs = require("fs");
  * Safely log to LoggingService with fallback for initialization
  */
 function _log(level, message, data = {}) {
-    if (global.logger && global.logger.backup && typeof global.logger.backup[level] === 'function') {
+    if (global.logger && global.logger.backup && typeof global.logger.backup[level] === "function") {
         global.logger.backup[level](message, data);
     }
 }
 
 function _audit(category, message, data = {}) {
-    if (global.logger && typeof global.logger.audit === 'function') {
+    if (global.logger && typeof global.logger.audit === "function") {
         global.logger.audit(category, message, data, null, null);
     }
 }
@@ -217,7 +217,7 @@ class BackupService {
      */
     async exportAll() {
         try {
-            _log('info', "Starting comprehensive database backup...");
+            _log("info", "Starting comprehensive database backup...");
 
             // Get comprehensive data from both export functions plus user preferences
             const [vulnerabilityData, ticketData, preferencesData] = await Promise.all([
@@ -238,7 +238,7 @@ class BackupService {
                 .filter(key => key !== "type" && key !== "exported_at")
                 .reduce((sum, key) => sum + (ticketData[key]?.count || 0), 0);
 
-            _log('info', `Backup complete: ${totalVulnRecords} vulnerability records, ${totalTicketRecords} ticket/template records`);
+            _log("info", `Backup complete: ${totalVulnRecords} vulnerability records, ${totalTicketRecords} ticket/template records`);
 
             return {
                 type: "complete_backup_enhanced",
@@ -259,7 +259,7 @@ class BackupService {
             };
 
         } catch (error) {
-            _log('error', "Complete backup failed:", error.message);
+            _log("error", "Complete backup failed:", error.message);
             throw new Error("Complete backup failed: " + error.message);
         }
     }
@@ -541,7 +541,7 @@ class BackupService {
             try {
                 PathValidator.safeUnlinkSync(filePath);
             } catch (unlinkError) {
-                _log('warn', "Could not clean up uploaded file:", unlinkError.message);
+                _log("warn", "Could not clean up uploaded file:", unlinkError.message);
             }
 
             return {
@@ -555,7 +555,7 @@ class BackupService {
             try {
                 PathValidator.safeUnlinkSync(filePath);
             } catch (unlinkError) {
-                _log('warn', "Could not clean up uploaded file after error:", unlinkError.message);
+                _log("warn", "Could not clean up uploaded file after error:", unlinkError.message);
             }
 
             throw new Error("Failed to restore data: " + error.message);
@@ -610,7 +610,7 @@ class BackupService {
      */
     async exportAllAsZip() {
         try {
-            _log('info', "Creating comprehensive ZIP backup...");
+            _log("info", "Creating comprehensive ZIP backup...");
 
             // Get all data using the enhanced export
             const backupData = await this.exportAll();
@@ -661,12 +661,12 @@ class BackupService {
                 compressionOptions: { level: 6 }
             });
 
-            _log('info', `ZIP backup created: ${(zipBuffer.length / 1024 / 1024).toFixed(1)}MB`);
+            _log("info", `ZIP backup created: ${(zipBuffer.length / 1024 / 1024).toFixed(1)}MB`);
 
             return zipBuffer;
 
         } catch (error) {
-            _log('error', "ZIP backup creation failed:", error.message);
+            _log("error", "ZIP backup creation failed:", error.message);
             throw new Error(`ZIP backup failed: ${error.message}`);
         }
     }
@@ -678,7 +678,7 @@ class BackupService {
      */
     async exportVulnerabilitiesAsZip() {
         try {
-            _log('info', "Creating vulnerabilities ZIP backup...");
+            _log("info", "Creating vulnerabilities ZIP backup...");
 
             const vulnData = await this.exportVulnerabilities();
             const zip = new JSZip();
@@ -702,7 +702,7 @@ class BackupService {
                     if (recordCount > CHUNK_SIZE) {
                         // Split into chunks
                         const numChunks = Math.ceil(recordCount / CHUNK_SIZE);
-                        _log('info', `Splitting ${key} into ${numChunks} chunks (${recordCount} records)`);
+                        _log("info", `Splitting ${key} into ${numChunks} chunks (${recordCount} records)`);
 
                         for (let i = 0; i < numChunks; i++) {
                             const start = i * CHUNK_SIZE;
@@ -729,12 +729,12 @@ class BackupService {
             });
 
             const zipBuffer = await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE" });
-            _log('info', `Vulnerabilities ZIP created: ${(zipBuffer.length / 1024 / 1024).toFixed(1)}MB`);
+            _log("info", `Vulnerabilities ZIP created: ${(zipBuffer.length / 1024 / 1024).toFixed(1)}MB`);
 
             return zipBuffer;
 
         } catch (error) {
-            _log('error', "Vulnerabilities ZIP backup failed:", error.message);
+            _log("error", "Vulnerabilities ZIP backup failed:", error.message);
             throw new Error(`Vulnerabilities ZIP backup failed: ${error.message}`);
         }
     }
@@ -746,7 +746,7 @@ class BackupService {
      */
     async exportTicketsAsZip() {
         try {
-            _log('info', "Creating tickets ZIP backup...");
+            _log("info", "Creating tickets ZIP backup...");
 
             const ticketData = await this.exportTickets();
             const zip = new JSZip();
@@ -767,12 +767,12 @@ class BackupService {
             });
 
             const zipBuffer = await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE" });
-            _log('info', `Tickets ZIP created: ${(zipBuffer.length / 1024 / 1024).toFixed(1)}MB`);
+            _log("info", `Tickets ZIP created: ${(zipBuffer.length / 1024 / 1024).toFixed(1)}MB`);
 
             return zipBuffer;
 
         } catch (error) {
-            _log('error', "Tickets ZIP backup failed:", error.message);
+            _log("error", "Tickets ZIP backup failed:", error.message);
             throw new Error(`Tickets ZIP backup failed: ${error.message}`);
         }
     }
@@ -784,39 +784,39 @@ class BackupService {
      */
     async createScheduledBackup() {
         try {
-            _log('info', "Starting scheduled backup...");
+            _log("info", "Starting scheduled backup...");
 
             // Ensure backup directory exists
             if (!fs.existsSync(this.backupDir)) {
                 fs.mkdirSync(this.backupDir, { recursive: true });
-                _log('info', "Created backup directory", { path: this.backupDir });
+                _log("info", "Created backup directory", { path: this.backupDir });
             }
 
             const timestamp = new Date().toISOString().replace(/[:.]/g, "-").split(".")[0]; // YYYY-MM-DDTHH-MM-SS
 
             // 1. Create JSON ZIP backup
-            _log('info', "Creating JSON ZIP backup...");
+            _log("info", "Creating JSON ZIP backup...");
             const zipBuffer = await this.exportAllAsZip();
             const zipPath = path.join(this.backupDir, `hextrackr_data_${timestamp}.zip`);
             fs.writeFileSync(zipPath, zipBuffer);
             const zipSize = (zipBuffer.length / 1024 / 1024).toFixed(2);
-            _log('info', `JSON ZIP backup saved: ${zipSize}MB`, { path: zipPath });
+            _log("info", `JSON ZIP backup saved: ${zipSize}MB`, { path: zipPath });
 
             // 2. Create database file backup using VACUUM INTO
-            _log('info', "Creating database file backup...");
+            _log("info", "Creating database file backup...");
             const dbBackupPath = path.join(this.backupDir, `hextrackr_db_${timestamp}.db`);
 
             await new Promise((resolve, reject) => {
                 // VACUUM INTO creates a clean, compacted copy of the database
                 // Safe to use while database is in use (no locks required)
-                this.db.run(`VACUUM INTO ?`, [dbBackupPath], (err) => {
+                this.db.run("VACUUM INTO ?", [dbBackupPath], (err) => {
                     if (err) {
-                        _log('error', "Database backup failed", { error: err.message });
+                        _log("error", "Database backup failed", { error: err.message });
                         reject(new Error(`Database backup failed: ${err.message}`));
                     } else {
                         const dbStats = fs.statSync(dbBackupPath);
                         const dbSize = (dbStats.size / 1024 / 1024).toFixed(2);
-                        _log('info', `Database backup saved: ${dbSize}MB`, { path: dbBackupPath });
+                        _log("info", `Database backup saved: ${dbSize}MB`, { path: dbBackupPath });
                         resolve();
                     }
                 });
@@ -842,12 +842,12 @@ class BackupService {
                 total_size_mb: ((zipStats.size + dbStats.size) / 1024 / 1024).toFixed(2)
             };
 
-            _audit('backup.scheduled', "Scheduled backup completed", result);
+            _audit("backup.scheduled", "Scheduled backup completed", result);
 
             return result;
 
         } catch (error) {
-            _log('error', "Scheduled backup failed", { error: error.message });
+            _log("error", "Scheduled backup failed", { error: error.message });
             throw new Error(`Scheduled backup failed: ${error.message}`);
         }
     }
@@ -859,7 +859,7 @@ class BackupService {
      */
     async getBackupHistory() {
         try {
-            _log('info', "Retrieving backup history...");
+            _log("info", "Retrieving backup history...");
 
             if (!fs.existsSync(this.backupDir)) {
                 return {
@@ -937,7 +937,7 @@ class BackupService {
             // Sort by creation time (newest first)
             backups.sort((a, b) => b.created_at - a.created_at);
 
-            _log('info', `Found ${backups.length} backups in history`);
+            _log("info", `Found ${backups.length} backups in history`);
 
             return {
                 success: true,
@@ -947,7 +947,7 @@ class BackupService {
             };
 
         } catch (error) {
-            _log('error', "Failed to retrieve backup history", { error: error.message });
+            _log("error", "Failed to retrieve backup history", { error: error.message });
             throw new Error(`Failed to retrieve backup history: ${error.message}`);
         }
     }
@@ -974,11 +974,11 @@ class BackupService {
                 throw new Error("Backup file not found");
             }
 
-            _log('info', `Downloading backup file: ${filename}`);
+            _log("info", `Downloading backup file: ${filename}`);
 
             const fileBuffer = fs.readFileSync(filePath);
 
-            _audit('backup.download', "Backup file downloaded", {
+            _audit("backup.download", "Backup file downloaded", {
                 filename: filename,
                 size_mb: (fileBuffer.length / 1024 / 1024).toFixed(2)
             });
@@ -986,7 +986,7 @@ class BackupService {
             return fileBuffer;
 
         } catch (error) {
-            _log('error', "Backup download failed", { error: error.message, filename });
+            _log("error", "Backup download failed", { error: error.message, filename });
             throw new Error(`Backup download failed: ${error.message}`);
         }
     }
@@ -999,12 +999,12 @@ class BackupService {
      */
     async saveBackupToDisk(type = "all") {
         try {
-            _log('info', `Saving ${type} backup to disk (manual trigger)...`);
+            _log("info", `Saving ${type} backup to disk (manual trigger)...`);
 
             // Ensure backup directory exists
             if (!fs.existsSync(this.backupDir)) {
                 fs.mkdirSync(this.backupDir, { recursive: true });
-                _log('info', "Created backup directory", { path: this.backupDir });
+                _log("info", "Created backup directory", { path: this.backupDir });
             }
 
             const timestamp = new Date().toISOString().replace(/[:.]/g, "-").split(".")[0];
@@ -1045,8 +1045,8 @@ class BackupService {
                 is_manual: true
             };
 
-            _audit('backup.manual', "Manual backup saved to disk", result);
-            _log('info', `Manual backup saved: ${filename} (${result.size_mb}MB)`);
+            _audit("backup.manual", "Manual backup saved to disk", result);
+            _log("info", `Manual backup saved: ${filename} (${result.size_mb}MB)`);
 
             // Run cleanup to maintain 7-day retention
             await this.cleanupOldBackups();
@@ -1054,7 +1054,7 @@ class BackupService {
             return result;
 
         } catch (error) {
-            _log('error', "Manual backup failed", { error: error.message, type });
+            _log("error", "Manual backup failed", { error: error.message, type });
             throw new Error(`Manual backup failed: ${error.message}`);
         }
     }
@@ -1069,10 +1069,10 @@ class BackupService {
      */
     async cleanupOldBackups() {
         try {
-            _log('info', "Starting backup cleanup (7 automated + 3 manual per type)...");
+            _log("info", "Starting backup cleanup (7 automated + 3 manual per type)...");
 
             if (!fs.existsSync(this.backupDir)) {
-                _log('info', "Backup directory does not exist, skipping cleanup");
+                _log("info", "Backup directory does not exist, skipping cleanup");
                 return { success: true, deleted: 0, message: "No backups to clean" };
             }
 
@@ -1124,7 +1124,7 @@ class BackupService {
                 const automatedToDelete = categories.automated.slice(7);
 
                 for (const backup of automatedToDelete) {
-                    _log('info', `Deleting old automated ${type} backup: ${backup.file}`);
+                    _log("info", `Deleting old automated ${type} backup: ${backup.file}`);
                     deletedSize += backup.stats.size;
                     fs.unlinkSync(backup.filePath);
                     deletedCount++;
@@ -1135,13 +1135,13 @@ class BackupService {
                 const manualToDelete = categories.manual.slice(3);
 
                 for (const backup of manualToDelete) {
-                    _log('info', `Deleting old manual ${type} backup: ${backup.file}`);
+                    _log("info", `Deleting old manual ${type} backup: ${backup.file}`);
                     deletedSize += backup.stats.size;
                     fs.unlinkSync(backup.filePath);
                     deletedCount++;
                 }
 
-                _log('info', `${type}: Keeping ${Math.min(categories.automated.length - automatedToDelete.length, 7)} automated + ${Math.min(categories.manual.length - manualToDelete.length, 3)} manual`);
+                _log("info", `${type}: Keeping ${Math.min(categories.automated.length - automatedToDelete.length, 7)} automated + ${Math.min(categories.manual.length - manualToDelete.length, 3)} manual`);
             }
 
             const result = {
@@ -1152,16 +1152,16 @@ class BackupService {
             };
 
             if (deletedCount > 0) {
-                _audit('backup.cleanup', "Old backups cleaned up", result);
-                _log('info', `Cleanup complete: ${deletedCount} files deleted, ${result.freed_mb}MB freed`);
+                _audit("backup.cleanup", "Old backups cleaned up", result);
+                _log("info", `Cleanup complete: ${deletedCount} files deleted, ${result.freed_mb}MB freed`);
             } else {
-                _log('info', "No old backups to delete");
+                _log("info", "No old backups to delete");
             }
 
             return result;
 
         } catch (error) {
-            _log('error', "Backup cleanup failed", { error: error.message });
+            _log("error", "Backup cleanup failed", { error: error.message });
             throw new Error(`Backup cleanup failed: ${error.message}`);
         }
     }

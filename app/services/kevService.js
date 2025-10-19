@@ -10,13 +10,13 @@
  * Safely log to LoggingService with fallback for initialization
  */
 function _log(level, message, data = {}) {
-    if (global.logger && global.logger.kev && typeof global.logger.kev[level] === 'function') {
+    if (global.logger && global.logger.kev && typeof global.logger.kev[level] === "function") {
         global.logger.kev[level](message, data);
     }
 }
 
 function _audit(category, message, data = {}) {
-    if (global.logger && typeof global.logger.audit === 'function') {
+    if (global.logger && typeof global.logger.audit === "function") {
         global.logger.audit(category, message, data, null, null);
     }
 }
@@ -88,9 +88,9 @@ class KevService {
 
             await this.db.run("CREATE INDEX IF NOT EXISTS idx_sync_metadata_type_time ON sync_metadata(sync_type, sync_time DESC)");
 
-            _log('info', "KEV database tables initialized");
+            _log("info", "KEV database tables initialized");
         } catch (error) {
-            _log('error', "Failed to initialize KEV tables:", error);
+            _log("error", "Failed to initialize KEV tables:", error);
         }
     }
 
@@ -137,7 +137,7 @@ class KevService {
         }
 
         this.syncInProgress = true;
-        _log('info', "Starting CISA KEV data sync");
+        _log("info", "Starting CISA KEV data sync");
 
         try {
             // Fetch KEV data from CISA
@@ -147,7 +147,7 @@ class KevService {
             }
 
             const kevData = await response.json();
-            _log('info', ` Fetched ${kevData.vulnerabilities.length} KEV entries from CISA`);
+            _log("info", ` Fetched ${kevData.vulnerabilities.length} KEV entries from CISA`);
 
             // Use promise-based database operations
             await new Promise((resolve, reject) => {
@@ -165,7 +165,7 @@ class KevService {
                         else {resolve();}
                     });
                 });
-                _log('info', "Cleared existing KEV data");
+                _log("info", "Cleared existing KEV data");
 
                 // Prepare insert statement
                 const insertStmt = await new Promise((resolve, reject) => {
@@ -196,7 +196,7 @@ class KevService {
                             kev.notes || null,
                             (err) => {
                                 if (err) {
-                                    _log('error', ` Insert failed for ${kev.cveID}:`, err);
+                                    _log("error", ` Insert failed for ${kev.cveID}:`, err);
                                     reject(err);
                                 } else {
                                     resolve();
@@ -228,7 +228,7 @@ class KevService {
                 // Get match statistics
                 const matchedCount = await this.getMatchedVulnerabilitiesCount();
 
-                _log('info', ` KEV sync completed: ${insertCount} KEVs imported, ${matchedCount} matched`);
+                _log("info", ` KEV sync completed: ${insertCount} KEVs imported, ${matchedCount} matched`);
 
                 return {
                     success: true,
@@ -249,7 +249,7 @@ class KevService {
             }
 
         } catch (error) {
-            _log('error', "KEV sync failed:", error);
+            _log("error", "KEV sync failed:", error);
             throw error;
         } finally {
             this.syncInProgress = false;

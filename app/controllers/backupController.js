@@ -255,9 +255,9 @@ class BackupController {
             // Use setImmediate to avoid blocking the event loop
             setImmediate(() => {
                 try {
-                    const path = require('path');
-                    const fs = require('fs').promises; // Use async version
-                    const backupDir = path.join(process.cwd(), 'backups');
+                    const path = require("path");
+                    const fs = require("fs").promises; // Use async version
+                    const backupDir = path.join(process.cwd(), "backups");
 
                     fs.mkdir(backupDir, { recursive: true })
                         .then(() => fs.writeFile(path.join(backupDir, filename), zipBuffer))
@@ -265,10 +265,10 @@ class BackupController {
                             console.log(`[BACKUP] Vulnerabilities backup saved to disk: ${filename} (${(zipBuffer.length / 1024 / 1024).toFixed(2)}MB)`);
                         })
                         .catch(err => {
-                            console.error(`[BACKUP] Failed to save vulnerabilities backup to disk:`, err);
+                            console.error("[BACKUP] Failed to save vulnerabilities backup to disk:", err);
                         });
                 } catch (error) {
-                    console.error(`[BACKUP] Error in background save:`, error);
+                    console.error("[BACKUP] Error in background save:", error);
                 }
             });
 
@@ -303,9 +303,9 @@ class BackupController {
             // HEX-270: Save to disk AFTER sending response (non-blocking)
             setImmediate(() => {
                 try {
-                    const path = require('path');
-                    const fs = require('fs').promises; // Use async version
-                    const backupDir = path.join(process.cwd(), 'backups');
+                    const path = require("path");
+                    const fs = require("fs").promises; // Use async version
+                    const backupDir = path.join(process.cwd(), "backups");
 
                     fs.mkdir(backupDir, { recursive: true })
                         .then(() => fs.writeFile(path.join(backupDir, filename), zipBuffer))
@@ -313,10 +313,10 @@ class BackupController {
                             console.log(`[BACKUP] Tickets backup saved to disk: ${filename} (${(zipBuffer.length / 1024 / 1024).toFixed(2)}MB)`);
                         })
                         .catch(err => {
-                            console.error(`[BACKUP] Failed to save tickets backup to disk:`, err);
+                            console.error("[BACKUP] Failed to save tickets backup to disk:", err);
                         });
                 } catch (error) {
-                    console.error(`[BACKUP] Error in background save:`, error);
+                    console.error("[BACKUP] Error in background save:", error);
                 }
             });
 

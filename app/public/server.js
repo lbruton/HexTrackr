@@ -775,8 +775,8 @@ async function gracefulShutdown(signal) {
 }
 
 // Register shutdown handlers for SIGTERM (Docker stop) and SIGINT (Ctrl+C)
-process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+process.on("SIGINT", () => gracefulShutdown("SIGINT"));
 
 initializeApplication().catch(error => {
     console.error("Failed to start server:", error);

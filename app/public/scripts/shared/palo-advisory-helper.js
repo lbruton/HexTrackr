@@ -43,7 +43,7 @@ class PaloAdvisoryHelper {
      * @returns {string} Normalized version string
      */
     normalizeVersion(versionString) {
-        if (!versionString) return 'Unknown';
+        if (!versionString) {return "Unknown";}
 
         // Azure marketplace format: 11.1.203 → 11.1.2-h3
         // Pattern: major.minor.patchHotfix (where last 2 digits are hotfix number)
@@ -73,7 +73,7 @@ class PaloAdvisoryHelper {
         // Extract version components: major.minor.patch-hHotfix
         const parseVersion = (ver) => {
             const match = ver.match(/^(\d+)\.(\d+)\.(\d+)(?:-h(\d+))?/);
-            if (!match) return { major: 0, minor: 0, patch: 0, hotfix: 0 };
+            if (!match) {return { major: 0, minor: 0, patch: 0, hotfix: 0 };}
             return {
                 major: parseInt(match[1], 10),
                 minor: parseInt(match[2], 10),
@@ -86,9 +86,9 @@ class PaloAdvisoryHelper {
         const vB = parseVersion(b);
 
         // Compare major, minor, patch, hotfix in order
-        if (vA.major !== vB.major) return vB.major - vA.major;
-        if (vA.minor !== vB.minor) return vB.minor - vA.minor;
-        if (vA.patch !== vB.patch) return vB.patch - vA.patch;
+        if (vA.major !== vB.major) {return vB.major - vA.major;}
+        if (vA.minor !== vB.minor) {return vB.minor - vA.minor;}
+        if (vA.patch !== vB.patch) {return vB.patch - vA.patch;}
         return vB.hotfix - vA.hotfix;
     }
 
@@ -127,7 +127,7 @@ class PaloAdvisoryHelper {
         // Filter fixed versions matching the same major.minor family
         const matchingVersions = fixedVersionsArray.filter(v => {
             const fixedMatch = v.match(/^(\d+)\.(\d+)/);
-            if (!fixedMatch) return false;
+            if (!fixedMatch) {return false;}
             const [, fixedMajor, fixedMinor] = fixedMatch;
             return `${fixedMajor}.${fixedMinor}` === installedKey;
         });
@@ -138,7 +138,7 @@ class PaloAdvisoryHelper {
         }
 
         // No match found for this major.minor family
-        logger.warn("ui", `No ${installedKey}.x fix found for ${installedVersion}. Available: ${fixedVersionsArray.join(', ')}`);
+        logger.warn("ui", `No ${installedKey}.x fix found for ${installedVersion}. Available: ${fixedVersionsArray.join(", ")}`);
         return null;
     }
 
@@ -152,12 +152,12 @@ class PaloAdvisoryHelper {
      */
     async getFixedVersion(cveId, vendor, installedVersion = null) {
         // Only query Palo Alto advisories for Palo Alto devices
-        if (!vendor || !vendor.toLowerCase().includes('palo')) {
+        if (!vendor || !vendor.toLowerCase().includes("palo")) {
             return null;
         }
 
         // Validate CVE ID
-        if (!cveId || !cveId.startsWith('CVE-')) {
+        if (!cveId || !cveId.startsWith("CVE-")) {
             logger.warn("ui", `Invalid CVE ID: ${cveId}`);
             return null;
         }
@@ -294,7 +294,7 @@ class PaloAdvisoryHelper {
      */
     clearCache() {
         this.advisoryCache.clear();
-        logger.debug("ui", 'Palo Alto advisory cache cleared');
+        logger.debug("ui", "Palo Alto advisory cache cleared");
     }
 
     /**
@@ -313,4 +313,4 @@ class PaloAdvisoryHelper {
 // Global instance - accessible from all vulnerability pages
 window.paloAdvisoryHelper = new PaloAdvisoryHelper();
 
-logger.debug("ui", 'Palo Alto Advisory Helper initialized');
+logger.debug("ui", "Palo Alto Advisory Helper initialized");

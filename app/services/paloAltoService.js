@@ -11,13 +11,13 @@
  * Safely log to LoggingService with fallback for initialization
  */
 function _log(level, message, data = {}) {
-    if (global.logger && global.logger.integration && typeof global.logger.integration[level] === 'function') {
+    if (global.logger && global.logger.integration && typeof global.logger.integration[level] === "function") {
         global.logger.integration[level](message, data);
     }
 }
 
 function _audit(category, message, data = {}) {
-    if (global.logger && typeof global.logger.audit === 'function') {
+    if (global.logger && typeof global.logger.audit === "function") {
         global.logger.audit(category, message, data, null, null);
     }
 }
@@ -92,9 +92,9 @@ class PaloAltoService {
             // No need to ALTER TABLE here - columns already exist from migration
 
             // sync_metadata table already exists from KEV/Cisco implementation
-            _log('info', "Palo Alto advisory database tables initialized");
+            _log("info", "Palo Alto advisory database tables initialized");
         } catch (error) {
-            _log('error', "Failed to initialize Palo Alto advisory tables:", error);
+            _log("error", "Failed to initialize Palo Alto advisory tables:", error);
         }
     }
 
@@ -234,7 +234,7 @@ class PaloAltoService {
             const data = await response.json();
             return data;
         } catch (error) {
-            _log('error', ` Failed to fetch advisory for ${cveId}:`, error.message);
+            _log("error", ` Failed to fetch advisory for ${cveId}:`, error.message);
             return null;
         }
     }
@@ -247,7 +247,7 @@ class PaloAltoService {
      */
     parseAdvisoryData(advisoryData, queriedCveId) {
         if (!advisoryData || !advisoryData.cveMetadata) {
-            _log('info', ` Invalid advisory data for ${queriedCveId}`);
+            _log("info", ` Invalid advisory data for ${queriedCveId}`);
             return null;
         }
 
@@ -279,11 +279,11 @@ class PaloAltoService {
         const cna = advisoryData.containers?.cna;
 
         if (!cna) {
-            _log('info', ` No CNA container found for ${queriedCveId}`);
+            _log("info", ` No CNA container found for ${queriedCveId}`);
             return null;
         }
 
-        _log('info', ` Processing advisory for CVE ${cveId}`);
+        _log("info", ` Processing advisory for CVE ${cveId}`);
 
         // Extract severity and CVSS score from metrics
         let severity = null;
@@ -328,10 +328,10 @@ class PaloAltoService {
             productName = cna.affected[0].product || "PAN-OS";
         }
 
-        _log('info', ` Severity: ${severity || "unknown"}`);
-        _log('info', ` CVSS Score: ${cvssScore || "unknown"}`);
-        _log('info', ` Fixed versions: ${fixedVersions.length > 0 ? fixedVersions.slice(0, 3).join(", ") : "none"}${fixedVersions.length > 3 ? "..." : ""}`);
-        _log('info', ` Affected versions: ${affectedVersions.length}`);
+        _log("info", ` Severity: ${severity || "unknown"}`);
+        _log("info", ` CVSS Score: ${cvssScore || "unknown"}`);
+        _log("info", ` Fixed versions: ${fixedVersions.length > 0 ? fixedVersions.slice(0, 3).join(", ") : "none"}${fixedVersions.length > 3 ? "..." : ""}`);
+        _log("info", ` Affected versions: ${affectedVersions.length}`);
 
         return {
             cve_id: cveId,
@@ -359,15 +359,15 @@ class PaloAltoService {
         }
 
         this.syncInProgress = true;
-        _log('info', "Starting Palo Alto Security Advisory data sync");
+        _log("info", "Starting Palo Alto Security Advisory data sync");
 
         try {
             // Get all Palo Alto CVE IDs needing sync (stale or never synced)
             const cveIds = await this.getAllCveIds();
-            _log('info', ` Found ${cveIds.length} CVEs needing Palo Alto advisory sync`);
+            _log("info", ` Found ${cveIds.length} CVEs needing Palo Alto advisory sync`);
 
             if (cveIds.length === 0) {
-                _log('info', "No CVEs need syncing");
+                _log("info", "No CVEs need syncing");
                 this.syncInProgress = false;
                 return {
                     success: true,
@@ -386,13 +386,13 @@ class PaloAltoService {
             for (let i = 0; i < cveIds.length; i++) {
                 const cveId = cveIds[i];
 
-                _log('info', ` [${i + 1}/${cveIds.length}] Fetching advisory for ${cveId}`);
+                _log("info", ` [${i + 1}/${cveIds.length}] Fetching advisory for ${cveId}`);
 
                 // Fetch advisory from Palo Alto API (no auth required)
                 const advisoryData = await this.fetchPaloAdvisoryForCve(cveId);
 
                 if (!advisoryData) {
-                    _log('info', ` No advisory found for ${cveId}`);
+                    _log("info", ` No advisory found for ${cveId}`);
                     // Rate limiting: small delay even for 404s
                     if (i < cveIds.length - 1) {
                         await new Promise(resolve => setTimeout(resolve, delayBetweenCalls));
@@ -422,7 +422,7 @@ class PaloAltoService {
                             parsed.publication_url
                         ], (err) => {
                             if (err) {
-                                _log('error', ` Insert failed for ${cveId}:`, err);
+                                _log("error", ` Insert failed for ${cveId}:`, err);
                                 reject(err);
                             } else {
                                 resolve();
@@ -440,7 +440,7 @@ class PaloAltoService {
                             WHERE cve = ?
                         `, [hasFixAvailable, cveId], (err) => {
                             if (err) {
-                                _log('error', ` Update failed for ${cveId}:`, err);
+                                _log("error", ` Update failed for ${cveId}:`, err);
                                 reject(err);
                             } else {
                                 resolve();
@@ -453,7 +453,7 @@ class PaloAltoService {
                         matchedCount++;
                     }
 
-                    _log('info', ` Processed ${cveId} (${hasFixAvailable ? "fix available" : "no fix"})`);
+                    _log("info", ` Processed ${cveId} (${hasFixAvailable ? "fix available" : "no fix"})`);
                 }
 
                 // Rate limiting: wait between calls
@@ -474,7 +474,7 @@ class PaloAltoService {
                 });
             });
 
-            _log('info', ` Palo Alto advisory sync completed: ${advisoryCount} advisories processed (${actualDbCount} unique CVEs in DB), ${matchedCount} with fixes`);
+            _log("info", ` Palo Alto advisory sync completed: ${advisoryCount} advisories processed (${actualDbCount} unique CVEs in DB), ${matchedCount} with fixes`);
 
             this.syncInProgress = false;
 
@@ -487,7 +487,7 @@ class PaloAltoService {
             };
 
         } catch (error) {
-            _log('error', "Palo Alto advisory sync failed:", error);
+            _log("error", "Palo Alto advisory sync failed:", error);
             this.syncInProgress = false;
             throw error;
         }
