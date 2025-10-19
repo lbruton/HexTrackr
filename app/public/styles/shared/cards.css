@@ -472,6 +472,59 @@
     }
 }
 
+/* ===========================
+   Vendor Filter Cards (Location Details Modal)
+   =========================== */
+
+/* Base vendor filter card - clickable with transition */
+.vendor-filter-card {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+}
+
+/* Active state - Cisco (Blue) */
+.vendor-filter-card.active-cisco {
+    border-color: var(--vendor-cisco) !important;
+    border-width: 3px !important;
+    background-color: var(--vendor-cisco-bg-active) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--vendor-cisco-shadow);
+}
+
+/* Active state - Palo Alto (Orange/Amber) */
+.vendor-filter-card.active-palo {
+    border-color: var(--vendor-palo) !important;
+    border-width: 3px !important;
+    background-color: var(--vendor-palo-bg-active) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--vendor-palo-shadow);
+}
+
+/* Active state - Other (Gray) */
+.vendor-filter-card.active-other {
+    border-color: var(--vendor-other) !important;
+    border-width: 3px !important;
+    background-color: var(--vendor-other-bg-active) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--vendor-other-shadow);
+}
+
+/* Active state - KEV (Red) */
+.vendor-filter-card.active-kev {
+    border-color: var(--vendor-kev) !important;
+    border-width: 3px !important;
+    background-color: var(--vendor-kev-bg-active) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--vendor-kev-shadow);
+}
+
+/* Hover effect for all vendor filter cards */
+.vendor-filter-card:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--hextrackr-shadow-md);
+}
+
 /* Print styles */
 @media print {
     .device-display-enhanced {
