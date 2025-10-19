@@ -635,6 +635,79 @@
         </div>
     </div>
 
+    <!-- Location Details Modal -->
+    <div class="modal modal-blur fade" id="locationDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-map-marker-alt me-2 text-primary"></i>
+                        Location Details
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <!-- LEFT: Location Information Card -->
+                        <div class="col-lg-4">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Location Information
+                                    </h3>
+                                </div>
+                                <div class="card-body">
+                                    <div id="locationInfo" class="space-y-3"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- RIGHT: Risk Cards + Grid (placeholders for Session 2) -->
+                        <div class="col-lg-8">
+                            <div class="row g-3">
+                                <!-- VPR Risk Breakdown Placeholder -->
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h3 class="card-title">
+                                                <i class="fas fa-chart-bar me-2"></i>
+                                                VPR Risk Breakdown
+                                            </h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row g-3" id="locationVprSummary"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Devices Grid Placeholder -->
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h3 class="card-title">
+                                                <i class="fas fa-server me-2"></i>
+                                                Devices at Location
+                                            </h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div id="location-devices-grid" class="ag-theme-quartz"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Legacy Vulnerability Modal (for backward compatibility) -->
     <div class="modal modal-blur fade" id="vulnerabilityModal" tabindex="-1" style="display: none;">
         <div class="modal-dialog modal-xl modal-dialog-centered">
@@ -917,6 +990,7 @@
     <script src="scripts/shared/palo-advisory-helper.js"></script>
     <script src="scripts/shared/vulnerability-cards.js"></script>
     <script src="scripts/shared/location-cards.js"></script>
+    <script src="scripts/shared/location-details-modal.js"></script>
     <script src="scripts/shared/device-security-modal.js"></script>
     <script src="scripts/shared/vulnerability-details-modal.js"></script>
 
