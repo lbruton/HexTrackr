@@ -483,6 +483,31 @@
     border: 2px solid transparent;
 }
 
+/* Baseline vendor colors (always visible, not just when active) */
+.modal-body .vendor-filter-card[data-filter="cisco"],
+.vendor-filter-card[data-filter="cisco"] {
+    border-color: var(--vendor-cisco);
+    background-color: var(--vendor-cisco-bg);
+}
+
+.modal-body .vendor-filter-card[data-filter="palo"],
+.vendor-filter-card[data-filter="palo"] {
+    border-color: var(--vendor-palo);
+    background-color: var(--vendor-palo-bg);
+}
+
+.modal-body .vendor-filter-card[data-filter="other"],
+.vendor-filter-card[data-filter="other"] {
+    border-color: var(--vendor-other);
+    background-color: var(--vendor-other-bg);
+}
+
+.modal-body .vendor-filter-card[data-filter="kev"],
+.vendor-filter-card[data-filter="kev"] {
+    border-color: var(--vendor-kev);
+    background-color: var(--vendor-kev-bg);
+}
+
 /* Active state - Cisco (Blue) */
 .modal-body .vendor-filter-card.active-cisco,
 .vendor-filter-card.active-cisco {
