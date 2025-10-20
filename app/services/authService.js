@@ -331,6 +331,55 @@ class AuthService {
             );
         });
     }
+
+    /**
+     * Reset admin password to default (HEX-303)
+     * Used when clearing all data to reset admin account to factory defaults
+     * Password is set to 'admin123!' with Argon2id hashing
+     * @returns {Promise<Object>} Success status and message
+     */
+    async resetAdminPassword() {
+        return new Promise(async (resolve, reject) => {
+            try {
+                // Hash the default password 'admin123!' with Argon2id
+                const defaultPassword = "admin123!";
+                const passwordHash = await argon2.hash(defaultPassword, {
+                    type: argon2.argon2id,
+                    memoryCost: 65536, // 64 MiB
+                    timeCost: 3,
+                    parallelism: 4
+                });
+
+                // Update admin user password and reset failed attempts
+                this.db.run(
+                    `UPDATE users
+                     SET password_hash = ?,
+                         failed_attempts = 0,
+                         failed_login_timestamp = NULL,
+                         last_login = NULL
+                     WHERE username = 'admin'`,
+                    [passwordHash],
+                    function(err) {
+                        if (err) {
+                            return reject(new Error("Failed to reset admin password: " + err.message));
+                        }
+
+                        if (this.changes === 0) {
+                            return reject(new Error("Admin user not found"));
+                        }
+
+                        resolve({
+                            success: true,
+                            message: "Admin password reset to 'admin123!' successfully"
+                        });
+                    }
+                );
+
+            } catch (error) {
+                reject(new Error("Admin password reset failed: " + error.message));
+            }
+        });
+    }
 }
 
 module.exports = AuthService;

@@ -12,16 +12,44 @@
     <script>
     (function() {
         try {
-            // Login page uses simple 'theme' key (not 'hextrackr-theme')
-            var theme = localStorage.getItem('theme');
-            if (theme && (theme === 'dark' || theme === 'light')) {
-                document.documentElement.setAttribute('data-bs-theme', theme);
+            var stored = localStorage.getItem('hextrackr-theme');
+            if (stored) {
+                // FIX (HEX-302): Handle both JSON and simple string formats
+                var theme = null;
+                try {
+                    var data = JSON.parse(stored);
+                    theme = data.theme || data; // Handle {"theme":"dark"} or "dark"
+                } catch (parseError) {
+                    // Simple string format (backward compatibility)
+                    theme = stored;
+                }
+                if (theme === 'dark' || theme === 'light') {
+                    document.documentElement.setAttribute('data-bs-theme', theme);
+                }
+            } else {
+                // Fallback to sessionStorage (private browsing)
+                stored = sessionStorage.getItem('hextrackr-theme');
+                if (stored) {
+                    var theme = null;
+                    try {
+                        var data = JSON.parse(stored);
+                        theme = data.theme || data;
+                    } catch (parseError) {
+                        theme = stored;
+                    }
+                    if (theme === 'dark' || theme === 'light') {
+                        document.documentElement.setAttribute('data-bs-theme', theme);
+                    }
+                }
             }
         } catch(e) {
-            // Silent fail - defaults to light theme
+            // Silent fail - theme controller will handle initialization
         }
     })();
     </script>
+
+    <!-- Tabler Variable Overrides (HEX-302: Eliminates Tabler flash - MUST load BEFORE Tabler) -->
+    <link rel="stylesheet" href="styles/tabler-overrides.css">
 
     <!-- Tabler CSS -->
     <link href="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/css/tabler.min.css" rel="stylesheet">
@@ -29,51 +57,14 @@
     <!-- FontAwesome Icons (LOCAL HOSTED - eliminates glyph bbox warnings) -->
     <link rel="stylesheet" href="fonts/fontawesome.min.css">
 
-    <style>
-        body {
-            background: #f7fafc; /* Clean light gray matching HexTrackr light mode */
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    <!-- HexTrackr Theme Files (HEX-302: Added missing imports) -->
+    <link rel="stylesheet" href="styles/shared/base.css">
+    <link rel="stylesheet" href="styles/shared/light-theme.css">
+    <link rel="stylesheet" href="styles/shared/dark-theme.css">
+    <link rel="stylesheet" href="styles/css-variables.css">
 
-        /* Dark mode background */
-        body[data-bs-theme="dark"] {
-            background: #0F1C31; /* Match HexTrackr navy theme */
-        }
-
-        .login-card {
-            max-width: 440px;
-            width: 100%;
-        }
-
-        .brand-logo {
-            font-size: 3rem;
-            color: #2563eb; /* Match HexTrackr primary blue */
-        }
-
-        body[data-bs-theme="dark"] .brand-logo {
-            color: #3b82f6; /* Match HexTrackr primary blue (lighter for dark mode) */
-        }
-
-        .shake {
-            animation: shake 0.5s;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
-        }
-
-        .theme-toggle-btn {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            z-index: 1000;
-        }
-    </style>
+    <!-- Page-Specific Styles (HEX-302: Extracted from inline <style> block) -->
+    <link rel="stylesheet" href="styles/pages/login.css">
 </head>
 <body>
     <!-- Theme Toggle Button (top right) -->
@@ -278,6 +269,7 @@
 
         /**
          * Toggle theme between light and dark
+         * FIX (HEX-302): Use correct 'hextrackr-theme' localStorage key
          */
         function toggleTheme() {
             const html = document.documentElement;
@@ -288,20 +280,21 @@
                 html.removeAttribute('data-bs-theme');
                 body.removeAttribute('data-bs-theme');
                 themeIcon.className = 'fas fa-moon';
-                localStorage.setItem('theme', 'light');
+                localStorage.setItem('hextrackr-theme', 'light');
             } else {
                 html.setAttribute('data-bs-theme', 'dark');
                 body.setAttribute('data-bs-theme', 'dark');
                 themeIcon.className = 'fas fa-sun';
-                localStorage.setItem('theme', 'dark');
+                localStorage.setItem('hextrackr-theme', 'dark');
             }
         }
 
         /**
          * Load saved theme preference on page load
+         * FIX (HEX-302): Use correct 'hextrackr-theme' localStorage key
          */
         function loadTheme() {
-            const savedTheme = localStorage.getItem('theme');
+            const savedTheme = localStorage.getItem('hextrackr-theme');
             if (savedTheme === 'dark') {
                 document.documentElement.setAttribute('data-bs-theme', 'dark');
                 document.body.setAttribute('data-bs-theme', 'dark');

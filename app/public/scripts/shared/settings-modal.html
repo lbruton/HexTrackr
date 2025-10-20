@@ -409,42 +409,56 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
-                                    <!-- Global Actions -->
-                                    <div class="col-12">
-                                        <div class="card border-warning">
-                                            <div class="card-header bg-warning">
-                                                <h6 class="card-title mb-0 text-dark">
-                                                    <i class="fas fa-globe me-2"></i>
-                                                    Global Data Operations
+
+                                    <!-- User Preferences Management (HEX-303) -->
+                                    <div class="col-lg-6 mb-4">
+                                        <div class="card">
+                                            <div class="card-header bg-info-subtle">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-user-cog me-2 text-info"></i>
+                                                    User Preferences Management
                                                 </h6>
                                             </div>
                                             <div class="card-body">
-                                                <div class="alert alert-warning mb-3">
-                                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                                    <strong>Warning:</strong> Global operations affect all data in the system.
+                                                <div class="mb-3">
+                                                    <small class="text-muted">
+                                                        Export/import your personal settings (theme, templates, UI preferences).
+                                                        Credentials and API keys are never exported for security.
+                                                    </small>
                                                 </div>
-                                                <div class="row g-2">
-                                                    <div class="col-md-3">
-                                                        <button type="button" class="btn btn-success w-100" onclick="openDatabaseBackupModal()">
-                                                            <i class="fas fa-download me-2"></i>Export All Data
-                                                        </button>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <button type="button" class="btn btn-primary w-100" onclick="window.backupModalManager.showDatabaseBackupModal()">
-                                                            <i class="fas fa-upload me-2"></i>Restore Full System Backup
-                                                        </button>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <button type="button" class="btn btn-warning w-100" onclick="refreshStats()">
-                                                            <i class="fas fa-sync me-2"></i>Refresh Statistics
-                                                        </button>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <button type="button" class="btn btn-danger w-100" onclick="clearData('all')">
-                                                            <i class="fas fa-exclamation-triangle me-2"></i>Clear All Data
-                                                        </button>
-                                                    </div>
+                                                <div class="d-grid gap-2">
+                                                    <button type="button" class="btn btn-outline-primary" onclick="exportUserPreferences()">
+                                                        <i class="fas fa-download me-2"></i>Export User Settings
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-primary" onclick="importUserPreferences()">
+                                                        <i class="fas fa-upload me-2"></i>Restore User Settings
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Global System Operations (HEX-303 - Redesigned) -->
+                                    <div class="col-lg-6 mb-4">
+                                        <div class="card border-danger">
+                                            <div class="card-header bg-danger-subtle">
+                                                <h6 class="card-title mb-0 text-dark">
+                                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                                    Global System Operations
+                                                </h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="alert alert-danger mb-3">
+                                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                                    <strong>Danger Zone:</strong> These operations affect the entire system and cannot be undone.
+                                                </div>
+                                                <div class="d-grid gap-2">
+                                                    <button type="button" class="btn btn-warning w-100" onclick="refreshStats()">
+                                                        <i class="fas fa-sync me-2"></i>Refresh Statistics
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger w-100" onclick="clearAllData()">
+                                                        <i class="fas fa-radiation me-2"></i>Clear All Data & Reset Admin
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>

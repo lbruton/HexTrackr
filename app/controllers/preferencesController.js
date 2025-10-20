@@ -368,6 +368,84 @@ class PreferencesController {
             });
         }
     }
+
+    /**
+     * Export user preferences (HEX-303) - GET /api/preferences/export
+     * Exports all non-sensitive preferences for current authenticated user
+     * Returns JSON file for download (no server-side storage)
+     * @param {Object} req - Express request
+     * @param {Object} req.user - User from requireAuth middleware
+     * @param {Object} res - Express response
+     */
+    static async exportUserPreferences(req, res) {
+        try {
+            const userId = req.user.id;
+            const username = req.user.username || "user";
+
+            const controller = PreferencesController.getInstance();
+            const exportData = await controller.preferencesService.exportUserPreferences(userId, username);
+
+            // Set headers for JSON download
+            const filename = `hextrackr_user_preferences_${username}_${new Date().toISOString().split("T")[0]}.json`;
+            res.setHeader("Content-Type", "application/json; charset=utf-8");
+            res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+            res.setHeader("Cache-Control", "no-cache");
+
+            // Send as formatted JSON string
+            res.send(JSON.stringify(exportData, null, 2));
+
+        } catch (error) {
+            console.error("Export user preferences error:", error);
+            res.status(500).json({
+                success: false,
+                error: "Failed to export user preferences",
+                details: error.message
+            });
+        }
+    }
+
+    /**
+     * Import user preferences (HEX-303) - POST /api/preferences/import
+     * Imports non-sensitive preferences from uploaded JSON file
+     * @param {Object} req - Express request
+     * @param {Object} req.body - Import data (from exportUserPreferences)
+     * @param {Object} req.user - User from requireAuth middleware
+     * @param {Object} res - Express response
+     */
+    static async importUserPreferences(req, res) {
+        try {
+            const userId = req.user.id;
+            const importData = req.body;
+
+            // Input validation
+            if (!importData || typeof importData !== "object") {
+                return res.status(400).json({
+                    success: false,
+                    error: "Invalid import data - must be valid JSON object"
+                });
+            }
+
+            const controller = PreferencesController.getInstance();
+            const result = await controller.preferencesService.importUserPreferences(userId, importData);
+
+            res.json({
+                success: result.success,
+                data: {
+                    message: result.message,
+                    imported: result.imported,
+                    skipped: result.skipped
+                }
+            });
+
+        } catch (error) {
+            console.error("Import user preferences error:", error);
+            res.status(500).json({
+                success: false,
+                error: "Failed to import user preferences",
+                details: error.message
+            });
+        }
+    }
 }
 
 module.exports = PreferencesController;

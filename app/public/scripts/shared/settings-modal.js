@@ -2380,9 +2380,267 @@ async function restoreData(type) {
     }
 }
 
+// ========================================
+// HEX-303: User Preferences Export/Import Functions
+// ========================================
+
+/**
+ * Export user preferences to JSON file (HEX-303)
+ * Downloads directly to user's PC (no server storage)
+ * @returns {Promise<void>}
+ */
+async function exportUserPreferences() {
+    try {
+        logger.info("ui", "Exporting user preferences...");
+
+        const response = await authState.authenticatedFetch("/api/preferences/export");
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ error: response.statusText }));
+            throw new Error(errorData.error || errorData.details || `Export failed: ${response.statusText}`);
+        }
+
+        // Get the filename from headers or generate one
+        const contentDisposition = response.headers.get("Content-Disposition");
+        const filenameMatch = contentDisposition?.match(/filename="(.+)"/);
+        const filename = filenameMatch ? filenameMatch[1] : `hextrackr_user_preferences_${new Date().toISOString().split("T")[0]}.json`;
+
+        // Get response as text first, then parse to show metadata
+        const textData = await response.text();
+        const data = JSON.parse(textData);
+
+        // Download the JSON file
+        const blob = new Blob([textData], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        const message = data.metadata ? `Exported ${data.metadata.exported_preferences} preferences (${data.metadata.filtered_out} sensitive items filtered)` : "User preferences exported successfully";
+        showNotification(message, "success");
+
+    } catch (error) {
+        logger.error("ui", "Error exporting user preferences:", error);
+        showNotification(`Export failed: ${error.message}`, "danger");
+    }
+}
+
+/**
+ * Import user preferences from JSON file (HEX-303)
+ * Uploads from user's PC and restores non-sensitive preferences
+ * @returns {Promise<void>}
+ */
+async function importUserPreferences() {
+    try {
+        // Create file input element
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = ".json";
+        input.style.display = "none";
+
+        input.onchange = async (event) => {
+            const file = event.target.files[0];
+            if (!file) {return;}
+
+            try {
+                // Read and parse the JSON file
+                const text = await file.text();
+                const data = JSON.parse(text);
+
+                // Validate it's a preferences export
+                if (data.export_type !== "user_preferences") {
+                    throw new Error("Invalid file - not a user preferences export");
+                }
+
+                logger.info("ui", "Importing user preferences...");
+
+                // Send to backend for import
+                const response = await authState.authenticatedFetch("/api/preferences/import", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || "Import failed");
+                }
+
+                const result = await response.json();
+                showNotification(`Import successful: ${result.data.imported} preferences imported, ${result.data.skipped} sensitive items skipped`, "success");
+
+                // Refresh the page to apply new preferences
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+
+            } catch (error) {
+                logger.error("ui", "Error importing user preferences:", error);
+                showNotification(`Import failed: ${error.message}`, "danger");
+            } finally {
+                // Clean up
+                document.body.removeChild(input);
+            }
+        };
+
+        // Trigger file selection
+        document.body.appendChild(input);
+        input.click();
+
+    } catch (error) {
+        logger.error("ui", "Error setting up import:", error);
+        showNotification(`Import setup failed: ${error.message}`, "danger");
+    }
+}
+
+/**
+ * Clear all data with enhanced confirmation modal (HEX-303)
+ * Shows typed confirmation modal before clearing entire database and resetting admin password
+ * @returns {Promise<void>}
+ */
+async function clearAllData() {
+    try {
+        // Show enhanced confirmation modal
+        const confirmed = await showClearAllDataConfirmationModal();
+        if (!confirmed) {return;}
+
+        logger.info("ui", "Clearing all data and resetting system...");
+        showNotification("Clearing all data... This may take a moment.", "warning");
+
+        const response = await authState.authenticatedFetch("/api/backup/clear/all", {
+            method: "DELETE"
+        });
+
+        if (!response.ok) {
+            throw new Error(`Clear failed: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        showNotification(result.message, "success");
+
+        // Clear client-side cache metadata
+        sessionStorage.removeItem("hextrackr_cache_metadata");
+        sessionStorage.removeItem("hextrackr_last_load");
+
+        // Log user out and redirect to login page after short delay
+        setTimeout(() => {
+            showNotification("System reset complete. Redirecting to login...", "info");
+            setTimeout(() => {
+                window.location.href = "/login.html";
+            }, 1500);
+        }, 1000);
+
+    } catch (error) {
+        logger.error("ui", "Error clearing all data:", error);
+        showNotification(`Clear all data failed: ${error.message}`, "danger");
+    }
+}
+
+/**
+ * Show enhanced confirmation modal for Clear All Data (HEX-303)
+ * Requires typed confirmation "DELETE ALL DATA" + checkbox
+ * @returns {Promise<boolean>} True if confirmed, false otherwise
+ */
+function showClearAllDataConfirmationModal() {
+    return new Promise((resolve) => {
+        const modal = document.createElement("div");
+        modal.className = "modal fade";
+        modal.innerHTML = `
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-danger">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title">
+                            <i class="fas fa-radiation me-2"></i>
+                            DANGER: Complete System Reset
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-danger">
+                            <strong>THIS WILL DELETE ALL DATA INCLUDING:</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>All vulnerability records</li>
+                                <li>All ticket records</li>
+                                <li>All user accounts and passwords</li>
+                                <li>All preferences and settings</li>
+                                <li>All backup metadata</li>
+                            </ul>
+                        </div>
+                        <div class="alert alert-warning">
+                            <strong>After reset:</strong><br>
+                            • Admin password will be: <code>admin123!</code><br>
+                            • You will be logged out immediately<br>
+                            • This action CANNOT be undone
+                        </div>
+                        <hr>
+                        <p><strong>Type the following to confirm:</strong></p>
+                        <p class="text-danger fw-bold">DELETE ALL DATA</p>
+                        <input type="text" class="form-control mb-3" id="confirmAllInput"
+                               placeholder="Type: DELETE ALL DATA" autocomplete="off">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="confirmCheckbox">
+                            <label class="form-check-label" for="confirmCheckbox">
+                                I understand this will permanently delete everything and reset the admin password
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-danger" id="confirmClearAllBtn" disabled>
+                            <i class="fas fa-radiation me-2"></i>DELETE EVERYTHING
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+        const bsModal = new bootstrap.Modal(modal);
+        const confirmInput = modal.querySelector("#confirmAllInput");
+        const confirmCheckbox = modal.querySelector("#confirmCheckbox");
+        const confirmBtn = modal.querySelector("#confirmClearAllBtn");
+
+        // Enable button only when both conditions are met
+        const updateButtonState = () => {
+            const textMatches = confirmInput.value === "DELETE ALL DATA";
+            const checkboxChecked = confirmCheckbox.checked;
+            confirmBtn.disabled = !(textMatches && checkboxChecked);
+        };
+
+        confirmInput.addEventListener("input", updateButtonState);
+        confirmCheckbox.addEventListener("change", updateButtonState);
+
+        confirmBtn.addEventListener("click", () => {
+            if (confirmInput.value === "DELETE ALL DATA" && confirmCheckbox.checked) {
+                bsModal.hide();
+                resolve(true);
+            }
+        });
+
+        modal.addEventListener("hidden.bs.modal", () => {
+            document.body.removeChild(modal);
+            resolve(false);
+        });
+
+        bsModal.show();
+        confirmInput.focus();
+    });
+}
+
 // Expose ServiceNow functions globally for use by other pages
 // Using synchronous versions for immediate access (no Promise handling needed)
 window.generateServiceNowUrl = generateServiceNowUrlSync;
 window.isServiceNowEnabled = () => window.serviceNowSettingsCache.enabled;
+
+// Expose HEX-303 functions globally
+window.exportUserPreferences = exportUserPreferences;
+window.importUserPreferences = importUserPreferences;
+window.clearAllData = clearAllData;
 
 })();

@@ -267,32 +267,60 @@ class BackupService {
     /**
      * Clear data by type
      * Extracted from server.js line 2701-2771
+     * HEX-303: Enhanced to clear ALL data including users and reset admin password when type === "all"
      */
     async clearData(type) {
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             if (type === "all") {
-                // Clear all tables in parallel (no foreign key dependencies between these groups)
-                // SECURITY: Preserves users, user_preferences, sessions (authentication)
-                // HEX-270: Preserves cisco_advisories, palo_alto_advisories (not in backups, managed by sync services)
-                const clearPromises = [
-                    new Promise((res, rej) => this.db.run("DELETE FROM vulnerability_imports", err => err ? rej(err) : res())),
-                    new Promise((res, rej) => this.db.run("DELETE FROM kev_status", err => err ? rej(err) : res())),
-                    new Promise((res, rej) => this.db.run("DELETE FROM ticket_templates", err => err ? rej(err) : res())),
-                    new Promise((res, rej) => this.db.run("DELETE FROM email_templates", err => err ? rej(err) : res())),
-                    new Promise((res, rej) => this.db.run("DELETE FROM ticket_vulnerabilities", err => err ? rej(err) : res())),
-                    new Promise((res, rej) => this.db.run("DELETE FROM vulnerability_snapshots", err => err ? rej(err) : res())),
-                    new Promise((res, rej) => this.db.run("DELETE FROM vulnerabilities_current", err => err ? rej(err) : res())),
-                    new Promise((res, rej) => this.db.run("DELETE FROM vulnerability_daily_totals", err => err ? rej(err) : res())),
-                    new Promise((res, rej) => this.db.run("DELETE FROM vendor_daily_totals", err => err ? rej(err) : res())),
-                    new Promise((res, rej) => this.db.run("DELETE FROM tickets", err => err ? rej(err) : res()))
-                ];
+                // HEX-303: Clear EVERYTHING including users and preferences, then reset admin password
+                // This is a complete system reset to factory defaults
+                try {
+                    const clearPromises = [
+                        // Data tables
+                        new Promise((res, rej) => this.db.run("DELETE FROM vulnerability_imports", err => err ? rej(err) : res())),
+                        new Promise((res, rej) => this.db.run("DELETE FROM kev_status", err => err ? rej(err) : res())),
+                        new Promise((res, rej) => this.db.run("DELETE FROM ticket_templates", err => err ? rej(err) : res())),
+                        new Promise((res, rej) => this.db.run("DELETE FROM email_templates", err => err ? rej(err) : res())),
+                        new Promise((res, rej) => this.db.run("DELETE FROM ticket_vulnerabilities", err => err ? rej(err) : res())),
+                        new Promise((res, rej) => this.db.run("DELETE FROM vulnerability_snapshots", err => err ? rej(err) : res())),
+                        new Promise((res, rej) => this.db.run("DELETE FROM vulnerabilities_current", err => err ? rej(err) : res())),
+                        new Promise((res, rej) => this.db.run("DELETE FROM vulnerability_daily_totals", err => err ? rej(err) : res())),
+                        new Promise((res, rej) => this.db.run("DELETE FROM vendor_daily_totals", err => err ? rej(err) : res())),
+                        new Promise((res, rej) => this.db.run("DELETE FROM tickets", err => err ? rej(err) : res())),
+                        new Promise((res, rej) => this.db.run("DELETE FROM sync_metadata", err => err ? rej(err) : res())),
+                        new Promise((res, rej) => this.db.run("DELETE FROM backup_metadata", err => err ? rej(err) : res())),
+                        // HEX-303: Clear user preferences (will be recreated on login)
+                        new Promise((res, rej) => this.db.run("DELETE FROM user_preferences", err => err ? rej(err) : res())),
+                        // HEX-303: Clear all users except admin (admin will be reset to default password)
+                        new Promise((res, rej) => this.db.run("DELETE FROM users WHERE username != 'admin'", err => err ? rej(err) : res()))
+                    ];
 
-                Promise.all(clearPromises)
-                    .then(() => resolve({
-                        message: "All data cleared successfully (authentication and vendor advisories preserved)",
-                        clearedCount: "all"
-                    }))
-                    .catch(err => reject(new Error("Failed to clear all data: " + err.message)));
+                    // Clear all data first
+                    await Promise.all(clearPromises);
+
+                    // HEX-303: Reset admin password to default 'admin123!'
+                    const AuthService = require("./authService");
+                    const authService = new AuthService();
+                    authService.initialize(this.db);
+                    await authService.resetAdminPassword();
+
+                    _log("info", "Complete system reset: All data cleared and admin password reset to 'admin123!'");
+                    _audit("SECURITY", "SYSTEM_RESET", {
+                        action: "clear_all_data",
+                        admin_password_reset: true,
+                        timestamp: new Date().toISOString()
+                    });
+
+                    resolve({
+                        message: "Complete system reset: All data cleared and admin password reset to 'admin123!'",
+                        clearedCount: "all",
+                        admin_reset: true
+                    });
+
+                } catch (err) {
+                    _log("error", "System reset failed:", err.message);
+                    reject(new Error("Failed to clear all data: " + err.message));
+                }
 
             } else if (type === "vulnerabilities") {
                 // Clear vulnerability tables in dependency order (cascade deletes)
