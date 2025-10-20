@@ -1016,7 +1016,7 @@
          * Show KEV details modal for a specific CVE
          * @param {string} cveId - CVE identifier
          */
-        async function showKevDetails(cveId) {
+        async function showKevDetails(cveId, fromPicker = false) {
             if (!cveId) {
                 console.warn('No CVE ID provided for KEV details');
                 return;
@@ -1090,6 +1090,46 @@
                                         Data source: CISA Known Exploited Vulnerabilities Catalog
                                     </div>
                                 </div>
+                                <div class="modal-footer">
+                                    ${fromPicker ? `
+                                        <button type="button" class="btn btn-outline-secondary" onclick="window.returnToKevPicker()">
+                                            <i class="fas fa-arrow-left me-1"></i>Back to Picker
+                                        </button>
+                                    ` : ''}
+                                    <button type="button" class="btn btn-primary" onclick="
+                                        const kevModalEl = document.getElementById('kevDetailsModal');
+                                        const kevModal = bootstrap.Modal.getInstance(kevModalEl);
+
+                                        // Listen for modal fully hidden event
+                                        kevModalEl.addEventListener('hidden.bs.modal', function cleanupAndOpen(e) {
+                                            // Remove the event listener to prevent multiple triggers
+                                            kevModalEl.removeEventListener('hidden.bs.modal', cleanupAndOpen);
+
+                                            // Clean up any stray modal backdrops
+                                            document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+
+                                            // Remove modal-open class from body
+                                            document.body.classList.remove('modal-open');
+                                            document.body.style.overflow = '';
+                                            document.body.style.paddingRight = '';
+
+                                            // Now open the vulnerability details modal
+                                            if (window.vulnManager && typeof window.vulnManager.showVulnerabilityDetailsByCVE === 'function') {
+                                                window.vulnManager.showVulnerabilityDetailsByCVE('${cveId}');
+                                            } else {
+                                                console.error('vulnManager.showVulnerabilityDetailsByCVE not available');
+                                            }
+                                        }, { once: true });
+
+                                        // Hide the KEV modal (this will trigger the hidden.bs.modal event)
+                                        if (kevModal) kevModal.hide();
+                                    ">
+                                        <i class="fas fa-eye me-1"></i>View CVE Details
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                        <i class="fas fa-times me-1"></i>Close
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1136,6 +1176,12 @@
                 return;
             }
 
+            // Store picker context globally for back navigation
+            window.kevPickerContext = {
+                hostname: hostname,
+                kevVulns: validKevs
+            };
+
             // If only one KEV, show details directly
             if (validKevs.length === 1) {
                 showKevDetails(validKevs[0].cve);
@@ -1151,10 +1197,10 @@
 
             modalBody.innerHTML = `
                 <p class="mb-3">
-                    <strong>${hostname}</strong> has <strong>${validKevs.length}</strong> Known Exploited Vulnerabilities. Which would you like to view?
+                    <strong>${hostname}</strong> has <strong>${validKevs.length}</strong> Known Exploited Vulnerabilities. Select one to view details.
                 </p>
-                <div class="list-group">
-                    ${validKevs.map(vuln => {
+                <div class="list-group" style="max-height: 400px; overflow-y: auto;">
+                    ${validKevs.map((vuln, index) => {
                         const severity = vuln.severity || vuln.vpr_severity || "Unknown";
                         const severityColors = {
                             "Critical": "danger",
@@ -1162,30 +1208,53 @@
                             "Medium": "info",
                             "Low": "success"
                         };
+                        const severityTextColors = {
+                            "Critical": "text-danger",
+                            "High": "text-warning",
+                            "Medium": "text-info",
+                            "Low": "text-success"
+                        };
                         const badgeColor = severityColors[severity] || "secondary";
+                        const textColor = severityTextColors[severity] || "text-secondary";
                         const vprScore = vuln.vpr_score || vuln.vprScore || "N/A";
                         const description = vuln.description || vuln.plugin_name || "No description";
                         // Truncate description to 100 chars
                         const shortDesc = description.length > 100 ? description.substring(0, 100) + "..." : description;
 
                         return `
-                            <button type="button" class="list-group-item list-group-item-action"
-                                    onclick="showKevDetails('${vuln.cve}'); bootstrap.Modal.getInstance(document.getElementById('kevPickerModal')).hide();">
-                                <div class="d-flex w-100 justify-content-between align-items-start">
-                                    <div class="flex-grow-1">
-                                        <div class="d-flex align-items-center mb-1">
-                                            <h6 class="mb-0 me-2">${vuln.cve}</h6>
-                                            <span class="badge bg-${badgeColor}">${severity}</span>
-                                            <span class="badge bg-primary ms-2">VPR: ${vprScore}</span>
+                            <div class="list-group-item list-group-item-action"
+                                 style="cursor: pointer;"
+                                 onclick="window.selectKevFromPicker('${vuln.cve}')"
+                                 id="kev-picker-item-${vuln.cve}">
+                                <div class="row align-items-center g-2">
+                                    <div class="col-auto d-flex align-items-center">
+                                        <input type="radio" name="selected-kev"
+                                               class="form-check-input"
+                                               value="${vuln.cve}"
+                                               ${index === 0 ? 'checked' : ''}
+                                               onclick="event.stopPropagation(); window.selectKevFromPicker('${vuln.cve}');">
+                                    </div>
+                                    <div class="col d-flex align-items-center">
+                                        <div class="w-100">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <a href="#" class="${textColor} fw-bold" style="font-size: 1.1rem; text-decoration: none;"
+                                                   onclick="event.stopPropagation(); showKevDetails('${vuln.cve}', true); bootstrap.Modal.getInstance(document.getElementById('kevPickerModal')).hide(); return false;">
+                                                    ${vuln.cve}
+                                                </a>
+                                                <span class="badge bg-${badgeColor} ms-2">VPR: ${vprScore}</span>
+                                            </div>
+                                            <small class="text-muted">${shortDesc}</small>
                                         </div>
-                                        <small class="text-muted">${shortDesc}</small>
                                     </div>
                                 </div>
-                            </button>
+                            </div>
                         `;
                     }).join("")}
                 </div>
             `;
+
+            // Store selected CVE (default to first one)
+            window.selectedKevCve = validKevs[0].cve;
 
             // Show the modal
             const modalElement = document.getElementById("kevPickerModal");
@@ -1205,9 +1274,106 @@
             console.log(`[KEV Picker] Modal shown successfully`);
         }
 
+        /**
+         * Return to KEV picker modal from KEV details modal
+         * Closes KEV details and re-opens picker with stored context
+         * Supports both regular KEV picker and location KEV picker
+         */
+        function returnToKevPicker() {
+            console.log('[KEV Details] Returning to picker modal');
+
+            // Close the KEV details modal
+            const kevDetailsModal = bootstrap.Modal.getInstance(document.getElementById('kevDetailsModal'));
+            if (kevDetailsModal) {
+                kevDetailsModal.hide();
+            }
+
+            // Wait for modal to close, then re-open appropriate picker
+            setTimeout(() => {
+                // Clean up any stray modal backdrops
+                document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
+
+                // Check which picker context is available and re-open accordingly
+                if (window.locationKevPickerContext) {
+                    // Location KEV picker context exists - prioritize this
+                    console.log('[KEV Details] Returning to location KEV picker');
+                    if (window.returnToLocationKevPicker && typeof window.returnToLocationKevPicker === 'function') {
+                        window.showLocationKevModal(window.locationKevPickerContext.location, window.locationKevPickerContext.kevDevices);
+                    } else {
+                        console.error('[KEV Details] returnToLocationKevPicker function not available');
+                    }
+                } else if (window.kevPickerContext) {
+                    // Regular KEV picker context exists
+                    console.log('[KEV Details] Returning to regular KEV picker');
+                    showKevPickerModal(window.kevPickerContext.hostname, window.kevPickerContext.kevVulns);
+                } else {
+                    console.error('[KEV Details] No picker context available');
+                }
+            }, 300);
+        }
+
+        /**
+         * Select a KEV from the picker modal
+         * Updates the selected radio button and stores the selection
+         * @param {string} cveId - CVE ID that was selected
+         */
+        function selectKevFromPicker(cveId) {
+            console.log(`[KEV Picker] Selected: ${cveId}`);
+
+            // Store the selected CVE
+            window.selectedKevCve = cveId;
+
+            // Update radio button
+            const radio = document.querySelector(`input[name="selected-kev"][value="${cveId}"]`);
+            if (radio) {
+                radio.checked = true;
+            }
+        }
+
+        /**
+         * View details for the selected KEV from picker modal
+         * Opens the vulnerability details modal for the selected CVE
+         */
+        function viewSelectedKevDetails() {
+            if (!window.selectedKevCve) {
+                console.warn('[KEV Picker] No KEV selected');
+                return;
+            }
+
+            console.log(`[KEV Picker] Opening CVE details for: ${window.selectedKevCve}`);
+
+            // Close the picker modal
+            const pickerModal = bootstrap.Modal.getInstance(document.getElementById('kevPickerModal'));
+            if (pickerModal) {
+                pickerModal.hide();
+            }
+
+            // Wait for modal to close, then open vulnerability details
+            setTimeout(() => {
+                // Clean up any stray modal backdrops
+                document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
+
+                // Open the vulnerability details modal
+                if (window.vulnManager && typeof window.vulnManager.showVulnerabilityDetailsByCVE === 'function') {
+                    window.vulnManager.showVulnerabilityDetailsByCVE(window.selectedKevCve);
+                } else {
+                    console.error('vulnManager.showVulnerabilityDetailsByCVE not available');
+                }
+            }, 300);
+        }
+
         // Make KEV helpers globally available
         window.showKevDetails = showKevDetails;
         window.showKevPickerModal = showKevPickerModal;
+        window.selectKevFromPicker = selectKevFromPicker;
+        window.viewSelectedKevDetails = viewSelectedKevDetails;
+        window.returnToKevPicker = returnToKevPicker;
 
         // HEX-120 Fix: Wrapper function for device modal that works before vulnManager is ready
         window.openDeviceModal = function(hostname) {
@@ -1294,6 +1460,14 @@
                 </div>
                 <div class="modal-body" id="kevPickerModalBody">
                     <!-- Content dynamically generated by showKevPickerModal() -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="kevPickerViewDetailsBtn" onclick="window.viewSelectedKevDetails()">
+                        <i class="fas fa-eye me-1"></i>View CVE Details
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Close
+                    </button>
                 </div>
             </div>
         </div>
