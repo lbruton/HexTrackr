@@ -1,0 +1,98 @@
+/**
+ * @fileoverview Login Page Specific Styles
+ * @description Styles for the HexTrackr login/authentication page
+ * @version 1.0.0
+ * @since 2025-10-19
+ * @related HEX-302 Theme Standardization - Phase 2
+ *
+ * PURPOSE:
+ * Extracted from inline <style> block in login.html to follow CSS Coding Standards.
+ * All colors use CSS variables (Rule 2), no inline styles (Rule 3).
+ *
+ * MIGRATION:
+ * BEFORE: Lines 32-76 of login.html had inline <style> block
+ * AFTER: Centralized page-specific stylesheet with theme-aware variables
+ */
+
+/* ===========================
+   Login Container Layout
+   =========================== */
+
+/**
+ * Full-viewport centered container for login card
+ * Uses CSS variables for background to support dark mode
+ */
+body {
+  background: var(--hextrackr-bg-primary);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===========================
+   Login Card
+   =========================== */
+
+/**
+ * Centered login form card
+ * Max-width ensures readability on large screens
+ */
+.login-card {
+  max-width: 440px;
+  width: 100%;
+}
+
+/* ===========================
+   Branding
+   =========================== */
+
+/**
+ * HexTrackr shield logo
+ * Uses CSS variable for primary brand color (theme-aware)
+ */
+.brand-logo {
+  font-size: 3rem;
+  color: var(--hextrackr-primary);
+}
+
+/* ===========================
+   Animations
+   =========================== */
+
+/**
+ * Shake animation for login errors
+ * Applied to .card element when login fails
+ */
+.shake {
+  animation: shake 0.5s;
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-10px);
+  }
+
+  75% {
+    transform: translateX(10px);
+  }
+}
+
+/* ===========================
+   Theme Toggle Button
+   =========================== */
+
+/**
+ * Fixed position theme toggle in top-right corner
+ * Accessible on all viewport sizes
+ */
+.theme-toggle-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
+}
