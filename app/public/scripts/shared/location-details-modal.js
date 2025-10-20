@@ -436,7 +436,7 @@ class LocationDetailsModal {
 
         // Count filtered rows for display
         let filteredCount = 0;
-        this.gridApi.forEachNodeAfterFilter(node => {
+        this.gridApi.forEachNodeAfterFilter(_node => {
             filteredCount++;
         });
 
@@ -563,8 +563,16 @@ class LocationDetailsModal {
                     width: 180,
                     cellRenderer: (params) => {
                         const hostname = params.value;
-                        const isKev = params.data.hasKev;
-                        const linkColor = isKev ? "#dc3545" : "#3b82f6"; // Red for KEV, blue for normal
+                        const vendor = params.data.vendor || "Other";
+
+                        // Vendor-based colors: Blue for Cisco, Orange for Palo Alto, Gray for Other
+                        let linkColor = "#6c757d"; // Gray for Other (Bootstrap secondary)
+                        if (vendor.toLowerCase().includes("cisco")) {
+                            linkColor = "#1A73E8"; // Blue for Cisco
+                        } else if (vendor.toLowerCase().includes("palo")) {
+                            linkColor = "#FF6B35"; // Orange for Palo Alto
+                        }
+
                         const fontWeight = "700";
 
                         return `<a href="#" style="color: ${linkColor} !important; font-weight: ${fontWeight} !important; text-decoration: none;"
@@ -579,7 +587,11 @@ class LocationDetailsModal {
                     width: 100,
                     cellRenderer: (params) => {
                         const count = params.value || 0;
-                        return `<span class="fw-bold">${count}</span>`;
+                        const hasKev = params.data.hasKev;
+                        // Red for KEV devices, Orange for non-KEV devices
+                        // Must use !important to override AG-Grid's default cell styling
+                        const color = hasKev ? "#dc3545" : "#f76707";
+                        return `<span class="fw-bold" style="color: ${color} !important;">${count}</span>`;
                     }
                 },
                 {
@@ -588,16 +600,11 @@ class LocationDetailsModal {
                     width: 100,
                     cellRenderer: (params) => {
                         const vpr = params.value || 0;
-                        // Colored text based on VPR score (matches Device Modal pattern)
-                        let color = "#16a34a";  // Green for low (0-3.9)
-                        if (vpr >= 9.0) {
-                            color = "#dc2626";   // Red for critical (9-10)
-                        } else if (vpr >= 7.0) {
-                            color = "#f76707";   // Orange for high (7-8.9)
-                        } else if (vpr >= 4.0) {
-                            color = "#d97706";   // Yellow for medium (4-6.9)
-                        }
-                        return `<span style="color: ${color}; font-weight: 700;">${vpr.toFixed(1)}</span>`;
+                        const hasKev = params.data.hasKev;
+                        // KEV-based colors for consistency with CVE column
+                        // Red for KEV devices, Orange for non-KEV devices
+                        const color = hasKev ? "#dc3545" : "#f76707";
+                        return `<span style="color: ${color} !important; font-weight: 700;">${vpr.toFixed(1)}</span>`;
                     }
                 },
                 {
@@ -633,17 +640,14 @@ class LocationDetailsModal {
                             const cell = document.getElementById(cellId);
                             if (!cell) {return;}
 
-                            // Get the first vulnerability for this device to determine vendor
                             const device = params.data;
                             if (!device.vulnerabilities || device.vulnerabilities.length === 0) {
                                 cell.innerHTML = "<span class=\"font-monospace text-muted\">N/A</span>";
                                 return;
                             }
 
-                            // Use first vulnerability's vendor and CVE
-                            const firstVuln = device.vulnerabilities[0];
-                            const vendor = firstVuln.vendor;
-                            const cveId = firstVuln.cve;
+                            // Get vendor from first vulnerability (all should be same vendor per device)
+                            const vendor = device.vulnerabilities[0].vendor;
 
                             // Determine which advisory helper to use
                             let advisoryHelper = null;
@@ -661,14 +665,41 @@ class LocationDetailsModal {
                             }
 
                             try {
+                                // Get ALL unique CVEs (not just first) - matches Device Security Modal pattern
+                                const uniqueCves = [...new Set(device.vulnerabilities
+                                    .filter(v => v.cve && v.cve.startsWith("CVE-"))
+                                    .map(v => v.cve))];
+
+                                if (uniqueCves.length === 0) {
+                                    cell.innerHTML = "<span class=\"font-monospace text-muted\">No CVEs</span>";
+                                    params.node.setDataValue("fixedVersion", "No CVEs");
+                                    return;
+                                }
+
                                 const installedVersion = device.installedVersion;
-                                const fixedVersion = await advisoryHelper.getFixedVersion(
-                                    cveId, vendor, installedVersion
+
+                                // Query ALL CVEs in parallel (matches device-security-modal.js:204-214)
+                                const fixedVersionPromises = uniqueCves.map(cve =>
+                                    advisoryHelper.getFixedVersion(cve, vendor, installedVersion)
+                                        .catch(err => {
+                                            console.warn(`[LocationDetailsModal] Failed to get fixed version for ${cve}:`, err);
+                                            return null;
+                                        })
                                 );
 
-                                if (fixedVersion) {
-                                    cell.innerHTML = `<span class=\"font-monospace text-success\">${DOMPurify.sanitize(fixedVersion)}</span>`;
-                                    params.node.setDataValue("fixedVersion", fixedVersion);
+                                const fixedVersions = await Promise.all(fixedVersionPromises);
+
+                                // Filter out nulls and deduplicate
+                                const validVersions = [...new Set(fixedVersions.filter(v => v !== null && v !== "No Fix"))];
+
+                                if (validVersions.length > 0) {
+                                    // Sort versions (highest/most recent first) using advisory helper's compareVersions
+                                    validVersions.sort((a, b) => advisoryHelper.compareVersions(a, b));
+
+                                    // Display highest version (first after sort)
+                                    const highestVersion = validVersions[0];
+                                    cell.innerHTML = `<span class=\"font-monospace text-success\">${DOMPurify.sanitize(highestVersion)}</span>`;
+                                    params.node.setDataValue("fixedVersion", highestVersion);
                                 } else {
                                     cell.innerHTML = "<span class=\"font-monospace text-muted\">No Fix</span>";
                                     params.node.setDataValue("fixedVersion", "No Fix");
