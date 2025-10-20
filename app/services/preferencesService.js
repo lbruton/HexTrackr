@@ -319,6 +319,185 @@ class PreferencesService {
             );
         });
     }
+
+    /**
+     * Export user preferences (HEX-303)
+     * Filters out sensitive preferences (API keys, credentials, passwords)
+     * @param {number} userId - User ID
+     * @param {string} username - Username for metadata
+     * @returns {Promise<Object>} Export data with metadata and filtered preferences
+     */
+    async exportUserPreferences(userId, username) {
+        return new Promise((resolve, reject) => {
+            this.db.all(
+                `SELECT preference_key, preference_value, created_at, updated_at
+                 FROM user_preferences
+                 WHERE user_id = ?
+                 ORDER BY preference_key ASC`,
+                [userId],
+                (err, rows) => {
+                    if (err) {
+                        return reject(new Error("Database error exporting preferences: " + err.message));
+                    }
+
+                    // Security filter patterns - exclude sensitive keys
+                    const sensitivePatterns = [
+                        /_api_key$/i,
+                        /_credentials$/i,
+                        /_password$/i,
+                        /_secret$/i,
+                        /_token$/i,
+                        /^cisco_api_key$/i,
+                        /^servicenow_password$/i,
+                        /^servicenow_credentials$/i
+                    ];
+
+                    // Filter and parse preferences
+                    const safePreferences = rows
+                        .filter(row => {
+                            // Exclude if matches any sensitive pattern
+                            const isSensitive = sensitivePatterns.some(pattern =>
+                                pattern.test(row.preference_key)
+                            );
+                            return !isSensitive;
+                        })
+                        .map(row => {
+                            let parsedValue;
+                            try {
+                                parsedValue = JSON.parse(row.preference_value);
+                            } catch (_parseError) {
+                                parsedValue = row.preference_value;
+                            }
+
+                            return {
+                                key: row.preference_key,
+                                value: parsedValue,
+                                created_at: row.created_at,
+                                updated_at: row.updated_at
+                            };
+                        });
+
+                    resolve({
+                        export_type: "user_preferences",
+                        export_version: "1.0",
+                        exported_at: new Date().toISOString(),
+                        user: {
+                            username: username,
+                            user_id: userId
+                        },
+                        metadata: {
+                            total_preferences: rows.length,
+                            exported_preferences: safePreferences.length,
+                            filtered_out: rows.length - safePreferences.length
+                        },
+                        preferences: safePreferences
+                    });
+                }
+            );
+        });
+    }
+
+    /**
+     * Import user preferences (HEX-303)
+     * Validates structure and filters out sensitive keys during import
+     * @param {number} userId - User ID
+     * @param {Object} importData - Export data structure from exportUserPreferences
+     * @returns {Promise<Object>} Result with success status and import counts
+     */
+    async importUserPreferences(userId, importData) {
+        return new Promise((resolve, reject) => {
+            // Validate import data structure
+            if (!importData || !importData.preferences || !Array.isArray(importData.preferences)) {
+                return reject(new Error("Invalid import data structure"));
+            }
+
+            if (importData.export_type !== "user_preferences") {
+                return reject(new Error("Invalid export type - expected 'user_preferences'"));
+            }
+
+            // Security filter patterns - exclude sensitive keys during import
+            const sensitivePatterns = [
+                /_api_key$/i,
+                /_credentials$/i,
+                /_password$/i,
+                /_secret$/i,
+                /_token$/i,
+                /^cisco_api_key$/i,
+                /^servicenow_password$/i,
+                /^servicenow_credentials$/i
+            ];
+
+            // Filter preferences
+            const safePreferences = importData.preferences.filter(pref => {
+                const isSensitive = sensitivePatterns.some(pattern =>
+                    pattern.test(pref.key)
+                );
+                return !isSensitive && pref.key && pref.value !== undefined;
+            });
+
+            if (safePreferences.length === 0) {
+                return resolve({
+                    success: true,
+                    message: "No safe preferences to import",
+                    imported: 0,
+                    skipped: importData.preferences.length
+                });
+            }
+
+            // Begin transaction
+            this.db.run("BEGIN TRANSACTION", (beginErr) => {
+                if (beginErr) {
+                    return reject(new Error("Failed to begin transaction: " + beginErr.message));
+                }
+
+                // Import each preference
+                const promises = safePreferences.map(pref => {
+                    return new Promise((resolveImport, rejectImport) => {
+                        const stringValue = typeof pref.value === "object"
+                            ? JSON.stringify(pref.value)
+                            : String(pref.value);
+
+                        this.db.run(
+                            `INSERT INTO user_preferences (user_id, preference_key, preference_value)
+                             VALUES (?, ?, ?)
+                             ON CONFLICT(user_id, preference_key)
+                             DO UPDATE SET
+                                 preference_value = excluded.preference_value,
+                                 updated_at = CURRENT_TIMESTAMP`,
+                            [userId, pref.key, stringValue],
+                            function(err) {
+                                if (err) {
+                                    return rejectImport(err);
+                                }
+                                resolveImport();
+                            }
+                        );
+                    });
+                });
+
+                // Execute all imports
+                Promise.all(promises)
+                    .then(() => {
+                        this.db.run("COMMIT", (commitErr) => {
+                            if (commitErr) {
+                                return reject(new Error("Failed to commit import: " + commitErr.message));
+                            }
+                            resolve({
+                                success: true,
+                                message: `Successfully imported ${safePreferences.length} preferences`,
+                                imported: safePreferences.length,
+                                skipped: importData.preferences.length - safePreferences.length
+                            });
+                        });
+                    })
+                    .catch((importErr) => {
+                        this.db.run("ROLLBACK", () => {
+                            reject(new Error("Failed to import preferences: " + importErr.message));
+                        });
+                    });
+            });
+        });
+    }
 }
 
 module.exports = PreferencesService;
