@@ -603,6 +603,12 @@ window.showLocationKevModal = function(location, kevDevices) {
         return;
     }
 
+    // Store location KEV context for back navigation
+    window.locationKevPickerContext = {
+        location: location,
+        kevDevices: kevDevices
+    };
+
     // Create modal HTML
     const modalId = "locationKevModal";
     let modal = document.getElementById(modalId);
@@ -616,25 +622,35 @@ window.showLocationKevModal = function(location, kevDevices) {
         document.body.appendChild(modal);
     }
 
-    // Build device list HTML
-    const deviceListHtml = kevDevices.map(device => {
+    // Build device list HTML with new picker pattern
+    const deviceListHtml = kevDevices.map((device, index) => {
         const cveList = device.cves.map(cve =>
-            `<a href="#" class="badge bg-red-lt me-1 mb-1" onclick="event.preventDefault(); window.showKevDetails('${cve}')">${cve}</a>`
+            `<a href="#" class="badge bg-red-lt me-1 mb-1" onclick="event.preventDefault(); event.stopPropagation(); window.showKevDetails('${cve}', true); bootstrap.Modal.getInstance(document.getElementById('locationKevModal')).hide(); return false;">${cve}</a>`
         ).join("");
 
         return `
-            <div class="list-group-item">
-                <div class="row align-items-center">
-                    <div class="col-auto">
-                        <i class="fas fa-server text-primary"></i>
+            <div class="list-group-item list-group-item-action"
+                 style="cursor: pointer;"
+                 onclick="window.selectLocationKevDevice('${device.hostname}')"
+                 id="location-kev-item-${device.hostname.replace(/[^a-zA-Z0-9]/g, '-')}">
+                <div class="row align-items-center g-2">
+                    <div class="col-auto d-flex align-items-center">
+                        <input type="radio" name="selected-location-kev-device"
+                               class="form-check-input"
+                               value="${device.hostname}"
+                               ${index === 0 ? 'checked' : ''}
+                               onclick="event.stopPropagation(); window.selectLocationKevDevice('${device.hostname}');">
                     </div>
-                    <div class="col">
-                        <div class="fw-bold">${device.hostname}</div>
-                        <div class="text-muted small">${device.cve_count} KEV ${device.cve_count === 1 ? "vulnerability" : "vulnerabilities"}</div>
+                    <div class="col d-flex align-items-center">
+                        <div class="w-100">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="fw-bold" style="font-size: 1.05rem;">${device.hostname}</div>
+                                <div>
+                                    ${cveList}
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="mt-2">
-                    ${cveList}
                 </div>
             </div>
         `;
@@ -643,31 +659,124 @@ window.showLocationKevModal = function(location, kevDevices) {
     modal.innerHTML = `
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header bg-danger text-white">
                     <h5 class="modal-title">
-                        <i class="fas fa-shield-halved text-danger me-2"></i>
+                        <i class="fas fa-shield-halved me-2"></i>
                         KEV Devices at ${location.toUpperCase()}
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-warning">
                         <i class="fas fa-exclamation-triangle me-2"></i>
                         <strong>${kevDevices.length} device${kevDevices.length === 1 ? "" : "s"}</strong> at this location ${kevDevices.length === 1 ? "has" : "have"} Known Exploited Vulnerabilities (KEV).
-                        These should be prioritized for immediate remediation.
+                        Select a device to view details.
                     </div>
-                    <div class="list-group" style="${kevDevices.length > 5 ? "max-height: 400px; overflow-y: auto;" : ""}">
+                    <div class="list-group" style="max-height: 400px; overflow-y: auto;">
                         ${deviceListHtml}
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="locationKevViewDeviceBtn" onclick="window.viewSelectedLocationKevDevice()">
+                        <i class="fas fa-server me-1"></i>View Device Details
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Close
+                    </button>
                 </div>
             </div>
         </div>
     `;
 
+    // Store selected device (default to first one)
+    window.selectedLocationKevDevice = kevDevices[0].hostname;
+
     // Show the modal
     const bsModal = new bootstrap.Modal(modal);
     bsModal.show();
+};
+
+/**
+ * Select a device from the location KEV picker modal
+ * Updates the selected radio button and stores the selection
+ * @param {string} hostname - Hostname that was selected
+ */
+window.selectLocationKevDevice = function(hostname) {
+    logger.debug("ui", "Selected location KEV device:", hostname);
+
+    // Store the selected device
+    window.selectedLocationKevDevice = hostname;
+
+    // Update radio button
+    const radio = document.querySelector(`input[name="selected-location-kev-device"][value="${hostname}"]`);
+    if (radio) {
+        radio.checked = true;
+    }
+};
+
+/**
+ * View device details for the selected device from location KEV picker modal
+ * Opens the device security modal for the selected device
+ */
+window.viewSelectedLocationKevDevice = function() {
+    if (!window.selectedLocationKevDevice) {
+        logger.warn("ui", "No device selected from location KEV picker");
+        return;
+    }
+
+    logger.info("ui", "Opening device details for:", window.selectedLocationKevDevice);
+
+    // Close the location KEV modal
+    const locationKevModal = bootstrap.Modal.getInstance(document.getElementById('locationKevModal'));
+    if (locationKevModal) {
+        locationKevModal.hide();
+    }
+
+    // Wait for modal to close, then open device details
+    setTimeout(() => {
+        // Clean up any stray modal backdrops
+        document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+
+        // Open the device details modal
+        if (window.vulnManager && typeof window.vulnManager.viewDeviceDetails === 'function') {
+            window.vulnManager.viewDeviceDetails(window.selectedLocationKevDevice);
+        } else if (window.openDeviceModal && typeof window.openDeviceModal === 'function') {
+            window.openDeviceModal(window.selectedLocationKevDevice);
+        } else {
+            logger.error("ui", "Device modal functions not available");
+        }
+    }, 300);
+};
+
+/**
+ * Return to location KEV picker modal from KEV details modal
+ * Closes KEV details and re-opens location picker with stored context
+ */
+window.returnToLocationKevPicker = function() {
+    logger.debug("ui", "Returning to location KEV picker modal");
+
+    // Close the KEV details modal
+    const kevDetailsModal = bootstrap.Modal.getInstance(document.getElementById('kevDetailsModal'));
+    if (kevDetailsModal) {
+        kevDetailsModal.hide();
+    }
+
+    // Wait for modal to close, then re-open location picker
+    setTimeout(() => {
+        // Clean up any stray modal backdrops
+        document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+
+        // Re-open the location KEV picker modal with stored context
+        if (window.locationKevPickerContext) {
+            window.showLocationKevModal(window.locationKevPickerContext.location, window.locationKevPickerContext.kevDevices);
+        } else {
+            logger.error("ui", "No location KEV picker context available");
+        }
+    }, 300);
 };
