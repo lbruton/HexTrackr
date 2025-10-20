@@ -28,6 +28,35 @@
         })();
     </script>
 
+    <!-- FOUC Prevention: Apply theme before CSS loads -->
+    <script>
+    (function() {
+        try {
+            var stored = localStorage.getItem('hextrackr-theme');
+            if (stored) {
+                var theme = null;
+                try {
+                    var data = JSON.parse(stored);
+                    theme = data.theme || data;
+                } catch (parseError) {
+                    theme = stored;
+                }
+                if (theme === 'dark' || theme === 'light') {
+                    document.documentElement.setAttribute('data-bs-theme', theme);
+                }
+            }
+        } catch(e) {
+            // Silent fail - defaults to light theme
+        }
+    })();
+    </script>
+
+    <!-- Tabler Variable Overrides (HEX-302: Eliminates Tabler flash - MUST load BEFORE Tabler if Tabler is added) -->
+    <link rel="stylesheet" href="styles/tabler-overrides.css">
+
+    <!-- HexTrackr CSS Variables (for theme-aware background) -->
+    <link rel="stylesheet" href="styles/css-variables.css">
+
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -36,15 +65,15 @@
             justify-content: center;
             min-height: 100vh;
             margin: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #fff;
+            background: var(--hextrackr-bg-primary);
+            color: var(--hextrackr-text);
         }
         .loading-container {
             text-align: center;
         }
         .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid #fff;
+            border: 4px solid var(--hextrackr-border);
+            border-top: 4px solid var(--hextrackr-primary);
             border-radius: 50%;
             width: 40px;
             height: 40px;

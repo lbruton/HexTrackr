@@ -358,13 +358,15 @@
     --hextrackr-info-active: #bfdbfe;
 
     /* Navy Theme Backgrounds */
-    --hextrackr-bg-primary: #0F1C31;
+    /* CORRECTED: Body uses #1a2234, header/cards use #1d273b */
+    --hextrackr-bg-primary: #1a2234;   /* Actual body background */
     --hextrackr-bg-secondary: #1a2744;
     --hextrackr-bg-tertiary: #1e293b;
     --hextrackr-bg-inverse: #ffffff;
 
     /* Surface Hierarchy */
-    --hextrackr-surface-0: #0F1C31;    /* Base level - page background */
+    /* CORRECTED: Body background is #1a2234 (darker than cards) */
+    --hextrackr-surface-0: #1a2234;    /* Base level - page background (actual body color) */
     --hextrackr-surface-1: #1a2234;    /* Cards - elevated from base */
     --hextrackr-surface-2: #202c42;    /* Elevated surfaces */
     --hextrackr-surface-3: #1a2234;    /* Modals */

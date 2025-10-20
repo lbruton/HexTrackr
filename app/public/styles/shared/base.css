@@ -88,9 +88,10 @@ body {
 }
 
 /* HEX-65: Critical dark theme card styles for immediate application */
+/* TEMPORARILY USING TABLER DEFAULTS - matching tabler-overrides.css and dark-theme.css */
 [data-bs-theme="dark"] .card {
-    background-color: #1a2234 !important;
-    border-color: rgb(255, 255, 255, 0.08) !important;
+    background-color: #1d273b !important;  /* Tabler default */
+    border-color: rgb(255, 255, 255, 0.15) !important;  /* Tabler default */
 }
 
 [data-bs-theme="dark"] .card-body {
@@ -98,8 +99,8 @@ body {
 }
 
 [data-bs-theme="dark"] .card-header {
-    background-color: #202c3f !important;
-    border-bottom-color: rgb(255, 255, 255, 0.08) !important;
+    background-color: #161f33 !important;  /* Tabler default */
+    border-bottom-color: rgb(255, 255, 255, 0.15) !important;  /* Tabler default */
 }
 
 /* Loading and animation base styles */

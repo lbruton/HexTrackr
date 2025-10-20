@@ -22,21 +22,22 @@
 }
 
 /* Bootstrap Card Dark Mode Styling - Tabler.io Override (HEX-122) */
+/* TEMPORARILY USING TABLER DEFAULTS - matching tabler-overrides.css */
 [data-bs-theme="dark"] .card {
-    background-color: #1e293b !important;
+    background-color: #1d273b !important;  /* Tabler default */
     border-color: rgb(255, 255, 255, 0.15) !important;
     color: #e2e8f0 !important;
     box-shadow: none !important;
 }
 
 [data-bs-theme="dark"] .card-header {
-    background-color: #1a2234 !important;
+    background-color: #161f33 !important;  /* Tabler default */
     border-bottom-color: rgb(255, 255, 255, 0.15) !important;
     color: #f8fafc !important;
 }
 
 [data-bs-theme="dark"] .card-body {
-    background-color: #1e293b !important;
+    background-color: #1d273b !important;  /* Tabler default */
     color: #e2e8f0 !important;
     border-radius: 8px !important;
 }
@@ -47,7 +48,7 @@
 
 /* Statistics Cards Dark Mode */
 [data-bs-theme="dark"] .stats-card {
-    background-color: #1e293b !important;
+    background-color: #1d273b !important;  /* Tabler default */
     border-color: rgb(255, 255, 255, 0.15) !important;
 }
 

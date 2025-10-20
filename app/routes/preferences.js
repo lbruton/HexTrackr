@@ -39,6 +39,18 @@ router.get("/count", PreferencesController.getPreferenceCount);
 router.post("/bulk", PreferencesController.setMultiplePreferences);
 
 /**
+ * GET /api/preferences/export - Export user preferences (HEX-303)
+ * Must be defined BEFORE /:key route to avoid matching "export" as a key
+ */
+router.get("/export", PreferencesController.exportUserPreferences);
+
+/**
+ * POST /api/preferences/import - Import user preferences (HEX-303)
+ * Must be defined BEFORE /:key route to avoid matching "import" as a key
+ */
+router.post("/import", PreferencesController.importUserPreferences);
+
+/**
  * GET /api/preferences - Get all preferences for current user
  */
 router.get("/", PreferencesController.getAllPreferences);
