@@ -780,9 +780,81 @@ class DeviceSecurityModal {
     }
 
     /**
-     * Export device data to CSV
+     * Calculate fixed versions for all vulnerabilities
+     * Performs async advisory lookups in parallel
+     * @param {Array} vulnerabilities - Array of vulnerability objects
+     * @param {string} vendor - Device vendor (Cisco, Palo Alto, etc.)
+     * @param {string} installedVersion - Installed OS version
+     * @returns {Promise<void>} Modifies vulnerabilities in place with fixed_version field
      */
-    exportDeviceData() {
+    async calculateAllFixedVersions(vulnerabilities, vendor, installedVersion) {
+        // Filter to only CVEs that need advisory lookups
+        const vulnsNeedingLookup = vulnerabilities.filter(vuln => {
+            const hasVendor = vendor && (vendor.toLowerCase().includes("cisco") || vendor.toLowerCase().includes("palo"));
+            const hasCve = vuln.cve && vuln.cve.startsWith("CVE-");
+            return hasVendor && hasCve;
+        });
+
+        if (vulnsNeedingLookup.length === 0) {
+            // No vulnerabilities need lookup - set all to N/A
+            vulnerabilities.forEach(vuln => {
+                if (!vuln.fixed_version) {
+                    vuln.fixed_version = "N/A";
+                }
+            });
+            return;
+        }
+
+        // Determine which advisory helper to use
+        let advisoryHelper = null;
+        if (vendor?.toLowerCase().includes("cisco")) {
+            advisoryHelper = window.ciscoAdvisoryHelper;
+        } else if (vendor?.toLowerCase().includes("palo")) {
+            advisoryHelper = window.paloAdvisoryHelper;
+        }
+
+        if (!advisoryHelper) {
+            vulnerabilities.forEach(vuln => {
+                if (!vuln.fixed_version) {
+                    vuln.fixed_version = "N/A";
+                }
+            });
+            return;
+        }
+
+        // Perform lookups in parallel with Promise.all
+        const lookupPromises = vulnsNeedingLookup.map(async (vuln) => {
+            const cveId = vuln.cve;
+
+            try {
+                const fixedVersion = await advisoryHelper.getFixedVersion(cveId, vendor, installedVersion);
+                if (fixedVersion) {
+                    vuln.fixed_version = fixedVersion;
+                } else {
+                    vuln.fixed_version = "No Fix";
+                }
+            } catch (error) {
+                logger.error("Failed to calculate fixed version for ${cveId}:", error);
+                vuln.fixed_version = "Error";
+            }
+        });
+
+        // Wait for all lookups to complete
+        await Promise.all(lookupPromises);
+
+        // Set N/A for vulnerabilities that didn't need lookup
+        vulnerabilities.forEach(vuln => {
+            if (!vuln.fixed_version) {
+                vuln.fixed_version = "N/A";
+            }
+        });
+    }
+
+    /**
+     * Export device data to CSV with async fixed version lookup
+     * Performs fresh advisory lookups for ALL vulnerabilities before export
+     */
+    async exportDeviceData() {
         const modal = document.getElementById("deviceModal");
         if (!modal.classList.contains("show")) {
             this.showToast("No device modal is currently open", "warning");
@@ -795,6 +867,19 @@ class DeviceSecurityModal {
         }
 
         const device = this.currentDevice;
+
+        // Show loading toast
+        this.showToast("Calculating fixed versions for all vulnerabilities...", "info");
+
+        // Clone vulnerabilities array to avoid modifying grid state
+        const vulnerabilities = device.vulnerabilities.map(v => ({...v}));
+
+        // Get device vendor and installed version
+        const vendor = device.vendor || "N/A";
+        const installedVersion = device.operating_system || "N/A";
+
+        // Perform async fixed version lookup for ALL vulnerabilities
+        await this.calculateAllFixedVersions(vulnerabilities, vendor, installedVersion);
 
         // Calculate KEV count
         const kevCount = device.vulnerabilities.filter(v => v.isKev === "Yes").length;
@@ -809,10 +894,6 @@ class DeviceSecurityModal {
         // Get IP address (prioritize from first vulnerability)
         const ipAddress = device.vulnerabilities?.find(v => v.ip_address)?.ip_address || device.ipAddress || "N/A";
 
-        // Get vendor and installed software
-        const vendor = device.vendor || "N/A";
-        const installedSoftware = device.operating_system || "N/A";
-
         // Prepare CSV data with comprehensive device information
         const csvData = [];
 
@@ -820,8 +901,8 @@ class DeviceSecurityModal {
         csvData.push(["Device Information"]);
         csvData.push(["Hostname", device.hostname]);
         csvData.push(["IP Address", ipAddress]);
-        csvData.push(["Vendor", vendor]);
-        csvData.push(["Installed Software", installedSoftware]);
+        csvData.push(["Vendor", vendor]); // vendor from line 878
+        csvData.push(["Installed Software", installedVersion]); // installedVersion from line 879
         csvData.push(["Total Vulnerabilities", device.totalCount]);
         csvData.push(["Total VPR Score", totalVPR.toFixed(1)]);
         csvData.push(["Risk Level", riskLevel]);
@@ -832,11 +913,11 @@ class DeviceSecurityModal {
         csvData.push(["Low Count", device.lowCount]);
         csvData.push([]);
 
-        // Add vulnerability data
+        // Add vulnerability data (use calculated vulnerabilities with fixed versions)
         csvData.push(["Vulnerabilities"]);
         csvData.push(["First Seen", "Fixed Version", "VPR Score", "Severity", "CVE/ID", "KEV", "Vulnerability Name", "Plugin ID", "IP Address", "Port"]);
 
-        device.vulnerabilities.forEach(vuln => {
+        vulnerabilities.forEach(vuln => {
             csvData.push([
                 vuln.first_seen || "N/A",
                 vuln.fixed_version || "N/A",
@@ -866,8 +947,8 @@ class DeviceSecurityModal {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        
-        this.showToast(`Device security data exported for ${device.hostname}`, "success");
+
+        this.showToast(`Exported ${vulnerabilities.length} vulnerabilities with fixed versions for ${device.hostname}`, "success");
     }
 
     /**
