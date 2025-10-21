@@ -795,15 +795,37 @@ class DeviceSecurityModal {
         }
 
         const device = this.currentDevice;
-        
+
+        // Calculate KEV count
+        const kevCount = device.vulnerabilities.filter(v => v.isKev === "Yes").length;
+
+        // Determine risk level based on VPR score
+        const totalVPR = device.totalVPR || 0;
+        let riskLevel = "Low Risk";
+        if (totalVPR >= 90) {riskLevel = "Critical Risk";}
+        else if (totalVPR >= 70) {riskLevel = "High Risk";}
+        else if (totalVPR >= 40) {riskLevel = "Medium Risk";}
+
+        // Get IP address (prioritize from first vulnerability)
+        const ipAddress = device.vulnerabilities?.find(v => v.ip_address)?.ip_address || device.ipAddress || "N/A";
+
+        // Get vendor and installed software
+        const vendor = device.vendor || "N/A";
+        const installedSoftware = device.operating_system || "N/A";
+
         // Prepare CSV data with comprehensive device information
         const csvData = [];
-        
+
         // Add device header information
         csvData.push(["Device Information"]);
         csvData.push(["Hostname", device.hostname]);
+        csvData.push(["IP Address", ipAddress]);
+        csvData.push(["Vendor", vendor]);
+        csvData.push(["Installed Software", installedSoftware]);
         csvData.push(["Total Vulnerabilities", device.totalCount]);
-        csvData.push(["Total VPR Score", (device.totalVPR || 0).toFixed(1)]);
+        csvData.push(["Total VPR Score", totalVPR.toFixed(1)]);
+        csvData.push(["Risk Level", riskLevel]);
+        csvData.push(["KEV Count", kevCount]);
         csvData.push(["Critical Count", device.criticalCount]);
         csvData.push(["High Count", device.highCount]);
         csvData.push(["Medium Count", device.mediumCount]);
@@ -812,14 +834,16 @@ class DeviceSecurityModal {
 
         // Add vulnerability data
         csvData.push(["Vulnerabilities"]);
-        csvData.push(["First Seen", "VPR Score", "Severity", "CVE/ID", "Vulnerability Name", "Plugin ID", "IP Address", "Port"]);
-        
+        csvData.push(["First Seen", "Fixed Version", "VPR Score", "Severity", "CVE/ID", "KEV", "Vulnerability Name", "Plugin ID", "IP Address", "Port"]);
+
         device.vulnerabilities.forEach(vuln => {
             csvData.push([
                 vuln.first_seen || "N/A",
+                vuln.fixed_version || "N/A",
                 (vuln.vpr_score || 0).toFixed(1),
                 vuln.severity || "Low",
                 vuln.cve || `Plugin ${vuln.plugin_id}`,
+                vuln.isKev === "Yes" ? "Yes" : "No",
                 vuln.plugin_name || "N/A",
                 vuln.plugin_id || "N/A",
                 vuln.ip_address || "N/A",
