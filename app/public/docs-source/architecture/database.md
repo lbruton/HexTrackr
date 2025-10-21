@@ -442,8 +442,8 @@ Complete ticketing system with shipping addresses, soft delete, and job type cat
 | `service_now_ticket` | TEXT | | External ServiceNow reference |
 | `location` | TEXT | NOT NULL | Human-readable location label |
 | `devices` | TEXT | | Semicolon-delimited device names |
-| `supervisor` | TEXT | | Supervisor name(s) |
-| `tech` | TEXT | | Assigned technician |
+| `supervisor` | TEXT | | Supervisor name(s) in normalized format: "First Last; First Last" (semicolon-delimited for multiple supervisors) |
+| `tech` | TEXT | | Assigned technician in normalized format: "First Last; First Last" (semicolon-delimited for multiple techs) |
 | `status` | TEXT | DEFAULT 'Open' | Workflow status |
 | `notes` | TEXT | | Free-form notes |
 | `attachments` | TEXT | | JSON array of attachment metadata |
@@ -1422,8 +1422,11 @@ Tracked in `/app/public/scripts/migrations/` directory:
 | `009-add-job-type-fields.sql` | v1.0.57 | - | Tracking numbers and job-specific fields |
 | `010-restructure-address-fields.sql` | v1.0.57 | - | Structured address components (line1, line2, city, state, zip) |
 | `011-add-ticket-deletion-reason.sql` | v1.0.66 | HEX-248 | Deletion audit trail (deletion_reason, deleted_by) |
+| `012-create-audit-logs.sql` | v1.0.67+ | HEX-254 | Unified logging system with audit trail |
+| `013-fix-truncated-markdown-templates.sql` | v1.0.79 | HEX-286 | Restore truncated ticket markdown templates |
+| `014-normalize-supervisor-tech.js` | v1.0.94 | HEX-267 | Normalize supervisor/tech fields from "LAST,FIRST" to "First Last" format (Node.js migration) |
 
-**Migration Strategy**: Idempotent ALTER TABLE statements executed at runtime (no down migrations)
+**Migration Strategy**: Idempotent ALTER TABLE statements executed at runtime (no down migrations). Migration 014 is a Node.js script for data transformation.
 
 ---
 
