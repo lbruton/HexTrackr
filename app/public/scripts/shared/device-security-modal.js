@@ -315,40 +315,53 @@ class DeviceSecurityModal {
      * @param {Object} device - The device data object
      */
     populateVprSummary(device) {
+        // HEX-298: Updated VPR cards with icons and centralized theme tokens (matches Location Details pattern)
         document.getElementById("deviceVprSummary").innerHTML = `
             <div class="col-lg-3 col-6">
-                <div class="card card-sm bg-red-lt vpr-filter-card" style="cursor: pointer;" data-severity="Critical" onclick="window.deviceSecurityModal.filterBySeverity('Critical')">
+                <div class="card card-sm vpr-filter-card" data-severity="Critical" onclick="window.deviceSecurityModal.filterBySeverity('Critical')">
                     <div class="card-body text-center">
-                        <div class="text-red h3 mb-1">${device.criticalCount}</div>
-                        <div class="text-muted small">Critical</div>
-                        <div class="text-red fw-bold">${(device.criticalVPR || 0).toFixed(1)}</div>
+                        <div class="mb-2">
+                            <i class="fas fa-exclamation-triangle fa-2x text-red"></i>
+                        </div>
+                        <div class="text-muted small text-uppercase">Critical</div>
+                        <div class="h3 mb-0">${device.criticalCount}</div>
+                        <div class="text-red fw-bold">${(device.criticalVPR || 0).toFixed(1)} VPR</div>
                     </div>
                 </div>
             </div>
             <div class="col-lg-3 col-6">
-                <div class="card card-sm bg-orange-lt vpr-filter-card" style="cursor: pointer;" data-severity="High" onclick="window.deviceSecurityModal.filterBySeverity('High')">
+                <div class="card card-sm vpr-filter-card" data-severity="High" onclick="window.deviceSecurityModal.filterBySeverity('High')">
                     <div class="card-body text-center">
-                        <div class="text-orange h3 mb-1">${device.highCount}</div>
-                        <div class="text-muted small">High</div>
-                        <div class="text-orange fw-bold">${(device.highVPR || 0).toFixed(1)}</div>
+                        <div class="mb-2">
+                            <i class="fas fa-exclamation-circle fa-2x text-orange"></i>
+                        </div>
+                        <div class="text-muted small text-uppercase">High</div>
+                        <div class="h3 mb-0">${device.highCount}</div>
+                        <div class="text-orange fw-bold">${(device.highVPR || 0).toFixed(1)} VPR</div>
                     </div>
                 </div>
             </div>
             <div class="col-lg-3 col-6">
-                <div class="card card-sm bg-yellow-lt vpr-filter-card" style="cursor: pointer;" data-severity="Medium" onclick="window.deviceSecurityModal.filterBySeverity('Medium')">
+                <div class="card card-sm vpr-filter-card" data-severity="Medium" onclick="window.deviceSecurityModal.filterBySeverity('Medium')">
                     <div class="card-body text-center">
-                        <div class="text-yellow h3 mb-1">${device.mediumCount}</div>
-                        <div class="text-muted small">Medium</div>
-                        <div class="text-yellow fw-bold">${(device.mediumVPR || 0).toFixed(1)}</div>
+                        <div class="mb-2">
+                            <i class="fas fa-info-circle fa-2x text-yellow"></i>
+                        </div>
+                        <div class="text-muted small text-uppercase">Medium</div>
+                        <div class="h3 mb-0">${device.mediumCount}</div>
+                        <div class="text-yellow fw-bold">${(device.mediumVPR || 0).toFixed(1)} VPR</div>
                     </div>
                 </div>
             </div>
             <div class="col-lg-3 col-6">
-                <div class="card card-sm bg-green-lt vpr-filter-card" style="cursor: pointer;" data-severity="Low" onclick="window.deviceSecurityModal.filterBySeverity('Low')">
+                <div class="card card-sm vpr-filter-card" data-severity="Low" onclick="window.deviceSecurityModal.filterBySeverity('Low')">
                     <div class="card-body text-center">
-                        <div class="text-green h3 mb-1">${device.lowCount}</div>
-                        <div class="text-muted small">Low</div>
-                        <div class="text-green fw-bold">${(device.lowVPR || 0).toFixed(1)}</div>
+                        <div class="mb-2">
+                            <i class="fas fa-check-circle fa-2x text-green"></i>
+                        </div>
+                        <div class="text-muted small text-uppercase">Low</div>
+                        <div class="h3 mb-0">${device.lowCount}</div>
+                        <div class="text-green fw-bold">${(device.lowVPR || 0).toFixed(1)} VPR</div>
                     </div>
                 </div>
             </div>
@@ -372,11 +385,9 @@ class DeviceSecurityModal {
             this.deviceGridApi.setFilterModel(null);
             this.activeFilter = null;
 
-            // Reset all card styles
+            // HEX-298: Reset all card styles using CSS classes
             document.querySelectorAll(".vpr-filter-card").forEach(card => {
-                card.style.opacity = "1";
-                card.style.border = "";
-                card.style.transform = "";
+                card.classList.remove("active-critical", "active-high", "active-medium", "active-low");
             });
 
             logger.debug("Filter cleared");
@@ -393,19 +404,17 @@ class DeviceSecurityModal {
                 }
             });
 
-            // Update card visual states
+            // HEX-298: Update card visual states using CSS classes (matches HEX-297 vendor filter pattern)
             document.querySelectorAll(".vpr-filter-card").forEach(card => {
                 const cardSeverity = card.getAttribute("data-severity");
+                const activeClass = `active-${cardSeverity.toLowerCase()}`;
+
+                // Remove all active classes first
+                card.classList.remove("active-critical", "active-high", "active-medium", "active-low");
+
+                // Add active class to the clicked severity
                 if (cardSeverity === severity) {
-                    // Highlight active card
-                    card.style.opacity = "1";
-                    card.style.border = "2px solid var(--hextrackr-primary)";
-                    card.style.transform = "translateY(-2px)";
-                } else {
-                    // Dim inactive cards
-                    card.style.opacity = "0.5";
-                    card.style.border = "";
-                    card.style.transform = "";
+                    card.classList.add(activeClass);
                 }
             });
 
