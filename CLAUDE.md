@@ -56,6 +56,27 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
 * **vulnerability_templates**: CVE templates
 * **backup_metadata**: Backup history with retention policy
 * **audit_logs**: [HEX-254](https://linear.app/hextrackr/issue/HEX-254/implement-unified-logging-system-with-audit-trail) logging system (Session 10/14 complete)
+* **cisco_fixed_versions**: Normalized Cisco fixed versions (HEX-287 Migration 007)
+
+**Vendor Advisory Sync Status** (October 2025):
+
+**Cisco PSIRT** (70 of 88 CVEs synced):
+- **70 advisories synced**: 70 with fixes, 0 no fix available
+- **18 CVEs not applicable**: Ancient CVEs (1999-2001) predate Cisco PSIRT API coverage
+- Count logic uses `cisco_fixed_versions` table (normalized schema from Migration 007)
+- **Expected**: Not all CVEs will sync - API coverage starts ~2010
+
+**Palo Alto Security Advisory** (21 of 32 CVEs synced):
+- **21 advisories synced**: 20 with fixes, 1 no fix available
+- **11 CVEs not applicable**: Generic SSH/crypto CVEs not specific to PAN-OS
+- Count logic excludes empty `first_fixed` arrays (legitimate "no fix yet" cases)
+- **Expected**: Generic infrastructure CVEs (OpenSSH, OpenSSL) won't sync
+
+**Counting Rules** (Applied October 2025):
+- `totalAdvisories`: ALL synced CVEs (including those with `first_fixed: []`)
+- `matchedCount`: CVEs with at least one fixed version
+- `noFixAvailable`: Synced CVEs with `first_fixed: []` (legitimate, not errors)
+- `unsyncedCount`: CVEs that will never sync (not in vendor APIs)
 
 **Quality**: ESLint 9+ | Codacy A+ (12 security issues pending triage)
 

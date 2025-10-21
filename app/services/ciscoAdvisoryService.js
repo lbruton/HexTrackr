@@ -861,16 +861,15 @@ class CiscoAdvisoryService {
 
     /**
      * Get count of advisories with fixed versions available
+     * Uses normalized cisco_fixed_versions table (HEX-287 schema)
      * @async
-     * @returns {Promise<number>} Count of advisories with fixes
+     * @returns {Promise<number>} Count of CVEs with at least one fixed version
      */
     async getMatchedVulnerabilitiesCount() {
         const result = await new Promise((resolve, reject) => {
             this.db.get(`
-                SELECT COUNT(*) as count
-                FROM cisco_advisories
-                WHERE first_fixed IS NOT NULL
-                  AND first_fixed != '[]'
+                SELECT COUNT(DISTINCT cve_id) as count
+                FROM cisco_fixed_versions
             `, (err, row) => {
                 if (err) {
                     reject(err);
@@ -886,10 +885,10 @@ class CiscoAdvisoryService {
     /**
      * Get Cisco advisory sync status
      * @async
-     * @returns {Promise<Object>} Sync status information
+     * @returns {Promise<Object>} Sync status information with detailed breakdown
      */
     async getSyncStatus() {
-        // Get total advisory count
+        // Get total advisory count (all synced CVEs, including those with no fixes)
         const advisoryCountResult = await new Promise((resolve, reject) => {
             this.db.get("SELECT COUNT(*) as count FROM cisco_advisories", (err, row) => {
                 if (err) {
@@ -900,7 +899,7 @@ class CiscoAdvisoryService {
             });
         });
 
-        // Get matched count
+        // Get matched count (CVEs with at least one fixed version in normalized table)
         const matchedCount = await this.getMatchedVulnerabilitiesCount();
 
         // Get total Cisco CVEs count from vulnerabilities table
@@ -910,6 +909,21 @@ class CiscoAdvisoryService {
                 FROM vulnerabilities_current
                 WHERE vendor LIKE '%Cisco%'
                   AND lifecycle_state IN ('active', 'reopened')
+            `, (err, row) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row);
+                }
+            });
+        });
+
+        // Get count of synced advisories with no fixes available yet
+        const noFixAvailableResult = await new Promise((resolve, reject) => {
+            this.db.get(`
+                SELECT COUNT(*) as count
+                FROM cisco_advisories
+                WHERE (first_fixed IS NULL OR first_fixed = '[]')
             `, (err, row) => {
                 if (err) {
                     reject(err);
@@ -930,10 +944,17 @@ class CiscoAdvisoryService {
             });
         });
 
+        const totalCiscoCves = totalCiscoCvesResult?.count || 0;
+        const totalAdvisories = advisoryCountResult?.count || 0;
+        const noFixAvailable = noFixAvailableResult?.count || 0;
+        const unsyncedCount = totalCiscoCves - totalAdvisories;
+
         return {
-            totalCiscoCves: totalCiscoCvesResult?.count || 0,
-            totalAdvisories: advisoryCountResult?.count || 0,
+            totalCiscoCves: totalCiscoCves,
+            totalAdvisories: totalAdvisories,
             matchedCount: matchedCount,
+            noFixAvailable: noFixAvailable,
+            unsyncedCount: unsyncedCount,
             lastSync: metadata?.sync_time || null,
             recordCount: metadata?.record_count || 0,
             syncInProgress: this.syncInProgress
