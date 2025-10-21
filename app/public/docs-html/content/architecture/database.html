@@ -473,13 +473,13 @@
 <td><code>supervisor</code></td>
 <td>TEXT</td>
 <td></td>
-<td>Supervisor name(s)</td>
+<td>Supervisor name(s) in normalized format: &quot;First Last; First Last&quot; (semicolon-delimited for multiple supervisors)</td>
 </tr>
 <tr>
 <td><code>tech</code></td>
 <td>TEXT</td>
 <td></td>
-<td>Assigned technician</td>
+<td>Assigned technician in normalized format: &quot;First Last; First Last&quot; (semicolon-delimited for multiple techs)</td>
 </tr>
 <tr>
 <td><code>status</code></td>
@@ -3003,8 +3003,26 @@ enhanced_unique_key = <span class="hljs-string">`<span class="hljs-subst">${cve}
 <td>HEX-248</td>
 <td>Deletion audit trail (deletion_reason, deleted_by)</td>
 </tr>
+<tr>
+<td><code>012-create-audit-logs.sql</code></td>
+<td>v1.0.67+</td>
+<td>HEX-254</td>
+<td>Unified logging system with audit trail</td>
+</tr>
+<tr>
+<td><code>013-fix-truncated-markdown-templates.sql</code></td>
+<td>v1.0.79</td>
+<td>HEX-286</td>
+<td>Restore truncated ticket markdown templates</td>
+</tr>
+<tr>
+<td><code>014-normalize-supervisor-tech.js</code></td>
+<td>v1.0.94</td>
+<td>HEX-267</td>
+<td>Normalize supervisor/tech fields from &quot;LAST,FIRST&quot; to &quot;First Last&quot; format (Node.js migration)</td>
+</tr>
 </tbody></table>
-<p><strong>Migration Strategy</strong>: Idempotent ALTER TABLE statements executed at runtime (no down migrations)</p>
+<p><strong>Migration Strategy</strong>: Idempotent ALTER TABLE statements executed at runtime (no down migrations). Migration 014 is a Node.js script for data transformation.</p>
 <hr>
 <h2>Database Size & Performance Metrics</h2><p><strong>Typical Production Database</strong>:</p>
 <ul>
