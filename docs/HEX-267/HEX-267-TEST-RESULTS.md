@@ -40,24 +40,24 @@
 ## Sample Transformations
 
 ### Sample 1: XT-0034
-**Before**: `BRYANT, CLIFF; FLORES, JASON`
-**After**: `Cliff Bryant; Jason Flores`
+**Before**: `SMITH, JOHN; DOE, JANE`
+**After**: `John Smith; Jane Doe`
 
 ### Sample 2: XT-0033
-**Before**: `BROWN, JEFF; WAGNER, CLAY`
-**After**: `Jeff Brown; Clay Wagner`
+**Before**: `JOHNSON, ROBERT; WILLIAMS, MARY`
+**After**: `Robert Johnson; Mary Williams`
 
 ### Sample 3: XT-0030 (Triple Supervisor)
-**Before**: `BROWN, HUNTER; BYRD, DAN; THOMAS, DUSTIN`
-**After**: `Hunter Brown; Dan Byrd; Dustin Thomas`
+**Before**: `DAVIS, ALICE; MILLER, BOB; WILSON, CHARLIE`
+**After**: `Alice Davis; Bob Miller; Charlie Wilson`
 
 ### Sample 4: XT-0029
-**Before**: `LAMPE, DANNY; SMITH, MICHAEL`
-**After**: `Danny Lampe; Michael Smith`
+**Before**: `MOORE, DAVID; TAYLOR, EMMA`
+**After**: `David Moore; Emma Taylor`
 
 ### Sample 5: XT-0028
-**Before**: `DREYER, AARON; MCKENZIE, TY`
-**After**: `Aaron Dreyer; Ty Mckenzie`
+**Before**: `ANDERSON, FRANK; JACKSON, GRACE`
+**After**: `Frank Anderson; Grace Jackson`
 
 ---
 

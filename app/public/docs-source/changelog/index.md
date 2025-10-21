@@ -94,6 +94,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 | Version | Release Date | Highlights |
 |---------|--------------|------------|
+| [1.0.94](#changelog/versions/1.0.94) | 2025-10-21 | Supervisor/Tech Field Normalization (HEX-267) |
+| [1.0.93](#changelog/versions/1.0.93) | 2025-10-21 | Unified Modal Design System |
+| [1.0.92](#changelog/versions/1.0.92) | 2025-10-19 | Location Details Modal Enhanced Color Coding |
 | [1.0.91](#changelog/versions/1.0.91) | 2025-10-19 | Fixed Version Display Accuracy |
 | [1.0.90](#changelog/versions/1.0.90) | 2025-10-18 | Location Details Modal Critical Fixes |
 | [1.0.65](#changelog/versions/1.0.65) | 2025-10-13 | Palo Alto Advisory Integration |
