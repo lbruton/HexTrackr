@@ -1234,11 +1234,95 @@ class LocationDetailsModal {
     }
 
     /**
-     * Export location grid data to CSV with comprehensive device and vulnerability data
+     * Calculate fixed version for a single device
+     * Gets highest fixed version from all CVEs for this device
+     * @param {Object} device - Device object with vulnerabilities array
+     * @returns {Promise<string>} Fixed version or "N/A"/"No Fix"
+     */
+    async calculateDeviceFixedVersion(device) {
+        const vendor = device.vendor;
+        const installedVersion = device.installedVersion;
+
+        // Filter to CVEs only
+        const cves = device.vulnerabilities
+            .filter(v => v.cve && v.cve.startsWith("CVE-"))
+            .map(v => v.cve);
+
+        if (cves.length === 0) {
+            return "N/A";
+        }
+
+        // Check if vendor supported
+        const hasVendor = vendor && (vendor.toLowerCase().includes("cisco") || vendor.toLowerCase().includes("palo"));
+        if (!hasVendor) {
+            return "N/A";
+        }
+
+        // Determine which advisory helper to use
+        let advisoryHelper = null;
+        if (vendor.toLowerCase().includes("cisco")) {
+            advisoryHelper = window.ciscoAdvisoryHelper;
+        } else if (vendor.toLowerCase().includes("palo")) {
+            advisoryHelper = window.paloAdvisoryHelper;
+        }
+
+        if (!advisoryHelper) {
+            return "N/A";
+        }
+
+        // Get unique CVEs
+        const uniqueCves = [...new Set(cves)];
+
+        try {
+            // Query all CVEs in parallel
+            const fixedVersionPromises = uniqueCves.map(cve =>
+                advisoryHelper.getFixedVersion(cve, vendor, installedVersion)
+                    .catch(err => {
+                        console.warn(`[LocationDetailsModal] Failed to get fixed version for ${cve}:`, err);
+                        return null;
+                    })
+            );
+
+            const fixedVersions = await Promise.all(fixedVersionPromises);
+
+            // Filter out nulls and deduplicate
+            const validVersions = [...new Set(fixedVersions.filter(v => v !== null && v !== "No Fix"))];
+
+            if (validVersions.length > 0) {
+                // Sort and return highest version
+                validVersions.sort((a, b) => advisoryHelper.compareVersions ? advisoryHelper.compareVersions(a, b) : a.localeCompare(b));
+                return validVersions[0];
+            } else {
+                return "No Fix";
+            }
+        } catch (error) {
+            console.error(`[LocationDetailsModal] Error calculating fixed version for ${device.hostname}:`, error);
+            return "Error";
+        }
+    }
+
+    /**
+     * Calculate fixed versions for all devices
+     * Performs async advisory lookups in parallel for all devices
+     * @param {Array} devices - Array of device objects
+     * @returns {Promise<void>} Modifies devices in place with fixedVersion field
+     */
+    async calculateAllDeviceFixedVersions(devices) {
+        // Perform lookups in parallel for all devices
+        const lookupPromises = devices.map(async (device) => {
+            device.fixedVersion = await this.calculateDeviceFixedVersion(device);
+        });
+
+        await Promise.all(lookupPromises);
+    }
+
+    /**
+     * Export location grid data to CSV with async fixed version calculation
+     * Performs fresh advisory lookups for ALL devices before export
      * Pattern source: device-security-modal.js:790-869 (CSV export pattern)
      * @since v1.0.93
      */
-    exportLocationCsv() {
+    async exportLocationCsv() {
         console.log("[LocationDetailsModal] Exporting location CSV");
 
         // Validate modal state
@@ -1257,7 +1341,19 @@ class LocationDetailsModal {
             return;
         }
 
+        // Show loading toast
+        if (window.vulnManager && typeof window.vulnManager.showToast === "function") {
+            window.vulnManager.showToast("Calculating fixed versions for all devices...", "info");
+        }
+
         const location = this.currentLocation;
+
+        // Clone allDevices to avoid modifying grid state
+        const devices = this.allDevices ? this.allDevices.map(d => ({...d, vulnerabilities: [...(d.vulnerabilities || [])]})) : [];
+
+        // Perform async fixed version lookup for ALL devices
+        await this.calculateAllDeviceFixedVersions(devices);
+
         const csvData = [];
 
         // Extract location metadata
@@ -1317,13 +1413,12 @@ class LocationDetailsModal {
         csvData.push(["Other", otherCount]);
         csvData.push([]);
 
-        // Device data section
+        // Device data section (use calculated devices with fixed versions)
         csvData.push(["Devices"]);
         csvData.push(["Hostname", "Vendor", "Installed Version", "Fixed Version", "CVE Count", "Total VPR", "KEV", "Ticket Count", "Ticket Status"]);
 
-        // Use allDevices (already aggregated with ticket data)
-        if (this.allDevices && this.allDevices.length > 0) {
-            this.allDevices.forEach(device => {
+        if (devices && devices.length > 0) {
+            devices.forEach(device => {
                 csvData.push([
                     device.hostname || "N/A",
                     device.vendor || "N/A",
@@ -1356,10 +1451,10 @@ class LocationDetailsModal {
         document.body.removeChild(link);
 
         if (window.vulnManager && typeof window.vulnManager.showToast === "function") {
-            window.vulnManager.showToast(`Location details exported for ${locationDisplay}`, "success");
+            window.vulnManager.showToast(`Exported ${devices.length} devices with fixed versions for ${locationDisplay}`, "success");
         }
 
-        console.log(`[LocationDetailsModal] Exported CSV for ${locationDisplay}: ${this.allDevices?.length || 0} devices`);
+        console.log(`[LocationDetailsModal] Exported CSV for ${locationDisplay}: ${devices.length} devices with calculated fixed versions`);
     }
 
     /**
