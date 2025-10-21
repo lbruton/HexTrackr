@@ -164,6 +164,25 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
 
 ---
 
+## Context Retrieval Strategy
+
+**Three-Tier Search Hierarchy** - Use these tools in order to maximize efficiency and prevent rebuilding solved problems:
+
+**1. Memento First (Historical Context)** - Query the knowledge graph using `mcp__memento__semantic_search` to find past implementations, architectural decisions, and lessons learned. Use temporal tags to filter: `week-42-2025`, `v1.0.93`, `q4-2025`. Example queries: "modal design patterns unified system", "SRPI workflow scope reduction", "vendor aggregation deduplication bugs". **Why**: Prevents assumption-based development - the HEX-190-193 SRPI cycle revealed 90% of infrastructure already existed, reducing 8 tasks to 4 tasks by searching Memento first.
+
+**2. Claude-Context Second (Current Codebase)** - Use `/codebase-search` for semantic code lookup (275 files, 3280 chunks, last updated 10/18/2025). Example queries: "WebSocket authentication session", "AG-Grid theme configuration", "vendor normalization helpers". Falls back to **Explore agent** (grep/glob) if index unavailable. **Why**: Verifies file:line locations with precision - HEX-155/156 research caught 49-line discrepancies that would have caused implementation failures.
+
+**3. Specialized Agents Third (Deep Analysis)** - Deploy **codebase-navigator** for comprehensive architectural analysis combining semantic search + targeted file reads. Runs in isolated context (saves 20-50K tokens in main session). Deploy **memento-oracle** for historical pattern mining across multiple sessions. **Why**: Prevents architectural misidentification - HEX-156 caught nginx vs Express node-cache confusion that would have invalidated entire implementation strategy.
+
+**SRPI Integration Pattern**:
+- **RESEARCH Phase**: Memento search ("have we solved this before?") → claude-context search ("where is this implemented?") → codebase-navigator ("how does this work?")
+- **PLAN Phase**: Verify ALL assumptions from RESEARCH using claude-context semantic search (NO ASSUMPTIONS rule)
+- **IMPLEMENT Phase**: Use Linear issue descriptions (HEX-XXX) as authoritative source, update descriptions not comments
+
+**Temporal Filtering**: Memento graph contains 497K+ tokens across 100+ sessions. Use taxonomy tags to filter: `TAG: week-XX-2025` for recent work, `TAG: breakthrough` for critical patterns, `TAG: lesson-learned` for anti-patterns, `TAG: reusable` for cross-project patterns. Query recent context: `semantic_search("modal patterns", entity_types: ["HEXTRACKR:FRONTEND:PATTERN"], hybrid_search: true)`.
+
+---
+
 ## MCP Tools & Slash Commands
 
 ### Codebase Indexing & Search (claude-context MCP)
