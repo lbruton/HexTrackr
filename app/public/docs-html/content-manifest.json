@@ -1,5 +1,5 @@
 {
-  "generated": "2025-10-21T13:44:12.613Z",
+  "generated": "2025-10-21T17:19:17.946Z",
   "sections": {
     "api-reference": {
       "title": "Api Reference",
@@ -70,6 +70,11 @@
       "icon": "fas fa-list",
       "indexFile": "changelog/index",
       "children": {
+        "1.0.94": {
+          "file": "changelog/versions/1.0.94",
+          "title": "1.0.94",
+          "path": "changelog/versions/1.0.94.html"
+        },
         "1.0.93": {
           "file": "changelog/versions/1.0.93",
           "title": "1.0.93",
@@ -522,30 +527,10 @@
           "title": "Cisco Psirt Integration",
           "path": "guides/cisco-psirt-integration.html"
         },
-        "css-customization": {
-          "file": "guides/css-customization",
-          "title": "Css Customization",
-          "path": "guides/css-customization.html"
-        },
-        "getting-started": {
-          "file": "guides/getting-started",
-          "title": "Getting Started",
-          "path": "guides/getting-started.html"
-        },
-        "https-setup": {
-          "file": "guides/https-setup",
-          "title": "Https Setup",
-          "path": "guides/https-setup.html"
-        },
         "kev-integration": {
           "file": "guides/kev-integration",
           "title": "Kev Integration",
           "path": "guides/kev-integration.html"
-        },
-        "logging-and-audit-trail": {
-          "file": "guides/logging-and-audit-trail",
-          "title": "Logging And Audit Trail",
-          "path": "guides/logging-and-audit-trail.html"
         },
         "palo-alto-advisory-integration": {
           "file": "guides/palo-alto-advisory-integration",
@@ -601,5 +586,5 @@
       "path": "overview.html"
     }
   },
-  "totalFiles": 118
+  "totalFiles": 115
 }

@@ -2,7 +2,7 @@
 
 Welcome to the HexTrackr changelog! This page tracks all notable changes, features, and fixes across all versions of HexTrackr.
 
-**Current Version**: [v1.0.92](#changelog/versions/1.0.92) - ✅ Released 2025-10-19
+**Current Version**: [v1.0.94](#changelog/versions/1.0.94) - ✅ Released 2025-10-21
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
@@ -14,6 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### Latest Releases
 
+- [**v1.0.94**](#changelog/versions/1.0.94) - 2025-10-21 - ✅ Supervisor/Tech Field Normalization (HEX-267)
+- [**v1.0.93**](#changelog/versions/1.0.93) - 2025-10-21 - ✅ Unified Modal Design System (HEX-269, HEX-298, HEX-308)
 - [**v1.0.92**](#changelog/versions/1.0.92) - 2025-10-19 - ✅ Location Details Modal: Enhanced Color Coding
 - [**v1.0.91**](#changelog/versions/1.0.91) - 2025-10-19 - ✅ Fixed Version Display Accuracy Fix (HEX-299)
 - [**v1.0.90**](#changelog/versions/1.0.90) - 2025-10-18 - ✅ Location Details Modal: Critical Fixes (HEX-296)
