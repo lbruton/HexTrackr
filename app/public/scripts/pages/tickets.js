@@ -152,6 +152,66 @@ class HexagonTicketsManager {
         return digits.padStart(4, "0");
     }
 
+    /**
+     * Normalize person name(s) to "First Last; First Last" format
+     * Handles multiple formats:
+     * - "LAST,FIRST; LAST2,FIRST2" → "First Last; First2 Last2"
+     * - "First Last; First2 Last2" → "First Last; First2 Last2" (pass-through)
+     * - "john smith" → "John Smith" (capitalize)
+     * - "" → "" (empty string preserved)
+     * - "N/A" → "N/A" (pass-through)
+     *
+     * Used for supervisor and tech fields to normalize Hexagon EAM export format
+     * (LAST,FIRST all-caps) to proper case "First Last" format.
+     *
+     * @param {string} input - Raw name(s) from form input (may be LAST,FIRST or First Last)
+     * @returns {string} Normalized name(s) in "First Last; First Last" format
+     */
+    normalizePersonName(input) {
+        if (!input || input === "N/A") {
+            return input;
+        }
+
+        const trimmed = input.trim();
+        if (!trimmed) {return "";}
+
+        // Split on semicolon (multiple people)
+        const people = trimmed.split(";").map(p => p.trim()).filter(Boolean);
+
+        // Transform each person
+        const normalized = people.map(person => {
+            // If no comma, assume "First Last" format (just capitalize)
+            if (!person.includes(",")) {
+                return this.toProperCase(person);
+            }
+
+            // "LAST,FIRST" format - reverse and capitalize
+            const parts = person.split(",").map(p => p.trim());
+            if (parts.length < 2) {
+                return this.toProperCase(person); // Fallback
+            }
+
+            const lastName = this.toProperCase(parts[0]);
+            const firstName = this.toProperCase(parts[1]);
+            return `${firstName} ${lastName}`;
+        });
+
+        // Join multiple people with semicolon-space
+        return normalized.join("; ");
+    }
+
+    /**
+     * Convert string to proper case (capitalize first letter of each word)
+     * Helper function for normalizePersonName()
+     *
+     * @param {string} str - Input string (may be all-caps or lowercase)
+     * @returns {string} String with first letter of each word capitalized
+     */
+    toProperCase(str) {
+        if (!str) {return str;}
+        return str.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+    }
+
     async loadTicketsFromDB() {
         try {
             const response = await authState.authenticatedFetch("/api/tickets");
