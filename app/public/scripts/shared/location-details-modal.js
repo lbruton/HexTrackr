@@ -1234,13 +1234,132 @@ class LocationDetailsModal {
     }
 
     /**
-     * Export location grid data to CSV (stub)
+     * Export location grid data to CSV with comprehensive device and vulnerability data
+     * Pattern source: device-security-modal.js:790-869 (CSV export pattern)
+     * @since v1.0.93
      */
     exportLocationCsv() {
-        console.log("[LocationDetailsModal] Export CSV clicked - feature coming soon");
-        if (window.vulnManager && typeof window.vulnManager.showToast === "function") {
-            window.vulnManager.showToast("Export CSV feature coming soon", "info");
+        console.log("[LocationDetailsModal] Exporting location CSV");
+
+        // Validate modal state
+        const modal = document.getElementById("locationDetailsModal");
+        if (!modal || !modal.classList.contains("show")) {
+            if (window.vulnManager && typeof window.vulnManager.showToast === "function") {
+                window.vulnManager.showToast("No location modal is currently open", "warning");
+            }
+            return;
         }
+
+        if (!this.currentLocation) {
+            if (window.vulnManager && typeof window.vulnManager.showToast === "function") {
+                window.vulnManager.showToast("No location data available for export", "warning");
+            }
+            return;
+        }
+
+        const location = this.currentLocation;
+        const csvData = [];
+
+        // Extract location metadata
+        const locationDisplay = location.location_display || location.location?.toUpperCase() || "N/A";
+        const deviceCount = location.device_count || 0;
+        const totalVPR = location.total_vpr || 0;
+        const kevDeviceCount = location.kev_count || 0;
+        const openTickets = location.open_tickets || 0;
+        const networkSubnet = this.calculateNetworkSubnet(location.device_ips || []);
+
+        // Calculate risk level from VPR
+        let riskLevel = "Low Risk";
+        if (totalVPR >= 90) {riskLevel = "Critical Risk";}
+        else if (totalVPR >= 70) {riskLevel = "High Risk";}
+        else if (totalVPR >= 40) {riskLevel = "Medium Risk";}
+
+        // Severity breakdown
+        const severityBreakdown = location.severity_breakdown || {};
+        const criticalCount = severityBreakdown.Critical?.count || 0;
+        const criticalVpr = severityBreakdown.Critical?.vpr || 0;
+        const highCount = severityBreakdown.High?.count || 0;
+        const highVpr = severityBreakdown.High?.vpr || 0;
+        const mediumCount = severityBreakdown.Medium?.count || 0;
+        const mediumVpr = severityBreakdown.Medium?.vpr || 0;
+        const lowCount = severityBreakdown.Low?.count || 0;
+        const lowVpr = severityBreakdown.Low?.vpr || 0;
+
+        // Vendor breakdown
+        const vendorBreakdown = location.vendor_breakdown || {};
+        const ciscoCount = vendorBreakdown["CISCO"] || 0;
+        const paloCount = vendorBreakdown["Palo Alto"] || 0;
+        const otherCount = vendorBreakdown["Other"] || 0;
+
+        // Build location header section
+        csvData.push(["Location Information"]);
+        csvData.push(["Location", locationDisplay]);
+        csvData.push(["Device Count", deviceCount]);
+        csvData.push(["Total VPR Score", totalVPR.toFixed(1)]);
+        csvData.push(["Risk Level", riskLevel]);
+        csvData.push(["KEV Devices", kevDeviceCount]);
+        csvData.push(["Open Tickets", openTickets]);
+        csvData.push(["Network Subnet", networkSubnet]);
+        csvData.push([]);
+
+        csvData.push(["Severity Breakdown"]);
+        csvData.push(["Severity", "Device Count", "Total VPR"]);
+        csvData.push(["Critical", criticalCount, criticalVpr.toFixed(1)]);
+        csvData.push(["High", highCount, highVpr.toFixed(1)]);
+        csvData.push(["Medium", mediumCount, mediumVpr.toFixed(1)]);
+        csvData.push(["Low", lowCount, lowVpr.toFixed(1)]);
+        csvData.push([]);
+
+        csvData.push(["Vendor Breakdown"]);
+        csvData.push(["Vendor", "Device Count"]);
+        csvData.push(["Cisco", ciscoCount]);
+        csvData.push(["Palo Alto", paloCount]);
+        csvData.push(["Other", otherCount]);
+        csvData.push([]);
+
+        // Device data section
+        csvData.push(["Devices"]);
+        csvData.push(["Hostname", "Vendor", "Installed Version", "Fixed Version", "CVE Count", "Total VPR", "KEV", "Ticket Count", "Ticket Status"]);
+
+        // Use allDevices (already aggregated with ticket data)
+        if (this.allDevices && this.allDevices.length > 0) {
+            this.allDevices.forEach(device => {
+                csvData.push([
+                    device.hostname || "N/A",
+                    device.vendor || "N/A",
+                    device.installedVersion || "N/A",
+                    device.fixedVersion || "N/A",
+                    device.vulnerabilityCount || 0,
+                    (device.totalVpr || 0).toFixed(1),
+                    device.hasKev ? "Yes" : "No",
+                    device.ticketCount || 0,
+                    device.ticketStatus || "None"
+                ]);
+            });
+        }
+
+        // Convert to CSV format with proper escaping
+        const csvContent = csvData.map(row =>
+            row.map(field => `"${String(field).replace(/"/g, "\"\"")}"`).join(",")
+        ).join("\n");
+
+        // Create and download the file
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const link = document.createElement("a");
+        const timestamp = new Date().toISOString().slice(0, 10);
+        const safeLocationName = locationDisplay.replace(/[^a-zA-Z0-9]/g, "_");
+        link.href = URL.createObjectURL(blob);
+        link.download = `location-details-${safeLocationName}-${timestamp}.csv`;
+        link.style.visibility = "hidden";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        if (window.vulnManager && typeof window.vulnManager.showToast === "function") {
+            window.vulnManager.showToast(`Location details exported for ${locationDisplay}`, "success");
+        }
+
+        console.log(`[LocationDetailsModal] Exported CSV for ${locationDisplay}: ${this.allDevices?.length || 0} devices`);
     }
 
     /**

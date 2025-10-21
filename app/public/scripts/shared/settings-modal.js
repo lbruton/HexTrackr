@@ -878,7 +878,7 @@ async function loadCiscoSyncStatus() {
                 }
             }
 
-            // Update statistics
+            // Update statistics with detailed breakdown
             const totalCvesElement = document.getElementById("ciscoTotalCves");
             if (totalCvesElement) {
                 totalCvesElement.textContent = statusData.totalCiscoCves || 0;
@@ -892,6 +892,16 @@ async function loadCiscoSyncStatus() {
             const matchedCountElement = document.getElementById("ciscoMatchedCount");
             if (matchedCountElement) {
                 matchedCountElement.textContent = statusData.matchedCount || 0;
+            }
+
+            const noFixCountElement = document.getElementById("ciscoNoFixCount");
+            if (noFixCountElement) {
+                noFixCountElement.textContent = statusData.noFixAvailable || 0;
+            }
+
+            const unsyncedCountElement = document.getElementById("ciscoUnsyncedCount");
+            if (unsyncedCountElement) {
+                unsyncedCountElement.textContent = statusData.unsyncedCount || 0;
             }
 
             // Update status badge
@@ -954,21 +964,8 @@ async function syncCiscoNow() {
                 statusBadge.className = "badge bg-success";
             }
 
-            // Update statistics
-            const totalCvesElement = document.getElementById("ciscoTotalCves");
-            if (totalCvesElement && result.totalCiscoCves !== undefined) {
-                totalCvesElement.textContent = result.totalCiscoCves;
-            }
-
-            const syncedCountElement = document.getElementById("ciscoSyncedCount");
-            if (syncedCountElement && result.totalAdvisories !== undefined) {
-                syncedCountElement.textContent = result.totalAdvisories;
-            }
-
-            const matchedCountElement = document.getElementById("ciscoMatchedCount");
-            if (matchedCountElement && result.matchedCount !== undefined) {
-                matchedCountElement.textContent = result.matchedCount;
-            }
+            // Reload full status to get all metrics (noFixAvailable, unsyncedCount)
+            await loadCiscoStatus();
 
             // Update last sync time
             const lastSyncElement = document.getElementById("ciscoLastSync");
@@ -977,7 +974,7 @@ async function syncCiscoNow() {
                 lastSyncElement.textContent = syncDate.toLocaleString();
             }
 
-            showNotification(`Cisco advisory sync completed: ${result.totalAdvisories} CVEs matched, ${result.matchedCount} with fixed versions`, "success");
+            showNotification(`Cisco advisory sync completed: ${result.totalAdvisories} synced, ${result.matchedCount} with fixes`, "success");
         } else {
             throw new Error(result.message || result.error || "Unknown sync error");
         }
@@ -1321,7 +1318,7 @@ function updatePaloSyncStatus(status) {
         lastSyncElement.textContent = syncDate.toLocaleString();
     }
 
-    // Update statistics
+    // Update statistics with detailed breakdown
     const totalCvesElement = document.getElementById("paloTotalCves");
     if (totalCvesElement && status.totalPaloCves !== undefined) {
         totalCvesElement.textContent = status.totalPaloCves;
@@ -1335,6 +1332,16 @@ function updatePaloSyncStatus(status) {
     const matchedCountElement = document.getElementById("paloMatchedCount");
     if (matchedCountElement && status.matchedCount !== undefined) {
         matchedCountElement.textContent = status.matchedCount;
+    }
+
+    const noFixCountElement = document.getElementById("paloNoFixCount");
+    if (noFixCountElement && status.noFixAvailable !== undefined) {
+        noFixCountElement.textContent = status.noFixAvailable;
+    }
+
+    const unsyncedCountElement = document.getElementById("paloUnsyncedCount");
+    if (unsyncedCountElement && status.unsyncedCount !== undefined) {
+        unsyncedCountElement.textContent = status.unsyncedCount;
     }
 
     // Update status badge
