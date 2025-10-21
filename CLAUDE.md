@@ -131,6 +131,36 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
 
 ---
 
+## Git Branch Workflow
+
+**CRITICAL**: `main` branch is **PROTECTED** - never merge directly to main
+
+**Branch Strategy**:
+- `dev`: Development branch (default, merge feature branches here)
+- `main`: Production branch (protected, deploy-only)
+- `feature/*`: Feature branches (create from dev, merge back to dev)
+
+**Workflow**:
+1. Create feature branch from `dev`: `git checkout -b feature/hex-XXX-description`
+2. Develop and commit to feature branch
+3. Merge feature branch to `dev`: `git checkout dev && git merge feature/hex-XXX-description`
+4. Deploy `dev` to staging/development environment
+5. After validation, deploy `dev` to production (updates `main` via deployment process)
+
+**Example**:
+```bash
+git checkout dev
+git checkout -b feature/hex-267-supervisor-tech-normalization
+# ... make changes, commit ...
+git checkout dev
+git merge feature/hex-267-supervisor-tech-normalization
+git push origin dev
+```
+
+**Production Deployment**: Code flows dev → production deployment (not dev → main merge)
+
+---
+
 ## Linear Issue Tracking
 
 **Team**: HexTrackr-Dev (primary development team)
