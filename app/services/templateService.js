@@ -702,13 +702,13 @@ Ticket ID: [XT_NUMBER]`;
                 processor: (ticketData) => this.formatDate(ticketData && (ticketData.date_submitted || ticketData.dateSubmitted)) || "[Submitted Date]"
             },
             "[SUPERVISOR]": {
-                description: "Supervisor name",
+                description: "Supervisor name (normalized format: First Last; First Last)",
                 required: false,
                 fallback: "N/A",
                 processor: (ticketData) => (ticketData && ticketData.supervisor) || "N/A"
             },
             "[TECHNICIAN]": {
-                description: "Technician name",
+                description: "Technician name (normalized format: First Last; First Last)",
                 required: false,
                 fallback: "N/A",
                 processor: (ticketData) => (ticketData && ticketData.technician) || "N/A"
