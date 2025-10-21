@@ -1,0 +1,247 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <hr>
+<h2>title: "Version 1.0.93 - Unified Modal Design System"
+date: "2025-10-21"
+version: "1.0.93"
+status: "Released"
+category: "Enhancement"</h2><h1>Version 1.0.93 - Unified Modal Design System</h1><p><strong>Release Status</strong>: ✅ Released<br><strong>Release Date</strong>: 2025-10-21<br><strong>Issues</strong>: <a href="https://linear.app/hextrackr/issue/HEX-269">HEX-269</a>, <a href="https://linear.app/hextrackr/issue/HEX-298">HEX-298</a>, <a href="https://linear.app/hextrackr/issue/HEX-308">HEX-308</a></p>
+<h2>Overview</h2><p>Established a unified design system across all HexTrackr modals with consistent icon-first layouts, prominent severity-based borders, and centralized CSS variables. This release includes cache-busting cleanup, VPR Risk Breakdown card redesign in the Device Security Modal, and Risk Summary card redesign in the Vulnerability Details Modal.</p>
+<h2>Features</h2><h3>HEX-308: Vulnerability Details Modal - Risk Summary Card Redesign</h3><p><strong>Description</strong>: Redesigned the Risk Summary cards in the Vulnerability Details Modal to match the visual design pattern established in the Location Details Modal.</p>
+<p><strong>Key Features</strong>:</p>
+<ul>
+<li><strong>Icon-first layout</strong>: Font Awesome icons (<code>fas fa-*</code>) at 2x size for visual hierarchy</li>
+<li><strong>Total VPR calculation</strong>: Shows aggregate VPR (individual score × affected devices) instead of individual score</li>
+<li><strong>Prominent severity borders</strong>: 2px colored borders using centralized CSS variables</li>
+<li><strong>Equal card sizing</strong>: Uniform heights across all 4 cards (VPR, Devices, First Seen, Last Seen)</li>
+<li><strong>Severity-based theming</strong>: VPR-Critical (red), VPR-High (orange), VPR-Medium (blue), VPR-Low (green)</li>
+</ul>
+<p><strong>Icons Used</strong>:</p>
+<ul>
+<li>Total VPR: <code>fas fa-chart-line</code> (dynamic color based on severity)</li>
+<li>Affected Devices: <code>fas fa-server text-azure</code></li>
+<li>First Seen: <code>fas fa-calendar-plus text-orange</code></li>
+<li>Last Seen: <code>fas fa-calendar-check text-blue</code></li>
+</ul>
+<p><strong>Technical Implementation</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Calculate total VPR (individual score × affected devices)</span>
+<span class="hljs-keyword">const</span> totalVPR = (vprScore * affectedDevices).<span class="hljs-title function_">toFixed</span>(<span class="hljs-number">1</span>);
+
+<span class="hljs-comment">// Determine VPR severity for color coding</span>
+<span class="hljs-keyword">const</span> vprSeverity = vprScore &gt;= <span class="hljs-number">9</span> ? <span class="hljs-string">&#x27;critical&#x27;</span> :
+                   vprScore &gt;= <span class="hljs-number">7</span> ? <span class="hljs-string">&#x27;high&#x27;</span> :
+                   vprScore &gt;= <span class="hljs-number">4</span> ? <span class="hljs-string">&#x27;medium&#x27;</span> : <span class="hljs-string">&#x27;low&#x27;</span>;
+<span class="hljs-keyword">const</span> vprColor = vprScore &gt;= <span class="hljs-number">9</span> ? <span class="hljs-string">&#x27;red&#x27;</span> :
+                vprScore &gt;= <span class="hljs-number">7</span> ? <span class="hljs-string">&#x27;orange&#x27;</span> :
+                vprScore &gt;= <span class="hljs-number">4</span> ? <span class="hljs-string">&#x27;blue&#x27;</span> : <span class="hljs-string">&#x27;green&#x27;</span>;
+
+<span class="hljs-comment">// Apply data-severity attribute for CSS styling</span>
+<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;card card-sm risk-summary-card&quot;</span> <span class="hljs-attr">data-severity</span>=<span class="hljs-string">&quot;vpr-${vprSeverity}&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;card-body text-center&quot;</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;mb-2&quot;</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">i</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;fas fa-chart-line fa-2x text-${vprColor}&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">i</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;text-muted small text-uppercase&quot;</span>&gt;</span>Total VPR<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;h3 mb-0&quot;</span>&gt;</span>${totalVPR}<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span></code></pre><p><strong>CSS Implementation</strong>:</p>
+<pre><code class="language-css"><span class="hljs-comment">/* Risk Summary Cards (Vulnerability Details Modal) */</span>
+<span class="hljs-selector-class">.risk-summary-card</span> {
+    <span class="hljs-attribute">transition</span>: all <span class="hljs-number">0.2s</span> ease;
+    <span class="hljs-attribute">border</span>: <span class="hljs-number">2px</span> solid transparent;
+}
+
+<span class="hljs-selector-class">.modal-body</span> <span class="hljs-selector-class">.risk-summary-card</span><span class="hljs-selector-attr">[data-severity=<span class="hljs-string">&quot;vpr-critical&quot;</span>]</span>,
+<span class="hljs-selector-class">.risk-summary-card</span><span class="hljs-selector-attr">[data-severity=<span class="hljs-string">&quot;vpr-critical&quot;</span>]</span> {
+    <span class="hljs-attribute">border-color</span>: <span class="hljs-built_in">var</span>(--vpr-critical) <span class="hljs-meta">!important</span>;
+    <span class="hljs-attribute">background-color</span>: <span class="hljs-built_in">var</span>(--vpr-critical-bg) <span class="hljs-meta">!important</span>;
+}
+<span class="hljs-comment">/* Similar for vpr-high, vpr-medium, vpr-low, first-seen, last-seen */</span></code></pre><p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/vulnerability-details-modal.js:177-226</code> - Risk Summary card rendering with icons and Total VPR calculation</li>
+<li><code>app/public/styles/shared/cards.css:557-605</code> - <code>.risk-summary-card</code> CSS with centralized theme tokens</li>
+</ul>
+<h3>HEX-298: Device Security Modal - VPR Risk Breakdown Card Redesign</h3><p><strong>Description</strong>: Applied the unified modal design system to the Device Security Modal&#39;s VPR Risk Breakdown cards, replacing inline styles with CSS classes and adding severity icons.</p>
+<p><strong>Key Features</strong>:</p>
+<ul>
+<li><strong>Icon-first layout</strong>: Font Awesome icons for each severity level (fa-2x size)</li>
+<li><strong>CSS class-based state management</strong>: Replaced inline <code>card.style.*</code> with <code>classList.add/remove</code> for active states</li>
+<li><strong>Centralized theme variables</strong>: All colors sourced from <code>css-variables.css</code> (--vpr-critical, --vpr-high, etc.)</li>
+<li><strong>Active state enhancements</strong>: 3px borders with box-shadows on selected severity</li>
+<li><strong>Interactive feedback</strong>: 2px hover transform for better UX</li>
+</ul>
+<p><strong>Icons Used</strong>:</p>
+<ul>
+<li>Critical: <code>fas fa-exclamation-triangle text-red</code></li>
+<li>High: <code>fas fa-exclamation-circle text-orange</code></li>
+<li>Medium: <code>fas fa-info-circle text-blue</code></li>
+<li>Low: <code>fas fa-check-circle text-green</code></li>
+</ul>
+<p><strong>Technical Implementation</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">populateVprSummary</span>(<span class="hljs-params">device</span>) {
+    <span class="hljs-comment">// HEX-298: Updated VPR cards with icons and centralized theme tokens</span>
+    <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&quot;deviceVprSummary&quot;</span>).<span class="hljs-property">innerHTML</span> = <span class="hljs-string">`
+        &lt;div class=&quot;col-lg-3 col-6&quot;&gt;
+            &lt;div class=&quot;card card-sm vpr-filter-card&quot;
+                 data-severity=&quot;Critical&quot;
+                 onclick=&quot;window.deviceSecurityModal.filterBySeverity(&#x27;Critical&#x27;)&quot;&gt;
+                &lt;div class=&quot;card-body text-center&quot;&gt;
+                    &lt;div class=&quot;mb-2&quot;&gt;
+                        &lt;i class=&quot;fas fa-exclamation-triangle fa-2x text-red&quot;&gt;&lt;/i&gt;
+                    &lt;/div&gt;
+                    &lt;div class=&quot;text-muted small text-uppercase&quot;&gt;Critical&lt;/div&gt;
+                    &lt;div class=&quot;h3 mb-0&quot;&gt;<span class="hljs-subst">${device.criticalCount}</span>&lt;/div&gt;
+                    &lt;div class=&quot;text-red fw-bold&quot;&gt;<span class="hljs-subst">${(device.criticalVPR || <span class="hljs-number">0</span>).toFixed(<span class="hljs-number">1</span>)}</span> VPR&lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;!-- Similar for High, Medium, Low --&gt;
+    `</span>;
+}
+
+<span class="hljs-title function_">filterBySeverity</span>(<span class="hljs-params">severity</span>) {
+    <span class="hljs-comment">// HEX-298: Reset all card styles using CSS classes</span>
+    <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelectorAll</span>(<span class="hljs-string">&quot;.vpr-filter-card&quot;</span>).<span class="hljs-title function_">forEach</span>(<span class="hljs-function"><span class="hljs-params">card</span> =&gt;</span> {
+        card.<span class="hljs-property">classList</span>.<span class="hljs-title function_">remove</span>(<span class="hljs-string">&quot;active-critical&quot;</span>, <span class="hljs-string">&quot;active-high&quot;</span>, <span class="hljs-string">&quot;active-medium&quot;</span>, <span class="hljs-string">&quot;active-low&quot;</span>);
+    });
+
+    <span class="hljs-keyword">if</span> (<span class="hljs-variable language_">this</span>.<span class="hljs-property">currentFilter</span> === severity) {
+        <span class="hljs-variable language_">this</span>.<span class="hljs-property">currentFilter</span> = <span class="hljs-literal">null</span>;
+        <span class="hljs-variable language_">this</span>.<span class="hljs-property">gridApi</span>.<span class="hljs-title function_">setFilterModel</span>(<span class="hljs-literal">null</span>);
+    } <span class="hljs-keyword">else</span> {
+        <span class="hljs-variable language_">this</span>.<span class="hljs-property">currentFilter</span> = severity;
+
+        <span class="hljs-comment">// HEX-298: Update card visual states using CSS classes</span>
+        <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">querySelectorAll</span>(<span class="hljs-string">&quot;.vpr-filter-card&quot;</span>).<span class="hljs-title function_">forEach</span>(<span class="hljs-function"><span class="hljs-params">card</span> =&gt;</span> {
+            <span class="hljs-keyword">const</span> cardSeverity = card.<span class="hljs-title function_">getAttribute</span>(<span class="hljs-string">&quot;data-severity&quot;</span>);
+            <span class="hljs-keyword">const</span> activeClass = <span class="hljs-string">`active-<span class="hljs-subst">${cardSeverity.toLowerCase()}</span>`</span>;
+            <span class="hljs-keyword">if</span> (cardSeverity === severity) {
+                card.<span class="hljs-property">classList</span>.<span class="hljs-title function_">add</span>(activeClass);
+            }
+        });
+
+        <span class="hljs-variable language_">this</span>.<span class="hljs-property">gridApi</span>.<span class="hljs-title function_">setFilterModel</span>({
+            <span class="hljs-attr">vprSeverity</span>: {
+                <span class="hljs-attr">type</span>: <span class="hljs-string">&quot;equals&quot;</span>,
+                <span class="hljs-attr">filter</span>: severity
+            }
+        });
+    }
+}</code></pre><p><strong>CSS Implementation</strong>:</p>
+<pre><code class="language-css"><span class="hljs-comment">/* VPR Filter Cards (Device Security Modal) */</span>
+<span class="hljs-selector-class">.vpr-filter-card</span> {
+    <span class="hljs-attribute">cursor</span>: pointer;
+    <span class="hljs-attribute">transition</span>: all <span class="hljs-number">0.2s</span> ease;
+    <span class="hljs-attribute">border</span>: <span class="hljs-number">2px</span> solid transparent;
+}
+
+<span class="hljs-selector-class">.modal-body</span> <span class="hljs-selector-class">.vpr-filter-card</span><span class="hljs-selector-attr">[data-severity=<span class="hljs-string">&quot;Critical&quot;</span>]</span>,
+<span class="hljs-selector-class">.vpr-filter-card</span><span class="hljs-selector-attr">[data-severity=<span class="hljs-string">&quot;Critical&quot;</span>]</span> {
+    <span class="hljs-attribute">border-color</span>: <span class="hljs-built_in">var</span>(--vpr-critical) <span class="hljs-meta">!important</span>;
+    <span class="hljs-attribute">background-color</span>: <span class="hljs-built_in">var</span>(--vpr-critical-bg) <span class="hljs-meta">!important</span>;
+}
+
+<span class="hljs-comment">/* Active state - Critical (Red) */</span>
+<span class="hljs-selector-class">.modal-body</span> <span class="hljs-selector-class">.vpr-filter-card</span><span class="hljs-selector-class">.active-critical</span>,
+<span class="hljs-selector-class">.vpr-filter-card</span><span class="hljs-selector-class">.active-critical</span> {
+    <span class="hljs-attribute">border-color</span>: <span class="hljs-built_in">var</span>(--vpr-critical) <span class="hljs-meta">!important</span>;
+    <span class="hljs-attribute">border-width</span>: <span class="hljs-number">3px</span> <span class="hljs-meta">!important</span>;
+    <span class="hljs-attribute">background-color</span>: <span class="hljs-built_in">var</span>(--vpr-critical-bg) <span class="hljs-meta">!important</span>;
+    <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">translateY</span>(-<span class="hljs-number">2px</span>);
+    <span class="hljs-attribute">box-shadow</span>: <span class="hljs-number">0</span> <span class="hljs-number">4px</span> <span class="hljs-number">12px</span> <span class="hljs-built_in">rgba</span>(<span class="hljs-number">239</span>, <span class="hljs-number">68</span>, <span class="hljs-number">68</span>, <span class="hljs-number">0.4</span>) <span class="hljs-meta">!important</span>;
+}
+<span class="hljs-comment">/* Similar for active-high, active-medium, active-low */</span></code></pre><p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/device-security-modal.js:317-368</code> - VPR card rendering with icons and CSS classes</li>
+<li><code>app/public/scripts/shared/device-security-modal.js:383-422</code> - Filter function using <code>classList</code> instead of inline styles</li>
+<li><code>app/public/styles/shared/cards.css:607-688</code> - <code>.vpr-filter-card</code> CSS with active state management</li>
+</ul>
+<h3>HEX-269: Cache-Busting Version Drift Cleanup</h3><p><strong>Description</strong>: Removed redundant cache-busting version query strings from script includes, as ETag-based cache validation handles automatic cache invalidation.</p>
+<p><strong>Key Insights</strong>:</p>
+<ul>
+<li>Express.static() automatically sends <code>Cache-Control: public, max-age=0</code> and <code>ETag</code> headers based on file modification time</li>
+<li>Browsers perform conditional GET requests using <code>If-None-Match: &lt;etag&gt;</code> header</li>
+<li>Server responds with <code>304 Not Modified</code> if file unchanged, <code>200 OK</code> with new content if modified</li>
+<li>Version query strings (<code>?v=1.0.48-session-fix</code>) were redundant and created maintenance burden</li>
+</ul>
+<p><strong>Technical Implementation</strong>:</p>
+<pre><code class="language-html"><span class="hljs-comment">&lt;!-- BEFORE (vulnerabilities.html:977, tickets.html:1258) --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;scripts/shared/auth-state.js?v=1.0.48-session-fix&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+
+<span class="hljs-comment">&lt;!-- AFTER --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;scripts/shared/auth-state.js&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre><p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/vulnerabilities.html:977</code> - Removed version query string from auth-state.js</li>
+<li><code>app/public/tickets.html:1258</code> - Removed version query string from auth-state.js</li>
+</ul>
+<h2>Implementation Tasks</h2><h3>Completed</h3><ul>
+<li><input checked="" disabled="" type="checkbox"> HEX-269: Remove version query strings from auth-state.js includes</li>
+<li><input checked="" disabled="" type="checkbox"> HEX-308: Add Font Awesome icons to Risk Summary cards</li>
+<li><input checked="" disabled="" type="checkbox"> HEX-308: Implement Total VPR calculation (score × devices)</li>
+<li><input checked="" disabled="" type="checkbox"> HEX-308: Create <code>.risk-summary-card</code> CSS with centralized theme tokens</li>
+<li><input checked="" disabled="" type="checkbox"> HEX-308: Apply equal card sizing with <code>mb-0</code> and <code>fa-2x</code></li>
+<li><input checked="" disabled="" type="checkbox"> HEX-298: Add Font Awesome icons to VPR Risk Breakdown cards</li>
+<li><input checked="" disabled="" type="checkbox"> HEX-298: Replace inline styles with CSS classes for state management</li>
+<li><input checked="" disabled="" type="checkbox"> HEX-298: Create <code>.vpr-filter-card</code> CSS with active state enhancements</li>
+<li><input checked="" disabled="" type="checkbox"> HEX-298: Update filter function to use <code>classList</code> API</li>
+<li><input checked="" disabled="" type="checkbox"> ESLint compliance verified (no errors)</li>
+<li><input checked="" disabled="" type="checkbox"> Docker restart confirmed functionality</li>
+<li><input checked="" disabled="" type="checkbox"> Version bumped to v1.0.93 across 5 files</li>
+</ul>
+<h2>Success Criteria</h2><h3>HEX-308: Vulnerability Details Modal</h3><ul>
+<li><input checked="" disabled="" type="checkbox"> Icons load correctly (Font Awesome, not Tabler)</li>
+<li><input checked="" disabled="" type="checkbox"> All 4 cards have equal heights</li>
+<li><input checked="" disabled="" type="checkbox"> VPR shows Total VPR (7.4 × 306 = 2,264.4), not individual score</li>
+<li><input checked="" disabled="" type="checkbox"> Borders match severity colors (2px baseline)</li>
+<li><input checked="" disabled="" type="checkbox"> Consistent with Location Details Modal design pattern</li>
+</ul>
+<h3>HEX-298: Device Security Modal</h3><ul>
+<li><input checked="" disabled="" type="checkbox"> Icons display for all 4 severity levels</li>
+<li><input checked="" disabled="" type="checkbox"> Active state uses CSS classes (not inline styles)</li>
+<li><input checked="" disabled="" type="checkbox"> 3px borders with box-shadows on active cards</li>
+<li><input checked="" disabled="" type="checkbox"> Colors source from centralized CSS variables</li>
+<li><input checked="" disabled="" type="checkbox"> No inline <code>card.style.*</code> manipulation</li>
+</ul>
+<h3>HEX-269: Cache-Busting Cleanup</h3><ul>
+<li><input checked="" disabled="" type="checkbox"> Version query strings removed from auth-state.js includes</li>
+<li><input checked="" disabled="" type="checkbox"> ETags handle cache invalidation automatically</li>
+<li><input checked="" disabled="" type="checkbox"> No impact on functionality or caching behavior</li>
+</ul>
+<h2>User Impact</h2><p><strong>Before</strong>:</p>
+<ul>
+<li><strong>Vulnerability Details Modal</strong>: Risk Summary cards lacked visual hierarchy, showed individual VPR instead of total, and had inconsistent sizing</li>
+<li><strong>Device Security Modal</strong>: VPR cards used inline styles, had no icons, and lacked visual feedback on selection</li>
+<li><strong>Cache-busting</strong>: Version query strings required manual updates and created maintenance burden</li>
+</ul>
+<p><strong>After</strong>:</p>
+<ul>
+<li><strong>Vulnerability Details Modal</strong>: Icon-first layout with prominent severity borders, Total VPR calculation, and equal card sizing</li>
+<li><strong>Device Security Modal</strong>: Unified design with icons, CSS class-based state management, and enhanced active states (3px borders + shadows)</li>
+<li><strong>Cache-busting</strong>: Automatic ETag-based validation reduces maintenance and ensures correct caching behavior</li>
+</ul>
+<h2>Pattern References</h2><ul>
+<li>Icon-first layout: <code>location-details-modal.js</code> (Location Details Modal card design)</li>
+<li>Font Awesome icons: <code>fas fa-chart-line</code>, <code>fas fa-exclamation-triangle</code>, etc.</li>
+<li>CSS variables: <code>css-variables.css</code> (--vpr-critical, --vpr-high, --vpr-medium, --vpr-low)</li>
+<li>Active state management: <code>classList.add/remove</code> pattern (Bootstrap 5 standard)</li>
+<li>Total VPR calculation: <code>vprScore * affectedDevices</code> (aggregate risk metric)</li>
+</ul>
+<h2>Related Issues</h2><ul>
+<li><a href="https://linear.app/hextrackr/issue/HEX-269">HEX-269</a> - Cache-busting version drift cleanup</li>
+<li><a href="https://linear.app/hextrackr/issue/HEX-298">HEX-298</a> - Device Security Modal VPR Risk Breakdown redesign</li>
+<li><a href="https://linear.app/hextrackr/issue/HEX-308">HEX-308</a> - Vulnerability Details Modal Risk Summary redesign</li>
+<li><a href="https://linear.app/hextrackr/issue/HEX-307">HEX-307</a> - Accidentally completed during HEX-298 implementation</li>
+</ul>
+<hr>
+<p>★ Insight ─────────────────────────────────────</p>
+<ol>
+<li><strong>Design System Unification</strong>: Establishing consistent patterns across modals (icon-first, severity borders, CSS variables) reduces cognitive load and improves maintainability</li>
+<li><strong>CSS Class Over Inline Styles</strong>: Using <code>classList</code> API with predefined CSS classes enables theme switching, A/B testing, and better performance than runtime style manipulation</li>
+<li><strong>ETag-based Caching</strong>: Modern browsers handle cache invalidation automatically via ETags - version query strings are legacy artifacts that add maintenance burden without benefit<br>─────────────────────────────────────────────────</li>
+</ol>
+<p><em>Changelog Version: 1.0.93 | Release Date: 2025-10-21</em></p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
