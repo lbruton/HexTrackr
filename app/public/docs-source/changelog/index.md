@@ -14,7 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### Latest Releases
 
-- [**v1.0.95**](#changelog/versions/1.0.95) - 2025-10-21 - Real-Time API Sync Service Monitoring (HEX-279)
+- [**v1.0.95**](#changelog/versions/1.0.95) - 2025-10-21 - Workspace Menu Reordering (HEX-309)
 - [**v1.0.94**](#changelog/versions/1.0.94) - 2025-10-21 - Supervisor/Tech Field Normalization (HEX-267)
 - [**v1.0.93**](#changelog/versions/1.0.93) - 2025-10-21 - Unified Modal Design System (HEX-269, HEX-298, HEX-308)
 - [**v1.0.92**](#changelog/versions/1.0.92) - 2025-10-19 - Location Details Modal: Enhanced Color Coding
