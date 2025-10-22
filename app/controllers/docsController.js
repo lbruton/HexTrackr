@@ -32,6 +32,12 @@ class DocsController {
  * Helper function to find a section path for a given filename by scanning the content folder
  * Extracted from server.js lines 2560-2582
  * Used by the documentation portal routing system
+ *
+ * @param {string} filename - The HTML filename to search for (e.g., "OVERVIEW.html")
+ * @returns {string|null} The section path without .html extension and using forward slashes, or null if not found
+ * @example
+ * findDocsSectionForFilename("OVERVIEW.html") // Returns "OVERVIEW"
+ * findDocsSectionForFilename("api/endpoints.html") // Returns "api/endpoints"
  */
 function findDocsSectionForFilename(filename) {
     return docsService.findDocsSectionForFilename(filename);
