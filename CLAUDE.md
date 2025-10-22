@@ -19,7 +19,7 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
 **Database**: SQLite (DELETE journal mode) at `/app/data/hextrackr.db`
 **Services**: 20 service files | **Routes**: 14 route modules
 
-**Core Services** (17 total):
+## Core Services
 
 * **DatabaseService**: `services/databaseService.js:23` (DELETE journal mode, backup/restore, schema migrations)
 * **LoggingService**: `services/loggingService.js:45` (category-based, rotating logs, audit trail)
@@ -39,7 +39,7 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
 * **DocsService**: `services/docsService.js:23` (markdown rendering, version docs)
 * **HostnameParserService**: `services/hostnameParserService.js:15` (Pattern 1/2/3 hostname normalization)
 
-**Database Tables** (15 core):
+## Database Tables
 
 * **tickets**: Field operations ticketing (6500+ records, soft delete)
 * **vulnerabilities**: Primary vuln data (3000+ CVEs)
@@ -58,29 +58,9 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
 * **audit_logs**: [HEX-254](https://linear.app/hextrackr/issue/HEX-254/implement-unified-logging-system-with-audit-trail) logging system (Session 10/14 complete)
 * **cisco_fixed_versions**: Normalized Cisco fixed versions (HEX-287 Migration 007)
 
-**Vendor Advisory Sync Status** (October 2025):
 
-**Cisco PSIRT** (70 of 88 CVEs synced):
-- **70 advisories synced**: 70 with fixes, 0 no fix available
-- **18 CVEs not applicable**: Ancient CVEs (1999-2001) predate Cisco PSIRT API coverage
-- Count logic uses `cisco_fixed_versions` table (normalized schema from Migration 007)
-- **Expected**: Not all CVEs will sync - API coverage starts ~2010
 
-**Palo Alto Security Advisory** (21 of 32 CVEs synced):
-- **21 advisories synced**: 20 with fixes, 1 no fix available
-- **11 CVEs not applicable**: Generic SSH/crypto CVEs not specific to PAN-OS
-- Count logic excludes empty `first_fixed` arrays (legitimate "no fix yet" cases)
-- **Expected**: Generic infrastructure CVEs (OpenSSH, OpenSSL) won't sync
-
-**Counting Rules** (Applied October 2025):
-- `totalAdvisories`: ALL synced CVEs (including those with `first_fixed: []`)
-- `matchedCount`: CVEs with at least one fixed version
-- `noFixAvailable`: Synced CVEs with `first_fixed: []` (legitimate, not errors)
-- `unsyncedCount`: CVEs that will never sync (not in vendor APIs)
-
-**Quality**: ESLint 9+ | Codacy A+ (12 security issues pending triage)
-
-**Key Commands**:
+## Key Commands
 
 * Dev: `npm run dev` or `docker-compose up`
 * Test Production: Access via `https://hextrackr.com` (NEVER use HTTP)
@@ -104,8 +84,8 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
 - **Specification + Research** (combined phase): Define WHY (user requirements) + discover WHAT (codebase integration points, risks)
 - **Plan**: Define HOW using Context7 standards, Codacy linting, proper frameworks
 - **Implement**: Break into bite-sized sessions, use specialized agents, checkpoint/rewind workflow
-- Full process guide: `/docs/SRPI/SRPI_PROCESS.md`
-- Templates: `/docs/SRPI/TEMPLATE_*.md` (Specification, Research, Plan, Implement, Changelog)
+- Full process guide: `/docs/SRPI_PROCESS.md`
+- Templates: `/docs/TEMPLATE_*.md` (Specification, Research, Plan, Implement, Changelog)
 
 ---
 
@@ -113,7 +93,7 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
 
 **Core Reference**:
 - MCP Tools Guide: `/docs/MCP_TOOLS.md`
-- Taxonomy: `TAXONOMY.md` (Memento entity naming)
+- Taxonomy: `/docs/TAXONOMY.md` (Memento entity naming)
 
 **Workflow Guides**:
 - SRPI Process: `/docs/SRPI_PROCESS.md`
@@ -123,7 +103,7 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
 - Location: `/app/public/docs-source/changelog/versions/`
 - Format: Each version gets its own file (e.g., `1.0.67.md`)
 - Index: `/app/public/docs-source/changelog/index.md` (links to all versions)
-- Template: `/docs/SRPI/TEMPLATE_CHANGELOG.md`
+- Template: `/docs/TEMPLATE_CHANGELOG.md`
 - **Version Strategy**: Each HEX-254 session gets a new patch version
   - Session 3 → v1.0.67
   - Session 4 → v1.0.68
@@ -175,7 +155,7 @@ git push origin dev
 **Purpose**: Offload complex searches to isolated context windows - preserves main session tokens for actual implementation work
 
 **Search Strategy** (use in this order to avoid assumptions):
-1. `/codebase-search` - Fast semantic search (if codebase indexed) - USE FIRST
+1. `/codebase-search` - Fast semantic search (if codebase indexed) - USE FIRST, If index is older than 8 hours use `/codebase-index` to re-index. 
 2. **Explore agent** - Grep/glob-based keyword search (fallback if index unavailable)
 3. **codebase-navigator** - Custom agent combining claude-context semantic search + file reads for comprehensive architectural analysis
 
