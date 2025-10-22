@@ -325,7 +325,23 @@ class TicketController {
     /**
      * Get address suggestions for autofill based on site and location
      * Returns most recent addresses (shipping and return) from matching tickets
-     * @route GET /api/tickets/address-suggestions?site=XXX&location=YYY
+     * Used by ticket creation form to auto-populate shipping/return address fields
+     *
+     * @async
+     * @param {Object} req - Express request object
+     * @param {Object} req.query - Query parameters
+     * @param {string} req.query.site - Site identifier (e.g., "LAX", "DFW")
+     * @param {string} req.query.location - Location within site (e.g., "Building A", "Floor 3")
+     * @param {Object} res - Express response object
+     * @returns {Promise<void>} Sends JSON response with address suggestions:
+     *   - 200: {success: true, data: {shippingAddress: string, returnAddress: string}}
+     *   - 400: {success: false, error: "site and location query parameters are required"}
+     *   - 500: {success: false, error: "Failed to fetch address suggestions", details: string}
+     * @throws {Error} Caught and returned as 500 response if TicketService.getAddressesBySiteLocation fails
+     * @route GET /api/tickets/address-suggestions
+     * @example
+     * // GET /api/tickets/address-suggestions?site=LAX&location=Building%20A
+     * // Returns: {success: true, data: {shippingAddress: "...", returnAddress: "..."}}
      */
     static async getAddressSuggestions(req, res) {
         try {

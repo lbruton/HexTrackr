@@ -62,20 +62,28 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
 
 ## Key Commands
 
-* Dev: `npm run dev` or `docker-compose up`
-* Test Production: Access via `https://hextrackr.com` (NEVER use HTTP)
 * Lint: `npm run lint`
 * Docs: `npm run docs:generate`
 * Database: `npm run db:backup`, `npm run db:restore`, `npm run db:migrate`
+
+## Testing & Development
+
+**Docker Service**: HexTrackr runs in Docker container `hextrackr` on port 8989
+**Access URL**: https://dev.hextrackr.com (Docker must be running)
+**Database Location**: Inside Docker volume `hextrackr-database` (NOT in project directory)
+
+**Testing Workflow**:
+- **Frontend changes**: Refresh browser (no restart needed)
+- **Backend changes**: `docker-compose restart hextrackr` (or `docker restart hextrackr`)
+- **Database changes**: Use `npm run db:migrate` (runs inside container)
+
+**Important**: Do NOT run `npm run dev` for testing - Docker is already running the server.
+Only use `npm run dev` if you're testing without Docker (rare).
 
 ## Coding Style & Naming Conventions
 - JavaScript: 4-space indentation, double quotes, required semicolons (`@stylistic/quotes` and `@stylistic/semi`). Prefer `const`/`let`; `no-var` is enforced.
 - Lint errors block CI; run `npm run eslint:fix` and `npm run stylelint:fix` before committing CSS or JS-heavy changes.
 - Folder naming mirrors feature areas (e.g., `controllers`, `services`); add new modules under the closest existing category for discoverability.
-
-## Security & Configuration Tips
-- Generate a strong `SESSION_SECRET` (`node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`) and store cert paths when enabling HTTPS (`USE_HTTPS=true` with `./scripts/setup-ssl.sh`).
-- Never commit files from `/secrets`, `/certs`, `hextrackr.db`, or any `.env`; add new sensitive paths to `.gitignore` where necessary.
 
 ---
 

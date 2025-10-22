@@ -19,7 +19,7 @@
 </tr>
 </thead>
 <tbody><tr>
-<td><code>server.js</code> (~557 lines)</td>
+<td><code>server.js</code> (~831 lines)</td>
 <td>Main application runtime (orchestration + initialization)</td>
 <td><code>/app/public/</code></td>
 </tr>
@@ -69,17 +69,17 @@
 </thead>
 <tbody><tr>
 <td><code>/app/controllers/</code></td>
-<td>11 controller modules</td>
-<td>Singleton (6), Constructor (4), Functional (1)</td>
+<td>13 controller modules</td>
+<td>Singleton (8), Constructor (3), Module Exports (1), Functional (1)</td>
 </tr>
 <tr>
 <td><code>/app/services/</code></td>
-<td>18 service modules</td>
+<td>20 service modules</td>
 <td>Functional exports with dependency injection</td>
 </tr>
 <tr>
 <td><code>/app/routes/</code></td>
-<td>12 route definition files</td>
+<td>15 route definition files</td>
 <td>Express router pattern</td>
 </tr>
 <tr>
@@ -163,15 +163,27 @@
 </tr>
 <tr>
 <td><code>docsController.js</code></td>
-<td>Constructor</td>
-<td>2 instance methods</td>
-<td><code>constructor()</code> - Direct instantiation</td>
+<td>Module Exports</td>
+<td>2 exported functions</td>
+<td>Instance created internally, methods exported as wrappers</td>
 </tr>
 <tr>
 <td><code>importController.js</code></td>
 <td>Functional</td>
 <td>6 exported functions</td>
 <td><code>setProgressTracker(tracker)</code></td>
+</tr>
+<tr>
+<td><code>locationController.js</code> <em>(v1.0.93+, HEX-292)</em></td>
+<td>Singleton</td>
+<td>3 static methods</td>
+<td><code>initialize(db)</code></td>
+</tr>
+<tr>
+<td><code>auditLogController.js</code> <em>(v1.0.67+, HEX-254)</em></td>
+<td>Singleton</td>
+<td>3 static methods</td>
+<td><code>initialize()</code></td>
 </tr>
 </tbody></table>
 <h3>Service Files</h3><table>
@@ -275,7 +287,7 @@
 </tbody></table>
 <hr>
 <h2>Controller Patterns</h2><p>The backend uses three distinct controller patterns, balancing consistency with flexibility based on controller requirements:</p>
-<h3>Singleton Pattern Controllers</h3><p>Six controllers implement the singleton pattern (<code>VulnerabilityController</code>, <code>TicketController</code>, <code>BackupController</code>, <code>TemplateController</code>, <code>AuthController</code>, <code>PreferencesController</code>):</p>
+<h3>Singleton Pattern Controllers</h3><p>Eight controllers implement the singleton pattern (<code>VulnerabilityController</code>, <code>TicketController</code>, <code>BackupController</code>, <code>TemplateController</code>, <code>AuthController</code>, <code>PreferencesController</code>, <code>LocationController</code>, <code>AuditLogController</code>):</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">VulnerabilityController</span> {
     <span class="hljs-keyword">static</span> instance = <span class="hljs-literal">null</span>;
 
@@ -307,7 +319,7 @@
 <li>All route methods are static</li>
 <li>Throws error if accessed before initialization</li>
 </ul>
-<h3>Constructor Pattern Controllers</h3><p>Four controllers use the constructor pattern (<code>KevController</code>, <code>CiscoController</code>, <code>PaloAltoController</code>, <code>DocsController</code>). These controllers instantiate new instances via routes, providing flexibility for dependency injection:</p>
+<h3>Constructor Pattern Controllers</h3><p>Three controllers use the constructor pattern (<code>KevController</code>, <code>CiscoController</code>, <code>PaloAltoController</code>). These controllers instantiate new instances via routes, providing flexibility for dependency injection:</p>
 <p><strong>KevController (Constructor with factory function in routes):</strong></p>
 <pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">KevController</span> {
     <span class="hljs-title function_">constructor</span>(<span class="hljs-params">db</span>) {
@@ -348,6 +360,45 @@
 <li>Instance methods (not static)</li>
 <li>Route files use factory functions that return configured routers</li>
 <li>Flexible for controllers with varying dependencies</li>
+</ul>
+<h3>Module Exports Pattern Controllers</h3><p>One controller (<code>DocsController</code>) uses the module exports with internal instance pattern:</p>
+<p><strong>DocsController (Module Exports with Internal Instance):</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">DocsController</span> {
+    <span class="hljs-keyword">async</span> <span class="hljs-title function_">getStats</span>(<span class="hljs-params"></span>) {
+        <span class="hljs-keyword">try</span> {
+            <span class="hljs-keyword">const</span> stats = <span class="hljs-keyword">await</span> docsService.<span class="hljs-title function_">computeStats</span>();
+            <span class="hljs-keyword">return</span> {
+                <span class="hljs-attr">apiEndpoints</span>: stats.<span class="hljs-property">apiEndpoints</span>,
+                <span class="hljs-attr">jsFunctions</span>: stats.<span class="hljs-property">jsFunctions</span>,
+                <span class="hljs-attr">frameworks</span>: stats.<span class="hljs-property">frameworks</span>,
+                <span class="hljs-attr">computedAt</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>().<span class="hljs-title function_">toISOString</span>()
+            };
+        } <span class="hljs-keyword">catch</span> (error) {
+            <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&quot;DocsController.getStats failed:&quot;</span>, error);
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&quot;Failed to compute documentation statistics&quot;</span>);
+        }
+    }
+}
+
+<span class="hljs-comment">// Export controller instance for route handlers</span>
+<span class="hljs-keyword">const</span> docsController = <span class="hljs-keyword">new</span> <span class="hljs-title class_">DocsController</span>();
+
+<span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = {
+    <span class="hljs-attr">getStats</span>: <span class="hljs-function">() =&gt;</span> docsController.<span class="hljs-title function_">getStats</span>(),
+    findDocsSectionForFilename
+};</code></pre><p><strong>Route Usage:</strong></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> <span class="hljs-title class_">DocsController</span> = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;../controllers/docsController&quot;</span>);
+
+router.<span class="hljs-title function_">get</span>(<span class="hljs-string">&quot;/stats&quot;</span>, requireAuth, <span class="hljs-title function_">async</span> (req, res) =&gt; {
+    <span class="hljs-keyword">const</span> stats = <span class="hljs-keyword">await</span> <span class="hljs-title class_">DocsController</span>.<span class="hljs-title function_">getStats</span>();
+    res.<span class="hljs-title function_">json</span>(stats);
+});</code></pre><p><strong>Characteristics:</strong></p>
+<ul>
+<li>Class-based internally but exports wrapper functions</li>
+<li>Single instance created within the module</li>
+<li>Routes import and call exported functions directly (no factory pattern)</li>
+<li>Simpler than constructor pattern when no dynamic dependencies needed</li>
+<li>Hybrid approach: object-oriented internally, functional externally</li>
 </ul>
 <h3>Functional Pattern Controllers</h3><p>One controller (<code>ImportController</code>) uses functional exports:</p>
 <p><strong>ImportController (Functional exports):</strong></p>

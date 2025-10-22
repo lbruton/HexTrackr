@@ -66,6 +66,15 @@ category: "Bug Fix"</h2><h1>Version 1.0.101 - CVE Reference Links Open in Multip
 </ul>
 <h2>Documentation Improvements</h2><ul>
 <li><strong>JSDoc</strong>: Fixed documentation for <code>findDocsSectionForFilename</code> in <code>app/controllers/docsController.js</code> (<a href="https://linear.app/hextrackr/issue/DOCS-56">DOCS-56</a>)</li>
+<li><strong>Content</strong>: Fixed inaccurate controller count in <code>architecture/backend.md</code> - Updated from 11 to 13 controllers, added missing <code>locationController.js</code> and <code>auditLogController.js</code> documentation (<a href="https://linear.app/hextrackr/issue/DOCS-57">DOCS-57</a>)</li>
+<li><strong>Content</strong>: Fixed three inaccuracies in <code>architecture/backend.md</code> - Updated <code>server.js</code> line count from ~557 to ~831 lines, corrected service module count from 18 to 20, and corrected route module count from 12 to 15 (<a href="https://linear.app/hextrackr/issue/DOCS-58">DOCS-58</a>)</li>
+<li><strong>JSDoc</strong>: Fixed documentation for <code>getStats</code> in <code>app/controllers/docsController.js</code> - Added @async, @returns, @throws, and @example tags for complete API documentation (<a href="https://linear.app/hextrackr/issue/DOCS-59">DOCS-59</a>)</li>
+<li><strong>Content</strong>: Fixed DocsController pattern incorrectly documented as &quot;Constructor pattern&quot; in <code>architecture/backend.md</code> - Corrected to &quot;Module Exports&quot; pattern with new dedicated section explaining the hybrid internal instance approach (<a href="https://linear.app/hextrackr/issue/DOCS-60">DOCS-60</a>)</li>
+<li><strong>JSDoc</strong>: Fixed documentation for <code>getAddressSuggestions</code> in <code>app/controllers/ticketController.js</code> - Added @async, @param, @returns, @throws, and @example tags for complete API documentation of address autofill endpoint (<a href="https://linear.app/hextrackr/issue/DOCS-61">DOCS-61</a>)</li>
+<li><strong>Content</strong>: Fixed incomplete DocsController pattern example in <code>architecture/backend.md</code> - Added missing try-catch error handling with console.error logging and custom error message that exists in actual implementation (<a href="https://linear.app/hextrackr/issue/DOCS-62">DOCS-62</a>)</li>
+</ul>
+<h2>Code Quality Improvements</h2><ul>
+<li><strong>Cleanup</strong>: Removed debug console.log from <code>app/public/scripts/shared/location-details-modal.js:1062</code> (<a href="https://linear.app/hextrackr/issue/HEX-317">HEX-317</a>)</li>
 </ul>
 <hr>
 <p><strong>Sprint</strong>: HEX-314 Bug Fix<br><strong>Impact</strong>: Low-risk, one-word change with high UX improvement<br><strong>Files Changed</strong>: 1 file, 1 line modified</p>
