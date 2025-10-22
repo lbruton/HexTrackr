@@ -614,6 +614,7 @@ class PaloAltoService {
             noFixAvailable: noFixAvailable,
             unsyncedCount: unsyncedCount,
             lastSync: metadata?.sync_time || null,
+            nextSync: metadata?.next_sync_time || null,
             recordCount: metadata?.record_count || 0,
             syncInProgress: this.syncInProgress
         };
@@ -626,11 +627,14 @@ class PaloAltoService {
      * @returns {Promise<void>}
      */
     async updateSyncMetadata(recordCount) {
+        // Calculate next sync time (24 hours from now)
+        const nextSyncTime = new Date(Date.now() + (24 * 60 * 60 * 1000)).toISOString();
+
         await new Promise((resolve, reject) => {
             this.db.run(`
-                INSERT INTO sync_metadata (sync_type, sync_time, version, record_count)
-                VALUES ('palo_alto', ?, NULL, ?)
-            `, [this.lastSyncTime, recordCount], (err) => {
+                INSERT INTO sync_metadata (sync_type, sync_time, next_sync_time, version, record_count)
+                VALUES ('palo_alto', ?, ?, NULL, ?)
+            `, [this.lastSyncTime, nextSyncTime, recordCount], (err) => {
                 if (err) {
                     reject(err);
                 } else {

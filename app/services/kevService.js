@@ -78,6 +78,7 @@ class KevService {
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     sync_type TEXT NOT NULL,
                     sync_time TIMESTAMP NOT NULL,
+                    next_sync_time TIMESTAMP,
                     version TEXT,
                     record_count INTEGER,
                     status TEXT DEFAULT 'completed',
@@ -88,7 +89,7 @@ class KevService {
 
             await this.db.run("CREATE INDEX IF NOT EXISTS idx_sync_metadata_type_time ON sync_metadata(sync_type, sync_time DESC)");
 
-            _log("info", "KEV database tables initialized");
+            _log("info", "KEV database tables initialized (HEX-279: next_sync_time column included)");
         } catch (error) {
             _log("error", "Failed to initialize KEV tables:", error);
         }
@@ -386,6 +387,7 @@ class KevService {
             totalKevs: kevCountResult?.count || 0,
             matchedCount: matchedCount,
             lastSync: metadata?.sync_time || null,
+            nextSync: metadata?.next_sync_time || null,
             catalogVersion: metadata?.version || null,
             syncInProgress: this.syncInProgress
         };
@@ -399,11 +401,14 @@ class KevService {
      * @returns {Promise<void>}
      */
     async updateSyncMetadata(version, recordCount) {
+        // Calculate next sync time (24 hours from now)
+        const nextSyncTime = new Date(Date.now() + (24 * 60 * 60 * 1000)).toISOString();
+
         await new Promise((resolve, reject) => {
             this.db.run(`
-                INSERT INTO sync_metadata (sync_type, sync_time, version, record_count)
-                VALUES ('kev', ?, ?, ?)
-            `, [this.lastSyncTime, version, recordCount], (err) => {
+                INSERT INTO sync_metadata (sync_type, sync_time, next_sync_time, version, record_count)
+                VALUES ('kev', ?, ?, ?, ?)
+            `, [this.lastSyncTime, nextSyncTime, version, recordCount], (err) => {
                 if (err) {reject(err);}
                 else {resolve();}
             });

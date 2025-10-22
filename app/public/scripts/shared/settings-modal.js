@@ -137,6 +137,12 @@ logger.debug("ui", "HexTrackr Settings Modal (shared) loaded successfully");
                 this.modal.setAttribute("data-bs-theme", currentTheme);
             }
             refreshStats();
+            startSyncStatusPolling(); // HEX-279: Start countdown timers
+        });
+
+        // Stop polling when modal is hidden
+        this.modal.addEventListener("hidden.bs.modal", () => {
+            stopSyncStatusPolling(); // HEX-279: Clean up countdown timers
         });
         
         // Cisco credential management
@@ -2185,6 +2191,150 @@ async function importCSV(type) {
     } catch (error) {
         logger.error("ui", "Error setting up import:", error);
         showNotification(`Import setup failed: ${error.message}`, "danger");
+    }
+}
+
+// ========================================
+// HEX-279: Sync Status Countdown Timers & Health Indicators
+// ========================================
+
+/**
+ * Global countdown timer state
+ */
+const syncCountdownTimers = {
+    cisco: null,
+    palo: null,
+    kev: null
+};
+
+/**
+ * Start countdown timer for a service
+ * @param {string} serviceType - Service type ('cisco', 'palo', or 'kev')
+ * @param {string} nextSyncTime - ISO timestamp of next sync
+ */
+function startSyncCountdown(serviceType, nextSyncTime) {
+    // Clear existing timer if any
+    if (syncCountdownTimers[serviceType]) {
+        clearInterval(syncCountdownTimers[serviceType]);
+    }
+
+    const countdownElement = document.getElementById(`${serviceType}NextSync`);
+    if (!countdownElement) {return;}
+
+    const updateCountdown = () => {
+        if (!nextSyncTime) {
+            countdownElement.textContent = "Not scheduled";
+            return;
+        }
+
+        const now = Date.now();
+        const next = new Date(nextSyncTime).getTime();
+        const remaining = next - now;
+
+        if (remaining <= 0) {
+            countdownElement.textContent = "Syncing soon...";
+            return;
+        }
+
+        const hours = Math.floor(remaining / (1000 * 60 * 60));
+        const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+
+        countdownElement.textContent = `Next: ${hours}h ${minutes}m ${seconds}s`;
+    };
+
+    // Update immediately
+    updateCountdown();
+
+    // Update every second
+    syncCountdownTimers[serviceType] = setInterval(updateCountdown, 1000);
+}
+
+/**
+ * Update health indicator badge based on last sync freshness
+ * @param {string} serviceType - Service type ('cisco', 'palo', or 'kev')
+ * @param {string} lastSyncTime - ISO timestamp of last sync
+ */
+function updateSyncHealthBadge(serviceType, lastSyncTime) {
+    const badge = document.getElementById(`${serviceType}HealthBadge`);
+    if (!badge) {return;}
+
+    if (!lastSyncTime) {
+        badge.className = "badge badge-sm bg-secondary";
+        badge.innerHTML = "<i class=\"fas fa-circle\" style=\"font-size: 0.5rem;\"></i>";
+        return;
+    }
+
+    const hoursSinceSync = (Date.now() - new Date(lastSyncTime).getTime()) / (1000 * 60 * 60);
+
+    if (hoursSinceSync < 25) {
+        // Healthy - synced within last 25 hours
+        badge.className = "badge badge-sm bg-success";
+        badge.innerHTML = "<i class=\"fas fa-circle\" style=\"font-size: 0.5rem;\"></i>";
+    } else if (hoursSinceSync < 48) {
+        // Delayed - synced 25-48 hours ago
+        badge.className = "badge badge-sm bg-warning";
+        badge.innerHTML = "<i class=\"fas fa-circle\" style=\"font-size: 0.5rem;\"></i>";
+    } else {
+        // Stale - synced over 48 hours ago
+        badge.className = "badge badge-sm bg-danger";
+        badge.innerHTML = "<i class=\"fas fa-circle\" style=\"font-size: 0.5rem;\"></i>";
+    }
+}
+
+/**
+ * Poll unified sync status and update all countdown timers
+ */
+async function pollUnifiedSyncStatus() {
+    try {
+        const response = await authState.authenticatedFetch("/api/sync/status");
+        if (!response.ok) {
+            throw new Error(`Status check failed: ${response.statusText}`);
+        }
+
+        const status = await response.json();
+
+        // Update all three services
+        for (const service of ["cisco", "palo", "kev"]) {
+            if (status[service]) {
+                startSyncCountdown(service, status[service].nextSync);
+                updateSyncHealthBadge(service, status[service].lastSync);
+            }
+        }
+    } catch (error) {
+        logger.error("ui", "Failed to poll sync status:", error);
+    }
+}
+
+/**
+ * Start polling sync status (called when settings modal opens)
+ */
+function startSyncStatusPolling() {
+    // Initial poll
+    pollUnifiedSyncStatus();
+
+    // Poll every 60 seconds
+    if (window.syncStatusPollInterval) {
+        clearInterval(window.syncStatusPollInterval);
+    }
+    window.syncStatusPollInterval = setInterval(pollUnifiedSyncStatus, 60000);
+}
+
+/**
+ * Stop polling sync status (called when settings modal closes)
+ */
+function stopSyncStatusPolling() {
+    if (window.syncStatusPollInterval) {
+        clearInterval(window.syncStatusPollInterval);
+        window.syncStatusPollInterval = null;
+    }
+
+    // Clear all countdown timers
+    for (const service in syncCountdownTimers) {
+        if (syncCountdownTimers[service]) {
+            clearInterval(syncCountdownTimers[service]);
+            syncCountdownTimers[service] = null;
+        }
     }
 }
 

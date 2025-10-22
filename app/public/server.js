@@ -67,6 +67,7 @@ const templateRoutes = require("../routes/templates");
 const kevRoutes = require("../routes/kev");
 const ciscoRoutes = require("../routes/cisco"); // HEX-141: Cisco PSIRT advisory sync
 const paloRoutes = require("../routes/palo-alto"); // HEX-209: Palo Alto advisory sync
+const syncRoutes = require("../routes/sync"); // HEX-279: Unified sync status endpoint
 const deviceRoutes = require("../routes/devices"); // HEX-101: Device statistics endpoint
 const authRoutes = require("../routes/auth");
 const preferencesRoutes = require("../routes/preferences"); // HEX-138: User preferences API
@@ -292,6 +293,7 @@ async function initializeApplication() {
     app.use("/api/kev", kevRoutes(db));
     app.use("/api/cisco", ciscoRoutes(db, PreferencesController.getInstance().preferencesService)); // HEX-141: Cisco PSIRT advisory sync
     app.use("/api/palo", paloRoutes(db, PreferencesController.getInstance().preferencesService)); // HEX-209: Palo Alto advisory sync
+    app.use("/api/sync", syncRoutes(db, PreferencesController.getInstance().preferencesService)); // HEX-279: Unified sync status
     app.use("/api/devices", deviceRoutes); // HEX-101: Device statistics endpoint
     app.use("/api/auth", authRoutes);
     app.use("/api/preferences", preferencesRoutes); // HEX-138: User preferences
@@ -515,6 +517,19 @@ function startCiscoBackgroundSync(db) {
         runSync();
     }, STARTUP_DELAY);
 
+    // HEX-279: Store initial next_sync_time for countdown timer
+    const ciscoNextSync = new Date(Date.now() + STARTUP_DELAY).toISOString();
+    db.run(
+        `INSERT INTO sync_metadata (sync_type, sync_time, next_sync_time, version, record_count, status)
+         VALUES ('cisco', datetime('now'), ?, 'pending', 0, 'scheduled')`,
+        [ciscoNextSync],
+        (err) => {
+            if (err) {
+                console.warn("Failed to store initial Cisco sync metadata:", err.message);
+            }
+        }
+    );
+
     // Schedule recurring sync every 24 hours
     setInterval(runSync, SYNC_INTERVAL);
 
@@ -571,6 +586,19 @@ function startCiscoBackgroundSync(db) {
     setTimeout(() => {
         runPaloSync();
     }, PALO_STARTUP_DELAY);
+
+    // HEX-279: Store initial next_sync_time for countdown timer
+    const paloNextSync = new Date(Date.now() + PALO_STARTUP_DELAY).toISOString();
+    db.run(
+        `INSERT INTO sync_metadata (sync_type, sync_time, next_sync_time, version, record_count, status)
+         VALUES ('palo', datetime('now'), ?, 'pending', 0, 'scheduled')`,
+        [paloNextSync],
+        (err) => {
+            if (err) {
+                console.warn("Failed to store initial Palo Alto sync metadata:", err.message);
+            }
+        }
+    );
 
     // Schedule recurring sync every 24 hours
     setInterval(runPaloSync, SYNC_INTERVAL);
@@ -632,6 +660,19 @@ function startCiscoBackgroundSync(db) {
     setTimeout(() => {
         runKevSync();
     }, KEV_STARTUP_DELAY);
+
+    // HEX-279: Store initial next_sync_time for countdown timer
+    const kevNextSync = new Date(Date.now() + KEV_STARTUP_DELAY).toISOString();
+    db.run(
+        `INSERT INTO sync_metadata (sync_type, sync_time, next_sync_time, version, record_count, status)
+         VALUES ('kev', datetime('now'), ?, 'pending', 0, 'scheduled')`,
+        [kevNextSync],
+        (err) => {
+            if (err) {
+                console.warn("Failed to store initial KEV sync metadata:", err.message);
+            }
+        }
+    );
 
     // Schedule recurring sync every 24 hours
     setInterval(runKevSync, SYNC_INTERVAL);
