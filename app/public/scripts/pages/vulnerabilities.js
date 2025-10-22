@@ -213,7 +213,11 @@ function setupVendorToggle() {
 
 /**
  * Setup vendor dropdown sync with radio buttons
- * When dropdown changes, update radio buttons to match
+ * HEX-310: Decoupled from chart filtering - dropdown now only controls workspace views
+ * Radio buttons remain the sole control for charts
+ *
+ * Workspace filtering is handled by VulnerabilitySearchManager (vulnerability-search.js:54-57)
+ * which listens to the dropdown and calls dataManager.filterData()
  */
 function setupVendorDropdownSync() {
     const vendorDropdown = document.getElementById("vendorFilter");
@@ -224,20 +228,32 @@ function setupVendorDropdownSync() {
     vendorDropdown.addEventListener("change", async (e) => {
         const selectedVendor = e.target.value; // "" = All, "CISCO", "Palo Alto", "Other"
 
-        // Find matching radio button and check it
-        vendorRadios.forEach(radio => {
-            const label = document.querySelector(`label[for="${radio.id}"]`);
-            const radioVendor = label.dataset.vendor;
+        logger.debug("ui", `Vendor dropdown changed to: ${selectedVendor || "All Vendors"}`);
 
-            if (radioVendor === selectedVendor) {
-                // Only trigger change if not already checked (prevents infinite loop)
-                if (!radio.checked) {
-                    radio.checked = true;
-                    // Trigger change event to update stats/charts
-                    radio.dispatchEvent(new Event("change"));
+        try {
+            // 1. Sync radio button visual state (but don't trigger change event)
+            //    This maintains visual consistency without triggering chart updates
+            vendorRadios.forEach(radio => {
+                const label = document.querySelector(`label[for="${radio.id}"]`);
+                const radioVendor = label.dataset.vendor;
+
+                if (radioVendor === selectedVendor) {
+                    radio.checked = true; // Visual sync only, no event dispatch
                 }
+            });
+
+            // 2. Update statistics cards (but NOT charts)
+            //    Charts are controlled exclusively by radio buttons (setupVendorToggle)
+            if (window.modernVulnManager && window.modernVulnManager.statisticsManager) {
+                await window.modernVulnManager.statisticsManager.updateStatisticsDisplay(selectedVendor);
             }
-        });
+
+            // Note: Workspace filtering (grid, cards) is handled by VulnerabilitySearchManager
+            // which already listens to this dropdown and calls dataManager.filterData()
+
+        } catch (error) {
+            logger.error("ui", "Failed to update vendor dropdown filter:", { error: error.message });
+        }
     });
 }
 
