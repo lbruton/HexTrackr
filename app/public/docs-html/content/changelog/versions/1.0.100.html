@@ -1,0 +1,130 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <hr>
+<h2>title: "Version 1.0.100 - Vulnerability Card Redesign & Modal UX Improvements"
+date: "2025-10-22"
+version: "1.0.100"
+status: "Released"
+category: "UI/UX Enhancement"</h2><h1>Version 1.0.100 - Vulnerability Card Redesign & Modal UX Improvements</h1><p><strong>Release Status</strong>: Released<br><strong>Release Date</strong>: 2025-10-22<br><strong>Category</strong>: UI/UX Enhancement</p>
+<h2>Overview</h2><p>Comprehensive redesign of vulnerability cards and modal layout to improve information density, visual hierarchy, and user experience. Implemented KEV-based color coding, individual VPR badges, vendor-colored device counts, and optimized modal card alignment.</p>
+<h2>Changes</h2><h3>Vulnerability Cards Redesign</h3><p><strong>UI/UX Improvements</strong>:</p>
+<ul>
+<li>CVE title color: RED for KEV vulnerabilities, light blue for non-KEV (not severity-based)</li>
+<li>Increased CVE font size from <code>fs-3</code> to <code>fs-2</code> for better prominence</li>
+<li>Added individual VPR score badge next to CVE title (right-aligned)</li>
+<li>Updated &quot;VPR&quot; mini-card label to &quot;VPR Total&quot; for clarity</li>
+<li>Relocated description below &quot;Affected Devices&quot; section</li>
+<li>Increased description truncation from 100 to 200 characters</li>
+<li>Reduced description font size for better information density</li>
+<li>Colored mini-card values (VPR Total, CVSS, Risk) by severity</li>
+<li>Device count colored by vendor: blue (Cisco), orange (Palo Alto), gray (Other)</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/vulnerability-cards.js:1164-1280</code> - Card rendering logic, color mapping, layout structure</li>
+<li><code>app/public/styles/pages/vulnerabilities.css:815-857</code> - Removed unused vendor mini-card CSS</li>
+</ul>
+<h3>Vulnerability Details Modal Improvements</h3><p><strong>Modal Layout Fixes</strong>:</p>
+<ul>
+<li>Fixed Affected Assets card height alignment to match Vulnerability Information card</li>
+<li>Replaced Bootstrap row/col grid with direct flexbox containers</li>
+<li>Removed negative margin conflicts from <code>.row</code> wrapper</li>
+<li>Applied <code>flex-grow-1</code> to Affected Assets card for proper vertical fill</li>
+<li>Risk Summary card maintains natural height at top</li>
+<li>Both left and right columns now anchor to same bottom position</li>
+</ul>
+<p><strong>CVE References Display</strong>:</p>
+<ul>
+<li>Removed card wrapper overhead for compact presentation</li>
+<li>Normalized link display showing &quot;domain + short path&quot; instead of full URLs</li>
+<li>Simple vertical list with <code>&lt;br&gt;</code> separators (original v1.0.99 design)</li>
+<li>Added <code>normalizeReferenceLink()</code> method for URL display formatting</li>
+<li>Removed scrolling container for natural flow</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/vulnerabilities.html:581-618</code> - Modal flexbox layout restructure</li>
+<li><code>app/public/scripts/shared/vulnerability-details-modal.js:156-241</code> - References section, URL normalization</li>
+</ul>
+<h2>Technical Details</h2><h3>Vulnerability Card Color Logic</h3><p><strong>CVE Title Color</strong> (vulnerability-cards.js:1170):</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> cveColorClass = isKev ? <span class="hljs-string">&quot;text-danger&quot;</span> : <span class="hljs-string">&quot;text-info&quot;</span>;</code></pre><p><strong>Severity Colors for Mini-Cards</strong> (vulnerability-cards.js:1173-1179):</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> severityColors = {
+    <span class="hljs-string">&quot;Critical&quot;</span>: <span class="hljs-string">&quot;danger&quot;</span>,
+    <span class="hljs-string">&quot;High&quot;</span>: <span class="hljs-string">&quot;orange&quot;</span>,
+    <span class="hljs-string">&quot;Medium&quot;</span>: <span class="hljs-string">&quot;yellow&quot;</span>,
+    <span class="hljs-string">&quot;Low&quot;</span>: <span class="hljs-string">&quot;success&quot;</span>
+};</code></pre><p><strong>Vendor Colors for Device Count</strong> (vulnerability-cards.js:1186-1192):</p>
+<pre><code class="language-javascript"><span class="hljs-keyword">const</span> vendorColors = {
+    <span class="hljs-string">&quot;CISCO&quot;</span>: <span class="hljs-string">&quot;primary&quot;</span>,      <span class="hljs-comment">// Blue</span>
+    <span class="hljs-string">&quot;Palo Alto&quot;</span>: <span class="hljs-string">&quot;warning&quot;</span>,  <span class="hljs-comment">// Orange</span>
+    <span class="hljs-string">&quot;Other&quot;</span>: <span class="hljs-string">&quot;secondary&quot;</span>     <span class="hljs-comment">// Gray</span>
+};</code></pre><h3>Modal Flexbox Layout</h3><p><strong>Right Column Structure</strong> (vulnerabilities.html:581-618):</p>
+<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;col-lg-8&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;d-flex flex-column h-100 gap-3&quot;</span>&gt;</span>
+        <span class="hljs-comment">&lt;!-- Risk Summary: Natural height --&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;card&quot;</span>&gt;</span>...<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+
+        <span class="hljs-comment">&lt;!-- Affected Assets: Grows to fill space --&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;flex-grow-1 d-flex flex-column&quot;</span>&gt;</span>
+            <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;card h-100 d-flex flex-column&quot;</span>&gt;</span>
+                <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;card-body p-3 flex-grow-1 d-flex flex-column&quot;</span>&gt;</span>
+                    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;ag-theme-quartz modal-grid-lg flex-grow-1&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+                <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+            <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+        <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></code></pre><h3>URL Normalization</h3><p><strong>normalizeReferenceLink Method</strong> (vulnerability-details-modal.js:268-311):</p>
+<pre><code class="language-javascript"><span class="hljs-title function_">normalizeReferenceLink</span>(<span class="hljs-params">url</span>) {
+    <span class="hljs-keyword">const</span> urlObj = <span class="hljs-keyword">new</span> <span class="hljs-title function_">URL</span>(url);
+    <span class="hljs-keyword">const</span> hostname = urlObj.<span class="hljs-property">hostname</span>.<span class="hljs-title function_">replace</span>(<span class="hljs-string">&quot;www.&quot;</span>, <span class="hljs-string">&quot;&quot;</span>);
+
+    <span class="hljs-comment">// Extract first 2 path segments</span>
+    <span class="hljs-keyword">const</span> segments = path.<span class="hljs-title function_">split</span>(<span class="hljs-string">&quot;/&quot;</span>).<span class="hljs-title function_">filter</span>(<span class="hljs-function"><span class="hljs-params">s</span> =&gt;</span> s.<span class="hljs-property">length</span> &gt; <span class="hljs-number">0</span>);
+    <span class="hljs-keyword">const</span> displaySegments = segments.<span class="hljs-title function_">slice</span>(<span class="hljs-number">0</span>, <span class="hljs-number">2</span>);
+    <span class="hljs-keyword">let</span> shortPath = <span class="hljs-string">&quot;/&quot;</span> + displaySegments.<span class="hljs-title function_">join</span>(<span class="hljs-string">&quot;/&quot;</span>);
+
+    <span class="hljs-comment">// Truncate if &gt; 40 chars</span>
+    <span class="hljs-keyword">if</span> (shortPath.<span class="hljs-property">length</span> &gt; <span class="hljs-number">40</span>) {
+        shortPath = shortPath.<span class="hljs-title function_">substring</span>(<span class="hljs-number">0</span>, <span class="hljs-number">37</span>) + <span class="hljs-string">&quot;...&quot;</span>;
+    }
+
+    <span class="hljs-keyword">return</span> {
+        <span class="hljs-attr">display</span>: hostname + shortPath,
+        <span class="hljs-attr">fullUrl</span>: url
+    };
+}</code></pre><h2>User Experience Improvements</h2><p><strong>Vulnerability Cards</strong>:</p>
+<ul>
+<li>Clearer visual hierarchy with larger CVE titles</li>
+<li>KEV vulnerabilities immediately identifiable by red color</li>
+<li>Individual VPR scores provide at-a-glance priority assessment</li>
+<li>Vendor-colored device counts improve workspace filtering context</li>
+<li>More description text visible before truncation (200 chars vs 100)</li>
+</ul>
+<p><strong>Vulnerability Details Modal</strong>:</p>
+<ul>
+<li>Consistent card alignment eliminates visual gaps</li>
+<li>Cleaner reference list without card overhead</li>
+<li>Readable domain names instead of cryptic URLs</li>
+<li>All references visible without scrolling constraints</li>
+</ul>
+<h2>Validation</h2><ul>
+<li>✅ Vulnerability cards render correctly with new color scheme</li>
+<li>✅ KEV vulnerabilities show red CVE titles</li>
+<li>✅ Non-KEV vulnerabilities show light blue CVE titles</li>
+<li>✅ Individual VPR badges display next to CVE titles</li>
+<li>✅ Device counts colored by vendor (Cisco=blue, Palo Alto=orange, Other=gray)</li>
+<li>✅ Modal cards align properly at bottom</li>
+<li>✅ References display as simple list without scrolling</li>
+<li>✅ URL normalization shows readable domain + path</li>
+<li>✅ Dark/light theme compatibility verified</li>
+<li>✅ No console errors or warnings</li>
+</ul>
+<hr>
+<p><strong>Sprint</strong>: UI/UX Improvements (Session 1)<br><strong>Files Changed</strong>: 4 files, 284 insertions, 54 deletions</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
