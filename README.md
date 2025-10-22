@@ -75,7 +75,7 @@ https://localhost:8989
 
 ## Version
 
-Current version: **v1.0.94**
+Current version: **v1.0.95**
 
 See [Changelog](app/public/docs-source/changelog/index.md) for detailed release notes.
 
