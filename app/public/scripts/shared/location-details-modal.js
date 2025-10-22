@@ -1059,7 +1059,6 @@ class LocationDetailsModal {
      * @param {string} hostname - Device hostname
      */
     navigateToDevice(hostname) {
-        console.log(`[LocationDetailsModal] Navigating to device: ${hostname}`);
         // Close this modal
         this.hide();
         // Open device modal (use existing vulnManager pattern)
