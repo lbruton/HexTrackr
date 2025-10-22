@@ -956,6 +956,7 @@ class CiscoAdvisoryService {
             noFixAvailable: noFixAvailable,
             unsyncedCount: unsyncedCount,
             lastSync: metadata?.sync_time || null,
+            nextSync: metadata?.next_sync_time || null,
             recordCount: metadata?.record_count || 0,
             syncInProgress: this.syncInProgress
         };
@@ -968,13 +969,16 @@ class CiscoAdvisoryService {
      * @returns {Promise<void>}
      */
     async updateSyncMetadata(recordCount) {
-        _log("info", ` Updating sync metadata: ${this.lastSyncTime}, ${recordCount} records`);
+        // Calculate next sync time (24 hours from now)
+        const nextSyncTime = new Date(Date.now() + (24 * 60 * 60 * 1000)).toISOString();
+
+        _log("info", ` Updating sync metadata: ${this.lastSyncTime}, next: ${nextSyncTime}, ${recordCount} records`);
         try {
             await new Promise((resolve, reject) => {
                 this.db.run(`
-                    INSERT INTO sync_metadata (sync_type, sync_time, version, record_count)
-                    VALUES ('cisco', ?, NULL, ?)
-                `, [this.lastSyncTime, recordCount], (err) => {
+                    INSERT INTO sync_metadata (sync_type, sync_time, next_sync_time, version, record_count)
+                    VALUES ('cisco', ?, ?, NULL, ?)
+                `, [this.lastSyncTime, nextSyncTime, recordCount], (err) => {
                     if (err) {
                         _log("error", " Sync metadata update FAILED:", err);
                         reject(err);
