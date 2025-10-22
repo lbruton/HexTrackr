@@ -1,0 +1,64 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <hr>
+<h2>title: "Version 1.0.97 - Vendor Dropdown Filter Decoupling"
+date: "2025-10-21"
+version: "1.0.97"
+status: "Released"
+category: "Bug Fix"</h2><h1>Version 1.0.97 - Vendor Dropdown Filter Decoupling</h1><p><strong>Release Status</strong>: Released<br><strong>Release Date</strong>: 2025-10-21<br><strong>Category</strong>: Bug Fix<br><strong>Issue</strong>: <a href="https://linear.app/hextrackr/issue/HEX-310">HEX-310</a></p>
+<h2>Overview</h2><p>Decoupled the &quot;All Vendors&quot; dropdown from chart filtering. The dropdown now filters only the Vulnerability Data Workspace (devices, vulnerabilities, locations, table views) and does not affect charts. Charts remain controlled exclusively by their dedicated vendor filter radio buttons.</p>
+<h2>Bug Fix</h2><h3>Vendor Filter Scope Separation</h3><p><strong>Problem</strong>:</p>
+<ul>
+<li>The vendor dropdown in the search/filter area was filtering BOTH the workspace views AND the charts</li>
+<li>Charts have their own independent vendor filter buttons above them</li>
+<li>This created confusing dual-control behavior where two different UI elements controlled the same charts</li>
+</ul>
+<p><strong>Solution</strong>:</p>
+<ul>
+<li>Modified <code>setupVendorDropdownSync()</code> in <code>vulnerabilities.js:218-258</code></li>
+<li>Removed chart update trigger when dropdown changes</li>
+<li>Dropdown now only filters workspace views (devices, vulnerabilities, locations, table)</li>
+<li>Radio buttons remain the sole control for chart filtering</li>
+<li>Visual synchronization between dropdown and radio buttons maintained</li>
+</ul>
+<p><strong>Technical Details</strong>:</p>
+<ul>
+<li>Removed <code>radio.dispatchEvent(new Event(&quot;change&quot;))</code> that was triggering chart updates</li>
+<li>Added direct statistics update via <code>modernVulnManager.statisticsManager.updateStatisticsDisplay()</code></li>
+<li>Workspace filtering handled by <code>VulnerabilitySearchManager</code> (already listening to dropdown)</li>
+<li>Charts controlled exclusively by <code>setupVendorToggle()</code> radio button handlers</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/pages/vulnerabilities.js:218-258</code> - Vendor dropdown sync logic</li>
+</ul>
+<h2>User Impact</h2><p><strong>Before</strong>:</p>
+<ul>
+<li>Dropdown filters workspace + charts (unintended)</li>
+<li>Radio buttons filter workspace + charts</li>
+<li>Two controls fighting for chart control = confusion</li>
+</ul>
+<p><strong>After</strong>:</p>
+<ul>
+<li>Dropdown filters workspace only</li>
+<li>Radio buttons filter workspace + charts</li>
+<li>Clear separation: dropdown = workspace, radio buttons = charts + workspace</li>
+</ul>
+<p><strong>Use Case</strong>: Users can now filter workspace data independently while keeping charts focused on a different vendor for comparison.</p>
+<h2>Testing</h2><p>Verified all 4 workspace views filter correctly when dropdown changes:</p>
+<ul>
+<li>Devices view filters by vendor</li>
+<li>Vulnerabilities view filters by vendor</li>
+<li>Locations view filters by vendor</li>
+<li>Table view filters by vendor</li>
+<li>Charts remain independent (not affected by dropdown)</li>
+<li>Radio buttons still control charts correctly</li>
+<li>Visual sync between dropdown/radio buttons maintained</li>
+</ul>
+<hr>
+<p><strong>Sprint</strong>: Part of <a href="https://linear.app/hextrackr/issue/HEX-311">HEX-311</a> - Vulnerability Dashboard UX Improvements (Session 2/2)</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
