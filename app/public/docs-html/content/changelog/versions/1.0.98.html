@@ -1,0 +1,86 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <hr>
+<h2>title: "Version 1.0.98 - Vendor Filter Simplification (UX Improvement)"
+date: "2025-10-21"
+version: "1.0.98"
+status: "Released"
+category: "Enhancement"</h2><h1>Version 1.0.98 - Vendor Filter Simplification (UX Improvement)</h1><p><strong>Release Status</strong>: Released<br><strong>Release Date</strong>: 2025-10-21<br><strong>Category</strong>: Enhancement<br><strong>Issue</strong>: <a href="https://linear.app/hextrackr/issue/HEX-310">HEX-310</a></p>
+<h2>Overview</h2><p>Simplified vendor filtering by removing the vendor dropdown from the search area and making the radio buttons at the top of the page the single source of truth for all vendor filtering (workspace + charts). This eliminates user confusion from having two separate vendor filter controls.</p>
+<h2>Changes</h2><h3>UX Simplification</h3><p><strong>Vendor Dropdown Removed</strong>:</p>
+<ul>
+<li>Removed vendor dropdown from search/filter area</li>
+<li>Radio buttons (All Vendors, CISCO, Palo Alto, Other) now control ALL vendor filtering</li>
+<li>One control, one purpose - clearer user experience</li>
+</ul>
+<p><strong>What Changed</strong>:</p>
+<ul>
+<li><strong>Before</strong>: Radio buttons controlled charts + workspace, dropdown also controlled workspace = confusing dual-control</li>
+<li><strong>After</strong>: Radio buttons control everything (charts + workspace + statistics) = simple single-control</li>
+</ul>
+<p><strong>User Impact</strong>:</p>
+<ul>
+<li>Clicking a vendor radio button now filters the entire page (charts, statistics cards, workspace views, table)</li>
+<li>No more confusion about which control does what</li>
+<li>Consistent with severity/location filter patterns (single control per dimension)</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/vulnerabilities.html:339-346</code> - Removed vendor dropdown HTML</li>
+<li><code>app/public/scripts/pages/vulnerabilities.js:163,174-212</code> - Global accessor + simplified vendor toggle</li>
+<li><code>app/public/scripts/shared/vulnerability-data.js:727-729</code> - Use radio button accessor</li>
+<li><code>app/public/scripts/shared/vulnerability-cards.js:604-605</code> - Use radio button accessor</li>
+</ul>
+<h2>Technical Details</h2><p><strong>Removed</strong>:</p>
+<ul>
+<li>❌ Vendor dropdown (<code>&lt;select id=&quot;vendorFilter&quot;&gt;</code>)</li>
+<li>❌ <code>setupVendorDropdownSync()</code> function (44 lines)</li>
+<li>❌ Dropdown sync code in <code>setupVendorToggle()</code> (6 lines)</li>
+</ul>
+<p><strong>Added (Post-Release Fix)</strong>:</p>
+<ul>
+<li>✅ Global <code>window.getCurrentVendor()</code> accessor for radio button state</li>
+<li>✅ Manual <code>dataManager.filterData()</code> call in radio button handler</li>
+<li>✅ Updated filter logic to use accessor instead of dropdown DOM element</li>
+</ul>
+<p><strong>Simplified</strong>:</p>
+<ul>
+<li>✅ <code>setupVendorToggle()</code> now only handles radio button changes</li>
+<li>✅ No event coupling between controls</li>
+<li>✅ Cleaner code (-50 lines total)</li>
+<li>✅ Single source of truth for vendor filtering (radio buttons)</li>
+</ul>
+<p><strong>Why This Approach</strong>:</p>
+<ul>
+<li>Original HEX-310 goal was to decouple dropdown from charts</li>
+<li>Testing revealed programmatic <code>radio.checked = true</code> still triggers change events (browser behavior)</li>
+<li>Decoupling would require complex flag-based event suppression (fragile, hard to maintain)</li>
+<li><strong>Better solution</strong>: Remove dropdown entirely - simpler UX and simpler code</li>
+</ul>
+<h2>User Experience Rationale</h2><p><strong>Decision</strong>: Removed dropdown instead of decoupling it</p>
+<p><strong>Reasoning</strong>:</p>
+<ol>
+<li><strong>Clarity</strong>: One control is easier to understand than two synchronized controls</li>
+<li><strong>Visibility</strong>: Radio buttons are more prominent (top of page) than dropdown (buried in search area)</li>
+<li><strong>Consistency</strong>: Matches pattern of other filter dimensions (severity, location)</li>
+<li><strong>Simplicity</strong>: No complex event synchronization logic required</li>
+</ol>
+<p><strong>Use Case</strong>: Users filter by vendor to analyze specific vendor vulnerabilities across all views - radio buttons provide clear, obvious control for this workflow.</p>
+<h2>Post-Release Fix (Same Version)</h2><p><strong>Issue Discovered</strong>: After initial deployment, workspace filtering (devices/vulnerabilities/locations/table views) stopped working when clicking radio buttons. Only statistics cards and charts were updating.</p>
+<p><strong>Root Cause</strong>: <code>VulnerabilitySearchManager</code> was listening to <code>#vendorFilter</code> dropdown change events to trigger workspace filtering. When dropdown was removed, the event chain broke.</p>
+<p><strong>Solution</strong>:</p>
+<ol>
+<li>Created global <code>window.getCurrentVendor()</code> accessor to read vendor state from radio buttons</li>
+<li>Modified <code>VulnerabilityDataManager.filterData()</code> to use accessor instead of dropdown element</li>
+<li>Updated <code>VulnerabilityCardsManager</code> to use accessor for device filtering</li>
+<li>Added manual <code>dataManager.filterData()</code> call to radio button change handler</li>
+</ol>
+<p><strong>Result</strong>: Radio buttons now correctly filter ALL components (stats, charts, workspace views).</p>
+<p><strong>Commit</strong>: <code>d61a74cb</code> - &quot;fix: Restore workspace filtering after vendor dropdown removal&quot;</p>
+<hr>
+<p><strong>Sprint</strong>: Part of <a href="https://linear.app/hextrackr/issue/HEX-311">HEX-311</a> - Vulnerability Dashboard UX Improvements (Session 2/2 - Revised)<br><strong>Previous Attempt</strong>: v1.0.97 attempted decoupling (failed due to event coupling issues)<br><strong>This Version</strong>: Simplified approach - remove dropdown, use radio buttons only<br><strong>Post-Release Fix</strong>: Restored workspace filtering via global accessor pattern</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
