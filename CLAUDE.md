@@ -16,12 +16,12 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
 
 **Architecture**: Modular MVC (controllers → services → database)
 **Runtime**: Node.js 18+ (4GB heap) | **Docker**: hextrackr service on port 8989
-**Database**: SQLite (DELETE journal mode) at `/app/data/hextrackr.db`
+**Database**: SQLite (WAL journal mode, Docker named volume) at `/app/data/hextrackr.db`
 **Services**: 20 service files | **Routes**: 14 route modules
 
 ## Core Services
 
-* **DatabaseService**: `services/databaseService.js:23` (DELETE journal mode, backup/restore, schema migrations)
+* **DatabaseService**: `services/databaseService.js:23` (WAL journal mode with Docker named volume isolation, backup/restore, schema migrations)
 * **LoggingService**: `services/loggingService.js:45` (category-based, rotating logs, audit trail)
 * **VulnerabilityService**: `services/vulnerabilityService.js:67` (CRUD + stats aggregation)
 * **TicketService**: `services/ticketService.js:89` (full CRUD, soft delete, field operations ticketing)
@@ -41,12 +41,12 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
 
 ## Database Tables
 
-* **tickets**: Field operations ticketing (6500+ records, soft delete)
-* **vulnerabilities**: Primary vuln data (3000+ CVEs)
+* **tickets**: Field operations ticketing (soft delete)
+* **vulnerabilities**: Primary vuln data
 * **vulnerabilities_affected_devices**: Many-to-many device mapping
 * **vulnerabilities_affected_locations**: Many-to-many location mapping
 * **daily_totals**: Historical trend aggregation (365-day retention)
-* **kev_status**: CISA KEV correlation (1200+ exploited vulns)
+* **kev_status**: CISA KEV correlation tracking
 * **cisco_advisories**: Cisco PSIRT advisories (OAuth2 synced)
 * **palo_alto_advisories**: Palo Alto security bulletins (web scraped)
 * **users**: Authentication (Argon2id hashed passwords)
