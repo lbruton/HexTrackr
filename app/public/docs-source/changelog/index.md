@@ -2,7 +2,7 @@
 
 Welcome to the HexTrackr changelog! This page tracks all notable changes, features, and fixes across all versions of HexTrackr.
 
-**Current Version**: [v1.0.99](#changelog/versions/1.0.99) - Released 2025-10-21
+**Current Version**: [v1.0.100](#changelog/versions/1.0.100) - Released 2025-10-22
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 #### Latest Releases
 
+- [**v1.0.100**](#changelog/versions/1.0.100) - 2025-10-22 - Vulnerability Card Redesign & Modal UX Improvements
 - [**v1.0.99**](#changelog/versions/1.0.99) - 2025-10-21 - CVE References Display with Blacklist Filtering (HEX-273)
 - [**v1.0.98**](#changelog/versions/1.0.98) - 2025-10-21 - Vendor Filter Simplification / UX Improvement (HEX-310)
 - [**v1.0.97**](#changelog/versions/1.0.97) - 2025-10-21 - Vendor Dropdown Filter Decoupling (HEX-310 - superseded by v1.0.98)

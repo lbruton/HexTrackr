@@ -762,3 +762,53 @@ button.back-to-top .icon {
     font-size: 1.1rem;
     font-weight: 600;
 }
+
+/* Metric mini-cards for vulnerability cards */
+.vulnerability-card .metric-mini-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    padding: 0.75rem 0;
+}
+
+.vulnerability-card .metric-mini-card {
+    background: var(--tblr-bg-surface);
+    border: 1px solid var(--tblr-border-color);
+    border-radius: var(--tblr-border-radius);
+    padding: 0.75rem 0.5rem;
+    text-align: center;
+    transition: all 0.2s ease;
+    min-height: 5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.vulnerability-card .metric-mini-card:hover {
+    border-color: var(--hextrackr-primary);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgb(32, 107, 196, 0.15);
+}
+
+.vulnerability-card .metric-mini-card .metric-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+}
+
+.vulnerability-card .metric-mini-card .metric-label {
+    font-size: 0.75rem;
+    color: var(--tblr-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+}
+
+.vulnerability-card .metric-mini-card .metric-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    line-height: 1;
+}
+
