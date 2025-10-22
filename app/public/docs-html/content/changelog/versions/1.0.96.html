@@ -1,0 +1,28 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <hr>
+<h2>title: "Version 1.0.96 - Workspace Menu Reordering"
+date: "2025-10-21"
+version: "1.0.96"
+status: "Released"
+category: "Enhancement"</h2><h1>Version 1.0.96 - Workspace Menu Reordering</h1><p><strong>Release Status</strong>: Released<br><strong>Release Date</strong>: 2025-10-21<br><strong>Category</strong>: Enhancement<br><strong>Issue</strong>: <a href="https://linear.app/hextrackr/issue/HEX-309">HEX-309</a></p>
+<h2>Overview</h2><p>Improved Vulnerability Data Workspace menu item ordering for better user workflow and logical navigation flow.</p>
+<h2>Changes</h2><h3>UX Improvements</h3><p><strong>Workspace Menu Reordering</strong>:</p>
+<ul>
+<li>Reordered menu buttons for more intuitive navigation flow</li>
+<li><strong>Previous Order</strong>: Devices → Vulnerabilities → Locations → Table</li>
+<li><strong>New Order</strong>: Devices → Locations → Vulnerabilities → Table</li>
+</ul>
+<p><strong>Rationale</strong>: Users typically navigate from devices to their locations before drilling into specific vulnerabilities. The new order matches this natural workflow progression.</p>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/vulnerabilities.html:369-387</code> - Menu button reordering</li>
+</ul>
+<h2>Technical Details</h2><p><strong>Change Type</strong>: Pure HTML reordering (no logic changes)<br><strong>Testing</strong>: Visual verification of button order<br><strong>Rollback</strong>: Safe - single file change with git checkpoint</p>
+<hr>
+<p><strong>Sprint</strong>: Part of <a href="https://linear.app/hextrackr/issue/HEX-311">HEX-311</a> - Vulnerability Dashboard UX Improvements (Session 1/2)</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

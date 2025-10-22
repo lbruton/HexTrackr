@@ -336,15 +336,8 @@
                                             </select>
                                         </div>
                                         
-                                        <!-- Right side: Vendor and Location filters -->
+                                        <!-- Right side: Location filter (Vendor filter moved to radio buttons at top) -->
                                         <div class="d-flex gap-2">
-                                            <select class="form-select vendor-filter" id="vendorFilter" aria-label="Filter by vendor">
-                                                <option value="">All Vendors</option>
-                                                <option value="CISCO">CISCO</option>
-                                                <option value="Palo Alto">Palo Alto</option>
-                                                <option value="Other">Other</option>
-                                            </select>
-
                                             <select class="form-select location-filter" id="locationFilter" aria-label="Filter by location">
                                                 <option value="">All Locations</option>
                                                 <!-- Populated dynamically from /api/locations/stats -->

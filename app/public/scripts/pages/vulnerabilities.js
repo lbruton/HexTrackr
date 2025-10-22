@@ -173,12 +173,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 /**
  * Setup vendor toggle event listeners
- * Updates dashboard stats cards and chart when vendor filter changes
- * Also syncs with vendor dropdown in search area
+ * HEX-310: Radio buttons now control ALL vendor filtering (charts + workspace)
+ * Vendor dropdown removed - radio buttons are the single source of truth
  */
 function setupVendorToggle() {
     const vendorRadios = document.querySelectorAll("input[name=\"vendor-filter\"]");
-    const vendorDropdown = document.getElementById("vendorFilter");
 
     vendorRadios.forEach(radio => {
         radio.addEventListener("change", async (e) => {
@@ -190,77 +189,26 @@ function setupVendorToggle() {
             logger.debug("ui", `Vendor filter changed to: ${vendor || "All Vendors"}`);
 
             try {
-                // Sync dropdown to match radio button (prevent infinite loop by checking current value)
-                if (vendorDropdown && vendorDropdown.value !== vendor) {
-                    vendorDropdown.value = vendor;
-                    // Trigger change event on dropdown to update table/cards filtering
-                    vendorDropdown.dispatchEvent(new Event("change"));
-                }
-
                 // Update stats cards
                 await window.modernVulnManager.statisticsManager.updateStatisticsDisplay(vendor);
 
                 // Update chart
                 await window.modernVulnManager.chartManager.update(false, vendor);
 
+                // Workspace filtering (grid, cards) handled by VulnerabilitySearchManager
+                // which listens to global vendor state and updates automatically
+
             } catch (error) {
                 logger.error("ui", "Failed to update vendor filter:", { error: error.message });
-                // Error handling enhancement (loading states, toast) comes in Task 3.2
             }
         });
     });
 }
 
-/**
- * Setup vendor dropdown sync with radio buttons
- * HEX-310: Decoupled from chart filtering - dropdown now only controls workspace views
- * Radio buttons remain the sole control for charts
- *
- * Workspace filtering is handled by VulnerabilitySearchManager (vulnerability-search.js:54-57)
- * which listens to the dropdown and calls dataManager.filterData()
- */
-function setupVendorDropdownSync() {
-    const vendorDropdown = document.getElementById("vendorFilter");
-    const vendorRadios = document.querySelectorAll("input[name=\"vendor-filter\"]");
-
-    if (!vendorDropdown) {return;}
-
-    vendorDropdown.addEventListener("change", async (e) => {
-        const selectedVendor = e.target.value; // "" = All, "CISCO", "Palo Alto", "Other"
-
-        logger.debug("ui", `Vendor dropdown changed to: ${selectedVendor || "All Vendors"}`);
-
-        try {
-            // 1. Sync radio button visual state (but don't trigger change event)
-            //    This maintains visual consistency without triggering chart updates
-            vendorRadios.forEach(radio => {
-                const label = document.querySelector(`label[for="${radio.id}"]`);
-                const radioVendor = label.dataset.vendor;
-
-                if (radioVendor === selectedVendor) {
-                    radio.checked = true; // Visual sync only, no event dispatch
-                }
-            });
-
-            // 2. Update statistics cards (but NOT charts)
-            //    Charts are controlled exclusively by radio buttons (setupVendorToggle)
-            if (window.modernVulnManager && window.modernVulnManager.statisticsManager) {
-                await window.modernVulnManager.statisticsManager.updateStatisticsDisplay(selectedVendor);
-            }
-
-            // Note: Workspace filtering (grid, cards) is handled by VulnerabilitySearchManager
-            // which already listens to this dropdown and calls dataManager.filterData()
-
-        } catch (error) {
-            logger.error("ui", "Failed to update vendor dropdown filter:", { error: error.message });
-        }
-    });
-}
-
-// Wire up vendor toggle and dropdown sync on page load
+// Wire up vendor toggle on page load
+// HEX-310: Vendor dropdown removed - radio buttons are now the sole vendor filter control
 document.addEventListener("DOMContentLoaded", () => {
     setupVendorToggle();
-    setupVendorDropdownSync();
 });
 
 // Handle browser back/forward cache (bfcache) restoration
