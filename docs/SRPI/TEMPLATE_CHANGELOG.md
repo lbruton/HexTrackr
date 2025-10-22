@@ -28,12 +28,12 @@
 - `app/public/path/to/file3.js`: Description of changes made
 
 **Validation**:
-- ✅ Feature works as expected in development (https://dev.hextrackr.com)
-- ✅ Feature works as expected in production (https://hextrackr.com)
-- ✅ No console errors or warnings
-- ✅ Passes ESLint validation
-- ✅ Cross-browser tested (Chrome, Firefox, Safari)
-- ✅ Dark/light theme compatibility verified
+-  Feature works as expected in development (https://dev.hextrackr.com)
+- Feature works as expected in production (https://hextrackr.com)
+- No console errors or warnings
+- Passes ESLint validation
+- Cross-browser tested (Chrome, Firefox, Safari)
+- Dark/light theme compatibility verified
 
 **Issues**:
 - [HEX-XXX](https://linear.app/hextrackr/issue/HEX-XXX) - RESEARCH: Feature Name
