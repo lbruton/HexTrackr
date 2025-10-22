@@ -11,6 +11,18 @@ class DocsController {
      * Handles GET /api/docs/stats
      * Computes API endpoints, JS function count, and framework statistics
      * Original: server.js lines 2624-2680
+     *
+     * @async
+     * @returns {Promise<{apiEndpoints: number, jsFunctions: number, frameworks: number, computedAt: string}>}
+     *   Statistics object containing:
+     *   - apiEndpoints: Count of unique Express API routes
+     *   - jsFunctions: Approximate count of JS functions across codebase
+     *   - frameworks: Number of primary frameworks detected
+     *   - computedAt: ISO 8601 timestamp of computation
+     * @throws {Error} If statistics computation fails (delegated from docsService)
+     * @example
+     * const stats = await docsController.getStats();
+     * // Returns: { apiEndpoints: 87, jsFunctions: 342, frameworks: 4, computedAt: "2025-10-22T..." }
      */
     async getStats() {
         try {

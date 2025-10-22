@@ -18,7 +18,7 @@ The backend is a modular Node.js/Express application providing REST endpoints, r
 
 | Component | Purpose | Location |
 | --------- | ------- | -------- |
-| `server.js` (~557 lines) | Main application runtime (orchestration + initialization) | `/app/public/` |
+| `server.js` (~831 lines) | Main application runtime (orchestration + initialization) | `/app/public/` |
 | **Controllers** | Business logic (mixed patterns - see Controller Patterns section) | `/app/controllers/` |
 | **Services** | Data access and business services | `/app/services/` |
 | **Routes** | Express route definitions | `/app/routes/` |
@@ -31,9 +31,9 @@ The backend is a modular Node.js/Express application providing REST endpoints, r
 
 | Directory | Contents | Pattern |
 | --------- | -------- | ------- |
-| `/app/controllers/` | 11 controller modules | Singleton (6), Constructor (4), Functional (1) |
-| `/app/services/` | 18 service modules | Functional exports with dependency injection |
-| `/app/routes/` | 12 route definition files | Express router pattern |
+| `/app/controllers/` | 13 controller modules | Singleton (8), Constructor (3), Module Exports (1), Functional (1) |
+| `/app/services/` | 20 service modules | Functional exports with dependency injection |
+| `/app/routes/` | 15 route definition files | Express router pattern |
 | `/app/config/` | 5 configuration modules | Module exports |
 | `/app/middleware/` | 5 middleware modules | Express middleware pattern |
 | `/app/utils/` | 5 utility modules | Static class methods and helper functions |
@@ -51,8 +51,10 @@ The backend is a modular Node.js/Express application providing REST endpoints, r
 | `kevController.js` *(v1.0.22+)* | Constructor | 7 instance methods | `constructor(db)` |
 | `ciscoController.js` *(v1.0.63+, HEX-141)* | Constructor | 6 instance methods | `constructor(db, preferencesService)` |
 | `paloAltoController.js` *(v1.0.63+, HEX-209)* | Constructor | 6 instance methods | `constructor(db, preferencesService)` |
-| `docsController.js` | Constructor | 2 instance methods | `constructor()` - Direct instantiation |
+| `docsController.js` | Module Exports | 2 exported functions | Instance created internally, methods exported as wrappers |
 | `importController.js` | Functional | 6 exported functions | `setProgressTracker(tracker)` |
+| `locationController.js` *(v1.0.93+, HEX-292)* | Singleton | 3 static methods | `initialize(db)` |
+| `auditLogController.js` *(v1.0.67+, HEX-254)* | Singleton | 3 static methods | `initialize()` |
 
 ### Service Files
 
@@ -85,7 +87,7 @@ The backend uses three distinct controller patterns, balancing consistency with 
 
 ### Singleton Pattern Controllers
 
-Six controllers implement the singleton pattern (`VulnerabilityController`, `TicketController`, `BackupController`, `TemplateController`, `AuthController`, `PreferencesController`):
+Eight controllers implement the singleton pattern (`VulnerabilityController`, `TicketController`, `BackupController`, `TemplateController`, `AuthController`, `PreferencesController`, `LocationController`, `AuditLogController`):
 
 ```javascript
 class VulnerabilityController {
@@ -124,7 +126,7 @@ class VulnerabilityController {
 
 ### Constructor Pattern Controllers
 
-Four controllers use the constructor pattern (`KevController`, `CiscoController`, `PaloAltoController`, `DocsController`). These controllers instantiate new instances via routes, providing flexibility for dependency injection:
+Three controllers use the constructor pattern (`KevController`, `CiscoController`, `PaloAltoController`). These controllers instantiate new instances via routes, providing flexibility for dependency injection:
 
 **KevController (Constructor with factory function in routes):**
 
@@ -176,6 +178,58 @@ module.exports = (db, preferencesService) => {
 - Instance methods (not static)
 - Route files use factory functions that return configured routers
 - Flexible for controllers with varying dependencies
+
+### Module Exports Pattern Controllers
+
+One controller (`DocsController`) uses the module exports with internal instance pattern:
+
+**DocsController (Module Exports with Internal Instance):**
+
+```javascript
+class DocsController {
+    async getStats() {
+        try {
+            const stats = await docsService.computeStats();
+            return {
+                apiEndpoints: stats.apiEndpoints,
+                jsFunctions: stats.jsFunctions,
+                frameworks: stats.frameworks,
+                computedAt: new Date().toISOString()
+            };
+        } catch (error) {
+            console.error("DocsController.getStats failed:", error);
+            throw new Error("Failed to compute documentation statistics");
+        }
+    }
+}
+
+// Export controller instance for route handlers
+const docsController = new DocsController();
+
+module.exports = {
+    getStats: () => docsController.getStats(),
+    findDocsSectionForFilename
+};
+```
+
+**Route Usage:**
+
+```javascript
+const DocsController = require("../controllers/docsController");
+
+router.get("/stats", requireAuth, async (req, res) => {
+    const stats = await DocsController.getStats();
+    res.json(stats);
+});
+```
+
+**Characteristics:**
+
+- Class-based internally but exports wrapper functions
+- Single instance created within the module
+- Routes import and call exported functions directly (no factory pattern)
+- Simpler than constructor pattern when no dynamic dependencies needed
+- Hybrid approach: object-oriented internally, functional externally
 
 ### Functional Pattern Controllers
 
