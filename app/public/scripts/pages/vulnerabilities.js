@@ -148,6 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 /**
  * Get currently selected vendor from radio buttons
+ * HEX-310: Global accessor for vendor filter state (replaces dropdown)
  * @returns {string} Current vendor ("", "CISCO", "Palo Alto", or "Other")
  */
 function getCurrentVendor() {
@@ -157,6 +158,9 @@ function getCurrentVendor() {
     const label = document.querySelector(`label[for="${checkedRadio.id}"]`);
     return label ? (label.dataset.vendor || "") : "";
 }
+
+// HEX-310: Expose as global for use by VulnerabilityDataManager and other modules
+window.getCurrentVendor = getCurrentVendor;
 
 // Add event listener for chart metric toggle
 document.addEventListener("DOMContentLoaded", () => {
@@ -195,8 +199,12 @@ function setupVendorToggle() {
                 // Update chart
                 await window.modernVulnManager.chartManager.update(false, vendor);
 
-                // Workspace filtering (grid, cards) handled by VulnerabilitySearchManager
-                // which listens to global vendor state and updates automatically
+                // HEX-310: Trigger workspace filtering manually since vendor dropdown was removed
+                // VulnerabilitySearchManager previously listened to dropdown change events
+                // Now we call dataManager.filterData() directly to filter workspace views
+                if (window.modernVulnManager.dataManager) {
+                    window.modernVulnManager.dataManager.filterData();
+                }
 
             } catch (error) {
                 logger.error("ui", "Failed to update vendor filter:", { error: error.message });
