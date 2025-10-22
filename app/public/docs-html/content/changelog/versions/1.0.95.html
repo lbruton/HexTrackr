@@ -1,0 +1,86 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.0.95</h1><hr>
+<h2>[1.0.95]</h2><h3>Added</h3><h4>Real-Time API Sync Service Monitoring (HEX-279) - 2025-10-21</h4><p><strong>Description</strong>: Implemented real-time countdown timers and health indicators for all three background API sync services (Cisco PSIRT, Palo Alto Security Advisory, CISA KEV) to provide visibility into sync scheduling and service health.</p>
+<p><strong>Key Features</strong>:</p>
+<ul>
+<li>Live countdown timers showing time until next sync run (updates every second)</li>
+<li>Color-coded health indicator badges based on sync freshness (green/yellow/red)</li>
+<li>Unified REST API endpoint for retrieving all three service statuses in parallel</li>
+<li>Smart polling that only runs when Settings modal is open (resource efficient)</li>
+<li>Inline layout design that maintains uniform card heights in Settings modal</li>
+</ul>
+<p><strong>Technical Implementation</strong>:</p>
+<ul>
+<li><strong>Database Schema</strong>: Added <code>next_sync_time</code> column to <code>sync_metadata</code> table (migration 015)</li>
+<li><strong>Backend Services</strong>: Updated <code>ciscoAdvisoryService.js</code>, <code>paloAltoService.js</code>, and <code>kevService.js</code> to store next_sync_time after each sync completion</li>
+<li><strong>API Endpoint</strong>: Created <code>/api/sync/status</code> unified endpoint returning all three service statuses with parallel Promise.all() execution</li>
+<li><strong>Server Initialization</strong>: Store initial next_sync_time immediately after setTimeout() scheduling to enable countdown from startup</li>
+<li><strong>Frontend Architecture</strong>: Hybrid approach - store timestamps in database, poll every 60s for updates, calculate countdown client-side every 1s for smooth UX</li>
+</ul>
+<p><strong>Countdown Timer Display</strong>:</p>
+<ul>
+<li>Format: &quot;Next: Xh Xm Xs&quot; with live countdown</li>
+<li>Cisco PSIRT: 5-minute startup delay (300,000ms)</li>
+<li>Palo Alto: 5.5-minute startup delay (330,000ms)</li>
+<li>CISA KEV: 6-minute startup delay (360,000ms)</li>
+<li>Recurring interval: 24 hours for all services</li>
+</ul>
+<p><strong>Health Indicator Logic</strong>:</p>
+<ul>
+<li>Green badge: &lt; 25 hours since last sync (healthy)</li>
+<li>Yellow badge: 25-48 hours since last sync (warning)</li>
+<li>Red badge: &gt; 48 hours since last sync (critical)</li>
+</ul>
+<p><strong>Use Case</strong>: System administrators can now monitor the health and scheduling of critical background sync services in real-time without checking logs. The countdown timers provide visibility into when the next sync will run, and health badges immediately highlight any services that haven&#39;t synced recently.</p>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/routes/sync.js</code> (NEW): Unified <code>/api/sync/status</code> endpoint with parallel service status retrieval</li>
+<li><code>app/public/scripts/migrations/015-add-next-sync-time.sql</code> (NEW): Migration documentation for next_sync_time column</li>
+<li><code>app/public/server.js</code>: Added initial next_sync_time storage immediately after setTimeout() scheduling for all three services</li>
+<li><code>app/services/ciscoAdvisoryService.js</code>: Updated <code>updateSyncMetadata()</code> to calculate and store next_sync_time (24 hours from completion)</li>
+<li><code>app/services/paloAltoService.js</code>: Updated <code>updateSyncMetadata()</code> to calculate and store next_sync_time</li>
+<li><code>app/services/kevService.js</code>: Updated <code>updateSyncMetadata()</code> to calculate and store next_sync_time, updated <code>getSyncStatus()</code> to return nextSync property</li>
+<li><code>app/public/scripts/shared/settings-modal.html</code>: Added inline countdown timer UI with flexbox layout (d-flex justify-content-between)</li>
+<li><code>app/public/scripts/shared/settings-modal.js</code>: Implemented countdown timer logic with 1-second interval, health badge color coding, 60-second polling lifecycle tied to modal visibility</li>
+</ul>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li>✅ Countdown timers display correct initial values on server startup (5m, 5.5m, 6m)</li>
+<li>✅ Countdown updates every second with smooth decrement</li>
+<li>✅ Health badges show appropriate colors based on last sync time</li>
+<li>✅ Polling only runs when Settings modal is open (verified with DevTools)</li>
+<li>✅ <code>/api/sync/status</code> endpoint returns all three service statuses in parallel</li>
+<li>✅ No console errors or warnings in browser</li>
+<li>✅ Passes ESLint validation (safe auto-fixes applied)</li>
+<li>✅ Inline layout maintains uniform card heights in Settings modal</li>
+</ul>
+<p><strong>Issues</strong>:</p>
+<ul>
+<li><a href="https://linear.app/hextrackr/issue/HEX-279">HEX-279</a> - Add real-time countdown timers and health indicators for API sync services</li>
+</ul>
+<hr>
+<h3>Fixed</h3><ul>
+<li>Fixed &quot;Not scheduled&quot; issue where countdown timers showed &quot;Not scheduled&quot; on server startup instead of displaying the initial countdown<ul>
+<li><strong>Root Cause</strong>: <code>next_sync_time</code> was only stored AFTER a sync completed (in <code>updateSyncMetadata()</code>), but the UI needed it immediately on startup</li>
+<li><strong>Solution</strong>: Added database INSERT statements immediately after each <code>setTimeout()</code> call to store initial next_sync_time when the sync is scheduled</li>
+<li><strong>Technical Details</strong>: Three INSERT statements added to <code>server.js</code> (lines 520-531 for Cisco, 590-601 for Palo Alto, 664-675 for KEV) that calculate next_sync_time by adding startup delay to current timestamp</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2>Notes</h2><h3>Performance Improvements</h3><ul>
+<li>Polling architecture only activates when Settings modal is open (saves continuous HTTP requests)</li>
+<li>Countdown calculation runs client-side every 1s (no server load for visual updates)</li>
+<li>Unified <code>/api/sync/status</code> endpoint uses Promise.all() for parallel service queries (faster response time)</li>
+<li>Bootstrap modal event listeners (<code>shown.bs.modal</code>, <code>hidden.bs.modal</code>) manage polling lifecycle automatically</li>
+</ul>
+<h3>Implementation Insights</h3><p><strong>Hybrid Architecture Pattern</strong>: This implementation demonstrates a classic real-time UI pattern where authoritative timestamp data is stored in the database and polled periodically (60s), while visual countdown updates are calculated client-side every second. This minimizes server load while maintaining smooth UX.</p>
+<p><strong>Critical Timing Principle</strong>: Metadata must be stored at the moment of scheduling, not at completion. By storing next_sync_time immediately after setTimeout(), the countdown timers work from server startup rather than waiting for the first sync to complete.</p>
+<hr>
+<p><em>Released: 2025-10-21</em></p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
