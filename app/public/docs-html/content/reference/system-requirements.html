@@ -76,14 +76,19 @@
 <li><strong>Large CSV Imports</strong>: ~500MB RAM (peak), 40-60% CPU</li>
 </ul>
 <hr>
-<h2>Network Requirements</h2><h3>Ports</h3><p><strong>Required</strong>:</p>
+<h2>Network Requirements</h2><h3>Ports</h3><p><strong>Docker Deployment</strong>:</p>
 <ul>
-<li><code>443/tcp</code> - HTTPS (nginx reverse proxy)</li>
-<li><code>8080/tcp</code> - Node.js application (internal)</li>
+<li><code>8989/tcp</code> - External application port (maps to internal 8080)</li>
+<li><code>8443/tcp</code> - External HTTPS port (SSL termination)</li>
 </ul>
-<p><strong>Optional</strong>:</p>
+<p><strong>Bare-metal Deployment</strong>:</p>
 <ul>
-<li><code>8989/tcp</code> - Alternative HTTPS port (Docker external mapping)</li>
+<li><code>8080/tcp</code> - Node.js application (configurable via PORT env var)</li>
+</ul>
+<p><strong>Nginx Reverse Proxy</strong> (recommended):</p>
+<ul>
+<li><code>443/tcp</code> - HTTPS (nginx → 8080 internal)</li>
+<li><code>80/tcp</code> - HTTP redirect to HTTPS</li>
 </ul>
 <h3>Bandwidth</h3><ul>
 <li><strong>Typical Usage</strong>: &lt;10 Mbps</li>
@@ -198,7 +203,7 @@ disk: 20GB</code></pre><p><strong>Use When</strong>:</p>
 <li><a href="#reference/troubleshooting">Troubleshooting</a> - Common issues and solutions</li>
 </ul>
 <hr>
-<p><em>Last Updated: 2025-10-09 | Version 1.0.54</em></p>
+<p><em>Last Updated: 2025-10-22 | Version 1.1.0</em></p>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be

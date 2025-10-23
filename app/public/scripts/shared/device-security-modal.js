@@ -1101,7 +1101,8 @@ class DeviceSecurityModal {
             // Filter for KEV devices at same location
             deviceList = allDevices
                 .filter(device => device.hostname.toLowerCase().startsWith(location.toLowerCase()) && device.hasKev === true)
-                .map(device => device.hostname.toUpperCase());
+                .map(device => device.hostname.toUpperCase())
+                .sort(); // HEX-313: Alphabetical sorting for boot order planning
         }
         // Mode 3: All devices at location (Alt + Shift)
         else if (event.altKey && event.shiftKey) {
@@ -1118,7 +1119,8 @@ class DeviceSecurityModal {
             // Filter for all devices at same location
             deviceList = allDevices
                 .filter(device => device.hostname.toLowerCase().startsWith(location.toLowerCase()))
-                .map(device => device.hostname.toUpperCase());
+                .map(device => device.hostname.toUpperCase())
+                .sort(); // HEX-313: Alphabetical sorting for boot order planning
         }
 
         // Console logging for debugging
