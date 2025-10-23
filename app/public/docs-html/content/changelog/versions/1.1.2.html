@@ -1,0 +1,146 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <hr>
+<h2>title: "Version 1.1.2 - ESLint Bug Fixes"
+date: "2025-10-23"
+version: "1.1.2"
+status: "Released"
+category: "Bug Fix"</h2><h1>Version 1.1.2 - ESLint Bug Fixes</h1><p><strong>Release Status</strong>: ✅ Released<br><strong>Release Date</strong>: 2025-10-23<br><strong>Parent Issues</strong>: <a href="https://linear.app/hextrackr/issue/HEX-318/bug-fix-userid-undefined-in-authcontroller-error-logging">HEX-318</a>, <a href="https://linear.app/hextrackr/issue/HEX-319/bug-fix-event-parameter-missing-in-backup-modal-createfreshbackup">HEX-319</a></p>
+<h2>Overview</h2><p>HexTrackr v1.1.2 addresses two ESLint-detected bugs that represent real code quality issues: undefined variable usage in error logging (auth controller) and deprecated event handling patterns (backup modal). These fixes improve error diagnostics and ensure modern JavaScript compatibility.</p>
+<h2>Bug Fixes</h2><h3>Bug Fix #1: userId Undefined in authController Error Logging (HEX-318)</h3><p><strong>Priority</strong>: Medium<br><strong>Impact</strong>: Error logs missing user identification, reduced audit trail quality</p>
+<p><strong>Problem</strong>: ESLint error <code>&#39;userId&#39; is not defined</code> at <code>app/controllers/authController.js:416</code></p>
+<ul>
+<li>Variable <code>userId</code> used in catch block error logging</li>
+<li>Defined inside try block at line 372: <code>const userId = req.user.id;</code></li>
+<li>When exceptions occur before line 372 (e.g., validation failures), <code>userId</code> is undefined</li>
+<li>Error logs fail to capture which user experienced the issue</li>
+</ul>
+<p><strong>Solution</strong>: Extract <code>userId</code> before try block with fallback</p>
+<ul>
+<li>Moved userId extraction to beginning of <code>changePassword()</code> method</li>
+<li>Uses optional chaining and fallback: <code>const userId = req.user?.id || &quot;unknown&quot;;</code></li>
+<li>Now available in both success and error logging paths</li>
+<li>Maintains audit trail even for early validation failures</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/controllers/authController.js:352-353</code> - userId extraction before try block</li>
+</ul>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li>✅ ESLint validation passed (no-undef error resolved)</li>
+<li>✅ userId now captured in all error logging scenarios</li>
+<li>✅ Fallback to &quot;unknown&quot; for edge cases (should never occur with requireAuth middleware)</li>
+</ul>
+<hr>
+<h3>Bug Fix #2: Event Parameter Missing in backup-modal (HEX-319)</h3><p><strong>Priority</strong>: High<br><strong>Impact</strong>: Code relies on deprecated implicit <code>event</code> global, breaks in strict mode</p>
+<p><strong>Problem</strong>: ESLint error <code>&#39;event&#39; is not defined</code> at <code>app/public/scripts/shared/backup-modal.js:305</code></p>
+<ul>
+<li>Method <code>createFreshBackup(type)</code> uses <code>event.target.closest(&quot;button&quot;)</code> without declaring <code>event</code> parameter</li>
+<li>Relies on deprecated implicit global <code>window.event</code> in onclick handlers</li>
+<li>Fragile pattern that fails in strict mode and modern JavaScript environments</li>
+<li>Anti-pattern violating explicit parameter passing</li>
+</ul>
+<p><strong>Solution</strong>: Backward-compatible dual-signature pattern</p>
+<ul>
+<li>Updated method signature: <code>createFreshBackup(eventOrType, type)</code></li>
+<li>Supports both modern and legacy call patterns:<ul>
+<li><strong>Modern</strong>: <code>createFreshBackup(event, type)</code> - explicit event parameter</li>
+<li><strong>Legacy</strong>: <code>createFreshBackup(type)</code> - falls back to <code>window.event</code></li>
+</ul>
+</li>
+<li>Uses optional chaining for safety: <code>btn = evt?.target?.closest(&quot;button&quot;)</code></li>
+<li>Declared <code>btn</code> outside try block for finally block access</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/backup-modal.js:299-319</code> - Dual-signature method with backward compatibility</li>
+<li><code>app/public/scripts/shared/backup-modal.js:310</code> - btn variable declared outside try block</li>
+<li><code>app/public/scripts/shared/backup-modal.js:324,348-354</code> - Updated to use <code>backupType</code> variable</li>
+</ul>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li>✅ ESLint validation passed (no-undef error resolved)</li>
+<li>✅ Backward compatible with existing onclick handlers</li>
+<li>✅ Works in strict mode</li>
+<li>✅ Modern event handling pattern available for future refactoring</li>
+</ul>
+<hr>
+<h2>Technical Details</h2><h3>ESLint Rules Enforced</h3><p>Both fixes address violations of ESLint&#39;s <code>no-undef</code> rule, which prevents:</p>
+<ul>
+<li>Usage of undeclared variables</li>
+<li>Reliance on implicit global variables</li>
+<li>Scope-related bugs that break code in strict mode</li>
+</ul>
+<h3>Backward Compatibility Strategy</h3><p><strong>HEX-319 (backup-modal)</strong>: Implemented graceful degradation</p>
+<ul>
+<li>Detects call signature via <code>typeof</code> check</li>
+<li>Falls back to <code>window.event</code> for legacy onclick handlers</li>
+<li>Maintains existing functionality while enabling modern usage</li>
+<li>Future refactoring can migrate to explicit event parameters</li>
+</ul>
+<p><strong>HEX-318 (authController)</strong>: Simple early extraction</p>
+<ul>
+<li>No backward compatibility needed (internal controller method)</li>
+<li>Uses optional chaining (<code>req.user?.id</code>) for safety</li>
+<li>Fallback value ensures logs always have context</li>
+</ul>
+<h3>Code Quality Improvements</h3><p><strong>Before v1.1.2</strong>:</p>
+<ul>
+<li>❌ Error logs missing user context when early validation fails</li>
+<li>❌ Backup modal relies on deprecated <code>window.event</code> global</li>
+<li>❌ Code breaks in strict mode</li>
+<li>❌ ESLint errors blocking CI/CD</li>
+</ul>
+<p><strong>After v1.1.2</strong>:</p>
+<ul>
+<li>✅ All error logs include user identification</li>
+<li>✅ Event handling follows modern JavaScript patterns</li>
+<li>✅ Strict mode compatible</li>
+<li>✅ ESLint clean on both files</li>
+</ul>
+<hr>
+<h2>User Impact</h2><p><strong>For Developers</strong>:</p>
+<ul>
+<li>Cleaner ESLint output (2 fewer errors)</li>
+<li>Better error diagnostics in production logs</li>
+<li>Code follows modern JavaScript best practices</li>
+</ul>
+<p><strong>For System Administrators</strong>:</p>
+<ul>
+<li>Improved audit trail quality (all password change errors now include userId)</li>
+<li>Better troubleshooting when backup operations fail</li>
+<li>More reliable error tracking</li>
+</ul>
+<p><strong>For End Users</strong>:</p>
+<ul>
+<li>No visible changes (bug fixes are internal code quality improvements)</li>
+<li>More stable backup functionality (strict mode compatible)</li>
+</ul>
+<hr>
+<h2>Notes</h2><h3>Why These Fixes Matter</h3><p>Both bugs were <strong>functional issues</strong>, not just style violations:</p>
+<ol>
+<li><p><strong>HEX-318 (userId)</strong>: Missing user context in error logs makes production debugging significantly harder. When password change fails, we need to know WHICH user experienced the problem.</p>
+</li>
+<li><p><strong>HEX-319 (event)</strong>: Relying on implicit <code>window.event</code> is a ticking time bomb. It works in legacy browsers but fails in:</p>
+<ul>
+<li>Strict mode JavaScript</li>
+<li>Modern bundlers with tree-shaking</li>
+<li>Server-side rendering contexts</li>
+<li>Future browser versions</li>
+</ul>
+</li>
+</ol>
+<h3>ESLint as Safety Net</h3><p>These catches demonstrate the value of static analysis:</p>
+<ul>
+<li><code>no-undef</code> rule caught real bugs, not just style issues</li>
+<li>Both would cause runtime errors in specific conditions</li>
+<li>Better to catch at lint time than in production</li>
+</ul>
+<hr>
+<p><em>Release Notes Generated: 2025-10-23</em></p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

@@ -1162,10 +1162,7 @@
          * @param {Array<Object>} kevVulns - Array of KEV vulnerability objects
          */
         function showKevPickerModal(hostname, kevVulns) {
-            console.log(`[KEV Picker] Opening picker for ${hostname} with ${kevVulns.length} KEVs:`, kevVulns);
-
             const validKevs = kevVulns.filter(v => v !== null && v.cve);
-            console.log(`[KEV Picker] Valid KEVs: ${validKevs.length}`, validKevs);
 
             if (validKevs.length === 0) {
                 console.error(`[KEV Picker] No valid KEV vulnerabilities found for ${hostname}`);
@@ -1259,7 +1256,6 @@
                 return;
             }
 
-            console.log(`[KEV Picker] Showing modal...`);
             if (typeof bootstrap === "undefined") {
                 console.error(`[KEV Picker] Bootstrap is not loaded!`);
                 return;
@@ -1267,7 +1263,6 @@
 
             const modal = new bootstrap.Modal(modalElement);
             modal.show();
-            console.log(`[KEV Picker] Modal shown successfully`);
         }
 
         /**
@@ -1276,8 +1271,6 @@
          * Supports both regular KEV picker and location KEV picker
          */
         function returnToKevPicker() {
-            console.log('[KEV Details] Returning to picker modal');
-
             // Close the KEV details modal
             const kevDetailsModal = bootstrap.Modal.getInstance(document.getElementById('kevDetailsModal'));
             if (kevDetailsModal) {
@@ -1295,7 +1288,6 @@
                 // Check which picker context is available and re-open accordingly
                 if (window.locationKevPickerContext) {
                     // Location KEV picker context exists - prioritize this
-                    console.log('[KEV Details] Returning to location KEV picker');
                     if (window.returnToLocationKevPicker && typeof window.returnToLocationKevPicker === 'function') {
                         window.showLocationKevModal(window.locationKevPickerContext.location, window.locationKevPickerContext.kevDevices);
                     } else {
@@ -1303,7 +1295,6 @@
                     }
                 } else if (window.kevPickerContext) {
                     // Regular KEV picker context exists
-                    console.log('[KEV Details] Returning to regular KEV picker');
                     showKevPickerModal(window.kevPickerContext.hostname, window.kevPickerContext.kevVulns);
                 } else {
                     console.error('[KEV Details] No picker context available');
@@ -1317,8 +1308,6 @@
          * @param {string} cveId - CVE ID that was selected
          */
         function selectKevFromPicker(cveId) {
-            console.log(`[KEV Picker] Selected: ${cveId}`);
-
             // Store the selected CVE
             window.selectedKevCve = cveId;
 
@@ -1338,8 +1327,6 @@
                 console.warn('[KEV Picker] No KEV selected');
                 return;
             }
-
-            console.log(`[KEV Picker] Opening CVE details for: ${window.selectedKevCve}`);
 
             // Close the picker modal
             const pickerModal = bootstrap.Modal.getInstance(document.getElementById('kevPickerModal'));
