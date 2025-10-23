@@ -63,7 +63,6 @@ const LIBRARY_GLOBALS = [
     "agGrid",         // AG Grid - Advanced data grid component
     "ApexCharts",     // ApexCharts - Chart and visualization library
     "DOMPurify",      // DOMPurify - HTML sanitization for XSS prevention
-    "Chart",          // Chart.js - Canvas-based charting library
     "jsPDF",          // jsPDF - PDF generation library
     "html2canvas"     // html2canvas - HTML to canvas conversion
 ];
@@ -93,7 +92,6 @@ const LIBRARY_GLOBALS = [
  * - agGrid: Advanced data tables and grids
  * - ApexCharts: Data visualization and charts
  * - DOMPurify: HTML sanitization for security
- * - Chart: Additional charting capabilities
  * - jsPDF: PDF export functionality
  * - html2canvas: Screenshot and export features
  *
@@ -108,7 +106,7 @@ const LIBRARY_GLOBALS = [
 
 // Declare all globals to ESLint
 /* global window document localStorage sessionStorage fetch console setTimeout clearTimeout setInterval clearInterval alert confirm prompt btoa atob URL Blob File FileReader FormData location history navigator XMLHttpRequest */
-/* global bootstrap Papa agGrid ApexCharts DOMPurify Chart jsPDF html2canvas */
+/* global bootstrap Papa agGrid ApexCharts DOMPurify jsPDF html2canvas */
 
 /**
  * Global Constants and Configuration
