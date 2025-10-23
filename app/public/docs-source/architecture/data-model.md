@@ -2,8 +2,8 @@
 
 This document provides a definitive overview of the HexTrackr database schema. The primary bootstrap is `scripts/init-database.js`; however, the live schema evolves further at runtime via idempotent `ALTER TABLE` and index creation logic inside `server.js` and migration code executed during imports. The authoritative state is therefore the **live SQLite schema** (captured below) rather than the historical `schema.sql` file (now outdated and retained only for legacy reference).
 
-**Schema Summary** (v1.0.66):
-- **16 Core Tables**: Vulnerabilities (4), Tickets (2), KEV (2), Templates (3), Authentication (2), Import/Staging (2), Analytics (1)
+**Schema Summary** (v1.0.101):
+- **16 Core Tables**: Vulnerabilities (4), Tickets (2), KEV (2), Templates (3), Authentication (2), Import (1), Analytics (2)
 - **49 Indexes**: Performance-optimized queries on critical fields
 - **4-Tier Deduplication**: Enhanced unique key generation with confidence scoring
 - **KEV Integration**: CISA Known Exploited Vulnerabilities catalog synchronization
@@ -13,7 +13,8 @@ This document provides a definitive overview of the HexTrackr database schema. T
 ## Database Engine
 
 - **Engine**: SQLite 3
-- **Database File**: `data/hextrackr.db`
+- **Database File**: `/app/data/hextrackr.db` (Docker named volume: `hextrackr-database`)
+- **Local Path**: Not accessible from host filesystem (isolated in Docker volume for SQLite integrity)
 
 ---
 
@@ -111,11 +112,40 @@ Current deduplicated state (one row per active unique vulnerability for the most
 
 This table is an append-only log of **all vulnerabilities from every scan**. It serves as the historical record for trend analysis.
 
-*Schema similar to `vulnerabilities_current` with the following key differences:*
+| Column | Type | Constraints | Description |
+| --- | --- | --- | --- |
+| `id` | INTEGER | PK AUTOINCREMENT | Snapshot record identifier. |
+| `import_id` | INTEGER | FK to `vulnerability_imports.id`, NOT NULL | Associated import batch. |
+| `scan_date` | TEXT | NOT NULL | Date of the scan (YYYY-MM-DD). |
+| `hostname` | TEXT |  | Raw hostname (pre-normalization retained). |
+| `ip_address` | TEXT |  | Optional IP (may be blank). |
+| `cve` | TEXT |  | CVE identifier if present. |
+| `severity` | TEXT |  | Critical/High/Medium/Low (case-insensitive input). |
+| `vpr_score` | REAL |  | Vulnerability Priority Rating. |
+| `cvss_score` | REAL |  | CVSS Base score. |
+| `first_seen` | TEXT |  | First observed date. |
+| `last_seen` | TEXT |  | Last observed date. |
+| `plugin_id` | TEXT |  | Scanner plugin id. |
+| `plugin_name` | TEXT |  | Scanner plugin name. |
+| `description` | TEXT |  | Short description (duplicate of plugin_name in some feeds). |
+| `solution` | TEXT |  | Remediation guidance. |
+| `vendor_reference` | TEXT |  | Original vendor family string. |
+| `vendor` | TEXT |  | Normalized vendor. |
+| `vulnerability_date` | TEXT |  | Publication date. |
+| `state` | TEXT | DEFAULT 'open' | Physical state (open/closed). |
+| `created_at` | DATETIME | DEFAULT CURRENT_TIMESTAMP | Insert timestamp. |
+| `unique_key` | TEXT |  | Composite key (not unique - allows duplicates across scan dates). |
+| `confidence_score` | INTEGER | DEFAULT 50 | Deduplication confidence (0-100). |
+| `dedup_tier` | INTEGER | DEFAULT 4 | Deduplication tier level (1-4). |
+| `enhanced_unique_key` | TEXT |  | Enhanced 4-tier deduplication key. |
+| `operating_system` | TEXT |  | Operating system information (added Migration 006). |
+| `solution_text` | TEXT |  | Extended solution details (added Migration 006). |
+
+**Key Differences from `vulnerabilities_current`**:
 - `unique_key` is **not unique** (allows duplicate vulnerabilities across scan dates)
-- Additional deduplication metadata: `confidence_score`, `dedup_tier`, `enhanced_unique_key`
-- Includes Migration 006 columns: `operating_system`, `solution_text`
-- Acts as append-only log for every scan ingestion
+- Missing lifecycle management columns: `lifecycle_state`, `resolved_date`, `resolution_reason`
+- Missing `updated_at` column (append-only, never updated)
+- Acts as append-only historical log for every scan ingestion
 
 ### `vulnerability_daily_totals`
 
@@ -511,4 +541,4 @@ The above reflects the database as inspected on the current build date. Regenera
 
 ---
 
-*Last Updated: 2025-10-16 | Version: v1.0.66 | Audit: DOCS-53*
+*Last Updated: 2025-10-22 | Version: v1.0.101 | Audit: DOCS-64*

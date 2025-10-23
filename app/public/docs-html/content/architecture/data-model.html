@@ -1,9 +1,9 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
     <h1>HexTrackr Data Model</h1><p>This document provides a definitive overview of the HexTrackr database schema. The primary bootstrap is <code>scripts/init-database.js</code>; however, the live schema evolves further at runtime via idempotent <code>ALTER TABLE</code> and index creation logic inside <code>server.js</code> and migration code executed during imports. The authoritative state is therefore the <strong>live SQLite schema</strong> (captured below) rather than the historical <code>schema.sql</code> file (now outdated and retained only for legacy reference).</p>
-<p><strong>Schema Summary</strong> (v1.0.66):</p>
+<p><strong>Schema Summary</strong> (v1.0.101):</p>
 <ul>
-<li><strong>16 Core Tables</strong>: Vulnerabilities (4), Tickets (2), KEV (2), Templates (3), Authentication (2), Import/Staging (2), Analytics (1)</li>
+<li><strong>16 Core Tables</strong>: Vulnerabilities (4), Tickets (2), KEV (2), Templates (3), Authentication (2), Import (1), Analytics (2)</li>
 <li><strong>49 Indexes</strong>: Performance-optimized queries on critical fields</li>
 <li><strong>4-Tier Deduplication</strong>: Enhanced unique key generation with confidence scoring</li>
 <li><strong>KEV Integration</strong>: CISA Known Exploited Vulnerabilities catalog synchronization</li>
@@ -12,7 +12,8 @@
 </ul>
 <h2>Database Engine</h2><ul>
 <li><strong>Engine</strong>: SQLite 3</li>
-<li><strong>Database File</strong>: <code>data/hextrackr.db</code></li>
+<li><strong>Database File</strong>: <code>/app/data/hextrackr.db</code> (Docker named volume: <code>hextrackr-database</code>)</li>
+<li><strong>Local Path</strong>: Not accessible from host filesystem (isolated in Docker volume for SQLite integrity)</li>
 </ul>
 <hr>
 <h2>Core Tables</h2><h3>`tickets`</h3><p>Stores all ticketing information. This table has <strong>indexes for query performance</strong> on dates, status, site codes, and external ticket numbers. Site and location tracking uses TEXT fields (<code>site</code>, <code>site_id</code>, <code>location</code>, <code>location_id</code>) for flexible data storage.</p>
@@ -395,12 +396,178 @@
 </tr>
 </tbody></table>
 <h3>`vulnerability_snapshots`</h3><p>This table is an append-only log of <strong>all vulnerabilities from every scan</strong>. It serves as the historical record for trend analysis.</p>
-<p><em>Schema similar to <code>vulnerabilities_current</code> with the following key differences:</em></p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Constraints</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>INTEGER</td>
+<td>PK AUTOINCREMENT</td>
+<td>Snapshot record identifier.</td>
+</tr>
+<tr>
+<td><code>import_id</code></td>
+<td>INTEGER</td>
+<td>FK to <code>vulnerability_imports.id</code>, NOT NULL</td>
+<td>Associated import batch.</td>
+</tr>
+<tr>
+<td><code>scan_date</code></td>
+<td>TEXT</td>
+<td>NOT NULL</td>
+<td>Date of the scan (YYYY-MM-DD).</td>
+</tr>
+<tr>
+<td><code>hostname</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Raw hostname (pre-normalization retained).</td>
+</tr>
+<tr>
+<td><code>ip_address</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Optional IP (may be blank).</td>
+</tr>
+<tr>
+<td><code>cve</code></td>
+<td>TEXT</td>
+<td></td>
+<td>CVE identifier if present.</td>
+</tr>
+<tr>
+<td><code>severity</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Critical/High/Medium/Low (case-insensitive input).</td>
+</tr>
+<tr>
+<td><code>vpr_score</code></td>
+<td>REAL</td>
+<td></td>
+<td>Vulnerability Priority Rating.</td>
+</tr>
+<tr>
+<td><code>cvss_score</code></td>
+<td>REAL</td>
+<td></td>
+<td>CVSS Base score.</td>
+</tr>
+<tr>
+<td><code>first_seen</code></td>
+<td>TEXT</td>
+<td></td>
+<td>First observed date.</td>
+</tr>
+<tr>
+<td><code>last_seen</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Last observed date.</td>
+</tr>
+<tr>
+<td><code>plugin_id</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Scanner plugin id.</td>
+</tr>
+<tr>
+<td><code>plugin_name</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Scanner plugin name.</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Short description (duplicate of plugin_name in some feeds).</td>
+</tr>
+<tr>
+<td><code>solution</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Remediation guidance.</td>
+</tr>
+<tr>
+<td><code>vendor_reference</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Original vendor family string.</td>
+</tr>
+<tr>
+<td><code>vendor</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Normalized vendor.</td>
+</tr>
+<tr>
+<td><code>vulnerability_date</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Publication date.</td>
+</tr>
+<tr>
+<td><code>state</code></td>
+<td>TEXT</td>
+<td>DEFAULT &#39;open&#39;</td>
+<td>Physical state (open/closed).</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Insert timestamp.</td>
+</tr>
+<tr>
+<td><code>unique_key</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Composite key (not unique - allows duplicates across scan dates).</td>
+</tr>
+<tr>
+<td><code>confidence_score</code></td>
+<td>INTEGER</td>
+<td>DEFAULT 50</td>
+<td>Deduplication confidence (0-100).</td>
+</tr>
+<tr>
+<td><code>dedup_tier</code></td>
+<td>INTEGER</td>
+<td>DEFAULT 4</td>
+<td>Deduplication tier level (1-4).</td>
+</tr>
+<tr>
+<td><code>enhanced_unique_key</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Enhanced 4-tier deduplication key.</td>
+</tr>
+<tr>
+<td><code>operating_system</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Operating system information (added Migration 006).</td>
+</tr>
+<tr>
+<td><code>solution_text</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Extended solution details (added Migration 006).</td>
+</tr>
+</tbody></table>
+<p><strong>Key Differences from <code>vulnerabilities_current</code></strong>:</p>
 <ul>
 <li><code>unique_key</code> is <strong>not unique</strong> (allows duplicate vulnerabilities across scan dates)</li>
-<li>Additional deduplication metadata: <code>confidence_score</code>, <code>dedup_tier</code>, <code>enhanced_unique_key</code></li>
-<li>Includes Migration 006 columns: <code>operating_system</code>, <code>solution_text</code></li>
-<li>Acts as append-only log for every scan ingestion</li>
+<li>Missing lifecycle management columns: <code>lifecycle_state</code>, <code>resolved_date</code>, <code>resolution_reason</code></li>
+<li>Missing <code>updated_at</code> column (append-only, never updated)</li>
+<li>Acts as append-only historical log for every scan ingestion</li>
 </ul>
 <h3>`vulnerability_daily_totals`</h3><p>This table stores pre-calculated daily aggregates to power the dashboard charts efficiently.</p>
 <table>
@@ -1463,7 +1630,7 @@
 <hr>
 <p>The above reflects the database as inspected on the current build date. Regenerate this document after structural changes or migration scripts are introduced.</p>
 <hr>
-<p><em>Last Updated: 2025-10-16 | Version: v1.0.66 | Audit: DOCS-53</em></p>
+<p><em>Last Updated: 2025-10-22 | Version: v1.0.101 | Audit: DOCS-64</em></p>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be

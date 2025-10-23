@@ -187,20 +187,53 @@ WHERE vc.lifecycle_state IN ('active', 'reopened')
 
 ## Database Schema
 
-### cisco_advisories Table
+### cisco_advisories Table (Advisory Metadata)
+
+Stores Cisco PSIRT advisory metadata (one row per CVE).
 
 ```sql
 CREATE TABLE cisco_advisories (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    cve_id TEXT NOT NULL UNIQUE,
-    advisory_id TEXT NOT NULL,
+    cve_id TEXT PRIMARY KEY,
+    advisory_id TEXT,
     advisory_title TEXT,
-    advisory_url TEXT,
-    first_fixed TEXT,           -- JSON array: ["12.2(22)S1", "12.2(30)S", ...]
-    product_names TEXT,         -- JSON array: ["Cisco IOS 12.2(20)S6a", ...]
-    last_synced TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(cve_id)
+    severity TEXT,
+    cvss_score TEXT,
+    first_fixed TEXT,              -- Deprecated: Use cisco_fixed_versions instead
+    affected_releases TEXT,
+    product_names TEXT,
+    publication_url TEXT,
+    last_synced TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+```
+
+### cisco_fixed_versions Table (Normalized Fixed Versions)
+
+Stores fixed software versions (many rows per CVE, one per OS family).
+
+**Why Normalized?** Multi-OS-family CVEs (affecting both IOS and IOS XE) need separate rows to prevent data overwrites. See [HEX-287](https://linear.app/hextrackr/issue/HEX-287) for details.
+
+```sql
+CREATE TABLE cisco_fixed_versions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    cve_id TEXT NOT NULL,
+    os_family TEXT NOT NULL,       -- "ios", "iosxe", "iosxr", "nxos"
+    fixed_version TEXT NOT NULL,
+    affected_version TEXT,
+    last_synced TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (cve_id) REFERENCES cisco_advisories(cve_id) ON DELETE CASCADE,
+    UNIQUE(cve_id, os_family, fixed_version)
+);
+```
+
+**Example Data:**
+
+```
+cve_id            | os_family | fixed_version
+------------------|-----------|---------------
+CVE-2025-20352    | ios       | 15.2(8)E8
+CVE-2025-20352    | ios       | 15.9(3)M11
+CVE-2025-20352    | iosxe     | 17.12.6
+CVE-2025-20352    | iosxe     | 17.9.4a
 ```
 
 ### vulnerabilities_current Table (Extended)
@@ -414,6 +447,6 @@ function startCiscoBackgroundSync(db) {
 
 ---
 
-**Version**: 1.0.63
-**Last Updated**: 2025-10-11
-**Status**: Phase 2 Complete - Backend Architecture Implemented and Working
+**Version**: 1.0.101 (Schema: 1.0.79+)
+**Last Updated**: 2025-10-22
+**Status**: Production - Normalized architecture (HEX-287)
