@@ -6,7 +6,10 @@ This document provides a comprehensive list of technologies, frameworks, and lib
 
 ## Runtime Environment
 
-- **Node.js 22.11.0 LTS** - JavaScript runtime
+- **Node.js 18.20.8 LTS (Alpine)** - JavaScript runtime
+  - **Development**: v18.20.8 (macOS Docker)
+  - **Production**: v18.20.8 (RHEL Docker)
+  - **Container Image**: node:18-alpine
 - **CommonJS Module System** - Backend module format
 - **ES6 Modules** - Frontend module format
 

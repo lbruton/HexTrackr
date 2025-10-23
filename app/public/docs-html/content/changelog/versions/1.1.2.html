@@ -1,12 +1,12 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
     <hr>
-<h2>title: "Version 1.1.2 - ESLint Bug Fixes"
+<h2>title: "Version 1.1.2 - ESLint Bug Fixes + Documentation Portal Script Dependency"
 date: "2025-10-23"
 version: "1.1.2"
 status: "Released"
-category: "Bug Fix"</h2><h1>Version 1.1.2 - ESLint Bug Fixes</h1><p><strong>Release Status</strong>: ✅ Released<br><strong>Release Date</strong>: 2025-10-23<br><strong>Parent Issues</strong>: <a href="https://linear.app/hextrackr/issue/HEX-318/bug-fix-userid-undefined-in-authcontroller-error-logging">HEX-318</a>, <a href="https://linear.app/hextrackr/issue/HEX-319/bug-fix-event-parameter-missing-in-backup-modal-createfreshbackup">HEX-319</a></p>
-<h2>Overview</h2><p>HexTrackr v1.1.2 addresses two ESLint-detected bugs that represent real code quality issues: undefined variable usage in error logging (auth controller) and deprecated event handling patterns (backup modal). These fixes improve error diagnostics and ensure modern JavaScript compatibility.</p>
+category: "Bug Fix"</h2><h1>Version 1.1.2 - ESLint Bug Fixes + Documentation Portal Script Dependency</h1><p><strong>Release Status</strong>: ✅ Released<br><strong>Release Date</strong>: 2025-10-23<br><strong>Parent Issues</strong>: <a href="https://linear.app/hextrackr/issue/HEX-318/bug-fix-userid-undefined-in-authcontroller-error-logging">HEX-318</a>, <a href="https://linear.app/hextrackr/issue/HEX-319/bug-fix-event-parameter-missing-in-backup-modal-createfreshbackup">HEX-319</a></p>
+<h2>Overview</h2><p>HexTrackr v1.1.2 addresses three bugs: two ESLint-detected code quality issues (undefined variable usage in error logging and deprecated event handling patterns) and one missing script dependency in the documentation portal that prevented backup modal buttons from working. These fixes improve error diagnostics, ensure modern JavaScript compatibility, and restore full functionality to the documentation portal settings modal.</p>
 <h2>Bug Fixes</h2><h3>Bug Fix #1: userId Undefined in authController Error Logging (HEX-318)</h3><p><strong>Priority</strong>: Medium<br><strong>Impact</strong>: Error logs missing user identification, reduced audit trail quality</p>
 <p><strong>Problem</strong>: ESLint error <code>&#39;userId&#39; is not defined</code> at <code>app/controllers/authController.js:416</code></p>
 <ul>
@@ -66,11 +66,45 @@ category: "Bug Fix"</h2><h1>Version 1.1.2 - ESLint Bug Fixes</h1><p><strong>Rele
 <li>✅ Modern event handling pattern available for future refactoring</li>
 </ul>
 <hr>
-<h2>Technical Details</h2><h3>ESLint Rules Enforced</h3><p>Both fixes address violations of ESLint&#39;s <code>no-undef</code> rule, which prevents:</p>
+<h3>Bug Fix #3: Documentation Portal Missing backup-modal.js Script</h3><p><strong>Priority</strong>: High<br><strong>Impact</strong>: Backup modal buttons completely non-functional in documentation portal</p>
+<p><strong>Problem</strong>: User-reported bug - backup buttons failed in documentation portal only</p>
+<ul>
+<li>Settings modal contains buttons calling <code>window.backupModalManager.showTicketsBackupModal()</code></li>
+<li>Documentation portal (<code>app/public/docs-html/index.html</code>) loads <code>settings-modal.js</code> but not <code>backup-modal.js</code></li>
+<li>BackupModalManager class never instantiated, causing <code>window.backupModalManager is undefined</code></li>
+<li>Console error: <code>Uncaught TypeError: can&#39;t access property &#39;showTicketsBackupModal&#39;, window.backupModalManager is undefined</code></li>
+<li>Worked correctly in <code>tickets.html</code> and <code>vulnerabilities.html</code> (they load backup-modal.js)</li>
+<li>Pre-existing bug uncovered during v1.1.2 testing</li>
+</ul>
+<p><strong>Solution</strong>: Add missing script dependency with correct load order</p>
+<ul>
+<li>Added <code>&lt;script src=&quot;../scripts/shared/backup-modal.js&quot;&gt;&lt;/script&gt;</code> to docs-html/index.html</li>
+<li>Placed BEFORE <code>settings-modal.js</code> (line 214) to ensure BackupModalManager exists before settings modal loads</li>
+<li>Follows same pattern as tickets.html and vulnerabilities.html</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/docs-html/index.html:214</code> - Added backup-modal.js script reference</li>
+</ul>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li>✅ Script dependency now matches tickets.html and vulnerabilities.html</li>
+<li>✅ Correct load order ensures BackupModalManager instantiation before usage</li>
+<li>✅ Backup buttons now functional in documentation portal settings modal</li>
+</ul>
+<hr>
+<h2>Technical Details</h2><h3>ESLint Rules Enforced</h3><p>HEX-318 and HEX-319 address violations of ESLint&#39;s <code>no-undef</code> rule, which prevents:</p>
 <ul>
 <li>Usage of undeclared variables</li>
 <li>Reliance on implicit global variables</li>
 <li>Scope-related bugs that break code in strict mode</li>
+</ul>
+<h3>Script Dependency Management</h3><p>HEX-320 (Documentation Portal) addresses missing script dependencies:</p>
+<ul>
+<li>Settings modal buttons require BackupModalManager class to be instantiated</li>
+<li>Script load order matters: backup-modal.js must load BEFORE settings-modal.js</li>
+<li>Consistency across all HTML pages (tickets, vulnerabilities, docs portal)</li>
+<li>Prevents runtime TypeError from undefined class instances</li>
 </ul>
 <h3>Backward Compatibility Strategy</h3><p><strong>HEX-319 (backup-modal)</strong>: Implemented graceful degradation</p>
 <ul>
@@ -89,6 +123,7 @@ category: "Bug Fix"</h2><h1>Version 1.1.2 - ESLint Bug Fixes</h1><p><strong>Rele
 <ul>
 <li>❌ Error logs missing user context when early validation fails</li>
 <li>❌ Backup modal relies on deprecated <code>window.event</code> global</li>
+<li>❌ Documentation portal backup buttons completely broken</li>
 <li>❌ Code breaks in strict mode</li>
 <li>❌ ESLint errors blocking CI/CD</li>
 </ul>
@@ -96,8 +131,9 @@ category: "Bug Fix"</h2><h1>Version 1.1.2 - ESLint Bug Fixes</h1><p><strong>Rele
 <ul>
 <li>✅ All error logs include user identification</li>
 <li>✅ Event handling follows modern JavaScript patterns</li>
+<li>✅ Documentation portal fully functional (backup modals work)</li>
 <li>✅ Strict mode compatible</li>
-<li>✅ ESLint clean on both files</li>
+<li>✅ ESLint clean on all affected files</li>
 </ul>
 <hr>
 <h2>User Impact</h2><p><strong>For Developers</strong>:</p>
@@ -105,20 +141,28 @@ category: "Bug Fix"</h2><h1>Version 1.1.2 - ESLint Bug Fixes</h1><p><strong>Rele
 <li>Cleaner ESLint output (2 fewer errors)</li>
 <li>Better error diagnostics in production logs</li>
 <li>Code follows modern JavaScript best practices</li>
+<li>Consistent script dependencies across all HTML pages</li>
 </ul>
 <p><strong>For System Administrators</strong>:</p>
 <ul>
 <li>Improved audit trail quality (all password change errors now include userId)</li>
 <li>Better troubleshooting when backup operations fail</li>
 <li>More reliable error tracking</li>
+<li><strong>FIXED</strong>: Backup buttons now work in documentation portal settings modal</li>
 </ul>
 <p><strong>For End Users</strong>:</p>
 <ul>
-<li>No visible changes (bug fixes are internal code quality improvements)</li>
+<li><strong>FIXED</strong>: Backup and restore functionality fully available from documentation portal</li>
 <li>More stable backup functionality (strict mode compatible)</li>
+<li>Improved user experience when accessing backups from docs portal</li>
 </ul>
 <hr>
-<h2>Notes</h2><h3>Why These Fixes Matter</h3><p>Both bugs were <strong>functional issues</strong>, not just style violations:</p>
+<h2>Documentation Improvements</h2><ul>
+<li><strong>Content</strong>: Fixed inaccurate Node.js version in <code>architecture/technology-stack.md</code> - Corrected from &quot;Node.js 22.11.0 LTS&quot; to &quot;Node.js 18.20.8 LTS (Alpine)&quot; with environment-specific details (<a href="https://linear.app/hextrackr/issue/DOCS-75/docs-content-fix-incorrect-nodejs-version-in-technology-stackmd">DOCS-75</a>)</li>
+<li><strong>JSDoc</strong>: Fixed documentation for <code>getResolvedVulnerabilities</code> in <code>app/controllers/vulnerabilityController.js</code> - Added complete @async, @param, @returns, @throws, @route, and @example tags (<a href="https://linear.app/hextrackr/issue/DOCS-74/jsdoc-fix-add-comprehensive-documentation-to">DOCS-74</a>)</li>
+</ul>
+<hr>
+<h2>Notes</h2><h3>Why These Fixes Matter</h3><p>All three bugs were <strong>functional issues</strong>, not just style violations:</p>
 <ol>
 <li><p><strong>HEX-318 (userId)</strong>: Missing user context in error logs makes production debugging significantly harder. When password change fails, we need to know WHICH user experienced the problem.</p>
 </li>
@@ -130,12 +174,21 @@ category: "Bug Fix"</h2><h1>Version 1.1.2 - ESLint Bug Fixes</h1><p><strong>Rele
 <li>Future browser versions</li>
 </ul>
 </li>
+<li><p><strong>Documentation Portal (backup-modal.js)</strong>: Missing script dependency created complete functional failure. Backup buttons appeared clickable but threw console errors. User-reported bug discovered during v1.1.2 testing - demonstrates importance of testing all code paths, not just primary workflows.</p>
+</li>
 </ol>
-<h3>ESLint as Safety Net</h3><p>These catches demonstrate the value of static analysis:</p>
+<h3>ESLint as Safety Net</h3><p>ESLint catches demonstrate the value of static analysis:</p>
 <ul>
 <li><code>no-undef</code> rule caught real bugs, not just style issues</li>
-<li>Both would cause runtime errors in specific conditions</li>
+<li>Both HEX-318 and HEX-319 would cause runtime errors in specific conditions</li>
 <li>Better to catch at lint time than in production</li>
+</ul>
+<h3>User Testing Importance</h3><p>The documentation portal bug was caught through actual user workflow testing:</p>
+<ul>
+<li>Unit tests would not catch missing script dependencies</li>
+<li>Integration tests focus on primary user paths (tickets.html, vulnerabilities.html)</li>
+<li>Real-world usage revealed edge case (documentation portal settings modal)</li>
+<li>Demonstrates value of dogfooding your own product</li>
 </ul>
 <hr>
 <p><em>Release Notes Generated: 2025-10-23</em></p>
