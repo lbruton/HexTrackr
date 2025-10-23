@@ -235,11 +235,30 @@ docker-compose restart hextrackr-app</code></pre><p><strong>Recovery Time Object
 <li>Intentional console.warn monitoring preserved for rate limit exceeded events</li>
 </ul>
 </li>
+<li><p><strong>Cleanup</strong>: Removed debug console.log from <code>app/public/vulnerabilities.html:1165</code> (<a href="https://linear.app/hextrackr/issue/HEX-330">HEX-330</a>)</p>
+<ul>
+<li>Removed KEV picker debug log from showKevPickerModal function</li>
+<li>Feature is stable and working correctly in production</li>
+<li>Error handling console.error preserved at line 1171</li>
+</ul>
+</li>
+<li><p><strong>Cleanup</strong>: Batch removal of 8 debug console.log statements from <code>app/public/vulnerabilities.html</code> KEV picker functions (<a href="https://linear.app/hextrackr/issue/HEX-331">HEX-331</a>)</p>
+<ul>
+<li>Removed from showKevPickerModal: lines 1166 (validKevs count), 1260 (showing modal), 1268 (modal shown)</li>
+<li>Removed from returnToKevPicker: lines 1277 (returning), 1296 (location picker), 1304 (regular picker)</li>
+<li>Removed from selectKevFromPicker: line 1318 (KEV selection)</li>
+<li>Removed from viewSelectedKevDetails: line 1340 (opening details)</li>
+<li>All console.error statements preserved for actual error handling</li>
+<li>Feature validated as working correctly (verified with HEX-330)</li>
+</ul>
+</li>
 </ul>
 <h2>Documentation Improvements</h2><ul>
 <li><p><strong>Content</strong>: Fixed inaccurate port documentation in <code>reference/system-requirements.md</code> - Port 8989 incorrectly labeled as &quot;alternative/optional&quot; when it&#39;s the primary external port for Docker deployments. Updated to clearly distinguish Docker (8989→8080 mapping), bare-metal (8080), and nginx proxy (443/80) port configurations. Also updated version footer from 1.0.54 to 1.1.0 (<a href="https://linear.app/hextrackr/issue/DOCS-72">DOCS-72</a>)</p>
 </li>
 <li><p><strong>JSDoc</strong>: Fixed documentation for <code>asyncErrorHandler</code> in <code>app/middleware/errorHandler.js</code> - Added comprehensive @param type signatures, @throws documentation, and three practical @example blocks demonstrating correct/incorrect usage patterns for async route wrapper (<a href="https://linear.app/hextrackr/issue/DOCS-73">DOCS-73</a>)</p>
+</li>
+<li><p><strong>JSDoc</strong>: Fixed documentation for <code>getVulnerabilities</code> in <code>app/services/vulnerabilityService.js</code> - Added comprehensive @param tags for all options properties (page, limit, search, severity, vendor, isKev), multiple @returns tags describing pagination metadata structure, and @throws tags for database error conditions (<a href="https://linear.app/hextrackr/issue/DOCS-77">DOCS-77</a>)</p>
 </li>
 </ul>
 <h2>Related Issues</h2><ul>
