@@ -1,0 +1,170 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <hr>
+<h2>title: "Version 1.1.3 - Dependency Cleanup: Chart.js and Stagehand Removal"
+date: "2025-10-23"
+version: "1.1.3"
+status: "Released"
+category: "Maintenance"</h2><h1>Version 1.1.3 - Dependency Cleanup: Chart.js and Stagehand Removal</h1><p><strong>Release Status</strong>: ✅ Released<br><strong>Release Date</strong>: 2025-10-23<br><strong>Parent Issues</strong>: <a href="https://linear.app/hextrackr/issue/HEX-333/tech-debt-remove-unused-chartjs-dependency-from-packagejson">HEX-333</a>, <a href="https://linear.app/hextrackr/issue/DOCS-79/docs-content-fix-outdated-chartjs-reference-in-vulnerabilitieshtml">DOCS-79</a></p>
+<h2>Overview</h2><p>HexTrackr v1.1.3 removes two unused dependencies (Chart.js and Stagehand) that were creating technical debt and dependency conflicts. This cleanup eliminates ~300KB of unused packages, resolves peer dependency issues with dotenv, and removes misleading documentation that incorrectly referenced Chart.js instead of the actually-used ApexCharts library.</p>
+<h2>Dependency Cleanup</h2><h3>Removed: Chart.js Production Dependency (HEX-333)</h3><p><strong>Priority</strong>: Low (Technical Debt)<br><strong>Impact</strong>: Eliminated dependency bloat, fixed misleading documentation, removed false security alerts</p>
+<p><strong>Problem</strong>: Chart.js listed as production dependency but completely unused</p>
+<ul>
+<li><code>package.json:33</code> listed <code>&quot;chart.js&quot;: &quot;^4.4.0&quot;</code> as dependency</li>
+<li>HexTrackr uses <strong>ApexCharts</strong> for all chart rendering (loaded from <code>/vendor/apexcharts/</code>)</li>
+<li>Chart.js never instantiated anywhere in codebase</li>
+<li>Added ~270KB to node_modules unnecessarily</li>
+<li>Created false security alerts from vulnerability scanners</li>
+<li>Misleading documentation suggested Chart.js was used</li>
+</ul>
+<p><strong>Solution</strong>: Complete removal of Chart.js and all references</p>
+<ul>
+<li>Removed <code>chart.js</code> from package.json dependencies</li>
+<li>Removed Chart.js ESLint global declarations from <code>globals.js</code></li>
+<li>Removed misleading HTML comments from <code>vulnerabilities.html</code></li>
+<li>Updated <code>technology-stack.html</code> documentation</li>
+<li>Verified all chart functionality continues to work via ApexCharts</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>package.json:33</code> - Removed chart.js dependency</li>
+<li><code>app/public/scripts/globals.js:66</code> - Removed from LIBRARY_GLOBALS array</li>
+<li><code>app/public/scripts/globals.js:96</code> - Removed from JSDoc comments</li>
+<li><code>app/public/scripts/globals.js:111</code> - Removed from ESLint global declarations</li>
+<li><code>app/public/vulnerabilities.html:73-74</code> - Removed misleading comments</li>
+<li><code>app/public/docs-html/content/architecture/technology-stack.html:144</code> - Removed from docs</li>
+<li><code>package-lock.json</code> - Cleaned 13 Chart.js-related packages</li>
+</ul>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li>✅ Chart.js successfully removed from node_modules</li>
+<li>✅ ApexCharts continues to render vulnerability trend charts correctly</li>
+<li>✅ No console errors after removal</li>
+<li>✅ Docker container restarted successfully (<a href="https://dev.hextrackr.com">https://dev.hextrackr.com</a>)</li>
+<li>✅ Vulnerabilities page returns HTTP 200</li>
+<li>✅ All chart functionality verified working (render, theme switching, zoom/pan)</li>
+</ul>
+<hr>
+<h3>Removed: Stagehand Development Dependency</h3><p><strong>Priority</strong>: Low (Technical Debt)<br><strong>Impact</strong>: Fixed peer dependency conflict with dotenv, eliminated unused browser automation tool</p>
+<p><strong>Problem</strong>: Stagehand listed as devDependency but never used</p>
+<ul>
+<li><code>package.json:55</code> listed <code>&quot;@browserbasehq/stagehand&quot;: &quot;^1.12.1&quot;</code> as devDependency</li>
+<li>Created peer dependency conflict: Stagehand requires <code>dotenv@^16.4.5</code>, HexTrackr uses <code>dotenv@^17.2.1</code></li>
+<li>Forced use of <code>--legacy-peer-deps</code> flag during npm install</li>
+<li>Referenced non-existent test file: <code>tests/stagehand-examples.js</code></li>
+<li>No Stagehand usage found anywhere in codebase</li>
+</ul>
+<p><strong>Solution</strong>: Complete removal of Stagehand and related scripts</p>
+<ul>
+<li>Removed <code>@browserbasehq/stagehand</code> from package.json devDependencies</li>
+<li>Removed <code>test:stagehand</code> script from package.json (referenced non-existent file)</li>
+<li>Verified no Stagehand imports or usage in codebase</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>package.json:55</code> - Removed @browserbasehq/stagehand devDependency</li>
+<li><code>package.json:25</code> - Removed test:stagehand script</li>
+<li><code>package-lock.json</code> - Cleaned 23 Stagehand-related packages</li>
+</ul>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li>✅ Stagehand successfully removed from dependency tree</li>
+<li>✅ <code>npm install</code> now runs cleanly without <code>--legacy-peer-deps</code> flag</li>
+<li>✅ dotenv peer dependency conflict resolved</li>
+<li>✅ All existing npm scripts continue to work</li>
+</ul>
+<hr>
+<h2>Documentation Fixes (DOCS-79)</h2><p><strong>Priority</strong>: High (Documentation Accuracy)<br><strong>Impact</strong>: Eliminated developer confusion about charting library architecture</p>
+<p><strong>Problem</strong>: HTML comments incorrectly referenced Chart.js</p>
+<ul>
+<li><code>vulnerabilities.html:73-74</code> had comments saying &quot;Chart.js for mini-charts&quot;</li>
+<li>Created confusion about which charting library is actually used</li>
+<li>Could mislead future developers during debugging or refactoring</li>
+<li>Documentation-code mismatch violated principle of accurate technical docs</li>
+</ul>
+<p><strong>Solution</strong>: Removed misleading comments, updated documentation</p>
+<ul>
+<li>Removed Chart.js comments from vulnerabilities.html</li>
+<li>Updated technology-stack.html to reflect ApexCharts-only architecture</li>
+<li>Aligned documentation with actual implementation (ApexCharts from /vendor/)</li>
+</ul>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li>✅ No Chart.js references remain in HTML or documentation</li>
+<li>✅ ApexCharts correctly documented as sole charting library</li>
+<li>✅ Documentation portal updated with accurate technology stack</li>
+</ul>
+<hr>
+<h2>Impact Summary</h2><h3>Dependency Cleanup Results</h3><p><strong>Packages Removed</strong>: 36 total packages (Chart.js: 13, Stagehand: 23)<br><strong>Bundle Size Reduction</strong>: ~300KB+ removed from node_modules<br><strong>Peer Conflicts Resolved</strong>: dotenv version mismatch eliminated<br><strong>Build Process Improvement</strong>: npm install now runs cleanly without flags</p>
+<h3>Before vs After</h3><table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Before</th>
+<th>After</th>
+<th>Improvement</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Dependencies</strong></td>
+<td>23</td>
+<td>22</td>
+<td>-1</td>
+</tr>
+<tr>
+<td><strong>DevDependencies</strong></td>
+<td>8</td>
+<td>7</td>
+<td>-1</td>
+</tr>
+<tr>
+<td><strong>Total Packages</strong></td>
+<td>627</td>
+<td>591</td>
+<td>-36</td>
+</tr>
+<tr>
+<td><strong>npm install</strong></td>
+<td>Requires <code>--legacy-peer-deps</code></td>
+<td>Works cleanly</td>
+<td>✅ Fixed</td>
+</tr>
+<tr>
+<td><strong>Peer Conflicts</strong></td>
+<td>1 (dotenv)</td>
+<td>0</td>
+<td>✅ Resolved</td>
+</tr>
+<tr>
+<td><strong>False Security Alerts</strong></td>
+<td>Chart.js CVEs flagged</td>
+<td>None</td>
+<td>✅ Eliminated</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Related Issues</h2><ul>
+<li>Tech Debt: <a href="https://linear.app/hextrackr/issue/HEX-333/tech-debt-remove-unused-chartjs-dependency-from-packagejson">HEX-333</a> - Remove unused Chart.js dependency</li>
+<li>Documentation: <a href="https://linear.app/hextrackr/issue/DOCS-79/docs-content-fix-outdated-chartjs-reference-in-vulnerabilitieshtml">DOCS-79</a> - Fix Chart.js reference in vulnerabilities.html</li>
+</ul>
+<hr>
+<h2>Notes</h2><h3>Why This Matters</h3><p><strong>Technical Debt Reduction</strong>: Unused dependencies create maintenance burden (security updates, compatibility conflicts) without providing value. Removing them improves codebase health.</p>
+<p><strong>Security Posture</strong>: Vulnerability scanners flag CVEs in all dependencies, even unused ones. Chart.js CVEs would trigger false alerts, wasting security team time investigating non-issues.</p>
+<p><strong>Developer Experience</strong>: Misleading documentation and unused dependencies confuse new developers during onboarding. Clear, accurate codebase documentation reduces ramp-up time and prevents architectural misunderstandings.</p>
+<p><strong>Build Reliability</strong>: Peer dependency conflicts force workarounds like <code>--legacy-peer-deps</code>, which can mask real compatibility issues. Clean dependency resolution ensures reliable builds.</p>
+<h3>Testing Performed</h3><ul>
+<li>✅ Full Docker container restart verified</li>
+<li>✅ Vulnerabilities page chart rendering tested (<a href="https://dev.hextrackr.com/vulnerabilities.html">https://dev.hextrackr.com/vulnerabilities.html</a>)</li>
+<li>✅ Chart theme switching verified (light/dark mode)</li>
+<li>✅ Chart interactions tested (zoom, pan, export)</li>
+<li>✅ npm install runs cleanly without flags</li>
+<li>✅ ESLint validation passes (no undefined global errors)</li>
+<li>✅ Pre-commit hooks passed successfully</li>
+</ul>
+<hr>
+<p><em>Changelog completed on 2025-10-23 by Claude Code</em></p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
