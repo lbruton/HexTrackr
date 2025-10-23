@@ -56,51 +56,10 @@ class CiscoAdvisoryService {
         // Initialize fetch - use global fetch (Node 18+) or require https module
         this.fetch = global.fetch || this._initHttpsClient();
 
-        // Initialize database tables if they don't exist
-        this.initializeTables();
+        // Tables guaranteed to exist in v1.1.0+ baseline
+        // (cisco_advisories, cisco_fixed_versions created by init-database-v1.1.0.js)
     }
 
-    /**
-     * Initialize Cisco advisory database tables
-     * @async
-     */
-    async initializeTables() {
-        try {
-            // Create cisco_advisories table
-            await this.db.run(`
-                CREATE TABLE IF NOT EXISTS cisco_advisories (
-                    cve_id TEXT PRIMARY KEY,
-                    advisory_id TEXT,
-                    advisory_title TEXT,
-                    severity TEXT,
-                    cvss_score TEXT,
-                    first_fixed TEXT,
-                    affected_releases TEXT,
-                    product_names TEXT,
-                    publication_url TEXT,
-                    last_synced TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
-            `);
-
-            // Create indexes
-            await this.db.run("CREATE INDEX IF NOT EXISTS idx_cisco_advisories_cve ON cisco_advisories(cve_id)");
-            await this.db.run("CREATE INDEX IF NOT EXISTS idx_cisco_advisories_synced ON cisco_advisories(last_synced)");
-            await this.db.run(`
-                CREATE INDEX IF NOT EXISTS idx_vulnerabilities_is_fixed
-                ON vulnerabilities(is_fixed)
-                WHERE is_fixed = 1
-            `);
-
-            // Note: vulnerabilities table columns (is_fixed, fixed_cisco_versions, etc.)
-            // are created by migration 005-cisco-advisories.sql
-            // No need to ALTER TABLE here - columns already exist from migration
-
-            // sync_metadata table already exists from KEV implementation
-            _log("info", "Cisco advisory database tables initialized");
-        } catch (error) {
-            _log("error", "Failed to initialize Cisco advisory tables:", error);
-        }
-    }
 
     /**
      * Fallback HTTPS client for environments without global fetch

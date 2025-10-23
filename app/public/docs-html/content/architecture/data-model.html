@@ -1,20 +1,63 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
-    <h1>HexTrackr Data Model</h1><p>This document provides a definitive overview of the HexTrackr database schema. The primary bootstrap is <code>scripts/init-database.js</code>; however, the live schema evolves further at runtime via idempotent <code>ALTER TABLE</code> and index creation logic inside <code>server.js</code> and migration code executed during imports. The authoritative state is therefore the <strong>live SQLite schema</strong> (captured below) rather than the historical <code>schema.sql</code> file (now outdated and retained only for legacy reference).</p>
-<p><strong>Schema Summary</strong> (v1.0.101):</p>
+    <h1>HexTrackr Data Model</h1><p>This document provides a definitive overview of the HexTrackr database schema. As of v1.1.0, the primary bootstrap is <code>scripts/init-database-v1.1.0.js</code>, which consolidates all 21 application tables into a single initialization script (see <a href="https://linear.app/hextrackr/issue/HEX-324">HEX-324</a>). The schema may evolve further via incremental migrations in the <code>migrations/</code> directory. The authoritative state is the <strong>live SQLite schema</strong> captured in this document and the v1.1.0 baseline script.</p>
+<p><strong>Schema Summary</strong> (v1.1.0 baseline):</p>
 <ul>
-<li><strong>16 Core Tables</strong>: Vulnerabilities (4), Tickets (2), KEV (2), Templates (3), Authentication (2), Import (1), Analytics (2)</li>
-<li><strong>49 Indexes</strong>: Performance-optimized queries on critical fields</li>
+<li><strong>21 Core Tables</strong>: Organized into 6 functional categories</li>
+<li><strong>68 Indexes</strong>: Performance-optimized queries on critical fields (67 user-created + 1 auto-generated trigger index)</li>
 <li><strong>4-Tier Deduplication</strong>: Enhanced unique key generation with confidence scoring</li>
 <li><strong>KEV Integration</strong>: CISA Known Exploited Vulnerabilities catalog synchronization</li>
 <li><strong>Template System</strong>: Email, ticket, and vulnerability report templates with variable substitution</li>
 <li><strong>Authentication</strong>: Argon2id password hashing with account lockout protection</li>
+<li><strong>Vendor Intelligence</strong>: Cisco PSIRT and Palo Alto advisory integration with 3NF normalization</li>
+<li><strong>Audit Logging</strong>: Encrypted audit trail with configurable retention policy</li>
 </ul>
 <h2>Database Engine</h2><ul>
 <li><strong>Engine</strong>: SQLite 3</li>
 <li><strong>Database File</strong>: <code>/app/data/hextrackr.db</code> (Docker named volume: <code>hextrackr-database</code>)</li>
 <li><strong>Local Path</strong>: Not accessible from host filesystem (isolated in Docker volume for SQLite integrity)</li>
 </ul>
+<hr>
+<h2>Schema Organization (v1.1.0)</h2><p>The 21 application tables are organized into 6 functional categories:</p>
+<p><strong>Core Business</strong> (3 tables):</p>
+<ul>
+<li><code>tickets</code> - Field operations ticketing system</li>
+<li><code>ticket_templates</code> - Ticket creation templates</li>
+<li><code>ticket_vulnerabilities</code> - Junction table linking tickets to vulnerabilities</li>
+</ul>
+<p><strong>Vulnerability Management</strong> (9 tables):</p>
+<ul>
+<li><code>vulnerabilities</code> - Legacy vulnerability data (pre-rollover, backup/export only)</li>
+<li><code>vulnerabilities_current</code> - Current deduplicated vulnerability state</li>
+<li><code>vulnerability_snapshots</code> - Historical append-only vulnerability log</li>
+<li><code>vulnerability_staging</code> - Bulk import staging area</li>
+<li><code>vulnerability_daily_totals</code> - Pre-calculated daily aggregates</li>
+<li><code>vulnerability_imports</code> - CSV import audit trail</li>
+<li><code>vulnerability_templates</code> - Vulnerability report templates</li>
+<li><code>vendor_daily_totals</code> - Vendor-specific daily aggregates</li>
+</ul>
+<p><strong>Vendor Intelligence</strong> (3 tables):</p>
+<ul>
+<li><code>cisco_advisories</code> - Cisco PSIRT security advisories (OAuth2 synced)</li>
+<li><code>cisco_fixed_versions</code> - Normalized Cisco fix versions (3NF, addresses multi-OS-family CVE corruption)</li>
+<li><code>palo_alto_advisories</code> - Palo Alto security bulletins (web scraped)</li>
+</ul>
+<p><strong>CISA Integration</strong> (2 tables):</p>
+<ul>
+<li><code>kev_status</code> - CISA Known Exploited Vulnerabilities catalog</li>
+<li><code>sync_metadata</code> - KEV synchronization history and status</li>
+</ul>
+<p><strong>Authentication &amp; Preferences</strong> (2 tables):</p>
+<ul>
+<li><code>users</code> - User accounts with Argon2id password hashing</li>
+<li><code>user_preferences</code> - Cross-device user settings (JSON blob storage)</li>
+</ul>
+<p><strong>Security &amp; Audit</strong> (2 tables):</p>
+<ul>
+<li><code>audit_logs</code> - Encrypted audit trail with retention policy</li>
+<li><code>audit_log_config</code> - Singleton configuration for audit logging</li>
+</ul>
+<p><strong>Note</strong>: The <code>email_templates</code> table (part of the Template System category) is included in the Vulnerability Management count above for organizational clarity.</p>
 <hr>
 <h2>Core Tables</h2><h3>`tickets`</h3><p>Stores all ticketing information. This table has <strong>indexes for query performance</strong> on dates, status, site codes, and external ticket numbers. Site and location tracking uses TEXT fields (<code>site</code>, <code>site_id</code>, <code>location</code>, <code>location_id</code>) for flexible data storage.</p>
 <table>
@@ -1066,6 +1109,235 @@
 </tbody></table>
 <p><strong>Purpose</strong>: Audit trail for KEV sync operations, enables troubleshooting and monitoring of catalog updates.</p>
 <hr>
+<h2>Vendor Intelligence *(v1.0.63+)*</h2><p>HexTrackr integrates with vendor security advisory systems to provide fix availability tracking and remediation guidance.</p>
+<h3>`cisco_advisories` *(v1.0.63 - HEX-287)*</h3><p>Stores Cisco PSIRT security advisory metadata synced via OAuth2 API.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Constraints</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>cve_id</code></td>
+<td>TEXT</td>
+<td>PRIMARY KEY</td>
+<td>CVE identifier (e.g., CVE-2025-20352).</td>
+</tr>
+<tr>
+<td><code>advisory_id</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Cisco advisory identifier (e.g., cisco-sa-20170317-cmp).</td>
+</tr>
+<tr>
+<td><code>advisory_title</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Advisory title/summary.</td>
+</tr>
+<tr>
+<td><code>severity</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Cisco severity rating (Critical/High/Medium/Low).</td>
+</tr>
+<tr>
+<td><code>cvss_score</code></td>
+<td>TEXT</td>
+<td></td>
+<td>CVSS base score from Cisco.</td>
+</tr>
+<tr>
+<td><code>first_fixed</code></td>
+<td>TEXT</td>
+<td></td>
+<td><strong>Deprecated</strong>: Legacy column, use <code>cisco_fixed_versions</code> instead.</td>
+</tr>
+<tr>
+<td><code>affected_releases</code></td>
+<td>TEXT</td>
+<td></td>
+<td>JSON array of affected software versions.</td>
+</tr>
+<tr>
+<td><code>product_names</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Affected product names.</td>
+</tr>
+<tr>
+<td><code>publication_url</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Direct link to Cisco advisory.</td>
+</tr>
+<tr>
+<td><code>last_synced</code></td>
+<td>TIMESTAMP</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Last synchronization timestamp.</td>
+</tr>
+</tbody></table>
+<p><strong>Indexes</strong>:</p>
+<ul>
+<li><code>idx_cisco_advisories_cve</code> (cve_id)</li>
+<li><code>idx_cisco_advisories_synced</code> (last_synced)</li>
+</ul>
+<p><strong>Sync Strategy</strong>: OAuth2 authentication with 90-day refresh cycle for existing advisories. See <a href="/docs-html/content/guides/cisco-psirt-integration.html">Cisco PSIRT Integration Guide</a> for details.</p>
+<h3>`cisco_fixed_versions` *(v1.0.79 - Migration 007, HEX-287)*</h3><p>Stores normalized Cisco fix versions (3NF normalization to prevent data corruption from multi-OS-family CVEs).</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Constraints</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>INTEGER</td>
+<td>PK AUTOINCREMENT</td>
+<td>Fixed version record identifier.</td>
+</tr>
+<tr>
+<td><code>cve_id</code></td>
+<td>TEXT</td>
+<td>FK to <code>cisco_advisories.cve_id</code>, NOT NULL</td>
+<td>Associated CVE.</td>
+</tr>
+<tr>
+<td><code>os_family</code></td>
+<td>TEXT</td>
+<td>NOT NULL</td>
+<td>Operating system family (ios, iosxe, iosxr, nxos, etc.).</td>
+</tr>
+<tr>
+<td><code>fixed_version</code></td>
+<td>TEXT</td>
+<td>NOT NULL</td>
+<td>Software version that fixes the vulnerability.</td>
+</tr>
+<tr>
+<td><code>affected_version</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Original affected version string.</td>
+</tr>
+<tr>
+<td><code>last_synced</code></td>
+<td>TIMESTAMP</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Last synchronization timestamp.</td>
+</tr>
+<tr>
+<td><strong>UNIQUE</strong></td>
+<td>(cve_id, os_family, fixed_version)</td>
+<td></td>
+<td>One row per CVE + OS family + version.</td>
+</tr>
+<tr>
+<td><strong>FOREIGN KEY</strong></td>
+<td>ON DELETE CASCADE</td>
+<td></td>
+<td>Versions deleted when advisory is deleted.</td>
+</tr>
+</tbody></table>
+<p><strong>Indexes</strong>:</p>
+<ul>
+<li><code>idx_cisco_fixed_versions_cve</code> (cve_id)</li>
+<li><code>idx_cisco_fixed_versions_os_family</code> (os_family)</li>
+<li><code>idx_cisco_fixed_versions_composite</code> (cve_id, os_family)</li>
+</ul>
+<p><strong>Why Normalized?</strong> Multi-OS-family CVEs (affecting both IOS and IOS XE) require separate rows to prevent data overwrites. See <a href="https://linear.app/hextrackr/issue/HEX-287">HEX-287</a> for technical details.</p>
+<p><strong>Example Data</strong>:</p>
+<pre><code class="language-">cve_id            | os_family | fixed_version
+------------------|-----------|---------------
+CVE-2025-20352    | ios       | 15.2(8)E8
+CVE-2025-20352    | ios       | 15.9(3)M11
+CVE-2025-20352    | iosxe     | 17.12.6
+CVE-2025-20352    | iosxe     | 17.9.4a</code></pre><h3>`palo_alto_advisories` *(v1.0.63)*</h3><p>Stores Palo Alto Networks security bulletin data scraped from their security advisory website.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Constraints</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>cve_id</code></td>
+<td>TEXT</td>
+<td>PRIMARY KEY</td>
+<td>CVE identifier.</td>
+</tr>
+<tr>
+<td><code>advisory_id</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Palo Alto advisory identifier (e.g., PAN-SA-2024-0001).</td>
+</tr>
+<tr>
+<td><code>advisory_title</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Advisory title/summary.</td>
+</tr>
+<tr>
+<td><code>severity</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Palo Alto severity rating.</td>
+</tr>
+<tr>
+<td><code>cvss_score</code></td>
+<td>TEXT</td>
+<td></td>
+<td>CVSS base score from Palo Alto.</td>
+</tr>
+<tr>
+<td><code>first_fixed</code></td>
+<td>TEXT</td>
+<td></td>
+<td>First fixed software version.</td>
+</tr>
+<tr>
+<td><code>affected_releases</code></td>
+<td>TEXT</td>
+<td></td>
+<td>JSON array of affected PAN-OS versions.</td>
+</tr>
+<tr>
+<td><code>product_names</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Affected product names.</td>
+</tr>
+<tr>
+<td><code>publication_url</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Direct link to Palo Alto advisory.</td>
+</tr>
+<tr>
+<td><code>last_synced</code></td>
+<td>TIMESTAMP</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Last synchronization timestamp.</td>
+</tr>
+</tbody></table>
+<p><strong>Indexes</strong>:</p>
+<ul>
+<li><code>idx_palo_advisories_cve</code> (cve_id)</li>
+<li><code>idx_palo_advisories_synced</code> (last_synced)</li>
+</ul>
+<p><strong>Sync Strategy</strong>: Web scraping with HTML parsing (no official API available). Manual refresh via admin interface.</p>
+<p><strong>Vendor-Neutral Fix Tracking</strong>: Both vendor advisory systems set the <code>is_fix_available</code> flag on <code>vulnerabilities_current</code> table for fast filtering of fixable vulnerabilities.</p>
+<hr>
 <h2>Template System *(v1.0.46+)*</h2><p>HexTrackr provides customizable templates for emails, tickets, and vulnerability reports with variable substitution.</p>
 <h3>`email_templates`</h3><p>Stores email notification templates with dynamic variable support.</p>
 <table>
@@ -1429,6 +1701,175 @@
 <li><code>table_preferences</code>: AG-Grid column state</li>
 </ul>
 <hr>
+<h2>Security & Audit *(v1.0.67 - Migration 012, HEX-254)*</h2><p>HexTrackr provides encrypted audit logging for compliance and security monitoring.</p>
+<h3>`audit_logs`</h3><p>Stores encrypted audit trail entries with automatic retention policy enforcement.</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Constraints</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>INTEGER</td>
+<td>PK AUTOINCREMENT</td>
+<td>Audit log entry identifier.</td>
+</tr>
+<tr>
+<td><code>category</code></td>
+<td>TEXT</td>
+<td>NOT NULL</td>
+<td>Log category (auth, data, system, security).</td>
+</tr>
+<tr>
+<td><code>timestamp</code></td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP, NOT NULL</td>
+<td>Event timestamp.</td>
+</tr>
+<tr>
+<td><code>user_id</code></td>
+<td>TEXT</td>
+<td></td>
+<td>User identifier (if user-initiated action).</td>
+</tr>
+<tr>
+<td><code>username</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Username (denormalized for query performance).</td>
+</tr>
+<tr>
+<td><code>ip_address</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Source IP address.</td>
+</tr>
+<tr>
+<td><code>user_agent</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Client user agent string.</td>
+</tr>
+<tr>
+<td><code>request_id</code></td>
+<td>TEXT</td>
+<td></td>
+<td>Request correlation identifier.</td>
+</tr>
+<tr>
+<td><code>encrypted_message</code></td>
+<td>BLOB</td>
+<td>NOT NULL</td>
+<td>AES-256-GCM encrypted log message.</td>
+</tr>
+<tr>
+<td><code>encrypted_data</code></td>
+<td>BLOB</td>
+<td></td>
+<td>AES-256-GCM encrypted additional context (JSON).</td>
+</tr>
+<tr>
+<td><code>encryption_iv</code></td>
+<td>BLOB</td>
+<td>NOT NULL</td>
+<td>Initialization vector for decryption.</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Record creation timestamp.</td>
+</tr>
+</tbody></table>
+<p><strong>Indexes</strong>:</p>
+<ul>
+<li><code>idx_audit_logs_category</code> (category)</li>
+<li><code>idx_audit_logs_timestamp</code> (timestamp DESC)</li>
+<li><code>idx_audit_logs_user_id</code> (user_id)</li>
+<li><code>idx_audit_logs_category_timestamp</code> (category, timestamp DESC)</li>
+<li><code>idx_audit_logs_user_timestamp</code> (user_id, timestamp DESC)</li>
+<li><code>idx_audit_logs_request_id</code> (request_id)</li>
+</ul>
+<p><strong>Encryption</strong>: All log messages and data are encrypted at rest using AES-256-GCM with per-record initialization vectors. Encryption keys are stored in <code>audit_log_config</code> and never logged.</p>
+<p><strong>Retention Policy</strong>: Logs older than <code>retention_days</code> (default: 30) are automatically purged by background cleanup job.</p>
+<h3>`audit_log_config`</h3><p>Singleton configuration table for audit logging system (enforced via <code>CHECK (id = 1)</code> constraint).</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Constraints</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id</code></td>
+<td>INTEGER</td>
+<td>PRIMARY KEY, CHECK (id = 1)</td>
+<td>Always 1 (singleton pattern).</td>
+</tr>
+<tr>
+<td><code>encryption_key</code></td>
+<td>BLOB</td>
+<td>NOT NULL</td>
+<td>AES-256 encryption key (32 bytes).</td>
+</tr>
+<tr>
+<td><code>key_created_at</code></td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Encryption key creation timestamp.</td>
+</tr>
+<tr>
+<td><code>key_rotated_at</code></td>
+<td>DATETIME</td>
+<td></td>
+<td>Last key rotation timestamp.</td>
+</tr>
+<tr>
+<td><code>retention_days</code></td>
+<td>INTEGER</td>
+<td>DEFAULT 30</td>
+<td>Log retention period in days.</td>
+</tr>
+<tr>
+<td><code>last_cleanup_at</code></td>
+<td>DATETIME</td>
+<td></td>
+<td>Last retention cleanup timestamp.</td>
+</tr>
+<tr>
+<td><code>total_logs_written</code></td>
+<td>INTEGER</td>
+<td>DEFAULT 0</td>
+<td>Lifetime audit log count.</td>
+</tr>
+<tr>
+<td><code>total_logs_purged</code></td>
+<td>INTEGER</td>
+<td>DEFAULT 0</td>
+<td>Lifetime purged log count.</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Record creation timestamp.</td>
+</tr>
+<tr>
+<td><code>updated_at</code></td>
+<td>DATETIME</td>
+<td>DEFAULT CURRENT_TIMESTAMP</td>
+<td>Last modification timestamp.</td>
+</tr>
+</tbody></table>
+<p><strong>Singleton Pattern</strong>: Only one row can exist (enforced by <code>CHECK (id = 1)</code>). Prevents accidental creation of multiple encryption key records.</p>
+<p><strong>Key Management</strong>: Encryption keys are randomly generated on first initialization and can be rotated via admin interface. Key rotation re-encrypts all existing logs.</p>
+<hr>
 <h2>Junction Tables</h2><h3>`ticket_vulnerabilities`</h3><p>Many-to-many relationship between tickets and (legacy) <code>vulnerabilities</code> (pre-rollover) or conceptually <code>vulnerabilities_current</code> for future adaptation.</p>
 <table>
 <thead>
@@ -1471,8 +1912,8 @@
 </tr>
 </tbody></table>
 <p><strong>Note on Sites &amp; Locations</strong>: The <code>tickets</code> table includes TEXT fields (<code>site</code>, <code>site_id</code>, <code>location</code>, <code>location_id</code>) for flexible site/location tracking. Dedicated normalization tables (<code>sites</code>, <code>locations</code>) are <strong>not currently implemented</strong> but may be added in future versions for structured taxonomy.</p>
-<h2>Indexes</h2><p>To ensure efficient querying, <strong>49 indexes</strong> are automatically created during database initialization.</p>
-<h3>Index Inventory by Table</h3><p><strong>vulnerability_snapshots</strong> (5 indexes):</p>
+<h2>Indexes</h2><p>To ensure efficient querying, <strong>68 indexes</strong> are automatically created during database initialization (v1.1.0 baseline). This includes 67 user-created indexes plus 1 auto-generated trigger index (<code>sqlite_autoindex_user_preferences_1</code>).</p>
+<h3>Index Inventory by Table (v1.1.0)</h3><p><strong>vulnerability_snapshots</strong> (5 indexes):</p>
 <ul>
 <li><code>idx_snapshots_scan_date</code> - Query by date</li>
 <li><code>idx_snapshots_hostname</code> - Query by hostname</li>
@@ -1526,6 +1967,21 @@
 <li><code>idx_kev_status_date_added</code> - Chronological queries</li>
 <li><code>idx_kev_status_due_date</code> - Deadline tracking</li>
 <li><code>idx_kev_status_ransomware</code> - Partial index (WHERE known_ransomware_use = 1)</li>
+</ul>
+<p><strong>Vendor Intelligence</strong> (7 indexes):</p>
+<ul>
+<li>Cisco advisories: <code>idx_cisco_advisories_cve</code>, <code>idx_cisco_advisories_synced</code></li>
+<li>Cisco fixed versions: <code>idx_cisco_fixed_versions_cve</code>, <code>idx_cisco_fixed_versions_os_family</code>, <code>idx_cisco_fixed_versions_composite</code></li>
+<li>Palo Alto advisories: <code>idx_palo_advisories_cve</code>, <code>idx_palo_advisories_synced</code></li>
+</ul>
+<p><strong>Security &amp; Audit</strong> (6 indexes):</p>
+<ul>
+<li><code>idx_audit_logs_category</code> - Category filtering</li>
+<li><code>idx_audit_logs_timestamp</code> - Chronological queries</li>
+<li><code>idx_audit_logs_user_id</code> - User activity tracking</li>
+<li><code>idx_audit_logs_category_timestamp</code> - Composite (category, timestamp DESC)</li>
+<li><code>idx_audit_logs_user_timestamp</code> - Composite (user_id, timestamp DESC)</li>
+<li><code>idx_audit_logs_request_id</code> - Request correlation</li>
 </ul>
 <p><strong>Template Tables</strong> (9 indexes total):</p>
 <ul>
@@ -1630,7 +2086,7 @@
 <hr>
 <p>The above reflects the database as inspected on the current build date. Regenerate this document after structural changes or migration scripts are introduced.</p>
 <hr>
-<p><em>Last Updated: 2025-10-22 | Version: v1.0.101 | Audit: DOCS-64</em></p>
+<p><em>Last Updated: 2025-10-22 | Version: v1.1.0 | Schema: HEX-324 Consolidation | Audit: DOCS-64</em></p>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be

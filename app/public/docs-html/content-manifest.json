@@ -1,5 +1,5 @@
 {
-  "generated": "2025-10-23T00:21:08.551Z",
+  "generated": "2025-10-23T02:42:34.156Z",
   "sections": {
     "api-reference": {
       "title": "Api Reference",
@@ -119,7 +119,9 @@
           "file": "changelog/versions/1.0.92",
           "title": "1.0.92",
           "path": "changelog/versions/1.0.92.html"
-        },
+        }
+      },
+      "archivedVersions": {
         "1.0.91": {
           "file": "changelog/versions/1.0.91",
           "title": "1.0.91",
@@ -549,6 +551,11 @@
           "file": "changelog/versions/1.0.0",
           "title": "1.0.0",
           "path": "changelog/versions/1.0.0.html"
+        },
+        "archive": {
+          "file": "changelog/archive",
+          "title": "Archive",
+          "path": "changelog/archive.html"
         }
       }
     },
@@ -621,5 +628,5 @@
       "path": "overview.html"
     }
   },
-  "totalFiles": 122
+  "totalFiles": 123
 }
