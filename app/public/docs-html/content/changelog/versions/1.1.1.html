@@ -1,0 +1,121 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <hr>
+<h2>title: "Version 1.1.1 - Ticket Creation UX Polish"
+date: "2025-10-23"
+version: "1.1.1"
+status: "Released"
+category: "Bug Fix"</h2><h1>Version 1.1.1 - Ticket Creation UX Polish</h1><p><strong>Release Status</strong>: ✅ Released<br><strong>Release Date</strong>: 2025-10-23<br><strong>Parent Issue</strong>: <a href="https://linear.app/hextrackr/issue/HEX-313/fix-create-ticket-and-power-tools-kb-shortcuts">HEX-313</a></p>
+<h2>Overview</h2><p>HexTrackr v1.1.1 addresses UX inconsistencies in the ticket creation workflow introduced in v1.0.57&#39;s power tools feature. This patch release ensures hostname normalization consistency across all ticket creation entry points and fixes critical sorting bugs in bulk ticket creation that prevented proper boot order planning.</p>
+<h2>Bug Fixes</h2><h3>Ticket Creation & Power Tools Fixes (HEX-313)</h3><p><strong>Problem</strong>: Three UX bugs affecting ticket creation workflow:</p>
+<ol>
+<li>Location details modal displayed hostnames in lowercase while other modals used uppercase (markdown template readability issue)</li>
+<li>Power tools keyboard shortcuts (Cmd+Shift, Alt+Shift) returned unsorted device lists, making boot order planning impossible</li>
+<li>Inconsistent SITE/Location field extraction across different ticket creation entry points</li>
+</ol>
+<p><strong>Solution</strong>: Applied comprehensive normalization and sorting fixes across all ticket creation pathways.</p>
+<p><strong>Changes</strong>:</p>
+<h4>Bug Fix #1: Hostname Case Consistency</h4><ul>
+<li><strong>Fixed</strong>: <code>location-details-modal.js:1081</code> - Now uses <code>hostname.toUpperCase()</code> for ticket data (matches device-security-modal.js, vulnerability-cards.js, ag-grid-responsive-config.js patterns)</li>
+<li><strong>Impact</strong>: All ticket creation flows now use consistent uppercase hostname formatting for markdown templates</li>
+</ul>
+<h4>Bug Fix #2: Power Tools Sorting (Critical)</h4><ul>
+<li><strong>Fixed</strong>: Added <code>.sort()</code> to all 8 power tools device list generation points:<ul>
+<li><code>device-security-modal.js:1105</code> - KEV devices bulk creation (Cmd/Ctrl+Shift)</li>
+<li><code>device-security-modal.js:1123</code> - All devices bulk creation (Alt+Shift)</li>
+<li><code>vulnerability-cards.js:262</code> - KEV devices bulk creation</li>
+<li><code>vulnerability-cards.js:275</code> - All devices bulk creation</li>
+<li><code>ag-grid-responsive-config.js:563</code> - Grid KEV devices bulk creation</li>
+<li><code>ag-grid-responsive-config.js:582</code> - Grid all devices bulk creation</li>
+<li><code>location-details-modal.js:1108</code> - Location modal KEV devices bulk creation (<strong>NEW</strong>)</li>
+<li><code>location-details-modal.js:1120</code> - Location modal all devices bulk creation (<strong>NEW</strong>)</li>
+</ul>
+</li>
+<li><strong>Impact</strong>: Device lists now appear in alphabetical/numerical order for boot sequence planning across <strong>all 4 entry points</strong></li>
+</ul>
+<h4>Bug Fix #3: Location Parsing Consistency</h4><ul>
+<li><strong>Analysis</strong>: Current substring approach (first 4 chars = SITE, first 5 chars = Location) is correct - it matches the fallback logic in HostnameParserService.js:154-160</li>
+<li><strong>Decision</strong>: No changes needed - substring extraction is the documented fallback pattern when device type patterns don&#39;t match</li>
+<li><strong>Note</strong>: Frontend doesn&#39;t have access to backend HostnameParserService, so substring approach is appropriate</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/location-details-modal.js:1081</code>: Added <code>.toUpperCase()</code> to hostname in ticket data</li>
+<li><code>app/public/scripts/shared/location-details-modal.js:1081-1140</code>: Added power tools keyboard shortcut support (HEX-313 follow-up)</li>
+<li><code>app/public/scripts/shared/location-details-modal.js:746</code>: Updated cellRenderer to pass event object for keyboard modifiers</li>
+<li><code>app/public/scripts/shared/device-security-modal.js:1105,1123</code>: Added <code>.sort()</code> to power tools device lists</li>
+<li><code>app/public/scripts/shared/vulnerability-cards.js:262,275</code>: Added <code>.sort()</code> to power tools device lists</li>
+<li><code>app/public/scripts/shared/ag-grid-responsive-config.js:563,582</code>: Added <code>.sort()</code> to grid power tools device lists</li>
+</ul>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li>✅ ESLint validation passed (no new errors introduced)</li>
+<li>✅ Hostname normalization consistent across all 4 ticket creation entry points</li>
+<li>✅ Device sorting works in all 8 power tools variations (2 modifiers × 4 entry points)</li>
+<li>✅ Backward compatibility maintained (single device creation unchanged)</li>
+<li>✅ Location Details modal now supports power tools (Cmd+Shift, Alt+Shift)</li>
+</ul>
+<p><strong>Issues</strong>:</p>
+<ul>
+<li><a href="https://linear.app/hextrackr/issue/HEX-313/fix-create-ticket-and-power-tools-kb-shortcuts">HEX-313</a></li>
+</ul>
+<hr>
+<h2>Technical Details</h2><h3>Power Tools Keyboard Shortcuts Reference</h3><p><strong>Entry Points</strong>: 4 locations support power tools</p>
+<ol>
+<li>Device Security Modal (device-security-modal.js)</li>
+<li>Vulnerability Cards View (vulnerability-cards.js)</li>
+<li>AG-Grid Table View (ag-grid-responsive-config.js)</li>
+<li><strong>Location Details Modal</strong> (location-details-modal.js) - <strong>NEW in v1.1.1</strong></li>
+</ol>
+<p><strong>Keyboard Modifiers</strong>:</p>
+<ul>
+<li><strong>No modifiers</strong>: Single device ticket creation</li>
+<li><strong>Cmd+Shift</strong> (Mac) or <strong>Ctrl+Shift</strong> (Windows): Bulk ticket for KEV devices at location</li>
+<li><strong>Alt+Shift</strong>: Bulk ticket for all devices at location</li>
+</ul>
+<p><strong>Power Tools Flow</strong>:</p>
+<ol>
+<li>User clicks &quot;Create Ticket&quot; button with keyboard modifier</li>
+<li>System extracts location from hostname (first 5 characters)</li>
+<li>System filters devices: <code>.getFilteredDevices()</code> → <code>.filter()</code> by location match</li>
+<li><strong>NEW</strong>: System sorts devices alphabetically: <code>.sort()</code></li>
+<li>System creates bulk ticket with sorted device list</li>
+</ol>
+<h3>Implementation Pattern</h3><p><strong>Before (Bug)</strong>:</p>
+<pre><code class="language-javascript">deviceList = allDevices
+    .<span class="hljs-title function_">filter</span>(<span class="hljs-function"><span class="hljs-params">device</span> =&gt;</span> device.<span class="hljs-property">hostname</span>.<span class="hljs-title function_">toLowerCase</span>().<span class="hljs-title function_">startsWith</span>(location.<span class="hljs-title function_">toLowerCase</span>()))
+    .<span class="hljs-title function_">map</span>(<span class="hljs-function"><span class="hljs-params">device</span> =&gt;</span> device.<span class="hljs-property">hostname</span>.<span class="hljs-title function_">toUpperCase</span>());
+<span class="hljs-comment">// Random order - unusable for boot planning</span></code></pre><p><strong>After (Fixed)</strong>:</p>
+<pre><code class="language-javascript">deviceList = allDevices
+    .<span class="hljs-title function_">filter</span>(<span class="hljs-function"><span class="hljs-params">device</span> =&gt;</span> device.<span class="hljs-property">hostname</span>.<span class="hljs-title function_">toLowerCase</span>().<span class="hljs-title function_">startsWith</span>(location.<span class="hljs-title function_">toLowerCase</span>()))
+    .<span class="hljs-title function_">map</span>(<span class="hljs-function"><span class="hljs-params">device</span> =&gt;</span> device.<span class="hljs-property">hostname</span>.<span class="hljs-title function_">toUpperCase</span>())
+    .<span class="hljs-title function_">sort</span>(); <span class="hljs-comment">// HEX-313: Alphabetical sorting for boot order planning</span></code></pre><hr>
+<h2>User Impact</h2><p><strong>Before v1.1.1</strong>:</p>
+<ul>
+<li>❌ Power tools returned devices in random order (based on database query order)</li>
+<li>❌ Location modal showed lowercase hostnames (inconsistent with other modals)</li>
+<li>❌ Boot order planning required manual sorting in ticket markdown</li>
+</ul>
+<p><strong>After v1.1.1</strong>:</p>
+<ul>
+<li>✅ Power tools return alphabetically sorted device lists</li>
+<li>✅ All modals show consistent uppercase hostname formatting</li>
+<li>✅ Boot order planning can use device list as-is or apply reverse sort for downstream dependencies</li>
+</ul>
+<hr>
+<h2>Notes</h2><h3>Sorting Rationale</h3><p><strong>Why Alphabetical Sorting?</strong></p>
+<p>Ticket markdown is used for field operations boot order planning. Alphabetical sorting provides:</p>
+<ol>
+<li><strong>Predictability</strong>: Same location always returns same order</li>
+<li><strong>Flexibility</strong>: Users can reverse sort or drag-and-drop to match topology</li>
+<li><strong>Consistency</strong>: Matches user expectations for sorted lists</li>
+</ol>
+<p><strong>Alternative Considered</strong>: Sorting by VPR score or severity was rejected because boot order depends on topology and downstream dependencies, not risk levels.</p>
+<h3>Location Parsing Architecture</h3><p><strong>Backend</strong>: HostnameParserService uses pattern matching (e.g., &quot;tulsatowernswan01&quot; → &quot;tulsatower&quot;) with substring fallback<br><strong>Frontend</strong>: Uses substring approach directly (no access to backend service)<br><strong>Result</strong>: Consistent extraction logic with acceptable accuracy trade-off</p>
+<hr>
+<p><em>Release Notes Generated: 2025-10-23</em></p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

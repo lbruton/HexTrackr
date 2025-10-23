@@ -41,8 +41,11 @@ async function checkExistingSchema(db) {
     db.get(
       "SELECT COUNT(*) as count FROM sqlite_master WHERE type='table' AND name='users'",
       (err, row) => {
-        if (err) reject(err);
-        else resolve(row.count > 0);
+        if (err) {
+          reject(err);
+        } else {
+          resolve(row.count > 0);
+        }
       }
     );
   });

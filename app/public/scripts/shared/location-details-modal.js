@@ -739,8 +739,11 @@ class LocationDetailsModal {
                                 tooltipText = `${closedCount} closed ticket${closedCount > 1 ? "s" : ""} - click to create new`;
                             }
 
+                            // HEX-313: Add keyboard shortcut hints to tooltip
+                            tooltipText += `&#13;&#10;Cmd+Shift: KEV devices at location&#13;&#10;Alt+Shift: All devices at location`;
+
                             return `<a href="#" class="text-muted"
-                                       onclick="window.locationDetailsModal.createTicket('${hostname}', ${isKev}); return false;"
+                                       onclick="window.locationDetailsModal.createTicket(event, '${hostname}', ${isKev}); return false;"
                                        title="${tooltipText}">
                                        <i class="fas fa-ticket-alt" style="opacity: 0.6;"></i>
                                     </a>`;
@@ -1066,22 +1069,69 @@ class LocationDetailsModal {
     }
 
     /**
-     * Create ticket for device
-     * Pattern source: device-security-modal.js:947-987 (ticket creation flow)
+     * Create ticket for device with power tools support
+     * Pattern source: device-security-modal.js:1023-1162 (power tools implementation)
+     * Supports keyboard shortcuts:
+     * - No modifiers: Single device ticket
+     * - Cmd+Shift or Ctrl+Shift: KEV devices at location
+     * - Alt+Shift: All devices at location
+     * @param {MouseEvent|null} event - Click event with keyboard modifiers (optional)
      * @param {string} hostname - Device hostname
+     * @param {boolean} isKev - Whether device has KEV vulnerabilities
      * @since v1.0.89
+     * @since v1.1.1 - Added power tools keyboard shortcut support (HEX-313)
      */
-    createTicket(hostname) {
-        // Parse hostname to extract SITE and Location (ALL CAPS)
-        const site = hostname.substring(0, 4).toUpperCase();       // First 4 characters
-        const location = hostname.substring(0, 5).toUpperCase();   // First 5 characters
+    createTicket(event, hostname, isKev) {
+        // Handle legacy calls without event parameter
+        if (typeof event === "string") {
+            // Old signature: createTicket(hostname, isKev)
+            isKev = hostname;
+            hostname = event;
+            event = null;
+        }
 
-        // Prepare ticket data for single device creation
+        // Parse hostname to extract SITE and Location (ALL CAPS)
+        const site = hostname.substring(0, 4).toUpperCase();
+        const location = hostname.substring(0, 5).toUpperCase();
+
+        // Detect keyboard modifiers for power tools (HEX-313)
+        let mode = "single";
+        let deviceList = [hostname.toUpperCase()];
+
+        if (event) {
+            // Mode 2: KEV devices at location (Cmd/Ctrl + Shift)
+            if ((event.metaKey || event.ctrlKey) && event.shiftKey) {
+                mode = "bulk-kev";
+
+                if (this.allDevices) {
+                    // Filter for KEV devices at same location
+                    deviceList = this.allDevices
+                        .filter(device => device.hostname.toLowerCase().startsWith(location.toLowerCase()) && device.hasKev === true)
+                        .map(device => device.hostname.toUpperCase())
+                        .sort(); // HEX-313: Alphabetical sorting for boot order planning
+                }
+            }
+            // Mode 3: All devices at location (Alt + Shift)
+            else if (event.altKey && event.shiftKey) {
+                mode = "bulk-all";
+
+                if (this.allDevices) {
+                    // Filter for all devices at same location
+                    deviceList = this.allDevices
+                        .filter(device => device.hostname.toLowerCase().startsWith(location.toLowerCase()))
+                        .map(device => device.hostname.toUpperCase())
+                        .sort(); // HEX-313: Alphabetical sorting for boot order planning
+                }
+            }
+        }
+
+        // Prepare ticket data
         const ticketData = {
-            devices: [hostname],
+            devices: deviceList,
             site: site,
             location: location,
-            mode: "single"
+            mode: mode,
+            timestamp: Date.now()
         };
 
         // Store data in sessionStorage for tickets.html to consume
