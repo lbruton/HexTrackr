@@ -24,6 +24,9 @@
 <li><strong>Added Columns</strong>: <code>failed_attempts</code>, <code>locked_until</code>, <code>last_login</code>, <code>failed_login_timestamp</code></li>
 <li><strong>Password Hash</strong>: Regenerated admin password hash for argon2 v0.31.2 compatibility</li>
 </ul>
+<h2>Documentation Improvements</h2><ul>
+<li><strong>Content</strong>: Fixed inaccurate chart types in <code>architecture/frontend.md</code> - removed non-existent donut/bar/histogram charts, clarified only line charts are implemented (<a href="https://linear.app/hextrackr/issue/DOCS-134">DOCS-134</a>)</li>
+</ul>
 <h2>Technical Details</h2><h3>Dockerfile Changes</h3><pre><code class="language-dockerfile"><span class="hljs-comment"># Production stage now rebuilds native modules</span>
 <span class="hljs-keyword">RUN</span><span class="language-bash"> apk add --no-cache sqlite python3 py3-setuptools make g++</span>
 <span class="hljs-keyword">RUN</span><span class="language-bash"> npm rebuild better-sqlite3 argon2</span></code></pre><h3>Database Schema Updates</h3><ul>
