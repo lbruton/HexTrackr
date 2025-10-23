@@ -1,6 +1,6 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
-    <h1>WebSocket Reference</h1><p><strong>Version</strong>: v1.0.54<br><strong>Last Updated</strong>: 2025-10-09</p>
+    <h1>WebSocket Reference</h1><p><strong>Version</strong>: v1.1.3<br><strong>Last Updated</strong>: 2025-10-09</p>
 <p>This reference documents the WebSocket protocol, including low-level classes and events used inside HexTrackr.</p>
 <p><strong>Implementation Locations</strong>:</p>
 <ul>
@@ -11,25 +11,45 @@
 <hr>
 <h2>WebSocket Security & Authentication</h2><h3>Session-Based Authentication</h3><p><strong>Since</strong>: v1.0.46 (authentication system)</p>
 <p><strong>Critical Requirement</strong>: All WebSocket connections MUST have a valid session to connect.</p>
-<p><strong>Handshake Implementation</strong> (<code>server.js</code>):</p>
-<pre><code class="language-javascript">io.<span class="hljs-title function_">use</span>(<span class="hljs-function">(<span class="hljs-params">socket, next</span>) =&gt;</span> {
-    <span class="hljs-comment">// Share session middleware with WebSocket</span>
-    <span class="hljs-title function_">sessionMiddleware</span>(socket.<span class="hljs-property">request</span>, {}, <span class="hljs-function">() =&gt;</span> {
-        <span class="hljs-keyword">if</span> (socket.<span class="hljs-property">request</span>.<span class="hljs-property">session</span> &amp;&amp; socket.<span class="hljs-property">request</span>.<span class="hljs-property">session</span>.<span class="hljs-property">userId</span>) {
-            <span class="hljs-comment">// User authenticated - allow connection</span>
-            socket.<span class="hljs-property">userId</span> = socket.<span class="hljs-property">request</span>.<span class="hljs-property">session</span>.<span class="hljs-property">userId</span>;
-            <span class="hljs-title function_">next</span>();
-        } <span class="hljs-keyword">else</span> {
-            <span class="hljs-comment">// Reject unauthenticated connections</span>
-            <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&quot;Authentication required&quot;</span>));
+<p><strong>Handshake Implementation</strong> (<code>server.js:108-130</code>):</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Secure WebSocket connections with session-based authentication</span>
+<span class="hljs-comment">// Only authenticate on handshake (when sid is undefined), not on subsequent polling requests</span>
+io.<span class="hljs-property">engine</span>.<span class="hljs-title function_">use</span>(<span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+    <span class="hljs-keyword">const</span> isHandshake = req.<span class="hljs-property">_query</span>.<span class="hljs-property">sid</span> === <span class="hljs-literal">undefined</span>;
+    <span class="hljs-keyword">if</span> (!isHandshake) {
+        <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>();
+    }
+
+    <span class="hljs-comment">// Apply session middleware during handshake</span>
+    <span class="hljs-title function_">sessionMiddleware</span>(req, res, <span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> {
+        <span class="hljs-keyword">if</span> (err) {
+            <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&quot;Socket session error:&quot;</span>, err);
+            <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(err);
         }
+
+        <span class="hljs-comment">// Check if user is authenticated</span>
+        <span class="hljs-keyword">if</span> (!req.<span class="hljs-property">session</span> || !req.<span class="hljs-property">session</span>.<span class="hljs-property">userId</span>) {
+            <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Unauthenticated WebSocket connection attempt&quot;</span>);
+            <span class="hljs-keyword">return</span> <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&quot;Authentication required&quot;</span>));
+        }
+
+        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">` Authenticated WebSocket handshake: <span class="hljs-subst">${req.session.username}</span>`</span>);
+        <span class="hljs-title function_">next</span>();
     });
 });</code></pre><p><strong>Security Features</strong>:</p>
 <ul>
 <li><strong>Session Validation</strong>: WebSocket connections require valid session cookie</li>
-<li><strong>User Identification</strong>: <code>socket.userId</code> populated from session</li>
+<li><strong>Handshake-Only Authentication</strong>: Only validates during initial handshake (when <code>sid === undefined</code>), not on polling requests</li>
+<li><strong>User Identification</strong>: Session accessible via <code>socket.request.session</code> in connection handler</li>
 <li><strong>Connection Rejection</strong>: Unauthenticated connections refused during handshake</li>
 <li><strong>Progress Session Isolation</strong>: ProgressTracker sessions tied to authenticated users</li>
+</ul>
+<p><strong>Key Implementation Details</strong>:</p>
+<ul>
+<li>Uses <code>io.engine.use()</code> instead of <code>io.use()</code> to access raw Socket.io Engine requests</li>
+<li>Checks <code>req._query.sid === undefined</code> to identify handshake vs subsequent polling</li>
+<li>Uses <code>req</code> and <code>res</code> parameters instead of <code>socket</code> during handshake</li>
+<li>Logs authentication status with username from session</li>
 </ul>
 <h3>HTTPS Requirement</h3><p><strong>WebSocket URL</strong>: ALWAYS use <code>wss://</code> (WebSocket Secure), never <code>ws://</code></p>
 <p><strong>Connection URLs</strong>:</p>
@@ -41,14 +61,14 @@
 <li>Session cookies have <code>secure: true</code> flag (HTTPS only)</li>
 <li>HTTP connections rejected by browser (no cookies sent)</li>
 <li>WebSocket inherits session from HTTPS connection</li>
-<li>nginx terminates TLS on port 443, forwards to Express on 8080</li>
+<li>nginx reverse proxy terminates TLS and forwards requests to Express backend</li>
 </ul>
 <h3>Trust Proxy Dependency</h3><p><strong>Critical</strong>: WebSocket authentication depends on <strong>trust proxy</strong> configuration.</p>
 <p><strong>Why</strong>:</p>
 <ul>
-<li>nginx terminates SSL/TLS on port 443</li>
-<li>nginx forwards HTTP to Express on port 8080 with <code>X-Forwarded-Proto: https</code> header</li>
-<li>Express needs <code>trust proxy: true</code> to recognize HTTPS from header</li>
+<li>nginx terminates SSL/TLS for incoming HTTPS requests</li>
+<li>nginx forwards requests to Express backend with <code>X-Forwarded-Proto: https</code> header</li>
+<li>Express needs <code>trust proxy: true</code> to recognize the connection as HTTPS from the header</li>
 <li>Session middleware checks <code>req.protocol === &quot;https&quot;</code> before setting secure cookies</li>
 <li>WebSocket connection uses same session middleware</li>
 </ul>

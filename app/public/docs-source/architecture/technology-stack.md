@@ -2,14 +2,16 @@
 
 This document provides a comprehensive list of technologies, frameworks, and libraries used in the HexTrackr project with version information.
 
+> **Version Documentation Standard**: All versions listed below represent **currently-running production versions** verified via `docker exec hextrackr-app npm list`. These may differ from `package.json` semver constraints (e.g., `^4.18.2`) which specify **minimum versions** for npm dependency resolution. Example: Express.js shows 4.21.2 (running) vs ^4.18.2 (package.json minimum). This is correct - documentation reflects deployed reality, not installation constraints.
+
 ---
 
 ## Runtime Environment
 
-- **Node.js 18.20.8 LTS (Alpine)** - JavaScript runtime
-  - **Development**: v18.20.8 (macOS Docker)
-  - **Production**: v18.20.8 (RHEL Docker)
-  - **Container Image**: node:18-alpine
+- **Node.js 22.x LTS (Alpine)** - JavaScript runtime
+  - **Development**: v22.x (macOS Docker)
+  - **Production**: v22.x (RHEL Docker)
+  - **Container Image**: node:22-alpine
 - **CommonJS Module System** - Backend module format
 - **ES6 Modules** - Frontend module format
 
@@ -27,7 +29,7 @@ This document provides a comprehensive list of technologies, frameworks, and lib
 
 - **Bootstrap 5.x** - Responsive CSS framework
 - **Tabler.io** - Dashboard UI theme and components
-- **AG-Grid Community 32.x** - Enterprise-grade data grid with infinite scroll
+- **AG-Grid Community 33.3.2** - Enterprise-grade data grid with infinite scroll
 - **ApexCharts 3.x** - Interactive charts and data visualization
 - **DOMPurify 3.2.6** - XSS sanitization library for user-generated content
 
@@ -59,12 +61,12 @@ This document provides a comprehensive list of technologies, frameworks, and lib
 
 ### Core Framework
 
-- **Express.js 4.18.2** - Web application framework
+- **Express.js 4.21.2** - Web application framework
 - **Node.js Built-ins** - http, https, path, fs, crypto
 
 ### Database
 
-- **better-sqlite3 11.10.0** - Synchronous SQLite3 driver (native bindings)
+- **better-sqlite3 12.4.1** - Synchronous SQLite3 driver (native bindings)
 - **SQLite 3** - Embedded relational database
 - **WAL Mode** - Write-Ahead Logging for improved concurrency
 
@@ -96,13 +98,15 @@ This document provides a comprehensive list of technologies, frameworks, and lib
 
 ### Real-Time Communication
 
-- **Socket.io 4.8.1** - WebSocket server for progress tracking (port 8988)
+- **Socket.io 4.8.1** - WebSocket server for real-time progress tracking
+  - Runs on same port as HTTP server (port 8080 inside container, 8989 externally)
+  - Client connects using `window.location.port` for automatic port detection
+  - No separate WebSocket port required
 
 ### Utilities
 
 - **uuid 12.0.0** - RFC4122 UUID generation
 - **node-fetch 3.3.2** - HTTP client for KEV API integration
-- **chart.js 4.4.0** - Server-side chart generation (future use)
 
 ---
 
@@ -129,7 +133,6 @@ This document provides a comprehensive list of technologies, frameworks, and lib
 
 ### Testing & Automation
 
-- **@browserbasehq/stagehand 1.12.1** - Browser automation framework
 - **zod 3.23.8** - Schema validation for testing
 
 ---
@@ -149,7 +152,7 @@ This document provides a comprehensive list of technologies, frameworks, and lib
 ### Hosting Environments
 
 - **Development**: Mac M4 (macOS) - Docker Desktop, localhost:8989
-- **Production**: Ubuntu Server 24.04 LTS (192.168.1.80) - Docker + nginx
+- **Production**: RHEL 10.0 (192.168.1.80) - Docker + nginx
 
 ---
 

@@ -107,6 +107,12 @@ Only use `npm run dev` if you're testing without Docker (rare).
 - SRPI Process: `/docs/SRPI_PROCESS.md`
 - CHANGELOG and Version Bump: `/docs/CHANGELOG AND VERSION BUMP PROCESS.md`
 
+**Documentation System**:
+- **Source of Truth**: ALL documentation edits MUST be made in markdown files under `/app/public/docs-source/`
+- **HTML Generation**: Run `npm run docs:generate` to convert markdown → HTML in `/app/public/docs-html/content/`
+- **CRITICAL**: Never edit HTML files directly - they are auto-generated and will be overwritten on next docs build
+- Markdown files are the canonical source; HTML files are build artifacts (like compiled code from source)
+
 **Changelogs**:
 - Location: `/app/public/docs-source/changelog/versions/`
 - Format: Each version gets its own file (e.g., `1.0.67.md`)

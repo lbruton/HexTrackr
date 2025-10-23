@@ -24,7 +24,7 @@ HexTrackr is currently deployed and tested on the following hardware and softwar
 - **Container**: Docker + Docker Compose
 
 **Operating System**:
-- **Distribution**: Ubuntu Server 24.04 LTS
+- **Distribution**: RHEL 10.0 (Coughlan)
 - **Kernel**: Linux 6.x
 
 **Runtime**:
@@ -238,4 +238,4 @@ Performance testing and benchmarking are **in development**. Current system requ
 
 ---
 
-*Last Updated: 2025-10-22 | Version 1.1.0*
+*Last Updated: 2025-10-23 | Version 1.1.3*

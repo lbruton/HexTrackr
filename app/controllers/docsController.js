@@ -43,13 +43,29 @@ class DocsController {
 /**
  * Helper function to find a section path for a given filename by scanning the content folder
  * Extracted from server.js lines 2560-2582
- * Used by the documentation portal routing system
+ * Used by the documentation portal routing system to resolve filenames to section paths
  *
- * @param {string} filename - The HTML filename to search for (e.g., "OVERVIEW.html")
- * @returns {string|null} The section path without .html extension and using forward slashes, or null if not found
+ * @param {string} filename - The HTML filename to search for in the docs content directory.
+ *   Should include the .html extension. Examples: "OVERVIEW.html", "api/endpoints.html"
+ *   No validation is performed on the input - invalid filenames return null
+ * @returns {string|null} The section path without .html extension and using forward slashes
+ *   (e.g., "OVERVIEW", "api/endpoints"), or null if filename not found in content directory.
+ *   Used as the hash fragment in documentation URLs (e.g., /docs-html/#api/endpoints)
+ * @throws {never} Does not throw - delegates to docsService.findDocsSectionForFilename() which
+ *   catches all filesystem errors internally and returns null on failure
+ * @see {@link DocsService#findDocsSectionForFilename} - Implementation details
+ *
  * @example
+ * // Simple filename lookup
  * findDocsSectionForFilename("OVERVIEW.html") // Returns "OVERVIEW"
+ *
+ * @example
+ * // Nested path lookup
  * findDocsSectionForFilename("api/endpoints.html") // Returns "api/endpoints"
+ *
+ * @example
+ * // File not found
+ * findDocsSectionForFilename("nonexistent.html") // Returns null
  */
 function findDocsSectionForFilename(filename) {
     return docsService.findDocsSectionForFilename(filename);
@@ -59,6 +75,41 @@ function findDocsSectionForFilename(filename) {
 const docsController = new DocsController();
 
 module.exports = {
+    /**
+     * Get documentation statistics (Public API)
+     * Computes API endpoints, JS function count, and framework statistics
+     * Used by GET /api/docs/stats route handler
+     *
+     * @async
+     * @function getStats
+     * @returns {Promise<{apiEndpoints: number, jsFunctions: number, frameworks: number, computedAt: string}>}
+     *   Statistics object containing documentation metrics
+     * @throws {Error} If statistics computation fails
+     * @example
+     * const stats = await docsController.getStats();
+     * // Returns: { apiEndpoints: 87, jsFunctions: 342, frameworks: 4, computedAt: "2025-10-22T..." }
+     */
     getStats: () => docsController.getStats(),
+
+    /**
+     * Find documentation section path for a given HTML filename (Public API)
+     * Searches the docs-html/content directory recursively to resolve filenames to section paths
+     * Used by documentation portal routing system to handle direct file requests
+     *
+     * @function findDocsSectionForFilename
+     * @param {string} filename - HTML filename to search for (e.g., "OVERVIEW.html", "api/endpoints.html")
+     * @returns {string|null} Section path without .html extension (e.g., "OVERVIEW", "api/endpoints"), or null if not found
+     * @throws {never} Does not throw - delegates to DocsService which catches all errors and returns null
+     * @see {@link DocsService#findDocsSectionForFilename} - Implementation in service layer
+     * @example
+     * // Resolve filename to section path
+     * const section = findDocsSectionForFilename("OVERVIEW.html");
+     * // Returns: "OVERVIEW"
+     *
+     * @example
+     * // File not found case
+     * const section = findDocsSectionForFilename("nonexistent.html");
+     * // Returns: null
+     */
     findDocsSectionForFilename
 };

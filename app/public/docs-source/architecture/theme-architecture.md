@@ -21,7 +21,7 @@ All CSS files are located in `app/public/styles/` directory.
 
 | File | Purpose | Scope |
 |------|---------|-------|
-| `styles/css-variables.css` | Global CSS custom properties for all themes (499 lines - single source of truth) | Application-wide |
+| `styles/css-variables.css` | Global CSS custom properties for all themes (624 lines - single source of truth) | Application-wide |
 | `styles/ag-grid-overrides.css` | AG-Grid specific color overrides with !important | AG-Grid components |
 
 ### Shared Component Styles
@@ -45,6 +45,7 @@ All CSS files are located in `app/public/styles/` directory.
 |------|---------|------|
 | `styles/pages/vulnerabilities.css` | Vulnerability dashboard specific styles | vulnerabilities.html |
 | `styles/pages/tickets.css` | AG-Grid tickets page styles | tickets.html |
+| `styles/pages/login.css` | Login page specific styles | login.html |
 
 ### Utility Styles
 
@@ -200,7 +201,7 @@ The centralized color system uses CSS custom properties to ensure consistency ac
 
 ### Complete CSS Variables Reference
 
-The `css-variables.css` file (499 lines) contains extensive variable systems beyond the core colors shown above. Here's the complete reference:
+The `css-variables.css` file (624 lines) contains extensive variable systems beyond the core colors shown above. Here's the complete reference:
 
 #### Typography System
 
@@ -713,4 +714,4 @@ HexTrackr's JSDoc developer documentation (`/app/dev-docs-html/`) includes autom
 
 ---
 
-*Last Updated: 2025-10-16 | Version: 3.0.0 | Audit: DOCS-52*
+*Last Updated: 2025-10-23 | Version: 3.0.0 | Audit: DOCS-52*

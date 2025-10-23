@@ -860,7 +860,7 @@ class DatabaseService {
                 });
 
                 // Audit log for VACUUM operation
-                this.this._audit("database.vacuum", "Database VACUUM operation completed", {
+                this._audit("database.vacuum", "Database VACUUM operation completed", {
                     duration: `${duration}s`,
                     startTime: new Date(startTime).toISOString()
                 }, null, null);

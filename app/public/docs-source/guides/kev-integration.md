@@ -315,4 +315,4 @@ Access KEV settings through **Settings > KEV Integration**:
 
 ---
 
-*Last Updated: v1.0.22 - September 2025*
+*Last Updated: v1.1.3 - October 2025*

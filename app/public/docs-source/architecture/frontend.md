@@ -71,7 +71,7 @@ export class VulnerabilityCoreOrchestrator {
 
 ### 1. VulnerabilityDataManager
 
-**Location**: `/scripts/shared/vulnerability-data.js`
+**Location**: `/app/public/scripts/shared/vulnerability-data.js`
 
 **Responsibilities**:
 
@@ -91,7 +91,7 @@ clearCache()
 
 ### 2. VulnerabilityStatisticsManager
 
-**Location**: `/scripts/shared/vulnerability-statistics.js`
+**Location**: `/app/public/scripts/shared/vulnerability-statistics.js`
 
 **Responsibilities**:
 
@@ -109,7 +109,7 @@ clearCache()
 
 ### 3. VulnerabilityChartManager
 
-**Location**: `/scripts/shared/vulnerability-chart-manager.js`
+**Location**: `/app/public/scripts/shared/vulnerability-chart-manager.js`
 
 **Responsibilities**:
 
@@ -151,7 +151,7 @@ async initializeCharts() {
 
 ### 4. VulnerabilitySearchManager
 
-**Location**: `/scripts/shared/vulnerability-search.js`
+**Location**: `/app/public/scripts/shared/vulnerability-search.js`
 
 **Responsibilities**:
 
@@ -162,7 +162,7 @@ async initializeCharts() {
 
 ### 5. VulnerabilityGridManager
 
-**Location**: `/scripts/shared/vulnerability-grid.js`
+**Location**: `/app/public/scripts/shared/vulnerability-grid.js`
 
 **Responsibilities**:
 
@@ -180,7 +180,7 @@ async initializeCharts() {
 
 ### 6. VulnerabilityCardsManager
 
-**Location**: `/scripts/shared/vulnerability-cards.js`
+**Location**: `/app/public/scripts/shared/vulnerability-cards.js`
 
 **Responsibilities**:
 
@@ -201,7 +201,7 @@ async initializeCharts() {
 
 ### WebSocketClient Architecture
 
-**Location**: `/scripts/shared/websocket-client.js`
+**Location**: `/app/public/scripts/shared/websocket-client.js`
 
 ```javascript
 class WebSocketClient {
@@ -238,7 +238,7 @@ class WebSocketClient {
 
 ### ThemeController Integration
 
-**Location**: `/scripts/shared/theme-controller.js`
+**Location**: `/app/public/scripts/shared/theme-controller.js`
 
 The frontend integrates with a sophisticated theme system providing:
 
@@ -273,7 +273,7 @@ applyThemeToChart(chartInstance, theme) {
 
 ### Modal Management
 
-**Location**: `/scripts/shared/` (various modal files)
+**Location**: `/app/public/scripts/shared/` (various modal files)
 
 **Available Modals**:
 
@@ -302,7 +302,7 @@ HexTrackr implements description-field-based aggregation for consistent modal re
 
 ### Vulnerabilities Page (`vulnerabilities.html`)
 
-**Main Controller**: `/scripts/pages/vulnerabilities.js`
+**Main Controller**: `/app/public/scripts/pages/vulnerabilities.js`
 
 ```javascript
 export class ModernVulnManager {
@@ -334,7 +334,7 @@ export class ModernVulnManager {
 
 ### Tickets Page (`tickets.html`)
 
-**Main Controller**: `/scripts/pages/tickets.js`
+**Main Controller**: `/app/public/scripts/pages/tickets.js`
 
 **Features**:
 
@@ -350,7 +350,7 @@ export class ModernVulnManager {
 
 ### Utility Modules
 
-**Location**: `/scripts/utils/`
+**Location**: `/app/public/scripts/utils/`
 
 - `accessibility-announcer.js` - Screen reader support
 - `security.js` - XSS prevention and input sanitization
@@ -359,7 +359,7 @@ export class ModernVulnManager {
 
 ### Shared Components
 
-**Location**: `/scripts/shared/`
+**Location**: `/app/public/scripts/shared/`
 
 - `header-loader.js` - Dynamic header management
 - `footer-loader.js` - Footer content loading

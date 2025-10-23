@@ -21,8 +21,19 @@ class TicketController {
     }
 
     /**
-     * Initialize controller with database connection
-     * Called from server.js during setup
+     * Initialize controller with database connection - Singleton pattern setup
+     * Creates TicketController singleton instance if not exists and initializes
+     * underlying TicketService with database connection. Called once during
+     * server.js startup sequence after database connection established.
+     *
+     * @static
+     * @param {sqlite3.Database} database - SQLite database connection from DatabaseService
+     * @returns {TicketController} The singleton TicketController instance (created or existing)
+     * @throws {never} Does not throw - assumes valid database connection from caller
+     * @example
+     * // In server.js after database initialization
+     * const ticketController = TicketController.initialize(db);
+     * // Returns singleton instance, safe to call multiple times
      */
     static initialize(database) {
         if (!TicketController.instance) {

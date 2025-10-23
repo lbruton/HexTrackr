@@ -95,6 +95,96 @@ category: "Maintenance"</h2><h1>Version 1.1.3 - Dependency Cleanup: Chart.js and
 <li>✅ Documentation portal updated with accurate technology stack</li>
 </ul>
 <hr>
+<h2>Documentation Improvements</h2><p>As part of ongoing documentation quality improvements, this release includes numerous corrections to ensure accuracy and completeness across technical documentation, API references, and architecture documentation. These fixes address outdated version numbers, incorrect line references, missing file paths, and incomplete JSDoc annotations.</p>
+<h3>Content Accuracy Corrections</h3><p><strong>Version &amp; Line Reference Updates</strong> (<a href="https://linear.app/hextrackr/issue/DOCS-80">DOCS-80</a>, <a href="https://linear.app/hextrackr/issue/DOCS-81">DOCS-81</a>, <a href="https://linear.app/hextrackr/issue/DOCS-85">DOCS-85</a>, <a href="https://linear.app/hextrackr/issue/DOCS-94">DOCS-94</a>, <a href="https://linear.app/hextrackr/issue/DOCS-100">DOCS-100</a>, <a href="https://linear.app/hextrackr/issue/DOCS-103">DOCS-103</a>, <a href="https://linear.app/hextrackr/issue/DOCS-105">DOCS-105</a>)</p>
+<ul>
+<li>Updated WebSocket documentation from v1.0.54 to v1.1.3, corrected <code>io.engine.use()</code> authentication implementation</li>
+<li>Simplified WebSocket port documentation to remove internal Docker port references (8080, 8989)</li>
+<li>Corrected security.md version references and trust proxy line numbers (lines 81-85)</li>
+<li>Updated database.md table count from 19 to 21 tables, corrected schema version to v1.1.3</li>
+<li><strong>Content</strong>: Fixed AG-Grid version in <code>architecture/technology-stack.md</code> from 32.x to 33.3.2 (verified against deployed vendor file)</li>
+<li><strong>Content</strong>: Fixed database schema version footer in <code>architecture/database.md</code> from v1.0.66 to v1.1.3, clarified that schema structure unchanged since v1.0.66 (<a href="https://linear.app/hextrackr/issue/DOCS-103">DOCS-103</a>)</li>
+<li><strong>Content</strong>: Fixed database location in <code>architecture/database.md</code> - added Docker context showing absolute path <code>/app/data/hextrackr.db</code> and named volume <code>hextrackr-database</code> (<a href="https://linear.app/hextrackr/issue/DOCS-105">DOCS-105</a>)</li>
+<li><strong>Content</strong>: Fixed version references in <code>architecture/data-model.md</code> - clarified distinction between schema baseline (v1.1.0) and application version (v1.1.3) in header and footer to eliminate confusion about documentation currency (<a href="https://linear.app/hextrackr/issue/DOCS-106">DOCS-106</a>)</li>
+<li><strong>Content</strong>: Fixed WebSocket port documentation in <code>architecture/technology-stack.md</code> - corrected incorrect port 8988 reference to accurate architecture where Socket.io runs on same port as HTTP server (8080 internal, 8989 external) (<a href="https://linear.app/hextrackr/issue/DOCS-110">DOCS-110</a>)</li>
+<li><strong>Content</strong>: Fixed Cisco PSIRT startup delay timing in <code>guides/cisco-psirt-integration.md</code> - corrected inaccurate &quot;10 seconds&quot; references (lines 81, 93, 393-394) to actual implementation of &quot;5 minutes&quot; (300 seconds) with rationale explaining the delay prevents database corruption on rapid Docker restarts (<a href="https://linear.app/hextrackr/issue/DOCS-112">DOCS-112</a>)</li>
+<li><strong>Content</strong>: Fixed Express.js version in <code>architecture/technology-stack.md</code> - corrected outdated 4.18.2 to actual installed version 4.21.2 (verified via npm list) to reflect current production dependency and ensure accurate technology documentation (<a href="https://linear.app/hextrackr/issue/DOCS-115">DOCS-115</a>)</li>
+</ul>
+<p><strong>Architecture Documentation Corrections</strong> (<a href="https://linear.app/hextrackr/issue/DOCS-83">DOCS-83</a>, <a href="https://linear.app/hextrackr/issue/DOCS-87">DOCS-87</a>, <a href="https://linear.app/hextrackr/issue/DOCS-89">DOCS-89</a>, <a href="https://linear.app/hextrackr/issue/DOCS-91">DOCS-91</a>, <a href="https://linear.app/hextrackr/issue/DOCS-93">DOCS-93</a>, <a href="https://linear.app/hextrackr/issue/DOCS-95">DOCS-95</a>, <a href="https://linear.app/hextrackr/issue/DOCS-96">DOCS-96</a>, <a href="https://linear.app/hextrackr/issue/DOCS-99">DOCS-99</a>, <a href="https://linear.app/hextrackr/issue/DOCS-114">DOCS-114</a>)</p>
+<ul>
+<li>Fixed 13+ file paths in frontend.md to include <code>/app/public/</code> prefix</li>
+<li>Removed stale Chart.js and Stagehand references from technology-stack.md</li>
+<li>Updated theme-architecture.md: css-variables.css line count (499 → 624), added missing login.css</li>
+<li>Corrected backend.md server.js line count inconsistency (205 → 831 lines)</li>
+<li>Updated backend.md route module count (13 → 15 modules), added missing loggingService.js to service table</li>
+<li>Standardized rate limit documentation across 5 locations: 60 req/15min (production), 10,000 req/1min (development)</li>
+<li><strong>Content</strong>: Fixed outdated version annotations in <code>architecture/backend.md</code> controller table - removed v1.0.x version references (v1.0.22+, v1.0.63+, v1.0.67+, v1.0.93+) as project is now at v1.1.3 and changelog documents feature history (<a href="https://linear.app/hextrackr/issue/DOCS-114">DOCS-114</a>)</li>
+</ul>
+<h3>JSDoc Enhancements</h3><p><strong>DocsService Methods</strong> (<a href="https://linear.app/hextrackr/issue/DOCS-82">DOCS-82</a>, <a href="https://linear.app/hextrackr/issue/DOCS-84">DOCS-84</a>, <a href="https://linear.app/hextrackr/issue/DOCS-86">DOCS-86</a>, <a href="https://linear.app/hextrackr/issue/DOCS-88">DOCS-88</a>, <a href="https://linear.app/hextrackr/issue/DOCS-90">DOCS-90</a>, <a href="https://linear.app/hextrackr/issue/DOCS-97">DOCS-97</a>)</p>
+<ul>
+<li>Enhanced JSDoc for <code>computeStats()</code>, <code>computeApiEndpoints()</code>, <code>computeJsFunctionCount()</code>, <code>detectFrameworks()</code>, <code>findDocsSectionForFilename()</code> with @async, @returns, @throws, @example tags</li>
+<li>Enhanced JSDoc for <code>generateJSDoc()</code> in html-content-updater.js</li>
+</ul>
+<p><strong>Controller Methods</strong> (<a href="https://linear.app/hextrackr/issue/DOCS-98">DOCS-98</a>, <a href="https://linear.app/hextrackr/issue/DOCS-101">DOCS-101</a>, <a href="https://linear.app/hextrackr/issue/DOCS-104">DOCS-104</a>, <a href="https://linear.app/hextrackr/issue/DOCS-107">DOCS-107</a>, <a href="https://linear.app/hextrackr/issue/DOCS-109">DOCS-109</a>, <a href="https://linear.app/hextrackr/issue/DOCS-111">DOCS-111</a>, <a href="https://linear.app/hextrackr/issue/DOCS-113">DOCS-113</a>, <a href="https://linear.app/hextrackr/issue/DOCS-116">DOCS-116</a>, <a href="https://linear.app/hextrackr/issue/DOCS-119">DOCS-119</a>)</p>
+<ul>
+<li>Enhanced JSDoc for <code>getMatchedKevs()</code> in kevController.js with query parameter documentation, @route tag, response structure, and usage examples</li>
+<li>Enhanced JSDoc for <code>checkAutoSync()</code> in kevController.js with detailed KEV auto-sync description, query parameter documentation, @route tag, @throws tag, response structure, and usage examples</li>
+<li><strong>JSDoc</strong>: Fixed documentation for <code>findDocsSectionForFilename</code> in <code>app/controllers/docsController.js</code> - added @throws tag to clarify non-throwing behavior (<a href="https://linear.app/hextrackr/issue/DOCS-104">DOCS-104</a>)</li>
+<li><strong>JSDoc</strong>: Fixed documentation for <code>syncKevData()</code> in <code>app/controllers/kevController.js</code> - added @throws tag documenting error conditions for sync failures, API unreachability, database errors, and cache clearing (<a href="https://linear.app/hextrackr/issue/DOCS-107">DOCS-107</a>)</li>
+<li><strong>JSDoc</strong>: Fixed documentation for <code>getKevStatus()</code>, <code>getKevByCve()</code>, and <code>getAllKevs()</code> in <code>app/controllers/kevController.js</code> - added @throws tags, enhanced @param documentation, added @example tags, and improved @returns documentation for complete file coverage (<a href="https://linear.app/hextrackr/issue/DOCS-109">DOCS-109</a>)</li>
+<li><strong>JSDoc</strong>: Fixed documentation for exported <code>getStats()</code> wrapper in <code>app/controllers/docsController.js</code> - added public API documentation with @async, @function, @returns, @throws, and @example tags (<a href="https://linear.app/hextrackr/issue/DOCS-111">DOCS-111</a>)</li>
+<li><strong>JSDoc</strong>: Fixed documentation for <code>exportUserPreferences()</code> in <code>app/controllers/preferencesController.js</code> - added comprehensive JSDoc with @async, @throws, @route, @example tags, detailed @param documentation for req.user properties, and complete @returns documentation for response format and error conditions (<a href="https://linear.app/hextrackr/issue/DOCS-113">DOCS-113</a>)</li>
+<li><strong>JSDoc</strong>: Fixed documentation for <code>getVulnerabilityById()</code> in <code>app/controllers/vulnerabilityController.js</code> - added comprehensive JSDoc with @async, @throws, @route, @example tags, nested @param documentation for req.params.id, and complete @returns documentation covering all HTTP response codes (200/400/404/500) (<a href="https://linear.app/hextrackr/issue/DOCS-116/jsdoc-fix-add-missing-documentation-tags-to-getvulnerabilitybyid">DOCS-116</a>)</li>
+<li><strong>JSDoc</strong>: Fixed documentation for <code>findDocsSectionForFilename()</code> in <code>app/controllers/docsController.js</code> - enhanced parameter documentation explaining validation expectations, clarified return value format with URL usage context, added @see tag for cross-reference to docsService implementation, and expanded examples to cover simple lookup, nested paths, and not-found cases (<a href="https://linear.app/hextrackr/issue/DOCS-119">DOCS-119</a>)</li>
+</ul>
+<p><strong>Security Middleware Methods</strong> (<a href="https://linear.app/hextrackr/issue/DOCS-102">DOCS-102</a>)</p>
+<ul>
+<li>Enhanced JSDoc for <code>PathValidator.safeReadFileSync()</code> in middleware/security.js with comprehensive security documentation, @throws tags for all error conditions (path traversal, filesystem errors), detailed @param documentation for encoding options, and four @example tags demonstrating correct usage and security violation scenarios</li>
+</ul>
+<p><strong>Validation Middleware Methods</strong> (<a href="https://linear.app/hextrackr/issue/DOCS-118">DOCS-118</a>, <a href="https://linear.app/hextrackr/issue/DOCS-123">DOCS-123</a>)</p>
+<ul>
+<li><strong>JSDoc</strong>: Fixed documentation for <code>validateNumericId()</code> in <code>app/middleware/validation.js</code> - added comprehensive JSDoc for higher-order function pattern with @param tag documenting default parameter value, @returns tag describing returned Express middleware behavior, @throws tag clarifying error handling strategy, and two @example tags demonstrating default usage and custom parameter name validation (<a href="https://linear.app/hextrackr/issue/DOCS-118">DOCS-118</a>)</li>
+<li><strong>JSDoc</strong>: Fixed documentation for <code>validateFileUpload()</code> in <code>app/middleware/validation.js</code> - added comprehensive JSDoc with @param tags for Express middleware parameters and req.file properties, @returns tag documenting validation responses and error codes, @throws tag clarifying error handling, and two @example tags demonstrating CSV upload and JSON restore endpoint usage (<a href="https://linear.app/hextrackr/issue/DOCS-123">DOCS-123</a>)</li>
+</ul>
+<p><strong>Location Controller Methods</strong> (<a href="https://linear.app/hextrackr/issue/DOCS-122">DOCS-122</a>)</p>
+<ul>
+<li><strong>JSDoc</strong>: Fixed documentation for <code>getLocationStats()</code> in <code>app/controllers/locationController.js</code> - added comprehensive JSDoc with @async, @param, @returns, @throws, @route, and @example tags to transform descriptive comments into machine-readable documentation for IDE autocomplete (<a href="https://linear.app/hextrackr/issue/DOCS-122">DOCS-122</a>)</li>
+</ul>
+<p><strong>API Reference Version Context</strong> (<a href="https://linear.app/hextrackr/issue/DOCS-124">DOCS-124</a>)</p>
+<ul>
+<li><strong>Content</strong>: Fixed outdated version references in <code>api-reference/backend-api.md</code> - added header note displaying current version (v1.1.3) with explanation that historical &quot;Since:&quot; annotations indicate feature introduction dates, preventing user confusion about feature availability (<a href="https://linear.app/hextrackr/issue/DOCS-124">DOCS-124</a>)</li>
+</ul>
+<p><strong>Service Helper Methods</strong> (<a href="https://linear.app/hextrackr/issue/DOCS-125">DOCS-125</a>)</p>
+<ul>
+<li><strong>JSDoc</strong>: Fixed documentation for <code>_log()</code> helper in <code>app/services/ticketService.js</code> - added comprehensive JSDoc with @param tags for all three parameters (level, message, data), @returns tag documenting void return, @throws tag clarifying defensive non-throwing behavior, and two @example tags demonstrating typical logging patterns (<a href="https://linear.app/hextrackr/issue/DOCS-125/jsdoc-fix-add-proper-jsdoc-to-log-helper-in-ticketservice">DOCS-125</a>)</li>
+</ul>
+<p><strong>Auth Controller Methods</strong> (<a href="https://linear.app/hextrackr/issue/DOCS-128">DOCS-128</a>)</p>
+<ul>
+<li><strong>JSDoc</strong>: Fixed documentation for <code>getProfile()</code> in <code>app/controllers/authController.js</code> - added comprehensive JSDoc with @async tag, nested @param documentation for req.user properties, detailed @returns documentation for all response codes (200/404/500), @throws tag documenting error conditions, @route tag, and two @example tags demonstrating successful profile retrieval and session destruction on deleted user (<a href="https://linear.app/hextrackr/issue/DOCS-128">DOCS-128</a>)</li>
+</ul>
+<p><strong>DocsController Exported Functions</strong> (<a href="https://linear.app/hextrackr/issue/DOCS-130">DOCS-130</a>)</p>
+<ul>
+<li><strong>JSDoc</strong>: Fixed documentation for exported <code>findDocsSectionForFilename</code> in <code>app/controllers/docsController.js</code> - added public API documentation with @function, @param, @returns, @throws, @see, and two @example tags to match pattern established by getStats export and provide IDE autocomplete support (<a href="https://linear.app/hextrackr/issue/DOCS-130">DOCS-130</a>)</li>
+</ul>
+<p><strong>TicketController Initialization Methods</strong> (<a href="https://linear.app/hextrackr/issue/DOCS-131">DOCS-131</a>)</p>
+<ul>
+<li><strong>JSDoc</strong>: Fixed documentation for <code>initialize()</code> in <code>app/controllers/ticketController.js</code> - added comprehensive JSDoc with @static, @param, @returns, @throws, and @example tags to document singleton pattern setup and database initialization sequence (<a href="https://linear.app/hextrackr/issue/DOCS-131">DOCS-131</a>)</li>
+</ul>
+<p><strong>Production OS Documentation Corrections</strong> (<a href="https://linear.app/hextrackr/issue/DOCS-121">DOCS-121</a>)</p>
+<ul>
+<li><strong>Content</strong>: Fixed contradictory production OS information in <code>architecture/technology-stack.md</code> - corrected line 153 from &quot;Ubuntu Server 24.04 LTS&quot; to &quot;RHEL 10.0&quot; to match actual production environment verified via <code>/etc/redhat-release</code> (<a href="https://linear.app/hextrackr/issue/DOCS-121">DOCS-121</a>)</li>
+<li><strong>Content</strong>: Fixed production OS in <code>reference/system-requirements.md</code> - corrected line 27 from &quot;Ubuntu Server 24.04 LTS&quot; to &quot;RHEL 10.0 (Coughlan)&quot; to accurately reflect current production deployment (<a href="https://linear.app/hextrackr/issue/DOCS-121">DOCS-121</a>)</li>
+<li><strong>Content</strong>: Fixed tested environment in <code>docs/RHEL_DEPLOYMENT_GUIDE.md</code> - corrected line 5 from &quot;Ubuntu 24.04 LTS (current production)&quot; to &quot;RHEL 10.0 (current production)&quot; to eliminate confusion about production OS (<a href="https://linear.app/hextrackr/issue/DOCS-121">DOCS-121</a>)</li>
+</ul>
+<p><strong>Database Schema Documentation Corrections</strong> (<a href="https://linear.app/hextrackr/issue/DOCS-129">DOCS-129</a>)</p>
+<ul>
+<li><strong>Content</strong>: Fixed missing <code>next_sync_time</code> column in <code>architecture/database.md</code> sync_metadata table documentation - updated from &quot;8 columns&quot; to &quot;9 columns&quot; and added missing column definition for ISO 8601 timestamp field used by countdown timers (<a href="https://linear.app/hextrackr/issue/DOCS-129">DOCS-129</a>)</li>
+</ul>
+<p><strong>Version Documentation Standard Clarification</strong> (<a href="https://linear.app/hextrackr/issue/DOCS-132">DOCS-132</a>)</p>
+<ul>
+<li><strong>Content</strong>: Added version documentation standard header to <code>architecture/technology-stack.md</code> - explains that all versions represent currently-running production versions (verified via docker exec npm list) which may differ from package.json semver constraints that specify minimum versions for npm dependency resolution, preventing future confusion during documentation accuracy hunts (<a href="https://linear.app/hextrackr/issue/DOCS-132">DOCS-132</a>)</li>
+</ul>
+<hr>
 <h2>Impact Summary</h2><h3>Dependency Cleanup Results</h3><p><strong>Packages Removed</strong>: 36 total packages (Chart.js: 13, Stagehand: 23)<br><strong>Bundle Size Reduction</strong>: ~300KB+ removed from node_modules<br><strong>Peer Conflicts Resolved</strong>: dotenv version mismatch eliminated<br><strong>Build Process Improvement</strong>: npm install now runs cleanly without flags</p>
 <h3>Before vs After</h3><table>
 <thead>
@@ -143,9 +233,148 @@ category: "Maintenance"</h2><h1>Version 1.1.3 - Dependency Cleanup: Chart.js and
 </tr>
 </tbody></table>
 <hr>
+<h2>Code Quality Improvements</h2><h3>Removed Commented Supervisor Filter Code ([HEX-335](https://linear.app/hextrackr/issue/HEX-335/code-cleanup-remove-commented-supervisor-filter-code-in-ticketsjs))</h3><p><strong>Priority</strong>: Low (Code Cleanup)<br><strong>Impact</strong>: Removed dead event listener code that has been commented out for 4.5 months</p>
+<p><strong>Problem</strong>: Leftover commented code from September 2025 spec 001 refactoring</p>
+<ul>
+<li><code>app/public/scripts/pages/tickets.js:528-532</code> contained commented event listener for supervisor filter</li>
+<li>Supervisor filter feature was completely removed during &quot;JavaScript module extraction and file reorganization&quot;</li>
+<li>Code was commented with note: &quot;Remove this event listener since we no longer have supervisor filter&quot;</li>
+<li>HTML element <code>clearSupervisorFilter</code> does not exist in codebase</li>
+<li>Method <code>clearSupervisorFilter()</code> does not exist in tickets.js</li>
+</ul>
+<p><strong>Solution</strong>: Removed 5-line commented code block</p>
+<ul>
+<li>Removed lines 528-532 containing commented event listener</li>
+<li>Verified no active references to supervisor filter in codebase</li>
+<li>Git history confirmed code was commented September 8, 2025 (4.5 months ago)</li>
+<li>Current implementation works without this code</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/pages/tickets.js:528-532</code> - Removed commented supervisor filter event listener</li>
+</ul>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li>✅ ESLint passed with no new errors</li>
+<li>✅ No active references found in codebase (HTML element doesn&#39;t exist)</li>
+<li>✅ Tickets page functionality unchanged (feature was already removed)</li>
+<li>✅ Clean removal with no extra blank lines</li>
+</ul>
+<hr>
+<h3>Unified Logging System Integration ([HEX-334](https://linear.app/hextrackr/issue/HEX-334/code-cleanup-replace-consolelog-with-logger-in-securityjs))</h3><p><strong>Priority</strong>: Low (Code Quality)<br><strong>Impact</strong>: Integrated API access monitoring into HexTrackr&#39;s unified LoggingService system for consistent production logging</p>
+<p><strong>Problem</strong>: API security middleware used console.log for production logging</p>
+<ul>
+<li><code>app/middleware/security.js:250</code> used <code>console.log()</code> for API access monitoring</li>
+<li>Fragmented logging where security events weren&#39;t centrally tracked</li>
+<li>API access logs (method, URL, source IP) critical for security audits but logged to stdout</li>
+<li>No integration with HexTrackr&#39;s unified LoggingService (HEX-254) and audit trail system</li>
+</ul>
+<p><strong>Solution</strong>: Upgraded to LoggingService.info() with proper category</p>
+<ul>
+<li>Replaced <code>console.log()</code> with <code>global.logger.info(&quot;backend&quot;, &quot;api&quot;, message)</code></li>
+<li>Added API access logging to unified logging system with category-based filtering</li>
+<li>Integrated with LoggingService configuration (<code>logging.config.json</code>)</li>
+<li>Follows global.logger pattern used throughout HexTrackr backend (server.js, controllers)</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/middleware/security.js:21-22</code> - Added LoggingService documentation comment</li>
+<li><code>app/middleware/security.js:251-253</code> - Replaced console.log with global.logger.info()</li>
+</ul>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li>✅ ESLint passed with no new errors</li>
+<li>✅ API security middleware functions correctly (401 authentication check verified)</li>
+<li>✅ LoggingService integration follows established patterns from HEX-254 unified logging system</li>
+</ul>
+<h3>Removed Commented Localhost Path Optimization ([HEX-336](https://linear.app/hextrackr/issue/HEX-336/code-cleanup-remove-commented-code-in-docs-portal-v2js))</h3><p><strong>Priority</strong>: Low (Code Cleanup)<br><strong>Impact</strong>: Removed dead hostname-based path optimization code from documentation portal</p>
+<p><strong>Problem</strong>: Leftover commented code from September 2025 spec 001 refactoring</p>
+<ul>
+<li><code>app/public/docs-html/js/docs-portal-v2.js:1099-1101</code> contained commented localhost optimization</li>
+<li>Hostname-based path detection (<code>window.location.hostname === &quot;localhost&quot;</code>) was replaced with pathname-based approach</li>
+<li>Code commented during &quot;JavaScript module extraction and file reorganization&quot; (commit 39ef5ea6)</li>
+<li>Inline comment explained removal: &quot;This is removed because we always need to respect the path structure&quot;</li>
+<li>Current implementation correctly handles path resolution using <code>window.location.pathname</code> (lines 1104-1110)</li>
+</ul>
+<p><strong>Solution</strong>: Removed 5-line commented code block</p>
+<ul>
+<li>Removed lines 1097-1101 containing commented localhost detection and explanatory comments</li>
+<li>Verified current pathname-based implementation works correctly across all deployment contexts</li>
+<li>Git history confirmed code was commented 6 weeks ago (September 8, 2025)</li>
+<li>No active references to hostname-based path logic in codebase</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/docs-html/js/docs-portal-v2.js:1097-1101</code> - Removed commented localhost path optimization</li>
+</ul>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li>✅ ESLint passed with no new errors in modified file</li>
+<li>✅ Documentation portal accessible at <a href="https://dev.hextrackr.com/docs-html/">https://dev.hextrackr.com/docs-html/</a> (HTTP 200)</li>
+<li>✅ Path resolution continues to work correctly via pathname detection</li>
+<li>✅ Clean removal with no extra blank lines</li>
+</ul>
+<h3>Removed Debug Console.log from Palo Alto Controller ([HEX-337](https://linear.app/hextrackr/issue/HEX-337/code-cleanup-remove-consolelog-in-paloaltocontrollerjs))</h3><p><strong>Priority</strong>: Low (Code Cleanup)<br><strong>Impact</strong>: Removed debugging console.log statement from Palo Alto advisory sync endpoint</p>
+<p><strong>Problem</strong>: Leftover debug logging from initial feature implementation</p>
+<ul>
+<li><code>app/controllers/paloAltoController.js:38</code> contained debug console.log statement</li>
+<li>Message: &quot;Palo Alto advisory sync requested via API&quot;</li>
+<li>Added during HEX-209 Task 1-7 Palo Alto backend implementation (September 2025)</li>
+<li>No production logging value (JSON response provides client feedback)</li>
+<li>File uses no <code>logger.*</code> calls - this was temporary debug code</li>
+</ul>
+<p><strong>Solution</strong>: Removed debug console.log statement</p>
+<ul>
+<li>Removed line 38 containing API invocation notification</li>
+<li>Preserved error handling (console.error at line 67 remains for production error logging)</li>
+<li>Client feedback maintained via JSON response (lines 57-64: success status, advisory counts, timestamps)</li>
+<li>No side effects or functional dependencies</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/controllers/paloAltoController.js:38</code> - Removed debug console.log</li>
+</ul>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li>✅ ESLint passed with no new errors in modified file</li>
+<li>✅ No side effects (simple string literal logging)</li>
+<li>✅ Docker container restarted successfully</li>
+<li>✅ Main site accessible (HTTP 200)</li>
+<li>✅ Error handling preserved (console.error remains)</li>
+<li>✅ JSON response provides complete client feedback</li>
+</ul>
+<h3>Removed Debug Console.log from Template Service ([HEX-338](https://linear.app/hextrackr/issue/HEX-338/code-cleanup-remove-consolelog-in-templateservicejs))</h3><p><strong>Priority</strong>: Low (Code Cleanup)<br><strong>Impact</strong>: Removed debugging console.log statement from template category validation</p>
+<p><strong>Problem</strong>: Leftover debug logging from September 2025 template editor transformation</p>
+<ul>
+<li><code>app/services/templateService.js:956</code> contained debug console.log statement</li>
+<li>Message: Category validation scores and best match results during template content analysis</li>
+<li>Added September 21, 2025 during v1.0.21 template editor UI transformation (dropdown variables feature)</li>
+<li>Validation warnings already captured in <code>result.warnings</code> array and displayed via console.warn at line 232</li>
+<li>No production logging value (structured return value provides complete validation data)</li>
+</ul>
+<p><strong>Solution</strong>: Removed debug console.log statement</p>
+<ul>
+<li>Removed line 956 containing category validation debug output</li>
+<li>Validation results remain fully captured in <code>result.warnings</code> array (line 952)</li>
+<li>User-facing warnings continue to display via console.warn at line 232</li>
+<li>No side effects or functional dependencies (only read categoryScores and bestMatch variables)</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/services/templateService.js:956</code> - Removed debug console.log from validateTemplateContent()</li>
+</ul>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li>✅ ESLint passed with no new errors in templateService.js</li>
+<li>✅ No side effects (only logged computed variables, no mutations)</li>
+<li>✅ Validation warnings remain fully functional (captured in result object, displayed to users)</li>
+<li>✅ Template category validation logic unchanged</li>
+</ul>
+<hr>
 <h2>Related Issues</h2><ul>
 <li>Tech Debt: <a href="https://linear.app/hextrackr/issue/HEX-333/tech-debt-remove-unused-chartjs-dependency-from-packagejson">HEX-333</a> - Remove unused Chart.js dependency</li>
 <li>Documentation: <a href="https://linear.app/hextrackr/issue/DOCS-79/docs-content-fix-outdated-chartjs-reference-in-vulnerabilitieshtml">DOCS-79</a> - Fix Chart.js reference in vulnerabilities.html</li>
+<li>Code Quality: <a href="https://linear.app/hextrackr/issue/HEX-334/code-cleanup-replace-consolelog-with-logger-in-securityjs">HEX-334</a> - Replace console.log with logger in security.js</li>
 </ul>
 <hr>
 <h2>Notes</h2><h3>Why This Matters</h3><p><strong>Technical Debt Reduction</strong>: Unused dependencies create maintenance burden (security updates, compatibility conflicts) without providing value. Removing them improves codebase health.</p>

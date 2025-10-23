@@ -1,12 +1,15 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
     <h1>Technology Stack</h1><p>This document provides a comprehensive list of technologies, frameworks, and libraries used in the HexTrackr project with version information.</p>
+<blockquote>
+<p><strong>Version Documentation Standard</strong>: All versions listed below represent <strong>currently-running production versions</strong> verified via <code>docker exec hextrackr-app npm list</code>. These may differ from <code>package.json</code> semver constraints (e.g., <code>^4.18.2</code>) which specify <strong>minimum versions</strong> for npm dependency resolution. Example: Express.js shows 4.21.2 (running) vs ^4.18.2 (package.json minimum). This is correct - documentation reflects deployed reality, not installation constraints.</p>
+</blockquote>
 <hr>
 <h2>Runtime Environment</h2><ul>
-<li><strong>Node.js 18.20.8 LTS (Alpine)</strong> - JavaScript runtime<ul>
-<li><strong>Development</strong>: v18.20.8 (macOS Docker)</li>
-<li><strong>Production</strong>: v18.20.8 (RHEL Docker)</li>
-<li><strong>Container Image</strong>: node:18-alpine</li>
+<li><strong>Node.js 22.x LTS (Alpine)</strong> - JavaScript runtime<ul>
+<li><strong>Development</strong>: v22.x (macOS Docker)</li>
+<li><strong>Production</strong>: v22.x (RHEL Docker)</li>
+<li><strong>Container Image</strong>: node:22-alpine</li>
 </ul>
 </li>
 <li><strong>CommonJS Module System</strong> - Backend module format</li>
@@ -21,7 +24,7 @@
 <h3>UI Frameworks & Libraries</h3><ul>
 <li><strong>Bootstrap 5.x</strong> - Responsive CSS framework</li>
 <li><strong>Tabler.io</strong> - Dashboard UI theme and components</li>
-<li><strong>AG-Grid Community 32.x</strong> - Enterprise-grade data grid with infinite scroll</li>
+<li><strong>AG-Grid Community 33.3.2</strong> - Enterprise-grade data grid with infinite scroll</li>
 <li><strong>ApexCharts 3.x</strong> - Interactive charts and data visualization</li>
 <li><strong>DOMPurify 3.2.6</strong> - XSS sanitization library for user-generated content</li>
 </ul>
@@ -104,11 +107,11 @@
 </ul>
 <hr>
 <h2>Backend Technologies</h2><h3>Core Framework</h3><ul>
-<li><strong>Express.js 4.18.2</strong> - Web application framework</li>
+<li><strong>Express.js 4.21.2</strong> - Web application framework</li>
 <li><strong>Node.js Built-ins</strong> - http, https, path, fs, crypto</li>
 </ul>
 <h3>Database</h3><ul>
-<li><strong>better-sqlite3 11.10.0</strong> - Synchronous SQLite3 driver (native bindings)</li>
+<li><strong>better-sqlite3 12.4.1</strong> - Synchronous SQLite3 driver (native bindings)</li>
 <li><strong>SQLite 3</strong> - Embedded relational database</li>
 <li><strong>WAL Mode</strong> - Write-Ahead Logging for improved concurrency</li>
 </ul>
@@ -136,12 +139,16 @@
 <li><strong>esprima 4.0.1</strong> - JavaScript parser for code analysis</li>
 </ul>
 <h3>Real-Time Communication</h3><ul>
-<li><strong>Socket.io 4.8.1</strong> - WebSocket server for progress tracking (port 8988)</li>
+<li><strong>Socket.io 4.8.1</strong> - WebSocket server for real-time progress tracking<ul>
+<li>Runs on same port as HTTP server (port 8080 inside container, 8989 externally)</li>
+<li>Client connects using <code>window.location.port</code> for automatic port detection</li>
+<li>No separate WebSocket port required</li>
+</ul>
+</li>
 </ul>
 <h3>Utilities</h3><ul>
 <li><strong>uuid 12.0.0</strong> - RFC4122 UUID generation</li>
 <li><strong>node-fetch 3.3.2</strong> - HTTP client for KEV API integration</li>
-<li><strong>chart.js 4.4.0</strong> - Server-side chart generation (future use)</li>
 </ul>
 <hr>
 <h2>Development Tools</h2><h3>Code Quality</h3><ul>
@@ -165,7 +172,6 @@
 <li><strong>Git Hooks</strong> - Pre-commit linting via <code>.githooks/</code></li>
 </ul>
 <h3>Testing & Automation</h3><ul>
-<li><strong>@browserbasehq/stagehand 1.12.1</strong> - Browser automation framework</li>
 <li><strong>zod 3.23.8</strong> - Schema validation for testing</li>
 </ul>
 <hr>
@@ -182,7 +188,7 @@
 </ul>
 <h3>Hosting Environments</h3><ul>
 <li><strong>Development</strong>: Mac M4 (macOS) - Docker Desktop, localhost:8989</li>
-<li><strong>Production</strong>: Ubuntu Server 24.04 LTS (192.168.1.80) - Docker + nginx</li>
+<li><strong>Production</strong>: RHEL 10.0 (192.168.1.80) - Docker + nginx</li>
 </ul>
 <hr>
 <h2>External Integrations</h2><h3>Security Intelligence</h3><ul>

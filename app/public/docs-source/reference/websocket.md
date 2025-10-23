@@ -1,6 +1,6 @@
 # WebSocket Reference
 
-**Version**: v1.0.54
+**Version**: v1.1.3
 **Last Updated**: 2025-10-09
 
 This reference documents the WebSocket protocol, including low-level classes and events used inside HexTrackr.
@@ -20,29 +20,48 @@ This reference documents the WebSocket protocol, including low-level classes and
 
 **Critical Requirement**: All WebSocket connections MUST have a valid session to connect.
 
-**Handshake Implementation** (`server.js`):
+**Handshake Implementation** (`server.js:108-130`):
 
 ```javascript
-io.use((socket, next) => {
-    // Share session middleware with WebSocket
-    sessionMiddleware(socket.request, {}, () => {
-        if (socket.request.session && socket.request.session.userId) {
-            // User authenticated - allow connection
-            socket.userId = socket.request.session.userId;
-            next();
-        } else {
-            // Reject unauthenticated connections
-            next(new Error("Authentication required"));
+// Secure WebSocket connections with session-based authentication
+// Only authenticate on handshake (when sid is undefined), not on subsequent polling requests
+io.engine.use((req, res, next) => {
+    const isHandshake = req._query.sid === undefined;
+    if (!isHandshake) {
+        return next();
+    }
+
+    // Apply session middleware during handshake
+    sessionMiddleware(req, res, (err) => {
+        if (err) {
+            console.error("Socket session error:", err);
+            return next(err);
         }
+
+        // Check if user is authenticated
+        if (!req.session || !req.session.userId) {
+            console.log("Unauthenticated WebSocket connection attempt");
+            return next(new Error("Authentication required"));
+        }
+
+        console.log(` Authenticated WebSocket handshake: ${req.session.username}`);
+        next();
     });
 });
 ```
 
 **Security Features**:
 - **Session Validation**: WebSocket connections require valid session cookie
-- **User Identification**: `socket.userId` populated from session
+- **Handshake-Only Authentication**: Only validates during initial handshake (when `sid === undefined`), not on polling requests
+- **User Identification**: Session accessible via `socket.request.session` in connection handler
 - **Connection Rejection**: Unauthenticated connections refused during handshake
 - **Progress Session Isolation**: ProgressTracker sessions tied to authenticated users
+
+**Key Implementation Details**:
+- Uses `io.engine.use()` instead of `io.use()` to access raw Socket.io Engine requests
+- Checks `req._query.sid === undefined` to identify handshake vs subsequent polling
+- Uses `req` and `res` parameters instead of `socket` during handshake
+- Logs authentication status with username from session
 
 ### HTTPS Requirement
 
@@ -61,16 +80,16 @@ io.use((socket, next) => {
 - Session cookies have `secure: true` flag (HTTPS only)
 - HTTP connections rejected by browser (no cookies sent)
 - WebSocket inherits session from HTTPS connection
-- nginx terminates TLS on port 443, forwards to Express on 8080
+- nginx reverse proxy terminates TLS and forwards requests to Express backend
 
 ### Trust Proxy Dependency
 
 **Critical**: WebSocket authentication depends on **trust proxy** configuration.
 
 **Why**:
-- nginx terminates SSL/TLS on port 443
-- nginx forwards HTTP to Express on port 8080 with `X-Forwarded-Proto: https` header
-- Express needs `trust proxy: true` to recognize HTTPS from header
+- nginx terminates SSL/TLS for incoming HTTPS requests
+- nginx forwards requests to Express backend with `X-Forwarded-Proto: https` header
+- Express needs `trust proxy: true` to recognize the connection as HTTPS from the header
 - Session middleware checks `req.protocol === "https"` before setting secure cookies
 - WebSocket connection uses same session middleware
 

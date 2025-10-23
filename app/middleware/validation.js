@@ -115,7 +115,38 @@ const jsonUpload = multer({
 
 /**
  * File upload validation middleware
- * Checks if file was uploaded and validates basic properties
+ * Validates that a file was uploaded and checks basic file properties
+ * Used after multer middleware to ensure file upload succeeded and meets requirements
+ *
+ * @param {Object} req - Express request object
+ * @param {Object} req.file - Multer file object (added by csvUpload or jsonUpload middleware)
+ * @param {string} req.file.originalname - Original filename from client
+ * @param {number} req.file.size - File size in bytes
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @returns {void} Sends JSON response on validation failure:
+ *   - 400: {success: false, error: string, details: string} if:
+ *     - No file uploaded (req.file missing)
+ *     - Invalid filename (empty or missing originalname)
+ *     - Empty file (size === 0)
+ *   - Calls next() on successful validation
+ * @throws {never} Does not throw - errors returned as 400 JSON responses
+ *
+ * @example
+ * // Use with CSV upload endpoint
+ * router.post("/api/import/csv",
+ *   csvUpload.single("file"),
+ *   validateFileUpload,
+ *   importController.handleCSV
+ * );
+ *
+ * @example
+ * // Use with JSON restore endpoint
+ * router.post("/api/backup/restore",
+ *   jsonUpload.single("file"),
+ *   validateFileUpload,
+ *   backupController.restore
+ * );
  */
 const validateFileUpload = (req, res, next) => {
     if (!req.file) {
@@ -299,7 +330,29 @@ const validateDateRangeParams = (req, res, next) => {
 // =============================================================================
 
 /**
- * Numeric ID parameter validation middleware
+ * Creates Express middleware for validating numeric ID parameters
+ * Higher-order function that returns middleware to validate and sanitize
+ * route parameters as positive integers, replacing string values with numeric IDs
+ *
+ * @param {string} [paramName="id"] - The route parameter name to validate (defaults to "id")
+ * @returns {Function} Express middleware function (req, res, next) => void that:
+ *   - Validates parameter exists and is a positive integer
+ *   - Sanitizes by replacing req.params[paramName] with parsed numeric value
+ *   - Returns 400 JSON error if validation fails
+ *   - Calls next() on successful validation
+ * @throws {never} Does not throw - errors caught internally and returned as 400 JSON responses
+ *
+ * @example
+ * // Validate default "id" parameter
+ * router.get("/api/tickets/:id", validateNumericId(), ticketController.getById);
+ *
+ * @example
+ * // Validate custom parameter name
+ * router.delete("/api/users/:userId/posts/:postId",
+ *   validateNumericId("userId"),
+ *   validateNumericId("postId"),
+ *   postController.delete
+ * );
  */
 const validateNumericId = (paramName = "id") => {
     return (req, res, next) => {

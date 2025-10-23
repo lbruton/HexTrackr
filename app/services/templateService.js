@@ -953,8 +953,6 @@ Ticket ID: [XT_NUMBER]`;
             result.suggestedCategory = bestMatch;
         }
 
-        console.log(`[TemplateService] Category validation for ${category}: scores=${JSON.stringify(categoryScores)}, bestMatch=${bestMatch}`);
-
         return result;
     }
 }

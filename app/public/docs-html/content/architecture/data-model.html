@@ -1,6 +1,6 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
-    <h1>HexTrackr Data Model</h1><p>This document provides a definitive overview of the HexTrackr database schema. As of v1.1.0, the primary bootstrap is <code>scripts/init-database-v1.1.0.js</code>, which consolidates all 21 application tables into a single initialization script (see <a href="https://linear.app/hextrackr/issue/HEX-324">HEX-324</a>). The schema may evolve further via incremental migrations in the <code>migrations/</code> directory. The authoritative state is the <strong>live SQLite schema</strong> captured in this document and the v1.1.0 baseline script.</p>
+    <h1>HexTrackr Data Model</h1><p>This document provides a definitive overview of the HexTrackr database schema. The schema baseline is v1.1.0 (established via HEX-324), which consolidates all 21 application tables into <code>scripts/init-database-v1.1.0.js</code>. This documentation reflects the current application version v1.1.3. The schema may evolve further via incremental migrations in the <code>migrations/</code> directory. The authoritative state is the <strong>live SQLite schema</strong> captured in this document and the v1.1.0 baseline script.</p>
 <p><strong>Schema Summary</strong> (v1.1.0 baseline):</p>
 <ul>
 <li><strong>21 Core Tables</strong>: Organized into 6 functional categories</li>
@@ -2086,7 +2086,7 @@ CVE-2025-20352    | iosxe     | 17.9.4a</code></pre><h3>`palo_alto_advisories` *
 <hr>
 <p>The above reflects the database as inspected on the current build date. Regenerate this document after structural changes or migration scripts are introduced.</p>
 <hr>
-<p><em>Last Updated: 2025-10-22 | Version: v1.1.0 | Schema: HEX-324 Consolidation | Audit: DOCS-64</em></p>
+<p><em>Last Updated: 2025-10-23 | Application Version: v1.1.3 | Schema Baseline: v1.1.0 | Audit: DOCS-64</em></p>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be

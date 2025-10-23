@@ -48,7 +48,7 @@
 <li>Error handling and recovery</li>
 </ul>
 <hr>
-<h2>Specialized Manager Modules</h2><h3>1. VulnerabilityDataManager</h3><p><strong>Location</strong>: <code>/scripts/shared/vulnerability-data.js</code></p>
+<h2>Specialized Manager Modules</h2><h3>1. VulnerabilityDataManager</h3><p><strong>Location</strong>: <code>/app/public/scripts/shared/vulnerability-data.js</code></p>
 <p><strong>Responsibilities</strong>:</p>
 <ul>
 <li>API communication and data fetching</li>
@@ -60,7 +60,7 @@
 <pre><code class="language-javascript"><span class="hljs-keyword">async</span> <span class="hljs-title function_">fetchVulnerabilities</span>(params)
 <span class="hljs-keyword">async</span> <span class="hljs-title function_">fetchStatistics</span>()
 <span class="hljs-keyword">async</span> <span class="hljs-title function_">importCSV</span>(file, options)
-<span class="hljs-title function_">clearCache</span>()</code></pre><h3>2. VulnerabilityStatisticsManager</h3><p><strong>Location</strong>: <code>/scripts/shared/vulnerability-statistics.js</code></p>
+<span class="hljs-title function_">clearCache</span>()</code></pre><h3>2. VulnerabilityStatisticsManager</h3><p><strong>Location</strong>: <code>/app/public/scripts/shared/vulnerability-statistics.js</code></p>
 <p><strong>Responsibilities</strong>:</p>
 <ul>
 <li>Statistical calculations and aggregations</li>
@@ -75,7 +75,7 @@
 <li>Device impact metrics</li>
 <li>Performance-optimized aggregations</li>
 </ul>
-<h3>3. VulnerabilityChartManager</h3><p><strong>Location</strong>: <code>/scripts/shared/vulnerability-chart-manager.js</code></p>
+<h3>3. VulnerabilityChartManager</h3><p><strong>Location</strong>: <code>/app/public/scripts/shared/vulnerability-chart-manager.js</code></p>
 <p><strong>Responsibilities</strong>:</p>
 <ul>
 <li>ApexCharts integration and management</li>
@@ -109,7 +109,7 @@
     <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> {
         <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">createChartsWithTheme</span>(<span class="hljs-string">&#x27;light&#x27;</span>);
     }, <span class="hljs-number">500</span>);
-}</code></pre><h3>4. VulnerabilitySearchManager</h3><p><strong>Location</strong>: <code>/scripts/shared/vulnerability-search.js</code></p>
+}</code></pre><h3>4. VulnerabilitySearchManager</h3><p><strong>Location</strong>: <code>/app/public/scripts/shared/vulnerability-search.js</code></p>
 <p><strong>Responsibilities</strong>:</p>
 <ul>
 <li>Search functionality implementation</li>
@@ -117,7 +117,7 @@
 <li>CVE lookup and validation</li>
 <li>Search optimization and indexing</li>
 </ul>
-<h3>5. VulnerabilityGridManager</h3><p><strong>Location</strong>: <code>/scripts/shared/vulnerability-grid.js</code></p>
+<h3>5. VulnerabilityGridManager</h3><p><strong>Location</strong>: <code>/app/public/scripts/shared/vulnerability-grid.js</code></p>
 <p><strong>Responsibilities</strong>:</p>
 <ul>
 <li>AG-Grid configuration and management</li>
@@ -132,7 +132,7 @@
 <li>Responsive column management</li>
 <li>Advanced filtering and sorting</li>
 </ul>
-<h3>6. VulnerabilityCardsManager</h3><p><strong>Location</strong>: <code>/scripts/shared/vulnerability-cards.js</code></p>
+<h3>6. VulnerabilityCardsManager</h3><p><strong>Location</strong>: <code>/app/public/scripts/shared/vulnerability-cards.js</code></p>
 <p><strong>Responsibilities</strong>:</p>
 <ul>
 <li>Card-based view rendering with distinct device and vulnerability card types</li>
@@ -149,7 +149,7 @@
 </li>
 </ul>
 <hr>
-<h2>Real-time Communication</h2><h3>WebSocketClient Architecture</h3><p><strong>Location</strong>: <code>/scripts/shared/websocket-client.js</code></p>
+<h2>Real-time Communication</h2><h3>WebSocketClient Architecture</h3><p><strong>Location</strong>: <code>/app/public/scripts/shared/websocket-client.js</code></p>
 <pre><code class="language-javascript"><span class="hljs-keyword">class</span> <span class="hljs-title class_">WebSocketClient</span> {
     <span class="hljs-title function_">constructor</span>(<span class="hljs-params"></span>) {
         <span class="hljs-variable language_">this</span>.<span class="hljs-property">socket</span> = <span class="hljs-literal">null</span>;
@@ -176,7 +176,7 @@
 <li>Connection status changes</li>
 </ul>
 <hr>
-<h2>Theme System Integration</h2><h3>ThemeController Integration</h3><p><strong>Location</strong>: <code>/scripts/shared/theme-controller.js</code></p>
+<h2>Theme System Integration</h2><h3>ThemeController Integration</h3><p><strong>Location</strong>: <code>/app/public/scripts/shared/theme-controller.js</code></p>
 <p>The frontend integrates with a sophisticated theme system providing:</p>
 <ul>
 <li><strong>Dark/Light Mode</strong>: Complete theme switching</li>
@@ -200,7 +200,7 @@
         }
     });
 }</code></pre><hr>
-<h2>Modal System Architecture</h2><h3>Modal Management</h3><p><strong>Location</strong>: <code>/scripts/shared/</code> (various modal files)</p>
+<h2>Modal System Architecture</h2><h3>Modal Management</h3><p><strong>Location</strong>: <code>/app/public/scripts/shared/</code> (various modal files)</p>
 <p><strong>Available Modals</strong>:</p>
 <ul>
 <li><code>vulnerability-details-modal.js</code> - Vulnerability information display</li>
@@ -218,7 +218,7 @@
 <h3>Universal Aggregation System</h3><p>HexTrackr implements description-field-based aggregation for consistent modal relationships:</p>
 <p><strong>Vulnerability Modals</strong>: Aggregate all devices affected by specific vulnerabilities<br><strong>Device Modals</strong>: Aggregate all vulnerabilities affecting specific devices</p>
 <hr>
-<h2>Page-Specific Architecture</h2><h3>Vulnerabilities Page (`vulnerabilities.html`)</h3><p><strong>Main Controller</strong>: <code>/scripts/pages/vulnerabilities.js</code></p>
+<h2>Page-Specific Architecture</h2><h3>Vulnerabilities Page (`vulnerabilities.html`)</h3><p><strong>Main Controller</strong>: <code>/app/public/scripts/pages/vulnerabilities.js</code></p>
 <pre><code class="language-javascript"><span class="hljs-keyword">export</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">ModernVulnManager</span> {
     <span class="hljs-title function_">constructor</span>(<span class="hljs-params"></span>) {
         <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">initializeModules</span>();
@@ -243,7 +243,7 @@
 <li>Multiple export formats (CSV, HTML, PDF)</li>
 <li>Advanced search and filtering</li>
 </ul>
-<h3>Tickets Page (`tickets.html`)</h3><p><strong>Main Controller</strong>: <code>/scripts/pages/tickets.js</code></p>
+<h3>Tickets Page (`tickets.html`)</h3><p><strong>Main Controller</strong>: <code>/app/public/scripts/pages/tickets.js</code></p>
 <p><strong>Features</strong>:</p>
 <ul>
 <li>Complete CRUD operations for tickets</li>
@@ -253,14 +253,14 @@
 <li>Audit trail management</li>
 </ul>
 <hr>
-<h2>Shared Infrastructure</h2><h3>Utility Modules</h3><p><strong>Location</strong>: <code>/scripts/utils/</code></p>
+<h2>Shared Infrastructure</h2><h3>Utility Modules</h3><p><strong>Location</strong>: <code>/app/public/scripts/utils/</code></p>
 <ul>
 <li><code>accessibility-announcer.js</code> - Screen reader support</li>
 <li><code>security.js</code> - XSS prevention and input sanitization</li>
 <li><code>theme-contrast-tester.js</code> - WCAG compliance validation</li>
 <li><code>wcag-contrast-validator.js</code> - Color contrast validation</li>
 </ul>
-<h3>Shared Components</h3><p><strong>Location</strong>: <code>/scripts/shared/</code></p>
+<h3>Shared Components</h3><p><strong>Location</strong>: <code>/app/public/scripts/shared/</code></p>
 <ul>
 <li><code>header-loader.js</code> - Dynamic header management</li>
 <li><code>footer-loader.js</code> - Footer content loading</li>

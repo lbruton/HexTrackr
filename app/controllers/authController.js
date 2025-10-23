@@ -430,10 +430,32 @@ class AuthController {
 
     /**
      * Get profile endpoint - GET /api/auth/profile
-     * Returns current user profile details
-     * Requires authentication (requireAuth middleware)
-     * @param {Object} req - Express request
-     * @param {Object} res - Express response
+     * Returns current authenticated user's profile with sensitive fields filtered out
+     * Requires authentication (requireAuth middleware sets req.user)
+     * Automatically destroys session if user record not found in database
+     *
+     * @async
+     * @param {Object} req - Express request object
+     * @param {Object} req.user - User object from requireAuth middleware
+     * @param {number} req.user.id - User ID from authenticated session
+     * @param {Object} res - Express response object
+     * @returns {Promise<void>} Sends JSON response:
+     *   - 200: {success: true, data: {user: Object}} - User profile without password_hash, failed_login_count, failed_login_timestamp
+     *   - 404: {success: false, error: "User not found"} - User ID from session not found in database (session destroyed)
+     *   - 500: {success: false, error: "Failed to retrieve profile", details: string}
+     * @throws {Error} Caught and returned as 500 response if:
+     *   - AuthService.getUserById() fails
+     *   - Database query errors during user lookup
+     *   - Unexpected errors during profile retrieval
+     * @route GET /api/auth/profile
+     * @example
+     * // GET /api/auth/profile (with valid session cookie)
+     * // Returns: {success: true, data: {user: {id: 1, username: "admin", email: "admin@example.com", ...}}}
+     *
+     * @example
+     * // GET /api/auth/profile (user deleted but session still valid)
+     * // Returns: {success: false, error: "User not found"}
+     * // Side effect: Session destroyed
      */
     static async getProfile(req, res) {
         try {

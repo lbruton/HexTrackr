@@ -1,7 +1,7 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
     <h1>Security Overview</h1><p>HexTrackr is designed with security as a foundational principle. This document provides comprehensive coverage of all security measures, controls, and implementations for corporate security review and compliance assessment.</p>
-<p><strong>Version</strong>: v1.0.54<br><strong>Last Updated</strong>: 2025-10-09</p>
+<p><strong>Version</strong>: v1.1.3<br><strong>Last Updated</strong>: 2025-10-23</p>
 <hr>
 <h2>Security Architecture Overview</h2><p>HexTrackr implements a defense-in-depth security strategy with multiple layers of protection:</p>
 <ul>
@@ -117,7 +117,7 @@
 node -e <span class="hljs-string">&quot;console.log(require(&#x27;crypto&#x27;).randomBytes(32).toString(&#x27;hex&#x27;))&quot;</span>
 
 <span class="hljs-comment"># Add to .env file</span>
-<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;SESSION_SECRET=&lt;generated-secret&gt;&quot;</span> &gt;&gt; .<span class="hljs-built_in">env</span></code></pre><h3>Trust Proxy Configuration (HEX-128 Fix)</h3><p><strong>Location</strong>: <code>app/public/server.js</code> (line 73)</p>
+<span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;SESSION_SECRET=&lt;generated-secret&gt;&quot;</span> &gt;&gt; .<span class="hljs-built_in">env</span></code></pre><h3>Trust Proxy Configuration (HEX-128 Fix)</h3><p><strong>Location</strong>: <code>app/public/server.js</code> (lines 81-85)</p>
 <p><strong>CRITICAL IMPORTANCE</strong>: HexTrackr <strong>ALWAYS</strong> runs behind nginx reverse proxy.</p>
 <p><strong>Implementation</strong>:</p>
 <pre><code class="language-javascript"><span class="hljs-comment">// Trust proxy configuration for nginx reverse proxy</span>
@@ -920,7 +920,7 @@ npm run lint:all</code></pre><h3>Penetration Testing Checklist</h3><p><strong>Ne
 <li>Critical vulnerabilities: Private disclosure preferred</li>
 </ul>
 <hr>
-<h2>Security Roadmap</h2><h3>Current Security Posture (v1.0.54)</h3><p><strong>Strengths</strong>:</p>
+<h2>Security Roadmap</h2><h3>Current Security Posture (v1.1.3)</h3><p><strong>Strengths</strong>:</p>
 <ul>
 <li>✅ Excellent password security (Argon2id)</li>
 <li>✅ Comprehensive path validation (100% coverage)</li>
