@@ -120,10 +120,7 @@ clearCache()
 
 **Chart Types**:
 
-- Severity distribution (donut charts)
-- Temporal trends (line charts)
-- Device impact analysis (bar charts)
-- VPR score distributions (histograms)
+- Temporal trends (line charts) - Severity breakdown over time with zoom/pan capabilities
 
 **Theme Integration**:
 
