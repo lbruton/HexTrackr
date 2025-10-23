@@ -1,11 +1,12 @@
 # Multi-stage build for smaller, cross-platform compatible image
-FROM node:18-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
 # Install build dependencies for native modules
 # Works on both Linux and macOS Docker environments
-RUN apk add --no-cache python3 make g++ sqlite
+# py3-setuptools provides distutils for node-gyp (required for Node 24 + Python 3.12)
+RUN apk add --no-cache python3 py3-setuptools make g++ sqlite
 
 # Copy package files for better Docker layer caching
 COPY package*.json ./
@@ -15,18 +16,21 @@ RUN npm install --production --legacy-peer-deps && \
     npm rebuild
 
 # Production stage
-FROM node:18-alpine
+FROM node:22-alpine
 
 WORKDIR /app
 
-# Install runtime dependencies
-RUN apk add --no-cache sqlite
+# Install runtime dependencies AND build tools for native module rebuild
+RUN apk add --no-cache sqlite python3 py3-setuptools make g++
 
 # Copy built node_modules from builder stage
 COPY --from=builder /app/node_modules ./node_modules
 
 # Copy package files
 COPY package*.json ./
+
+# Rebuild native modules in production environment to ensure V8 ABI compatibility
+RUN npm rebuild better-sqlite3 argon2
 
 # Copy entire application structure (excluding data files)
 COPY app/ ./app/

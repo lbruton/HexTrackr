@@ -2,6 +2,10 @@
 
 > Complete reference for HexTrackr's backend architecture, including controllers, services, routes, and server configuration
 
+> **Current Version**: v1.1.3 (see `package.json` for latest version)
+>
+> Historical "Since:" annotations throughout this document indicate when features were first introduced.
+
 ## Overview
 
 HexTrackr's backend follows a modular Express.js architecture with clear separation of concerns:

@@ -1094,12 +1094,6 @@ class DocumentationPortalV2 {
     getBasePath() {
         const currentPath = window.location.pathname;
 
-        // If we're serving directly from docs-html directory (like http://localhost:8081)
-        // This is removed because we always need to respect the path structure
-        // if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-        //     return "";  // No prefix needed when serving from docs-html itself
-        // }
-        
         // If we're in the docs-html directory, return the path to docs-html
         if (currentPath.includes("/docs-html/")) {
             const basePath = currentPath.substring(0, currentPath.indexOf("/docs-html/") + "/docs-html/".length);

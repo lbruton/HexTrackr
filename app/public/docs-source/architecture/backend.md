@@ -6,7 +6,7 @@ The backend is a modular Node.js/Express application providing REST endpoints, r
 
 ## Key Characteristics
 
-- **Modular Architecture**: `server.js` (~205 lines) orchestrates modular components across multiple directories.
+- **Modular Architecture**: `server.js` (~831 lines) orchestrates modular components across multiple directories.
 - **Separation of Concerns**: Controllers, services, routes, and configuration are cleanly separated.
 - **Unified Delivery**: API + static assets + docs from one process.
 - **Embedded DB**: Single SQLite file (`data/hextrackr.db`). No external service dependency.
@@ -25,7 +25,7 @@ The backend is a modular Node.js/Express application providing REST endpoints, r
 | **Configuration** | Database, middleware, websocket configs | `/app/config/` |
 | **Utilities** | PathValidator, ProgressTracker, helpers, seedEmailTemplates | `/app/utils/` |
 | `init-database.js` | Bootstrap base schema & indexes | `/app/public/scripts/` |
-| Rate Limiting | Cache-aware throttling (60 req/15min prod, 10,000 req/min dev) | Express middleware |
+| Rate Limiting | Cache-aware throttling (60 req/15min prod, 10,000 req/1min dev) | Express middleware |
 
 ### Module Organization
 
@@ -48,13 +48,13 @@ The backend is a modular Node.js/Express application providing REST endpoints, r
 | `templateController.js` | Singleton | 7 static methods | `initialize(db)` |
 | `authController.js` | Singleton | 5 static methods | `initialize(db)` |
 | `preferencesController.js` | Singleton | 7 static methods | `initialize(db)` |
-| `kevController.js` *(v1.0.22+)* | Constructor | 7 instance methods | `constructor(db)` |
-| `ciscoController.js` *(v1.0.63+, HEX-141)* | Constructor | 6 instance methods | `constructor(db, preferencesService)` |
-| `paloAltoController.js` *(v1.0.63+, HEX-209)* | Constructor | 6 instance methods | `constructor(db, preferencesService)` |
+| `kevController.js` | Constructor | 7 instance methods | `constructor(db)` |
+| `ciscoController.js` | Constructor | 6 instance methods | `constructor(db, preferencesService)` |
+| `paloAltoController.js` | Constructor | 6 instance methods | `constructor(db, preferencesService)` |
 | `docsController.js` | Module Exports | 2 exported functions | Instance created internally, methods exported as wrappers |
 | `importController.js` | Functional | 6 exported functions | `setProgressTracker(tracker)` |
-| `locationController.js` *(v1.0.93+, HEX-292)* | Singleton | 3 static methods | `initialize(db)` |
-| `auditLogController.js` *(v1.0.67+, HEX-254)* | Singleton | 3 static methods | `initialize()` |
+| `locationController.js` | Singleton | 3 static methods | `initialize(db)` |
+| `auditLogController.js` | Singleton | 3 static methods | `initialize()` |
 
 ### Service Files
 
@@ -77,6 +77,7 @@ The backend is a modular Node.js/Express application providing REST endpoints, r
 | `fileService.js` | File system operations | `readFile()`, `writeFile()`, `validatePath()` |
 | `progressService.js` | WebSocket progress tracking | `createSession()`, `updateProgress()`, `completeSession()` |
 | `validationService.js` | Input validation and sanitization | `validateVulnerability()`, `sanitizeInput()`, `validateTicket()` |
+| `loggingService.js` *(v1.0.67+, HEX-254)* | Centralized logging with encrypted audit trail | `initialize()`, `info()`, `warn()`, `error()`, `audit()`, `debug()` |
 | `cacheService.js` *(v1.0.46+)* | Server-side caching with TTL | `withCaching()`, `invalidateCache()`, `getCacheStats()` |
 
 ---
@@ -393,7 +394,7 @@ class PathValidator {
 | **Authentication** *(v1.0.46+)* | Argon2id + `requireAuth` middleware | 46+ protected endpoints, account lockout after 5 failed attempts |
 | **CSRF Protection** *(v1.0.46+)* | `csrf-sync` (Synchronizer Token Pattern) | Token-based protection for all state-changing requests |
 | **CORS** | `cors()` with dynamic validation | **HTTPS-only** - Rejects HTTP origins, allows same-origin requests |
-| **Rate Limiting** | `express-rate-limit` with cache awareness | **Production**: 60 req/15min per IP, **Development**: 10,000 req/min (cache hits excluded) |
+| **Rate Limiting** | `express-rate-limit` with cache awareness | **Production**: 60 req/15min per IP, **Development**: 10,000 req/1min (cache hits excluded). **Note**: Current production deployment uses development limits pending performance testing. |
 | **Compression** | `compression()` | **Conditional**: Only if `TRUST_PROXY !== "true"` (avoids double compression with nginx) |
 | **Parsing** | `express.json` & `express.urlencoded` | 100MB limit for request bodies (CSV imports) |
 | **Uploads** | `multer` | CSV import only, 100MB cap, MIME type validation (`text/csv`) |
@@ -680,13 +681,14 @@ return `desc:${descriptionHash}|host:${hostIdentifier}`;
 
 ### API Endpoint Summary
 
-- **Total Endpoints**: 85+ REST endpoints across 13 route modules
+- **Total Endpoints**: 85+ REST endpoints across 15 route modules
 - **Protected Endpoints**: 46+ endpoints with `requireAuth` middleware
 - **Public Endpoints**: 9+ endpoints (health, auth, docs)
 - **Import System**: 13+ dedicated import endpoints with progress tracking
 - **External Integrations**: CISA KEV, Cisco PSIRT, Palo Alto Security advisories
 - **WebSocket**: Real-time progress tracking on same port as REST API (8080)
-- **Rate Limited**: Production: 60 req/15min, Development: 10,000 req/min (cache hits excluded)
+- **Rate Limited**: Production: 60 req/15min (standard), Development: 10,000 req/1min (cache hits excluded)
+- **Current State**: Production deployment uses development limits (10,000 req/1min) due to card view data loading requirements. Performance testing planned to determine optimal production limits.
 
 ---
 
@@ -806,7 +808,7 @@ sequenceDiagram
 | Concern | Implementation | Details |
 | ------- | -------------- | ------- |
 | **Path Traversal** | `PathValidator` class | Comprehensive path validation and safe file operations |
-| **Rate Limiting** | Express rate limit middleware | 100 requests per 15-minute window per IP |
+| **Rate Limiting** | Express rate limit middleware | 60 requests per 15-minute window (production standard), 10,000 requests per 1-minute window (development), cache hits excluded. Production currently uses development limits pending optimization. |
 | **Upload Security** | Multer with size limits | 50MB cap with file type validation |
 | **XSS Prevention** | Security headers | `X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection` |
 | **SQL Injection** | Parameterized queries | All database operations use prepared statements |
@@ -857,6 +859,8 @@ const RATE_LIMIT_MAX_REQUESTS = IS_PRODUCTION ? 60 : 10000; // 60 (prod) / 10000
 ```
 
 **Cache-Aware Rate Limiting**: With the introduction of `cacheService.js` (v1.0.46+), rate limits were reduced from 100 to 60 requests per window (40% reduction) because cached responses are excluded from rate limiting.
+
+**Current Production Configuration**: Production deployment currently uses development limits (10,000 req/1min) due to high data volume requirements from card view components. Performance testing is planned to determine optimal production limits without impacting user experience.
 
 ### Future Security Enhancements
 

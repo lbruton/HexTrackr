@@ -396,11 +396,32 @@ class PreferencesController {
 
     /**
      * Export user preferences (HEX-303) - GET /api/preferences/export
-     * Exports all non-sensitive preferences for current authenticated user
-     * Returns JSON file for download (no server-side storage)
-     * @param {Object} req - Express request
-     * @param {Object} req.user - User from requireAuth middleware
-     * @param {Object} res - Express response
+     * Exports all non-sensitive preferences for current authenticated user as downloadable JSON file
+     * No server-side storage occurs - file is generated in-memory and sent directly to client
+     * Filename format: hextrackr_user_preferences_USERNAME_YYYY-MM-DD.json
+     *
+     * @async
+     * @param {Object} req - Express request object
+     * @param {Object} req.user - User object from requireAuth middleware
+     * @param {number} req.user.id - User ID for preference lookup
+     * @param {string} [req.user.username="user"] - Username for filename generation (defaults to "user")
+     * @param {Object} res - Express response object
+     * @returns {Promise<void>} Sends JSON file download response:
+     *   - 200: Formatted JSON export with Content-Disposition attachment header
+     *   - 500: {success: false, error: "Failed to export user preferences", details: string}
+     * @throws {Error} Caught and returned as 500 response if PreferencesService.exportUserPreferences fails
+     * @route GET /api/preferences/export
+     * @example
+     * // GET /api/preferences/export
+     * // Response headers:
+     * //   Content-Type: application/json; charset=utf-8
+     * //   Content-Disposition: attachment; filename="hextrackr_user_preferences_john_2025-10-23.json"
+     * // Response body (formatted JSON):
+     * // {
+     * //   "exportedAt": "2025-10-23T14:30:00.000Z",
+     * //   "username": "john",
+     * //   "preferences": { "theme": "dark", "gridDensity": "comfortable", ... }
+     * // }
      */
     static async exportUserPreferences(req, res) {
         try {

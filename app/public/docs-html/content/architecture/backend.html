@@ -3,7 +3,7 @@
     <h1>Backend Architecture</h1><p>The backend is a modular Node.js/Express application providing REST endpoints, rollover ingestion, documentation delivery, and SQLite persistence. It serves the static frontend pages (<code>tickets.html</code>, <code>vulnerabilities.html</code>) and the generated documentation portal (<code>/docs-html</code>).</p>
 <hr>
 <h2>Key Characteristics</h2><ul>
-<li><strong>Modular Architecture</strong>: <code>server.js</code> (~205 lines) orchestrates modular components across multiple directories.</li>
+<li><strong>Modular Architecture</strong>: <code>server.js</code> (~831 lines) orchestrates modular components across multiple directories.</li>
 <li><strong>Separation of Concerns</strong>: Controllers, services, routes, and configuration are cleanly separated.</li>
 <li><strong>Unified Delivery</strong>: API + static assets + docs from one process.</li>
 <li><strong>Embedded DB</strong>: Single SQLite file (<code>data/hextrackr.db</code>). No external service dependency.</li>
@@ -55,7 +55,7 @@
 </tr>
 <tr>
 <td>Rate Limiting</td>
-<td>Cache-aware throttling (60 req/15min prod, 10,000 req/min dev)</td>
+<td>Cache-aware throttling (60 req/15min prod, 10,000 req/1min dev)</td>
 <td>Express middleware</td>
 </tr>
 </tbody></table>
@@ -144,19 +144,19 @@
 <td><code>initialize(db)</code></td>
 </tr>
 <tr>
-<td><code>kevController.js</code> <em>(v1.0.22+)</em></td>
+<td><code>kevController.js</code></td>
 <td>Constructor</td>
 <td>7 instance methods</td>
 <td><code>constructor(db)</code></td>
 </tr>
 <tr>
-<td><code>ciscoController.js</code> <em>(v1.0.63+, HEX-141)</em></td>
+<td><code>ciscoController.js</code></td>
 <td>Constructor</td>
 <td>6 instance methods</td>
 <td><code>constructor(db, preferencesService)</code></td>
 </tr>
 <tr>
-<td><code>paloAltoController.js</code> <em>(v1.0.63+, HEX-209)</em></td>
+<td><code>paloAltoController.js</code></td>
 <td>Constructor</td>
 <td>6 instance methods</td>
 <td><code>constructor(db, preferencesService)</code></td>
@@ -174,13 +174,13 @@
 <td><code>setProgressTracker(tracker)</code></td>
 </tr>
 <tr>
-<td><code>locationController.js</code> <em>(v1.0.93+, HEX-292)</em></td>
+<td><code>locationController.js</code></td>
 <td>Singleton</td>
 <td>3 static methods</td>
 <td><code>initialize(db)</code></td>
 </tr>
 <tr>
-<td><code>auditLogController.js</code> <em>(v1.0.67+, HEX-254)</em></td>
+<td><code>auditLogController.js</code></td>
 <td>Singleton</td>
 <td>3 static methods</td>
 <td><code>initialize()</code></td>
@@ -278,6 +278,11 @@
 <td><code>validationService.js</code></td>
 <td>Input validation and sanitization</td>
 <td><code>validateVulnerability()</code>, <code>sanitizeInput()</code>, <code>validateTicket()</code></td>
+</tr>
+<tr>
+<td><code>loggingService.js</code> <em>(v1.0.67+, HEX-254)</em></td>
+<td>Centralized logging with encrypted audit trail</td>
+<td><code>initialize()</code>, <code>info()</code>, <code>warn()</code>, <code>error()</code>, <code>audit()</code>, <code>debug()</code></td>
 </tr>
 <tr>
 <td><code>cacheService.js</code> <em>(v1.0.46+)</em></td>
@@ -586,7 +591,7 @@ router.<span class="hljs-title function_">get</span>(<span class="hljs-string">&
 <tr>
 <td><strong>Rate Limiting</strong></td>
 <td><code>express-rate-limit</code> with cache awareness</td>
-<td><strong>Production</strong>: 60 req/15min per IP, <strong>Development</strong>: 10,000 req/min (cache hits excluded)</td>
+<td><strong>Production</strong>: 60 req/15min per IP, <strong>Development</strong>: 10,000 req/1min (cache hits excluded). <strong>Note</strong>: Current production deployment uses development limits pending performance testing.</td>
 </tr>
 <tr>
 <td><strong>Compression</strong></td>
@@ -905,13 +910,14 @@ router.<span class="hljs-title function_">post</span>(<span class="hljs-string">
 </tr>
 </tbody></table>
 <h3>API Endpoint Summary</h3><ul>
-<li><strong>Total Endpoints</strong>: 85+ REST endpoints across 13 route modules</li>
+<li><strong>Total Endpoints</strong>: 85+ REST endpoints across 15 route modules</li>
 <li><strong>Protected Endpoints</strong>: 46+ endpoints with <code>requireAuth</code> middleware</li>
 <li><strong>Public Endpoints</strong>: 9+ endpoints (health, auth, docs)</li>
 <li><strong>Import System</strong>: 13+ dedicated import endpoints with progress tracking</li>
 <li><strong>External Integrations</strong>: CISA KEV, Cisco PSIRT, Palo Alto Security advisories</li>
 <li><strong>WebSocket</strong>: Real-time progress tracking on same port as REST API (8080)</li>
-<li><strong>Rate Limited</strong>: Production: 60 req/15min, Development: 10,000 req/min (cache hits excluded)</li>
+<li><strong>Rate Limited</strong>: Production: 60 req/15min (standard), Development: 10,000 req/1min (cache hits excluded)</li>
+<li><strong>Current State</strong>: Production deployment uses development limits (10,000 req/1min) due to card view data loading requirements. Performance testing planned to determine optimal production limits.</li>
 </ul>
 <hr>
 <h2>Real-time Communication (WebSocket)</h2><h3>ProgressTracker Architecture</h3><p>HexTrackr implements a sophisticated WebSocket-based progress tracking system through the <code>ProgressTracker</code> class:</p>
@@ -1054,7 +1060,7 @@ router.<span class="hljs-title function_">post</span>(<span class="hljs-string">
 <tr>
 <td><strong>Rate Limiting</strong></td>
 <td>Express rate limit middleware</td>
-<td>100 requests per 15-minute window per IP</td>
+<td>60 requests per 15-minute window (production standard), 10,000 requests per 1-minute window (development), cache hits excluded. Production currently uses development limits pending optimization.</td>
 </tr>
 <tr>
 <td><strong>Upload Security</strong></td>
@@ -1108,6 +1114,7 @@ router.<span class="hljs-title function_">post</span>(<span class="hljs-string">
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> <span class="hljs-variable constant_">IS_PRODUCTION</span> = process.<span class="hljs-property">env</span>.<span class="hljs-property">NODE_ENV</span> === <span class="hljs-string">&quot;production&quot;</span>;
 <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">RATE_LIMIT_WINDOW_MS</span> = <span class="hljs-variable constant_">IS_PRODUCTION</span> ? <span class="hljs-number">15</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span> : <span class="hljs-number">1</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>; <span class="hljs-comment">// 15 min (prod) / 1 min (dev)</span>
 <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">RATE_LIMIT_MAX_REQUESTS</span> = <span class="hljs-variable constant_">IS_PRODUCTION</span> ? <span class="hljs-number">60</span> : <span class="hljs-number">10000</span>; <span class="hljs-comment">// 60 (prod) / 10000 (dev) - cache HITs excluded</span></code></pre><p><strong>Cache-Aware Rate Limiting</strong>: With the introduction of <code>cacheService.js</code> (v1.0.46+), rate limits were reduced from 100 to 60 requests per window (40% reduction) because cached responses are excluded from rate limiting.</p>
+<p><strong>Current Production Configuration</strong>: Production deployment currently uses development limits (10,000 req/1min) due to high data volume requirements from card view components. Performance testing is planned to determine optimal production limits without impacting user experience.</p>
 <h3>Future Security Enhancements</h3><table>
 <thead>
 <tr>

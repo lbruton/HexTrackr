@@ -31,6 +31,11 @@ class KevController {
      * @param {Object} req - Express request object
      * @param {Object} res - Express response object
      * @returns {Promise<void>}
+     * @throws {Error} Caught and returned as 500 response if:
+     *   - KEV sync is already in progress (409 conflict)
+     *   - CISA API is unreachable or returns invalid data
+     *   - Database operations fail during sync
+     *   - Cache clearing fails after successful sync
      */
     async syncKevData(req, res) {
         try {
@@ -91,6 +96,10 @@ class KevController {
      * @param {Object} req - Express request object
      * @param {Object} res - Express response object
      * @returns {Promise<void>}
+     * @throws {Error} Caught and returned as 500 response if:
+     *   - Database query fails when retrieving sync status
+     *   - KEV service metadata is corrupted or missing
+     *   - Sync status retrieval encounters unexpected errors
      */
     async getKevStatus(req, res) {
         try {
@@ -115,8 +124,20 @@ class KevController {
      * Get KEV metadata for a specific CVE
      * @async
      * @param {Object} req - Express request object
+     * @param {Object} req.params - URL parameters
+     * @param {string} req.params.cveId - CVE identifier (e.g., "CVE-2024-1234")
      * @param {Object} res - Express response object
-     * @returns {Promise<void>}
+     * @returns {Promise<void>} Sends JSON response:
+     *   - 200: KEV metadata object for the specified CVE
+     *   - 400: {error: "CVE ID is required"} if cveId parameter missing
+     *   - 404: {error: "CVE not found in KEV catalog"} if CVE not in CISA catalog
+     *   - 500: {error: "Failed to get KEV data", message: string}
+     * @throws {Error} Caught and returned as 500 response if:
+     *   - Database query fails when searching KEV catalog
+     *   - KEV service encounters errors during metadata retrieval
+     * @example
+     * // GET /api/kev/CVE-2024-1234
+     * // Returns: {cveId: "CVE-2024-1234", dateAdded: "2024-01-15", ...}
      */
     async getKevByCve(req, res) {
         try {
@@ -157,9 +178,17 @@ class KevController {
     /**
      * Get all KEV vulnerabilities
      * @async
-     * @param {Object} req - Express request object
+     * @param {Object} req - Express request object (no parameters required)
      * @param {Object} res - Express response object
-     * @returns {Promise<void>}
+     * @returns {Promise<void>} Sends JSON response:
+     *   - 200: {count: number, kevs: Array<Object>} - All KEVs in CISA catalog
+     *   - 500: {error: "Failed to get KEV list", message: string}
+     * @throws {Error} Caught and returned as 500 response if:
+     *   - Database query fails when retrieving KEV catalog
+     *   - KEV service encounters errors during retrieval
+     * @example
+     * // GET /api/kev/all
+     * // Returns: {count: 1042, kevs: [{cveId: "CVE-2024-1234", ...}, ...]}
      */
     async getAllKevs(req, res) {
         try {
@@ -184,11 +213,23 @@ class KevController {
     }
 
     /**
-     * Get matched KEV vulnerabilities in environment
+     * Get matched KEV vulnerabilities in environment - GET /api/kev/matched
+     * Returns CISA Known Exploited Vulnerabilities that match vulnerabilities
+     * currently tracked in the HexTrackr environment (cross-referenced by CVE ID)
+     *
      * @async
      * @param {Object} req - Express request object
+     * @param {Object} req.query - Query parameters
+     * @param {number} [req.query.limit=100] - Maximum number of matched KEVs to return
      * @param {Object} res - Express response object
-     * @returns {Promise<void>}
+     * @returns {Promise<void>} Sends JSON response:
+     *   - 200: {count: number, limit: number, vulnerabilities: Array<Object>}
+     *   - 500: {error: "Failed to get matched KEVs", message: string}
+     * @throws {Error} Caught and returned as 500 response if KevService.getMatchedVulnerabilities fails
+     * @route GET /api/kev/matched
+     * @example
+     * // GET /api/kev/matched?limit=50
+     * // Returns: {count: 42, limit: 50, vulnerabilities: [{cveId: "CVE-2024-1234", ...}, ...]}
      */
     async getMatchedKevs(req, res) {
         try {
@@ -253,11 +294,30 @@ class KevController {
     }
 
     /**
-     * Check if auto-sync is needed
+     * Check if KEV auto-sync is needed - GET /api/kev/auto-sync/check
+     * Determines if KEV catalog should be automatically refreshed based on time
+     * elapsed since last sync. Used by background sync scheduler to decide
+     * whether to trigger a CISA KEV catalog update.
+     *
      * @async
      * @param {Object} req - Express request object
+     * @param {Object} req.query - Query parameters
+     * @param {number} [req.query.hours=24] - Hours threshold for auto-sync (default: 24)
      * @param {Object} res - Express response object
-     * @returns {Promise<void>}
+     * @returns {Promise<void>} Sends JSON response:
+     *   - 200: {autoSyncNeeded: boolean, hoursThreshold: number}
+     *   - 500: {error: "Failed to check auto-sync status", message: string}
+     * @throws {Error} Caught and returned as 500 response if KevService.isAutoSyncNeeded fails
+     * @route GET /api/kev/auto-sync/check
+     * @example
+     * // Check if sync needed with default 24-hour threshold
+     * // GET /api/kev/auto-sync/check
+     * // Returns: {autoSyncNeeded: true, hoursThreshold: 24}
+     *
+     * @example
+     * // Check with custom 12-hour threshold
+     * // GET /api/kev/auto-sync/check?hours=12
+     * // Returns: {autoSyncNeeded: false, hoursThreshold: 12}
      */
     async checkAutoSync(req, res) {
         try {

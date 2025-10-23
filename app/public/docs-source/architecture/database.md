@@ -1,26 +1,28 @@
 # Database Architecture
 
-HexTrackr uses a file-based SQLite 3 database as its primary data store. This document provides a comprehensive overview of the current database architecture, including all 19 tables, vendor advisory integrations, and optimized performance configurations.
+HexTrackr uses a file-based SQLite 3 database as its primary data store. This document provides a comprehensive overview of the current database architecture, including all 21 tables, vendor advisory integrations, and optimized performance configurations.
 
 ## Engine
 
 - **Type**: SQLite 3
-- **Location**: `data/hextrackr.db`
+- **Location**: `/app/data/hextrackr.db` (absolute path inside Docker container)
+- **Docker Volume**: `hextrackr-database` (named volume for SQLite integrity)
 - **Initialization**: `app/public/scripts/init-database.js`
 - **Driver**: `better-sqlite3` (Node.js)
 - **Session Store**: `better-sqlite3-session-store`
 
 ---
 
-## Schema Overview (v1.0.66)
+## Schema Overview (v1.1.3)
 
-**Tables**: 19 total
+**Tables**: 21 total
 - **Vulnerability Management**: 7 tables (vulnerabilities, vulnerabilities_current, vulnerability_snapshots, vulnerability_staging, vulnerability_imports, vulnerability_daily_totals, vendor_daily_totals)
-- **Vendor Advisories**: 3 tables (kev_status, cisco_advisories, palo_alto_advisories)
+- **Vendor Advisories**: 4 tables (kev_status, cisco_advisories, cisco_fixed_versions, palo_alto_advisories)
 - **Ticket Management**: 2 tables (tickets, ticket_vulnerabilities)
 - **Template System**: 3 tables (email_templates, ticket_templates, vulnerability_templates)
 - **Authentication**: 2 tables (users, user_preferences)
-- **System**: 2 tables (sync_metadata, sessions)
+- **Audit & System**: 3 tables (audit_logs, audit_log_config, sync_metadata)
+- **Sessions**: 1 table (sessions)
 
 **Indexes**: 72 total (59 user-created + 13 auto-generated)
 
@@ -36,7 +38,7 @@ HexTrackr uses a file-based SQLite 3 database as its primary data store. This do
 
 ## Entity Relationship Diagram
 
-The diagram below shows all 19 tables and their key relationships in the production database.
+The diagram below shows all 21 tables and their key relationships in the production database.
 
 <div style="text-align: center; margin: 1.5rem 0;">
   <a href="/docs-html/database-erd-full.html" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="display: inline-block; padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #3d5afe 0%, #5c7cfa 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; box-shadow: 0 4px 12px rgba(61, 90, 254, 0.3); transition: all 0.3s ease;">
@@ -802,7 +804,7 @@ Palo Alto Networks security advisory data with fixed PAN-OS versions (v1.0.63+).
 
 ---
 
-#### `sync_metadata` (8 columns)
+#### `sync_metadata` (9 columns)
 
 Multi-purpose synchronization tracking for KEV, Cisco, Palo Alto, and auto-VACUUM operations.
 
@@ -816,6 +818,7 @@ Multi-purpose synchronization tracking for KEV, Cisco, Palo Alto, and auto-VACUU
 | `status` | TEXT | DEFAULT 'completed' | Sync status (completed/failed/in_progress) |
 | `error_message` | TEXT | | Error details if sync failed |
 | `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Record creation timestamp |
+| `next_sync_time` | TEXT | | Next scheduled sync timestamp (ISO 8601 format) |
 
 **Supported sync_type Values**:
 - `kev_catalog` - CISA KEV synchronization
@@ -1482,6 +1485,6 @@ Tracked in `/app/public/scripts/migrations/` directory:
 
 ---
 
-This document reflects the schema as of **v1.0.66**. Re-run architecture analysis after structural migrations or table additions.
+This document reflects the database schema as of **v1.1.3**. Schema structure was last modified in v1.0.66 (subsequent versions include data migrations only). Re-run architecture analysis after structural migrations or table additions.
 
-**Last Updated**: 2025-10-16
+**Last Updated**: 2025-10-23

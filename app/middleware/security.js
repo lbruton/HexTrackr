@@ -18,6 +18,8 @@ const rateLimit = require("express-rate-limit");
 const path = require("path");
 const fs = require("fs");
 
+// LoggingService is available via global.logger (initialized in server.js)
+
 // Import security configuration from constants
 const {
     CORS_ORIGINS,
@@ -64,10 +66,46 @@ class PathValidator {
     }
 
     /**
-     * Safely reads a file with path validation
-     * @param {string} filePath - The file path to read
-     * @param {string|object} options - Encoding or options object
-     * @returns {string|Buffer} - File contents
+     * Safely reads a file with path validation - prevents path traversal attacks
+     * Validates the file path using PathValidator.validatePath() to ensure no directory
+     * traversal attempts (../ or ..\\) before delegating to fs.readFileSync().
+     * Used throughout HexTrackr for secure file operations (DocsService, BackupService, etc.)
+     *
+     * @static
+     * @param {string} filePath - Absolute or relative file path to read (will be validated and normalized)
+     * @param {string|object} [options="utf8"] - File reading options:
+     *   - string: Encoding name (e.g., "utf8", "base64", "hex")
+     *   - object: Options object passed to fs.readFileSync (encoding, flag)
+     * @returns {string|Buffer} File contents as string (if encoding specified) or Buffer (if no encoding)
+     * @throws {Error} "Invalid file path" - If filePath is null, undefined, or not a string
+     * @throws {Error} "Path traversal detected" - If filePath contains ../ or ..\\ sequences
+     * @throws {Error} "Invalid path component" - If normalized path contains suspicious components
+     * @throws {SystemError} ENOENT - If file does not exist (from fs.readFileSync)
+     * @throws {SystemError} EACCES - If insufficient permissions to read file (from fs.readFileSync)
+     * @throws {SystemError} EISDIR - If path is a directory, not a file (from fs.readFileSync)
+     *
+     * @example
+     * // Read UTF-8 text file
+     * const content = PathValidator.safeReadFileSync("/app/data/config.json", "utf8");
+     *
+     * @example
+     * // Read binary file as Buffer
+     * const buffer = PathValidator.safeReadFileSync("/app/data/image.png");
+     *
+     * @example
+     * // Read with custom options
+     * const content = PathValidator.safeReadFileSync("/app/logs/app.log", {
+     *     encoding: "utf8",
+     *     flag: "r"
+     * });
+     *
+     * @example
+     * // Path traversal attempt throws error
+     * try {
+     *     PathValidator.safeReadFileSync("../../../etc/passwd");
+     * } catch (error) {
+     *     console.error(error.message); // "Path traversal detected"
+     * }
      */
     static safeReadFileSync(filePath, options = "utf8") {
         const validatedPath = this.validatePath(filePath);
@@ -246,8 +284,8 @@ function apiSecurityMiddleware(req, res, next) {
         res.setHeader("Expires", "0");
 
         // Log API access for monitoring
-        if (req.url.startsWith("/api/")) {
-            console.log(`API Access: ${req.method} ${req.url} from IP ${req.ip}`);
+        if (req.url.startsWith("/api/") && global.logger) {
+            global.logger.info("backend", "api", `API Access: ${req.method} ${req.url} from IP ${req.ip}`);
         }
 
         next();

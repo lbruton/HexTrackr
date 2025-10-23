@@ -1105,6 +1105,17 @@ ${this.stats.filesRemoved > 0 ? `\nAdditionally, ${this.stats.filesRemoved} orph
 
     /**
      * Generate JSDoc HTML documentation from code comments
+     * Executes 'npm run docs:dev' to generate API reference documentation
+     * from source code JSDoc comments into HTML format
+     *
+     * @async
+     * @returns {Promise<void>} Resolves when JSDoc generation completes or fails
+     * @throws {never} Does not throw - errors are caught and logged as warnings (non-fatal)
+     *
+     * @example
+     * await this.generateJSDoc();
+     * // Logs: "📚 Generating JSDoc HTML documentation..."
+     * // Logs: "JSDoc HTML generation complete!" (or warning on error)
      */
     async generateJSDoc() {
         const { exec } = require("child_process");

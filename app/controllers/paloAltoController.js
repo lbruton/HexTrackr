@@ -35,8 +35,6 @@ class PaloAltoController {
      */
     async syncPaloAdvisories(req, res) {
         try {
-            console.log("Palo Alto advisory sync requested via API");
-
             // Check if sync is already in progress
             const status = await this.paloAdvisoryService.getSyncStatus();
             if (status.syncInProgress) {
