@@ -22,7 +22,6 @@
     "lint:md:fix": "node app/public/scripts/fix-markdown.js",
     "lint:all": "npm run lint:md && npm run eslint && npm run stylelint",
     "fix:all": "npm run lint:md:fix && npm run eslint:fix && npm run stylelint:fix",
-    "test:stagehand": "node tests/stagehand-examples.js",
     "db:cleanup": "node scripts/db-snapshot-cleanup.js",
     "db:cleanup:execute": "node scripts/db-snapshot-cleanup.js --execute"
   },
@@ -30,7 +29,6 @@
     "argon2": "^0.31.2",
     "better-sqlite3": "^11.10.0",
     "better-sqlite3-session-store": "^0.1.0",
-    "chart.js": "^4.4.0",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "csrf-sync": "^4.2.1",
@@ -53,7 +51,6 @@
     "uuid": "^12.0.0"
   },
   "devDependencies": {
-    "@browserbasehq/stagehand": "^1.12.1",
     "@stylistic/eslint-plugin": "^5.2.3",
     "eslint": "^9.34.0",
     "eslint-formatter-compact": "^8.40.0",
