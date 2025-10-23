@@ -2,8 +2,23 @@ const crypto = require("crypto");
 const { normalizeXtNumber } = require("../utils/helpers");
 
 /**
- * Defensive logging helpers
- * Safely log to LoggingService with fallback for initialization
+ * Defensive logging helper for TicketService operations
+ * Safely logs to global LoggingService with fallback when logger unavailable
+ * Used throughout TicketService to prevent logging failures from breaking business logic
+ *
+ * @param {string} level - Log level to use (e.g., "info", "warn", "error", "debug")
+ * @param {string} message - Log message describing the event
+ * @param {Object} [data={}] - Optional structured data to include with log entry
+ * @returns {void} Does not return a value
+ * @throws {never} Does not throw - silently fails if logger unavailable
+ *
+ * @example
+ * // Log info message with ticket data
+ * _log("info", "Ticket created successfully", { ticketId: 1234, xtNumber: "XT-5678" });
+ *
+ * @example
+ * // Log error with error object
+ * _log("error", "Failed to parse devices JSON", { ticketId: 42, error: err.message });
  */
 function _log(level, message, data = {}) {
     if (global.logger && global.logger.ticket && typeof global.logger.ticket[level] === "function") {

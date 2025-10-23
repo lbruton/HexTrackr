@@ -2,7 +2,7 @@
 
 **Last Updated**: 2025-10-16
 **Target OS**: Red Hat Enterprise Linux 9.x
-**Tested On**: Ubuntu 24.04 LTS (current production)
+**Tested On**: RHEL 10.0 (current production)
 
 ---
 
@@ -186,7 +186,7 @@ sudo dnf install -y nodejs
 node --version
 ```
 
-**HexTrackr Requirement**: Node.js 18.x or later (v22.11.0 LTS recommended)
+**HexTrackr Requirement**: Node.js 22.x LTS (current production version)
 
 ---
 

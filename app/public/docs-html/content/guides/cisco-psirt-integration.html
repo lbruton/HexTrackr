@@ -60,7 +60,7 @@
 </ol>
 <p><strong>When Enabled</strong>:</p>
 <ul>
-<li>Sync runs on server startup (after 10-second initialization delay)</li>
+<li>Sync runs on server startup (after <strong>5-minute initialization delay</strong> to prevent database corruption)</li>
 <li>Sync repeats every 24 hours automatically</li>
 <li>Automatically refreshes advisories older than 90 days</li>
 </ul>
@@ -72,7 +72,7 @@
 <h4>Step 3: Initial Sync</h4><p><strong>Option A: Automatic</strong> (Recommended)</p>
 <ul>
 <li>Restart Docker container: <code>docker-compose restart</code></li>
-<li>Background worker runs within 10 seconds</li>
+<li>Background worker runs within <strong>5 minutes</strong> (prevents database corruption on rapid restarts)</li>
 <li>Check logs: <code>docker-compose logs -f hextrackr-app</code></li>
 </ul>
 <p><strong>Option B: Manual</strong></p>
@@ -260,10 +260,14 @@ Body: grant_type=client_credentials</code></pre></li>
     <span class="hljs-attribute">proxy_read_timeout</span> <span class="hljs-number">600s</span>;    <span class="hljs-comment"># 2min → 10min</span>
 }</code></pre><h3>Background Worker Architecture</h3><pre><code class="language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">startCiscoBackgroundSync</span>(<span class="hljs-params">db</span>) {
     <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">SYNC_INTERVAL</span> = <span class="hljs-number">24</span> * <span class="hljs-number">60</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>; <span class="hljs-comment">// 24 hours</span>
+    <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">STARTUP_DELAY</span> = <span class="hljs-number">5</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>; <span class="hljs-comment">// 5 minutes - prevent database corruption on rapid Docker restarts</span>
     <span class="hljs-keyword">const</span> <span class="hljs-variable constant_">ADMIN_USER_ID</span> = <span class="hljs-string">&quot;00000000-0000-0000-0000-000000000001&quot;</span>;
 
-    <span class="hljs-comment">// Run on startup (10s delay for initialization)</span>
-    <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-title function_">runSync</span>(), <span class="hljs-number">10000</span>);
+    <span class="hljs-comment">// Run on startup (5 minute delay to prevent database corruption on rapid restarts)</span>
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Cisco advisory background sync scheduled (runs 5 min after startup + every 24 hours)&quot;</span>);
+    <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">() =&gt;</span> {
+        <span class="hljs-title function_">runSync</span>();
+    }, <span class="hljs-variable constant_">STARTUP_DELAY</span>);
 
     <span class="hljs-comment">// Repeat every 24 hours</span>
     <span class="hljs-built_in">setInterval</span>(runSync, <span class="hljs-variable constant_">SYNC_INTERVAL</span>);

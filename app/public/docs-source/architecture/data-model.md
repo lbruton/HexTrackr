@@ -1,6 +1,6 @@
 # HexTrackr Data Model
 
-This document provides a definitive overview of the HexTrackr database schema. As of v1.1.0, the primary bootstrap is `scripts/init-database-v1.1.0.js`, which consolidates all 21 application tables into a single initialization script (see [HEX-324](https://linear.app/hextrackr/issue/HEX-324)). The schema may evolve further via incremental migrations in the `migrations/` directory. The authoritative state is the **live SQLite schema** captured in this document and the v1.1.0 baseline script.
+This document provides a definitive overview of the HexTrackr database schema. The schema baseline is v1.1.0 (established via HEX-324), which consolidates all 21 application tables into `scripts/init-database-v1.1.0.js`. This documentation reflects the current application version v1.1.3. The schema may evolve further via incremental migrations in the `migrations/` directory. The authoritative state is the **live SQLite schema** captured in this document and the v1.1.0 baseline script.
 
 **Schema Summary** (v1.1.0 baseline):
 - **21 Core Tables**: Organized into 6 functional categories
@@ -740,4 +740,4 @@ The above reflects the database as inspected on the current build date. Regenera
 
 ---
 
-*Last Updated: 2025-10-22 | Version: v1.1.0 | Schema: HEX-324 Consolidation | Audit: DOCS-64*
+*Last Updated: 2025-10-23 | Application Version: v1.1.3 | Schema Baseline: v1.1.0 | Audit: DOCS-64*

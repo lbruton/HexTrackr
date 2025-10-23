@@ -524,12 +524,6 @@ class HexagonTicketsManager {
         document.getElementById("reverseDevicesBtn").addEventListener("click", () => {
             this.reverseDeviceOrder();
         });
-
-        // Supervisor filter clear button
-        // Remove this event listener since we no longer have supervisor filter
-        // document.getElementById('clearSupervisorFilter').addEventListener('click', () => {
-        //     this.clearSupervisorFilter();
-        // });
     }
 
     /**

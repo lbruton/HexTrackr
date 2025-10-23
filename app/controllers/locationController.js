@@ -81,42 +81,52 @@ class LocationController {
     }
 
     /**
-     * GET /api/locations/stats
-     *
-     * Get aggregated vulnerability statistics grouped by location.
+     * Get aggregated vulnerability statistics grouped by location
+     * Handles GET /api/locations/stats endpoint with intelligent caching
      * Returns array of locations with device counts, VPR totals, severity breakdowns,
-     * KEV counts, vendor distributions, and ticket correlations.
+     * KEV counts, vendor distributions, and ticket correlations
      *
-     * Caching: 5-minute server TTL, 60-second browser TTL
-     * Cache invalidation: Triggered by CSV imports via cacheService.invalidate("stats")
+     * Caching Strategy:
+     * - Server cache: 5-minute TTL (300s)
+     * - Browser cache: 60-second TTL
+     * - Cache key: "location-stats"
+     * - Cache type: "stats" (invalidated on CSV imports)
+     * - Cache bypass: Query param bustCache=true or ?_t=[timestamp]
      *
-     * Query Parameters:
-     * - bustCache: Set to "true" or append ?_t=[timestamp] to bypass cache
+     * @async
+     * @param {Object} req - Express request object
+     * @param {Object} req.query - Query parameters
+     * @param {string} [req.query.bustCache] - Set to "true" to bypass cache
+     * @param {string} [req.query._t] - Timestamp param to bypass cache
+     * @param {Object} res - Express response object
+     * @returns {Promise<void>} Sends JSON response:
+     *   - 200: {success: true, data: Array<Object>, error: null}
+     *     - data[].location: Normalized location code (e.g., "wtulsa")
+     *     - data[].location_display: Display name (e.g., "WTULSA")
+     *     - data[].device_count: Number of devices at location
+     *     - data[].primary_vendor: Most common vendor at location
+     *     - data[].vendor_breakdown: Object mapping vendors to device counts
+     *     - data[].total_vpr: Aggregated VPR score across all devices
+     *     - data[].severity_breakdown: Object with Critical/High/Medium/Low counts and VPR
+     *     - data[].kev_count: Count of CISA Known Exploited Vulnerabilities
+     *     - data[].open_tickets: Count of open tickets for location
+     *     - data[].confidence: Data quality confidence score (0.0-1.0)
+     *   - 500: {success: false, error: string, details: string}
+     * @throws {Error} Caught and returned as 500 response if:
+     *   - LocationService.getLocationStats() fails
+     *   - Database query errors during aggregation
+     *   - Cache service encounters errors
+     * @route GET /api/locations/stats
+     * @example
+     * // Normal cached request
+     * // GET /api/locations/stats
+     * // Response: {success: true, data: [{location: "wtulsa", device_count: 42, ...}], error: null}
      *
-     * Response format:
-     * {
-     *   success: true,
-     *   data: [
-     *     {
-     *       location: "wtulsa",
-     *       location_display: "WTULSA",
-     *       device_count: 42,
-     *       primary_vendor: "CISCO",
-     *       vendor_breakdown: { CISCO: 35, "Palo Alto": 5, Other: 2 },
-     *       total_vpr: 1847.3,
-     *       severity_breakdown: {
-     *         Critical: { count: 12, vpr: 456.2 },
-     *         High: { count: 28, vpr: 892.1 },
-     *         Medium: { count: 15, vpr: 398.0 },
-     *         Low: { count: 8, vpr: 101.0 }
-     *       },
-     *       kev_count: 3,
-     *       open_tickets: 2,
-     *       confidence: 0.85
-     *     }
-     *   ],
-     *   error: null
-     * }
+     * @example
+     * // Cache bypass request
+     * // GET /api/locations/stats?bustCache=true
+     * // Headers: X-Cache: BYPASS, Cache-Control: no-cache, no-store, must-revalidate
+     * // Response: {success: true, data: [...], error: null}
      */
     static async getLocationStats(req, res) {
         try {

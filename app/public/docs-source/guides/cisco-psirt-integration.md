@@ -78,7 +78,7 @@ By default, background sync is **enabled**. To control it:
 3. Setting is stored in database (survives server restarts)
 
 **When Enabled**:
-- Sync runs on server startup (after 10-second initialization delay)
+- Sync runs on server startup (after **5-minute initialization delay** to prevent database corruption)
 - Sync repeats every 24 hours automatically
 - Automatically refreshes advisories older than 90 days
 
@@ -90,7 +90,7 @@ By default, background sync is **enabled**. To control it:
 
 **Option A: Automatic** (Recommended)
 - Restart Docker container: `docker-compose restart`
-- Background worker runs within 10 seconds
+- Background worker runs within **5 minutes** (prevents database corruption on rapid restarts)
 - Check logs: `docker-compose logs -f hextrackr-app`
 
 **Option B: Manual**
@@ -388,10 +388,14 @@ location ~ ^/api/(cisco|kev)/sync$ {
 ```javascript
 function startCiscoBackgroundSync(db) {
     const SYNC_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours
+    const STARTUP_DELAY = 5 * 60 * 1000; // 5 minutes - prevent database corruption on rapid Docker restarts
     const ADMIN_USER_ID = "00000000-0000-0000-0000-000000000001";
 
-    // Run on startup (10s delay for initialization)
-    setTimeout(() => runSync(), 10000);
+    // Run on startup (5 minute delay to prevent database corruption on rapid restarts)
+    console.log("Cisco advisory background sync scheduled (runs 5 min after startup + every 24 hours)");
+    setTimeout(() => {
+        runSync();
+    }, STARTUP_DELAY);
 
     // Repeat every 24 hours
     setInterval(runSync, SYNC_INTERVAL);

@@ -2,8 +2,8 @@
 
 HexTrackr is designed with security as a foundational principle. This document provides comprehensive coverage of all security measures, controls, and implementations for corporate security review and compliance assessment.
 
-**Version**: v1.0.54
-**Last Updated**: 2025-10-09
+**Version**: v1.1.3
+**Last Updated**: 2025-10-23
 
 ---
 
@@ -166,7 +166,7 @@ echo "SESSION_SECRET=<generated-secret>" >> .env
 
 ### Trust Proxy Configuration (HEX-128 Fix)
 
-**Location**: `app/public/server.js` (line 73)
+**Location**: `app/public/server.js` (lines 81-85)
 
 **CRITICAL IMPORTANCE**: HexTrackr **ALWAYS** runs behind nginx reverse proxy.
 
@@ -1150,7 +1150,7 @@ npm run lint:all
 
 ## Security Roadmap
 
-### Current Security Posture (v1.0.54)
+### Current Security Posture (v1.1.3)
 
 **Strengths**:
 - ✅ Excellent password security (Argon2id)

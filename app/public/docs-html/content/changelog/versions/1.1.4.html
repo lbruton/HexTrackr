@@ -1,0 +1,62 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.1.4</h1><p><strong>Release Date:</strong> October 23, 2025<br><strong>Issue:</strong> <a href="https://linear.app/hextrackr/issue/HEX-340">HEX-340</a></p>
+<h2>Overview</h2><p>Major Node.js runtime upgrade from v18 LTS to v22 LTS, improving performance, security, and long-term support through April 2027.</p>
+<h2>Infrastructure Upgrades</h2><h3>Node.js 22 LTS Migration</h3><ul>
+<li><strong>Upgraded Node.js</strong>: v18.20.8 → v22.21.0</li>
+<li><strong>Extended Support</strong>: LTS support through April 2027 (vs April 2025 for v18)</li>
+<li><strong>Container Image</strong>: Updated from <code>node:18-alpine</code> to <code>node:22-alpine</code></li>
+<li><strong>Performance</strong>: Improved V8 JavaScript engine with better JIT compilation</li>
+<li><strong>Security</strong>: Latest security patches and vulnerability fixes</li>
+</ul>
+<h3>Build System Improvements</h3><ul>
+<li><strong>Native Module Compilation</strong>: Fixed Docker multi-stage build to properly rebuild native modules in production environment</li>
+<li><strong>Python 3.12 Compatibility</strong>: Added <code>py3-setuptools</code> to provide distutils for node-gyp compilation</li>
+<li><strong>Better-sqlite3</strong>: Upgraded to v12.4.1 for improved Node.js 22 compatibility</li>
+<li><strong>Build Isolation</strong>: Ensured native modules (<code>better-sqlite3</code>, <code>argon2</code>) compile with correct V8 ABI version</li>
+</ul>
+<h2>Bug Fixes</h2><h3>Database Service</h3><ul>
+<li><strong>Fixed</strong>: Typo in <code>databaseService.js:863</code> causing runtime error (<code>this.this._audit</code> → <code>this._audit</code>)</li>
+<li><strong>Impact</strong>: VACUUM operations now properly audit log without crashes</li>
+</ul>
+<h3>Authentication System</h3><ul>
+<li><strong>Fixed</strong>: Missing security columns in users table preventing login</li>
+<li><strong>Added Columns</strong>: <code>failed_attempts</code>, <code>locked_until</code>, <code>last_login</code>, <code>failed_login_timestamp</code></li>
+<li><strong>Password Hash</strong>: Regenerated admin password hash for argon2 v0.31.2 compatibility</li>
+</ul>
+<h2>Technical Details</h2><h3>Dockerfile Changes</h3><pre><code class="language-dockerfile"><span class="hljs-comment"># Production stage now rebuilds native modules</span>
+<span class="hljs-keyword">RUN</span><span class="language-bash"> apk add --no-cache sqlite python3 py3-setuptools make g++</span>
+<span class="hljs-keyword">RUN</span><span class="language-bash"> npm rebuild better-sqlite3 argon2</span></code></pre><h3>Database Schema Updates</h3><ul>
+<li>Ensured v1.1.0 schema compliance across all tables</li>
+<li>Added audit logging tables (<code>audit_logs</code>, <code>audit_log_config</code>)</li>
+<li>Added sync metadata tracking (<code>sync_metadata</code> with <code>next_sync_time</code>)</li>
+<li>Verified all 21 application tables present</li>
+</ul>
+<h2>Deployment Notes</h2><h3>Upgrade Path</h3><ol>
+<li>Backup existing database before upgrade</li>
+<li>Build new Docker image with Node.js 22</li>
+<li>Apply database migrations for missing columns/tables</li>
+<li>Verify native modules compile correctly</li>
+<li>Test authentication and core functionality</li>
+</ol>
+<h3>Breaking Changes</h3><p>None - backward compatible with existing data and configurations</p>
+<h3>Known Issues</h3><ul>
+<li>Docker Desktop migration may require manual database restore from backups</li>
+<li>Nginx health checks may show unhealthy temporarily after restart (self-heals)</li>
+</ul>
+<h2>Performance Impact</h2><ul>
+<li><strong>Build Time</strong>: ~5 minutes for full rebuild with native modules</li>
+<li><strong>Runtime</strong>: No performance degradation, slight improvement in async operations</li>
+<li><strong>Memory</strong>: Same 4GB heap allocation, more efficient garbage collection</li>
+<li><strong>Startup</strong>: ~8 seconds to healthy state</li>
+</ul>
+<h2>Related Issues</h2><ul>
+<li><a href="https://linear.app/hextrackr/issue/HEX-254">HEX-254</a>: Audit logging infrastructure (tables added)</li>
+<li>Database schema alignment with v1.1.0 baseline</li>
+</ul>
+<h2>Credits</h2><p>Generated with Claude Code</p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
