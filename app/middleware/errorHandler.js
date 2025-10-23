@@ -160,9 +160,36 @@ function formatValidationError(err) {
 }
 
 /**
- * Async wrapper to catch async route handler errors
- * @param {Function} fn - Async route handler function
- * @returns {Function} Wrapped function that catches async errors
+ * Async wrapper to catch errors from async route handler functions
+ * Wraps async Express route handlers to catch rejected promises and pass them to Express error middleware.
+ * Without this wrapper, unhandled promise rejections in async routes crash the server.
+ *
+ * @param {Function} fn - Async route handler function with signature (req, res, next) => Promise<void>
+ * @returns {Function} Wrapped Express middleware function (req, res, next) => void
+ * @throws {Error} Passes any caught errors to Express error handler via next(err)
+ *
+ * @example
+ * // Wrap async route handlers to catch errors
+ * const { asyncErrorHandler } = require('./middleware/errorHandler');
+ *
+ * router.get('/api/tickets', asyncErrorHandler(async (req, res) => {
+ *     const tickets = await ticketService.getTickets();
+ *     res.json({ success: true, data: tickets });
+ * }));
+ *
+ * @example
+ * // Without wrapper (WRONG - crashes on error):
+ * router.get('/api/tickets', async (req, res) => {
+ *     const tickets = await ticketService.getTickets(); // Unhandled rejection crashes server
+ *     res.json({ success: true, data: tickets });
+ * });
+ *
+ * @example
+ * // With wrapper (CORRECT - errors caught):
+ * router.get('/api/tickets', asyncErrorHandler(async (req, res) => {
+ *     const tickets = await ticketService.getTickets(); // Errors passed to globalErrorHandler
+ *     res.json({ success: true, data: tickets });
+ * }));
  */
 function asyncErrorHandler(fn) {
     return (req, res, next) => {

@@ -559,7 +559,8 @@ function handleGridCreateTicket(event, link) {
             // Filter for KEV devices at same location
             deviceList = allDevices
                 .filter(device => device.hostname.toLowerCase().startsWith(location.toLowerCase()) && device.hasKev === true)
-                .map(device => device.hostname.toUpperCase());
+                .map(device => device.hostname.toUpperCase())
+                .sort(); // HEX-313: Alphabetical sorting for boot order planning
 
             logger.debug("ui", `[Grid Power Tool] KEV mode - found ${deviceList.length} KEV devices at ${location}`);
         } else {
@@ -577,7 +578,8 @@ function handleGridCreateTicket(event, link) {
             // Filter for all devices at same location
             deviceList = allDevices
                 .filter(device => device.hostname.toLowerCase().startsWith(location.toLowerCase()))
-                .map(device => device.hostname.toUpperCase());
+                .map(device => device.hostname.toUpperCase())
+                .sort(); // HEX-313: Alphabetical sorting for boot order planning
 
             logger.debug("ui", `[Grid Power Tool] All devices mode - found ${deviceList.length} devices at ${location}`);
         } else {

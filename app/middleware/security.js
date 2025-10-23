@@ -173,7 +173,6 @@ function createRateLimitMiddleware() {
             // Check if response has X-Cache header indicating cache hit
             const cacheHeader = res.getHeader("X-Cache");
             if (cacheHeader && (cacheHeader.includes("HIT") || cacheHeader.includes("HIT-LARGE-QUERY"))) {
-                console.log(` Cache HIT - skipping rate limit: ${req.method} ${req.path}`);
                 return true;  // Don't count this request toward limit
             }
             return false;  // Count this request (cache MISS or uncached endpoint)

@@ -100,12 +100,16 @@ services:
 
 ### Ports
 
-**Required**:
-- `443/tcp` - HTTPS (nginx reverse proxy)
-- `8080/tcp` - Node.js application (internal)
+**Docker Deployment**:
+- `8989/tcp` - External application port (maps to internal 8080)
+- `8443/tcp` - External HTTPS port (SSL termination)
 
-**Optional**:
-- `8989/tcp` - Alternative HTTPS port (Docker external mapping)
+**Bare-metal Deployment**:
+- `8080/tcp` - Node.js application (configurable via PORT env var)
+
+**Nginx Reverse Proxy** (recommended):
+- `443/tcp` - HTTPS (nginx → 8080 internal)
+- `80/tcp` - HTTP redirect to HTTPS
 
 ### Bandwidth
 
@@ -234,4 +238,4 @@ Performance testing and benchmarking are **in development**. Current system requ
 
 ---
 
-*Last Updated: 2025-10-09 | Version 1.0.54*
+*Last Updated: 2025-10-22 | Version 1.1.0*

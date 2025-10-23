@@ -220,6 +220,28 @@ git revert f459b6f0  <span class="hljs-comment"># Undo HEX-324 consolidation</sp
 docker <span class="hljs-built_in">cp</span> backups/hextrackr-pre-hex324-*.db \
   hextrackr-app:/app/data/hextrackr.db
 docker-compose restart hextrackr-app</code></pre><p><strong>Recovery Time Objective</strong>: 5 minutes (git revert + Docker restart)<br><strong>Recovery Point Objective</strong>: 0 minutes (backup taken before consolidation)</p>
+<h2>Code Quality Improvements</h2><ul>
+<li><p><strong>Cleanup</strong>: Removed 3 debug console.log statements from <code>app/controllers/vulnerabilityController.js:498-500</code> (<a href="https://linear.app/hextrackr/issue/HEX-328">HEX-328</a>)</p>
+<ul>
+<li>Removed &quot;STAGING IMPORT&quot; debugging logs from CSV import endpoint</li>
+<li>Information already captured by ProgressTracker and JSON response</li>
+<li>Controller maintains proper console.error for actual error handling</li>
+</ul>
+</li>
+<li><p><strong>Cleanup</strong>: Removed debug console.log from <code>app/middleware/security.js:176</code> (<a href="https://linear.app/hextrackr/issue/HEX-329">HEX-329</a>)</p>
+<ul>
+<li>Removed cache HIT debugging log from rate limiter skip logic</li>
+<li>Cache skip functionality works correctly without logging</li>
+<li>Intentional console.warn monitoring preserved for rate limit exceeded events</li>
+</ul>
+</li>
+</ul>
+<h2>Documentation Improvements</h2><ul>
+<li><p><strong>Content</strong>: Fixed inaccurate port documentation in <code>reference/system-requirements.md</code> - Port 8989 incorrectly labeled as &quot;alternative/optional&quot; when it&#39;s the primary external port for Docker deployments. Updated to clearly distinguish Docker (8989→8080 mapping), bare-metal (8080), and nginx proxy (443/80) port configurations. Also updated version footer from 1.0.54 to 1.1.0 (<a href="https://linear.app/hextrackr/issue/DOCS-72">DOCS-72</a>)</p>
+</li>
+<li><p><strong>JSDoc</strong>: Fixed documentation for <code>asyncErrorHandler</code> in <code>app/middleware/errorHandler.js</code> - Added comprehensive @param type signatures, @throws documentation, and three practical @example blocks demonstrating correct/incorrect usage patterns for async route wrapper (<a href="https://linear.app/hextrackr/issue/DOCS-73">DOCS-73</a>)</p>
+</li>
+</ul>
 <h2>Related Issues</h2><ul>
 <li>Parent: <a href="https://linear.app/hextrackr/issue/HEX-324">HEX-324</a> - Schema consolidation v1.1.0 baseline</li>
 <li>Documentation: SCHEMA_EVOLUTION.md - Complete schema timeline</li>
