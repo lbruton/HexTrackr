@@ -40,60 +40,10 @@ class KevService {
         // Initialize fetch - use global fetch (Node 18+) or require https module
         this.fetch = global.fetch || this._initHttpsClient();
 
-        // Initialize database tables if they don't exist
-        this.initializeTables();
+        // Tables guaranteed to exist in v1.1.0+ baseline
+        // (kev_status, sync_metadata created by init-database-v1.1.0.js)
     }
 
-    /**
-     * Initialize KEV database tables
-     * @async
-     */
-    async initializeTables() {
-        try {
-            // Create KEV status table
-            await this.db.run(`
-                CREATE TABLE IF NOT EXISTS kev_status (
-                    cve_id TEXT PRIMARY KEY,
-                    date_added DATE NOT NULL,
-                    vulnerability_name TEXT,
-                    vendor_project TEXT,
-                    product TEXT,
-                    required_action TEXT,
-                    due_date DATE,
-                    known_ransomware_use BOOLEAN DEFAULT 0,
-                    notes TEXT,
-                    last_synced TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
-            `);
-
-            // Create indexes
-            await this.db.run("CREATE INDEX IF NOT EXISTS idx_kev_status_cve_id ON kev_status(cve_id)");
-            await this.db.run("CREATE INDEX IF NOT EXISTS idx_kev_status_due_date ON kev_status(due_date)");
-            await this.db.run("CREATE INDEX IF NOT EXISTS idx_kev_status_date_added ON kev_status(date_added)");
-            await this.db.run("CREATE INDEX IF NOT EXISTS idx_kev_status_ransomware ON kev_status(known_ransomware_use) WHERE known_ransomware_use = 1");
-
-            // Create sync metadata table
-            await this.db.run(`
-                CREATE TABLE IF NOT EXISTS sync_metadata (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    sync_type TEXT NOT NULL,
-                    sync_time TIMESTAMP NOT NULL,
-                    next_sync_time TIMESTAMP,
-                    version TEXT,
-                    record_count INTEGER,
-                    status TEXT DEFAULT 'completed',
-                    error_message TEXT,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
-            `);
-
-            await this.db.run("CREATE INDEX IF NOT EXISTS idx_sync_metadata_type_time ON sync_metadata(sync_type, sync_time DESC)");
-
-            _log("info", "KEV database tables initialized (HEX-279: next_sync_time column included)");
-        } catch (error) {
-            _log("error", "Failed to initialize KEV tables:", error);
-        }
-    }
 
     /**
      * Fallback HTTPS client for environments without global fetch

@@ -52,51 +52,10 @@ class PaloAltoService {
         // Initialize fetch - use global fetch (Node 18+) or require https module
         this.fetch = global.fetch || this._initHttpsClient();
 
-        // Initialize database tables if they don't exist
-        this.initializeTables();
+        // Tables guaranteed to exist in v1.1.0+ baseline
+        // (palo_alto_advisories created by init-database-v1.1.0.js)
     }
 
-    /**
-     * Initialize Palo Alto advisory database tables
-     * @async
-     */
-    async initializeTables() {
-        try {
-            // Create palo_alto_advisories table
-            await this.db.run(`
-                CREATE TABLE IF NOT EXISTS palo_alto_advisories (
-                    cve_id TEXT PRIMARY KEY,
-                    advisory_id TEXT,
-                    advisory_title TEXT,
-                    severity TEXT,
-                    cvss_score TEXT,
-                    first_fixed TEXT,
-                    affected_versions TEXT,
-                    product_name TEXT,
-                    publication_url TEXT,
-                    last_synced TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
-            `);
-
-            // Create indexes
-            await this.db.run("CREATE INDEX IF NOT EXISTS idx_palo_advisories_cve ON palo_alto_advisories(cve_id)");
-            await this.db.run("CREATE INDEX IF NOT EXISTS idx_palo_advisories_synced ON palo_alto_advisories(last_synced)");
-            await this.db.run(`
-                CREATE INDEX IF NOT EXISTS idx_vulnerabilities_is_fixed
-                ON vulnerabilities(is_fixed)
-                WHERE is_fixed = 1
-            `);
-
-            // Note: vulnerabilities table columns (is_fixed, fixed_palo_versions, etc.)
-            // are created by migration 006-palo-alto-advisories.sql
-            // No need to ALTER TABLE here - columns already exist from migration
-
-            // sync_metadata table already exists from KEV/Cisco implementation
-            _log("info", "Palo Alto advisory database tables initialized");
-        } catch (error) {
-            _log("error", "Failed to initialize Palo Alto advisory tables:", error);
-        }
-    }
 
     /**
      * Fallback HTTPS client for environments without global fetch
