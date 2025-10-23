@@ -307,11 +307,25 @@ class PreferencesController {
     /**
      * Check if preference exists - HEAD /api/preferences/:key
      * Returns 200 if preference exists, 404 if not
+     *
+     * @async
      * @param {Object} req - Express request
      * @param {Object} req.params - Route parameters
      * @param {string} req.params.key - Preference key to check
      * @param {Object} req.user - User from requireAuth middleware
+     * @param {number} req.user.id - User ID from authentication middleware
      * @param {Object} res - Express response
+     * @returns {Promise<void>} Sends HTTP response:
+     *   - 200: Preference exists (no body)
+     *   - 400: Missing preference key (no body)
+     *   - 404: Preference not found (no body)
+     *   - 500: Server error (no body)
+     * @throws {Error} Caught and returned as 500 response if PreferencesService.hasPreference fails
+     * @route HEAD /api/preferences/:key
+     * @example
+     * // Check if dark mode preference exists
+     * // HEAD /api/preferences/theme
+     * // Returns: 200 (if exists) or 404 (if not)
      */
     static async hasPreference(req, res) {
         try {
@@ -341,9 +355,20 @@ class PreferencesController {
     /**
      * Get preference count - GET /api/preferences/count
      * Returns total number of preferences for current authenticated user
-     * @param {Object} req - Express request
+     *
+     * @async
+     * @param {Object} req - Express request object
      * @param {Object} req.user - User from requireAuth middleware
-     * @param {Object} res - Express response
+     * @param {number} req.user.id - User ID from authentication middleware
+     * @param {Object} res - Express response object
+     * @returns {Promise<void>} Sends JSON response:
+     *   - 200: {success: true, data: {count: number}}
+     *   - 500: {success: false, error: "Failed to get preference count", details: string}
+     * @throws {Error} Caught and returned as 500 response if PreferencesService.getPreferenceCount fails
+     * @route GET /api/preferences/count
+     * @example
+     * // GET /api/preferences/count
+     * // Returns: {success: true, data: {count: 42}}
      */
     static async getPreferenceCount(req, res) {
         try {

@@ -1288,11 +1288,17 @@
             // Get location value from the appropriate modal
             let location = '';
             if (modalId === 'ticketModal') {
+                // Form-based modal: read from form field
                 location = document.getElementById('location')?.value || '';
             } else if (modalId === 'viewTicketModal') {
-                location = document.getElementById('viewLocation')?.textContent || '';
+                // HEX-312 FIX: Markdown view modal - get ticket ID and retrieve location from ticket data
+                const ticketId = document.getElementById('viewTicketModal')?.getAttribute('data-ticket-id');
+                if (ticketId && window.ticketManager) {
+                    const ticket = window.ticketManager.getTicketById(ticketId);
+                    location = ticket?.location || '';
+                }
             }
-            
+
             // Navigate to vulnerabilities page with search parameter
             if (location) {
                 window.location.href = `/vulnerabilities.html?search=${encodeURIComponent(location)}`;

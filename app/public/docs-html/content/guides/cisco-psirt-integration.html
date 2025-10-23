@@ -141,17 +141,36 @@ Example: [&quot;12.2(22)S1&quot;, &quot;12.2(30)S&quot;, &quot;15.3(3)S8&quot;, 
 <li>Automatic refresh requires zero user intervention</li>
 </ul>
 <hr>
-<h2>Database Schema</h2><h3>cisco_advisories Table</h3><pre><code class="language-sql"><span class="hljs-keyword">CREATE TABLE</span> cisco_advisories (
-    id <span class="hljs-type">INTEGER</span> <span class="hljs-keyword">PRIMARY KEY</span> AUTOINCREMENT,
-    cve_id TEXT <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">UNIQUE</span>,
-    advisory_id TEXT <span class="hljs-keyword">NOT NULL</span>,
+<h2>Database Schema</h2><h3>cisco_advisories Table (Advisory Metadata)</h3><p>Stores Cisco PSIRT advisory metadata (one row per CVE).</p>
+<pre><code class="language-sql"><span class="hljs-keyword">CREATE TABLE</span> cisco_advisories (
+    cve_id TEXT <span class="hljs-keyword">PRIMARY KEY</span>,
+    advisory_id TEXT,
     advisory_title TEXT,
-    advisory_url TEXT,
-    first_fixed TEXT,           <span class="hljs-comment">-- JSON array: [&quot;12.2(22)S1&quot;, &quot;12.2(30)S&quot;, ...]</span>
-    product_names TEXT,         <span class="hljs-comment">-- JSON array: [&quot;Cisco IOS 12.2(20)S6a&quot;, ...]</span>
+    severity TEXT,
+    cvss_score TEXT,
+    first_fixed TEXT,              <span class="hljs-comment">-- Deprecated: Use cisco_fixed_versions instead</span>
+    affected_releases TEXT,
+    product_names TEXT,
+    publication_url TEXT,
+    last_synced <span class="hljs-type">TIMESTAMP</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-built_in">CURRENT_TIMESTAMP</span>
+);</code></pre><h3>cisco_fixed_versions Table (Normalized Fixed Versions)</h3><p>Stores fixed software versions (many rows per CVE, one per OS family).</p>
+<p><strong>Why Normalized?</strong> Multi-OS-family CVEs (affecting both IOS and IOS XE) need separate rows to prevent data overwrites. See <a href="https://linear.app/hextrackr/issue/HEX-287">HEX-287</a> for details.</p>
+<pre><code class="language-sql"><span class="hljs-keyword">CREATE TABLE</span> cisco_fixed_versions (
+    id <span class="hljs-type">INTEGER</span> <span class="hljs-keyword">PRIMARY KEY</span> AUTOINCREMENT,
+    cve_id TEXT <span class="hljs-keyword">NOT NULL</span>,
+    os_family TEXT <span class="hljs-keyword">NOT NULL</span>,       <span class="hljs-comment">-- &quot;ios&quot;, &quot;iosxe&quot;, &quot;iosxr&quot;, &quot;nxos&quot;</span>
+    fixed_version TEXT <span class="hljs-keyword">NOT NULL</span>,
+    affected_version TEXT,
     last_synced <span class="hljs-type">TIMESTAMP</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-built_in">CURRENT_TIMESTAMP</span>,
-    <span class="hljs-keyword">UNIQUE</span>(cve_id)
-);</code></pre><h3>vulnerabilities_current Table (Extended)</h3><pre><code class="language-sql"><span class="hljs-keyword">ALTER TABLE</span> vulnerabilities_current
+    <span class="hljs-keyword">FOREIGN KEY</span> (cve_id) <span class="hljs-keyword">REFERENCES</span> cisco_advisories(cve_id) <span class="hljs-keyword">ON</span> <span class="hljs-keyword">DELETE</span> CASCADE,
+    <span class="hljs-keyword">UNIQUE</span>(cve_id, os_family, fixed_version)
+);</code></pre><p><strong>Example Data:</strong></p>
+<pre><code class="language-">cve_id            | os_family | fixed_version
+------------------|-----------|---------------
+CVE-2025-20352    | ios       | 15.2(8)E8
+CVE-2025-20352    | ios       | 15.9(3)M11
+CVE-2025-20352    | iosxe     | 17.12.6
+CVE-2025-20352    | iosxe     | 17.9.4a</code></pre><h3>vulnerabilities_current Table (Extended)</h3><pre><code class="language-sql"><span class="hljs-keyword">ALTER TABLE</span> vulnerabilities_current
 <span class="hljs-keyword">ADD</span> <span class="hljs-keyword">COLUMN</span> is_fix_available <span class="hljs-type">INTEGER</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-number">0</span>;
 
 <span class="hljs-keyword">CREATE</span> INDEX idx_vulnerabilities_is_fix_available
@@ -287,7 +306,7 @@ Body: grant_type=client_credentials</code></pre></li>
 <li>Tags: <code>two-stage-api</code>, <code>rate-limiting</code>, <code>resilience</code>, <code>background-worker</code></li>
 </ul>
 <hr>
-<p><strong>Version</strong>: 1.0.63<br><strong>Last Updated</strong>: 2025-10-11<br><strong>Status</strong>: Phase 2 Complete - Backend Architecture Implemented and Working</p>
+<p><strong>Version</strong>: 1.0.101 (Schema: 1.0.79+)<br><strong>Last Updated</strong>: 2025-10-22<br><strong>Status</strong>: Production - Normalized architecture (HEX-287)</p>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be
