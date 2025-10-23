@@ -5,8 +5,8 @@
 date: "2025-10-23"
 version: "1.1.2"
 status: "Released"
-category: "Bug Fix"</h2><h1>Version 1.1.2 - ESLint Bug Fixes + Documentation Portal Script Dependency</h1><p><strong>Release Status</strong>: ✅ Released<br><strong>Release Date</strong>: 2025-10-23<br><strong>Parent Issues</strong>: <a href="https://linear.app/hextrackr/issue/HEX-318/bug-fix-userid-undefined-in-authcontroller-error-logging">HEX-318</a>, <a href="https://linear.app/hextrackr/issue/HEX-319/bug-fix-event-parameter-missing-in-backup-modal-createfreshbackup">HEX-319</a>, <a href="https://linear.app/hextrackr/issue/HEX-320/bug-fix-btn-variable-scope-issue-in-backup-modal-createfreshbackup">HEX-320</a>, <a href="https://linear.app/hextrackr/issue/HEX-332/bug-fix-documentation-portal-missing-backup-modaljs-script-dependency">HEX-332</a></p>
-<h2>Overview</h2><p>HexTrackr v1.1.2 addresses four bugs: three ESLint-detected code quality issues (undefined variable usage in error logging, deprecated event handling patterns, and variable scoping in try/catch/finally blocks) and one missing script dependency in the documentation portal that prevented backup modal buttons from working. These fixes improve error diagnostics, ensure modern JavaScript compatibility, and restore full functionality to the documentation portal settings modal.</p>
+category: "Bug Fix"</h2><h1>Version 1.1.2 - ESLint Bug Fixes + Documentation Portal Script Dependency</h1><p><strong>Release Status</strong>: ✅ Released<br><strong>Release Date</strong>: 2025-10-23<br><strong>Parent Issues</strong>: <a href="https://linear.app/hextrackr/issue/HEX-318/bug-fix-userid-undefined-in-authcontroller-error-logging">HEX-318</a>, <a href="https://linear.app/hextrackr/issue/HEX-319/bug-fix-event-parameter-missing-in-backup-modal-createfreshbackup">HEX-319</a>, <a href="https://linear.app/hextrackr/issue/HEX-320/bug-fix-btn-variable-scope-issue-in-backup-modal-createfreshbackup">HEX-320</a>, <a href="https://linear.app/hextrackr/issue/HEX-321/bug-fix-loadciscostatus-function-missing-in-settings-modal">HEX-321</a>, <a href="https://linear.app/hextrackr/issue/HEX-332/bug-fix-documentation-portal-missing-backup-modaljs-script-dependency">HEX-332</a></p>
+<h2>Overview</h2><p>HexTrackr v1.1.2 addresses five bugs: four ESLint-detected code quality issues (undefined variable usage in error logging, deprecated event handling patterns, variable scoping in try/catch/finally blocks, and incorrect function name) and one missing script dependency in the documentation portal that prevented backup modal buttons from working. These fixes improve error diagnostics, ensure modern JavaScript compatibility, restore full functionality to the documentation portal settings modal, and fix Cisco advisory statistics not refreshing after manual sync.</p>
 <h2>Bug Fixes</h2><h3>Bug Fix #1: userId Undefined in authController Error Logging (HEX-318)</h3><p><strong>Priority</strong>: Medium<br><strong>Impact</strong>: Error logs missing user identification, reduced audit trail quality</p>
 <p><strong>Problem</strong>: ESLint error <code>&#39;userId&#39; is not defined</code> at <code>app/controllers/authController.js:416</code></p>
 <ul>
@@ -94,7 +94,57 @@ category: "Bug Fix"</h2><h1>Version 1.1.2 - ESLint Bug Fixes + Documentation Por
 </ul>
 <p><strong>Note</strong>: Fixed in same commit as HEX-319. ESLint validation after fixing event parameter immediately caught this scoping issue, allowing both bugs to be resolved together.</p>
 <hr>
-<h3>Bug Fix #4: Documentation Portal Missing backup-modal.js Script (HEX-332)</h3><p><strong>Priority</strong>: High<br><strong>Impact</strong>: Backup modal buttons completely non-functional in documentation portal</p>
+<h3>Bug Fix #4: Incorrect Function Name in Cisco Sync (HEX-321)</h3><p><strong>Priority</strong>: High<br><strong>Impact</strong>: Cisco advisory statistics don&#39;t refresh after manual sync</p>
+<p><strong>Problem</strong>: ESLint error <code>&#39;loadCiscoStatus&#39; is not defined</code> at <code>app/public/scripts/shared/settings-modal.js:974</code></p>
+<ul>
+<li>Function called after manual Cisco advisory sync completes</li>
+<li>Intended to reload full status to refresh statistics in Settings modal</li>
+<li>Function name missing &quot;Sync&quot; part (typo)</li>
+<li>Actual function is <code>loadCiscoSyncStatus()</code> (defined at line 823)</li>
+<li>Called <code>loadCiscoStatus()</code> which doesn&#39;t exist</li>
+</ul>
+<p><strong>Solution</strong>: Correct function name to match actual definition</p>
+<ul>
+<li>Changed <code>loadCiscoStatus()</code> to <code>loadCiscoSyncStatus()</code> on line 974</li>
+<li>Simple function name correction</li>
+<li>Follows codebase naming pattern: <code>loadCiscoSyncStatus()</code>, <code>loadKevSyncStatus()</code>, <code>loadPaloSyncStatus()</code></li>
+</ul>
+<p><strong>Context - syncCiscoNow() Function</strong>:</p>
+<ol>
+<li>User clicks &quot;Sync Now&quot; button in Settings modal</li>
+<li>API call to <code>/api/cisco/sync</code> (POST)</li>
+<li>Server syncs Cisco PSIRT advisories</li>
+<li><strong>Line 974</strong>: Reload full status to refresh all statistics</li>
+<li>Update last sync timestamp</li>
+<li>Show success notification</li>
+</ol>
+<p><strong>Statistics That Should Refresh</strong>:</p>
+<ul>
+<li>Total CVEs from Cisco advisories</li>
+<li>Synced count (total advisories processed)</li>
+<li>Matched count (advisories with fix versions)</li>
+<li>No fix available count</li>
+<li>Unsynced count (advisories without matches)</li>
+</ul>
+<p><strong>Why Bug Wasn&#39;t Noticed</strong>:</p>
+<ul>
+<li>Sync appeared to work (badge updated, timestamp updated, notification shown)</li>
+<li>Only missing piece was refreshing detailed statistics</li>
+<li>Statistics would update when modal reopened</li>
+<li>Users likely close modal immediately after sync</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/settings-modal.js:974</code> - Function name corrected</li>
+</ul>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li>✅ ESLint validation passed (no-undef error resolved)</li>
+<li>✅ Function name now matches definition at line 823</li>
+<li>✅ Statistics now refresh immediately after manual sync</li>
+</ul>
+<hr>
+<h3>Bug Fix #5: Documentation Portal Missing backup-modal.js Script (HEX-332)</h3><p><strong>Priority</strong>: High<br><strong>Impact</strong>: Backup modal buttons completely non-functional in documentation portal</p>
 <p><strong>Problem</strong>: User-reported bug - backup buttons failed in documentation portal only</p>
 <ul>
 <li>Settings modal contains buttons calling <code>window.backupModalManager.showTicketsBackupModal()</code></li>
@@ -166,10 +216,11 @@ category: "Bug Fix"</h2><h1>Version 1.1.2 - ESLint Bug Fixes + Documentation Por
 <hr>
 <h2>User Impact</h2><p><strong>For Developers</strong>:</p>
 <ul>
-<li>Cleaner ESLint output (6 fewer errors: 1 from HEX-318, 1 from HEX-319, 3 from HEX-320, 1 from implicit window.event)</li>
+<li>Cleaner ESLint output (7 fewer errors: 1 from HEX-318, 1 from HEX-319, 3 from HEX-320, 1 from HEX-321, 1 from implicit window.event)</li>
 <li>Better error diagnostics in production logs</li>
 <li>Code follows modern JavaScript best practices</li>
 <li>Proper try/catch/finally variable scoping</li>
+<li>Consistent function naming patterns across codebase</li>
 <li>Consistent script dependencies across all HTML pages</li>
 </ul>
 <p><strong>For System Administrators</strong>:</p>
@@ -177,10 +228,12 @@ category: "Bug Fix"</h2><h1>Version 1.1.2 - ESLint Bug Fixes + Documentation Por
 <li>Improved audit trail quality (all password change errors now include userId)</li>
 <li>Better troubleshooting when backup operations fail</li>
 <li>More reliable error tracking</li>
+<li><strong>FIXED</strong>: Cisco advisory statistics now refresh immediately after manual sync</li>
 <li><strong>FIXED</strong>: Backup buttons now work in documentation portal settings modal</li>
 </ul>
 <p><strong>For End Users</strong>:</p>
 <ul>
+<li><strong>FIXED</strong>: Cisco sync statistics update in real-time without reopening Settings modal</li>
 <li><strong>FIXED</strong>: Backup and restore functionality fully available from documentation portal</li>
 <li>More stable backup functionality (strict mode compatible)</li>
 <li>Improved user experience when accessing backups from docs portal</li>
@@ -191,7 +244,7 @@ category: "Bug Fix"</h2><h1>Version 1.1.2 - ESLint Bug Fixes + Documentation Por
 <li><strong>JSDoc</strong>: Fixed documentation for <code>getResolvedVulnerabilities</code> in <code>app/controllers/vulnerabilityController.js</code> - Added complete @async, @param, @returns, @throws, @route, and @example tags (<a href="https://linear.app/hextrackr/issue/DOCS-74/jsdoc-fix-add-comprehensive-documentation-to">DOCS-74</a>)</li>
 </ul>
 <hr>
-<h2>Notes</h2><h3>Why These Fixes Matter</h3><p>All four bugs were <strong>functional issues</strong>, not just style violations:</p>
+<h2>Notes</h2><h3>Why These Fixes Matter</h3><p>All five bugs were <strong>functional issues</strong>, not just style violations:</p>
 <ol>
 <li><p><strong>HEX-318 (userId)</strong>: Missing user context in error logs makes production debugging significantly harder. When password change fails, we need to know WHICH user experienced the problem.</p>
 </li>
@@ -205,13 +258,15 @@ category: "Bug Fix"</h2><h1>Version 1.1.2 - ESLint Bug Fixes + Documentation Por
 </li>
 <li><p><strong>HEX-320 (btn scoping)</strong>: Block-scoped variable in try block but used in finally block. While currently functional due to JavaScript engine quirks, violates block scoping rules and could break with stricter engines or optimization passes. Demonstrates importance of following language semantics.</p>
 </li>
+<li><p><strong>HEX-321 (loadCiscoStatus)</strong>: Function name typo prevented Cisco statistics from refreshing after manual sync. Demonstrates importance of consistent naming patterns and thorough testing of all code paths.</p>
+</li>
 <li><p><strong>HEX-332 (Documentation Portal backup-modal.js)</strong>: Missing script dependency created complete functional failure. Backup buttons appeared clickable but threw console errors. User-reported bug discovered during v1.1.2 testing - demonstrates importance of testing all code paths, not just primary workflows.</p>
 </li>
 </ol>
 <h3>ESLint as Safety Net</h3><p>ESLint catches demonstrate the value of static analysis:</p>
 <ul>
 <li><code>no-undef</code> rule caught real bugs, not just style issues</li>
-<li>HEX-318, HEX-319, and HEX-320 would cause runtime errors in specific conditions</li>
+<li>HEX-318, HEX-319, HEX-320, and HEX-321 would cause runtime errors in specific conditions</li>
 <li>Better to catch at lint time than in production</li>
 <li>Incremental testing (validating after each fix) caught HEX-320 immediately after fixing HEX-319</li>
 </ul>
