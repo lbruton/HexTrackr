@@ -349,6 +349,9 @@ class AuthController {
      * @param {Object} res - Express response
      */
     static async changePassword(req, res) {
+        // Get userId early for error logging (HEX-318)
+        const userId = req.user?.id || "unknown";
+
         try {
             const { oldPassword, newPassword } = req.body;
 
@@ -367,9 +370,6 @@ class AuthController {
                     error: "New password must be at least 8 characters long"
                 });
             }
-
-            // Get userId from session (set by requireAuth middleware)
-            const userId = req.user.id;
 
             const controller = AuthController.getInstance();
             const result = await controller.authService.changePassword(userId, oldPassword, newPassword);

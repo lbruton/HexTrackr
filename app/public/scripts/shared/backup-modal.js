@@ -298,17 +298,31 @@ class BackupModalManager {
 
     /**
      * Create fresh backup and download
-     * @param {string} type - Backup type ('tickets', 'vulnerabilities', 'all')
+     * @param {Event|string} eventOrType - Click event (modern) or backup type (legacy)
+     * @param {string} [type] - Backup type if first param is event
      */
-    async createFreshBackup(type) {
+    async createFreshBackup(eventOrType, type) {
+        // Handle both signatures:
+        // Modern: createFreshBackup(event, type)
+        // Legacy: createFreshBackup(type) - relies on implicit window.event
+        let evt = eventOrType;
+        let backupType = type;
+        let btn = null; // Declare outside try block for finally access (HEX-319)
+
+        if (typeof eventOrType === "string") {
+            // Legacy signature: createFreshBackup(type)
+            backupType = eventOrType;
+            evt = window.event || null; // Use implicit event if available
+        }
+
         try {
-            const btn = event.target.closest("button");
+            btn = evt?.target?.closest("button");
             if (btn) {
                 btn.disabled = true;
                 btn.innerHTML = "<span class=\"spinner-border spinner-border-sm me-1\"></span>Creating...";
             }
 
-            logger.info("backup", `Creating fresh ${type} backup...`);
+            logger.info("backup", `Creating fresh ${backupType} backup...`);
 
             const csrfToken = await this.getCsrfToken();
 
@@ -332,9 +346,9 @@ class BackupModalManager {
             window.showNotification(`Fresh backup created successfully (${data.total_size_mb}MB)`, "success");
 
             // Reload the current modal
-            if (type === "tickets") {
+            if (backupType === "tickets") {
                 await this.showTicketsBackupModal();
-            } else if (type === "vulnerabilities") {
+            } else if (backupType === "vulnerabilities") {
                 await this.showVulnerabilitiesBackupModal();
             } else {
                 await this.showDatabaseBackupModal();
