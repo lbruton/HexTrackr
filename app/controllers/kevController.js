@@ -217,11 +217,21 @@ class KevController {
     }
 
     /**
-     * Get KEV dashboard statistics
+     * Get KEV dashboard statistics - GET /api/kev/stats
+     * Returns aggregated statistics about CISA Known Exploited Vulnerabilities
+     * including total KEV count, matched vulnerabilities, and sync status
+     *
      * @async
-     * @param {Object} req - Express request object
+     * @param {Object} req - Express request object (no parameters required)
      * @param {Object} res - Express response object
-     * @returns {Promise<void>}
+     * @returns {Promise<void>} Sends JSON response:
+     *   - 200: {totalKevs: number, matchedCount: number, lastSync: string, catalogVersion: string}
+     *   - 500: {error: "Failed to get KEV statistics", message: string}
+     * @throws {Error} Caught and returned as 500 response if KevService.getDashboardStats fails
+     * @route GET /api/kev/stats
+     * @example
+     * // GET /api/kev/stats
+     * // Returns: {totalKevs: 1042, matchedCount: 87, lastSync: "2025-10-22T10:30:00Z", catalogVersion: "2025.10.22"}
      */
     async getKevStats(req, res) {
         try {

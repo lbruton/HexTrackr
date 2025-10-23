@@ -971,7 +971,7 @@ async function syncCiscoNow() {
             }
 
             // Reload full status to get all metrics (noFixAvailable, unsyncedCount)
-            await loadCiscoStatus();
+            await loadCiscoSyncStatus();
 
             // Update last sync time
             const lastSyncElement = document.getElementById("ciscoLastSync");
