@@ -869,8 +869,6 @@ class LocationDetailsModal {
             // Create grid
             this.grid = agGrid.createGrid(gridContainer, gridOptions);
 
-            console.log(`[LocationDetailsModal] Grid created with ${deviceData.length} devices`);
-
         } catch (error) {
             console.error("[LocationDetailsModal] Error creating device grid:", error);
         }
@@ -1042,8 +1040,6 @@ class LocationDetailsModal {
                     device.ticketStatus = ticketData.status;
                     device.tickets = ticketData.tickets || [];
                 });
-
-                console.log(`[LocationDetailsModal] Enriched ${devices.length} devices with ticket counts`);
             }
 
             return devices;
@@ -1076,8 +1072,6 @@ class LocationDetailsModal {
      * @since v1.0.89
      */
     createTicket(hostname) {
-        console.log(`[LocationDetailsModal] Creating ticket for device: ${hostname}`);
-
         // Parse hostname to extract SITE and Location (ALL CAPS)
         const site = hostname.substring(0, 4).toUpperCase();       // First 4 characters
         const location = hostname.substring(0, 5).toUpperCase();   // First 5 characters
@@ -1105,8 +1099,6 @@ class LocationDetailsModal {
      * @since v1.0.89
      */
     viewTickets(hostname) {
-        console.log(`[LocationDetailsModal] Viewing tickets for device: ${hostname}`);
-
         // Find device data to get ticket info
         const device = this.allDevices?.find(d => d.hostname === hostname);
         if (!device) {
@@ -1118,13 +1110,11 @@ class LocationDetailsModal {
         const tickets = device.tickets || [];
 
         if (ticketCount === 0) {
-            console.log("[LocationDetailsModal] No tickets found, showing create instead");
             this.createTicket(hostname);
             return;
         } else if (ticketCount === 1) {
             // Open ticket edit modal directly (not navigation)
             const ticketId = tickets[0].id;
-            console.log(`[LocationDetailsModal] Opening single ticket modal: ${ticketId}`);
 
             if (window.ticketManager && typeof window.ticketManager.editTicket === "function") {
                 window.ticketManager.editTicket(ticketId);
@@ -1135,7 +1125,6 @@ class LocationDetailsModal {
             return;
         } else {
             // Show picker modal for multiple tickets
-            console.log(`[LocationDetailsModal] Showing picker for ${ticketCount} tickets`);
             this.showTicketPickerModal(hostname, tickets);
         }
     }
@@ -1148,8 +1137,6 @@ class LocationDetailsModal {
      * @since v1.0.89
      */
     showTicketPickerModal(hostname, tickets) {
-        console.log(`[LocationDetailsModal] Showing ticket picker for ${hostname}: ${tickets.length} tickets`);
-
         // Use existing ticket picker modal if available
         if (window.ticketPickerModal && typeof window.ticketPickerModal.show === "function") {
             window.ticketPickerModal.show(hostname, tickets);
@@ -1322,8 +1309,6 @@ class LocationDetailsModal {
      * @since v1.0.93
      */
     async exportLocationCsv() {
-        console.log("[LocationDetailsModal] Exporting location CSV");
-
         // Validate modal state
         const modal = document.getElementById("locationDetailsModal");
         if (!modal || !modal.classList.contains("show")) {
@@ -1452,8 +1437,6 @@ class LocationDetailsModal {
         if (window.vulnManager && typeof window.vulnManager.showToast === "function") {
             window.vulnManager.showToast(`Exported ${devices.length} devices with fixed versions for ${locationDisplay}`, "success");
         }
-
-        console.log(`[LocationDetailsModal] Exported CSV for ${locationDisplay}: ${devices.length} devices with calculated fixed versions`);
     }
 
     /**
