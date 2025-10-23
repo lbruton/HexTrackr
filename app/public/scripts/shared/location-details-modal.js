@@ -743,7 +743,7 @@ class LocationDetailsModal {
                             tooltipText += `&#13;&#10;Cmd+Shift: KEV devices at location&#13;&#10;Alt+Shift: All devices at location`;
 
                             return `<a href="#" class="text-muted"
-                                       onclick="window.locationDetailsModal.createTicket(event, '${hostname}', ${isKev}); return false;"
+                                       onclick="event.stopPropagation(); window.locationDetailsModal.createTicket(event, '${hostname}', ${isKev}); return false;"
                                        title="${tooltipText}">
                                        <i class="fas fa-ticket-alt" style="opacity: 0.6;"></i>
                                     </a>`;
