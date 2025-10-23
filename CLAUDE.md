@@ -110,12 +110,21 @@ Only use `npm run dev` if you're testing without Docker (rare).
 **Changelogs**:
 - Location: `/app/public/docs-source/changelog/versions/`
 - Format: Each version gets its own file (e.g., `1.0.67.md`)
-- Index: `/app/public/docs-source/changelog/index.md` (links to all versions)
 - Template: `/docs/TEMPLATE_CHANGELOG.md`
-- **Version Strategy**: Each HEX-254 session gets a new patch version
+- **Rolling Window Architecture** (as of v1.1.0):
+  - `index.md`: **AUTO-GENERATED** - Shows last 10 versions with summaries
+  - `archive.md`: **AUTO-GENERATED** - Table of all versions older than last 10
+  - Dropdown navigation: Shows only last 10 versions (newest first)
+  - When v1.1.10 ships, all v1.0.x versions automatically roll into archive
+  - **Never manually edit** `index.md` or `archive.md` - they regenerate on each `npm run docs:generate`
+- **Adding New Versions**:
+  1. Create new version file in `/changelog/versions/` (e.g., `1.1.0.md`) using template
+  2. Run `npm run docs:generate` to regenerate index, archive, and HTML
+  3. System automatically updates dropdown and archive table
+- **Version Strategy**: Each major session/feature gets a new patch version
   - Session 3 → v1.0.67
   - Session 4 → v1.0.68
-  - Session 5 → v1.0.69 (etc.)
+  - Major release → v1.1.0 (etc.)
 
 ---
 

@@ -6,7 +6,7 @@ date: "2025-10-22"
 version: "1.0.101"
 status: "Released"
 category: "Bug Fix"</h2><h1>Version 1.0.101 - CVE Reference Links Open in Multiple Popups</h1><p><strong>Release Status</strong>: Released<br><strong>Release Date</strong>: 2025-10-22<br><strong>Category</strong>: Bug Fix<br><strong>Issue</strong>: <a href="https://linear.app/hextrackr/issue/HEX-314">HEX-314</a></p>
-<h2>Overview</h2><p>Fixed CVE reference links in the Vulnerability Details Modal to open in separate popup windows instead of reusing the same window. This enables users to compare multiple security advisories (CVE.org, NIST NVD, vendor advisories) side-by-side during vulnerability research.</p>
+<h2>Overview</h2><p>Implemented deterministic window naming for CVE reference links, enabling users to compare multiple security advisories (CVE.org, NIST NVD, vendor advisories) side-by-side while preventing duplicate window proliferation. Each reference type opens in its own uniquely-named popup that can be reused when clicked again.</p>
 <h2>Fixed</h2><h3>CVE Reference Links Reusing Same Popup Window (HEX-314)</h3><p><strong>Problem</strong>:</p>
 <ul>
 <li>Clicking any CVE reference link opened in a 1200x1200 popup window</li>
@@ -20,33 +20,41 @@ category: "Bug Fix"</h2><h1>Version 1.0.101 - CVE Reference Links Open in Multip
 <li>Per W3C/WHATWG specification, named targets reuse existing windows with that name</li>
 <li>All reference links shared the same target name, causing window reuse</li>
 </ul>
-<p><strong>Solution</strong>:</p>
+<p><strong>Solution</strong> (Improved Implementation):</p>
 <ul>
-<li>Changed window target from <code>&#39;cve_ref_popup&#39;</code> to <code>&#39;_blank&#39;</code></li>
-<li><code>&#39;_blank&#39;</code> forces each link to open in a new browsing context</li>
-<li>Window features (<code>width=1200,height=1200</code>) maintain popup behavior</li>
+<li>Implemented <strong>deterministic window naming</strong> based on reference display text</li>
+<li>Each reference type gets a unique window name (e.g., <code>cve_ref_cveorg_official_record</code>, <code>cve_ref_nist_nvd</code>)</li>
+<li>Window naming pattern: <code>cve_ref_${displayText.replace(/[^a-zA-Z0-9]/g, &quot;_&quot;).toLowerCase()}</code></li>
+<li>Benefits over simple <code>_blank</code>:<ul>
+<li>✅ Allows side-by-side comparison (different sources = different windows)</li>
+<li>✅ Prevents duplicate windows (clicking same reference twice reuses existing window)</li>
+<li>✅ More organized than unlimited <code>_blank</code> windows proliferating</li>
+</ul>
+</li>
 </ul>
 <p><strong>File Modified</strong>:</p>
 <ul>
-<li><code>app/public/scripts/shared/vulnerability-details-modal.js:234</code> - One-word change</li>
+<li><code>app/public/scripts/shared/vulnerability-details-modal.js:236</code> - Deterministic window name generation</li>
 </ul>
 <p><strong>Code Change</strong>:</p>
 <pre><code class="language-diff"><span class="hljs-deletion">- onclick=&quot;window.open(&#x27;${sanitizedUrl}&#x27;, &#x27;cve_ref_popup&#x27;, &#x27;width=1200,height=1200,scrollbars=yes,resizable=yes&#x27;); return false;&quot;</span>
-<span class="hljs-addition">+ onclick=&quot;window.open(&#x27;${sanitizedUrl}&#x27;, &#x27;_blank&#x27;, &#x27;width=1200,height=1200,scrollbars=yes,resizable=yes&#x27;); return false;&quot;</span></code></pre><h2>User Experience Improvements</h2><p><strong>Before Fix</strong>:</p>
+<span class="hljs-addition">+ const windowName = `cve_ref_${sanitizedDisplay.replace(/[^a-zA-Z0-9]/g, &quot;_&quot;).toLowerCase()}`;</span>
+<span class="hljs-addition">+ onclick=&quot;window.open(&#x27;${sanitizedUrl}&#x27;, &#x27;${windowName}&#x27;, &#x27;width=1200,height=1200,scrollbars=yes,resizable=yes&#x27;); return false;&quot;</span></code></pre><h2>User Experience Improvements</h2><p><strong>Before Fix</strong>:</p>
 <ol>
 <li>Click &quot;CVE.org Official Record&quot; → Opens popup</li>
 <li>Click &quot;NIST NVD&quot; → Replaces first popup content (CVE.org closes)</li>
 <li>Cannot compare multiple sources simultaneously</li>
 </ol>
-<p><strong>After Fix</strong>:</p>
+<p><strong>After Fix</strong> (Improved Behavior):</p>
 <ol>
-<li>Click &quot;CVE.org Official Record&quot; → Opens first popup</li>
-<li>Click &quot;NIST NVD&quot; → Opens second popup (first remains open)</li>
-<li>Click vendor advisory → Opens third popup (both previous remain open)</li>
+<li>Click &quot;CVE.org Official Record&quot; → Opens popup in window <code>cve_ref_cveorg_official_record</code></li>
+<li>Click &quot;NIST NVD&quot; → Opens second popup in window <code>cve_ref_nist_nvd</code> (first remains open)</li>
+<li>Click vendor advisory → Opens third popup with unique window name (both previous remain open)</li>
+<li>Click &quot;CVE.org Official Record&quot; again → Reuses existing <code>cve_ref_cveorg_official_record</code> window (prevents duplicates)</li>
 <li>All popups maintain 1200x1200 dimensions for optimal viewing</li>
-<li>Users can compare multiple authoritative sources side-by-side</li>
+<li>Users can compare multiple authoritative sources side-by-side without window proliferation</li>
 </ol>
-<p><strong>Use Case</strong>: Security researchers need to cross-reference CVE.org official records, NIST NVD analysis, and vendor-specific advisories simultaneously to understand vulnerability scope, affected versions, and remediation strategies.</p>
+<p><strong>Use Case</strong>: Security researchers need to cross-reference CVE.org official records, NIST NVD analysis, and vendor-specific advisories simultaneously to understand vulnerability scope, affected versions, and remediation strategies. The deterministic naming prevents clutter while enabling parallel comparison.</p>
 <h2>Technical Details</h2><p><strong>window.open() Target Parameter Behavior</strong>:</p>
 <ul>
 <li><strong>Named target</strong> (e.g., <code>&#39;cve_ref_popup&#39;</code>): Reuses existing window with that name</li>

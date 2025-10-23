@@ -661,9 +661,10 @@ class HtmlContentUpdater {
             }
         }
 
-        // Sort changelog versions (newest first) if changelog section exists
+        // Sort changelog versions (newest first) and implement rolling window (last 10 versions)
         if (manifest.sections.changelog && manifest.sections.changelog.children) {
             const sortedChildren = {};
+            const archivedVersions = {};
             const versionKeys = Object.keys(manifest.sections.changelog.children);
 
             // Sort version numbers in descending order (newest first)
@@ -683,12 +684,22 @@ class HtmlContentUpdater {
                 return 0;
             });
 
-            // Rebuild children object in sorted order
-            versionKeys.forEach(key => {
-                sortedChildren[key] = manifest.sections.changelog.children[key];
+            // Rolling window: Keep last 10 versions in children, move rest to archivedVersions
+            const RECENT_VERSION_LIMIT = 10;
+            versionKeys.forEach((key, index) => {
+                if (index < RECENT_VERSION_LIMIT) {
+                    // Last 10 versions stay in children (visible in dropdown)
+                    sortedChildren[key] = manifest.sections.changelog.children[key];
+                } else {
+                    // Older versions move to archive (still accessible, not in dropdown)
+                    archivedVersions[key] = manifest.sections.changelog.children[key];
+                }
             });
 
             manifest.sections.changelog.children = sortedChildren;
+            manifest.sections.changelog.archivedVersions = archivedVersions;
+
+            console.log(` Changelog rolling window: ${Object.keys(sortedChildren).length} recent versions, ${Object.keys(archivedVersions).length} archived versions`);
         }
 
         // Write manifest file
@@ -727,6 +738,282 @@ class HtmlContentUpdater {
             "sprint": "fas fa-running"
         };
         return iconMap[sectionName] || "fas fa-file-alt";
+    }
+
+    /**
+     * Parse YAML frontmatter from markdown content
+     * Simple frontmatter parser that extracts key-value pairs from --- delimited sections
+     * @param {string} content - The markdown content with frontmatter
+     * @returns {object} Parsed frontmatter object
+     */
+    parseFrontmatter(content) {
+        const frontmatterRegex = /^---\s*\n([\s\S]*?)\n---/;
+        const match = content.match(frontmatterRegex);
+
+        if (!match) {
+            return {};
+        }
+
+        const frontmatterText = match[1];
+        const frontmatter = {};
+
+        // Parse each line as key: value
+        frontmatterText.split("\n").forEach(line => {
+            const colonIndex = line.indexOf(":");
+            if (colonIndex > 0) {
+                const key = line.substring(0, colonIndex).trim();
+                const value = line.substring(colonIndex + 1).trim().replace(/^["']|["']$/g, "");
+                frontmatter[key] = value;
+            }
+        });
+
+        return frontmatter;
+    }
+
+    /**
+     * Generate dynamic index.md for changelog with last 10 versions
+     * Creates an auto-updating index page that displays recent releases with summaries
+     */
+    async generateDynamicIndex() {
+        try {
+            const manifestPath = path.join(process.cwd(), "app", "public", "docs-html", "content-manifest.json");
+            const manifest = JSON.parse(await PathValidator.safeReadFile(manifestPath, "utf8"));
+
+            if (!manifest.sections.changelog) {
+                console.warn(" No changelog section found in manifest, skipping index generation");
+                return;
+            }
+
+            const recentVersions = manifest.sections.changelog.children;
+            const versionKeys = Object.keys(recentVersions);
+
+            // Build recent releases list with metadata from version files
+            const recentReleasesList = [];
+            for (const versionKey of versionKeys) {
+                const versionFile = recentVersions[versionKey].file;
+                const versionPath = path.join(process.cwd(), "app", "public", "docs-source", `${versionFile}.md`);
+
+                try {
+                    const versionContent = await PathValidator.safeReadFile(versionPath, "utf8");
+                    const frontmatter = this.parseFrontmatter(versionContent);
+
+                    const version = frontmatter.version || versionKey;
+                    const date = frontmatter.date || "Unknown date";
+                    const title = frontmatter.title || `Version ${version}`;
+                    const category = frontmatter.category || "Update";
+
+                    // Extract first paragraph from content as summary (skip frontmatter and title)
+                    const contentWithoutFrontmatter = versionContent.replace(/^---[\s\S]*?---\n/, "");
+                    const contentLines = contentWithoutFrontmatter.split("\n");
+                    let summary = "";
+                    for (const line of contentLines) {
+                        if (line.trim() && !line.startsWith("#") && !line.startsWith("**")) {
+                            summary = line.trim();
+                            break;
+                        }
+                    }
+
+                    recentReleasesList.push({
+                        version,
+                        date,
+                        title,
+                        category,
+                        summary,
+                        link: `#changelog/versions/${version}`
+                    });
+                } catch (error) {
+                    console.warn(` Could not read version file ${versionPath}: ${error.message}`);
+                }
+            }
+
+            // Get current version from root package.json
+            const rootPackagePath = path.join(process.cwd(), "package.json");
+            const rootPackageContent = JSON.parse(await PathValidator.safeReadFile(rootPackagePath, "utf8"));
+            const currentVersion = rootPackageContent.version;
+
+            // Build the index.md content
+            const indexContent = `<!-- AUTO-GENERATED FILE - DO NOT EDIT MANUALLY -->
+<!-- This file is automatically generated by html-content-updater.js -->
+<!-- Last generated: ${new Date().toISOString()} -->
+
+# HexTrackr Changelog
+
+Welcome to the HexTrackr changelog! This page tracks all notable changes, features, and fixes across all versions of HexTrackr.
+
+**Current Version**: [v${currentVersion}](#changelog/versions/${currentVersion}) - Released ${recentReleasesList[0]?.date || "Unknown"}
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## Recent Releases
+
+${recentReleasesList.map(release =>
+    `### [v${release.version}](${release.link}) - ${release.date}
+**Category**: ${release.category}
+
+${release.summary}
+
+[View full changelog →](${release.link})`
+).join("\n\n")}
+
+---
+
+## Older Versions
+
+For versions older than the 10 most recent releases, see the [Changelog Archive](#changelog/archive).
+
+---
+
+## Navigation
+
+- **[Latest Version (v${recentReleasesList[0]?.version || currentVersion})](${recentReleasesList[0]?.link || "#"})** - Most recent changes
+- **[Changelog Archive](#changelog/archive)** - All historical versions
+- **[Project Roadmap](#roadmap)** - Planned features and improvements
+
+---
+
+## Contributing
+
+Found a bug or want to request a feature? Check our [project roadmap](#roadmap) or create an issue in our Linear workspace.
+`;
+
+            // Write the generated index.md
+            const indexPath = path.join(process.cwd(), "app", "public", "docs-source", "changelog", "index.md");
+            await PathValidator.safeWriteFile(indexPath, indexContent);
+
+            console.log(` Dynamic changelog index.md generated with ${recentReleasesList.length} recent versions`);
+
+        } catch (error) {
+            console.error(` Failed to generate dynamic index.md: ${error.message}`);
+            throw error;
+        }
+    }
+
+    /**
+     * Generate archive.md table with all versions older than the last 10
+     * Creates a comprehensive table of historical versions
+     */
+    async generateArchiveTable() {
+        try {
+            const manifestPath = path.join(process.cwd(), "app", "public", "docs-html", "content-manifest.json");
+            const manifest = JSON.parse(await PathValidator.safeReadFile(manifestPath, "utf8"));
+
+            if (!manifest.sections.changelog || !manifest.sections.changelog.archivedVersions) {
+                console.warn(" No archived versions found in manifest, creating empty archive");
+
+                // Create empty archive file
+                const emptyArchiveContent = `<!-- AUTO-GENERATED FILE - DO NOT EDIT MANUALLY -->
+<!-- This file is automatically generated by html-content-updater.js -->
+<!-- Last generated: ${new Date().toISOString()} -->
+
+# HexTrackr Changelog Archive
+
+This archive contains all historical versions of HexTrackr older than the 10 most recent releases.
+
+For the latest changes, see the [Changelog Index](#changelog/index).
+
+---
+
+## Archived Versions
+
+No archived versions yet. All versions are still in the recent releases list.
+
+---
+
+[← Back to Changelog Index](#changelog/index)
+`;
+                const archivePath = path.join(process.cwd(), "app", "public", "docs-source", "changelog", "archive.md");
+                await PathValidator.safeWriteFile(archivePath, emptyArchiveContent);
+                console.log(" Empty archive.md generated (no archived versions yet)");
+                return;
+            }
+
+            const archivedVersions = manifest.sections.changelog.archivedVersions;
+            const versionKeys = Object.keys(archivedVersions);
+
+            // Build table rows with metadata from version files
+            const tableRows = [];
+            for (const versionKey of versionKeys) {
+                const versionFile = archivedVersions[versionKey].file;
+                const versionPath = path.join(process.cwd(), "app", "public", "docs-source", `${versionFile}.md`);
+
+                try {
+                    const versionContent = await PathValidator.safeReadFile(versionPath, "utf8");
+                    const frontmatter = this.parseFrontmatter(versionContent);
+
+                    const version = frontmatter.version || versionKey;
+                    const date = frontmatter.date || "Unknown";
+                    const category = frontmatter.category || "Update";
+                    const title = frontmatter.title || `Version ${version}`;
+
+                    // Extract brief summary (first sentence or first 100 chars)
+                    const contentWithoutFrontmatter = versionContent.replace(/^---[\s\S]*?---\n/, "");
+                    const contentLines = contentWithoutFrontmatter.split("\n");
+                    let summary = "";
+                    for (const line of contentLines) {
+                        if (line.trim() && !line.startsWith("#") && !line.startsWith("**")) {
+                            summary = line.trim();
+                            const firstSentence = summary.match(/^[^.!?]+[.!?]/);
+                            if (firstSentence) {
+                                summary = firstSentence[0];
+                            } else if (summary.length > 100) {
+                                summary = summary.substring(0, 100) + "...";
+                            }
+                            break;
+                        }
+                    }
+
+                    tableRows.push({
+                        version,
+                        date,
+                        category,
+                        summary,
+                        link: `#changelog/versions/${version}`
+                    });
+                } catch (error) {
+                    console.warn(` Could not read archived version file ${versionPath}: ${error.message}`);
+                }
+            }
+
+            // Build the archive.md content
+            const archiveContent = `<!-- AUTO-GENERATED FILE - DO NOT EDIT MANUALLY -->
+<!-- This file is automatically generated by html-content-updater.js -->
+<!-- Last generated: ${new Date().toISOString()} -->
+
+# HexTrackr Changelog Archive
+
+This archive contains all historical versions of HexTrackr older than the 10 most recent releases.
+
+For the latest changes, see the [Changelog Index](#changelog/index).
+
+---
+
+## Archived Versions
+
+Total archived versions: **${tableRows.length}**
+
+| Version | Release Date | Category | Summary | Details |
+|---------|--------------|----------|---------|---------|
+${tableRows.map(row =>
+    `| [v${row.version}](${row.link}) | ${row.date} | ${row.category} | ${row.summary} | [View →](${row.link}) |`
+).join("\n")}
+
+---
+
+[← Back to Changelog Index](#changelog/index)
+`;
+
+            // Write the generated archive.md
+            const archivePath = path.join(process.cwd(), "app", "public", "docs-source", "changelog", "archive.md");
+            await PathValidator.safeWriteFile(archivePath, archiveContent);
+
+            console.log(` Changelog archive.md generated with ${tableRows.length} archived versions`);
+
+        } catch (error) {
+            console.error(` Failed to generate archive.md: ${error.message}`);
+            throw error;
+        }
     }
 
     /**
@@ -886,8 +1173,13 @@ ${this.stats.filesRemoved > 0 ? `\nAdditionally, ${this.stats.filesRemoved} orph
             // Clean up deleted files
             await this.cleanupDeletedFiles(generatedFiles);
 
-            // Generate content manifest for dynamic navigation
+            // Generate content manifest for dynamic navigation (includes rolling window logic)
             await this.generateContentManifest(sources);
+
+            // Generate dynamic changelog index.md and archive.md
+            console.log("\nGenerating dynamic changelog files...");
+            await this.generateDynamicIndex();
+            await this.generateArchiveTable();
 
             // Generate summary report
             await this.generateUpdateReport(generatedFiles);
@@ -909,14 +1201,11 @@ ${this.stats.filesRemoved > 0 ? `\nAdditionally, ${this.stats.filesRemoved} orph
 
             console.log("\nComplete documentation workflow finished successfully!\n");
 
-            // MANUAL STEP REMINDER
-            console.log("MANUAL STEP REQUIRED:");
-            console.log("Update app/public/docs-source/changelog/index.md with new version:");
-            console.log(" 1. Current Version reference (line ~5)");
-            console.log(" 2. Latest Releases list (line ~17)");
-            console.log(" 3. Version History table (line ~60)");
-            console.log(" 4. Navigation section (line ~118)");
-            console.log("\nThen run: npm run docs:generate && docker-compose restart\n");
+            // NOTE: Changelog index.md and archive.md are now auto-generated
+            console.log("Changelog Management:");
+            console.log(" Changelog index.md and archive.md are automatically generated");
+            console.log(" Rolling window: Last 10 versions in dropdown, older versions in archive");
+            console.log(" To add a new version: Add the .md file to changelog/versions/ and run: npm run docs:generate\n");
 
         } catch (error) {
             console.error("Documentation generation process failed:", error);
