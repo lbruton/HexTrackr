@@ -1144,12 +1144,7 @@ ${this.stats.filesRemoved > 0 ? `\nAdditionally, ${this.stats.filesRemoved} orph
             // STEP 1: Update version across all project files to maintain consistency
             await this.updateVersionsAcrossFiles();
 
-            console.log("\nGenerating markdown documentation...");
-
-            // Load the template first
-            await this.loadTemplate();
-
-            // Find all markdown source files
+            // STEP 2: Find all markdown source files (needed for manifest generation)
             const sources = await this.findAllMarkdownSources();
             console.log(` Found ${sources.length} markdown source files to convert.`);
 
@@ -1158,9 +1153,23 @@ ${this.stats.filesRemoved > 0 ? `\nAdditionally, ${this.stats.filesRemoved} orph
                 return;
             }
 
+            // STEP 3: Generate content manifest FIRST (contains rolling window logic)
+            await this.generateContentManifest(sources);
+
+            // STEP 4: Generate dynamic changelog files BEFORE HTML conversion
+            // This ensures index.md is up-to-date when converted to HTML
+            console.log("\nGenerating dynamic changelog files...");
+            await this.generateDynamicIndex();
+            await this.generateArchiveTable();
+
+            console.log("\nGenerating markdown documentation...");
+
+            // STEP 5: Load the template for HTML conversion
+            await this.loadTemplate();
+
             const generatedFiles = [];
 
-            // Generate each HTML file
+            // STEP 6: Generate HTML files from markdown (now uses fresh index.md)
             for (const source of sources) {
                 const success = await this.generateHtmlFile(source);
                 if (success) {
@@ -1170,16 +1179,8 @@ ${this.stats.filesRemoved > 0 ? `\nAdditionally, ${this.stats.filesRemoved} orph
                 await new Promise(resolve => setTimeout(resolve, 50));
             }
 
-            // Clean up deleted files
+            // STEP 7: Clean up deleted files
             await this.cleanupDeletedFiles(generatedFiles);
-
-            // Generate content manifest for dynamic navigation (includes rolling window logic)
-            await this.generateContentManifest(sources);
-
-            // Generate dynamic changelog index.md and archive.md
-            console.log("\nGenerating dynamic changelog files...");
-            await this.generateDynamicIndex();
-            await this.generateArchiveTable();
 
             // Generate summary report
             await this.generateUpdateReport(generatedFiles);
