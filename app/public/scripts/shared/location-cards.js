@@ -565,11 +565,9 @@ class LocationCardsManager {
             // CRITICAL: Use lowercase for lookup (backend returns lowercase keys)
             const ticketData = ticketMap[hostname.toLowerCase()] || { count: 0, tickets: [] };
             if (ticketData.count > 0) {
-                ticketData.tickets.forEach(ticket => {
-                    // ticket is now {id, xt_number} object from backend
-                    locationTickets.set(ticket.id, {
-                        id: ticket.id,
-                        xt_number: ticket.xt_number,
+                ticketData.tickets.forEach(ticketId => {
+                    locationTickets.set(ticketId, {
+                        id: ticketId,
                         status: ticketData.status,
                         jobType: ticketData.jobType
                     });
@@ -657,9 +655,10 @@ class LocationCardsManager {
         }
 
         // TIER 2: Multiple tickets exist → Show picker modal
+        // HEX-344: Fetch full ticket details and reuse device cards modal (same UX)
         if (ticketCount > 1) {
-            logger.info("tickets", `Showing picker for ${ticketCount} tickets at ${locationKey}`);
-            this.showLocationTicketPickerModal(locationKey, tickets);
+            logger.info("tickets", `Fetching ${ticketCount} tickets for ${locationKey}`);
+            this.fetchAndShowLocationTicketModal(locationKey);
             return;
         }
 
@@ -699,164 +698,101 @@ class LocationCardsManager {
     }
 
     /**
-     * Show ticket picker modal when 2+ tickets exist for a location
-     * Reuses existing #ticketPickerModal from vulnerabilities.html
-     * HEX-344 Step 5: Multi-ticket picker modal
+     * Fetch full ticket details for a location and show picker modal
+     * HEX-344: Reuses device cards modal implementation for consistent UX
+     * Fetches complete ticket objects (with xt_number, created_at, etc.)
+     * Then calls vulnerability-cards.js showTicketPickerModal() directly
      *
-     * @param {string} locationKey - Location identifier (e.g., "LAXB1")
-     * @param {Array} tickets - Array of ticket objects [{id, status, jobType}, ...]
+     * @param {string} locationKey - Location identifier (e.g., "WTULSA", "LAXB1")
      */
-    showLocationTicketPickerModal(locationKey, tickets) {
-        const modalElement = document.getElementById("ticketPickerModal");
-        const modalBody = document.getElementById("ticketPickerModalBody");
-        const modalTitle = document.querySelector("#ticketPickerModal .modal-title");
+    async fetchAndShowLocationTicketModal(locationKey) {
+        try {
+            // Fetch full ticket details from backend
+            const response = await fetch(`/api/tickets/location/${locationKey}`);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
 
-        if (!modalElement || !modalBody) {
-            logger.error("ui", "Ticket picker modal elements not found");
-            return;
-        }
+            const data = await response.json();
+            if (!data.success || !data.tickets) {
+                throw new Error(data.error || "Failed to fetch tickets");
+            }
 
-        // Update modal title to show location context
-        if (modalTitle) {
-            modalTitle.innerHTML = `
-                <i class="fas fa-layer-group me-2"></i>
-                Tickets at ${locationKey.toUpperCase()}
-            `;
-        }
+            // Reuse device cards modal - same UX, same data structure
+            // Call vulnerability-cards.js showTicketPickerModal() directly
+            if (window.vulnManager && window.vulnManager.cardsManager) {
+                window.vulnManager.cardsManager.showTicketPickerModal(locationKey.toUpperCase(), data.tickets);
 
-        // Status colors for badges (matches device-security-modal.js:1004-1012)
-        const statusColors = {
-            "Pending": "warning",      // Amber yellow
-            "Staged": "info",          // Purple
-            "Open": "primary",         // Blue
-            "Overdue": "danger",       // Red
-            "Completed": "success",    // Green
-            "Failed": "danger",        // Orange-red
-            "Closed": "secondary"      // Gray
-        };
+                // Override "Create New Ticket Anyway" button to handle location-based creation
+                // The device modal's button calls createTicketFromDevice(hostname) which only adds 1 device
+                // For locations, we need to add ALL devices at the location (same as "Create Ticket" button with 0 tickets)
+                setTimeout(() => {
+                    this.overrideModalCreateButton(locationKey);
+                }, 100); // Small delay to ensure modal DOM is rendered
+            } else {
+                logger.error("tickets", "VulnerabilityCardsManager not available");
+                alert("Unable to show ticket picker. Please refresh the page.");
+            }
 
-        // Build ticket list HTML with radio buttons
-        const ticketListHtml = tickets.map((ticket, index) => {
-            const statusColor = statusColors[ticket.status] || "secondary";
-
-            return `
-                <div class="list-group-item list-group-item-action"
-                     style="cursor: pointer;"
-                     onclick="document.getElementById('ticket-radio-${ticket.id}').checked = true;">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="form-check">
-                            <input class="form-check-input"
-                                   type="radio"
-                                   name="selected-location-ticket"
-                                   id="ticket-radio-${ticket.id}"
-                                   value="${ticket.id}"
-                                   ${index === 0 ? "checked" : ""}>
-                            <label class="form-check-label" for="ticket-radio-${ticket.id}">
-                                <strong>${ticket.xt_number || `Ticket #${ticket.id}`}</strong>
-                            </label>
-                        </div>
-                        <div>
-                            <span class="badge bg-${statusColor}">${ticket.status}</span>
-                            ${ticket.jobType ? `<span class="badge bg-secondary ms-1">${ticket.jobType}</span>` : ""}
-                        </div>
-                    </div>
-                </div>
-            `;
-        }).join("");
-
-        modalBody.innerHTML = `
-            <div class="alert alert-info">
-                <i class="fas fa-info-circle me-2"></i>
-                This location has <strong>${tickets.length} tickets</strong>. Select one to view, or create a new ticket.
-            </div>
-            <div class="list-group mb-3">
-                ${ticketListHtml}
-            </div>
-            <div class="d-grid gap-2">
-                <button class="btn btn-outline-success"
-                        onclick="window.locationCardsManager.createNewTicketAnyway(event, '${locationKey.replace(/'/g, "\\'")}')">
-                    <i class="fas fa-plus me-1"></i>Create New Ticket Anyway
-                </button>
-            </div>
-        `;
-
-        // Store context for view button
-        window.selectedLocationTicketContext = { locationKey, tickets };
-
-        // Show modal
-        const bsModal = new bootstrap.Modal(modalElement);
-        bsModal.show();
-
-        // Wire up view button (should already exist in modal footer)
-        const viewButton = modalElement.querySelector("[data-action=\"view-selected-ticket\"]");
-        if (viewButton) {
-            viewButton.onclick = () => this.viewSelectedLocationTicket();
+        } catch (error) {
+            logger.error("tickets", `Failed to fetch tickets for location ${locationKey}:`, error);
+            alert(`Failed to load tickets: ${error.message}`);
         }
     }
 
     /**
-     * View the selected ticket from picker modal
-     * HEX-344 Step 5: Modal navigation helper
-     */
-    viewSelectedLocationTicket() {
-        const selectedRadio = document.querySelector("input[name=\"selected-location-ticket\"]:checked");
-
-        if (!selectedRadio) {
-            logger.warn("ui", "No ticket selected from picker");
-            return;
-        }
-
-        const ticketId = selectedRadio.value;
-        logger.info("tickets", `Navigating to selected ticket: ${ticketId}`);
-
-        // Close modal and navigate
-        const modal = bootstrap.Modal.getInstance(document.getElementById("ticketPickerModal"));
-        if (modal) {
-            modal.hide();
-        }
-
-        window.location.href = `/tickets.html?openTicket=${ticketId}`;
-    }
-
-    /**
-     * Create new ticket even when tickets already exist
-     * Triggered from "Create New Ticket Anyway" button in picker modal
-     * HEX-344 Step 5: Override handler
+     * Override the "Create New Ticket Anyway" button in device modal for location context
+     * HEX-344: Make button behavior match "Create Ticket" button (add all devices at location)
      *
-     * @param {Event} event - Click event
      * @param {string} locationKey - Location identifier
      */
-    createNewTicketAnyway(event, locationKey) {
-        logger.info("tickets", `Creating new ticket anyway for location: ${locationKey}`);
+    overrideModalCreateButton(locationKey) {
+        const modal = document.getElementById("ticketPickerModal");
+        if (!modal) {return;}
 
-        // Close picker modal
-        const modal = bootstrap.Modal.getInstance(document.getElementById("ticketPickerModal"));
-        if (modal) {
-            modal.hide();
+        // Find the "Create New Ticket Anyway" button
+        const createButton = modal.querySelector("button.btn-success");
+        if (!createButton) {
+            logger.warn("tickets", "Create button not found in modal");
+            return;
         }
 
         // Find the location card button to get device data
-        const button = document.querySelector(`[data-location-key="${locationKey}"]`);
-        if (!button) {
-            logger.error("ui", "Could not find location card button for new ticket creation");
+        const locationButton = document.querySelector(`[data-location-key="${locationKey}"]`);
+        if (!locationButton) {
+            logger.error("tickets", `Location button not found for ${locationKey}`);
             return;
         }
 
-        // Trigger regular create flow (but without checking ticket count)
-        const allDevices = JSON.parse(button.dataset.allDevices || "[]");
-        const site = button.dataset.site || "";
+        // Replace onclick to use location-based creation (all devices at location)
+        createButton.onclick = (event) => {
+            event.preventDefault();
+            logger.info("tickets", `Creating ticket with all devices at ${locationKey}`);
 
-        const ticketData = {
-            devices: allDevices.map(h => h.toUpperCase()),
-            site: site.toUpperCase(),
-            location: locationKey.toUpperCase(),
-            mode: "bulk-all",
-            timestamp: Date.now()
+            // Close modal
+            const bsModal = bootstrap.Modal.getInstance(modal);
+            if (bsModal) {
+                bsModal.hide();
+            }
+
+            // Get device data from location button
+            const allDevices = JSON.parse(locationButton.dataset.allDevices || "[]");
+            const site = locationButton.dataset.site || "";
+
+            // Build ticket data (same as TIER 3 in handleLocationTicketClick)
+            const ticketData = {
+                devices: allDevices.map(h => h.toUpperCase()),
+                site: site.toUpperCase(),
+                location: locationKey.toUpperCase(),
+                mode: "bulk-all",
+                timestamp: Date.now()
+            };
+
+            // Store and navigate
+            sessionStorage.setItem("createTicketData", JSON.stringify(ticketData));
+            sessionStorage.setItem("autoOpenModal", "true");
+            window.location.href = "/tickets.html";
         };
-
-        sessionStorage.setItem("createTicketData", JSON.stringify(ticketData));
-        sessionStorage.setItem("autoOpenModal", "true");
-        window.location.href = "/tickets.html";
     }
 
     /**

@@ -353,6 +353,41 @@ class TicketController {
     }
 
     /**
+     * Get all tickets for devices at a specific location
+     * HEX-344: Location cards multi-ticket modal support
+     * Enables location cards to show full ticket details (with xt_number) in picker modal
+     * @param {string} req.params.locationKey - Location prefix (e.g., "WTULSA", "LAXB1")
+     * @returns {Array} List of tickets at location with full details
+     */
+    static async getTicketsByLocation(req, res) {
+        try {
+            const controller = TicketController.getInstance();
+            const { locationKey } = req.params;
+
+            if (!locationKey) {
+                return res.status(400).json({
+                    success: false,
+                    error: "Location key parameter is required"
+                });
+            }
+
+            const tickets = await controller.ticketService.getTicketsByLocation(locationKey);
+            res.json({
+                success: true,
+                count: tickets.length,
+                tickets: tickets
+            });
+        } catch (error) {
+            console.error(`Error fetching tickets for location ${req.params.locationKey}:`, error);
+            res.status(500).json({
+                success: false,
+                error: "Failed to fetch tickets for location",
+                details: error.message
+            });
+        }
+    }
+
+    /**
      * Get address suggestions for autofill based on site and location
      * Returns most recent addresses (shipping and return) from matching tickets
      * Used by ticket creation form to auto-populate shipping/return address fields
