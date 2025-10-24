@@ -578,14 +578,16 @@ class LocationCardsManager {
         const uniqueTicketCount = locationTickets.size;
         const ticketArray = Array.from(locationTickets.values());
 
-        // Button state configuration (follows device-security-modal.js:1023-1044)
+        // Button state configuration (follows device-security-modal.js:1004-1012)
         let buttonText, buttonClass, buttonIcon;
         const statusColors = {
-            "New": "primary",
-            "In Progress": "warning",
-            "Waiting on Parts": "info",
-            "Complete": "success",
-            "Cancelled": "secondary"
+            "Pending": "warning",      // Amber yellow
+            "Staged": "info",          // Purple (using info as closest Bootstrap match)
+            "Open": "primary",         // Blue
+            "Overdue": "danger",       // Red
+            "Completed": "success",    // Green
+            "Failed": "danger",        // Orange-red
+            "Closed": "secondary"      // Gray
         };
 
         if (uniqueTicketCount === 0) {
