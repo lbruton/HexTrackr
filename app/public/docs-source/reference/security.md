@@ -2,7 +2,7 @@
 
 HexTrackr is designed with security as a foundational principle. This document provides comprehensive coverage of all security measures, controls, and implementations for corporate security review and compliance assessment.
 
-**Version**: v1.1.3
+**Version**: v1.1.5
 **Last Updated**: 2025-10-23
 
 ---
@@ -33,12 +33,16 @@ HexTrackr implements a defense-in-depth security strategy with multiple layers o
 
 **Location**: `app/services/authService.js`
 
-**Argon2id Configuration**:
+HexTrackr uses two different Argon2id configurations depending on context:
+
+**Production Authentication** (authService.js):
+
+Used for runtime password hashing during login, password changes, and admin password resets:
 
 ```javascript
 const argon2 = require("argon2");
 
-// Password hashing
+// Strong configuration for production password hashing
 const hash = await argon2.hash(password, {
     type: argon2.argon2id,    // Hybrid mode (side-channel + GPU resistant)
     memoryCost: 65536,        // 64 MiB memory cost
@@ -50,7 +54,25 @@ const hash = await argon2.hash(password, {
 const isValid = await argon2.verify(storedHash, password);
 ```
 
-**Security Strength**:
+This strong configuration provides robust protection for user passwords in production.
+
+**Admin Seeding** (init-database.js):
+
+Used only during initial database seeding:
+
+```javascript
+// Faster configuration for database initialization
+const hash = await argon2.hash(password, {
+    type: argon2.argon2id,
+    memoryCost: 19456,        // 19 MiB memory cost
+    timeCost: 2,              // 2 iterations
+    parallelism: 1            // 1 thread
+});
+```
+
+This faster configuration speeds up development workflows and database initialization. It is **not** used for runtime authentication.
+
+**Security Strength** (Production Configuration):
 - **Algorithm**: Argon2id (superior to bcrypt and scrypt)
 - **Memory Hardness**: 64 MiB makes GPU attacks impractical
 - **Time Cost**: 3 iterations balances security and performance

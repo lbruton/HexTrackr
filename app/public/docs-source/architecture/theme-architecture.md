@@ -677,28 +677,40 @@ cellRenderer: (params) => {
 
 ---
 
-## Documentation Theme Synchronization (v1.0.29)
+## Documentation Theme Synchronization
 
 ### JSDoc Dark Mode Integration
 
-HexTrackr's JSDoc developer documentation (`/app/dev-docs-html/`) includes automatic theme synchronization with the main application:
+HexTrackr's JSDoc developer documentation (`/app/dev-docs-html/`) includes automatic theme synchronization with the main application.
 
-**Implementation**:
+**Current Implementation (v1.1.5)**:
 - `inject-jsdoc-theme.js` - Node script that injects theme detection code into generated JSDoc HTML
-- `inject-jsdoc-theme-wrapper.sh` - Shell wrapper for reliable execution during build
-- Theme script reads from localStorage and applies `jsdoc-dark-theme` class
+- `html-content-updater.js` - Unified documentation workflow orchestrates theme injection
+- Theme script reads from localStorage (`hextrackr-theme`) and applies 350+ lines of dark mode CSS
+- Integrated into `npm run release` workflow for atomic documentation generation
 
 **Build Process**:
-1. JSDoc generates HTML documentation files
-2. Injection script processes all HTML files (121 files as of v1.0.29)
-3. Theme detection code is inserted into each file
-4. Documentation respects user's theme preference
+1. JSDoc generates HTML documentation files (185 files as of v1.1.5)
+2. `HtmlContentUpdater.injectJSDocTheme()` executes injection script
+3. Theme detection code is inserted before `</head>` tag in all HTML files
+4. Console output reports file count: `✅ JSDoc theme injection complete! (190 files processed)`
+5. Documentation automatically respects user's theme preference
 
-**Fixed in v1.0.29**:
-- Resolved issue where only 6 of 121 files had theme injection
-- Added progress logging and error handling
-- Ensured idempotent operation (safe to run multiple times)
-- Fixed JSON parsing for modern localStorage format
+**Theme Detection Logic**:
+```javascript
+// Checks localStorage for 'hextrackr-theme' key
+// Supports both JSON format {theme: "dark"} and legacy string format
+// Falls back to 'dark' as default
+// Applies comprehensive dark mode CSS variables if theme === 'dark'
+```
+
+**Evolution History**:
+- **v1.0.29** - Initial implementation with bash wrapper (fixed 6/121 → 121/121 files)
+- **v1.1.5** - Integrated into unified docs workflow (HEX-341 fix)
+  - Removed bash wrapper dependency
+  - Added to `html-content-updater.js` as Step 9
+  - Non-fatal error handling with clear logging
+  - 100% reliability (185/185 files processed)
 
 ---
 
@@ -714,4 +726,4 @@ HexTrackr's JSDoc developer documentation (`/app/dev-docs-html/`) includes autom
 
 ---
 
-*Last Updated: 2025-10-23 | Version: 3.0.0 | Audit: DOCS-52*
+*Last Updated: 2025-10-24 | Version: 3.1.0 | Audit: HEX-341*

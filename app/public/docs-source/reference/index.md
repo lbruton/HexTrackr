@@ -12,31 +12,6 @@
 
 - **[Troubleshooting Guide](./troubleshooting.md)**: Common issues and solutions for Docker & environment issues, database troubleshooting, import/export problems, frontend issues, API & WebSocket debugging, and performance diagnostics
 
-## Quick Reference
-
-### Performance Benchmarks
-
-- Page loads: < 2 seconds
-- API responses: < 500ms
-- Database queries: < 100ms
-- WebSocket messages: < 50ms
-- CSV processing: > 1000 rows/second
-
-### Debug Mode
-
-Enable detailed logging:
-
-```javascript
-localStorage.hextrackr_debug = "true";
-location.reload();
-```
-
-### Key Paths
-
-- Database: `data/hextrackr.db`
-- Backups: `backups/`
-- Uploads: `uploads/`
-- Documentation: `app/public/docs-html/`
 
 ## Related Documentation
 

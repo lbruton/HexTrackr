@@ -1,7 +1,7 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
     <h1>Security Overview</h1><p>HexTrackr is designed with security as a foundational principle. This document provides comprehensive coverage of all security measures, controls, and implementations for corporate security review and compliance assessment.</p>
-<p><strong>Version</strong>: v1.1.3<br><strong>Last Updated</strong>: 2025-10-23</p>
+<p><strong>Version</strong>: v1.1.5<br><strong>Last Updated</strong>: 2025-10-23</p>
 <hr>
 <h2>Security Architecture Overview</h2><p>HexTrackr implements a defense-in-depth security strategy with multiple layers of protection:</p>
 <ul>
@@ -18,10 +18,12 @@
 <h2>Authentication System</h2><p><strong>Since</strong>: v1.0.46 (HEX-133, HEX-128)<br><strong>Status</strong>: ✅ Fully Implemented</p>
 <h3>Password Security</h3><p><strong>Implementation</strong>: Argon2id password hashing (2015 Password Hashing Competition winner)</p>
 <p><strong>Location</strong>: <code>app/services/authService.js</code></p>
-<p><strong>Argon2id Configuration</strong>:</p>
+<p>HexTrackr uses two different Argon2id configurations depending on context:</p>
+<p><strong>Production Authentication</strong> (authService.js):</p>
+<p>Used for runtime password hashing during login, password changes, and admin password resets:</p>
 <pre><code class="language-javascript"><span class="hljs-keyword">const</span> argon2 = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;argon2&quot;</span>);
 
-<span class="hljs-comment">// Password hashing</span>
+<span class="hljs-comment">// Strong configuration for production password hashing</span>
 <span class="hljs-keyword">const</span> hash = <span class="hljs-keyword">await</span> argon2.<span class="hljs-title function_">hash</span>(password, {
     <span class="hljs-attr">type</span>: argon2.<span class="hljs-property">argon2id</span>,    <span class="hljs-comment">// Hybrid mode (side-channel + GPU resistant)</span>
     <span class="hljs-attr">memoryCost</span>: <span class="hljs-number">65536</span>,        <span class="hljs-comment">// 64 MiB memory cost</span>
@@ -30,7 +32,17 @@
 });
 
 <span class="hljs-comment">// Password verification (timing-safe comparison built-in)</span>
-<span class="hljs-keyword">const</span> isValid = <span class="hljs-keyword">await</span> argon2.<span class="hljs-title function_">verify</span>(storedHash, password);</code></pre><p><strong>Security Strength</strong>:</p>
+<span class="hljs-keyword">const</span> isValid = <span class="hljs-keyword">await</span> argon2.<span class="hljs-title function_">verify</span>(storedHash, password);</code></pre><p>This strong configuration provides robust protection for user passwords in production.</p>
+<p><strong>Admin Seeding</strong> (init-database.js):</p>
+<p>Used only during initial database seeding:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Faster configuration for database initialization</span>
+<span class="hljs-keyword">const</span> hash = <span class="hljs-keyword">await</span> argon2.<span class="hljs-title function_">hash</span>(password, {
+    <span class="hljs-attr">type</span>: argon2.<span class="hljs-property">argon2id</span>,
+    <span class="hljs-attr">memoryCost</span>: <span class="hljs-number">19456</span>,        <span class="hljs-comment">// 19 MiB memory cost</span>
+    <span class="hljs-attr">timeCost</span>: <span class="hljs-number">2</span>,              <span class="hljs-comment">// 2 iterations</span>
+    <span class="hljs-attr">parallelism</span>: <span class="hljs-number">1</span>            <span class="hljs-comment">// 1 thread</span>
+});</code></pre><p>This faster configuration speeds up development workflows and database initialization. It is <strong>not</strong> used for runtime authentication.</p>
+<p><strong>Security Strength</strong> (Production Configuration):</p>
 <ul>
 <li><strong>Algorithm</strong>: Argon2id (superior to bcrypt and scrypt)</li>
 <li><strong>Memory Hardness</strong>: 64 MiB makes GPU attacks impractical</li>

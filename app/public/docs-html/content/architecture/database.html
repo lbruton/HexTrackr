@@ -57,6 +57,9 @@
     vulnerabilities }o..o| cisco_advisories : "LEFT JOIN on cve"
     vulnerabilities }o..o| palo_alto_advisories : "LEFT JOIN on cve"
 
+    %% Cisco Fixed Versions Normalization
+    cisco_advisories ||--o{ cisco_fixed_versions : "normalized_versions"
+
     %% Ticket-Vulnerability Junction
     tickets ||--o{ ticket_vulnerabilities : "links"
     vulnerabilities_current ||--o{ ticket_vulnerabilities : "links"
@@ -281,6 +284,43 @@
         TEXT product_name
         TEXT publication_url
         TIMESTAMP last_synced
+    }
+
+    cisco_fixed_versions {
+        INTEGER id
+        TEXT cve_id
+        TEXT os_family
+        TEXT fixed_version
+        TEXT affected_version
+        TIMESTAMP last_synced
+    }
+
+    audit_logs {
+        INTEGER id
+        TEXT category
+        DATETIME timestamp
+        TEXT user_id
+        TEXT username
+        TEXT ip_address
+        TEXT user_agent
+        TEXT request_id
+        BLOB encrypted_message
+        BLOB encrypted_data
+        BLOB encryption_iv
+        DATETIME created_at
+    }
+
+    audit_log_config {
+        INTEGER id
+        BLOB encryption_key
+        DATETIME key_created_at
+        DATETIME key_rotated_at
+        INTEGER retention_days
+        DATETIME last_cleanup_at
+        INTEGER total_logs_written
+        INTEGER total_logs_purged
+        DATETIME created_at
+        DATETIME updated_at
     }
 
     tickets {
