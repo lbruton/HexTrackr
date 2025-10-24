@@ -763,6 +763,53 @@ class TicketService {
     }
 
     /**
+     * Get all tickets for devices at a specific location
+     * HEX-344: Location cards multi-ticket modal support
+     * Fetches full ticket objects (including xt_number) for all devices at a location
+     * Uses LIKE query to match location prefix (e.g., "WTULSA%" matches WTULSA-RTR-01, WTULSA-SW-02)
+     * @param {string} locationPrefix - Location prefix to match (e.g., "WTULSA", "LAXB1")
+     * @returns {Promise<Array>} List of tickets at location, sorted by creation date (newest first)
+     * @example
+     * // Returns: [{id, xt_number, job_type, created_at, status, devices: [...]}]
+     */
+    async getTicketsByLocation(locationPrefix) {
+        return new Promise((resolve, reject) => {
+            // Use LIKE with % wildcard to match location prefix
+            // DISTINCT ensures we don't get duplicate tickets when multiple devices from same location are on one ticket
+            const query = `
+                SELECT DISTINCT t.*
+                FROM tickets t, json_each(t.devices) AS device
+                WHERE lower(device.value) LIKE lower(?)
+                  AND t.deleted = 0
+                  AND t.status NOT IN ('Completed', 'Cancelled')
+                ORDER BY t.created_at DESC
+            `;
+
+            // Add % wildcard to match any device starting with location prefix
+            const searchPattern = `${locationPrefix}%`;
+
+            this.db.all(query, [searchPattern], (err, rows) => {
+                if (err) {
+                    return reject(new Error(`Failed to fetch tickets for location ${locationPrefix}: ${err.message}`));
+                }
+
+                // Parse devices JSON for each ticket
+                const tickets = rows.map(row => {
+                    try {
+                        row.devices = JSON.parse(row.devices);
+                    } catch (parseError) {
+                        _log("error", `Failed to parse devices for ticket ${row.id}:`, parseError);
+                        row.devices = [];
+                    }
+                    return row;
+                });
+
+                resolve(tickets);
+            });
+        });
+    }
+
+    /**
      * Get ticket summary for multiple devices in a single query (batch lookup)
      * HEX-216: Performance optimization to replace N+1 HTTP requests
      * @param {Array<string>} hostnames - Array of device hostnames
@@ -831,7 +878,6 @@ class TicketService {
                     SELECT DISTINCT
                         lower(device.value) as hostname,
                         t.id,
-                        t.xt_number,
                         t.status,
                         t.job_type,
                         t.created_at
@@ -869,7 +915,7 @@ class TicketService {
                     });
 
                     // Add ticket details (status, job type, IDs) for each device
-                    // Group by hostname and collect all ticket IDs with xt_number
+                    // Group by hostname and collect all ticket IDs
                     const ticketMap = {};
                     detailRows.forEach(row => {
                         if (!ticketMap[row.hostname]) {
@@ -879,10 +925,7 @@ class TicketService {
                                 tickets: []
                             };
                         }
-                        ticketMap[row.hostname].tickets.push({
-                            id: row.id,
-                            xt_number: row.xt_number
-                        });
+                        ticketMap[row.hostname].tickets.push(row.id);
                     });
 
                     // Merge ticket data into result
