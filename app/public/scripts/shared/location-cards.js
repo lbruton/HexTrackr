@@ -565,9 +565,11 @@ class LocationCardsManager {
             // CRITICAL: Use lowercase for lookup (backend returns lowercase keys)
             const ticketData = ticketMap[hostname.toLowerCase()] || { count: 0, tickets: [] };
             if (ticketData.count > 0) {
-                ticketData.tickets.forEach(ticketId => {
-                    locationTickets.set(ticketId, {
-                        id: ticketId,
+                ticketData.tickets.forEach(ticket => {
+                    // ticket is now {id, xt_number} object from backend
+                    locationTickets.set(ticket.id, {
+                        id: ticket.id,
+                        xt_number: ticket.xt_number,
                         status: ticketData.status,
                         jobType: ticketData.jobType
                     });
@@ -722,13 +724,15 @@ class LocationCardsManager {
             `;
         }
 
-        // Status colors for badges
+        // Status colors for badges (matches device-security-modal.js:1004-1012)
         const statusColors = {
-            "New": "primary",
-            "In Progress": "warning",
-            "Waiting on Parts": "info",
-            "Complete": "success",
-            "Cancelled": "secondary"
+            "Pending": "warning",      // Amber yellow
+            "Staged": "info",          // Purple
+            "Open": "primary",         // Blue
+            "Overdue": "danger",       // Red
+            "Completed": "success",    // Green
+            "Failed": "danger",        // Orange-red
+            "Closed": "secondary"      // Gray
         };
 
         // Build ticket list HTML with radio buttons
@@ -748,7 +752,7 @@ class LocationCardsManager {
                                    value="${ticket.id}"
                                    ${index === 0 ? "checked" : ""}>
                             <label class="form-check-label" for="ticket-radio-${ticket.id}">
-                                <strong>Ticket #${ticket.id}</strong>
+                                <strong>${ticket.xt_number || `Ticket #${ticket.id}`}</strong>
                             </label>
                         </div>
                         <div>
