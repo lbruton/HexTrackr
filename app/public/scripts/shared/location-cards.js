@@ -872,11 +872,19 @@ class LocationCardsManager {
             // Backend ticketService.js:822 returns lowercase keys
             const normalizedHostnames = hostnames.map(h => h.toLowerCase());
 
+            // Get CSRF token first (required for POST requests)
+            const csrfResponse = await fetch("/api/auth/csrf", {
+                credentials: "include"
+            });
+            const { csrfToken } = await csrfResponse.json();
+
             const response = await fetch("/api/tickets/batch-device-lookup", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "x-csrf-token": csrfToken
                 },
+                credentials: "include",
                 body: JSON.stringify({ hostnames: normalizedHostnames })
             });
 
