@@ -1,0 +1,61 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <h1>Version 1.1.6</h1><hr>
+<h2>[1.1.6]</h2><h3>Fixed</h3><h4>Location Cards Multi-Ticket Modal Data Display (HEX-344) - 2025-10-24</h4><p><strong>Issue</strong>: Location cards showed &quot;placeholder information&quot; in multi-ticket picker modal instead of proper ticket details.</p>
+<p><strong>Symptoms</strong>:</p>
+<ul>
+<li>Displayed timestamp IDs like &quot;Ticket #1761280480398&quot; instead of XT numbers (&quot;XT-0046&quot;)</li>
+<li>All tickets showed same status/job type (only most recent ticket&#39;s metadata)</li>
+<li>Missing creation dates</li>
+<li>Radio button selection pattern instead of direct-click navigation</li>
+</ul>
+<p><strong>Root Cause</strong>: Location cards used batch lookup API response which returns summary metadata <code>{id, status, jobType}</code> for performance optimization, not full ticket objects <code>{id, xt_number, job_type, created_at, status}</code>. A duplicate modal implementation (<code>showLocationTicketPickerModal</code>) was built using this incomplete data instead of reusing the working device cards modal.</p>
+<p><strong>Solution</strong>:</p>
+<ul>
+<li>Added backend <code>getTicketsByLocation()</code> method to fetch full ticket details by location prefix</li>
+<li>Location cards now fetch complete ticket data on-demand and reuse device cards modal directly</li>
+<li>Eliminated 119 lines of duplicate modal code</li>
+<li>Overridden &quot;Create New Ticket Anyway&quot; button to add all location devices (not just location name)</li>
+</ul>
+<p><strong>Technical Implementation</strong>:</p>
+<ul>
+<li>Backend query uses <code>LIKE</code> pattern matching with <code>DISTINCT</code> to find all tickets for devices at location</li>
+<li>Frontend calls device modal after async fetch, then overrides button onclick handler</li>
+<li>Both modals now share identical UX and data structure</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/services/ticketService.js</code>: Added <code>getTicketsByLocation(locationPrefix)</code> method (45 lines)</li>
+<li><code>app/controllers/ticketController.js</code>: Added <code>getTicketsByLocation()</code> route handler (28 lines)</li>
+<li><code>app/routes/tickets.js</code>: Registered <code>GET /location/:locationKey</code> endpoint (1 line)</li>
+<li><code>app/public/scripts/shared/location-cards.js</code>: Replaced duplicate modal with <code>fetchAndShowLocationTicketModal()</code> and <code>overrideModalCreateButton()</code>, deleted 119 lines of duplicate code</li>
+</ul>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li>✅ Location cards show proper XT numbers in multi-ticket modal</li>
+<li>✅ Each ticket displays individual status, job type, and creation date</li>
+<li>✅ Direct-click navigation (no radio buttons)</li>
+<li>✅ &quot;Create New Ticket Anyway&quot; button adds all location devices</li>
+<li>✅ Identical UX to device cards modal</li>
+<li>✅ No console errors or warnings</li>
+<li>✅ Passes ESLint validation</li>
+</ul>
+<p><strong>Issues</strong>:</p>
+<ul>
+<li><a href="https://linear.app/hextrackr/issue/HEX-344">HEX-344</a> - Location Card Ticket Buttons</li>
+</ul>
+<hr>
+<h2>Notes</h2><h3>Performance Impact</h3><p><strong>Positive</strong>: Eliminated 119 lines of duplicate code, reducing maintenance burden and future bug surface area.</p>
+<p><strong>Trade-off</strong>: Location multi-ticket modal now makes additional API call to fetch full ticket details (only triggered when user clicks &quot;View Tickets&quot; on locations with 2+ tickets). This is acceptable because:</p>
+<ul>
+<li>Only affects rare case (most locations have 0-1 tickets)</li>
+<li>Preserves batch API&#39;s performance optimization for initial card rendering</li>
+<li>Matches device cards pattern (consistency is more valuable than micro-optimization)</li>
+</ul>
+<hr>
+<p><em>Version 1.1.6 | Released: 2025-10-24</em></p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
