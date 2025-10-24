@@ -831,6 +831,7 @@ class TicketService {
                     SELECT DISTINCT
                         lower(device.value) as hostname,
                         t.id,
+                        t.xt_number,
                         t.status,
                         t.job_type,
                         t.created_at
@@ -868,7 +869,7 @@ class TicketService {
                     });
 
                     // Add ticket details (status, job type, IDs) for each device
-                    // Group by hostname and collect all ticket IDs
+                    // Group by hostname and collect all ticket IDs with xt_number
                     const ticketMap = {};
                     detailRows.forEach(row => {
                         if (!ticketMap[row.hostname]) {
@@ -878,7 +879,10 @@ class TicketService {
                                 tickets: []
                             };
                         }
-                        ticketMap[row.hostname].tickets.push(row.id);
+                        ticketMap[row.hostname].tickets.push({
+                            id: row.id,
+                            xt_number: row.xt_number
+                        });
                     });
 
                     // Merge ticket data into result
