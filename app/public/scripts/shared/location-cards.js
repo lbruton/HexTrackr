@@ -195,8 +195,10 @@ class LocationCardsManager {
         // Get current page data
         const paginatedLocations = this.pagination.getCurrentPageData(this.filteredData);
 
-        // Render cards
-        container.innerHTML = this.generateLocationCardsHTML(paginatedLocations);
+        // Render cards (now async - HEX-344 Step 2)
+        this.generateLocationCardsHTML(paginatedLocations).then(html => {
+            container.innerHTML = html;
+        });
 
         // Render top controls (sort + items per page)
         // Standardized to match device/vulnerability cards naming
@@ -291,10 +293,11 @@ class LocationCardsManager {
 
     /**
      * Generate HTML for location cards with VPR mini-cards and vendor icons
+     * HEX-344: Now async to support batch ticket lookup
      * @param {Array} locations - Array of location stat objects
-     * @returns {string} HTML string for location cards
+     * @returns {Promise<string>} HTML string for location cards
      */
-    generateLocationCardsHTML(locations) {
+    async generateLocationCardsHTML(locations) {
         if (!locations || locations.length === 0) {
             return `
                 <div class="col-12">
@@ -305,6 +308,10 @@ class LocationCardsManager {
                 </div>
             `;
         }
+
+        // HEX-344 Step 2: Fetch ticket data for all devices across all locations
+        const allHostnames = locations.flatMap(loc => loc.device_hostnames || []);
+        const ticketMap = await this.checkTicketStatusBatch(allHostnames);
 
         return locations.map(location => {
             const totalVPR = location.total_vpr || 0;
@@ -448,10 +455,7 @@ class LocationCardsManager {
 
                         <div class="card-actions">
                             <span class="text-info font-monospace" style="font-size: 0.875rem;">${network}</span>
-                            <button class="btn btn-outline-info" style="font-size: 0.875rem; padding: 0.375rem 0.75rem;"
-                                    onclick="event.stopPropagation(); window.locationDetailsModal?.showLocationDetails(JSON.parse(this.closest('.card').dataset.location), window.vulnManager?.dataManager)">
-                                <i class="fas fa-eye me-1"></i>View Site Details
-                            </button>
+                            ${this.generateTicketButton(location, ticketMap)}
                         </div>
                     </div>
                 </div>
@@ -537,6 +541,354 @@ class LocationCardsManager {
         return mostCommon;
     }
 
+    /**
+     * Generate ticket button HTML for a location card
+     * Follows device card pattern from vulnerability-cards.js
+     * HEX-344 Step 3: Dynamic button based on ticket count
+     *
+     * @param {Object} location - Location data object
+     * @param {Object} ticketMap - Map of hostname to ticket data (from batch lookup)
+     * @returns {string} Button HTML
+     */
+    generateTicketButton(location, ticketMap) {
+        // Get ticket counts for ALL devices at this location
+        const deviceHostnames = location.device_hostnames || [];
+        const locationTickets = new Map(); // Track unique tickets
+
+        deviceHostnames.forEach(hostname => {
+            // CRITICAL: Use lowercase for lookup (backend returns lowercase keys)
+            const ticketData = ticketMap[hostname.toLowerCase()] || { count: 0, tickets: [] };
+            if (ticketData.count > 0) {
+                ticketData.tickets.forEach(ticketId => {
+                    locationTickets.set(ticketId, {
+                        id: ticketId,
+                        status: ticketData.status,
+                        jobType: ticketData.jobType
+                    });
+                });
+            }
+        });
+
+        const uniqueTicketCount = locationTickets.size;
+        const ticketArray = Array.from(locationTickets.values());
+
+        // Button state configuration (follows device-security-modal.js:1023-1044)
+        let buttonText, buttonClass, buttonIcon;
+        const statusColors = {
+            "New": "primary",
+            "In Progress": "warning",
+            "Waiting on Parts": "info",
+            "Complete": "success",
+            "Cancelled": "secondary"
+        };
+
+        if (uniqueTicketCount === 0) {
+            buttonText = "Create Ticket";
+            buttonClass = "btn-outline-success";
+            buttonIcon = "fas fa-ticket-alt";
+        } else if (uniqueTicketCount === 1) {
+            const ticket = ticketArray[0];
+            const statusColor = statusColors[ticket.status] || "secondary";
+            buttonText = "View Ticket";
+            buttonClass = `btn-outline-${statusColor}`;
+            buttonIcon = "fas fa-folder-open";
+        } else {
+            // Use most recent ticket's status for color
+            const ticket = ticketArray[0];
+            const statusColor = statusColors[ticket.status] || "secondary";
+            buttonText = `View Tickets (${uniqueTicketCount})`;
+            buttonClass = `btn-outline-${statusColor}`;
+            buttonIcon = "fas fa-layer-group";
+        }
+
+        // Escape data for HTML attributes
+        const locationKey = location.location || "";
+        const escapedLocation = locationKey.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+        const ticketsJson = JSON.stringify(ticketArray).replace(/"/g, "&quot;");
+
+        return `
+            <button class="btn ${buttonClass} location-ticket-btn"
+                    style="font-size: 0.875rem; padding: 0.375rem 0.75rem;"
+                    data-location-key="${escapedLocation}"
+                    data-site="${location.site || ""}"
+                    data-ticket-count="${uniqueTicketCount}"
+                    data-tickets="${ticketsJson}"
+                    data-kev-devices="${JSON.stringify(location.kev_devices || []).replace(/"/g, "&quot;")}"
+                    data-all-devices="${JSON.stringify(deviceHostnames).replace(/"/g, "&quot;")}"
+                    onclick="event.stopPropagation(); window.locationCardsManager.handleLocationTicketClick(event, this)">
+                <i class="${buttonIcon} me-1"></i>${buttonText}
+            </button>
+        `;
+    }
+
+    /**
+     * Handle ticket button click on location card
+     * Implements 3-tier navigation: 0 tickets → Create, 1 → View, 2+ → Picker modal
+     * Supports keyboard shortcuts: Cmd+Shift for KEV-only filtering
+     * HEX-344 Step 4: Click handler with location context
+     *
+     * @param {Event} event - Click event (needed for keyboard modifiers)
+     * @param {HTMLElement} button - Button element that was clicked
+     */
+    handleLocationTicketClick(event, button) {
+        event.stopPropagation(); // Prevent card click
+
+        // Read data from button dataset
+        const ticketCount = parseInt(button.dataset.ticketCount) || 0;
+        const tickets = button.dataset.tickets ? JSON.parse(button.dataset.tickets) : [];
+        const site = button.dataset.site || "";
+        const locationKey = button.dataset.locationKey || "";
+
+        // TIER 1: Single ticket exists → Direct navigation
+        if (ticketCount === 1) {
+            const ticketId = tickets[0].id;
+            logger.info("tickets", `Navigating to single ticket: ${ticketId}`);
+            window.location.href = `/tickets.html?openTicket=${ticketId}`;
+            return;
+        }
+
+        // TIER 2: Multiple tickets exist → Show picker modal
+        if (ticketCount > 1) {
+            logger.info("tickets", `Showing picker for ${ticketCount} tickets at ${locationKey}`);
+            this.showLocationTicketPickerModal(locationKey, tickets);
+            return;
+        }
+
+        // TIER 3: No tickets exist → Create new ticket
+        logger.info("tickets", "Creating new ticket for location", { site, locationKey });
+
+        // Parse device lists from button data
+        const allDevices = JSON.parse(button.dataset.allDevices || "[]");
+        const kevDevices = JSON.parse(button.dataset.kevDevices || "[]");
+
+        // Determine mode based on keyboard modifiers
+        let mode = "bulk-all"; // Default: all devices at location
+        let deviceList = allDevices.map(h => h.toUpperCase()); // UPPERCASE for ticket form
+
+        // Cmd+Shift or Ctrl+Shift → KEV devices only
+        if ((event.metaKey || event.ctrlKey) && event.shiftKey) {
+            mode = "bulk-kev";
+            deviceList = kevDevices.map(d => d.hostname.toUpperCase());
+            logger.info("tickets", `[KEV Filter] Creating ticket with ${deviceList.length} KEV devices`);
+        } else {
+            logger.info("tickets", `Creating ticket with ${deviceList.length} devices at ${locationKey}`);
+        }
+
+        // Build sessionStorage data for ticket creation
+        const ticketData = {
+            devices: deviceList,              // UPPERCASE hostnames
+            site: site.toUpperCase(),         // UPPERCASE site
+            location: locationKey.toUpperCase(), // UPPERCASE location
+            mode: mode,
+            timestamp: Date.now()
+        };
+
+        // Store in sessionStorage and navigate to tickets page
+        sessionStorage.setItem("createTicketData", JSON.stringify(ticketData));
+        sessionStorage.setItem("autoOpenModal", "true");
+        window.location.href = "/tickets.html";
+    }
+
+    /**
+     * Show ticket picker modal when 2+ tickets exist for a location
+     * Reuses existing #ticketPickerModal from vulnerabilities.html
+     * HEX-344 Step 5: Multi-ticket picker modal
+     *
+     * @param {string} locationKey - Location identifier (e.g., "LAXB1")
+     * @param {Array} tickets - Array of ticket objects [{id, status, jobType}, ...]
+     */
+    showLocationTicketPickerModal(locationKey, tickets) {
+        const modalElement = document.getElementById("ticketPickerModal");
+        const modalBody = document.getElementById("ticketPickerModalBody");
+        const modalTitle = document.querySelector("#ticketPickerModal .modal-title");
+
+        if (!modalElement || !modalBody) {
+            logger.error("ui", "Ticket picker modal elements not found");
+            return;
+        }
+
+        // Update modal title to show location context
+        if (modalTitle) {
+            modalTitle.innerHTML = `
+                <i class="fas fa-layer-group me-2"></i>
+                Tickets at ${locationKey.toUpperCase()}
+            `;
+        }
+
+        // Status colors for badges
+        const statusColors = {
+            "New": "primary",
+            "In Progress": "warning",
+            "Waiting on Parts": "info",
+            "Complete": "success",
+            "Cancelled": "secondary"
+        };
+
+        // Build ticket list HTML with radio buttons
+        const ticketListHtml = tickets.map((ticket, index) => {
+            const statusColor = statusColors[ticket.status] || "secondary";
+
+            return `
+                <div class="list-group-item list-group-item-action"
+                     style="cursor: pointer;"
+                     onclick="document.getElementById('ticket-radio-${ticket.id}').checked = true;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="form-check">
+                            <input class="form-check-input"
+                                   type="radio"
+                                   name="selected-location-ticket"
+                                   id="ticket-radio-${ticket.id}"
+                                   value="${ticket.id}"
+                                   ${index === 0 ? "checked" : ""}>
+                            <label class="form-check-label" for="ticket-radio-${ticket.id}">
+                                <strong>Ticket #${ticket.id}</strong>
+                            </label>
+                        </div>
+                        <div>
+                            <span class="badge bg-${statusColor}">${ticket.status}</span>
+                            ${ticket.jobType ? `<span class="badge bg-secondary ms-1">${ticket.jobType}</span>` : ""}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join("");
+
+        modalBody.innerHTML = `
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                This location has <strong>${tickets.length} tickets</strong>. Select one to view, or create a new ticket.
+            </div>
+            <div class="list-group mb-3">
+                ${ticketListHtml}
+            </div>
+            <div class="d-grid gap-2">
+                <button class="btn btn-outline-success"
+                        onclick="window.locationCardsManager.createNewTicketAnyway(event, '${locationKey.replace(/'/g, "\\'")}')">
+                    <i class="fas fa-plus me-1"></i>Create New Ticket Anyway
+                </button>
+            </div>
+        `;
+
+        // Store context for view button
+        window.selectedLocationTicketContext = { locationKey, tickets };
+
+        // Show modal
+        const bsModal = new bootstrap.Modal(modalElement);
+        bsModal.show();
+
+        // Wire up view button (should already exist in modal footer)
+        const viewButton = modalElement.querySelector("[data-action=\"view-selected-ticket\"]");
+        if (viewButton) {
+            viewButton.onclick = () => this.viewSelectedLocationTicket();
+        }
+    }
+
+    /**
+     * View the selected ticket from picker modal
+     * HEX-344 Step 5: Modal navigation helper
+     */
+    viewSelectedLocationTicket() {
+        const selectedRadio = document.querySelector("input[name=\"selected-location-ticket\"]:checked");
+
+        if (!selectedRadio) {
+            logger.warn("ui", "No ticket selected from picker");
+            return;
+        }
+
+        const ticketId = selectedRadio.value;
+        logger.info("tickets", `Navigating to selected ticket: ${ticketId}`);
+
+        // Close modal and navigate
+        const modal = bootstrap.Modal.getInstance(document.getElementById("ticketPickerModal"));
+        if (modal) {
+            modal.hide();
+        }
+
+        window.location.href = `/tickets.html?openTicket=${ticketId}`;
+    }
+
+    /**
+     * Create new ticket even when tickets already exist
+     * Triggered from "Create New Ticket Anyway" button in picker modal
+     * HEX-344 Step 5: Override handler
+     *
+     * @param {Event} event - Click event
+     * @param {string} locationKey - Location identifier
+     */
+    createNewTicketAnyway(event, locationKey) {
+        logger.info("tickets", `Creating new ticket anyway for location: ${locationKey}`);
+
+        // Close picker modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById("ticketPickerModal"));
+        if (modal) {
+            modal.hide();
+        }
+
+        // Find the location card button to get device data
+        const button = document.querySelector(`[data-location-key="${locationKey}"]`);
+        if (!button) {
+            logger.error("ui", "Could not find location card button for new ticket creation");
+            return;
+        }
+
+        // Trigger regular create flow (but without checking ticket count)
+        const allDevices = JSON.parse(button.dataset.allDevices || "[]");
+        const site = button.dataset.site || "";
+
+        const ticketData = {
+            devices: allDevices.map(h => h.toUpperCase()),
+            site: site.toUpperCase(),
+            location: locationKey.toUpperCase(),
+            mode: "bulk-all",
+            timestamp: Date.now()
+        };
+
+        sessionStorage.setItem("createTicketData", JSON.stringify(ticketData));
+        sessionStorage.setItem("autoOpenModal", "true");
+        window.location.href = "/tickets.html";
+    }
+
+    /**
+     * Check ticket status for multiple devices in a single batch API call
+     * Performance optimization: HEX-216 batch lookup pattern
+     * Case-insensitive hostname handling: HEX-190 lessons learned
+     *
+     * @param {Array<string>} hostnames - Array of device hostnames to check
+     * @returns {Promise<Object>} Map of hostname (lowercase) to ticket data
+     *   Example: { "lax-fw01": { count: 2, status: "In Progress", jobType: "Firmware", tickets: [123, 456] } }
+     */
+    async checkTicketStatusBatch(hostnames) {
+        if (!hostnames || hostnames.length === 0) {
+            return {};
+        }
+
+        try {
+            // CRITICAL: Normalize hostnames to lowercase for API call
+            // Backend ticketService.js:822 returns lowercase keys
+            const normalizedHostnames = hostnames.map(h => h.toLowerCase());
+
+            const response = await fetch("/api/tickets/batch-device-lookup", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ hostnames: normalizedHostnames })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Batch ticket lookup failed: ${response.status}`);
+            }
+
+            const result = await response.json();
+
+            // Backend returns { success: true, data: { hostname: {count, status, ...} } }
+            // CRITICAL: Keys are lowercase in response
+            return result.data || {};
+        } catch (error) {
+            logger.error("tickets", "Failed to fetch batch ticket status", error);
+            return {}; // Return empty map on error - don't break card render
+        }
+    }
 
     /**
      * Update pagination info text
@@ -632,13 +984,13 @@ window.showLocationKevModal = function(location, kevDevices) {
             <div class="list-group-item list-group-item-action"
                  style="cursor: pointer;"
                  onclick="window.selectLocationKevDevice('${device.hostname}')"
-                 id="location-kev-item-${device.hostname.replace(/[^a-zA-Z0-9]/g, '-')}">
+                 id="location-kev-item-${device.hostname.replace(/[^a-zA-Z0-9]/g, "-")}">
                 <div class="row align-items-center g-2">
                     <div class="col-auto d-flex align-items-center">
                         <input type="radio" name="selected-location-kev-device"
                                class="form-check-input"
                                value="${device.hostname}"
-                               ${index === 0 ? 'checked' : ''}
+                               ${index === 0 ? "checked" : ""}
                                onclick="event.stopPropagation(); window.selectLocationKevDevice('${device.hostname}');">
                     </div>
                     <div class="col d-flex align-items-center">
@@ -727,7 +1079,7 @@ window.viewSelectedLocationKevDevice = function() {
     logger.info("ui", "Opening device details for:", window.selectedLocationKevDevice);
 
     // Close the location KEV modal
-    const locationKevModal = bootstrap.Modal.getInstance(document.getElementById('locationKevModal'));
+    const locationKevModal = bootstrap.Modal.getInstance(document.getElementById("locationKevModal"));
     if (locationKevModal) {
         locationKevModal.hide();
     }
@@ -735,15 +1087,15 @@ window.viewSelectedLocationKevDevice = function() {
     // Wait for modal to close, then open device details
     setTimeout(() => {
         // Clean up any stray modal backdrops
-        document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
-        document.body.classList.remove('modal-open');
-        document.body.style.overflow = '';
-        document.body.style.paddingRight = '';
+        document.querySelectorAll(".modal-backdrop").forEach(backdrop => backdrop.remove());
+        document.body.classList.remove("modal-open");
+        document.body.style.overflow = "";
+        document.body.style.paddingRight = "";
 
         // Open the device details modal
-        if (window.vulnManager && typeof window.vulnManager.viewDeviceDetails === 'function') {
+        if (window.vulnManager && typeof window.vulnManager.viewDeviceDetails === "function") {
             window.vulnManager.viewDeviceDetails(window.selectedLocationKevDevice);
-        } else if (window.openDeviceModal && typeof window.openDeviceModal === 'function') {
+        } else if (window.openDeviceModal && typeof window.openDeviceModal === "function") {
             window.openDeviceModal(window.selectedLocationKevDevice);
         } else {
             logger.error("ui", "Device modal functions not available");
@@ -759,7 +1111,7 @@ window.returnToLocationKevPicker = function() {
     logger.debug("ui", "Returning to location KEV picker modal");
 
     // Close the KEV details modal
-    const kevDetailsModal = bootstrap.Modal.getInstance(document.getElementById('kevDetailsModal'));
+    const kevDetailsModal = bootstrap.Modal.getInstance(document.getElementById("kevDetailsModal"));
     if (kevDetailsModal) {
         kevDetailsModal.hide();
     }
@@ -767,10 +1119,10 @@ window.returnToLocationKevPicker = function() {
     // Wait for modal to close, then re-open location picker
     setTimeout(() => {
         // Clean up any stray modal backdrops
-        document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
-        document.body.classList.remove('modal-open');
-        document.body.style.overflow = '';
-        document.body.style.paddingRight = '';
+        document.querySelectorAll(".modal-backdrop").forEach(backdrop => backdrop.remove());
+        document.body.classList.remove("modal-open");
+        document.body.style.overflow = "";
+        document.body.style.paddingRight = "";
 
         // Re-open the location KEV picker modal with stored context
         if (window.locationKevPickerContext) {
