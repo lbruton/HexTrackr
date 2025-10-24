@@ -95,7 +95,7 @@ By default, background sync is **enabled**. To control it:
 
 **Option B: Manual**
 - Click **"Sync Now"** button in Settings
-- Wait ~6 minutes for 126 CVEs to process
+- Sync time varies based on your Cisco CVE count (typically 5-15 minutes)
 - Statistics update automatically when complete
 
 ---
@@ -136,7 +136,7 @@ Example: ["12.2(22)S1", "12.2(30)S", "15.3(3)S8", ...]
 - Processes CVEs one at a time (no parallel batching)
 - 3-second delay between each CVE
 - Each CVE requires 2 API calls (6 seconds total per CVE)
-- 126 CVEs × 3s = ~6 minutes total sync time
+- Sync time varies based on Cisco CVE count in your environment
 
 **Why Not Parallel?**
 - Parallel batch processing triggered 429 errors after ~19 CVEs
@@ -318,37 +318,16 @@ If you see "429 Too Many Requests" in logs:
 ### 504 Gateway Timeout
 
 If sync times out in browser but continues in background:
-- This is normal for the first sync (~6 minutes for 126 CVEs)
+- This is normal for the first sync (typically 5-15 minutes depending on CVE count)
 - Nginx configured for 10-minute timeout
 - Check logs to see sync completion: `docker-compose logs hextrackr-app`
 
 ### No Fixed Versions Found
 
-**13.4% of CVEs don't have fixed versions** (by design):
+**Some CVEs don't have fixed versions** (by design):
 - Some vulnerabilities are configuration issues (no software patch)
 - Some affect end-of-life products (no fix available)
 - Cisco's Software Checker API returns empty array
-
----
-
-## Statistics (As of v1.0.63)
-
-**Current Sync Results** (126 CVEs tested):
-- Total Advisories Synced: 82
-- With Fixed Versions: 71 (86.6%)
-- Without Fixed Versions: 11 (13.4%)
-- Average Fixed Versions per CVE: 28.3
-- Top CVE: CVE-2021-1392 with 65 fixed versions
-
-**Sample Advisory**:
-```
-CVE-2017-3881: Cisco IOS Cluster Management Protocol RCE
-├── Advisory: cisco-sa-20170317-cmp
-├── Fixed Versions: 20 total
-│   ├── Minimum: 12.2(22)S1
-│   ├── Also: 12.2(30)S, 15.3(3)S8, 12.2(31)SB13, ...
-└── UI Display: "Fixed in: 12.2(22)S1 or later"
-```
 
 ---
 

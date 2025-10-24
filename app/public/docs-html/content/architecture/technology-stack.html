@@ -24,11 +24,11 @@
 <h3>UI Frameworks & Libraries</h3><ul>
 <li><strong>Bootstrap 5.x</strong> - Responsive CSS framework</li>
 <li><strong>Tabler.io</strong> - Dashboard UI theme and components</li>
-<li><strong>AG-Grid Community 33.3.2</strong> - Enterprise-grade data grid with infinite scroll</li>
-<li><strong>ApexCharts 3.x</strong> - Interactive charts and data visualization</li>
+<li><strong>AG-Grid Community 32.2</strong> - Enterprise-grade data grid with infinite scroll</li>
+<li><strong>ApexCharts 3.44.0</strong> - Interactive charts and data visualization</li>
 <li><strong>DOMPurify 3.2.6</strong> - XSS sanitization library for user-generated content</li>
 </ul>
-<h3>Frontend Modules *(32 specialized modules)*</h3><table>
+<h3>Frontend Modules *(50+ specialized modules)*</h3><table>
 <thead>
 <tr>
 <th>Module Category</th>
@@ -140,7 +140,13 @@
 </ul>
 <h3>Real-Time Communication</h3><ul>
 <li><strong>Socket.io 4.8.1</strong> - WebSocket server for real-time progress tracking<ul>
-<li>Runs on same port as HTTP server (port 8080 inside container, 8989 externally)</li>
+<li>Runs on same port as HTTP server (port 8080 inside container)</li>
+<li><strong>Standard access</strong>: Through nginx reverse proxy on port 443 (HTTPS)<ul>
+<li>nginx proxies WebSocket connections to backend: <code>wss://dev.hextrackr.com/socket.io/</code> → <code>http://hextrackr-app:8080/socket.io/</code></li>
+<li>WebSocket upgrade headers handled by nginx (nginx.conf:200-228)</li>
+</ul>
+</li>
+<li><strong>Direct access</strong>: Port 8989 maps to internal 8080 (bypasses nginx, development/debugging)</li>
 <li>Client connects using <code>window.location.port</code> for automatic port detection</li>
 <li>No separate WebSocket port required</li>
 </ul>

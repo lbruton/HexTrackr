@@ -4,26 +4,6 @@ Welcome to HexTrackr! This guide will help you make the most of your vulnerabili
 
 ---
 
-## Table of Contents
-
-- [Quick Start](#quick-start)
-- [Vulnerability Dashboard](#vulnerability-dashboard)
-  - [VPR Cards and Statistics](#vpr-cards-and-statistics)
-  - [Vendor Filtering](#vendor-filtering)
-  - [Data Views](#data-views)
-  - [KEV Integration](#kev-integration)
-- [Ticket Management](#ticket-management)
-  - [Creating and Managing Tickets](#creating-and-managing-tickets)
-  - [Device Management](#device-management)
-  - [Ticket Bundles](#ticket-bundles)
-- [Import and Export](#import-and-export)
-  - [CSV Import](#csv-import)
-  - [Exporting Data](#exporting-data)
-- [Advanced Features](#advanced-features)
-- [Settings and Preferences](#settings-and-preferences)
-
----
-
 ## Quick Start
 
 After installation, access HexTrackr through your browser:
@@ -87,7 +67,7 @@ Both filtering methods stay synchronized - selecting a vendor in one updates the
 
 Switch between three views to analyze vulnerabilities from different perspectives:
 
-#### Table View (Default)
+#### Table View
 
 A comprehensive, sortable table powered by AG-Grid showing all vulnerability details:
 
@@ -96,7 +76,7 @@ A comprehensive, sortable table powered by AG-Grid showing all vulnerability det
 - **Advanced Filtering**: Use the filter bar for complex queries
 - **Column Customization**: Resize and reorder columns to your preference
 
-#### Devices View
+#### Devices View (Default)
 
 Group vulnerabilities by affected devices:
 

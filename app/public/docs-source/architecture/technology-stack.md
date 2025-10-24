@@ -29,11 +29,11 @@ This document provides a comprehensive list of technologies, frameworks, and lib
 
 - **Bootstrap 5.x** - Responsive CSS framework
 - **Tabler.io** - Dashboard UI theme and components
-- **AG-Grid Community 33.3.2** - Enterprise-grade data grid with infinite scroll
-- **ApexCharts 3.x** - Interactive charts and data visualization
+- **AG-Grid Community 32.2** - Enterprise-grade data grid with infinite scroll
+- **ApexCharts 3.44.0** - Interactive charts and data visualization
 - **DOMPurify 3.2.6** - XSS sanitization library for user-generated content
 
-### Frontend Modules *(32 specialized modules)*
+### Frontend Modules *(50+ specialized modules)*
 
 | Module Category | Modules | Purpose |
 |----------------|---------|---------|
@@ -99,7 +99,11 @@ This document provides a comprehensive list of technologies, frameworks, and lib
 ### Real-Time Communication
 
 - **Socket.io 4.8.1** - WebSocket server for real-time progress tracking
-  - Runs on same port as HTTP server (port 8080 inside container, 8989 externally)
+  - Runs on same port as HTTP server (port 8080 inside container)
+  - **Standard access**: Through nginx reverse proxy on port 443 (HTTPS)
+    - nginx proxies WebSocket connections to backend: `wss://dev.hextrackr.com/socket.io/` → `http://hextrackr-app:8080/socket.io/`
+    - WebSocket upgrade headers handled by nginx (nginx.conf:200-228)
+  - **Direct access**: Port 8989 maps to internal 8080 (bypasses nginx, development/debugging)
   - Client connects using `window.location.port` for automatic port detection
   - No separate WebSocket port required
 
