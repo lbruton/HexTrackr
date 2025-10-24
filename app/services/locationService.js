@@ -219,6 +219,7 @@ class LocationService {
                     location: loc.location,
                     location_display: loc.location_display,
                     device_count: loc.hostnames.size,
+                    device_hostnames: Array.from(loc.hostnames), // HEX-344: Required for ticket creation
                     device_ips: loc.device_ips,
                     kev_devices: kev_devices,
                     primary_vendor: primary_vendor,
