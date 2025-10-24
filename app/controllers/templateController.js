@@ -45,10 +45,39 @@ class TemplateController {
     }
 
     /**
-     * Get all email templates
-     * GET /api/templates
-     * @param {Request} req - Express request
-     * @param {Response} res - Express response
+     * Get all templates across all types (email, ticket, vulnerability)
+     * Retrieves active templates from email_templates, ticket_templates, and vulnerability_templates
+     * via UNION query, returning unified array with parsed JSON variables
+     *
+     * @async
+     * @param {Object} req - Express request object (no parameters required)
+     * @param {Object} res - Express response object
+     * @returns {Promise<void>} Sends JSON response:
+     *   - 200: {success: true, data: Array<Object>, count: number} - All active templates
+     *     Each template object contains:
+     *       - id {number} - Template ID
+     *       - name {string} - Template name
+     *       - template_type {string} - Type: 'email', 'ticket', or 'vulnerability'
+     *       - content {string} - Template content with variable placeholders
+     *       - variables {Array<string>} - Parsed array of available variables
+     *       - is_active {number} - Always 1 (inactive templates excluded)
+     *   - 500: {success: false, error: "Failed to fetch templates", details: string}
+     * @throws {Error} Caught and returned as 500 response if:
+     *   - TemplateService.getAllTemplates() fails
+     *   - Database UNION query fails across template tables
+     *   - JSON parsing of variables field fails
+     * @route GET /api/templates
+     * @example
+     * // GET /api/templates
+     * // Returns: {
+     * //   success: true,
+     * //   data: [
+     * //     {id: 1, name: "default_email", template_type: "email", variables: ["{{subject}}", ...]},
+     * //     {id: 5, name: "default_ticket", template_type: "ticket", variables: ["{{description}}", ...]},
+     * //     {id: 8, name: "default_vulnerability", template_type: "vulnerability", variables: [...]}
+     * //   ],
+     * //   count: 12
+     * // }
      */
     async getAllTemplates(req, res) {
         try {

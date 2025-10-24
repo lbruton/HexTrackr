@@ -44,7 +44,26 @@ class TicketController {
     }
 
     /**
-     * Get singleton instance (for use in routes)
+     * Get singleton TicketController instance for use in route handlers
+     * Returns the initialized singleton instance created by initialize().
+     * Used by route modules to access controller methods without managing lifecycle.
+     *
+     * @static
+     * @returns {TicketController} The singleton TicketController instance
+     * @throws {Error} "TicketController not initialized. Call initialize() first." - If initialize() was never called
+     *
+     * @example
+     * // In app/routes/tickets.js
+     * const controller = TicketController.getInstance();
+     * const tickets = await controller.ticketService.getAllTickets();
+     *
+     * @example
+     * // Error case - calling before initialization
+     * try {
+     *     TicketController.getInstance(); // Throws error
+     * } catch (error) {
+     *     console.error(error.message); // "TicketController not initialized..."
+     * }
      */
     static getInstance() {
         if (!TicketController.instance) {

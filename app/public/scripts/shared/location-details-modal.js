@@ -740,7 +740,7 @@ class LocationDetailsModal {
                             }
 
                             // HEX-313: Add keyboard shortcut hints to tooltip
-                            tooltipText += `&#13;&#10;Cmd+Shift: KEV devices at location&#13;&#10;Alt+Shift: All devices at location`;
+                            tooltipText += "&#13;&#10;Cmd+Shift: KEV devices at location&#13;&#10;Alt+Shift: All devices at location";
 
                             return `<a href="#" class="text-muted"
                                        onclick="event.stopPropagation(); window.locationDetailsModal.createTicket(event, '${hostname}', ${isKev}); return false;"
