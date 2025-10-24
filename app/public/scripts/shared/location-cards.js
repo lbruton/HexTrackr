@@ -555,6 +555,12 @@ class LocationCardsManager {
         const deviceHostnames = location.device_hostnames || [];
         const locationTickets = new Map(); // Track unique tickets
 
+        // BUGFIX HEX-344: Extract site code from location
+        // LocationService doesn't include site_code in returned data, so we need to derive it
+        // Pattern: location is like "laxb1" → site is "LAX" (first 4 chars uppercase)
+        const locationKey = location.location || "";
+        const site = locationKey.substring(0, 4).toUpperCase(); // Extract site from location code
+
         deviceHostnames.forEach(hostname => {
             // CRITICAL: Use lowercase for lookup (backend returns lowercase keys)
             const ticketData = ticketMap[hostname.toLowerCase()] || { count: 0, tickets: [] };
@@ -602,7 +608,6 @@ class LocationCardsManager {
         }
 
         // Escape data for HTML attributes
-        const locationKey = location.location || "";
         const escapedLocation = locationKey.replace(/'/g, "\\'").replace(/"/g, "&quot;");
         const ticketsJson = JSON.stringify(ticketArray).replace(/"/g, "&quot;");
 
@@ -610,7 +615,7 @@ class LocationCardsManager {
             <button class="btn ${buttonClass} location-ticket-btn"
                     style="font-size: 0.875rem; padding: 0.375rem 0.75rem;"
                     data-location-key="${escapedLocation}"
-                    data-site="${location.site || ""}"
+                    data-site="${site}"
                     data-ticket-count="${uniqueTicketCount}"
                     data-tickets="${ticketsJson}"
                     data-kev-devices="${JSON.stringify(location.kev_devices || []).replace(/"/g, "&quot;")}"
