@@ -490,12 +490,9 @@ pagination.<span class="hljs-title function_">setCurrentPage</span>(<span class=
 </ul>
 <h3>ChartManager Components</h3><h4>VulnerabilityChartManager</h4><p><strong>Location:</strong> <code>app/public/scripts/shared/vulnerability-chart-manager.js</code></p>
 <p>Manages ApexCharts visualizations.</p>
-<p><strong>Charts:</strong></p>
+<p><strong>Chart Type:</strong></p>
 <ul>
-<li>Severity distribution (donut)</li>
-<li>Trend analysis (line)</li>
-<li>Top vulnerabilities (bar)</li>
-<li>Risk matrix (heatmap)</li>
+<li>Temporal trends (line chart) - Severity breakdown over time with zoom/pan capabilities</li>
 </ul>
 <p><strong>Features:</strong></p>
 <ul>
@@ -1043,11 +1040,11 @@ vendorDropdown.<span class="hljs-title function_">addEventListener</span>(<span 
 <hr>
 <h2>CSS Custom Properties</h2><p>The frontend relies on CSS custom properties for theming:</p>
 <pre><code class="language-css"><span class="hljs-comment">/* Surface hierarchy for dark mode */</span>
-<span class="hljs-attr">--hextrackr-surface-base</span>: <span class="hljs-number">#0f172a</span>;  <span class="hljs-comment">/* Background */</span>
-<span class="hljs-attr">--hextrackr-surface-1</span>: <span class="hljs-number">#1a2332</span>;     <span class="hljs-comment">/* Cards */</span>
-<span class="hljs-attr">--hextrackr-surface-2</span>: <span class="hljs-number">#253241</span>;     <span class="hljs-comment">/* Tables */</span>
-<span class="hljs-attr">--hextrackr-surface-3</span>: <span class="hljs-number">#2f3f50</span>;     <span class="hljs-comment">/* Modals */</span>
-<span class="hljs-attr">--hextrackr-surface-4</span>: <span class="hljs-number">#526880</span>;     <span class="hljs-comment">/* Overlays */</span>
+<span class="hljs-attr">--hextrackr-surface-0</span>: <span class="hljs-number">#1a2234</span>;    <span class="hljs-comment">/* Base level - page background */</span>
+<span class="hljs-attr">--hextrackr-surface-1</span>: <span class="hljs-number">#1a2234</span>;    <span class="hljs-comment">/* Cards - elevated from base */</span>
+<span class="hljs-attr">--hextrackr-surface-2</span>: <span class="hljs-number">#202c42</span>;    <span class="hljs-comment">/* Elevated surfaces */</span>
+<span class="hljs-attr">--hextrackr-surface-3</span>: <span class="hljs-number">#1a2234</span>;    <span class="hljs-comment">/* Modals */</span>
+<span class="hljs-attr">--hextrackr-surface-4</span>: <span class="hljs-number">#334155</span>;    <span class="hljs-comment">/* Highest elevation */</span>
 
 <span class="hljs-comment">/* Severity colors */</span>
 <span class="hljs-attr">--hextrackr-critical</span>: <span class="hljs-number">#d63939</span>;

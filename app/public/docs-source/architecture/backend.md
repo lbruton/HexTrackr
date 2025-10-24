@@ -72,6 +72,7 @@ The backend is a modular Node.js/Express application providing REST endpoints, r
 | `paloAltoService.js` *(v1.0.63+, HEX-209)* | Palo Alto Security Advisory integration | `syncPaloAdvisories()`, `getSyncStatus()`, `fetchPaloAdvisories()` |
 | `hostnameParserService.js` | Hostname parsing and normalization | `parseHostname()`, `extractDomain()`, `normalizeHostname()` |
 | `importService.js` | Import business logic | `processVulnerabilitiesWithLifecycle()`, `bulkLoadToStagingTable()` |
+| `locationService.js` *(v1.0.80, HEX-292)* | Location-based vulnerability aggregation | `getLocationStats()`, `initialize()` |
 | `backupService.js` | Backup/restore operations | `getBackupStats()`, `restoreBackup()`, `exportData()` |
 | `docsService.js` | Documentation statistics | `computeStats()`, `computeApiEndpoints()` |
 | `fileService.js` | File system operations | `readFile()`, `writeFile()`, `validatePath()` |

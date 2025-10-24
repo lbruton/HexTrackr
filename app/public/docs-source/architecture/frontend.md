@@ -118,7 +118,7 @@ clearCache()
 - Real-time chart updates
 - Chart lifecycle management
 
-**Chart Types**:
+**Chart Type**:
 
 - Temporal trends (line charts) - Severity breakdown over time with zoom/pan capabilities
 

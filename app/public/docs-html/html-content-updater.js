@@ -341,6 +341,67 @@ class HtmlContentUpdater {
                 console.warn(` Could not update login.html: ${error.message}`);
             }
 
+            // 7. Update documentation version headers (excluding changelog/versions/*.md)
+            try {
+                const docsSourcePath = path.join(process.cwd(), "app", "public", "docs-source");
+                const markdownFiles = [];
+
+                // Recursively find all .md files
+                async function findMarkdownFiles(dir) {
+                    const entries = await PathValidator.safeReaddir(dir, { withFileTypes: true });
+                    for (const entry of entries) {
+                        const fullPath = path.join(dir, entry.name);
+                        if (entry.isDirectory()) {
+                            await findMarkdownFiles(fullPath);
+                        } else if (entry.isFile() && entry.name.endsWith(".md")) {
+                            markdownFiles.push(fullPath);
+                        }
+                    }
+                }
+
+                await findMarkdownFiles(docsSourcePath);
+
+                // Filter out changelog/versions/*.md files (those are version-specific historical docs)
+                const filesToUpdate = markdownFiles.filter(file => !file.includes("changelog/versions/"));
+
+                let docsUpdated = 0;
+                for (const filePath of filesToUpdate) {
+                    try {
+                        const content = await PathValidator.safeReadFile(filePath, "utf8");
+                        let updated = content;
+
+                        // Pattern 1: "**Version**: vX.Y.Z" (used in reference docs)
+                        updated = updated.replace(
+                            /\*\*Version\*\*:\s*v[\d.]+/g,
+                            `**Version**: v${currentVersion}`
+                        );
+
+                        // Pattern 2: "**Current Version**: vX.Y.Z" (used in API reference)
+                        updated = updated.replace(
+                            /\*\*Current Version\*\*:\s*v[\d.]+/g,
+                            `**Current Version**: v${currentVersion}`
+                        );
+
+                        // Only write if changed
+                        if (content !== updated) {
+                            await PathValidator.safeWriteFile(filePath, updated);
+                            const relativePath = path.relative(process.cwd(), filePath);
+                            console.log(` Updated ${relativePath}`);
+                            docsUpdated++;
+                        }
+                    } catch (fileError) {
+                        console.warn(` Could not update ${filePath}: ${fileError.message}`);
+                    }
+                }
+
+                if (docsUpdated > 0) {
+                    console.log(` Updated ${docsUpdated} documentation file(s) to v${currentVersion}`);
+                    updatesApplied += docsUpdated;
+                }
+            } catch (error) {
+                console.warn(` Could not update documentation versions: ${error.message}`);
+            }
+
             if (updatesApplied > 0) {
                 console.log(` Version sync complete: ${updatesApplied} files updated to v${currentVersion}`);
             } else {
@@ -1104,6 +1165,42 @@ ${this.stats.filesRemoved > 0 ? `\nAdditionally, ${this.stats.filesRemoved} orph
     }
 
     /**
+     * Update the API reference index.md timestamp to reflect current generation time
+     * This ensures the "Generated:" timestamp stays current with each documentation build
+     *
+     * @async
+     * @returns {Promise<void>} Resolves when timestamp update completes
+     * @throws {Error} If file read/write operations fail
+     *
+     * @example
+     * await this.updateApiReferenceTimestamp();
+     * // Updates: *Generated: 2025-10-23T19:12:45.016Z*
+     */
+    async updateApiReferenceTimestamp() {
+        try {
+            const docsSourceDir = path.join(process.cwd(), "app", "public", "docs-source");
+            const apiRefIndexPath = path.join(docsSourceDir, "api-reference", "index.md");
+            const currentTimestamp = new Date().toISOString();
+
+            // Read the current content
+            const content = await fs.readFile(apiRefIndexPath, "utf8");
+
+            // Replace the generated timestamp line (format: *Generated: YYYY-MM-DDTHH:mm:ss.sssZ*)
+            const timestampRegex = /\*Generated: \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z\*/;
+            const updatedContent = content.replace(timestampRegex, `*Generated: ${currentTimestamp}*`);
+
+            // Write the updated content back
+            await fs.writeFile(apiRefIndexPath, updatedContent, "utf8");
+
+            console.log(` Updated API reference timestamp to ${currentTimestamp}`);
+
+        } catch (error) {
+            console.warn(` Failed to update API reference timestamp: ${error.message}`);
+            // Non-fatal - continue with process
+        }
+    }
+
+    /**
      * Generate JSDoc HTML documentation from code comments
      * Executes 'npm run docs:dev' to generate API reference documentation
      * from source code JSDoc comments into HTML format
@@ -1136,6 +1233,49 @@ ${this.stats.filesRemoved > 0 ? `\nAdditionally, ${this.stats.filesRemoved} orph
         } catch (error) {
             console.warn(` JSDoc generation encountered an issue: ${error.message}`);
             // Non-fatal - continue with process
+        } finally {
+            // Always update the API reference index timestamp, even if JSDoc had warnings
+            // JSDoc warnings/errors are non-fatal and HTML is still generated
+            await this.updateApiReferenceTimestamp();
+        }
+    }
+
+    /**
+     * Inject dark mode theme synchronization script into JSDoc HTML files
+     * Post-processes all generated JSDoc HTML files to add theme detection
+     * and dark mode CSS that syncs with HexTrackr's main theme system
+     *
+     * @async
+     * @returns {Promise<void>} Resolves when theme injection completes or fails
+     * @throws {never} Does not throw - errors are caught and logged as warnings (non-fatal)
+     *
+     * @example
+     * await this.injectJSDocTheme();
+     * // Logs: "🎨 Injecting dark mode theme into JSDoc HTML..."
+     * // Logs: "✅ JSDoc theme injection complete! (185 files processed)"
+     */
+    async injectJSDocTheme() {
+        const { exec } = require("child_process");
+        const util = require("util");
+        const execPromise = util.promisify(exec);
+
+        try {
+            console.log("\n🎨 Injecting dark mode theme into JSDoc HTML...");
+
+            // Run theme injection script
+            const { stdout } = await execPromise("node app/scripts/inject-jsdoc-theme.js", {
+                cwd: process.cwd(),
+                maxBuffer: 5 * 1024 * 1024 // 5MB buffer
+            });
+
+            // Parse output to count processed files
+            const fileCount = (stdout.match(/✓/g) || []).length;
+            console.log(`✅ JSDoc theme injection complete! (${fileCount} files processed)`);
+
+        } catch (error) {
+            console.error(`❌ JSDoc theme injection failed: ${error.message}`);
+            console.warn("⚠️  JSDoc documentation will display in light mode only");
+            // Non-fatal - continue with process
         }
     }
 
@@ -1144,6 +1284,7 @@ ${this.stats.filesRemoved > 0 ? `\nAdditionally, ${this.stats.filesRemoved} orph
      * 1. Sync versions across all files
      * 2. Generate markdown → HTML documentation
      * 3. Generate JSDoc → HTML API reference
+     * 4. Inject dark mode theme into JSDoc HTML
      */
     async run() {
         console.log("Starting complete documentation generation workflow...\n");
@@ -1208,10 +1349,13 @@ ${this.stats.filesRemoved > 0 ? `\nAdditionally, ${this.stats.filesRemoved} orph
                 console.log(` ${this.stats.errors} errors encountered during markdown generation.`);
             }
 
-            // STEP 2: Generate JSDoc HTML documentation
+            // STEP 8: Generate JSDoc HTML documentation
             await this.generateJSDoc();
 
-            console.log("\nComplete documentation workflow finished successfully!\n");
+            // STEP 9: Inject dark mode theme into JSDoc HTML files
+            await this.injectJSDocTheme();
+
+            console.log("\n✨ Complete documentation workflow finished successfully!\n");
 
             // NOTE: Changelog index.md and archive.md are now auto-generated
             console.log("Changelog Management:");

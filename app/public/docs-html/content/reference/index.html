@@ -13,21 +13,6 @@
 <li><p><strong><a href="#reference/troubleshooting">Troubleshooting Guide</a></strong>: Common issues and solutions for Docker &amp; environment issues, database troubleshooting, import/export problems, frontend issues, API &amp; WebSocket debugging, and performance diagnostics</p>
 </li>
 </ul>
-<h2>Quick Reference</h2><h3>Performance Benchmarks</h3><ul>
-<li>Page loads: &lt; 2 seconds</li>
-<li>API responses: &lt; 500ms</li>
-<li>Database queries: &lt; 100ms</li>
-<li>WebSocket messages: &lt; 50ms</li>
-<li>CSV processing: &gt; 1000 rows/second</li>
-</ul>
-<h3>Debug Mode</h3><p>Enable detailed logging:</p>
-<pre><code class="language-javascript"><span class="hljs-variable language_">localStorage</span>.<span class="hljs-property">hextrackr_debug</span> = <span class="hljs-string">&quot;true&quot;</span>;
-location.<span class="hljs-title function_">reload</span>();</code></pre><h3>Key Paths</h3><ul>
-<li>Database: <code>data/hextrackr.db</code></li>
-<li>Backups: <code>backups/</code></li>
-<li>Uploads: <code>uploads/</code></li>
-<li>Documentation: <code>app/public/docs-html/</code></li>
-</ul>
 <h2>Related Documentation</h2><ul>
 <li><a href="#api-reference/index">API Reference</a> - Auto-generated API documentation</li>
 <li><a href="#architecture/index">Architecture</a> - System design and patterns</li>

@@ -83,7 +83,25 @@ function extractDateFromFilename(filename) {
 }
 
 /**
- * Extract vendor from filename based on common patterns
+ * Extract vendor name from filename using pattern matching
+ * Scans filename for common vendor keywords and returns normalized vendor name
+ * Used during CSV import to auto-detect vulnerability scan vendor
+ *
+ * @param {string} filename - The filename to analyze (case-insensitive). Examples: "tenable_scan.csv", "qualys-report.csv", "nessus_aug28.csv"
+ * @returns {string} Normalized vendor name: "Tenable", "Qualys", "Rapid7", "OpenVAS", or "unknown" if no pattern matches
+ * @throws {never} Does not throw - returns "unknown" for null/undefined/unrecognized filenames
+ *
+ * @example
+ * extractVendorFromFilename("tenable_vuln_scan.csv")  // Returns: "Tenable"
+ * extractVendorFromFilename("nessus-report.csv")       // Returns: "Tenable"
+ * extractVendorFromFilename("qualys_export.csv")       // Returns: "Qualys"
+ * extractVendorFromFilename("unknown_file.csv")        // Returns: "unknown"
+ *
+ * Supported vendor patterns:
+ * - Tenable: "tenable" or "nessus"
+ * - Qualys: "qualys"
+ * - Rapid7: "rapid7" or "nexpose"
+ * - OpenVAS: "openvas"
  */
 function extractVendorFromFilename(filename) {
     if (!filename) {

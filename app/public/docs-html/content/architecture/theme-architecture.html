@@ -531,26 +531,36 @@ gridApi.<span class="hljs-title function_">setGridOption</span>(<span class="hlj
 <li>Test across all pages and components</li>
 </ol>
 <hr>
-<h2>Documentation Theme Synchronization (v1.0.29)</h2><h3>JSDoc Dark Mode Integration</h3><p>HexTrackr&#39;s JSDoc developer documentation (<code>/app/dev-docs-html/</code>) includes automatic theme synchronization with the main application:</p>
-<p><strong>Implementation</strong>:</p>
+<h2>Documentation Theme Synchronization</h2><h3>JSDoc Dark Mode Integration</h3><p>HexTrackr&#39;s JSDoc developer documentation (<code>/app/dev-docs-html/</code>) includes automatic theme synchronization with the main application.</p>
+<p><strong>Current Implementation (v1.1.5)</strong>:</p>
 <ul>
 <li><code>inject-jsdoc-theme.js</code> - Node script that injects theme detection code into generated JSDoc HTML</li>
-<li><code>inject-jsdoc-theme-wrapper.sh</code> - Shell wrapper for reliable execution during build</li>
-<li>Theme script reads from localStorage and applies <code>jsdoc-dark-theme</code> class</li>
+<li><code>html-content-updater.js</code> - Unified documentation workflow orchestrates theme injection</li>
+<li>Theme script reads from localStorage (<code>hextrackr-theme</code>) and applies 350+ lines of dark mode CSS</li>
+<li>Integrated into <code>npm run release</code> workflow for atomic documentation generation</li>
 </ul>
 <p><strong>Build Process</strong>:</p>
 <ol>
-<li>JSDoc generates HTML documentation files</li>
-<li>Injection script processes all HTML files (121 files as of v1.0.29)</li>
-<li>Theme detection code is inserted into each file</li>
-<li>Documentation respects user&#39;s theme preference</li>
+<li>JSDoc generates HTML documentation files (185 files as of v1.1.5)</li>
+<li><code>HtmlContentUpdater.injectJSDocTheme()</code> executes injection script</li>
+<li>Theme detection code is inserted before <code>&lt;/head&gt;</code> tag in all HTML files</li>
+<li>Console output reports file count: <code>✅ JSDoc theme injection complete! (190 files processed)</code></li>
+<li>Documentation automatically respects user&#39;s theme preference</li>
 </ol>
-<p><strong>Fixed in v1.0.29</strong>:</p>
+<p><strong>Theme Detection Logic</strong>:</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Checks localStorage for &#x27;hextrackr-theme&#x27; key</span>
+<span class="hljs-comment">// Supports both JSON format {theme: &quot;dark&quot;} and legacy string format</span>
+<span class="hljs-comment">// Falls back to &#x27;dark&#x27; as default</span>
+<span class="hljs-comment">// Applies comprehensive dark mode CSS variables if theme === &#x27;dark&#x27;</span></code></pre><p><strong>Evolution History</strong>:</p>
 <ul>
-<li>Resolved issue where only 6 of 121 files had theme injection</li>
-<li>Added progress logging and error handling</li>
-<li>Ensured idempotent operation (safe to run multiple times)</li>
-<li>Fixed JSON parsing for modern localStorage format</li>
+<li><strong>v1.0.29</strong> - Initial implementation with bash wrapper (fixed 6/121 → 121/121 files)</li>
+<li><strong>v1.1.5</strong> - Integrated into unified docs workflow (HEX-341 fix)<ul>
+<li>Removed bash wrapper dependency</li>
+<li>Added to <code>html-content-updater.js</code> as Step 9</li>
+<li>Non-fatal error handling with clear logging</li>
+<li>100% reliability (185/185 files processed)</li>
+</ul>
+</li>
 </ul>
 <hr>
 <h2>Related Documentation</h2><ul>
@@ -562,7 +572,7 @@ gridApi.<span class="hljs-title function_">setGridOption</span>(<span class="hlj
 <li><code>004-tickets-table-prototype</code> - AG-Grid theme integration patterns</li>
 </ul>
 <hr>
-<p><em>Last Updated: 2025-10-23 | Version: 3.0.0 | Audit: DOCS-52</em></p>
+<p><em>Last Updated: 2025-10-24 | Version: 3.1.0 | Audit: HEX-341</em></p>
 
     <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
              are provided by docs-html/index.html. Content generated using this template will be

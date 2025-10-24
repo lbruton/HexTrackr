@@ -515,12 +515,9 @@ Device management for tickets.
 
 Manages ApexCharts visualizations.
 
-**Charts:**
+**Chart Type:**
 
-- Severity distribution (donut)
-- Trend analysis (line)
-- Top vulnerabilities (bar)
-- Risk matrix (heatmap)
+- Temporal trends (line chart) - Severity breakdown over time with zoom/pan capabilities
 
 **Features:**
 
@@ -1155,11 +1152,11 @@ The frontend relies on CSS custom properties for theming:
 
 ```css
 /* Surface hierarchy for dark mode */
---hextrackr-surface-base: #0f172a;  /* Background */
---hextrackr-surface-1: #1a2332;     /* Cards */
---hextrackr-surface-2: #253241;     /* Tables */
---hextrackr-surface-3: #2f3f50;     /* Modals */
---hextrackr-surface-4: #526880;     /* Overlays */
+--hextrackr-surface-0: #1a2234;    /* Base level - page background */
+--hextrackr-surface-1: #1a2234;    /* Cards - elevated from base */
+--hextrackr-surface-2: #202c42;    /* Elevated surfaces */
+--hextrackr-surface-3: #1a2234;    /* Modals */
+--hextrackr-surface-4: #334155;    /* Highest elevation */
 
 /* Severity colors */
 --hextrackr-critical: #d63939;

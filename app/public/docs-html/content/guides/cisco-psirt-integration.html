@@ -78,7 +78,7 @@
 <p><strong>Option B: Manual</strong></p>
 <ul>
 <li>Click <strong>&quot;Sync Now&quot;</strong> button in Settings</li>
-<li>Wait ~6 minutes for 126 CVEs to process</li>
+<li>Sync time varies based on your Cisco CVE count (typically 5-15 minutes)</li>
 <li>Statistics update automatically when complete</li>
 </ul>
 <hr>
@@ -103,7 +103,7 @@ Example: [&quot;12.2(22)S1&quot;, &quot;12.2(30)S&quot;, &quot;15.3(3)S8&quot;, 
 <li>Processes CVEs one at a time (no parallel batching)</li>
 <li>3-second delay between each CVE</li>
 <li>Each CVE requires 2 API calls (6 seconds total per CVE)</li>
-<li>126 CVEs × 3s = ~6 minutes total sync time</li>
+<li>Sync time varies based on Cisco CVE count in your environment</li>
 </ul>
 <p><strong>Why Not Parallel?</strong></p>
 <ul>
@@ -214,32 +214,17 @@ CVE-2025-20352    | iosxe     | 17.9.4a</code></pre><h3>vulnerabilities_current 
 </ul>
 <h3>504 Gateway Timeout</h3><p>If sync times out in browser but continues in background:</p>
 <ul>
-<li>This is normal for the first sync (~6 minutes for 126 CVEs)</li>
+<li>This is normal for the first sync (typically 5-15 minutes depending on CVE count)</li>
 <li>Nginx configured for 10-minute timeout</li>
 <li>Check logs to see sync completion: <code>docker-compose logs hextrackr-app</code></li>
 </ul>
-<h3>No Fixed Versions Found</h3><p><strong>13.4% of CVEs don&#39;t have fixed versions</strong> (by design):</p>
+<h3>No Fixed Versions Found</h3><p><strong>Some CVEs don&#39;t have fixed versions</strong> (by design):</p>
 <ul>
 <li>Some vulnerabilities are configuration issues (no software patch)</li>
 <li>Some affect end-of-life products (no fix available)</li>
 <li>Cisco&#39;s Software Checker API returns empty array</li>
 </ul>
 <hr>
-<h2>Statistics (As of v1.0.63)</h2><p><strong>Current Sync Results</strong> (126 CVEs tested):</p>
-<ul>
-<li>Total Advisories Synced: 82</li>
-<li>With Fixed Versions: 71 (86.6%)</li>
-<li>Without Fixed Versions: 11 (13.4%)</li>
-<li>Average Fixed Versions per CVE: 28.3</li>
-<li>Top CVE: CVE-2021-1392 with 65 fixed versions</li>
-</ul>
-<p><strong>Sample Advisory</strong>:</p>
-<pre><code class="language-">CVE-2017-3881: Cisco IOS Cluster Management Protocol RCE
-├── Advisory: cisco-sa-20170317-cmp
-├── Fixed Versions: 20 total
-│   ├── Minimum: 12.2(22)S1
-│   ├── Also: 12.2(30)S, 15.3(3)S8, 12.2(31)SB13, ...
-└── UI Display: &quot;Fixed in: 12.2(22)S1 or later&quot;</code></pre><hr>
 <h2>Technical Details</h2><h3>OAuth2 Authentication Flow</h3><ol>
 <li>User configures credentials in Settings modal</li>
 <li>Credentials stored in <code>user_preferences</code> table as <code>cisco_api_key</code></li>
