@@ -993,34 +993,16 @@ class DeviceSecurityModal {
     }
 
     /**
-     * Get button configuration based on ticket state (HEX-203)
+     * Get button configuration based on ticket state (HEX-203, HEX-347)
+     * Simplified 3-color system: Green = No tickets | Orange = Has tickets | Red = Has overdue
      * @param {number} count - Number of tickets
      * @param {string} status - Ticket status
-     * @param {string} jobType - Job type
+     * @param {string} jobType - Job type (kept for compatibility but not used for colors)
      * @returns {Object} Button configuration
      */
     getButtonConfig(count, status, jobType) {
-        // Status to Bootstrap color mapping (matches tickets.css actual statuses)
-        const statusColors = {
-            "Pending": "warning",      // Amber yellow
-            "Staged": "info",          // Purple (using info as closest Bootstrap match)
-            "Open": "primary",         // Blue
-            "Overdue": "danger",       // Red
-            "Completed": "success",    // Green
-            "Failed": "danger",        // Orange-red
-            "Closed": "secondary"      // Gray
-        };
-
-        // Job type to status-label class mapping (for text color)
-        const jobTypeTextColors = {
-            "Upgrade": "status-open",      // Blue
-            "Replace": "status-overdue",   // Orange/red
-            "Refresh": "status-pending",   // Purple
-            "Mitigate": "status-failed",   // Red
-            "Other": "status-generic"      // Gray
-        };
-
         if (count === 0) {
+            // GREEN: No tickets
             return {
                 text: "Create Ticket",
                 colorClass: "btn-outline-success",
@@ -1028,22 +1010,22 @@ class DeviceSecurityModal {
                 textColorClass: ""
             };
         } else if (count === 1) {
-            const colorClass = `btn-outline-${statusColors[status] || "primary"}`;
-            const textColorClass = jobType ? `status-label ${jobTypeTextColors[jobType] || "status-generic"}` : "";
+            // Single ticket: ORANGE or RED based on overdue status
+            const isOverdue = status === "Overdue";
             return {
                 text: "View Ticket",
-                colorClass: colorClass,
+                colorClass: isOverdue ? "btn-outline-danger" : "btn-outline-warning",
                 icon: "fas fa-folder-open",
-                textColorClass: textColorClass
+                textColorClass: ""
             };
         } else {
-            const colorClass = `btn-outline-${statusColors[status] || "primary"}`;
-            const textColorClass = jobType ? `status-label ${jobTypeTextColors[jobType] || "status-generic"}` : "";
+            // Multiple tickets: ORANGE or RED (backend sets status to "Overdue" if any ticket is overdue)
+            const isOverdue = status === "Overdue";
             return {
                 text: `View Tickets (${count})`,
-                colorClass: colorClass,
+                colorClass: isOverdue ? "btn-outline-danger" : "btn-outline-warning",
                 icon: "fas fa-layer-group",
-                textColorClass: textColorClass
+                textColorClass: ""
             };
         }
     }

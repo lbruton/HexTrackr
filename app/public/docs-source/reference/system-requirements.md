@@ -238,4 +238,4 @@ Performance testing and benchmarking are **in development**. Current system requ
 
 ---
 
-*Last Updated: 2025-10-23 | Version 1.1.3*
+*Last Updated: 2025-10-25 | Version 1.1.6*

@@ -259,12 +259,15 @@ class LocationService {
      */
     async _getTicketCountsByLocation() {
         try {
+            // HEX-347: Count all open tickets (exclude only Completed/Cancelled/Closed)
+            // Matches ticketService.js:838 query pattern for open tickets
             const query = `
                 SELECT
                     LOWER(location) as location,
                     COUNT(*) as ticket_count
                 FROM tickets
-                WHERE status IN ('Open', 'In Progress', 'Pending')
+                WHERE deleted = 0
+                  AND status NOT IN ('Completed', 'Cancelled', 'Closed')
                   AND location IS NOT NULL
                   AND location != ''
                 GROUP BY LOWER(location)

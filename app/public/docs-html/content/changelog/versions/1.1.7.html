@@ -1,0 +1,54 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <hr>
+<h2>title: "Version 1.1.7 - Extract duplicate cache-busting helpers"
+date: "2025-10-25"
+version: "1.1.7"
+status: "Released"
+category: "Maintenance"</h2><h2>Overview</h2><p>Code quality improvement that eliminates duplicate cache-busting helper functions by extracting them into a shared utility module, reducing code duplication by 56 lines and improving maintainability.</p>
+<h2>🔧 Code Quality Improvements</h2><h3>Cache-Busting Helper Extraction (HEX-346)</h3><p><strong>Problem</strong>: Two controllers contained byte-for-byte identical cache-busting helper functions:</p>
+<ul>
+<li><code>shouldBypassCache(req)</code>: Detects cache bypass via query parameters (<code>_t</code> timestamp or <code>bustCache</code> flag)</li>
+<li><code>sendBypassResponse(res, payload)</code>: Sends JSON response with cache bypass headers</li>
+</ul>
+<p><strong>Solution</strong>: Created shared <code>app/utils/httpHelpers.js</code> module following existing <code>app/utils/helpers.js</code> pattern.</p>
+<p><strong>Impact</strong>:</p>
+<ul>
+<li><strong>149 lines removed</strong> from controllers (87 from vulnerabilityController + 62 from locationController)</li>
+<li><strong>93 lines added</strong> in new httpHelpers module</li>
+<li><strong>Net reduction</strong>: 56 lines</li>
+<li><strong>Duplication eliminated</strong>: 100% (2 implementations → 1 shared module)</li>
+</ul>
+<p><strong>Files Changed</strong>:</p>
+<ul>
+<li><code>app/utils/httpHelpers.js</code> (NEW): Shared cache-busting utilities with comprehensive JSDoc</li>
+<li><code>app/controllers/vulnerabilityController.js</code>: Import shared helpers, removed duplicate code</li>
+<li><code>app/controllers/locationController.js</code>: Import shared helpers, removed duplicate code</li>
+</ul>
+<p><strong>Benefits</strong>:</p>
+<ul>
+<li>Single source of truth for cache-busting logic</li>
+<li>Bug fixes and enhancements apply universally</li>
+<li>Improved testability (one module vs. two controller copies)</li>
+<li>Follows established codebase patterns</li>
+</ul>
+<p><strong>Technical Details</strong>:</p>
+<ul>
+<li>Zero behavioral changes (pure code relocation)</li>
+<li>All 10 endpoints (8 vulnerability + 2 location) continue working unchanged</li>
+<li>Module loading verified via Docker container restart</li>
+<li>No import/require errors detected</li>
+</ul>
+<h2>📋 Technical Notes</h2><p><strong>Architecture Decision</strong>: Extracted to <code>app/utils/</code> (not <code>app/middleware/</code>) because these are HTTP response utilities (stateless helpers), not request pipeline interceptors. Consistent with existing <code>app/utils/helpers.js</code> precedent.</p>
+<p><strong>Verification</strong>: Docker container restart successful, module loading confirmed, controllers import functions without errors.</p>
+<h2>🔗 Related Issues</h2><ul>
+<li><strong>HEX-346</strong>: Research and implementation of cache-busting helper extraction</li>
+<li><strong>DOCS-160</strong>: JSDoc documentation work that identified duplication (v1.1.5)</li>
+<li><strong>DOCS-148</strong>: JSDoc for vulnerabilityController (v1.1.4)</li>
+<li><strong>DOCS-147</strong>: JSDoc for shouldBypassCache (v1.1.4)</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

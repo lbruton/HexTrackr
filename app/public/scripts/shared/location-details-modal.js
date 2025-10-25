@@ -60,6 +60,9 @@ class LocationDetailsModal {
             // Populate modal sections
             this.populateLocationInfo(location);
 
+            // HEX-347: Update dynamic ticket button
+            this.updateTicketButton(location);
+
             // Show modal with theme propagation
             this.showModal();
 
@@ -1255,17 +1258,133 @@ class LocationDetailsModal {
 
     /**
      * Initialize footer button event listeners
+     * HEX-347: Ticket button is now dynamic (populated by updateTicketButton)
      */
     initializeFooterButtons() {
         const exportBtn = document.getElementById("exportLocationCsvBtn");
-        const createTicketBtn = document.getElementById("createLocationTicketBtn");
 
         if (exportBtn) {
             exportBtn.addEventListener("click", () => this.exportLocationCsv());
         }
 
-        if (createTicketBtn) {
-            createTicketBtn.addEventListener("click", () => this.createLocationTicket());
+        // Ticket button is now dynamically created by updateTicketButton()
+    }
+
+    /**
+     * Update the dynamic ticket button based on location ticket count
+     * HEX-347: Implements 3-color system (Green/Orange/Red)
+     * Pattern source: device-security-modal.js:1246-1279 (updateTicketButton)
+     * @param {Object} location - Location object with open_tickets count
+     */
+    async updateTicketButton(location) {
+        const buttonContainer = document.getElementById("locationModalTicketButton");
+        if (!buttonContainer) {
+            console.warn("[LocationDetailsModal] Ticket button container not found");
+            return;
+        }
+
+        const ticketCount = location.open_tickets || 0;
+        const locationKey = location.location || "";
+
+        // Determine button configuration using 3-color system
+        let buttonText, buttonClass, buttonIcon;
+
+        if (ticketCount === 0) {
+            // GREEN: No tickets
+            buttonText = "Create Ticket";
+            buttonClass = "btn-outline-success";
+            buttonIcon = "fas fa-ticket-alt";
+        } else if (ticketCount === 1) {
+            // ORANGE or RED: Need to check if the ticket is overdue
+            // For now, default to ORANGE (we'd need to fetch ticket details to know if overdue)
+            buttonText = "View Ticket";
+            buttonClass = "btn-outline-warning";
+            buttonIcon = "fas fa-folder-open";
+        } else {
+            // ORANGE or RED: Multiple tickets
+            buttonText = `View Tickets (${ticketCount})`;
+            buttonClass = "btn-outline-warning";
+            buttonIcon = "fas fa-layer-group";
+        }
+
+        // Generate button HTML
+        buttonContainer.innerHTML = `
+            <button class="btn ${buttonClass}"
+                    data-location-key="${locationKey}"
+                    data-ticket-count="${ticketCount}"
+                    onclick="window.locationDetailsModal.handleTicketButtonClick(event, this)">
+                <i class="${buttonIcon} me-2"></i>${buttonText}
+            </button>
+        `;
+    }
+
+    /**
+     * Handle ticket button click from location details modal
+     * HEX-347: Routes to create/view based on ticket count
+     * Matches device modal pattern: 1 ticket = direct navigation, 2+ = picker modal
+     * @param {Event} event - Click event
+     * @param {HTMLElement} button - Button element
+     */
+    async handleTicketButtonClick(event, button) {
+        const ticketCount = parseInt(button.dataset.ticketCount) || 0;
+        const locationKey = button.dataset.locationKey || "";
+
+        if (ticketCount === 0) {
+            // No tickets - create new ticket
+            this.createLocationTicket();
+        } else if (ticketCount === 1) {
+            // Single ticket - fetch ticket ID and navigate directly
+            await this.viewSingleLocationTicket(locationKey);
+        } else {
+            // Multiple tickets - show picker modal
+            await this.viewLocationTickets(locationKey);
+        }
+    }
+
+    /**
+     * View single ticket for location (direct navigation)
+     * Fetches tickets for location and navigates to the single ticket
+     * @param {string} locationKey - Location identifier
+     */
+    async viewSingleLocationTicket(locationKey) {
+        try {
+            // Fetch tickets for this location
+            const response = await fetch(`/api/tickets/location/${locationKey}`, {
+                credentials: "include"
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch tickets: ${response.status}`);
+            }
+
+            const data = await response.json();
+            if (!data.success || !data.tickets || data.tickets.length === 0) {
+                throw new Error("No tickets found for location");
+            }
+
+            // Navigate directly to the single ticket
+            const ticketId = data.tickets[0].id;
+            window.location.href = `/tickets.html?openTicket=${ticketId}`;
+
+        } catch (error) {
+            console.error("[LocationDetailsModal] Error fetching single ticket:", error);
+            alert(`Failed to load ticket: ${error.message}`);
+        }
+    }
+
+    /**
+     * View tickets for location (opens picker modal)
+     * @param {string} locationKey - Location identifier
+     */
+    async viewLocationTickets(locationKey) {
+        // Close this modal first
+        this.hide();
+
+        // Use location cards manager to show ticket picker
+        if (window.locationCardsManager) {
+            await window.locationCardsManager.fetchAndShowLocationTicketModal(locationKey);
+        } else {
+            console.error("[LocationDetailsModal] locationCardsManager not available");
         }
     }
 

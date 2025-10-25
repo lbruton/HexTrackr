@@ -1,4 +1,20 @@
-# Version X.Y.Z
+---
+title: "Version X.Y.Z - Brief Description of Release"
+date: "YYYY-MM-DD"
+version: "X.Y.Z"
+status: "Released"
+category: "Bug Fix|Update|Maintenance|Feature"
+---
+
+# Version X.Y.Z - Brief Description of Release
+
+**Release Status**: ✅ Released
+**Release Date**: YYYY-MM-DD
+**Parent Issues**: [HEX-XXX](https://linear.app/hextrackr/issue/HEX-XXX)
+
+## Overview
+
+**REQUIRED**: One concise paragraph (1-3 sentences) summarizing what this version accomplishes. This appears in the changelog index as the version summary. DO NOT skip this section - it's required for the documentation generator to create proper summaries.
 
 ---
 

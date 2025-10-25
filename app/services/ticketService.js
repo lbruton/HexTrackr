@@ -916,14 +916,26 @@ class TicketService {
 
                     // Add ticket details (status, job type, IDs) for each device
                     // Group by hostname and collect all ticket IDs
+                    // HEX-347: Simplified 3-color button logic
+                    //   - Green: No tickets (handled elsewhere)
+                    //   - Orange: Has tickets, none overdue
+                    //   - Red: Has at least one overdue ticket
                     const ticketMap = {};
                     detailRows.forEach(row => {
                         if (!ticketMap[row.hostname]) {
+                            // First ticket for this device
                             ticketMap[row.hostname] = {
                                 status: row.status,
                                 jobType: row.job_type,
-                                tickets: []
+                                tickets: [],
+                                hasOverdue: row.status === "Overdue"
                             };
+                        } else {
+                            // Multiple tickets - check if ANY are overdue
+                            if (row.status === "Overdue") {
+                                ticketMap[row.hostname].status = "Overdue";
+                                ticketMap[row.hostname].hasOverdue = true;
+                            }
                         }
                         ticketMap[row.hostname].tickets.push(row.id);
                     });
