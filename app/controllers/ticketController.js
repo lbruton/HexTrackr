@@ -105,6 +105,25 @@ class TicketController {
             const ticket = req.body;
 
             const result = await controller.ticketService.createTicket(ticket);
+
+            // Audit: Ticket creation
+            if (global.logger?.audit) {
+                await global.logger.audit(
+                    "ticket.create",
+                    `Ticket ${ticket.xt_number} created`,
+                    {
+                        ticketId: result.id,
+                        xtNumber: ticket.xt_number,
+                        priority: ticket.priority,
+                        status: ticket.status || "open",
+                        site: ticket.site,
+                        location: ticket.location
+                    },
+                    req.user?.id || null,
+                    req
+                );
+            }
+
             res.json({
                 success: true,
                 id: result.id,
@@ -134,7 +153,56 @@ class TicketController {
             const ticketId = req.params.id;
             const ticket = req.body;
 
+            // Fetch existing ticket BEFORE update for change tracking
+            const existingTicket = await controller.ticketService.getTicketById(ticketId);
+
             const _result = await controller.ticketService.updateTicket(ticketId, ticket);
+
+            // Track changes for audit
+            const changes = {};
+            const trackFields = ["status", "priority", "assigned_to", "notes", "vulnerabilities", "site", "location"];
+            trackFields.forEach(field => {
+                if (ticket[field] !== undefined && ticket[field] !== existingTicket[field]) {
+                    changes[field] = {
+                        from: existingTicket[field],
+                        to: ticket[field]
+                    };
+                }
+            });
+
+            // Audit: Ticket update
+            if (global.logger?.audit) {
+                await global.logger.audit(
+                    "ticket.update",
+                    `Ticket ${existingTicket.xt_number} updated`,
+                    {
+                        ticketId: ticketId,
+                        xtNumber: existingTicket.xt_number,
+                        changes: changes,
+                        changeCount: Object.keys(changes).length
+                    },
+                    req.user?.id || null,
+                    req
+                );
+
+                // Special audit entry for status changes
+                if (changes.status) {
+                    await global.logger.audit(
+                        "ticket.status_change",
+                        `Ticket ${existingTicket.xt_number} status changed from ${changes.status.from} to ${changes.status.to}`,
+                        {
+                            ticketId: ticketId,
+                            xtNumber: existingTicket.xt_number,
+                            previousStatus: changes.status.from,
+                            newStatus: changes.status.to,
+                            transitionType: `${changes.status.from}_to_${changes.status.to}`
+                        },
+                        req.user?.id || null,
+                        req
+                    );
+                }
+            }
+
             res.json({
                 success: true,
                 id: ticketId,
@@ -165,11 +233,31 @@ class TicketController {
             const { deletion_reason } = req.body; // Accept reason from request body
             const deletedBy = req.user?.username || "system"; // From auth session
 
+            // Fetch ticket BEFORE deletion for audit
+            const ticket = await controller.ticketService.getTicketById(ticketId);
+
             const deletedCount = await controller.ticketService.deleteTicket(
                 ticketId,
                 deletion_reason,
                 deletedBy
             );
+
+            // Audit: Ticket deletion
+            if (global.logger?.audit) {
+                await global.logger.audit(
+                    "ticket.delete",
+                    `Ticket ${ticket.xt_number} deleted (soft delete)`,
+                    {
+                        ticketId: ticketId,
+                        xtNumber: ticket.xt_number,
+                        deletionReason: deletion_reason || "No reason provided",
+                        deletedBy: deletedBy,
+                        softDelete: true // HexTrackr uses soft deletes
+                    },
+                    req.user?.id || null,
+                    req
+                );
+            }
 
             res.json({
                 success: true,
@@ -203,6 +291,23 @@ class TicketController {
             }
 
             const result = await controller.ticketService.migrateTickets(tickets);
+
+            // Audit: Ticket migration
+            if (global.logger?.audit) {
+                await global.logger.audit(
+                    "ticket.migrate",
+                    `Legacy ticket migration completed: ${result.successCount} tickets migrated`,
+                    {
+                        totalTickets: tickets.length,
+                        successCount: result.successCount,
+                        errorCount: result.errorCount,
+                        migrationSource: "legacy_import"
+                    },
+                    req.user?.id || null,
+                    req
+                );
+            }
+
             res.json({
                 success: true,
                 message: `Migration completed: ${result.successCount} tickets migrated, ${result.errorCount} errors`

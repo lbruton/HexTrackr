@@ -519,6 +519,172 @@ class LoggingService {
     }
 
     /**
+     * Get audit log statistics (HEX-254 Session 13)
+     * @returns {Promise<Object>} Statistics object with totalLogs, oldestLog, newestLog, categoriesTracked
+     */
+    async getAuditLogStatistics() {
+        return new Promise((resolve, reject) => {
+            if (!this.db) {
+                reject(new Error("Database not initialized"));
+                return;
+            }
+
+            // Get total logs, oldest, and newest timestamps
+            this.db.get(
+                `SELECT
+                    COUNT(*) as totalLogs,
+                    MIN(timestamp) as oldestLog,
+                    MAX(timestamp) as newestLog
+                 FROM audit_logs`,
+                [],
+                (err, statsRow) => {
+                    if (err) {
+                        reject(new Error("Failed to get audit log stats: " + err.message));
+                        return;
+                    }
+
+                    // Get unique categories
+                    this.db.all(
+                        "SELECT DISTINCT category FROM audit_logs ORDER BY category",
+                        [],
+                        (categoryErr, categoryRows) => {
+                            if (categoryErr) {
+                                reject(new Error("Failed to get categories: " + categoryErr.message));
+                                return;
+                            }
+
+                            resolve({
+                                totalLogs: statsRow.totalLogs || 0,
+                                oldestLog: statsRow.oldestLog || null,
+                                newestLog: statsRow.newestLog || null,
+                                categoriesTracked: categoryRows.map(row => row.category),
+                                encryptionStatus: "active"
+                            });
+                        }
+                    );
+                }
+            );
+        });
+    }
+
+    /**
+     * Query audit logs with filtering and pagination (HEX-254 Session 13)
+     * @param {Object} filters - {startDate, endDate, category, page, limit}
+     * @returns {Promise<Object>} {logs: array, pagination: object}
+     */
+    async queryAuditLogs(filters = {}) {
+        return new Promise((resolve, reject) => {
+            if (!this.db) {
+                reject(new Error("Database not initialized"));
+                return;
+            }
+
+            const {
+                startDate = null,
+                endDate = null,
+                category = null,
+                page = 1,
+                limit = 100
+            } = filters;
+
+            // Build WHERE clauses
+            const whereClauses = [];
+            const params = [];
+
+            if (startDate) {
+                whereClauses.push("timestamp >= ?");
+                params.push(startDate);
+            }
+            if (endDate) {
+                whereClauses.push("timestamp <= ?");
+                params.push(endDate);
+            }
+            if (category) {
+                whereClauses.push("category = ?");
+                params.push(category);
+            }
+
+            const whereClause = whereClauses.length > 0 ? "WHERE " + whereClauses.join(" AND ") : "";
+
+            // Get total count for pagination
+            this.db.get(
+                `SELECT COUNT(*) as total FROM audit_logs ${whereClause}`,
+                params,
+                (countErr, countRow) => {
+                    if (countErr) {
+                        reject(new Error("Failed to count audit logs: " + countErr.message));
+                        return;
+                    }
+
+                    const total = countRow.total || 0;
+                    const pages = Math.ceil(total / limit);
+                    const offset = (page - 1) * limit;
+
+                    // Get paginated logs
+                    this.db.all(
+                        `SELECT
+                            id, timestamp, category,
+                            encrypted_message, encryption_iv, encrypted_data,
+                            user_id, username, ip_address, user_agent, request_id
+                         FROM audit_logs
+                         ${whereClause}
+                         ORDER BY timestamp DESC
+                         LIMIT ? OFFSET ?`,
+                        [...params, limit, offset],
+                        (logsErr, rows) => {
+                            if (logsErr) {
+                                reject(new Error("Failed to query audit logs: " + logsErr.message));
+                                return;
+                            }
+
+                            // Decrypt messages
+                            const logs = rows.map(row => {
+                                try {
+                                    const decrypted = this.decrypt(row.encrypted_message, row.encryption_iv);
+                                    return {
+                                        id: row.id,
+                                        timestamp: row.timestamp,
+                                        category: row.category,
+                                        message: decrypted || "[Decryption failed]",
+                                        user_id: row.user_id,
+                                        username: row.username,
+                                        ip_address: row.ip_address,
+                                        user_agent: row.user_agent,
+                                        request_id: row.request_id
+                                    };
+                                } catch (decryptErr) {
+                                    // Return partial data if decryption fails
+                                    return {
+                                        id: row.id,
+                                        timestamp: row.timestamp,
+                                        category: row.category,
+                                        message: "[Decryption failed]",
+                                        user_id: row.user_id,
+                                        username: row.username,
+                                        ip_address: row.ip_address,
+                                        user_agent: row.user_agent,
+                                        request_id: row.request_id
+                                    };
+                                }
+                            });
+
+                            resolve({
+                                logs,
+                                pagination: {
+                                    page,
+                                    limit,
+                                    total,
+                                    pages
+                                }
+                            });
+                        }
+                    );
+                }
+            );
+        });
+    }
+
+    /**
      * Get default configuration (fallback if file loading fails)
      * @private
      */

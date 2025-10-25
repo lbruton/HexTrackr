@@ -76,6 +76,37 @@ function requireAuth(req, res, next) {
 }
 
 /**
+ * Admin authorization middleware - ensures user has admin role
+ * Must be used after requireAuth middleware
+ * @param {Object} req - Express request with req.user populated
+ * @param {Object} res - Express response
+ * @param {Function} next - Next middleware
+ */
+function requireAdmin(req, res, next) {
+    // Accept both "admin" and "superadmin" roles
+    const allowedRoles = ["admin", "superadmin"];
+
+    if (!req.user || !allowedRoles.includes(req.user.role)) {
+        if (global.logger?.error) {
+            global.logger.error("backend", "auth", "Non-admin access attempt to admin-only route", {
+                path: req.path,
+                method: req.method,
+                userId: req.user?.id,
+                userRole: req.user?.role
+            });
+        } else {
+            console.error("Non-admin access attempt:", req.path);
+        }
+        return res.status(403).json({
+            success: false,
+            error: "Admin access required"
+        });
+    }
+
+    next();
+}
+
+/**
  * Extended session for "Remember Me" functionality
  * Call this after successful login when user checks "Remember Me"
  * @param {Object} req - Express request with session
@@ -89,5 +120,6 @@ function extendSession(req) {
 module.exports = {
     sessionMiddleware,
     requireAuth,
+    requireAdmin,
     extendSession
 };

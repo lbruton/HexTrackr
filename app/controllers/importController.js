@@ -195,7 +195,8 @@ async function importVulnerabilitiesStaging(req, res) {
             scanDate,
             sessionId,
             startTime,
-            progressTracker
+            progressTracker,
+            userId: req.user?.id || null  // ADD: Capture authenticated user ID for audit trail
         });
 
     } catch (error) {
