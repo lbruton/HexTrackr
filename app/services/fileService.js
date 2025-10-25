@@ -206,7 +206,11 @@ class FileService {
                 this.deleteFile(filePath);
             }
         } catch (error) {
-            console.error("Error cleaning up uploaded file:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "file", "Error cleaning up uploaded file", { error: error.message, filePath });
+            } else {
+                console.error("Error cleaning up uploaded file:", error);
+            }
         }
     }
 
@@ -381,12 +385,20 @@ class FileService {
 
                     if (now - stats.mtime.getTime() > maxAge) {
                         this.deleteFile(filePath);
-                        console.log(`Cleaned up temporary file: ${filePath}`);
+                        if (global.logger?.info) {
+                            global.logger.info("backend", "file", "Cleaned up temporary file", { filePath, ageMs: now - stats.mtime.getTime() });
+                        } else {
+                            console.log(`Cleaned up temporary file: ${filePath}`);
+                        }
                     }
                 }
             }
         } catch (error) {
-            console.error(`Failed to cleanup temp files in ${directory}:`, error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "file", "Failed to cleanup temp files", { error: error.message, directory });
+            } else {
+                console.error(`Failed to cleanup temp files in ${directory}:`, error);
+            }
         }
     }
 
