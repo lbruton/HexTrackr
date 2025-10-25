@@ -71,7 +71,7 @@ const syncRoutes = require("../routes/sync"); // HEX-279: Unified sync status en
 const deviceRoutes = require("../routes/devices"); // HEX-101: Device statistics endpoint
 const authRoutes = require("../routes/auth");
 const preferencesRoutes = require("../routes/preferences"); // HEX-138: User preferences API
-const auditLogRoutes = require("../routes/auditLogs"); // HEX-254: Audit log API
+const auditLogRoutes = require("../routes/auditLogRoutes"); // HEX-254: Audit log API (Session 13)
 const locationRoutes = require("../routes/locations"); // HEX-292: Location Cards API
 
 // Express application & HTTP/HTTPS server
