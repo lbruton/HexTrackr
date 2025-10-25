@@ -40,7 +40,11 @@ class DocsService {
                 frameworks: frameworks.length
             };
         } catch (error) {
-            console.error("DocsService.computeStats failed:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "docs", "DocsService.computeStats failed", { error: error.message, stack: error.stack });
+            } else {
+                console.error("DocsService.computeStats failed:", error);
+            }
             throw error;
         }
     }
@@ -66,7 +70,11 @@ class DocsService {
             const matches = serverCode.match(apiRouteRegex) || [];
             return [...new Set(matches)].length; // dedupe
         } catch (error) {
-            console.error("Failed to compute API endpoints:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "docs", "Failed to compute API endpoints", { error: error.message, filePath: this.serverFilePath });
+            } else {
+                console.error("Failed to compute API endpoints:", error);
+            }
             return 0;
         }
     }
@@ -131,7 +139,11 @@ class DocsService {
 
             return jsFunctions;
         } catch (error) {
-            console.error("Failed to compute JS function count:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "docs", "Failed to compute JS function count", { error: error.message });
+            } else {
+                console.error("Failed to compute JS function count:", error);
+            }
             return 0;
         }
     }

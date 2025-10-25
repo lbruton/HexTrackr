@@ -88,7 +88,11 @@ class TemplateController {
                 count: templates.length
             });
         } catch (error) {
-            console.error("Error fetching templates:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "template", "Error fetching templates", { error: error.message });
+            } else {
+                console.error("Error fetching templates:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to fetch templates",
@@ -120,7 +124,11 @@ class TemplateController {
                 data: template
             });
         } catch (error) {
-            console.error("Error fetching template:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "template", "Error fetching template by ID", { error: error.message, id: req.params.id });
+            } else {
+                console.error("Error fetching template:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to fetch template",
@@ -152,7 +160,11 @@ class TemplateController {
                 data: template
             });
         } catch (error) {
-            console.error("Error fetching template by name:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "template", "Error fetching template by name", { error: error.message, name: req.params.name });
+            } else {
+                console.error("Error fetching template by name:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to fetch template",
@@ -209,7 +221,11 @@ class TemplateController {
                 message: "Template updated successfully"
             });
         } catch (error) {
-            console.error("Error updating template:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "template", "Error updating template", { error: error.message, id: req.params.id });
+            } else {
+                console.error("Error updating template:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to update template",
@@ -250,7 +266,11 @@ class TemplateController {
                 message: "Template created successfully"
             });
         } catch (error) {
-            console.error("Error creating template:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "template", "Error creating template", { error: error.message, name: req.body.name });
+            } else {
+                console.error("Error creating template:", error);
+            }
             if (error.message && error.message.includes("UNIQUE")) {
                 return res.status(409).json({
                     success: false,
@@ -291,7 +311,11 @@ class TemplateController {
                 message: "Template reset to default successfully"
             });
         } catch (error) {
-            console.error("Error resetting template:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "template", "Error resetting template to default", { error: error.message, id: req.params.id });
+            } else {
+                console.error("Error resetting template:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to reset template",
@@ -334,7 +358,11 @@ class TemplateController {
                 }
             });
         } catch (error) {
-            console.error("Error previewing template:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "template", "Error previewing template with data", { error: error.message, id: req.params.id });
+            } else {
+                console.error("Error previewing template:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to preview template",

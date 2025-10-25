@@ -47,7 +47,11 @@ class PaloAltoController {
             // Perform sync (pass userId from session for consistency, not used for Palo Alto)
             const result = await this.paloAdvisoryService.syncPaloAdvisories(req.session.userId);
 
-            console.log(` Palo Alto advisory sync completed: ${result.totalAdvisories} advisories, ${result.matchedCount} matched`);
+            if (global.logger?.info) {
+                global.logger.info("backend", "paloalto", "Palo Alto advisory sync completed", { totalAdvisories: result.totalAdvisories, matchedCount: result.matchedCount });
+            } else {
+                console.log(` Palo Alto advisory sync completed: ${result.totalAdvisories} advisories, ${result.matchedCount} matched`);
+            }
 
             // Clear all caches after sync (vulnerabilities may have new fix data)
             cacheService.clearAll();
@@ -62,7 +66,11 @@ class PaloAltoController {
             });
 
         } catch (error) {
-            console.error("Palo Alto advisory sync failed:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "paloalto", "Palo Alto advisory sync failed", { error: error.message });
+            } else {
+                console.error("Palo Alto advisory sync failed:", error);
+            }
             res.status(500).json({
                 error: "Failed to sync Palo Alto advisory data",
                 message: error.message
@@ -82,7 +90,11 @@ class PaloAltoController {
             const status = await this.paloAdvisoryService.getSyncStatus();
             res.json(status);
         } catch (error) {
-            console.error("Failed to get Palo Alto advisory status:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "paloalto", "Failed to get Palo Alto advisory status", { error: error.message });
+            } else {
+                console.error("Failed to get Palo Alto advisory status:", error);
+            }
             res.status(500).json({
                 error: "Failed to get Palo Alto advisory status",
                 message: error.message
@@ -120,7 +132,11 @@ class PaloAltoController {
             }, 60);
 
         } catch (error) {
-            console.error(` Failed to get Palo Alto advisory for CVE ${req.params.cveId}:`, error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "paloalto", "Failed to get Palo Alto advisory", { cveId: req.params.cveId, error: error.message });
+            } else {
+                console.error(` Failed to get Palo Alto advisory for CVE ${req.params.cveId}:`, error);
+            }
             res.status(500).json({
                 error: "Failed to get Palo Alto advisory data",
                 message: error.message
@@ -146,7 +162,11 @@ class PaloAltoController {
             });
 
         } catch (error) {
-            console.error("Failed to check Palo Alto auto-sync status:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "paloalto", "Failed to check Palo Alto auto-sync status", { error: error.message });
+            } else {
+                console.error("Failed to check Palo Alto auto-sync status:", error);
+            }
             res.status(500).json({
                 error: "Failed to check auto-sync status",
                 message: error.message
