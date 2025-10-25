@@ -34,7 +34,11 @@ class DocsController {
                 computedAt: new Date().toISOString()
             };
         } catch (error) {
-            console.error("DocsController.getStats failed:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "docs", "DocsController.getStats failed", { error: error.message });
+            } else {
+                console.error("DocsController.getStats failed:", error);
+            }
             throw new Error("Failed to compute documentation statistics");
         }
     }

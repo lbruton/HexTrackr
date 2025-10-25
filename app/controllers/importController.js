@@ -51,15 +51,24 @@ async function importVulnerabilities(req, res) {
         const extractedDate = importService.extractDateFromFilename(filename);
         const scanDate = req.body.scanDate || extractedDate || new Date().toISOString().split("T")[0];
 
-        console.log("📥 STANDARD IMPORT: Starting vulnerability CSV import");
-        console.log(` File: ${filename}, Vendor: ${vendor}, Scan Date: ${scanDate}`);
+        if (global.logger?.info) {
+            global.logger.info("backend", "import", "STANDARD IMPORT: Starting vulnerability CSV import");
+            global.logger.info("backend", "import", "Import file metadata", { filename, vendor, scanDate });
+        } else {
+            console.log("STANDARD IMPORT: Starting vulnerability CSV import");
+            console.log(` File: ${filename}, Vendor: ${vendor}, Scan Date: ${scanDate}`);
+        }
 
         // Parse CSV file
         const csvData = PathValidator.safeReadFileSync(req.file.path, "utf8");
         const results = await importService.parseCSV(csvData);
         const rows = results.data.filter(row => Object.values(row).some(val => val && val.trim()));
 
-        console.log(` Parsed ${rows.length} rows from CSV`);
+        if (global.logger?.info) {
+            global.logger.info("backend", "import", "CSV parsed successfully", { rowCount: rows.length });
+        } else {
+            console.log(` Parsed ${rows.length} rows from CSV`);
+        }
 
         // Create import record
         const importRecord = await importService.createImportRecord({
@@ -85,7 +94,11 @@ async function importVulnerabilities(req, res) {
                 PathValidator.safeUnlinkSync(req.file.path);
             }
         } catch (cleanupError) {
-            console.warn("File cleanup warning:", cleanupError.message);
+            if (global.logger?.warn) {
+                global.logger.warn("backend", "import", "File cleanup warning", { error: cleanupError.message });
+            } else {
+                console.warn("File cleanup warning:", cleanupError.message);
+            }
         }
 
         res.json({
@@ -98,7 +111,11 @@ async function importVulnerabilities(req, res) {
         });
 
     } catch (error) {
-        console.error("Vulnerability import failed:", error);
+        if (global.logger?.error) {
+            global.logger.error("backend", "import", "Vulnerability import failed", { error: error.message });
+        } else {
+            console.error("Vulnerability import failed:", error);
+        }
 
         // Clean up file on error
         try {
@@ -106,7 +123,11 @@ async function importVulnerabilities(req, res) {
                 PathValidator.safeUnlinkSync(req.file.path);
             }
         } catch (cleanupError) {
-            console.warn("File cleanup error:", cleanupError.message);
+            if (global.logger?.warn) {
+                global.logger.warn("backend", "import", "File cleanup error", { error: cleanupError.message });
+            } else {
+                console.warn("File cleanup error:", cleanupError.message);
+            }
         }
 
         res.status(500).json({
@@ -178,7 +199,11 @@ async function importVulnerabilitiesStaging(req, res) {
         });
 
     } catch (error) {
-        console.error("Staging import failed:", error);
+        if (global.logger?.error) {
+            global.logger.error("backend", "import", "Staging import failed", { error: error.message });
+        } else {
+            console.error("Staging import failed:", error);
+        }
 
         if (progressTracker && req.body.sessionId) {
             progressTracker.errorSession(req.body.sessionId, "Import failed: " + error.message, { error });
@@ -219,7 +244,11 @@ async function importVulnerabilitiesJSON(req, res) {
         });
 
     } catch (error) {
-        console.error("JSON vulnerability import failed:", error);
+        if (global.logger?.error) {
+            global.logger.error("backend", "import", "JSON vulnerability import failed", { error: error.message });
+        } else {
+            console.error("JSON vulnerability import failed:", error);
+        }
         res.status(500).json({
             success: false,
             error: "Import failed",
@@ -251,7 +280,11 @@ async function importTicketsJSON(req, res) {
         });
 
     } catch (error) {
-        console.error("JSON ticket import failed:", error);
+        if (global.logger?.error) {
+            global.logger.error("backend", "import", "JSON ticket import failed", { error: error.message });
+        } else {
+            console.error("JSON ticket import failed:", error);
+        }
         res.status(500).json({
             success: false,
             error: "Import failed",
@@ -273,7 +306,11 @@ async function getImportHistory(req, res) {
             data: imports
         });
     } catch (error) {
-        console.error("Error fetching import history:", error);
+        if (global.logger?.error) {
+            global.logger.error("backend", "import", "Error fetching import history", { error: error.message });
+        } else {
+            console.error("Error fetching import history:", error);
+        }
         res.status(500).json({
             success: false,
             error: "Failed to fetch import history",
@@ -317,7 +354,11 @@ async function checkImportProgress(req, res) {
         });
 
     } catch (error) {
-        console.error("Error checking import progress:", error);
+        if (global.logger?.error) {
+            global.logger.error("backend", "import", "Error checking import progress", { error: error.message });
+        } else {
+            console.error("Error checking import progress:", error);
+        }
         res.status(500).json({
             success: false,
             error: "Failed to check progress",

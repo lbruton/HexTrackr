@@ -136,7 +136,11 @@ class LocationController {
                 60                          // Browser TTL: 60 seconds
             );
         } catch (error) {
-            console.error("Error fetching location stats:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "location", "Error fetching location stats", { error: error.message });
+            } else {
+                console.error("Error fetching location stats:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to fetch location statistics",

@@ -82,7 +82,11 @@ class TicketController {
             const tickets = await controller.ticketService.getAllTickets();
             res.json(tickets);
         } catch (error) {
-            console.error("Error fetching tickets:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "ticket", "Error fetching all tickets", { error: error.message });
+            } else {
+                console.error("Error fetching tickets:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to fetch tickets",
@@ -107,7 +111,11 @@ class TicketController {
                 message: "Ticket saved successfully"
             });
         } catch (error) {
-            console.error("Error saving ticket:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "ticket", "Error creating new ticket", { error: error.message });
+            } else {
+                console.error("Error saving ticket:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to save ticket",
@@ -133,7 +141,11 @@ class TicketController {
                 message: "Ticket updated successfully"
             });
         } catch (error) {
-            console.error("Error updating ticket:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "ticket", "Error updating ticket", { error: error.message, ticketId: req.params.id });
+            } else {
+                console.error("Error updating ticket:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to update ticket",
@@ -164,7 +176,11 @@ class TicketController {
                 deleted: deletedCount
             });
         } catch (error) {
-            console.error("Error deleting ticket:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "ticket", "Error soft-deleting ticket", { error: error.message, ticketId: req.params.id });
+            } else {
+                console.error("Error deleting ticket:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to delete ticket",
@@ -192,7 +208,11 @@ class TicketController {
                 message: `Migration completed: ${result.successCount} tickets migrated, ${result.errorCount} errors`
             });
         } catch (error) {
-            console.error("Error migrating tickets:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "ticket", "Error migrating legacy tickets", { error: error.message });
+            } else {
+                console.error("Error migrating tickets:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to migrate tickets",
@@ -225,7 +245,11 @@ class TicketController {
                 errors: result.errors.length > 0 ? result.errors : undefined
             });
         } catch (error) {
-            console.error("Error importing tickets:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "ticket", "Error importing tickets from CSV", { error: error.message });
+            } else {
+                console.error("Error importing tickets:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Import failed",
@@ -244,7 +268,11 @@ class TicketController {
             const exportData = await controller.ticketService.exportTickets();
             res.json(exportData);
         } catch (error) {
-            console.error("Error exporting tickets for backup:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "ticket", "Error exporting tickets for backup", { error: error.message });
+            } else {
+                console.error("Error exporting tickets for backup:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to fetch tickets",
@@ -267,7 +295,11 @@ class TicketController {
                 nextXtNumber: nextXtNumber
             });
         } catch (error) {
-            console.error("Error generating next XT#:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "ticket", "Error generating next XT number", { error: error.message });
+            } else {
+                console.error("Error generating next XT#:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to generate next XT#",
@@ -302,7 +334,11 @@ class TicketController {
                 tickets: tickets
             });
         } catch (error) {
-            console.error(`Error fetching tickets for device ${req.params.hostname}:`, error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "ticket", "Error fetching tickets for device", { error: error.message, hostname: req.params.hostname });
+            } else {
+                console.error(`Error fetching tickets for device ${req.params.hostname}:`, error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to fetch tickets for device",
@@ -343,7 +379,11 @@ class TicketController {
                 data: ticketMap
             });
         } catch (error) {
-            console.error("Error fetching tickets for device batch:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "ticket", "Error fetching tickets for device batch", { error: error.message, batchSize: req.body.hostnames?.length });
+            } else {
+                console.error("Error fetching tickets for device batch:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to fetch tickets for device batch",
@@ -378,7 +418,11 @@ class TicketController {
                 tickets: tickets
             });
         } catch (error) {
-            console.error(`Error fetching tickets for location ${req.params.locationKey}:`, error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "ticket", "Error fetching tickets for location", { error: error.message, locationKey: req.params.locationKey });
+            } else {
+                console.error(`Error fetching tickets for location ${req.params.locationKey}:`, error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to fetch tickets for location",
@@ -426,7 +470,11 @@ class TicketController {
                 data: addresses
             });
         } catch (error) {
-            console.error("Error fetching address suggestions:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "ticket", "Error fetching address suggestions", { error: error.message, site: req.query.site, location: req.query.location });
+            } else {
+                console.error("Error fetching address suggestions:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to fetch address suggestions",

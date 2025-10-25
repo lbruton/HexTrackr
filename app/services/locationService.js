@@ -242,7 +242,12 @@ class LocationService {
             };
 
         } catch (error) {
-            console.error("[LocationService] Error getting location stats:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "location", "Error getting location stats", { error: error.message, stack: error.stack });
+            } else {
+                console.error("[LocationService] Error getting location stats:", error);
+            }
+
             return {
                 success: false,
                 data: [],
@@ -283,7 +288,11 @@ class LocationService {
             return ticketMap;
 
         } catch (error) {
-            console.error("[LocationService] Error getting ticket counts:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "location", "Error getting ticket counts", { error: error.message });
+            } else {
+                console.error("[LocationService] Error getting ticket counts:", error);
+            }
             return new Map(); // Return empty map on error
         }
     }

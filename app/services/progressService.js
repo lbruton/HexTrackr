@@ -71,7 +71,12 @@ class ProgressService {
             this.progressTracker.createSessionWithId(customSessionId, metadata) :
             this.progressTracker.createSession(metadata);
 
-        console.log(` Import session started: ${sessionId} for ${filename} (${totalRows} rows)`);
+        if (global.logger?.info) {
+            global.logger.info("backend", "progress", "Import session started", { sessionId, filename, totalRows, vendor, scanDate });
+        } else {
+            console.log(` Import session started: ${sessionId} for ${filename} (${totalRows} rows)`);
+        }
+
         return sessionId;
     }
 
@@ -86,7 +91,11 @@ class ProgressService {
     updateImportProgress(sessionId, processed, status, additionalData = {}) {
         const session = this.progressTracker.getSession(sessionId);
         if (!session) {
-            console.warn(`Import progress update attempted for unknown session: ${sessionId}`);
+            if (global.logger?.warn) {
+                global.logger.warn("backend", "progress", "Import progress update attempted for unknown session", { sessionId });
+            } else {
+                console.warn(`Import progress update attempted for unknown session: ${sessionId}`);
+            }
             return false;
         }
 
@@ -222,7 +231,12 @@ class ProgressService {
             this.progressTracker.createSessionWithId(customSessionId, metadata) :
             this.progressTracker.createSession(metadata);
 
-        console.log(` Export session started: ${sessionId} for ${type} (${totalItems} items, ${format} format)`);
+        if (global.logger?.info) {
+            global.logger.info("backend", "progress", "Export session started", { sessionId, exportType: type, totalItems, format });
+        } else {
+            console.log(` Export session started: ${sessionId} for ${type} (${totalItems} items, ${format} format)`);
+        }
+
         return sessionId;
     }
 
@@ -237,7 +251,11 @@ class ProgressService {
     updateExportProgress(sessionId, processed, phase = "querying", status = "") {
         const session = this.progressTracker.getSession(sessionId);
         if (!session) {
-            console.warn(`Export progress update attempted for unknown session: ${sessionId}`);
+            if (global.logger?.warn) {
+                global.logger.warn("backend", "progress", "Export progress update attempted for unknown session", { sessionId });
+            } else {
+                console.warn(`Export progress update attempted for unknown session: ${sessionId}`);
+            }
             return false;
         }
 
@@ -333,7 +351,13 @@ class ProgressService {
         if (this.progressTracker.sessions.has(sessionId)) {
             this.progressTracker.sessions.delete(sessionId);
             this.progressTracker.eventThrottle.delete(sessionId);
-            console.log(` Manually cleaned up session: ${sessionId}`);
+
+            if (global.logger?.info) {
+                global.logger.info("backend", "progress", "Manually cleaned up session", { sessionId });
+            } else {
+                console.log(` Manually cleaned up session: ${sessionId}`);
+            }
+
             return true;
         }
         return false;

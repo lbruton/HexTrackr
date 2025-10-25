@@ -87,7 +87,11 @@ class AuditLogController {
             });
 
         } catch (error) {
-            console.error("Error creating audit log:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "audit", "Error creating audit log", { error: error.message });
+            } else {
+                console.error("Error creating audit log:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to create audit log",

@@ -49,7 +49,11 @@ class LocationDetailsModal {
         try {
             // Validate inputs
             if (!location) {
-                console.error("[LocationDetailsModal] No location data provided");
+                if (window.logger?.error) {
+                    window.logger.error("location", "No location data provided");
+                } else {
+                    console.error("[LocationDetailsModal] No location data provided");
+                }
                 return;
             }
 
@@ -67,7 +71,11 @@ class LocationDetailsModal {
             this.showModal();
 
         } catch (error) {
-            console.error("[LocationDetailsModal] Error showing location details:", error);
+            if (window.logger?.error) {
+                window.logger.error("location", "Error showing location details", { error: error.message });
+            } else {
+                console.error("[LocationDetailsModal] Error showing location details:", error);
+            }
         }
     }
 
@@ -242,7 +250,11 @@ class LocationDetailsModal {
             });
 
         } catch (error) {
-            console.error("[LocationDetailsModal] Error populating location info:", error);
+            if (window.logger?.error) {
+                window.logger.error("location", "Error populating location info", { error: error.message });
+            } else {
+                console.error("[LocationDetailsModal] Error populating location info:", error);
+            }
             document.getElementById("locationInfo").innerHTML = "<p class=\"text-danger\">Error loading location information</p>";
         }
     }
@@ -392,7 +404,11 @@ class LocationDetailsModal {
                 </div>
             `;
         } catch (error) {
-            console.error("[LocationDetailsModal] Error populating vendor breakdown cards:", error);
+            if (window.logger?.error) {
+                window.logger.error("location", "Error populating vendor breakdown cards", { error: error.message });
+            } else {
+                console.error("[LocationDetailsModal] Error populating vendor breakdown cards:", error);
+            }
         }
     }
 
@@ -543,7 +559,11 @@ class LocationDetailsModal {
             // Get container and clear existing content
             const gridContainer = document.getElementById("locationDevicesGridContainer");
             if (!gridContainer) {
-                console.error("[LocationDetailsModal] Grid container not found");
+                if (window.logger?.error) {
+                    window.logger.error("location", "Grid container not found");
+                } else {
+                    console.error("[LocationDetailsModal] Grid container not found");
+                }
                 return;
             }
             gridContainer.innerHTML = "";
@@ -685,7 +705,11 @@ class LocationDetailsModal {
                                 const fixedVersionPromises = uniqueCves.map(cve =>
                                     advisoryHelper.getFixedVersion(cve, vendor, installedVersion)
                                         .catch(err => {
-                                            console.warn(`[LocationDetailsModal] Failed to get fixed version for ${cve}:`, err);
+                                            if (window.logger?.warn) {
+                                                window.logger.warn("location", `Failed to get fixed version for ${cve}`, { error: err.message });
+                                            } else {
+                                                console.warn(`[LocationDetailsModal] Failed to get fixed version for ${cve}:`, err);
+                                            }
                                             return null;
                                         })
                                 );
@@ -708,7 +732,11 @@ class LocationDetailsModal {
                                     params.node.setDataValue("fixedVersion", "No Fix");
                                 }
                             } catch (error) {
-                                console.error("[LocationDetailsModal] Fixed version lookup failed:", error);
+                                if (window.logger?.error) {
+                                    window.logger.error("location", "Fixed version lookup failed", { error: error.message });
+                                } else {
+                                    console.error("[LocationDetailsModal] Fixed version lookup failed:", error);
+                                }
                                 cell.innerHTML = "<span class=\"font-monospace text-muted\">Error</span>";
                                 params.node.setDataValue("fixedVersion", "Error");
                             }
@@ -876,7 +904,11 @@ class LocationDetailsModal {
             this.grid = agGrid.createGrid(gridContainer, gridOptions);
 
         } catch (error) {
-            console.error("[LocationDetailsModal] Error creating device grid:", error);
+            if (window.logger?.error) {
+                window.logger.error("location", "Error creating device grid", { error: error.message });
+            } else {
+                console.error("[LocationDetailsModal] Error creating device grid:", error);
+            }
         }
     }
 
@@ -907,7 +939,11 @@ class LocationDetailsModal {
             });
 
             if (!response.ok) {
-                console.error("[LocationDetailsModal] Failed to fetch batch ticket data:", response.statusText);
+                if (window.logger?.error) {
+                    window.logger.error("location", "Failed to fetch batch ticket data", { status: response.statusText });
+                } else {
+                    console.error("[LocationDetailsModal] Failed to fetch batch ticket data:", response.statusText);
+                }
                 // Return empty map on error
                 const emptyMap = {};
                 hostnames.forEach(hostname => {
@@ -919,7 +955,11 @@ class LocationDetailsModal {
             const result = await response.json();
             return result.data || {};
         } catch (error) {
-            console.error("[LocationDetailsModal] Error checking ticket state batch:", error);
+            if (window.logger?.error) {
+                window.logger.error("location", "Error checking ticket state batch", { error: error.message });
+            } else {
+                console.error("[LocationDetailsModal] Error checking ticket state batch:", error);
+            }
             // Return empty map on error
             const emptyMap = {};
             hostnames.forEach(hostname => {
@@ -1051,7 +1091,11 @@ class LocationDetailsModal {
             return devices;
 
         } catch (error) {
-            console.error("[LocationDetailsModal] Error aggregating device data:", error);
+            if (window.logger?.error) {
+                window.logger.error("location", "Error aggregating device data", { error: error.message });
+            } else {
+                console.error("[LocationDetailsModal] Error aggregating device data:", error);
+            }
             return [];
         }
     }
@@ -1067,7 +1111,11 @@ class LocationDetailsModal {
         if (window.vulnManager && typeof window.vulnManager.viewDeviceDetails === "function") {
             window.vulnManager.viewDeviceDetails(hostname);
         } else {
-            console.error("[LocationDetailsModal] vulnManager.viewDeviceDetails not available");
+            if (window.logger?.error) {
+                window.logger.error("location", "vulnManager.viewDeviceDetails not available");
+            } else {
+                console.error("[LocationDetailsModal] vulnManager.viewDeviceDetails not available");
+            }
         }
     }
 
@@ -1155,7 +1203,11 @@ class LocationDetailsModal {
         // Find device data to get ticket info
         const device = this.allDevices?.find(d => d.hostname === hostname);
         if (!device) {
-            console.error("[LocationDetailsModal] Device not found:", hostname);
+            if (window.logger?.error) {
+                window.logger.error("location", "Device not found", { hostname });
+            } else {
+                console.error("[LocationDetailsModal] Device not found:", hostname);
+            }
             return;
         }
 
@@ -1172,7 +1224,11 @@ class LocationDetailsModal {
             if (window.ticketManager && typeof window.ticketManager.editTicket === "function") {
                 window.ticketManager.editTicket(ticketId);
             } else {
-                console.error("[LocationDetailsModal] ticketManager.editTicket not available, falling back to navigation");
+                if (window.logger?.warn) {
+                    window.logger.warn("location", "ticketManager.editTicket not available, falling back to navigation");
+                } else {
+                    console.error("[LocationDetailsModal] ticketManager.editTicket not available, falling back to navigation");
+                }
                 window.location.href = `/tickets.html?openTicket=${ticketId}`;
             }
             return;
@@ -1194,7 +1250,11 @@ class LocationDetailsModal {
         if (window.ticketPickerModal && typeof window.ticketPickerModal.show === "function") {
             window.ticketPickerModal.show(hostname, tickets);
         } else {
-            console.error("[LocationDetailsModal] ticketPickerModal not available");
+            if (window.logger?.warn) {
+                window.logger.warn("location", "ticketPickerModal not available, using fallback navigation");
+            } else {
+                console.error("[LocationDetailsModal] ticketPickerModal not available");
+            }
             // Fallback: Navigate to tickets page filtered by device
             window.location.href = `/tickets.html?device=${encodeURIComponent(hostname)}`;
         }
@@ -1252,7 +1312,11 @@ class LocationDetailsModal {
             this.modal.show();
 
         } catch (error) {
-            console.error("[LocationDetailsModal] Error showing modal:", error);
+            if (window.logger?.error) {
+                window.logger.error("location", "Error showing modal", { error: error.message });
+            } else {
+                console.error("[LocationDetailsModal] Error showing modal:", error);
+            }
         }
     }
 
@@ -1279,7 +1343,11 @@ class LocationDetailsModal {
     async updateTicketButton(location) {
         const buttonContainer = document.getElementById("locationModalTicketButton");
         if (!buttonContainer) {
-            console.warn("[LocationDetailsModal] Ticket button container not found");
+            if (window.logger?.warn) {
+                window.logger.warn("location", "Ticket button container not found");
+            } else {
+                console.warn("[LocationDetailsModal] Ticket button container not found");
+            }
             return;
         }
 
@@ -1367,7 +1435,11 @@ class LocationDetailsModal {
             window.location.href = `/tickets.html?openTicket=${ticketId}`;
 
         } catch (error) {
-            console.error("[LocationDetailsModal] Error fetching single ticket:", error);
+            if (window.logger?.error) {
+                window.logger.error("location", "Error fetching single ticket", { error: error.message });
+            } else {
+                console.error("[LocationDetailsModal] Error fetching single ticket:", error);
+            }
             alert(`Failed to load ticket: ${error.message}`);
         }
     }
@@ -1384,7 +1456,11 @@ class LocationDetailsModal {
         if (window.locationCardsManager) {
             await window.locationCardsManager.fetchAndShowLocationTicketModal(locationKey);
         } else {
-            console.error("[LocationDetailsModal] locationCardsManager not available");
+            if (window.logger?.error) {
+                window.logger.error("location", "locationCardsManager not available");
+            } else {
+                console.error("[LocationDetailsModal] locationCardsManager not available");
+            }
         }
     }
 
@@ -1433,7 +1509,11 @@ class LocationDetailsModal {
             const fixedVersionPromises = uniqueCves.map(cve =>
                 advisoryHelper.getFixedVersion(cve, vendor, installedVersion)
                     .catch(err => {
-                        console.warn(`[LocationDetailsModal] Failed to get fixed version for ${cve}:`, err);
+                        if (window.logger?.warn) {
+                            window.logger.warn("location", `Failed to get fixed version for ${cve}`, { error: err.message });
+                        } else {
+                            console.warn(`[LocationDetailsModal] Failed to get fixed version for ${cve}:`, err);
+                        }
                         return null;
                     })
             );
@@ -1451,7 +1531,11 @@ class LocationDetailsModal {
                 return "No Fix";
             }
         } catch (error) {
-            console.error(`[LocationDetailsModal] Error calculating fixed version for ${device.hostname}:`, error);
+            if (window.logger?.error) {
+                window.logger.error("location", `Error calculating fixed version for ${device.hostname}`, { error: error.message });
+            } else {
+                console.error(`[LocationDetailsModal] Error calculating fixed version for ${device.hostname}:`, error);
+            }
             return "Error";
         }
     }
