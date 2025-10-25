@@ -196,7 +196,8 @@ async function importVulnerabilitiesStaging(req, res) {
             sessionId,
             startTime,
             progressTracker,
-            userId: req.user?.id || null  // ADD: Capture authenticated user ID for audit trail
+            userId: req.session?.userId || null,  // FIX: Use req.session.userId (HexTrackr uses express-session auth)
+            username: req.session?.username || null  // ADD: Include username for better audit trail display
         });
 
     } catch (error) {
