@@ -578,34 +578,27 @@ class LocationCardsManager {
         const uniqueTicketCount = locationTickets.size;
         const ticketArray = Array.from(locationTickets.values());
 
-        // Button state configuration (follows device-security-modal.js:1004-1012)
+        // Button state configuration - HEX-347: Simplified 3-color system
+        // Green = No tickets | Orange = Has tickets | Red = Has overdue ticket(s)
         let buttonText, buttonClass, buttonIcon;
-        const statusColors = {
-            "Pending": "warning",      // Amber yellow
-            "Staged": "info",          // Purple (using info as closest Bootstrap match)
-            "Open": "primary",         // Blue
-            "Overdue": "danger",       // Red
-            "Completed": "success",    // Green
-            "Failed": "danger",        // Orange-red
-            "Closed": "secondary"      // Gray
-        };
 
         if (uniqueTicketCount === 0) {
+            // GREEN: No tickets
             buttonText = "Create Ticket";
             buttonClass = "btn-outline-success";
             buttonIcon = "fas fa-ticket-alt";
         } else if (uniqueTicketCount === 1) {
+            // Single ticket: ORANGE or RED based on overdue status
             const ticket = ticketArray[0];
-            const statusColor = statusColors[ticket.status] || "secondary";
+            const isOverdue = ticket.status === "Overdue";
             buttonText = "View Ticket";
-            buttonClass = `btn-outline-${statusColor}`;
+            buttonClass = isOverdue ? "btn-outline-danger" : "btn-outline-warning";
             buttonIcon = "fas fa-folder-open";
         } else {
-            // Use most recent ticket's status for color
-            const ticket = ticketArray[0];
-            const statusColor = statusColors[ticket.status] || "secondary";
+            // Multiple tickets: ORANGE or RED (red if ANY ticket is overdue)
+            const hasOverdue = ticketArray.some(ticket => ticket.status === "Overdue");
             buttonText = `View Tickets (${uniqueTicketCount})`;
-            buttonClass = `btn-outline-${statusColor}`;
+            buttonClass = hasOverdue ? "btn-outline-danger" : "btn-outline-warning";
             buttonIcon = "fas fa-layer-group";
         }
 

@@ -1,6 +1,6 @@
 {
   "name": "hextrackr-server",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "HexTrackr with database backend",
   "main": "app/public/server.js",
   "type": "commonjs",
