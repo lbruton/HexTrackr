@@ -61,7 +61,8 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
 * **ticket_templates**: Field ops markdown templates (restored in [HEX-286](https://linear.app/hextrackr/issue/HEX-286/ticket-markdown-templates-truncated-in-database))
 * **vulnerability_templates**: CVE templates
 * **backup_metadata**: Backup history with retention policy
-* **audit_logs**: [HEX-254](https://linear.app/hextrackr/issue/HEX-254/implement-unified-logging-system-with-audit-trail) logging system (Session 10/14 complete)
+* **audit_logs**: [HEX-254](https://linear.app/hextrackr/issue/HEX-254/implement-unified-logging-system-with-audit-trail) logging system with AES-256-GCM encryption (14/14 sessions complete)
+* **audit_log_config**: Encryption key storage and retention policy configuration
 * **cisco_fixed_versions**: Normalized Cisco fixed versions (HEX-287 Migration 007)
 
 ## Key Commands
@@ -69,6 +70,25 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
 * Lint: `npm run lint`
 * Docs: `npm run docs:generate`
 * Database: `npm run db:backup`, `npm run db:restore`, `npm run db:migrate`
+
+## Audit Log System (HEX-254)
+
+**Admin Access**: Settings modal → "View Audit Logs" button (admin users only)
+**Features**: AES-256-GCM encrypted audit trail with filtering, search, CSV/JSON export
+**Categories Tracked**:
+- **Authentication**: `user.login`, `user.logout`, `user.failed_login`, `user.password_change`
+- **Tickets**: `ticket.create`, `ticket.update`, `ticket.delete`, `ticket.status_change`
+- **Imports**: `import.start`, `import.complete`, `import.failed`
+- **Backups**: `backup.create`, `backup.restore`
+- **System**: `settings.change`, `database.vacuum`, `sync.kev`, `sync.cisco`, `sync.palo_alto`
+
+**Quick Database Query**:
+```sql
+-- View recent audit logs (encrypted)
+SELECT category, username, timestamp FROM audit_logs ORDER BY timestamp DESC LIMIT 10;
+```
+
+**Documentation**: See `/docs/LOGGING_SYSTEM.md` for complete developer guide
 
 ## Testing & Development
 
