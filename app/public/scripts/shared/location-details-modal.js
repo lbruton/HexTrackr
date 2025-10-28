@@ -44,8 +44,9 @@ class LocationDetailsModal {
      * @param {Object} dataManager - VulnerabilityCore dataManager instance
      *
      * Pattern source: device-security-modal.js:57-76 (entry point pattern)
+     * HEX-351 Phase 2: Now async to support pre-aggregating device data for KEV count fix
      */
-    showLocationDetails(location, dataManager) {
+    async showLocationDetails(location, dataManager) {
         try {
             // Validate inputs
             if (!location) {
@@ -61,8 +62,15 @@ class LocationDetailsModal {
             this.currentLocation = location;
             this.dataManager = dataManager;
 
-            // Populate modal sections
-            this.populateLocationInfo(location);
+            // HEX-351 Phase 2: Pre-aggregate device data to get accurate KEV device count
+            const deviceData = await this.aggregateDeviceData(location);
+            this.allDevices = deviceData; // Store for later grid creation
+
+            // Calculate KEV device count from aggregated data (not from backend kev_count which is vulnerability count)
+            const kevDeviceCount = deviceData.filter(device => device.hasKev === true).length;
+
+            // Populate modal sections with corrected KEV count
+            this.populateLocationInfo(location, kevDeviceCount);
 
             // HEX-347: Update dynamic ticket button
             this.updateTicketButton(location);
@@ -82,16 +90,19 @@ class LocationDetailsModal {
     /**
      * Populate left info card with location data
      * @param {Object} location - Location data
+     * @param {number} [kevDeviceCount] - Actual count of KEV devices (overrides location.kev_count)
      *
      * Pattern source: device-security-modal.js:77-167 (info card population)
+     * HEX-351 Phase 2: Fixed KEV device count bug - now shows unique device count instead of vulnerability count
      */
-    populateLocationInfo(location) {
+    populateLocationInfo(location, kevDeviceCount) {
         try {
             // Extract location data with fallbacks
             const locationDisplay = location.location_display || location.location?.toUpperCase() || "N/A";
             const deviceCount = location.device_count || 0;
             const totalVPR = location.total_vpr || 0;
-            const kevCount = location.kev_count || 0;
+            // HEX-351 Phase 2: Use passed kevDeviceCount (calculated from aggregated devices) instead of backend kev_count
+            const kevCount = (kevDeviceCount !== undefined && kevDeviceCount !== null) ? kevDeviceCount : (location.kev_count || 0);
             const openTickets = location.open_tickets || 0;
 
             // VPR severity badge
@@ -574,11 +585,11 @@ class LocationDetailsModal {
                 this.gridApi = null;
             }
 
-            // Aggregate device data from vulnerabilities (now async with ticket counts)
-            const deviceData = await this.aggregateDeviceData(location);
-            this.allDevices = deviceData; // Store for filtering
+            // HEX-351 Phase 2: Use pre-aggregated device data from showLocationDetails()
+            // Device data is already stored in this.allDevices (calculated earlier for KEV count fix)
+            const deviceData = this.allDevices;
 
-            // Define column structure (matches Device Security Modal patterns)
+            // Define column structure (HEX-351 Phase 2: Added CVSS, KEV columns + severity-based colors)
             const columnDefs = [
                 {
                     headerName: "Hostname",
@@ -605,29 +616,75 @@ class LocationDetailsModal {
                     }
                 },
                 {
-                    headerName: "CVE",
-                    field: "vulnerabilityCount",
-                    width: 100,
+                    headerName: "Vendor",
+                    field: "vendor",
+                    width: 110,
                     cellRenderer: (params) => {
-                        const count = params.value || 0;
-                        const hasKev = params.data.hasKev;
-                        // Red for KEV devices, Orange for non-KEV devices
-                        // Must use !important to override AG-Grid's default cell styling
-                        const color = hasKev ? "#dc3545" : "#f76707";
-                        return `<span class="fw-bold" style="color: ${color} !important;">${count}</span>`;
+                        const vendor = params.value || "Other";
+                        // HEX-351 Phase 2 Fix: Colored text instead of badges for cleaner table
+                        let color = "#6c757d"; // Gray for Other
+                        if (vendor.toLowerCase().includes("cisco")) {
+                            color = "#1A73E8"; // Blue for Cisco
+                        } else if (vendor.toLowerCase().includes("palo")) {
+                            color = "#FF6B35"; // Orange for Palo Alto
+                        }
+                        return `<span style="color: ${color} !important; font-weight: 600;">${vendor}</span>`;
+                    }
+                },
+                {
+                    headerName: "CVSS",
+                    field: "highestCvss",
+                    width: 90,
+                    cellRenderer: (params) => {
+                        const cvss = params.value || 0;
+                        // Severity-based colors (Critical=red, High=orange, Medium=yellow, Low=green)
+                        let color = "#16a34a"; // Green for Low (0-3.9)
+                        if (cvss >= 9.0) {
+                            color = "#dc2626"; // Red for Critical (9-10)
+                        } else if (cvss >= 7.0) {
+                            color = "#f76707"; // Orange for High (7-8.9)
+                        } else if (cvss >= 4.0) {
+                            color = "#d97706"; // Yellow for Medium (4-6.9)
+                        }
+
+                        // Show "N/A" if CVSS is 0 (not available)
+                        if (cvss === 0) {
+                            return "<span class=\"text-muted\">N/A</span>";
+                        }
+
+                        return `<span style="color: ${color} !important; font-weight: 700;">${cvss.toFixed(1)}</span>`;
                     }
                 },
                 {
                     headerName: "VPR",
                     field: "totalVpr",
-                    width: 100,
+                    width: 90,
                     cellRenderer: (params) => {
                         const vpr = params.value || 0;
-                        const hasKev = params.data.hasKev;
-                        // KEV-based colors for consistency with CVE column
-                        // Red for KEV devices, Orange for non-KEV devices
-                        const color = hasKev ? "#dc3545" : "#f76707";
+                        const severity = params.data.highestSeverity;
+                        // HEX-351 Phase 2: Severity-based colors instead of KEV-based
+                        let color = "#16a34a"; // Green for Low
+                        if (severity === "Critical") {
+                            color = "#dc2626"; // Red for Critical
+                        } else if (severity === "High") {
+                            color = "#f76707"; // Orange for High
+                        } else if (severity === "Medium") {
+                            color = "#d97706"; // Yellow for Medium
+                        }
                         return `<span style="color: ${color} !important; font-weight: 700;">${vpr.toFixed(1)}</span>`;
+                    }
+                },
+                {
+                    headerName: "KEV",
+                    field: "hasKev",
+                    width: 70,
+                    cellRenderer: (params) => {
+                        const hasKev = params.value === true;
+                        // HEX-351 Phase 2 Fix: Colored text instead of badges for cleaner table
+                        if (hasKev) {
+                            return "<span style=\"color: #dc2626 !important; font-weight: 700;\">Yes</span>";
+                        }
+                        return "<span class=\"text-muted\">No</span>";
                     }
                 },
                 {
@@ -876,7 +933,8 @@ class LocationDetailsModal {
                 doesExternalFilterPass: (node) => this.doesExternalFilterPass(node),
                 initialState: {
                     sort: {
-                        sortModel: [{ colId: "totalVpr", sort: "desc" }]
+                        // HEX-351 Phase 2: Default sort by hostname A-Z for cleaner display
+                        sortModel: [{ colId: "hostname", sort: "asc" }]
                     }
                 },
                 onGridReady: (params) => {
@@ -1021,6 +1079,7 @@ class LocationDetailsModal {
                             Low: { count: 0, vpr: 0 }
                         },
                         hasKev: false,
+                        highestCvss: 0, // HEX-351 Phase 2: Track highest CVSS score per device
                         installedVersion: null,
                         fixedVersion: null,
                         ticketCount: 0,
@@ -1049,6 +1108,12 @@ class LocationDetailsModal {
                 // Track KEV status
                 if (vuln.isKev === "Yes") {
                     device.hasKev = true;
+                }
+
+                // HEX-351 Phase 2: Track highest CVSS score per device
+                const cvssScore = parseFloat(vuln.cvss_score) || 0;
+                if (cvssScore > device.highestCvss) {
+                    device.highestCvss = cvssScore;
                 }
 
                 // Extract version info (use first available)
