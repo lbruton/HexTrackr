@@ -1,6 +1,6 @@
 # Troubleshooting Guide
 
-**Version**: v1.1.7
+**Version**: v1.1.8
 **Last Updated**: 2025-10-09
 
 This guide covers common issues, solutions, and diagnostic steps for HexTrackr. Issues are organized by category for quick reference.
