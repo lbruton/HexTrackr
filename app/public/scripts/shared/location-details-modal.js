@@ -1084,25 +1084,33 @@ class LocationDetailsModal {
                         fixedVersion: null,
                         ticketCount: 0,
                         ticketStatus: null,
-                        highestSeverity: "Low"
+                        highestSeverity: "Low",
+                        vprByPlugin: new Map()  // HEX-356: Track VPR per plugin for deduplication
                     });
                 }
 
                 const device = deviceMap.get(hostname);
                 device.vulnerabilities.push(vuln);
                 device.vulnerabilityCount++;
-                device.totalVpr += vuln.vpr_score || 0;
+
+                // HEX-356: VPR Deduplication Fix
+                const vprScore = vuln.vpr_score || 0;
+                const pluginKey = vuln.plugin_id || vuln.description?.substring(0, 100) || "unknown";
+                const existingVpr = device.vprByPlugin.get(pluginKey) || 0;
+
+                if (vprScore > existingVpr) {
+                    device.vprByPlugin.set(pluginKey, vprScore);
+                }
 
                 // Extract vendor from first vulnerability (all vulns for same device have same vendor)
                 if (!device.vendor && vuln.vendor) {
                     device.vendor = vuln.vendor;
                 }
 
-                // Update severity breakdown
+                // Update severity breakdown count (VPR will be calculated later from deduplicated data)
                 const severity = vuln.severity || "Low";
                 if (device.severityBreakdown[severity]) {
                     device.severityBreakdown[severity].count++;
-                    device.severityBreakdown[severity].vpr += vuln.vpr_score || 0;
                 }
 
                 // Track KEV status
@@ -1129,8 +1137,41 @@ class LocationDetailsModal {
                 }
             });
 
-            // Convert map to array and calculate highest severity
+            // Convert map to array and calculate highest severity + deduplicated VPR
             const devices = Array.from(deviceMap.values()).map(device => {
+                // HEX-356: Calculate deduplicated VPR totals
+                device.totalVpr = Array.from(device.vprByPlugin.values())
+                    .reduce((sum, vpr) => sum + vpr, 0);
+
+                // Calculate severity-specific VPR from deduplicated data
+                const severityVprMap = {
+                    Critical: new Map(),
+                    High: new Map(),
+                    Medium: new Map(),
+                    Low: new Map()
+                };
+
+                device.vulnerabilities.forEach(vuln => {
+                    const vprScore = vuln.vpr_score || 0;
+                    const pluginKey = vuln.plugin_id || vuln.description?.substring(0, 100) || "unknown";
+                    const severity = vuln.severity || "Low";
+
+                    if (severityVprMap[severity]) {
+                        const existingVpr = severityVprMap[severity].get(pluginKey) || 0;
+                        if (vprScore > existingVpr) {
+                            severityVprMap[severity].set(pluginKey, vprScore);
+                        }
+                    }
+                });
+
+                device.severityBreakdown.Critical.vpr = Array.from(severityVprMap.Critical.values()).reduce((sum, vpr) => sum + vpr, 0);
+                device.severityBreakdown.High.vpr = Array.from(severityVprMap.High.values()).reduce((sum, vpr) => sum + vpr, 0);
+                device.severityBreakdown.Medium.vpr = Array.from(severityVprMap.Medium.values()).reduce((sum, vpr) => sum + vpr, 0);
+                device.severityBreakdown.Low.vpr = Array.from(severityVprMap.Low.values()).reduce((sum, vpr) => sum + vpr, 0);
+
+                // Clean up temporary map
+                delete device.vprByPlugin;
+
                 // Determine highest severity based on counts
                 if (device.severityBreakdown.Critical.count > 0) {
                     device.highestSeverity = "Critical";
