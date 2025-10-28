@@ -127,6 +127,17 @@ class DeviceSecurityModal {
             </div>
             <div class="mb-3">
                 <div class="row">
+                    <div class="col-sm-4 text-muted">Location:</div>
+                    <div class="col-sm-8">
+                        <a href="#" class="location-link text-primary"
+                           onclick="event.preventDefault(); event.stopPropagation(); window.deviceSecurityModal.openLocationModal('${device.hostname}'); return false;">
+                            <i class="fas fa-map-marker-alt me-1"></i>${window.hostnameParserHelper?.extractLocationFromHostname(device.hostname).toUpperCase() || device.hostname.substring(0, 5).toUpperCase()}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="row">
                     <div class="col-sm-4 text-muted">Fixed Version(s):</div>
                     <div class="col-sm-8">
                         <span id="deviceFixedVersion" class="font-monospace text-muted">Loading...</span>
@@ -1277,6 +1288,56 @@ class DeviceSecurityModal {
      */
     setupReportWindowControls(reportWindow) {
         logger.warn("[Device Modal] setupReportWindowControls() has been deprecated");
+    }
+
+    /**
+     * Open location details modal for a given hostname
+     * HEX-351: Added to support location links in Device Security Modal
+     * Uses shared hostname-parser-helper.js for location extraction
+     * @param {string} hostname - Full device hostname (e.g., "stroudnswan01")
+     */
+    async openLocationModal(hostname) {
+        try {
+            // Extract location from hostname using shared helper
+            const locationCode = window.hostnameParserHelper?.extractLocationFromHostname(hostname) ||
+                                hostname.substring(0, 5).toLowerCase();
+
+            // Fetch location data from API
+            const response = await fetch("/api/locations/stats");
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            const result = await response.json();
+            if (!result.success || !result.data) {
+                throw new Error(result.error || "Failed to fetch location data");
+            }
+
+            // Find matching location (case-insensitive)
+            const normalizedCode = locationCode.toLowerCase();
+            const locationData = result.data.find(loc =>
+                (loc.location || "").toLowerCase() === normalizedCode ||
+                (loc.location_display || "").toLowerCase() === normalizedCode
+            );
+
+            if (!locationData) {
+                logger.warn(`[Device Modal] Location not found: ${locationCode}`);
+                this.showToast(`Location "${locationCode.toUpperCase()}" not found`, "warning");
+                return;
+            }
+
+            // Open Location Details Modal
+            if (window.locationDetailsModal && typeof window.locationDetailsModal.showLocationDetails === "function") {
+                window.locationDetailsModal.showLocationDetails(locationData, this.dataManager);
+            } else {
+                logger.error("[Device Modal] locationDetailsModal not available");
+                this.showToast("Location details modal not available", "error");
+            }
+
+        } catch (error) {
+            logger.error("[Device Modal] Failed to open location modal:", error);
+            this.showToast("Failed to load location details", "error");
+        }
     }
 
     /**

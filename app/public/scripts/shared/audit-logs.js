@@ -49,11 +49,16 @@ class AuditLogModalManager {
             // Attach event listeners
             this.attachEventListeners();
 
-            console.log("AuditLogModalManager initialized");
+            if (window.logger?.info) {
+                window.logger.info("audit", "AuditLogModalManager initialized");
+            }
 
         } catch (error) {
-            console.error("Failed to initialize AuditLogModalManager:", error);
-            global.logger?.error("frontend", "audit", "Failed to initialize audit logs modal", { error: error.message });
+            if (window.logger?.error) {
+                window.logger.error("audit", "Failed to initialize AuditLogModalManager", { error: error.message });
+            } else {
+                console.error("Failed to initialize AuditLogModalManager:", error);
+            }
         }
     }
 
@@ -449,12 +454,16 @@ class AuditLogModalManager {
             // Trigger download
             window.location.href = `/api/audit-logs/export?${params.toString()}`;
 
-            console.log(`Exporting audit logs as ${format}`);
-            global.logger?.info("frontend", "audit", `Exported audit logs as ${format}`);
+            if (window.logger?.info) {
+                window.logger.info("audit", `Exported audit logs as ${format}`);
+            }
 
         } catch (error) {
-            console.error(`Failed to export logs as ${format}:`, error);
-            global.logger?.error("frontend", "audit", `Failed to export logs as ${format}`, { error: error.message });
+            if (window.logger?.error) {
+                window.logger.error("audit", `Failed to export logs as ${format}`, { error: error.message });
+            } else {
+                console.error(`Failed to export logs as ${format}:`, error);
+            }
             this.showError(`Failed to export logs as ${format.toUpperCase()}. Please try again.`);
         }
     }

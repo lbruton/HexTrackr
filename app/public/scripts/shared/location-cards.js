@@ -205,6 +205,7 @@ class LocationCardsManager {
         const sortOptions = [
             { value: "kev_device_count", label: "KEV Priority" },
             { value: "vpr", label: "VPR Priority" },
+            { value: "tickets_priority", label: "Tickets Priority" },
             { value: "location_name_asc", label: "Name A-Z" },
             { value: "location_name_desc", label: "Name Z-A" },
             { value: "device_count", label: "Device Count (High-Low)" },
@@ -267,6 +268,13 @@ class LocationCardsManager {
                     aVal = (a.location_display || "").toLowerCase();
                     bVal = (b.location_display || "").toLowerCase();
                     return bVal.localeCompare(aVal);
+
+                case "tickets_priority":
+                    // HEX-351: Tickets Priority (High-Low)
+                    aVal = a.open_tickets || 0;
+                    bVal = b.open_tickets || 0;
+                    // Descending (high first)
+                    return bVal - aVal;
 
                 case "device_count":
                     // Device Count (High-Low)

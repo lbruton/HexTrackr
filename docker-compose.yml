@@ -29,7 +29,7 @@ services:
       - ./certs:/app/certs:ro
     environment:
       - NODE_ENV=${NODE_ENV:-development}
-      - HEXTRACKR_VERSION=1.1.7
+      - HEXTRACKR_VERSION=1.1.8
       - PORT=${PORT:-8080}
       - DATABASE_PATH=${DATABASE_PATH:-data/hextrackr.db}
       - USE_HTTPS=${USE_HTTPS:-false}

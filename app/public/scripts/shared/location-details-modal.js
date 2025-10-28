@@ -656,16 +656,17 @@ class LocationDetailsModal {
                     field: "fixedVersion",
                     width: 150,
                     cellRenderer: (params) => {
-                        const cellId = `fixed-version-cell-${params.node.id}`;
+                        // Create DOM element directly (not string) for AG-Grid to insert
+                        const container = document.createElement("span");
+                        container.className = "font-monospace text-muted";
+                        container.textContent = "Loading...";
 
-                        // Return placeholder with unique ID for async update
-                        setTimeout(async () => {
-                            const cell = document.getElementById(cellId);
-                            if (!cell) {return;}
-
+                        // Start async update immediately (no setTimeout needed)
+                        (async () => {
                             const device = params.data;
                             if (!device.vulnerabilities || device.vulnerabilities.length === 0) {
-                                cell.innerHTML = "<span class=\"font-monospace text-muted\">N/A</span>";
+                                container.className = "font-monospace text-muted";
+                                container.textContent = "N/A";
                                 return;
                             }
 
@@ -682,7 +683,8 @@ class LocationDetailsModal {
 
                             // Unsupported vendor or helper not loaded
                             if (!advisoryHelper) {
-                                cell.innerHTML = "<span class=\"font-monospace text-muted\">N/A</span>";
+                                container.className = "font-monospace text-muted";
+                                container.textContent = "N/A";
                                 params.node.setDataValue("fixedVersion", "N/A");
                                 return;
                             }
@@ -694,7 +696,8 @@ class LocationDetailsModal {
                                     .map(v => v.cve))];
 
                                 if (uniqueCves.length === 0) {
-                                    cell.innerHTML = "<span class=\"font-monospace text-muted\">No CVEs</span>";
+                                    container.className = "font-monospace text-muted";
+                                    container.textContent = "No CVEs";
                                     params.node.setDataValue("fixedVersion", "No CVEs");
                                     return;
                                 }
@@ -725,10 +728,12 @@ class LocationDetailsModal {
 
                                     // Display highest version (first after sort)
                                     const highestVersion = validVersions[0];
-                                    cell.innerHTML = `<span class=\"font-monospace text-success\">${DOMPurify.sanitize(highestVersion)}</span>`;
+                                    container.className = "font-monospace text-success";
+                                    container.textContent = highestVersion;
                                     params.node.setDataValue("fixedVersion", highestVersion);
                                 } else {
-                                    cell.innerHTML = "<span class=\"font-monospace text-muted\">No Fix</span>";
+                                    container.className = "font-monospace text-muted";
+                                    container.textContent = "No Fix";
                                     params.node.setDataValue("fixedVersion", "No Fix");
                                 }
                             } catch (error) {
@@ -737,12 +742,13 @@ class LocationDetailsModal {
                                 } else {
                                     console.error("[LocationDetailsModal] Fixed version lookup failed:", error);
                                 }
-                                cell.innerHTML = "<span class=\"font-monospace text-muted\">Error</span>";
+                                container.className = "font-monospace text-muted";
+                                container.textContent = "Error";
                                 params.node.setDataValue("fixedVersion", "Error");
                             }
-                        }, 0);
+                        })();
 
-                        return `<span id=\"${cellId}\" class=\"font-monospace text-muted\">Loading...</span>`;
+                        return container;
                     }
                 },
                 {
