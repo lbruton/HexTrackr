@@ -685,37 +685,30 @@ class LocationCardsManager {
         }
 
         // HEX-350: Use HostnameParserService API for intelligent location extraction
-        // Use first device hostname to parse location (all devices at same location)
-        let finalLocation = locationKey.toUpperCase(); // Fallback to location key
-        let finalSite = ""; // Default: blank (user will fill from Hexagon)
+        // No fallback - internal API must work for app to function
+        let finalLocation = "";
+        let finalSite = ""; // Blank unless found in tickets database
 
         if (deviceList.length > 0) {
-            try {
-                // Use first device to parse location
-                const firstHostname = deviceList[0].toLowerCase();
-                const parseResponse = await fetch(`/api/hostname/parse/${encodeURIComponent(firstHostname)}`);
-                if (parseResponse.ok) {
-                    const parseData = await parseResponse.json();
-                    if (parseData.success && parseData.data && parseData.data.confidence >= 0.5) {
-                        finalLocation = parseData.data.location.toUpperCase();
-                        logger.info("tickets", `[HEX-350] Parsed location from hostname: ${finalLocation}`, {
-                            hostname: firstHostname,
-                            confidence: parseData.data.confidence
-                        });
+            // Use first device to parse location (all devices at same location)
+            const firstHostname = deviceList[0].toLowerCase();
+            const parseResponse = await fetch(`/api/hostname/parse/${encodeURIComponent(firstHostname)}`);
+            const parseData = await parseResponse.json();
+            if (parseData.success && parseData.data) {
+                finalLocation = parseData.data.location.toUpperCase();
+                logger.info("tickets", `[HEX-350] Parsed location from hostname: ${finalLocation}`, {
+                    hostname: firstHostname,
+                    confidence: parseData.data.confidence
+                });
 
-                        // Lookup site from tickets database
-                        const siteResponse = await fetch(`/api/tickets/site-by-location/${encodeURIComponent(finalLocation)}`);
-                        if (siteResponse.ok) {
-                            const siteData = await siteResponse.json();
-                            if (siteData.success && siteData.site) {
-                                finalSite = siteData.site.toUpperCase();
-                                logger.info("tickets", `[HEX-350] Found site for location: ${finalSite}`);
-                            }
-                        }
-                    }
+                // Lookup site from tickets database
+                const siteResponse = await fetch(`/api/tickets/site-by-location/${encodeURIComponent(finalLocation)}`);
+                const siteData = await siteResponse.json();
+                if (siteData.success && siteData.site) {
+                    finalSite = siteData.site.toUpperCase();
+                    logger.info("tickets", `[HEX-350] Found site for location: ${finalSite}`);
                 }
-            } catch (error) {
-                logger.warn("tickets", "[HEX-350] Failed to parse hostname or fetch site, using fallback", error);
+                // If site not found, stays blank - user enters from Hexagon
             }
         }
 
@@ -818,31 +811,25 @@ class LocationCardsManager {
             const deviceList = allDevices.map(h => h.toUpperCase());
 
             // HEX-350: Use HostnameParserService API for intelligent location extraction
-            let finalLocation = locationKey.toUpperCase(); // Fallback
-            let finalSite = ""; // Default: blank
+            // No fallback - internal API must work for app to function
+            let finalLocation = "";
+            let finalSite = ""; // Blank unless found in tickets database
 
             if (deviceList.length > 0) {
-                try {
-                    // Use first device to parse location
-                    const firstHostname = deviceList[0].toLowerCase();
-                    const parseResponse = await fetch(`/api/hostname/parse/${encodeURIComponent(firstHostname)}`);
-                    if (parseResponse.ok) {
-                        const parseData = await parseResponse.json();
-                        if (parseData.success && parseData.data && parseData.data.confidence >= 0.5) {
-                            finalLocation = parseData.data.location.toUpperCase();
+                // Use first device to parse location
+                const firstHostname = deviceList[0].toLowerCase();
+                const parseResponse = await fetch(`/api/hostname/parse/${encodeURIComponent(firstHostname)}`);
+                const parseData = await parseResponse.json();
+                if (parseData.success && parseData.data) {
+                    finalLocation = parseData.data.location.toUpperCase();
 
-                            // Lookup site from tickets database
-                            const siteResponse = await fetch(`/api/tickets/site-by-location/${encodeURIComponent(finalLocation)}`);
-                            if (siteResponse.ok) {
-                                const siteData = await siteResponse.json();
-                                if (siteData.success && siteData.site) {
-                                    finalSite = siteData.site.toUpperCase();
-                                }
-                            }
-                        }
+                    // Lookup site from tickets database
+                    const siteResponse = await fetch(`/api/tickets/site-by-location/${encodeURIComponent(finalLocation)}`);
+                    const siteData = await siteResponse.json();
+                    if (siteData.success && siteData.site) {
+                        finalSite = siteData.site.toUpperCase();
                     }
-                } catch (error) {
-                    logger.warn("tickets", "[HEX-350] Failed to parse hostname or fetch site in modal", error);
+                    // If site not found, stays blank - user enters from Hexagon
                 }
             }
 
