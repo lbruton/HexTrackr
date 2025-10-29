@@ -587,6 +587,61 @@ class TicketController {
             });
         }
     }
+
+    /**
+     * Get site code by location from existing tickets
+     * HEX-350: Intelligent site field population based on existing tickets database
+     * Queries tickets table for most recent site associated with a location
+     * Used for auto-populating site field when creating tickets from vulnerabilities
+     *
+     * @async
+     * @param {Object} req - Express request object
+     * @param {Object} req.params - URL parameters
+     * @param {string} req.params.location - Location code (e.g., "NSWAN", "WTULSA")
+     * @param {Object} res - Express response object
+     * @returns {Promise<void>} Sends JSON response with site code:
+     *   - 200: {success: true, site: "TULS"} or {success: true, site: null}
+     *   - 400: {success: false, error: "Location parameter is required"}
+     *   - 500: {success: false, error: "Failed to fetch site for location", details: string}
+     * @throws {Error} Caught and returned as 500 response if TicketService.getSiteByLocation fails
+     * @route GET /api/tickets/site-by-location/:location
+     * @example
+     * // GET /api/tickets/site-by-location/WTULSA
+     * // Returns: {success: true, site: "TULS"}
+     * @example
+     * // GET /api/tickets/site-by-location/NEWLOC
+     * // Returns: {success: true, site: null} (no existing tickets for this location)
+     */
+    static async getSiteByLocation(req, res) {
+        try {
+            const controller = TicketController.getInstance();
+            const { location } = req.params;
+
+            if (!location) {
+                return res.status(400).json({
+                    success: false,
+                    error: "Location parameter is required"
+                });
+            }
+
+            const site = await controller.ticketService.getSiteByLocation(location);
+            res.json({
+                success: true,
+                site: site
+            });
+        } catch (error) {
+            if (global.logger?.error) {
+                global.logger.error("backend", "ticket", "Error fetching site for location", { error: error.message, location: req.params.location });
+            } else {
+                console.error(`Error fetching site for location ${req.params.location}:`, error);
+            }
+            res.status(500).json({
+                success: false,
+                error: "Failed to fetch site for location",
+                details: error.message
+            });
+        }
+    }
 }
 
 module.exports = TicketController;
