@@ -77,6 +77,20 @@ category: "Bug Fix"</h2><h1>Version 1.1.10 - Intelligent Ticket Creation (HEX-35
 <li><a href="https://linear.app/hextrackr/issue/HEX-350">HEX-350</a> - RESEARCH: Ticket Creation From Vulnerabilities.html</li>
 </ul>
 <hr>
+<h3>Documentation Improvements</h3><h4>JSDoc Enhancement - getAllTickets() Method (DOCS-165) - 2025-10-29</h4><ul>
+<li><strong>JSDoc</strong>: Fixed documentation for <code>getAllTickets()</code> in <code>app/controllers/ticketController.js</code> (<a href="https://linear.app/hextrackr/issue/DOCS-165">DOCS-165</a>)<ul>
+<li>Added complete JSDoc with @static, @async, @param, @returns, @throws, @route, @middleware, and @example tags</li>
+<li>Documented response structure for 200 and 500 status codes</li>
+<li>Added practical usage example showing ticket array format</li>
+<li>Improved IDE autocomplete and IntelliSense support</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2>Documentation Improvements</h2><h3>Content Accuracy Fixes</h3><ul>
+<li><strong>Content</strong>: Fixed incorrect AG-Grid version in <code>architecture/technology-stack.md</code> - corrected from 32.2 to actual production version 33.3.2 (<a href="https://linear.app/hextrackr/issue/DOCS-164">DOCS-164</a>)</li>
+</ul>
+<hr>
 <h2>Notes</h2><h3>Key Learning</h3><p><strong>Anti-pattern Identified</strong>: Fallback logic for <strong>internal APIs</strong> serves no purpose and masks errors.</p>
 <ul>
 <li>External dependencies (third-party APIs) → Graceful degradation with fallbacks ✅</li>

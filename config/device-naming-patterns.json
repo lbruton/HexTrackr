@@ -158,6 +158,22 @@
       "type": "edge",
       "vendor": "CISCO",
       "precedence": 21
+    },
+    {
+      "pattern": "nwwbr",
+      "description": "Network Wireless Bridge",
+      "type": "bridge",
+      "vendor": "Other",
+      "precedence": 22,
+      "comment": "Wireless bridge devices (standardizing naming convention)"
+    },
+    {
+      "pattern": "wwbr",
+      "description": "Wireless Bridge (Generic)",
+      "type": "bridge",
+      "vendor": "Other",
+      "precedence": 23,
+      "comment": "Generic wireless bridge - less specific than nwwbr"
     }
   ],
 
