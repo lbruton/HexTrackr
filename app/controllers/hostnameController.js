@@ -6,7 +6,7 @@
  * Delegates business logic to hostnameParserService.
  */
 
-const hostnameParserService = require("../services/hostnameParserService");
+const { getHostnameParserService } = require("../services/hostnameParserService");
 
 class HostnameController {
     /**
@@ -43,8 +43,9 @@ class HostnameController {
                 });
             }
 
-            // Call hostnameParserService.parseHostname
-            const result = hostnameParserService.parseHostname(hostname);
+            // Get singleton instance and call parseHostname
+            const parserService = getHostnameParserService();
+            const result = parserService.parseHostname(hostname);
 
             res.json({
                 success: true,
