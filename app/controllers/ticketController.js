@@ -73,8 +73,28 @@ class TicketController {
     }
 
     /**
-     * Get all tickets
-     * Extracted from server.js line 3320-3344
+     * Get all active tickets - GET /api/tickets
+     * Retrieves all non-deleted tickets ordered by creation date (newest first)
+     * Used by tickets page to populate AG-Grid table view
+     * Extracted from server.js lines 3320-3344
+     *
+     * @static
+     * @async
+     * @param {Object} req - Express request object
+     * @param {Object} req.user - User from requireAuth middleware
+     * @param {Object} res - Express response object
+     * @returns {Promise<void>} Sends JSON response:
+     *   - 200: Array<Object> - Array of ticket records (non-deleted only, DESC by created_at)
+     *   - 500: {success: false, error: "Failed to fetch tickets", details: string}
+     * @throws {Error} Caught and returned as 500 response if:
+     *   - Database query fails (SELECT from tickets table)
+     *   - TicketService.getAllTickets() encounters errors
+     *   - Ticket transformation logic fails
+     * @route GET /api/tickets
+     * @middleware requireAuth - User must be authenticated
+     * @example
+     * // GET /api/tickets
+     * // Returns: [{id: "XT-001", status: "Open", priority: "High", ...}, ...]
      */
     static async getAllTickets(req, res) {
         try {
