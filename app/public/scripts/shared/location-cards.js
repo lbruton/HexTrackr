@@ -563,11 +563,11 @@ class LocationCardsManager {
         const deviceHostnames = location.device_hostnames || [];
         const locationTickets = new Map(); // Track unique tickets
 
-        // BUGFIX HEX-344: Extract site code from location
-        // LocationService doesn't include site_code in returned data, so we need to derive it
-        // Pattern: location is like "laxb1" → site is "LAX" (first 4 chars uppercase)
+        // HEX-350: Site should be left BLANK for new locations
+        // User will manually fill in accurate site data from Hexagon
+        // No substring extraction, no fallback - empty string is the correct value
         const locationKey = location.location || "";
-        const site = locationKey.substring(0, 4).toUpperCase(); // Extract site from location code
+        const site = ""; // Always blank - will be populated manually by user
 
         deviceHostnames.forEach(hostname => {
             // CRITICAL: Use lowercase for lookup (backend returns lowercase keys)
@@ -634,11 +634,12 @@ class LocationCardsManager {
      * Implements 3-tier navigation: 0 tickets → Create, 1 → View, 2+ → Picker modal
      * Supports keyboard shortcuts: Cmd+Shift for KEV-only filtering
      * HEX-344 Step 4: Click handler with location context
+     * HEX-350: Use HostnameParserService API for intelligent location/site extraction
      *
      * @param {Event} event - Click event (needed for keyboard modifiers)
      * @param {HTMLElement} button - Button element that was clicked
      */
-    handleLocationTicketClick(event, button) {
+    async handleLocationTicketClick(event, button) {
         event.stopPropagation(); // Prevent card click
 
         // Read data from button dataset
@@ -683,11 +684,46 @@ class LocationCardsManager {
             logger.info("tickets", `Creating ticket with ${deviceList.length} devices at ${locationKey}`);
         }
 
+        // HEX-350: Use HostnameParserService API for intelligent location extraction
+        // Use first device hostname to parse location (all devices at same location)
+        let finalLocation = locationKey.toUpperCase(); // Fallback to location key
+        let finalSite = ""; // Default: blank (user will fill from Hexagon)
+
+        if (deviceList.length > 0) {
+            try {
+                // Use first device to parse location
+                const firstHostname = deviceList[0].toLowerCase();
+                const parseResponse = await fetch(`/api/hostname/parse/${encodeURIComponent(firstHostname)}`);
+                if (parseResponse.ok) {
+                    const parseData = await parseResponse.json();
+                    if (parseData.success && parseData.data && parseData.data.confidence >= 0.5) {
+                        finalLocation = parseData.data.location.toUpperCase();
+                        logger.info("tickets", `[HEX-350] Parsed location from hostname: ${finalLocation}`, {
+                            hostname: firstHostname,
+                            confidence: parseData.data.confidence
+                        });
+
+                        // Lookup site from tickets database
+                        const siteResponse = await fetch(`/api/tickets/site-by-location/${encodeURIComponent(finalLocation)}`);
+                        if (siteResponse.ok) {
+                            const siteData = await siteResponse.json();
+                            if (siteData.success && siteData.site) {
+                                finalSite = siteData.site.toUpperCase();
+                                logger.info("tickets", `[HEX-350] Found site for location: ${finalSite}`);
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                logger.warn("tickets", "[HEX-350] Failed to parse hostname or fetch site, using fallback", error);
+            }
+        }
+
         // Build sessionStorage data for ticket creation
         const ticketData = {
             devices: deviceList,              // UPPERCASE hostnames
-            site: site.toUpperCase(),         // UPPERCASE site
-            location: locationKey.toUpperCase(), // UPPERCASE location
+            site: finalSite,                  // UPPERCASE site (or blank if no match)
+            location: finalLocation,          // UPPERCASE location (parsed or fallback)
             mode: mode,
             timestamp: Date.now()
         };
@@ -744,6 +780,7 @@ class LocationCardsManager {
     /**
      * Override the "Create New Ticket Anyway" button in device modal for location context
      * HEX-344: Make button behavior match "Create Ticket" button (add all devices at location)
+     * HEX-350: Use HostnameParserService API for intelligent location/site extraction
      *
      * @param {string} locationKey - Location identifier
      */
@@ -766,7 +803,7 @@ class LocationCardsManager {
         }
 
         // Replace onclick to use location-based creation (all devices at location)
-        createButton.onclick = (event) => {
+        createButton.onclick = async (event) => {
             event.preventDefault();
             logger.info("tickets", `Creating ticket with all devices at ${locationKey}`);
 
@@ -778,13 +815,42 @@ class LocationCardsManager {
 
             // Get device data from location button
             const allDevices = JSON.parse(locationButton.dataset.allDevices || "[]");
-            const site = locationButton.dataset.site || "";
+            const deviceList = allDevices.map(h => h.toUpperCase());
+
+            // HEX-350: Use HostnameParserService API for intelligent location extraction
+            let finalLocation = locationKey.toUpperCase(); // Fallback
+            let finalSite = ""; // Default: blank
+
+            if (deviceList.length > 0) {
+                try {
+                    // Use first device to parse location
+                    const firstHostname = deviceList[0].toLowerCase();
+                    const parseResponse = await fetch(`/api/hostname/parse/${encodeURIComponent(firstHostname)}`);
+                    if (parseResponse.ok) {
+                        const parseData = await parseResponse.json();
+                        if (parseData.success && parseData.data && parseData.data.confidence >= 0.5) {
+                            finalLocation = parseData.data.location.toUpperCase();
+
+                            // Lookup site from tickets database
+                            const siteResponse = await fetch(`/api/tickets/site-by-location/${encodeURIComponent(finalLocation)}`);
+                            if (siteResponse.ok) {
+                                const siteData = await siteResponse.json();
+                                if (siteData.success && siteData.site) {
+                                    finalSite = siteData.site.toUpperCase();
+                                }
+                            }
+                        }
+                    }
+                } catch (error) {
+                    logger.warn("tickets", "[HEX-350] Failed to parse hostname or fetch site in modal", error);
+                }
+            }
 
             // Build ticket data (same as TIER 3 in handleLocationTicketClick)
             const ticketData = {
-                devices: allDevices.map(h => h.toUpperCase()),
-                site: site.toUpperCase(),
-                location: locationKey.toUpperCase(),
+                devices: deviceList,
+                site: finalSite,
+                location: finalLocation,
                 mode: "bulk-all",
                 timestamp: Date.now()
             };
