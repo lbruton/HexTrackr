@@ -1063,7 +1063,7 @@ class DeviceSecurityModal {
      * @param {MouseEvent} event - Click event with keyboard modifiers
      * @param {HTMLButtonElement} button - Button element with data attributes
      */
-    handleCreateTicketClick(event, button) {
+    async handleCreateTicketClick(event, button) {
         event.stopPropagation();
 
         // Read data from button attributes
