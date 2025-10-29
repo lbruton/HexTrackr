@@ -1244,7 +1244,7 @@ class LocationDetailsModal {
      * @since v1.0.89
      * @since v1.1.1 - Added power tools keyboard shortcut support (HEX-313)
      */
-    createTicket(event, hostname, isKev) {
+    async createTicket(event, hostname, isKev) {
         // Handle legacy calls without event parameter
         if (typeof event === "string") {
             // Old signature: createTicket(hostname, isKev)
