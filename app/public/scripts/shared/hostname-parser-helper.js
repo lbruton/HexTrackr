@@ -43,6 +43,8 @@ const DEVICE_TYPE_PATTERNS = [
     "nrouter",    // Network router - generic
     "nfirewall",  // Network firewall - generic
     "nmpan",      // Network management (PAN)
+    "nwwbr",      // Network wireless bridge (specific)
+    "wwbr",       // Wireless bridge (generic)
 ];
 
 /**
