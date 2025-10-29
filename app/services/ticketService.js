@@ -984,6 +984,41 @@ class TicketService {
     }
 
     /**
+     * Get site code by location from existing tickets
+     * HEX-350: Intelligent site field population based on existing tickets database
+     * Queries tickets table for most recent site associated with a location
+     * Used for auto-populating site field when creating tickets from vulnerabilities
+     * @param {string} location - Location code (e.g., "NSWAN", "WTULSA")
+     * @returns {Promise<string|null>} Site code (e.g., "TULS") or null if no match found
+     * @example
+     * const site = await getSiteByLocation("WTULSA");
+     * // Returns: "TULS" (from existing tickets) or null (new location)
+     */
+    async getSiteByLocation(location) {
+        return new Promise((resolve, reject) => {
+            // Query for most recent ticket with this location
+            // Use LOWER() for case-insensitive matching
+            // Filter by deleted=0 to only use active tickets
+            const sql = `SELECT site
+                FROM tickets
+                WHERE LOWER(location) = LOWER(?)
+                  AND deleted = 0
+                  AND site IS NOT NULL
+                  AND site != ''
+                ORDER BY created_at DESC
+                LIMIT 1`;
+
+            this.db.get(sql, [location], (err, row) => {
+                if (err) {
+                    return reject(new Error(`Failed to fetch site for location ${location}: ${err.message}`));
+                }
+                // Return site or null if no match found
+                resolve(row ? row.site : null);
+            });
+        });
+    }
+
+    /**
      * Format address fields into a single text block for legacy site_address/return_address columns
      * @param {string} line1 - Address line 1
      * @param {string} line2 - Address line 2 (optional)

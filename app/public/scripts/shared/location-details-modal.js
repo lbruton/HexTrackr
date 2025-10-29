@@ -1253,9 +1253,37 @@ class LocationDetailsModal {
             event = null;
         }
 
-        // Parse hostname to extract SITE and Location (ALL CAPS)
-        const site = hostname.substring(0, 4).toUpperCase();
-        const location = hostname.substring(0, 5).toUpperCase();
+        // HEX-350: Parse hostname using HostnameParserService API
+        // Fetch parsed location and site from backend
+        let location = hostname.substring(0, 5).toUpperCase(); // Fallback
+        let site = ""; // Will be populated from tickets database
+
+        try {
+            // Parse hostname via API
+            const parseResponse = await fetch(`/api/hostname/parse/${encodeURIComponent(hostname)}`);
+            if (parseResponse.ok) {
+                const parseData = await parseResponse.json();
+                if (parseData.success && parseData.data) {
+                    // Use parsed location if confidence is acceptable (>= 0.5)
+                    if (parseData.data.confidence >= 0.5) {
+                        location = parseData.data.location.toUpperCase();
+                    }
+
+                    // Query tickets database for existing site
+                    const siteResponse = await fetch(`/api/tickets/site-by-location/${encodeURIComponent(location)}`);
+                    if (siteResponse.ok) {
+                        const siteData = await siteResponse.json();
+                        if (siteData.success && siteData.site) {
+                            site = siteData.site.toUpperCase();
+                        }
+                        // If site is null, leave blank (new location)
+                    }
+                }
+            }
+        } catch (error) {
+            console.warn("HEX-350: Failed to parse hostname or fetch site, using fallback", error);
+            // Graceful degradation - location already set to fallback above
+        }
 
         // Detect keyboard modifiers for power tools (HEX-313)
         let mode = "single";
@@ -1806,10 +1834,26 @@ class LocationDetailsModal {
 
     /**
      * Create ticket for all devices at this location
+     * HEX-350: Uses site lookup from tickets database instead of substring
      */
-    createLocationTicket() {
+    async createLocationTicket() {
         const location = this.currentLocation.location?.toUpperCase() || "UNKNOWN";
-        const site = location.substring(0, 4);
+        let site = ""; // Will be populated from tickets database
+
+        // HEX-350: Query tickets database for existing site
+        try {
+            const siteResponse = await fetch(`/api/tickets/site-by-location/${encodeURIComponent(location)}`);
+            if (siteResponse.ok) {
+                const siteData = await siteResponse.json();
+                if (siteData.success && siteData.site) {
+                    site = siteData.site.toUpperCase();
+                }
+                // If site is null, leave blank (new location)
+            }
+        } catch (error) {
+            console.warn("HEX-350: Failed to fetch site for location, leaving blank", error);
+            // Graceful degradation - site stays empty string
+        }
 
         // Get all device hostnames at this location
         const deviceList = this.allDevices.map(d => d.hostname.toUpperCase());

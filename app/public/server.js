@@ -73,6 +73,7 @@ const authRoutes = require("../routes/auth");
 const preferencesRoutes = require("../routes/preferences"); // HEX-138: User preferences API
 const auditLogRoutes = require("../routes/auditLogRoutes"); // HEX-254: Audit log API (Session 13)
 const locationRoutes = require("../routes/locations"); // HEX-292: Location Cards API
+const hostnameRoutes = require("../routes/hostname"); // HEX-350: Hostname parsing API
 
 // Express application & HTTP/HTTPS server
 const app = express();
@@ -299,6 +300,7 @@ async function initializeApplication() {
     app.use("/api/preferences", preferencesRoutes); // HEX-138: User preferences
     app.use("/api/audit-logs", auditLogRoutes); // HEX-254: Audit log API
     app.use("/api/locations", locationRoutes); // HEX-292: Location Cards API
+    app.use("/api/hostname", hostnameRoutes); // HEX-350: Hostname parsing API
 
     // Legacy lightweight endpoints retained from monolith
     app.get("/api/sites", (req, res) => {
