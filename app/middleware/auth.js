@@ -18,7 +18,7 @@ if (!fs.existsSync(dataDir)) {
 const sessionMiddleware = session({
     store: new SQLiteStore({
         // HEX-280: Use absolute path to named volume location (not bind mount)
-        client: new Database("/app/data/sessions.db"),
+        client: new Database("/app/app/data/sessions.db"),
         expired: {
             clear: true,
             intervalMs: 900000 // Clean expired sessions every 15 minutes

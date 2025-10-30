@@ -19,8 +19,8 @@ services:
       - ./config:/app/config:ro
       # HEX-280: Database uses named volume (isolated from macOS filesystem)
       # Named volume prevents corruption from macOS fcntl locking issues with SQLite
-      # Database is at /app/data/ (NOT /app/app/data/) to avoid bind mount conflicts
-      - hextrackr-database:/app/data
+      # Database is at /app/app/data/ to match application mount structure
+      - hextrackr-database:/app/app/data
       # Mount backups directory for automated backups (HEX-270)
       - ./backups:/app/backups:rw
       # Mount uploads directory for file persistence
