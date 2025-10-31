@@ -94,35 +94,8 @@ function createTables(db) {
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
 
-  // 3. Main vulnerabilities table - legacy/normalized data
-  // NEW (Migration 006): Added operating_system and solution_text columns
-  db.run(`CREATE TABLE IF NOT EXISTS vulnerabilities (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    import_id INTEGER NOT NULL,
-    hostname TEXT,
-    ip_address TEXT,
-    cve TEXT,
-    severity TEXT,
-    vpr_score REAL,
-    cvss_score REAL,
-    first_seen TEXT,
-    last_seen TEXT,
-    plugin_id TEXT,
-    plugin_name TEXT,
-    description TEXT,
-    solution TEXT,
-    vendor_reference TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    vendor TEXT DEFAULT '',
-    vulnerability_date TEXT DEFAULT '',
-    state TEXT DEFAULT 'open',
-    import_date TEXT DEFAULT '',
-    operating_system TEXT,
-    solution_text TEXT,
-    FOREIGN KEY (import_id) REFERENCES vulnerability_imports (id)
-  )`);
-
-  // 4. Ticket-vulnerability junction table
+  // 3. Ticket-vulnerability junction table
+  // References vulnerabilities_current for future mitigation tracking feature
   db.run(`CREATE TABLE IF NOT EXISTS ticket_vulnerabilities (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     ticket_id TEXT NOT NULL,
@@ -131,10 +104,10 @@ function createTables(db) {
     notes TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (ticket_id) REFERENCES tickets (id),
-    FOREIGN KEY (vulnerability_id) REFERENCES vulnerabilities (id)
+    FOREIGN KEY (vulnerability_id) REFERENCES vulnerabilities_current (id)
   )`);
 
-  // 5. Vulnerability snapshots - historical data
+  // 4. Vulnerability snapshots - historical data
   // NEW (Migration 006): Added operating_system and solution_text columns
   db.run(`CREATE TABLE IF NOT EXISTS vulnerability_snapshots (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -166,7 +139,7 @@ function createTables(db) {
     FOREIGN KEY (import_id) REFERENCES vulnerability_imports (id)
   )`);
 
-  // 6. Current vulnerabilities - active data
+  // 5. Current vulnerabilities - active data
   // NEW (Migration 006): Added operating_system and solution_text columns
   db.run(`CREATE TABLE IF NOT EXISTS vulnerabilities_current (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -201,7 +174,7 @@ function createTables(db) {
     FOREIGN KEY (import_id) REFERENCES vulnerability_imports (id)
   )`);
 
-  // 7. Daily vulnerability totals - aggregated metrics
+  // 6. Daily vulnerability totals - aggregated metrics
   db.run(`CREATE TABLE IF NOT EXISTS vulnerability_daily_totals (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     scan_date TEXT NOT NULL UNIQUE,
@@ -220,7 +193,7 @@ function createTables(db) {
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
 
-  // 7b. Vendor daily totals - vendor-specific aggregated metrics (Migration 008)
+  // 6b. Vendor daily totals - vendor-specific aggregated metrics (Migration 008)
   // Permanent storage for vendor-specific trend data
   // Never cleaned up by db-snapshot-cleanup.js
   db.run(`CREATE TABLE IF NOT EXISTS vendor_daily_totals (
@@ -241,7 +214,7 @@ function createTables(db) {
     UNIQUE(scan_date, vendor)
   )`);
 
-  // 8. Vulnerability staging - import staging area
+  // 7. Vulnerability staging - import staging area
   // NEW (Migration 006): Added operating_system and solution_text columns
   db.run(`CREATE TABLE IF NOT EXISTS vulnerability_staging (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -275,7 +248,7 @@ function createTables(db) {
     FOREIGN KEY (import_id) REFERENCES vulnerability_imports (id)
   )`);
 
-  // 9. Email templates
+  // 8. Email templates
   db.run(`CREATE TABLE IF NOT EXISTS email_templates (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL UNIQUE,
@@ -289,7 +262,7 @@ function createTables(db) {
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
 
-  // 10. KEV (Known Exploited Vulnerabilities) status
+  // 9. KEV (Known Exploited Vulnerabilities) status
   db.run(`CREATE TABLE IF NOT EXISTS kev_status (
     cve_id TEXT PRIMARY KEY,
     date_added DATE NOT NULL,
@@ -303,7 +276,7 @@ function createTables(db) {
     last_synced TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`);
 
-  // 11. Sync metadata
+  // 10. Sync metadata
   db.run(`CREATE TABLE IF NOT EXISTS sync_metadata (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     sync_type TEXT NOT NULL,
@@ -315,7 +288,7 @@ function createTables(db) {
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`);
 
-  // 12. Ticket templates
+  // 11. Ticket templates
   db.run(`CREATE TABLE IF NOT EXISTS ticket_templates (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL UNIQUE,
@@ -329,7 +302,7 @@ function createTables(db) {
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
 
-  // 13. Vulnerability templates
+  // 12. Vulnerability templates
   db.run(`CREATE TABLE IF NOT EXISTS vulnerability_templates (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL UNIQUE,
