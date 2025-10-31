@@ -506,63 +506,202 @@ class BackupService {
             }
 
             if (type === "vulnerabilities" || type === "all") {
-                // Extract vulnerabilities.json if it exists
-                if (zipContent.files["vulnerabilities.json"]) {
-                    const vulnJson = await zipContent.files["vulnerabilities.json"].async("string");
-                    const vulnData = JSON.parse(vulnJson);
+                // HEX-359: Comprehensive restore for all 10 vulnerability-related tables
+                _log("info", "Starting comprehensive vulnerability restore (HEX-359)");
 
-                    // Handle both old and new data formats
-                    let vulnArray = [];
-                    if (vulnData) {
-                        if (vulnData.data && Array.isArray(vulnData.data)) {
-                            // Old format: vulnData.data
-                            vulnArray = vulnData.data;
-                        } else if (vulnData.vulnerabilities && vulnData.vulnerabilities.data &&
-                                   Array.isArray(vulnData.vulnerabilities.data)) {
-                            // New format: vulnData.vulnerabilities.data
-                            vulnArray = vulnData.vulnerabilities.data;
-                        } else if (Array.isArray(vulnData)) {
-                            // Direct array format
-                            vulnArray = vulnData;
-                        }
-                    }
-
-                    if (vulnArray.length > 0) {
-                        // Clear existing vulnerabilities if requested
-                        if (clearExisting) {
-                            await this._executeQuery("DELETE FROM vulnerability_snapshots");
-                            await this._executeQuery("DELETE FROM vulnerabilities_current");
-                            await this._executeQuery("DELETE FROM vulnerability_daily_totals");
-                        }
-
-                        // Insert vulnerability data
-                        const vulnValues = vulnArray.map(vuln => [
-                            vuln.hostname || "",
-                            vuln.ip_address || "",
-                            vuln.cve || "",
-                            vuln.severity || "",
-                            vuln.vpr_score || 0,
-                            vuln.cvss_score || 0,
-                            vuln.first_seen || "",
-                            vuln.last_seen || "",
-                            vuln.plugin_name || "",
-                            vuln.description || "",
-                            vuln.solution || ""
-                        ]);
-
-                        for (const values of vulnValues) {
-                            await this._executeQuery(`
-                                INSERT INTO vulnerabilities
-                                (hostname, ip_address, cve, severity, vpr_score, cvss_score,
-                                first_seen, last_seen, plugin_name, description, solution)
-                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                            `, values);
-                            restoredCount++;
-                        }
-
-                        details.vulnerabilities = vulnValues.length;
-                    }
+                // Clear existing data if requested (before any inserts)
+                if (clearExisting) {
+                    _log("info", "Clearing existing vulnerability data");
+                    await this._executeQuery("DELETE FROM ticket_vulnerabilities");
+                    await this._executeQuery("DELETE FROM vulnerability_snapshots");
+                    await this._executeQuery("DELETE FROM vulnerabilities_current");
+                    await this._executeQuery("DELETE FROM vulnerability_daily_totals");
+                    await this._executeQuery("DELETE FROM vendor_daily_totals");
+                    await this._executeQuery("DELETE FROM vulnerability_imports");
+                    await this._executeQuery("DELETE FROM kev_status");
+                    await this._executeQuery("DELETE FROM cisco_advisories");
+                    await this._executeQuery("DELETE FROM palo_alto_advisories");
                 }
+
+                // 1. Restore vulnerabilities_current
+                const currentVulns = await this._readTableFromZip(zipContent, "vulnerabilities_current");
+                if (currentVulns.length > 0) {
+                    _log("info", `Restoring ${currentVulns.length} vulnerabilities_current records`);
+                    for (const vuln of currentVulns) {
+                        await this._executeQuery(`
+                            INSERT INTO vulnerabilities_current
+                            (hostname, ip_address, cve, severity, vpr_score, cvss_score, first_seen, last_seen,
+                             plugin_id, plugin_name, description, solution, vendor_reference, vendor, scan_date,
+                             unique_key, lifecycle_state, confidence_score, dedup_tier, enhanced_unique_key)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        `, [
+                            vuln.hostname || "", vuln.ip_address || "", vuln.cve || "", vuln.severity || "",
+                            vuln.vpr_score || 0, vuln.cvss_score || 0, vuln.first_seen || "", vuln.last_seen || "",
+                            vuln.plugin_id || "", vuln.plugin_name || "", vuln.description || "", vuln.solution || "",
+                            vuln.vendor_reference || "", vuln.vendor || "", vuln.scan_date || "",
+                            vuln.unique_key || "", vuln.lifecycle_state || "active", vuln.confidence_score || 0,
+                            vuln.dedup_tier || 0, vuln.enhanced_unique_key || ""
+                        ]);
+                        restoredCount++;
+                    }
+                    details.vulnerabilities_current = currentVulns.length;
+                }
+
+                // 2. Restore vulnerability_snapshots
+                const snapshots = await this._readTableFromZip(zipContent, "vulnerability_snapshots");
+                if (snapshots.length > 0) {
+                    _log("info", `Restoring ${snapshots.length} vulnerability_snapshots records`);
+                    for (const snap of snapshots) {
+                        await this._executeQuery(`
+                            INSERT INTO vulnerability_snapshots
+                            (scan_date, hostname, ip_address, cve, severity, vpr_score, cvss_score, first_seen, last_seen,
+                             plugin_id, plugin_name, description, vendor, unique_key, enhanced_unique_key)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        `, [
+                            snap.scan_date || "", snap.hostname || "", snap.ip_address || "", snap.cve || "",
+                            snap.severity || "", snap.vpr_score || 0, snap.cvss_score || 0, snap.first_seen || "",
+                            snap.last_seen || "", snap.plugin_id || "", snap.plugin_name || "", snap.description || "",
+                            snap.vendor || "", snap.unique_key || "", snap.enhanced_unique_key || ""
+                        ]);
+                        restoredCount++;
+                    }
+                    details.vulnerability_snapshots = snapshots.length;
+                }
+
+                // 3. Restore vulnerability_daily_totals
+                const dailyTotals = await this._readTableFromZip(zipContent, "vulnerability_daily_totals");
+                if (dailyTotals.length > 0) {
+                    _log("info", `Restoring ${dailyTotals.length} vulnerability_daily_totals records`);
+                    for (const total of dailyTotals) {
+                        await this._executeQuery(`
+                            INSERT INTO vulnerability_daily_totals
+                            (scan_date, critical_count, critical_total_vpr, high_count, high_total_vpr,
+                             medium_count, medium_total_vpr, low_count, low_total_vpr, total_vulnerabilities, total_vpr)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        `, [
+                            total.scan_date || "", total.critical_count || 0, total.critical_total_vpr || 0,
+                            total.high_count || 0, total.high_total_vpr || 0, total.medium_count || 0,
+                            total.medium_total_vpr || 0, total.low_count || 0, total.low_total_vpr || 0,
+                            total.total_vulnerabilities || 0, total.total_vpr || 0
+                        ]);
+                        restoredCount++;
+                    }
+                    details.vulnerability_daily_totals = dailyTotals.length;
+                }
+
+                // 4. Restore vendor_daily_totals
+                const vendorTotals = await this._readTableFromZip(zipContent, "vendor_daily_totals");
+                if (vendorTotals.length > 0) {
+                    _log("info", `Restoring ${vendorTotals.length} vendor_daily_totals records`);
+                    for (const vt of vendorTotals) {
+                        await this._executeQuery(`
+                            INSERT INTO vendor_daily_totals
+                            (scan_date, vendor, critical_count, critical_total_vpr, high_count, high_total_vpr,
+                             medium_count, medium_total_vpr, low_count, low_total_vpr, total_vulnerabilities, total_vpr)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        `, [
+                            vt.scan_date || "", vt.vendor || "", vt.critical_count || 0, vt.critical_total_vpr || 0,
+                            vt.high_count || 0, vt.high_total_vpr || 0, vt.medium_count || 0, vt.medium_total_vpr || 0,
+                            vt.low_count || 0, vt.low_total_vpr || 0, vt.total_vulnerabilities || 0, vt.total_vpr || 0
+                        ]);
+                        restoredCount++;
+                    }
+                    details.vendor_daily_totals = vendorTotals.length;
+                }
+
+                // 5. Restore vulnerability_imports
+                const imports = await this._readTableFromZip(zipContent, "vulnerability_imports");
+                if (imports.length > 0) {
+                    _log("info", `Restoring ${imports.length} vulnerability_imports records`);
+                    for (const imp of imports) {
+                        await this._executeQuery(`
+                            INSERT INTO vulnerability_imports
+                            (filename, import_date, row_count, vendor, file_size, processing_time)
+                            VALUES (?, ?, ?, ?, ?, ?)
+                        `, [
+                            imp.filename || "", imp.import_date || "", imp.row_count || 0,
+                            imp.vendor || "", imp.file_size || 0, imp.processing_time || 0
+                        ]);
+                        restoredCount++;
+                    }
+                    details.vulnerability_imports = imports.length;
+                }
+
+                // 6. Restore kev_status
+                const kevStatus = await this._readTableFromZip(zipContent, "kev_status");
+                if (kevStatus.length > 0) {
+                    _log("info", `Restoring ${kevStatus.length} kev_status records`);
+                    for (const kev of kevStatus) {
+                        await this._executeQuery(`
+                            INSERT INTO kev_status
+                            (cve_id, date_added, vulnerability_name, vendor_project, product, required_action,
+                             due_date, known_ransomware_use, notes)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        `, [
+                            kev.cve_id || "", kev.date_added || "", kev.vulnerability_name || "",
+                            kev.vendor_project || "", kev.product || "", kev.required_action || "",
+                            kev.due_date || "", kev.known_ransomware_use || 0, kev.notes || ""
+                        ]);
+                        restoredCount++;
+                    }
+                    details.kev_status = kevStatus.length;
+                }
+
+                // 7. Restore ticket_vulnerabilities
+                const ticketVulns = await this._readTableFromZip(zipContent, "ticket_vulnerabilities");
+                if (ticketVulns.length > 0) {
+                    _log("info", `Restoring ${ticketVulns.length} ticket_vulnerabilities records`);
+                    for (const tv of ticketVulns) {
+                        await this._executeQuery(`
+                            INSERT INTO ticket_vulnerabilities (ticket_id, vulnerability_id)
+                            VALUES (?, ?)
+                        `, [tv.ticket_id || null, tv.vulnerability_id || null]);
+                        restoredCount++;
+                    }
+                    details.ticket_vulnerabilities = ticketVulns.length;
+                }
+
+                // 8. Restore cisco_advisories
+                const ciscoAdvisories = await this._readTableFromZip(zipContent, "cisco_advisories");
+                if (ciscoAdvisories.length > 0) {
+                    _log("info", `Restoring ${ciscoAdvisories.length} cisco_advisories records`);
+                    for (const ca of ciscoAdvisories) {
+                        await this._executeQuery(`
+                            INSERT INTO cisco_advisories
+                            (cve_id, advisory_id, advisory_title, severity, cvss_score, first_fixed,
+                             affected_releases, product_names, publication_url)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        `, [
+                            ca.cve_id || "", ca.advisory_id || "", ca.advisory_title || "", ca.severity || "",
+                            ca.cvss_score || "", ca.first_fixed || "", ca.affected_releases || "",
+                            ca.product_names || "", ca.publication_url || ""
+                        ]);
+                        restoredCount++;
+                    }
+                    details.cisco_advisories = ciscoAdvisories.length;
+                }
+
+                // 9. Restore palo_alto_advisories
+                const paloAdvisories = await this._readTableFromZip(zipContent, "palo_alto_advisories");
+                if (paloAdvisories.length > 0) {
+                    _log("info", `Restoring ${paloAdvisories.length} palo_alto_advisories records`);
+                    for (const pa of paloAdvisories) {
+                        await this._executeQuery(`
+                            INSERT INTO palo_alto_advisories
+                            (cve_id, advisory_id, advisory_title, severity, cvss_score, first_fixed,
+                             affected_versions, product_name, publication_url)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        `, [
+                            pa.cve_id || "", pa.advisory_id || "", pa.advisory_title || "", pa.severity || "",
+                            pa.cvss_score || "", pa.first_fixed || "", pa.affected_versions || "",
+                            pa.product_name || "", pa.publication_url || ""
+                        ]);
+                        restoredCount++;
+                    }
+                    details.palo_alto_advisories = paloAdvisories.length;
+                }
+
+                _log("info", `Vulnerability restore complete: ${restoredCount} total records across all tables`);
             }
 
             // Clean up the uploaded file
@@ -624,6 +763,55 @@ class BackupService {
                 }
             });
         });
+    }
+
+    /**
+     * HEX-359: Helper to read chunked or single file from ZIP
+     * @param {JSZip} zipContent - Loaded ZIP content
+     * @param {string} tableName - Table name (e.g., "vulnerabilities_current")
+     * @returns {Promise<Array>} Array of records
+     */
+    async _readTableFromZip(zipContent, tableName) {
+        const chunkIndexFile = `${tableName}_chunks_index.json`;
+        const singleFile = `${tableName}.json`;
+
+        // Check for chunked files first
+        if (zipContent.files[chunkIndexFile]) {
+            _log("info", `Reading chunked data for ${tableName}`);
+            const indexJson = await zipContent.files[chunkIndexFile].async("string");
+            const chunkIndex = JSON.parse(indexJson);
+
+            let allRecords = [];
+            for (const chunkFile of chunkIndex.chunks) {
+                if (zipContent.files[chunkFile]) {
+                    const chunkJson = await zipContent.files[chunkFile].async("string");
+                    const chunkData = JSON.parse(chunkJson);
+                    // Chunks have { count, data } structure
+                    if (chunkData.data && Array.isArray(chunkData.data)) {
+                        allRecords = allRecords.concat(chunkData.data);
+                    }
+                }
+            }
+            _log("info", `Reassembled ${allRecords.length} records from ${chunkIndex.num_chunks} chunks for ${tableName}`);
+            return allRecords;
+        }
+
+        // Check for single file
+        if (zipContent.files[singleFile]) {
+            _log("info", `Reading single file for ${tableName}`);
+            const fileJson = await zipContent.files[singleFile].async("string");
+            const fileData = JSON.parse(fileJson);
+
+            // Handle different formats
+            if (fileData.data && Array.isArray(fileData.data)) {
+                return fileData.data;
+            } else if (Array.isArray(fileData)) {
+                return fileData;
+            }
+        }
+
+        // No data found
+        return [];
     }
 
 

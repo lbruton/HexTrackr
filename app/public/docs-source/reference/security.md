@@ -2,7 +2,7 @@
 
 HexTrackr is designed with security as a foundational principle. This document provides comprehensive coverage of all security measures, controls, and implementations for corporate security review and compliance assessment.
 
-**Version**: v1.1.10
+**Version**: v1.1.11
 **Last Updated**: 2025-10-23
 
 ---

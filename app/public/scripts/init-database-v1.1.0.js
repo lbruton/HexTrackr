@@ -185,43 +185,8 @@ function createTables(db) {
   )`);
 
   // ============================================================================
-  // TABLE 3: vulnerabilities - Legacy vulnerability data
-  // ============================================================================
-  db.run(`CREATE TABLE IF NOT EXISTS vulnerabilities (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    import_id INTEGER NOT NULL,
-    hostname TEXT,
-    ip_address TEXT,
-    cve TEXT,
-    severity TEXT,
-    vpr_score REAL,
-    cvss_score REAL,
-    first_seen TEXT,
-    last_seen TEXT,
-    plugin_id TEXT,
-    plugin_name TEXT,
-    description TEXT,
-    solution TEXT,
-    vendor_reference TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    vendor TEXT DEFAULT '',
-    vulnerability_date TEXT DEFAULT '',
-    state TEXT DEFAULT 'open',
-    import_date TEXT DEFAULT '',
-    operating_system TEXT,
-    solution_text TEXT,
-    is_fixed INTEGER DEFAULT 0,
-    fixed_cisco_versions TEXT,
-    fixed_cisco_url TEXT,
-    cisco_synced_at DATETIME,
-    fixed_palo_versions TEXT,
-    fixed_palo_url TEXT,
-    palo_synced_at DATETIME,
-    FOREIGN KEY (import_id) REFERENCES vulnerability_imports (id)
-  )`);
-
-  // ============================================================================
-  // TABLE 4: ticket_vulnerabilities - Junction table for ticket-vuln mapping
+  // TABLE 3: ticket_vulnerabilities - Junction table for ticket-vuln mapping
+  // References vulnerabilities_current for future mitigation tracking feature
   // ============================================================================
   db.run(`CREATE TABLE IF NOT EXISTS ticket_vulnerabilities (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -231,11 +196,11 @@ function createTables(db) {
     notes TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (ticket_id) REFERENCES tickets (id),
-    FOREIGN KEY (vulnerability_id) REFERENCES vulnerabilities (id)
+    FOREIGN KEY (vulnerability_id) REFERENCES vulnerabilities_current (id)
   )`);
 
   // ============================================================================
-  // TABLE 5: vulnerability_snapshots - Historical vulnerability data
+  // TABLE 4: vulnerability_snapshots - Historical vulnerability data
   // ============================================================================
   db.run(`CREATE TABLE IF NOT EXISTS vulnerability_snapshots (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -268,7 +233,7 @@ function createTables(db) {
   )`);
 
   // ============================================================================
-  // TABLE 6: vulnerabilities_current - Active vulnerability data
+  // TABLE 5: vulnerabilities_current - Active vulnerability data
   // ============================================================================
   db.run(`CREATE TABLE IF NOT EXISTS vulnerabilities_current (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -305,7 +270,7 @@ function createTables(db) {
   )`);
 
   // ============================================================================
-  // TABLE 7: vulnerability_daily_totals - Aggregated trend metrics
+  // TABLE 6: vulnerability_daily_totals - Aggregated trend metrics
   // ============================================================================
   db.run(`CREATE TABLE IF NOT EXISTS vulnerability_daily_totals (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -326,7 +291,7 @@ function createTables(db) {
   )`);
 
   // ============================================================================
-  // TABLE 8: vendor_daily_totals - Vendor-specific trend metrics (Migration 008)
+  // TABLE 7: vendor_daily_totals - Vendor-specific trend metrics (Migration 008)
   // ============================================================================
   db.run(`CREATE TABLE IF NOT EXISTS vendor_daily_totals (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -347,7 +312,7 @@ function createTables(db) {
   )`);
 
   // ============================================================================
-  // TABLE 9: vulnerability_staging - Import staging area
+  // TABLE 8: vulnerability_staging - Import staging area
   // ============================================================================
   db.run(`CREATE TABLE IF NOT EXISTS vulnerability_staging (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -382,7 +347,7 @@ function createTables(db) {
   )`);
 
   // ============================================================================
-  // TABLE 10: email_templates - Email notification templates
+  // TABLE 9: email_templates - Email notification templates
   // ============================================================================
   db.run(`CREATE TABLE IF NOT EXISTS email_templates (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -398,7 +363,7 @@ function createTables(db) {
   )`);
 
   // ============================================================================
-  // TABLE 11: kev_status - CISA Known Exploited Vulnerabilities
+  // TABLE 10: kev_status - CISA Known Exploited Vulnerabilities
   // ============================================================================
   db.run(`CREATE TABLE IF NOT EXISTS kev_status (
     cve_id TEXT PRIMARY KEY,
@@ -414,7 +379,7 @@ function createTables(db) {
   )`);
 
   // ============================================================================
-  // TABLE 12: sync_metadata - Background sync tracking
+  // TABLE 11: sync_metadata - Background sync tracking
   // ============================================================================
   db.run(`CREATE TABLE IF NOT EXISTS sync_metadata (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -429,7 +394,7 @@ function createTables(db) {
   )`);
 
   // ============================================================================
-  // TABLE 13: ticket_templates - Ticket markdown templates
+  // TABLE 12: ticket_templates - Ticket markdown templates
   // ============================================================================
   db.run(`CREATE TABLE IF NOT EXISTS ticket_templates (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -445,7 +410,7 @@ function createTables(db) {
   )`);
 
   // ============================================================================
-  // TABLE 14: vulnerability_templates - CVE templates
+  // TABLE 13: vulnerability_templates - CVE templates
   // ============================================================================
   db.run(`CREATE TABLE IF NOT EXISTS vulnerability_templates (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -461,7 +426,7 @@ function createTables(db) {
   )`);
 
   // ============================================================================
-  // TABLE 15: users - Authentication and authorization
+  // TABLE 14: users - Authentication and authorization
   // ============================================================================
   db.run(`CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,
@@ -478,7 +443,7 @@ function createTables(db) {
   )`);
 
   // ============================================================================
-  // TABLE 16: user_preferences - Cross-device settings (HEX-138)
+  // TABLE 15: user_preferences - Cross-device settings (HEX-138)
   // ============================================================================
   db.run(`CREATE TABLE IF NOT EXISTS user_preferences (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -492,7 +457,7 @@ function createTables(db) {
   )`);
 
   // ============================================================================
-  // TABLE 17: cisco_advisories - Cisco PSIRT advisory data
+  // TABLE 16: cisco_advisories - Cisco PSIRT advisory data
   // ============================================================================
   db.run(`CREATE TABLE IF NOT EXISTS cisco_advisories (
     cve_id TEXT PRIMARY KEY,
@@ -508,7 +473,7 @@ function createTables(db) {
   )`);
 
   // ============================================================================
-  // TABLE 18: cisco_fixed_versions - Normalized Cisco fixed versions (Migration 007)
+  // TABLE 17: cisco_fixed_versions - Normalized Cisco fixed versions (Migration 007)
   // ============================================================================
   db.run(`CREATE TABLE IF NOT EXISTS cisco_fixed_versions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -522,7 +487,7 @@ function createTables(db) {
   )`);
 
   // ============================================================================
-  // TABLE 19: palo_alto_advisories - Palo Alto security bulletins
+  // TABLE 18: palo_alto_advisories - Palo Alto security bulletins
   // ============================================================================
   db.run(`CREATE TABLE IF NOT EXISTS palo_alto_advisories (
     cve_id TEXT PRIMARY KEY,
@@ -538,7 +503,7 @@ function createTables(db) {
   )`);
 
   // ============================================================================
-  // TABLE 20: audit_logs - Encrypted audit trail (Migration 012)
+  // TABLE 19: audit_logs - Encrypted audit trail (Migration 012)
   // ============================================================================
   db.run(`CREATE TABLE IF NOT EXISTS audit_logs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -556,7 +521,7 @@ function createTables(db) {
   )`);
 
   // ============================================================================
-  // TABLE 21: audit_log_config - Audit configuration (Migration 012)
+  // TABLE 20: audit_log_config - Audit configuration (Migration 012)
   // ============================================================================
   db.run(`CREATE TABLE IF NOT EXISTS audit_log_config (
     id INTEGER PRIMARY KEY CHECK (id = 1),
