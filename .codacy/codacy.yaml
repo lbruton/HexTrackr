@@ -1,31 +1,10 @@
-duplication:
-    config:
-        minLines: 10
-        minTokens: 50
-    enabled: true
-exclude_paths:
-    - docs/**
-    - app/public/docs-source/**
-    - app/public/docs-html/**
-    - app/dev-docs-html/**
-    - app/public/jsdoc/**
-    - app/public/vendor/**
-    - node_modules/**
-    - '**/*.min.js'
-    - '**/*.min.css'
-    - depreciated/**
-    - .codacy/**
-    - .claude/**
-    - .cursor/**
-    - .github/**
 runtimes:
     - java@17.0.10
     - node@22.2.0
     - python@3.11.11
 tools:
-    - eslint@9.32.0
+    - eslint@9.38.0
     - lizard@1.17.31
-    - pmd@7.11.0
-    - pylint@3.3.7
+    - pmd@6.55.0
     - semgrep@1.78.0
     - trivy@0.66.0

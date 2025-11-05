@@ -1,6 +1,6 @@
 # WebSocket Reference
 
-**Version**: v1.1.11
+**Version**: v1.1.12
 **Last Updated**: 2025-10-09
 
 This reference documents the WebSocket protocol, including low-level classes and events used inside HexTrackr.
