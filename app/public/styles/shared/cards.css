@@ -23,7 +23,7 @@
 
 /* Card Header */
 .card-header {
-    background: var(--tblr-bg-surface-secondary);
+    background: var(--hextrackr-card-header-bg);  /* Use themed card header background */
     border-bottom: 1px solid var(--tblr-border-color);
     padding: 1rem 1.25rem;
     border-radius: 8px 8px 0 0 !important;  /* Match parent .card top corners (HEX-122) */
@@ -59,7 +59,7 @@
 
 /* Card Footer */
 .card-footer {
-    background: var(--tblr-bg-surface-secondary);
+    background: var(--hextrackr-card-footer-bg);  /* Use themed card footer background */
     border-top: 1px solid var(--tblr-border-color);
     padding: 0.75rem 1.25rem;
 }
@@ -214,12 +214,13 @@
    =========================== */
 
 .chart-container {
-    background: white;
+    background: var(--hextrackr-surface-1);  /* Use CSS variable instead of hardcoded white */
     border-radius: 12px;
-    box-shadow: 0 1px 3px 0 rgb(0, 0, 0, 0.1);
+    box-shadow: var(--hextrackr-shadow-sm);
     padding: 2rem;
     margin-bottom: 2rem;
     min-height: 400px;
+    border: 1px solid var(--hextrackr-border-subtle);
 }
 
 [data-bs-theme="dark"] .chart-container {
@@ -231,10 +232,11 @@
    =========================== */
 
 .workspace-container {
-    background: white;
+    background: var(--hextrackr-surface-1);  /* Use CSS variable instead of hardcoded white */
     border-radius: 12px;
-    box-shadow: 0 1px 3px 0 rgb(0, 0, 0, 0.1);
+    box-shadow: var(--hextrackr-shadow-sm);
     overflow: hidden;
+    border: 1px solid var(--hextrackr-border-subtle);
 }
 
 .workspace-header {
@@ -309,11 +311,8 @@
     border-color: var(--hextrackr-border-subtle);
 }
 
-[data-bs-theme="dark"] .card-header,
-[data-bs-theme="dark"] .card-footer {
-    background: var(--tblr-bg-surface-secondary);
-    border-color: var(--tblr-border-color-dark);
-}
+/* Card headers and footers now use themed variables (--hextrackr-card-header-bg, --hextrackr-card-footer-bg) */
+/* No dark mode override needed - CSS variables handle both themes */
 
 [data-bs-theme="dark"] .vulnerability-title {
     color: var(--tblr-body-color);

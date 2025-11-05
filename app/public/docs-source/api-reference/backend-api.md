@@ -2,7 +2,7 @@
 
 > Complete reference for HexTrackr's backend architecture, including controllers, services, routes, and server configuration
 
-> **Current Version**: v1.1.11 (see `package.json` for latest version)
+> **Current Version**: v1.1.12 (see `package.json` for latest version)
 >
 > Historical "Since:" annotations throughout this document indicate when features were first introduced.
 
