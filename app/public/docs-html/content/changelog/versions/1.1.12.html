@@ -1,0 +1,144 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <hr>
+<h2>title: "Version 1.1.12 - Light Mode Visual Depth & Theme Consistency"
+date: "2025-11-04"
+version: "1.1.12"
+status: "Released"
+category: "Update"</h2><h1>Version 1.1.12 - Light Mode Visual Depth & Theme Consistency</h1><p><strong>Release Status</strong>: ✅ Released<br><strong>Release Date</strong>: 2025-11-04<br><strong>Parent Issues</strong>: UI/UX Improvements</p>
+<h2>Overview</h2><p>Restored Material Design elevation principles to light mode with blue-gray surface hierarchy, fixed missing CSS files across tickets.html and documentation portal, and unified search bar presentation with card-based design. This release brings light mode visual depth on par with dark mode, creating proper contrast and &quot;pop&quot; for elevated UI elements.</p>
+<hr>
+<h2>[1.1.12]</h2><h3>Changed</h3><h4>Light Mode Surface Hierarchy Redesign - 2025-11-04</h4><p><strong>Description</strong>: Implemented multi-layer surface hierarchy in light mode using blue-gray color palette, replacing flat white-on-white design with proper Material Design elevation principles.</p>
+<p><strong>Problem Solved</strong>:<br>Light mode had lost all visual depth - white cards on white background created a flat, undifferentiated interface where elements blended together. Dark mode had proper contrast and &quot;pop&quot; but light mode looked washed out and unprofessional.</p>
+<p><strong>Design Changes</strong>:</p>
+<p><strong>Color Hierarchy</strong> (darker foundation → lighter elevated elements):</p>
+<ul>
+<li><strong>Page Background</strong>: <code>#d0dae6</code> - Darker blue-gray foundation</li>
+<li><strong>Card Headers</strong>: <code>#e8eef5</code> - Lighter blue-gray for elevation</li>
+<li><strong>Card Bodies</strong>: <code>#ffffff</code> - Pure white for maximum contrast</li>
+<li><strong>Secondary Backgrounds</strong>: <code>#c8d4e0</code> - Even deeper blue-gray for base surfaces</li>
+</ul>
+<p><strong>CSS Variables Updated</strong> (<code>/app/public/styles/css-variables.css</code>):</p>
+<pre><code class="language-css"><span class="hljs-comment">/* Light Mode Surfaces */</span>
+<span class="hljs-attr">--hextrackr-bg-primary</span>: <span class="hljs-number">#d0dae6</span>;      <span class="hljs-comment">/* Page background */</span>
+<span class="hljs-attr">--hextrackr-bg-secondary</span>: <span class="hljs-number">#c8d4e0</span>;    <span class="hljs-comment">/* Deeper backgrounds */</span>
+<span class="hljs-attr">--hextrackr-bg-tertiary</span>: <span class="hljs-number">#e8eef5</span>;     <span class="hljs-comment">/* Elevated elements */</span>
+<span class="hljs-attr">--hextrackr-card-header-bg</span>: <span class="hljs-number">#e8eef5</span>;  <span class="hljs-comment">/* Card headers */</span>
+<span class="hljs-attr">--hextrackr-card-body-bg</span>: <span class="hljs-number">#ffffff</span>;    <span class="hljs-comment">/* Card bodies */</span></code></pre><p><strong>Enhanced Depth Elements</strong> (<code>/app/public/styles/shared/light-theme.css</code>):</p>
+<ul>
+<li>Navbar: Added subtle box-shadow and border for header distinction</li>
+<li>Stats cards: Gradient background with hover effects (translateY + box-shadow)</li>
+<li>Proper surface elevation hierarchy across all card components</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/styles/css-variables.css</code> (lines 15-25, 95-100)</li>
+<li><code>app/public/styles/shared/light-theme.css</code> (lines 58-88)</li>
+<li><code>app/public/styles/shared/cards.css</code> (chart-container, workspace-container backgrounds)</li>
+</ul>
+<p><strong>User Experience</strong>:</p>
+<ul>
+<li>✅ Cards now &quot;pop&quot; from the background with clear visual hierarchy</li>
+<li>✅ Light mode matches dark mode quality and professional appearance</li>
+<li>✅ Improved readability through proper contrast ratios</li>
+<li>✅ Consistent elevation across all UI surfaces</li>
+</ul>
+<hr>
+<h3>Fixed</h3><h4>Missing CSS Files on Tickets Page - 2025-11-04</h4><p><strong>Description</strong>: Fixed missing <code>light-theme.css</code> link in tickets.html that caused inconsistent styling compared to vulnerabilities.html.</p>
+<p><strong>Problem</strong>: Tickets page had different header styling and white backgrounds despite sharing the same header component HTML as vulnerabilities page.</p>
+<p><strong>Root Cause</strong>: <code>tickets.html</code> was missing the light-theme.css file entirely, causing it to fall back to default Bootstrap variables instead of HexTrackr theme variables.</p>
+<p><strong>Fix</strong>: Added missing CSS link to tickets.html (line 64):</p>
+<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;styles/shared/light-theme.css&quot;</span>&gt;</span></code></pre><p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/tickets.html</code> (line 64)</li>
+</ul>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li>✅ Tickets page now has consistent blue-gray backgrounds</li>
+<li>✅ Header styling matches vulnerabilities page</li>
+<li>✅ Theme variables properly applied across all elements</li>
+</ul>
+<hr>
+<h4>Missing CSS Files on Documentation Portal - 2025-11-04</h4><p><strong>Description</strong>: Fixed missing <code>light-theme.css</code> link and incorrect body background variable in documentation portal.</p>
+<p><strong>Problem</strong>: Documentation portal remained white after initial light mode fixes, not picking up the blue-gray theme.</p>
+<p><strong>Root Cause</strong>:</p>
+<ol>
+<li>Missing <code>light-theme.css</code> link in index.html</li>
+<li><code>docs-tabler.css</code> using old Bootstrap variable instead of HexTrackr theme variable</li>
+</ol>
+<p><strong>Fixes</strong>:</p>
+<ol>
+<li><p><strong>index.html</strong> - Added missing CSS link (line 58):</p>
+<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">&quot;stylesheet&quot;</span> <span class="hljs-attr">href</span>=<span class="hljs-string">&quot;../styles/shared/light-theme.css&quot;</span>&gt;</span></code></pre></li>
+<li><p><strong>docs-tabler.css</strong> - Updated body background variable:</p>
+<pre><code class="language-css"><span class="hljs-comment">/* OLD: background-color: var(--tblr-body-bg); */</span>
+<span class="hljs-selector-tag">body</span> {
+  <span class="hljs-attribute">background-color</span>: <span class="hljs-built_in">var</span>(--hextrackr-bg-primary);
+}</code></pre></li>
+</ol>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/docs-html/index.html</code> (line 58)</li>
+<li><code>app/public/docs-html/css/docs-tabler.css</code> (body background)</li>
+</ul>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li>✅ Documentation portal has blue-gray background matching main app</li>
+<li>✅ Consistent theming across docs, vulnerabilities, and tickets pages</li>
+<li>✅ All three major sections now share unified visual design</li>
+</ul>
+<hr>
+<h4>Tickets Search Bar Card Wrapper - 2025-11-04</h4><p><strong>Description</strong>: Wrapped tickets.html search bar in card component to match vulnerabilities.html aesthetic and improve visual consistency.</p>
+<p><strong>Problem</strong>: Tickets page had floating search bar directly on blue-gray background, while vulnerabilities page had search controls contained in a clean white card - inconsistent presentation.</p>
+<p><strong>Solution</strong>: Added card wrapper with <code>search-filters-card</code> class around search and filter controls.</p>
+<p><strong>Implementation</strong>:</p>
+<ol>
+<li><p><strong>tickets.html</strong> (lines 579-617) - Added card wrapper:</p>
+<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;card mb-4 search-filters-card&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">&quot;card-body py-2&quot;</span>&gt;</span>
+        <span class="hljs-comment">&lt;!-- Search bar and filter controls --&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></code></pre></li>
+<li><p><strong>tickets.css</strong> - Added matching CSS rule:</p>
+<pre><code class="language-css"><span class="hljs-selector-class">.search-filters-card</span> <span class="hljs-selector-class">.card-body</span> {
+    <span class="hljs-attribute">margin-top</span>: <span class="hljs-number">0</span>;
+}</code></pre></li>
+</ol>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/tickets.html</code> (lines 579-617)</li>
+<li><code>app/public/styles/pages/tickets.css</code> (lines 7-10)</li>
+</ul>
+<p><strong>User Experience</strong>:</p>
+<ul>
+<li>✅ Search bar now &quot;pops&quot; from background as elevated white card</li>
+<li>✅ Matches vulnerabilities page presentation exactly</li>
+<li>✅ Improved visual hierarchy and cleaner aesthetic</li>
+<li>✅ Consistent card-based design across both major data tables</li>
+</ul>
+<hr>
+<h2>Notes</h2><h3>Design Philosophy</h3><p><strong>Material Design Elevation</strong>: Light mode now follows Material Design principles with proper surface elevation hierarchy. Darker foundation layers create depth, allowing lighter elevated elements (cards, modals) to &quot;float&quot; above with clear visual distinction.</p>
+<p><strong>Color Psychology</strong>: Blue-gray palette provides:</p>
+<ul>
+<li>Professional, enterprise-appropriate aesthetic</li>
+<li>Reduced eye strain compared to pure white backgrounds</li>
+<li>Clear visual hierarchy without overwhelming contrast</li>
+<li>Consistent with modern SaaS application design patterns</li>
+</ul>
+<h3>User Experience Improvements</h3><ul>
+<li><strong>Light Mode Users</strong>: Major quality of life upgrade for users who prefer light mode - now matches dark mode&#39;s professional appearance and visual depth</li>
+<li><strong>Cross-Page Consistency</strong>: Unified theming across vulnerabilities, tickets, and documentation portal eliminates visual dissonance when navigating between sections</li>
+<li><strong>Card-Based Design</strong>: Consistent use of white cards on colored backgrounds creates predictable, learnable UI patterns</li>
+</ul>
+<h3>Performance Impact</h3><ul>
+<li>Zero performance impact - CSS-only changes</li>
+<li>No JavaScript modifications required</li>
+<li>Theme variables enable instant theme switching</li>
+</ul>
+<hr>
+<p><em>Changelog Entry: v1.1.12 | Light Mode Visual Depth &amp; Theme Consistency</em></p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
