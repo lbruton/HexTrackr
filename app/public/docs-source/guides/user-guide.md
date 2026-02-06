@@ -511,5 +511,5 @@ Configure ServiceNow to enable clickable ticket links:
 
 ---
 
-**Version**: 1.0.54
-**Last Updated**: 2025-10-09
+**Version**: 1.1.6
+**Last Updated**: 2025-10-25

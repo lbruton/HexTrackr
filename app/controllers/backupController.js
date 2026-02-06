@@ -47,7 +47,11 @@ class BackupController {
             const stats = await controller.backupService.getBackupStats();
             res.json(stats);
         } catch (error) {
-            console.error("Error getting backup stats:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "backup", "Error getting backup stats", { error: error.message });
+            } else {
+                console.error("Error getting backup stats:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to get backup statistics",
@@ -66,7 +70,11 @@ class BackupController {
             const exportData = await controller.backupService.exportVulnerabilities();
             res.json(exportData);
         } catch (error) {
-            console.error("Error exporting vulnerabilities:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "backup", "Error exporting vulnerabilities", { error: error.message });
+            } else {
+                console.error("Error exporting vulnerabilities:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Export failed",
@@ -85,7 +93,11 @@ class BackupController {
             const exportData = await controller.backupService.exportTickets();
             res.json(exportData);
         } catch (error) {
-            console.error("Error exporting tickets:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "backup", "Error exporting tickets", { error: error.message });
+            } else {
+                console.error("Error exporting tickets:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to export tickets",
@@ -104,7 +116,11 @@ class BackupController {
             const exportData = await controller.backupService.exportAll();
             res.json(exportData);
         } catch (error) {
-            console.error("Error exporting complete backup:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "backup", "Error exporting complete backup", { error: error.message });
+            } else {
+                console.error("Error exporting complete backup:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Export failed",
@@ -143,7 +159,11 @@ class BackupController {
                 clearedCount: result.clearedCount
             });
         } catch (error) {
-            console.error("Error clearing data:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "backup", "Error clearing data", { error: error.message });
+            } else {
+                console.error("Error clearing data:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to clear data",
@@ -195,7 +215,11 @@ class BackupController {
             });
 
         } catch (error) {
-            console.error("Error restoring backup:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "backup", "Error restoring backup", { error: error.message });
+            } else {
+                console.error("Error restoring backup:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to restore data",
@@ -224,7 +248,11 @@ class BackupController {
             res.send(zipBuffer);
 
         } catch (error) {
-            console.error("Error creating ZIP backup:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "backup", "Error creating ZIP backup", { error: error.message });
+            } else {
+                console.error("Error creating ZIP backup:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "ZIP backup failed",
@@ -262,18 +290,34 @@ class BackupController {
                     fs.mkdir(backupDir, { recursive: true })
                         .then(() => fs.writeFile(path.join(backupDir, filename), zipBuffer))
                         .then(() => {
-                            console.log(`[BACKUP] Vulnerabilities backup saved to disk: ${filename} (${(zipBuffer.length / 1024 / 1024).toFixed(2)}MB)`);
+                            if (global.logger?.info) {
+                                global.logger.info("backend", "backup", "Vulnerabilities backup saved to disk", { filename, sizeMB: (zipBuffer.length / 1024 / 1024).toFixed(2) });
+                            } else {
+                                console.log(`[BACKUP] Vulnerabilities backup saved to disk: ${filename} (${(zipBuffer.length / 1024 / 1024).toFixed(2)}MB)`);
+                            }
                         })
                         .catch(err => {
-                            console.error("[BACKUP] Failed to save vulnerabilities backup to disk:", err);
+                            if (global.logger?.error) {
+                                global.logger.error("backend", "backup", "Failed to save vulnerabilities backup to disk", { error: err.message });
+                            } else {
+                                console.error("[BACKUP] Failed to save vulnerabilities backup to disk:", err);
+                            }
                         });
                 } catch (error) {
-                    console.error("[BACKUP] Error in background save:", error);
+                    if (global.logger?.error) {
+                        global.logger.error("backend", "backup", "Error in background save", { error: error.message });
+                    } else {
+                        console.error("[BACKUP] Error in background save:", error);
+                    }
                 }
             });
 
         } catch (error) {
-            console.error("Error creating vulnerabilities ZIP:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "backup", "Error creating vulnerabilities ZIP", { error: error.message });
+            } else {
+                console.error("Error creating vulnerabilities ZIP:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Vulnerabilities ZIP backup failed",
@@ -310,18 +354,34 @@ class BackupController {
                     fs.mkdir(backupDir, { recursive: true })
                         .then(() => fs.writeFile(path.join(backupDir, filename), zipBuffer))
                         .then(() => {
-                            console.log(`[BACKUP] Tickets backup saved to disk: ${filename} (${(zipBuffer.length / 1024 / 1024).toFixed(2)}MB)`);
+                            if (global.logger?.info) {
+                                global.logger.info("backend", "backup", "Tickets backup saved to disk", { filename, sizeMB: (zipBuffer.length / 1024 / 1024).toFixed(2) });
+                            } else {
+                                console.log(`[BACKUP] Tickets backup saved to disk: ${filename} (${(zipBuffer.length / 1024 / 1024).toFixed(2)}MB)`);
+                            }
                         })
                         .catch(err => {
-                            console.error("[BACKUP] Failed to save tickets backup to disk:", err);
+                            if (global.logger?.error) {
+                                global.logger.error("backend", "backup", "Failed to save tickets backup to disk", { error: err.message });
+                            } else {
+                                console.error("[BACKUP] Failed to save tickets backup to disk:", err);
+                            }
                         });
                 } catch (error) {
-                    console.error("[BACKUP] Error in background save:", error);
+                    if (global.logger?.error) {
+                        global.logger.error("backend", "backup", "Error in background save", { error: error.message });
+                    } else {
+                        console.error("[BACKUP] Error in background save:", error);
+                    }
                 }
             });
 
         } catch (error) {
-            console.error("Error creating tickets ZIP:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "backup", "Error creating tickets ZIP", { error: error.message });
+            } else {
+                console.error("Error creating tickets ZIP:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Tickets ZIP backup failed",
@@ -342,7 +402,11 @@ class BackupController {
             res.json(result);
 
         } catch (error) {
-            console.error("Error retrieving backup history:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "backup", "Error retrieving backup history", { error: error.message });
+            } else {
+                console.error("Error retrieving backup history:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to retrieve backup history",
@@ -379,7 +443,11 @@ class BackupController {
             res.send(fileBuffer);
 
         } catch (error) {
-            console.error("Error downloading backup file:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "backup", "Error downloading backup file", { error: error.message });
+            } else {
+                console.error("Error downloading backup file:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to download backup file",
@@ -411,7 +479,11 @@ class BackupController {
             res.send(fileBuffer);
 
         } catch (error) {
-            console.error("Error saving backup to disk:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "backup", "Error saving backup to disk", { error: error.message });
+            } else {
+                console.error("Error saving backup to disk:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to save backup to disk",
@@ -437,7 +509,11 @@ class BackupController {
             });
 
         } catch (error) {
-            console.error("Error triggering manual backup:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "backup", "Error triggering manual backup", { error: error.message });
+            } else {
+                console.error("Error triggering manual backup:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to trigger manual backup",

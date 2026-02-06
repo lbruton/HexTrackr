@@ -284,6 +284,32 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
             }
         },
         {
+            headerName: "CVSS",
+            field: "cvss_score",
+            sortable: true,
+            filter: "agNumberColumnFilter",
+            width: 90,
+            minWidth: 70,
+            maxWidth: 120,
+            resizable: true,
+            cellRenderer: (params) => {
+                const cvss = parseFloat(params.value) || 0;
+                // Colored text based on CVSS score - cleaner table design
+                let colorClass = "text-success";  // Green for low (0-3.9)
+                if (cvss >= 9.0) {
+                    colorClass = "text-danger";   // Red for critical (9-10)
+                } else if (cvss >= 7.0) {
+                    colorClass = "text-orange";   // Orange for high (7-8.9)
+                } else if (cvss >= 4.0) {
+                    colorClass = "text-warning";  // Yellow for medium (4-6.9)
+                }
+                if (cvss === 0) {
+                    return "<span class=\"text-muted\">N/A</span>";
+                }
+                return `<span class="${colorClass} fw-bold">${cvss.toFixed(1)}</span>`;
+            }
+        },
+        {
             headerName: "Severity",
             field: "severity",
             sortable: true,

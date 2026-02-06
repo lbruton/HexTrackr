@@ -211,32 +211,8 @@ class DatabaseService {
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )`,
 
-            // Main vulnerabilities table
-            `CREATE TABLE IF NOT EXISTS vulnerabilities (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                import_id INTEGER,
-                hostname TEXT,
-                ip_address TEXT,
-                cve TEXT,
-                severity TEXT,
-                vpr_score REAL,
-                cvss_score REAL,
-                first_seen TEXT,
-                last_seen TEXT,
-                plugin_id TEXT,
-                plugin_name TEXT,
-                description TEXT,
-                solution TEXT,
-                vendor_reference TEXT,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                vendor TEXT DEFAULT '',
-                vulnerability_date TEXT DEFAULT '',
-                state TEXT DEFAULT 'open',
-                import_date TEXT DEFAULT '',
-                FOREIGN KEY (import_id) REFERENCES vulnerability_imports (id)
-            )`,
-
             // Junction table for ticket-vulnerability relationships
+            // References vulnerabilities_current for future mitigation tracking feature
             `CREATE TABLE IF NOT EXISTS ticket_vulnerabilities (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 ticket_id TEXT NOT NULL,
@@ -245,7 +221,7 @@ class DatabaseService {
                 notes TEXT,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (ticket_id) REFERENCES tickets (id),
-                FOREIGN KEY (vulnerability_id) REFERENCES vulnerabilities (id)
+                FOREIGN KEY (vulnerability_id) REFERENCES vulnerabilities_current (id)
             )`,
 
             // vulnerability_snapshots table (lines 2888-2915)

@@ -29,7 +29,9 @@ router.post("/migrate", requireAuth, TicketController.migrateTickets);
 router.get("/next-xt-number", requireAuth, TicketController.getNextXTNumber);
 router.get("/by-device/:hostname", requireAuth, TicketController.getTicketsByDevice);
 router.post("/batch-device-lookup", requireAuth, TicketController.getTicketsByDeviceBatch);
+router.get("/location/:locationKey", requireAuth, TicketController.getTicketsByLocation); // HEX-344: Location cards multi-ticket modal
 router.get("/address-suggestions", requireAuth, TicketController.getAddressSuggestions);
+router.get("/site-by-location/:location", requireAuth, TicketController.getSiteByLocation); // HEX-350: Intelligent site field population
 
 /**
  * T053 INTEGRATION NOTES:

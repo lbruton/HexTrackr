@@ -4,6 +4,11 @@
  * @version 1.0.0
  */
 
+/* Search Filters Card - matches vulnerabilities.html aesthetic */
+.search-filters-card .card-body {
+    margin-top: 0;
+}
+
 /* Beta Banner Styling */
 .alert-info .alert-title {
     font-weight: 600;

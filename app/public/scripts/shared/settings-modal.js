@@ -67,12 +67,20 @@ logger.debug("ui", "HexTrackr Settings Modal (shared) loaded successfully");
   "use strict";
   
   const SettingsModal = {
+    _initialized: false, // Guard to prevent double initialization (HEX-254 Session 13)
+
     // Initialize the settings modal
     async init() {
+      if (this._initialized) {
+        logger.debug("ui", "Settings modal already initialized, skipping");
+        return;
+      }
+
       try {
         await this.loadModalHtml();
         this.setupEventListeners();
         initServiceNowSettings(); // Call as standalone function instead of method
+        this._initialized = true; // Mark as initialized (HEX-254 Session 13)
         logger.debug("ui", "Settings modal initialized");
       } catch (error) {
         logger.error("ui", "Failed to initialize settings modal:", error);
@@ -107,7 +115,7 @@ logger.debug("ui", "HexTrackr Settings Modal (shared) loaded successfully");
         
         // Get reference to the modal element for Bootstrap
         this.modal = document.getElementById("settingsModal");
-        
+
         logger.debug("ui", "HexTrackr Settings Modal (shared) loaded successfully");
         
       } catch (error) {
@@ -161,13 +169,13 @@ logger.debug("ui", "HexTrackr Settings Modal (shared) loaded successfully");
         document.getElementById("paloAutoSync")?.addEventListener("change", togglePaloAutoSync);
 
         // Load status and settings when modal opens
-        const settingsModalElement = document.getElementById("settingsModal");
-        if (settingsModalElement) {
-            settingsModalElement.addEventListener("shown.bs.modal", loadSettings);
-            settingsModalElement.addEventListener("shown.bs.modal", loadKevSyncStatus);
-            settingsModalElement.addEventListener("shown.bs.modal", loadCiscoSyncStatus);
-            settingsModalElement.addEventListener("shown.bs.modal", loadPaloSyncStatus); // HEX-209
-            settingsModalElement.addEventListener("shown.bs.modal", loadTenableImportStatus); // HEX-240
+        if (this.modal) {
+            this.modal.addEventListener("shown.bs.modal", loadSettings);
+            this.modal.addEventListener("shown.bs.modal", loadKevSyncStatus);
+            this.modal.addEventListener("shown.bs.modal", loadCiscoSyncStatus);
+            this.modal.addEventListener("shown.bs.modal", loadPaloSyncStatus); // HEX-209
+            this.modal.addEventListener("shown.bs.modal", loadTenableImportStatus); // HEX-240
+            this.modal.addEventListener("shown.bs.modal", loadAuditLogStats); // HEX-254 Session 13
         }
         
         // Settings save button
@@ -283,6 +291,42 @@ async function refreshStats() {
     } catch (error) {
         logger.error("ui", "Error fetching stats:", error);
         showNotification("Error loading statistics", "danger");
+    }
+}
+
+/**
+ * Load audit log statistics for the Settings modal (HEX-254 Session 13)
+ * @returns {Promise<void>}
+ */
+async function loadAuditLogStats() {
+    logger.debug("ui", "🔍 loadAuditLogStats() called - fetching audit log stats");
+    console.log("🔍 loadAuditLogStats() called - fetching audit log stats");
+    try {
+        const response = await authState.authenticatedFetch("/api/audit-logs/stats");
+        const result = await response.json();
+        console.log("📊 Audit log stats response:", result);
+
+        if (!result.success) {
+            throw new Error(result.error || "Failed to load audit log stats");
+        }
+
+        const stats = result.data;
+
+        // Update audit log stats in the card
+        const totalLogsEl = document.getElementById("auditTotalLogs");
+        const categoriesCountEl = document.getElementById("auditCategoriesCount");
+
+        if (totalLogsEl) {
+            totalLogsEl.textContent = stats.totalLogs?.toLocaleString() || "0";
+        }
+        if (categoriesCountEl) {
+            categoriesCountEl.textContent = stats.categoriesTracked?.length || "0";
+        }
+
+    } catch (error) {
+        logger.error("ui", "Error loading audit log stats:", error);
+        // Don't show notification for audit log stats errors (non-critical)
+        console.error("Failed to load audit log stats:", error);
     }
 }
 

@@ -29,7 +29,7 @@ This document provides a comprehensive list of technologies, frameworks, and lib
 
 - **Bootstrap 5.x** - Responsive CSS framework
 - **Tabler.io** - Dashboard UI theme and components
-- **AG-Grid Community 32.2** - Enterprise-grade data grid with infinite scroll
+- **AG-Grid Community 33.3.2** - Enterprise-grade data grid with infinite scroll
 - **ApexCharts 3.44.0** - Interactive charts and data visualization
 - **DOMPurify 3.2.6** - XSS sanitization library for user-generated content
 

@@ -1,0 +1,111 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <hr>
+<h2>title: "Version 1.1.10 - Intelligent Ticket Creation (HEX-350)"
+date: "2025-10-28"
+version: "1.1.10"
+status: "Released"
+category: "Bug Fix"</h2><h1>Version 1.1.10 - Intelligent Ticket Creation (HEX-350)</h1><p><strong>Release Status</strong>: ✅ Released<br><strong>Release Date</strong>: 2025-10-28<br><strong>Parent Issues</strong>: <a href="https://linear.app/hextrackr/issue/HEX-350">HEX-350</a></p>
+<h2>Overview</h2><p>Replaced simple substring extraction with intelligent hostname parsing for ticket creation. Location values now use HostnameParserService API (e.g., &quot;BARNHA&quot; instead of &quot;BARNH&quot;), and site codes are intelligently pre-filled from historical tickets database or left blank for user entry from Hexagon EAM.</p>
+<hr>
+<h2>[1.1.10]</h2><h3>Fixed</h3><h4>Intelligent Ticket Location Parsing (HEX-350) - 2025-10-28</h4><p><strong>Description</strong>: Fixed ticket creation to use HostnameParserService API for intelligent location extraction instead of naive substring extraction, matching the pattern already used in location cards view.</p>
+<p><strong>Problem Solved</strong>:</p>
+<ul>
+<li>Ticket location field was using <code>hostname.substring(0, 5)</code> instead of parsed location</li>
+<li>Example: BARNHANSWAN03 showed &quot;BARNH&quot; instead of &quot;BARNHA&quot;</li>
+<li>Site field had no intelligent lookup from historical tickets</li>
+<li>Inconsistent with location cards behavior (which already used HostnameParserService)</li>
+</ul>
+<p><strong>Technical Fixes</strong>:</p>
+<ol>
+<li><p><strong>Fixed hostnameController singleton pattern</strong> (<code>app/controllers/hostnameController.js:9,47</code>)</p>
+<ul>
+<li>Controller was calling <code>parseHostname()</code> on module exports object instead of singleton instance</li>
+<li>Changed from <code>require(&quot;./service&quot;)</code> to <code>require(&quot;./service&quot;).getHostnameParserService()</code></li>
+<li>This bug caused all hostname parser API calls to fail silently with 500 errors</li>
+</ul>
+</li>
+<li><p><strong>Removed pointless location fallback logic</strong> (4 files)</p>
+<ul>
+<li>Removed try/catch and substring fallback for location parsing</li>
+<li>Internal API must work for app to function - fallback masked real errors</li>
+<li>Simplified from 30+ lines to 15 lines per file</li>
+</ul>
+</li>
+<li><p><strong>Removed incorrect 4-digit site substring extraction</strong> (<code>location-cards.js:570</code>)</p>
+<ul>
+<li>Was using <code>locationKey.substring(0, 4)</code> for site code</li>
+<li>Now uses intelligent database lookup or blank value</li>
+</ul>
+</li>
+</ol>
+<p><strong>Implementation Pattern</strong> (applied to all 4 entry points):</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// Parse hostname via API</span>
+<span class="hljs-keyword">const</span> parseResponse = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string">`/api/hostname/parse/<span class="hljs-subst">${hostname}</span>`</span>);
+<span class="hljs-keyword">const</span> parseData = <span class="hljs-keyword">await</span> parseResponse.<span class="hljs-title function_">json</span>();
+<span class="hljs-keyword">if</span> (parseData.<span class="hljs-property">success</span> &amp;&amp; parseData.<span class="hljs-property">data</span>) {
+    location = parseData.<span class="hljs-property">data</span>.<span class="hljs-property">location</span>.<span class="hljs-title function_">toUpperCase</span>(); <span class="hljs-comment">// e.g., &quot;BARNHA&quot;</span>
+
+    <span class="hljs-comment">// Lookup site from tickets database</span>
+    <span class="hljs-keyword">const</span> siteResponse = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string">`/api/tickets/site-by-location/<span class="hljs-subst">${location}</span>`</span>);
+    <span class="hljs-keyword">const</span> siteData = <span class="hljs-keyword">await</span> siteResponse.<span class="hljs-title function_">json</span>();
+    <span class="hljs-keyword">if</span> (siteData.<span class="hljs-property">success</span> &amp;&amp; siteData.<span class="hljs-property">site</span>) {
+        site = siteData.<span class="hljs-property">site</span>.<span class="hljs-title function_">toUpperCase</span>(); <span class="hljs-comment">// e.g., &quot;TULS&quot; if found</span>
+    }
+    <span class="hljs-comment">// If not found, site stays blank - user enters from Hexagon</span>
+}</code></pre><p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/controllers/hostnameController.js</code>: Fixed singleton pattern usage</li>
+<li><code>app/public/scripts/shared/vulnerability-cards.js</code>: Removed fallback, simplified parsing</li>
+<li><code>app/public/scripts/shared/device-security-modal.js</code>: Removed fallback, simplified parsing</li>
+<li><code>app/public/scripts/shared/location-details-modal.js</code>: Removed fallback, simplified parsing</li>
+<li><code>app/public/scripts/shared/location-cards.js</code>: Removed fallback and site substring extraction</li>
+</ul>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li>✅ Device cards &quot;Create Ticket&quot; button works correctly</li>
+<li>✅ Device Security Modal &quot;Create Ticket&quot; button works correctly</li>
+<li>✅ Location cards &quot;Create Ticket&quot; button works correctly</li>
+<li>✅ Location Details Modal ticket creation works correctly</li>
+<li>✅ BARNHANSWAN03 correctly shows Location: &quot;BARNHA&quot;, Site: &quot;&quot; (blank)</li>
+<li>✅ WTULSANSWAN01 correctly shows Location: &quot;WTULSA&quot;, Site: &quot;TULS&quot; (from database)</li>
+<li>✅ No console errors</li>
+<li>✅ Tested on dev.hextrackr.com</li>
+</ul>
+<p><strong>Issues</strong>:</p>
+<ul>
+<li><a href="https://linear.app/hextrackr/issue/HEX-350">HEX-350</a> - RESEARCH: Ticket Creation From Vulnerabilities.html</li>
+</ul>
+<hr>
+<h3>Documentation Improvements</h3><h4>JSDoc Enhancement - getAllTickets() Method (DOCS-165) - 2025-10-29</h4><ul>
+<li><strong>JSDoc</strong>: Fixed documentation for <code>getAllTickets()</code> in <code>app/controllers/ticketController.js</code> (<a href="https://linear.app/hextrackr/issue/DOCS-165">DOCS-165</a>)<ul>
+<li>Added complete JSDoc with @static, @async, @param, @returns, @throws, @route, @middleware, and @example tags</li>
+<li>Documented response structure for 200 and 500 status codes</li>
+<li>Added practical usage example showing ticket array format</li>
+<li>Improved IDE autocomplete and IntelliSense support</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2>Documentation Improvements</h2><h3>Content Accuracy Fixes</h3><ul>
+<li><strong>Content</strong>: Fixed incorrect AG-Grid version in <code>architecture/technology-stack.md</code> - corrected from 32.2 to actual production version 33.3.2 (<a href="https://linear.app/hextrackr/issue/DOCS-164">DOCS-164</a>)</li>
+</ul>
+<hr>
+<h2>Notes</h2><h3>Key Learning</h3><p><strong>Anti-pattern Identified</strong>: Fallback logic for <strong>internal APIs</strong> serves no purpose and masks errors.</p>
+<ul>
+<li>External dependencies (third-party APIs) → Graceful degradation with fallbacks ✅</li>
+<li>Internal APIs (same application) → Fail fast, surface errors for debugging ✅</li>
+</ul>
+<p>Removed 49 lines of unnecessary try/catch and fallback logic that was hiding the real bug (singleton pattern error).</p>
+<h3>Performance Improvements</h3><ul>
+<li>Reduced code complexity: 132 lines removed, 83 lines added (net -49 lines)</li>
+<li>Simplified error handling: No silent failures, errors surface immediately</li>
+<li>Reduced cognitive load: Simpler code flow, no fallback branching</li>
+</ul>
+<hr>
+<p><em>Changelog Entry: v1.1.10 | HEX-350 Intelligent Ticket Creation Fix</em></p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

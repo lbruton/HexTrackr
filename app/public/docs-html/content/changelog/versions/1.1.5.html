@@ -1,6 +1,12 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
-    <h1>Version 1.1.5</h1><p><strong>Release Date</strong>: 2025-10-24</p>
+    <hr>
+<h2>title: "Version 1.1.5 - JSDoc Dark Mode Theme Injection Fix"
+date: "2025-10-24"
+version: "1.1.5"
+status: "Released"
+category: "Bug Fix"</h2><h1>Version 1.1.5 - JSDoc Dark Mode Theme Injection Fix</h1><p><strong>Release Status</strong>: ✅ Released<br><strong>Release Date</strong>: 2025-10-24<br><strong>Parent Issues</strong>: <a href="https://linear.app/hextrackr/issue/HEX-341">HEX-341</a></p>
+<h2>Overview</h2><p>Resolved JSDoc developer documentation portal failing to apply HexTrackr&#39;s dark mode theme by integrating theme injection into the automated documentation build workflow.</p>
 <hr>
 <h2>[1.1.5] - 2025-10-24</h2><h3>Fixed</h3><h4>JSDoc Dark Mode Theme Injection (HEX-341) - 2025-10-24</h4><p><strong>Description</strong>: Resolved critical bug where JSDoc developer documentation portal (<code>/app/dev-docs-html/</code>) failed to detect and apply HexTrackr&#39;s dark mode theme, forcing users into light mode regardless of their theme preference.</p>
 <p><strong>Root Cause</strong>:</p>
@@ -92,6 +98,110 @@ $ <span class="hljs-built_in">ls</span> app/dev-docs-html/*.html | <span class="
 <ul>
 <li><a href="https://linear.app/hextrackr/issue/HEX-341">HEX-341</a> - JSDoc HTML portal not detecting dark mode theme</li>
 </ul>
+<hr>
+<h3>Documentation Improvements</h3><h4>JSDoc Enhancement for TicketController.getInstance() (DOCS-155)</h4><p><strong>Description</strong>: Added complete JSDoc documentation to <code>getInstance()</code> static method in TicketController, improving API reference completeness.</p>
+<p><strong>File Modified</strong>: <code>app/controllers/ticketController.js:46-73</code></p>
+<p><strong>Improvements</strong>:</p>
+<ul>
+<li>Added <code>@static</code> tag to indicate static method pattern</li>
+<li>Added <code>@returns</code> tag documenting the TicketController singleton instance return type</li>
+<li>Added <code>@throws</code> tag documenting initialization dependency error</li>
+<li>Added two <code>@example</code> tags showing:<ul>
+<li>Typical usage pattern in route handlers</li>
+<li>Error handling when called before initialization</li>
+</ul>
+</li>
+</ul>
+<p><strong>Before</strong> (Minimal Documentation):</p>
+<pre><code class="language-javascript"><span class="hljs-comment">/**
+ * Get singleton instance (for use in routes)
+ */</span>
+<span class="hljs-keyword">static</span> <span class="hljs-title function_">getInstance</span>(<span class="hljs-params"></span>) { ... }</code></pre><p><strong>After</strong> (Complete Documentation):</p>
+<pre><code class="language-javascript"><span class="hljs-comment">/**
+ * Get singleton TicketController instance for use in route handlers
+ * Returns the initialized singleton instance created by initialize().
+ * Used by route modules to access controller methods without managing lifecycle.
+ *
+ * <span class="hljs-doctag">@static</span>
+ * <span class="hljs-doctag">@returns</span> {<span class="hljs-type">TicketController</span>} The singleton TicketController instance
+ * <span class="hljs-doctag">@throws</span> {<span class="hljs-type">Error</span>} &quot;TicketController not initialized. Call initialize() first.&quot; - If initialize() was never called
+ *
+ * <span class="hljs-doctag">@example</span>
+ * // In app/routes/tickets.js
+ * const controller = TicketController.getInstance();
+ * const tickets = await controller.ticketService.getAllTickets();
+ *
+ * <span class="hljs-doctag">@example</span>
+ * // Error case - calling before initialization
+ * try {
+ *     TicketController.getInstance(); // Throws error
+ * } catch (error) {
+ *     console.error(error.message); // &quot;TicketController not initialized...&quot;
+ * }
+ */</span></code></pre><p><strong>Impact</strong>: Developers consulting API documentation or using IDE autocomplete will now see complete parameter types, return values, error conditions, and usage examples for this critical singleton accessor method.</p>
+<p><strong>Linear Issue</strong>: <a href="https://linear.app/hextrackr/issue/DOCS-155/jsdoc-fix-add-complete-jsdoc-to-getinstance-in-ticketcontroller">DOCS-155</a></p>
+<hr>
+<h4>JSDoc Enhancement for TemplateController.getAllTemplates() (DOCS-156)</h4><p><strong>Description</strong>: Added complete JSDoc documentation to <code>getAllTemplates()</code> method in TemplateController, correcting misleading description and adding comprehensive API documentation.</p>
+<p><strong>File Modified</strong>: <code>app/controllers/templateController.js:47-81</code></p>
+<p><strong>Improvements</strong>:</p>
+<ul>
+<li>Corrected description from &quot;Get all email templates&quot; to &quot;Get all templates across all types (email, ticket, vulnerability)&quot;</li>
+<li>Added <code>@async</code> tag to indicate asynchronous method</li>
+<li>Added detailed <code>@returns</code> tag documenting complete response structure with all fields</li>
+<li>Added <code>@throws</code> tag documenting error conditions (service failures, database errors, JSON parsing)</li>
+<li>Added <code>@route</code> tag documenting the API endpoint (GET /api/templates)</li>
+<li>Added <code>@example</code> tag showing typical response structure with all three template types</li>
+</ul>
+<p><strong>Before</strong> (Incomplete and Misleading):</p>
+<pre><code class="language-javascript"><span class="hljs-comment">/**
+ * Get all email templates
+ * GET /api/templates
+ * <span class="hljs-doctag">@param</span> {<span class="hljs-type">Request</span>} <span class="hljs-variable">req</span> - Express request
+ * <span class="hljs-doctag">@param</span> {<span class="hljs-type">Response</span>} <span class="hljs-variable">res</span> - Express response
+ */</span>
+<span class="hljs-keyword">async</span> <span class="hljs-title function_">getAllTemplates</span>(<span class="hljs-params">req, res</span>) { ... }</code></pre><p><strong>After</strong> (Complete and Accurate):</p>
+<pre><code class="language-javascript"><span class="hljs-comment">/**
+ * Get all templates across all types (email, ticket, vulnerability)
+ * Retrieves active templates from email_templates, ticket_templates, and vulnerability_templates
+ * via UNION query, returning unified array with parsed JSON variables
+ *
+ * <span class="hljs-doctag">@async</span>
+ * <span class="hljs-doctag">@param</span> {<span class="hljs-type">Object</span>} <span class="hljs-variable">req</span> - Express request object (no parameters required)
+ * <span class="hljs-doctag">@param</span> {<span class="hljs-type">Object</span>} <span class="hljs-variable">res</span> - Express response object
+ * <span class="hljs-doctag">@returns</span> {<span class="hljs-type">Promise&lt;void&gt;</span>} Sends JSON response:
+ *   - 200: {success: true, data: Array&lt;Object&gt;, count: number} - All active templates
+ *     Each template object contains:
+ *       - id {number} - Template ID
+ *       - name {string} - Template name
+ *       - template_type {string} - Type: &#x27;email&#x27;, &#x27;ticket&#x27;, or &#x27;vulnerability&#x27;
+ *       - content {string} - Template content with variable placeholders
+ *       - variables {Array&lt;string&gt;} - Parsed array of available variables
+ *       - is_active {number} - Always 1 (inactive templates excluded)
+ *   - 500: {success: false, error: &quot;Failed to fetch templates&quot;, details: string}
+ * <span class="hljs-doctag">@throws</span> {<span class="hljs-type">Error</span>} Caught and returned as 500 response if:
+ *   - TemplateService.getAllTemplates() fails
+ *   - Database UNION query fails across template tables
+ *   - JSON parsing of variables field fails
+ * <span class="hljs-doctag">@route</span> GET /api/templates
+ * <span class="hljs-doctag">@example</span>
+ * // GET /api/templates
+ * // Returns: {
+ * //   success: true,
+ * //   data: [
+ * //     {id: 1, name: &quot;default_email&quot;, template_type: &quot;email&quot;, variables: [&quot;{{subject}}&quot;, ...]},
+ * //     {id: 5, name: &quot;default_ticket&quot;, template_type: &quot;ticket&quot;, variables: [&quot;{{description}}&quot;, ...]},
+ * //     {id: 8, name: &quot;default_vulnerability&quot;, template_type: &quot;vulnerability&quot;, variables: [...]}
+ * //   ],
+ * //   count: 12
+ * // }
+ */</span></code></pre><p><strong>Impact</strong>:</p>
+<ul>
+<li>Corrects misleading documentation that suggested only email templates were returned</li>
+<li>Developers now see accurate multi-table UNION query behavior</li>
+<li>Complete response structure documentation aids API consumers</li>
+<li>Proper error handling documentation improves debugging</li>
+</ul>
+<p><strong>Linear Issue</strong>: <a href="https://linear.app/hextrackr/issue/DOCS-156/jsdoc-fix-add-complete-jsdoc-to-getalltemplates-in-templatecontroller">DOCS-156</a></p>
 <hr>
 <h3>Changed</h3><h4>Documentation Workflow Integration</h4><p><strong>Changed</strong>: JSDoc theme injection from standalone bash script to integrated documentation workflow step.</p>
 <p><strong>Before</strong> (v1.0.29 - v1.1.4):</p>

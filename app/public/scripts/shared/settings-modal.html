@@ -30,7 +30,7 @@
                     <div class="row">
                         <!-- Cisco PSIRT API Configuration -->
                         <div class="col-lg-6 mb-4" data-integration="cisco">
-                                        <div class="card">
+                                        <div class="card h-100">
                                             <div class="card-header">
                                                 <h6 class="card-title mb-0">
                                                     <i class="fas fa-network-wired me-2 text-primary"></i>
@@ -82,7 +82,7 @@
                                     
                                     <!-- CISA KEV Sync Configuration -->
                                     <div class="col-lg-6 mb-4" data-integration="kev">
-                                        <div class="card">
+                                        <div class="card h-100">
                                             <div class="card-header">
                                                 <h6 class="card-title mb-0">
                                                     <i class="fas fa-fire me-2 text-danger"></i>
@@ -131,7 +131,7 @@
 
                                     <!-- Palo Alto Security Advisory Sync Configuration (HEX-209) -->
                                     <div class="col-lg-6 mb-4" data-integration="palo">
-                                        <div class="card">
+                                        <div class="card h-100">
                                             <div class="card-header">
                                                 <h6 class="card-title mb-0">
                                                     <i class="fas fa-shield-alt me-2 text-warning"></i>
@@ -180,7 +180,7 @@
 
                                     <!-- ServiceNow Integration -->
                                     <div class="col-lg-6 mb-4" data-integration="servicenow">
-                                        <div class="card">
+                                        <div class="card h-100">
                                             <div class="card-header">
                                                 <h6 class="card-title mb-0">
                                                     <i class="fas fa-cloud me-2 text-primary"></i>
@@ -222,7 +222,7 @@
 
                                     <!-- Netbox Integration (HEX-233) -->
                                     <div class="col-lg-6 mb-4" data-integration="netbox">
-                                        <div class="card">
+                                        <div class="card h-100">
                                             <div class="card-header">
                                                 <h6 class="card-title mb-0">
                                                     <i class="fas fa-server me-2 text-info"></i>
@@ -282,7 +282,7 @@
 
                                     <!-- Tenable Integration (HEX-233) -->
                                     <div class="col-lg-6 mb-4" data-integration="tenable">
-                                        <div class="card">
+                                        <div class="card h-100">
                                             <div class="card-header">
                                                 <h6 class="card-title mb-0">
                                                     <i class="fas fa-shield-virus me-2 text-success"></i>
@@ -518,11 +518,22 @@
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <div class="card border-dashed border-secondary">
-                                                            <div class="card-body text-center text-muted">
-                                                                <i class="fas fa-network-wired fs-1 mb-3"></i>
-                                                                <h6>SNMP Polling</h6>
-                                                                <p class="small">Configure SNMP monitoring and polling intervals</p>
+                                                        <div class="card">
+                                                            <div class="card-body text-center">
+                                                                <i class="fas fa-clipboard-list fs-1 mb-3 text-info"></i>
+                                                                <h6>Audit Logging</h6>
+                                                                <div class="mb-3" id="auditLogStats">
+                                                                    <div class="text-muted">
+                                                                        <span id="auditTotalLogs">0</span> logs •
+                                                                        <span id="auditCategoriesCount">0</span> categories
+                                                                    </div>
+                                                                    <div class="text-success mt-2">
+                                                                        <i class="fas fa-lock me-1"></i>AES-256-GCM Encrypted
+                                                                    </div>
+                                                                </div>
+                                                                <button type="button" class="btn btn-outline-info mt-2" onclick="window.auditLogModalManager?.show()">
+                                                                    <i class="fas fa-search me-2"></i>View Audit Logs
+                                                                </button>
                                                             </div>
                                                         </div>
                                                     </div>

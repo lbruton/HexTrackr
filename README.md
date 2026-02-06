@@ -1,6 +1,9 @@
 # HexTrackr
 
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/b3f731f8d8244dabafabb39339014886)](https://app.codacy.com?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/80ae81dcc5fc499097b7d80a0e2610d0)](https://app.codacy.com/gh/lbruton/HexTrackr/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
+[![Version](https://img.shields.io/badge/version-1.1.12-blue)](https://github.com/lbruton/HexTrackr)
 
 > Enterprise vulnerability management system for tracking security vulnerabilities, tickets, and Known Exploited Vulnerabilities (KEV)
 
@@ -26,7 +29,7 @@
 
 1. **Clone and Install**
    ```bash
-   git clone https://github.com/Lonnie-Bruton/HexTrackr.git
+   git clone https://github.com/lbruton/HexTrackr.git
    cd HexTrackr
    chmod +x install.sh
    ./install.sh
@@ -75,7 +78,7 @@ https://localhost:8989
 
 ## Version
 
-Current version: **v1.1.5**
+Current version: **v1.1.12**
 
 See [Changelog](app/public/docs-source/changelog/index.md) for detailed release notes.
 

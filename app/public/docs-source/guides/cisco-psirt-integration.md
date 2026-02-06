@@ -409,7 +409,6 @@ function startCiscoBackgroundSync(db) {
 ## Related Documentation
 
 - [KEV Integration Guide](./kev-integration.md) - Similar auto-sync pattern
-- [Getting Started Guide](./getting-started.md) - Initial HexTrackr setup
 - [User Guide](./user-guide.md) - General HexTrackr usage
 - [API Reference](../api-reference/index.md) - Backend API documentation
 

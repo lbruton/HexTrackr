@@ -13,45 +13,14 @@
 
 const { LocationService } = require("../services/locationService");
 const CacheService = require("../services/cacheService");
+const { shouldBypassCache, sendBypassResponse } = require("../utils/httpHelpers");
 
 // Get singleton instance explicitly (prevents race conditions)
 const cacheService = CacheService.getInstance();
 
-/**
- * Check if request should bypass cache
- * @param {object} req - Express request object
- * @returns {boolean} - True if cache should be bypassed
- */
-function shouldBypassCache(req) {
-    if (!req || !req.query) {
-        return false;
-    }
-
-    // Support both explicit bustCache flag and timestamp query param
-    if (Object.prototype.hasOwnProperty.call(req.query, "_t")) {
-        return true;
-    }
-
-    if (typeof req.query.bustCache === "string") {
-        return req.query.bustCache.toLowerCase() === "true";
-    }
-
-    return Boolean(req.query.bustCache);
-}
-
-/**
- * Send bypass response with no-cache headers
- * @param {object} res - Express response object
- * @param {object} payload - Response payload
- * @returns {object} - Express response
- */
-function sendBypassResponse(res, payload) {
-    res.setHeader("X-Cache", "BYPASS");
-    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-    res.setHeader("Pragma", "no-cache");
-    res.setHeader("Expires", "0");
-    return res.json(payload);
-}
+// HEX-346: Cache-busting helpers moved to app/utils/httpHelpers.js
+// - shouldBypassCache(req): Check if cache should be bypassed via query params (_t or bustCache)
+// - sendBypassResponse(res, payload): Send JSON response with cache bypass headers
 
 class LocationController {
     constructor() {
@@ -167,7 +136,11 @@ class LocationController {
                 60                          // Browser TTL: 60 seconds
             );
         } catch (error) {
-            console.error("Error fetching location stats:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "location", "Error fetching location stats", { error: error.message });
+            } else {
+                console.error("Error fetching location stats:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to fetch location statistics",

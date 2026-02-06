@@ -34,9 +34,12 @@
       
       // Initialize theme management
       await initThemeManagement();
-      
+
+      // Initialize shared modals (settings, backup, audit logs)
+      await initSharedModals();
+
       logger.debug("ui", "HexTrackr Header (shared) loaded successfully");
-      
+
     } catch (error) {
       logger.error("ui", "Failed to load shared header:", error);
       // Fallback: show basic navigation if loading fails
@@ -103,6 +106,39 @@
     }
   }
   
+  async function initSharedModals() {
+    try {
+      // Initialize settings modal
+      if (window.SettingsModal && typeof window.SettingsModal.init === "function") {
+        await window.SettingsModal.init();
+        logger.debug("ui", "Settings modal initialized via header-loader");
+      } else {
+        logger.warn("ui", "SettingsModal not available - script may not be loaded yet");
+      }
+
+      // Backup modal manager is already initialized on script load
+      // It creates window.backupModalManager = new BackupModalManager() at load time
+      if (window.backupModalManager) {
+        logger.debug("ui", "Backup modal manager available");
+      } else {
+        logger.warn("ui", "Backup modal manager not available - script may not be loaded yet");
+      }
+
+      // Audit log modal manager is already initialized on script load
+      // It creates window.auditLogModalManager = new AuditLogModalManager() at load time
+      if (window.auditLogModalManager) {
+        logger.debug("ui", "Audit log modal manager available");
+      } else {
+        logger.warn("ui", "Audit log modal manager not available - script may not be loaded yet");
+      }
+
+      logger.debug("ui", "Shared modals initialization complete");
+    } catch (error) {
+      logger.error("ui", "Failed to initialize shared modals:", error);
+      // Graceful degradation - header still works without modals
+    }
+  }
+
   function showFallbackHeader() {
     let headerContainer = document.getElementById("headerContainer");
     if (!headerContainer) {
@@ -110,7 +146,7 @@
       headerContainer.id = "headerContainer";
       document.body.insertBefore(headerContainer, document.body.firstChild);
     }
-    
+
   headerContainer.innerHTML = `
       <header class="navbar navbar-expand-md navbar-light d-print-none">
         <div class="container-xl">
@@ -125,7 +161,7 @@
         </div>
       </header>
     `;
-    
+
     logger.debug("ui", "HexTrackr Header fallback loaded");
   }
   

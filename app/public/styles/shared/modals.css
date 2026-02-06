@@ -20,12 +20,22 @@
 
 /* Secondary modals (opened from settings modal) - higher z-index */
 #scanDateModal,
-#progressModal {
+#progressModal,
+#ticketsBackupModal,
+#vulnerabilitiesBackupModal,
+#databaseBackupModal,
+#auditLogsModal,
+#auditLogDetailsModal {
     z-index: 1065;
 }
 
 #scanDateModal .modal-backdrop,
-#progressModal .modal-backdrop {
+#progressModal .modal-backdrop,
+#ticketsBackupModal .modal-backdrop,
+#vulnerabilitiesBackupModal .modal-backdrop,
+#databaseBackupModal .modal-backdrop,
+#auditLogsModal .modal-backdrop,
+#auditLogDetailsModal .modal-backdrop {
     z-index: 1064;
 }
 

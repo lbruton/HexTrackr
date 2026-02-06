@@ -1,6 +1,6 @@
 {
   "name": "hextrackr-server",
-  "version": "1.1.5",
+  "version": "1.1.12",
   "description": "HexTrackr with database backend",
   "main": "app/public/server.js",
   "type": "commonjs",
@@ -23,7 +23,9 @@
     "lint:all": "npm run lint:md && npm run eslint && npm run stylelint",
     "fix:all": "npm run lint:md:fix && npm run eslint:fix && npm run stylelint:fix",
     "db:cleanup": "node scripts/db-snapshot-cleanup.js",
-    "db:cleanup:execute": "node scripts/db-snapshot-cleanup.js --execute"
+    "db:cleanup:execute": "node scripts/db-snapshot-cleanup.js --execute",
+    "db:seed:create": "node app/scripts/build-seed-database.js",
+    "db:seed:validate": "node app/scripts/validate-seed-database.js"
   },
   "dependencies": {
     "argon2": "^0.31.2",

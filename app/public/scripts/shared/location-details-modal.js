@@ -44,12 +44,17 @@ class LocationDetailsModal {
      * @param {Object} dataManager - VulnerabilityCore dataManager instance
      *
      * Pattern source: device-security-modal.js:57-76 (entry point pattern)
+     * HEX-351 Phase 2: Now async to support pre-aggregating device data for KEV count fix
      */
-    showLocationDetails(location, dataManager) {
+    async showLocationDetails(location, dataManager) {
         try {
             // Validate inputs
             if (!location) {
-                console.error("[LocationDetailsModal] No location data provided");
+                if (window.logger?.error) {
+                    window.logger.error("location", "No location data provided");
+                } else {
+                    console.error("[LocationDetailsModal] No location data provided");
+                }
                 return;
             }
 
@@ -57,30 +62,47 @@ class LocationDetailsModal {
             this.currentLocation = location;
             this.dataManager = dataManager;
 
-            // Populate modal sections
-            this.populateLocationInfo(location);
+            // HEX-351 Phase 2: Pre-aggregate device data to get accurate KEV device count
+            const deviceData = await this.aggregateDeviceData(location);
+            this.allDevices = deviceData; // Store for later grid creation
+
+            // Calculate KEV device count from aggregated data (not from backend kev_count which is vulnerability count)
+            const kevDeviceCount = deviceData.filter(device => device.hasKev === true).length;
+
+            // Populate modal sections with corrected KEV count
+            this.populateLocationInfo(location, kevDeviceCount);
+
+            // HEX-347: Update dynamic ticket button
+            this.updateTicketButton(location);
 
             // Show modal with theme propagation
             this.showModal();
 
         } catch (error) {
-            console.error("[LocationDetailsModal] Error showing location details:", error);
+            if (window.logger?.error) {
+                window.logger.error("location", "Error showing location details", { error: error.message });
+            } else {
+                console.error("[LocationDetailsModal] Error showing location details:", error);
+            }
         }
     }
 
     /**
      * Populate left info card with location data
      * @param {Object} location - Location data
+     * @param {number} [kevDeviceCount] - Actual count of KEV devices (overrides location.kev_count)
      *
      * Pattern source: device-security-modal.js:77-167 (info card population)
+     * HEX-351 Phase 2: Fixed KEV device count bug - now shows unique device count instead of vulnerability count
      */
-    populateLocationInfo(location) {
+    populateLocationInfo(location, kevDeviceCount) {
         try {
             // Extract location data with fallbacks
             const locationDisplay = location.location_display || location.location?.toUpperCase() || "N/A";
             const deviceCount = location.device_count || 0;
             const totalVPR = location.total_vpr || 0;
-            const kevCount = location.kev_count || 0;
+            // HEX-351 Phase 2: Use passed kevDeviceCount (calculated from aggregated devices) instead of backend kev_count
+            const kevCount = (kevDeviceCount !== undefined && kevDeviceCount !== null) ? kevDeviceCount : (location.kev_count || 0);
             const openTickets = location.open_tickets || 0;
 
             // VPR severity badge
@@ -239,7 +261,11 @@ class LocationDetailsModal {
             });
 
         } catch (error) {
-            console.error("[LocationDetailsModal] Error populating location info:", error);
+            if (window.logger?.error) {
+                window.logger.error("location", "Error populating location info", { error: error.message });
+            } else {
+                console.error("[LocationDetailsModal] Error populating location info:", error);
+            }
             document.getElementById("locationInfo").innerHTML = "<p class=\"text-danger\">Error loading location information</p>";
         }
     }
@@ -389,7 +415,11 @@ class LocationDetailsModal {
                 </div>
             `;
         } catch (error) {
-            console.error("[LocationDetailsModal] Error populating vendor breakdown cards:", error);
+            if (window.logger?.error) {
+                window.logger.error("location", "Error populating vendor breakdown cards", { error: error.message });
+            } else {
+                console.error("[LocationDetailsModal] Error populating vendor breakdown cards:", error);
+            }
         }
     }
 
@@ -540,7 +570,11 @@ class LocationDetailsModal {
             // Get container and clear existing content
             const gridContainer = document.getElementById("locationDevicesGridContainer");
             if (!gridContainer) {
-                console.error("[LocationDetailsModal] Grid container not found");
+                if (window.logger?.error) {
+                    window.logger.error("location", "Grid container not found");
+                } else {
+                    console.error("[LocationDetailsModal] Grid container not found");
+                }
                 return;
             }
             gridContainer.innerHTML = "";
@@ -551,11 +585,11 @@ class LocationDetailsModal {
                 this.gridApi = null;
             }
 
-            // Aggregate device data from vulnerabilities (now async with ticket counts)
-            const deviceData = await this.aggregateDeviceData(location);
-            this.allDevices = deviceData; // Store for filtering
+            // HEX-351 Phase 2: Use pre-aggregated device data from showLocationDetails()
+            // Device data is already stored in this.allDevices (calculated earlier for KEV count fix)
+            const deviceData = this.allDevices;
 
-            // Define column structure (matches Device Security Modal patterns)
+            // Define column structure (HEX-351 Phase 2: Added CVSS, KEV columns + severity-based colors)
             const columnDefs = [
                 {
                     headerName: "Hostname",
@@ -582,29 +616,75 @@ class LocationDetailsModal {
                     }
                 },
                 {
-                    headerName: "CVE",
-                    field: "vulnerabilityCount",
-                    width: 100,
+                    headerName: "Vendor",
+                    field: "vendor",
+                    width: 110,
                     cellRenderer: (params) => {
-                        const count = params.value || 0;
-                        const hasKev = params.data.hasKev;
-                        // Red for KEV devices, Orange for non-KEV devices
-                        // Must use !important to override AG-Grid's default cell styling
-                        const color = hasKev ? "#dc3545" : "#f76707";
-                        return `<span class="fw-bold" style="color: ${color} !important;">${count}</span>`;
+                        const vendor = params.value || "Other";
+                        // HEX-351 Phase 2 Fix: Colored text instead of badges for cleaner table
+                        let color = "#6c757d"; // Gray for Other
+                        if (vendor.toLowerCase().includes("cisco")) {
+                            color = "#1A73E8"; // Blue for Cisco
+                        } else if (vendor.toLowerCase().includes("palo")) {
+                            color = "#FF6B35"; // Orange for Palo Alto
+                        }
+                        return `<span style="color: ${color} !important; font-weight: 600;">${vendor}</span>`;
+                    }
+                },
+                {
+                    headerName: "CVSS",
+                    field: "highestCvss",
+                    width: 90,
+                    cellRenderer: (params) => {
+                        const cvss = params.value || 0;
+                        // Severity-based colors (Critical=red, High=orange, Medium=yellow, Low=green)
+                        let color = "#16a34a"; // Green for Low (0-3.9)
+                        if (cvss >= 9.0) {
+                            color = "#dc2626"; // Red for Critical (9-10)
+                        } else if (cvss >= 7.0) {
+                            color = "#f76707"; // Orange for High (7-8.9)
+                        } else if (cvss >= 4.0) {
+                            color = "#d97706"; // Yellow for Medium (4-6.9)
+                        }
+
+                        // Show "N/A" if CVSS is 0 (not available)
+                        if (cvss === 0) {
+                            return "<span class=\"text-muted\">N/A</span>";
+                        }
+
+                        return `<span style="color: ${color} !important; font-weight: 700;">${cvss.toFixed(1)}</span>`;
                     }
                 },
                 {
                     headerName: "VPR",
                     field: "totalVpr",
-                    width: 100,
+                    width: 90,
                     cellRenderer: (params) => {
                         const vpr = params.value || 0;
-                        const hasKev = params.data.hasKev;
-                        // KEV-based colors for consistency with CVE column
-                        // Red for KEV devices, Orange for non-KEV devices
-                        const color = hasKev ? "#dc3545" : "#f76707";
+                        const severity = params.data.highestSeverity;
+                        // HEX-351 Phase 2: Severity-based colors instead of KEV-based
+                        let color = "#16a34a"; // Green for Low
+                        if (severity === "Critical") {
+                            color = "#dc2626"; // Red for Critical
+                        } else if (severity === "High") {
+                            color = "#f76707"; // Orange for High
+                        } else if (severity === "Medium") {
+                            color = "#d97706"; // Yellow for Medium
+                        }
                         return `<span style="color: ${color} !important; font-weight: 700;">${vpr.toFixed(1)}</span>`;
+                    }
+                },
+                {
+                    headerName: "KEV",
+                    field: "hasKev",
+                    width: 70,
+                    cellRenderer: (params) => {
+                        const hasKev = params.value === true;
+                        // HEX-351 Phase 2 Fix: Colored text instead of badges for cleaner table
+                        if (hasKev) {
+                            return "<span style=\"color: #dc2626 !important; font-weight: 700;\">Yes</span>";
+                        }
+                        return "<span class=\"text-muted\">No</span>";
                     }
                 },
                 {
@@ -633,16 +713,17 @@ class LocationDetailsModal {
                     field: "fixedVersion",
                     width: 150,
                     cellRenderer: (params) => {
-                        const cellId = `fixed-version-cell-${params.node.id}`;
+                        // Create DOM element directly (not string) for AG-Grid to insert
+                        const container = document.createElement("span");
+                        container.className = "font-monospace text-muted";
+                        container.textContent = "Loading...";
 
-                        // Return placeholder with unique ID for async update
-                        setTimeout(async () => {
-                            const cell = document.getElementById(cellId);
-                            if (!cell) {return;}
-
+                        // Start async update immediately (no setTimeout needed)
+                        (async () => {
                             const device = params.data;
                             if (!device.vulnerabilities || device.vulnerabilities.length === 0) {
-                                cell.innerHTML = "<span class=\"font-monospace text-muted\">N/A</span>";
+                                container.className = "font-monospace text-muted";
+                                container.textContent = "N/A";
                                 return;
                             }
 
@@ -659,7 +740,8 @@ class LocationDetailsModal {
 
                             // Unsupported vendor or helper not loaded
                             if (!advisoryHelper) {
-                                cell.innerHTML = "<span class=\"font-monospace text-muted\">N/A</span>";
+                                container.className = "font-monospace text-muted";
+                                container.textContent = "N/A";
                                 params.node.setDataValue("fixedVersion", "N/A");
                                 return;
                             }
@@ -671,7 +753,8 @@ class LocationDetailsModal {
                                     .map(v => v.cve))];
 
                                 if (uniqueCves.length === 0) {
-                                    cell.innerHTML = "<span class=\"font-monospace text-muted\">No CVEs</span>";
+                                    container.className = "font-monospace text-muted";
+                                    container.textContent = "No CVEs";
                                     params.node.setDataValue("fixedVersion", "No CVEs");
                                     return;
                                 }
@@ -682,7 +765,11 @@ class LocationDetailsModal {
                                 const fixedVersionPromises = uniqueCves.map(cve =>
                                     advisoryHelper.getFixedVersion(cve, vendor, installedVersion)
                                         .catch(err => {
-                                            console.warn(`[LocationDetailsModal] Failed to get fixed version for ${cve}:`, err);
+                                            if (window.logger?.warn) {
+                                                window.logger.warn("location", `Failed to get fixed version for ${cve}`, { error: err.message });
+                                            } else {
+                                                console.warn(`[LocationDetailsModal] Failed to get fixed version for ${cve}:`, err);
+                                            }
                                             return null;
                                         })
                                 );
@@ -698,20 +785,27 @@ class LocationDetailsModal {
 
                                     // Display highest version (first after sort)
                                     const highestVersion = validVersions[0];
-                                    cell.innerHTML = `<span class=\"font-monospace text-success\">${DOMPurify.sanitize(highestVersion)}</span>`;
+                                    container.className = "font-monospace text-success";
+                                    container.textContent = highestVersion;
                                     params.node.setDataValue("fixedVersion", highestVersion);
                                 } else {
-                                    cell.innerHTML = "<span class=\"font-monospace text-muted\">No Fix</span>";
+                                    container.className = "font-monospace text-muted";
+                                    container.textContent = "No Fix";
                                     params.node.setDataValue("fixedVersion", "No Fix");
                                 }
                             } catch (error) {
-                                console.error("[LocationDetailsModal] Fixed version lookup failed:", error);
-                                cell.innerHTML = "<span class=\"font-monospace text-muted\">Error</span>";
+                                if (window.logger?.error) {
+                                    window.logger.error("location", "Fixed version lookup failed", { error: error.message });
+                                } else {
+                                    console.error("[LocationDetailsModal] Fixed version lookup failed:", error);
+                                }
+                                container.className = "font-monospace text-muted";
+                                container.textContent = "Error";
                                 params.node.setDataValue("fixedVersion", "Error");
                             }
-                        }, 0);
+                        })();
 
-                        return `<span id=\"${cellId}\" class=\"font-monospace text-muted\">Loading...</span>`;
+                        return container;
                     }
                 },
                 {
@@ -740,7 +834,7 @@ class LocationDetailsModal {
                             }
 
                             // HEX-313: Add keyboard shortcut hints to tooltip
-                            tooltipText += `&#13;&#10;Cmd+Shift: KEV devices at location&#13;&#10;Alt+Shift: All devices at location`;
+                            tooltipText += "&#13;&#10;Cmd+Shift: KEV devices at location&#13;&#10;Alt+Shift: All devices at location";
 
                             return `<a href="#" class="text-muted"
                                        onclick="event.stopPropagation(); window.locationDetailsModal.createTicket(event, '${hostname}', ${isKev}); return false;"
@@ -839,7 +933,8 @@ class LocationDetailsModal {
                 doesExternalFilterPass: (node) => this.doesExternalFilterPass(node),
                 initialState: {
                     sort: {
-                        sortModel: [{ colId: "totalVpr", sort: "desc" }]
+                        // HEX-351 Phase 2: Default sort by hostname A-Z for cleaner display
+                        sortModel: [{ colId: "hostname", sort: "asc" }]
                     }
                 },
                 onGridReady: (params) => {
@@ -873,7 +968,11 @@ class LocationDetailsModal {
             this.grid = agGrid.createGrid(gridContainer, gridOptions);
 
         } catch (error) {
-            console.error("[LocationDetailsModal] Error creating device grid:", error);
+            if (window.logger?.error) {
+                window.logger.error("location", "Error creating device grid", { error: error.message });
+            } else {
+                console.error("[LocationDetailsModal] Error creating device grid:", error);
+            }
         }
     }
 
@@ -904,7 +1003,11 @@ class LocationDetailsModal {
             });
 
             if (!response.ok) {
-                console.error("[LocationDetailsModal] Failed to fetch batch ticket data:", response.statusText);
+                if (window.logger?.error) {
+                    window.logger.error("location", "Failed to fetch batch ticket data", { status: response.statusText });
+                } else {
+                    console.error("[LocationDetailsModal] Failed to fetch batch ticket data:", response.statusText);
+                }
                 // Return empty map on error
                 const emptyMap = {};
                 hostnames.forEach(hostname => {
@@ -916,7 +1019,11 @@ class LocationDetailsModal {
             const result = await response.json();
             return result.data || {};
         } catch (error) {
-            console.error("[LocationDetailsModal] Error checking ticket state batch:", error);
+            if (window.logger?.error) {
+                window.logger.error("location", "Error checking ticket state batch", { error: error.message });
+            } else {
+                console.error("[LocationDetailsModal] Error checking ticket state batch:", error);
+            }
             // Return empty map on error
             const emptyMap = {};
             hostnames.forEach(hostname => {
@@ -972,34 +1079,49 @@ class LocationDetailsModal {
                             Low: { count: 0, vpr: 0 }
                         },
                         hasKev: false,
+                        highestCvss: 0, // HEX-351 Phase 2: Track highest CVSS score per device
                         installedVersion: null,
                         fixedVersion: null,
                         ticketCount: 0,
                         ticketStatus: null,
-                        highestSeverity: "Low"
+                        highestSeverity: "Low",
+                        vprByPlugin: new Map()  // HEX-356: Track VPR per plugin for deduplication
                     });
                 }
 
                 const device = deviceMap.get(hostname);
                 device.vulnerabilities.push(vuln);
                 device.vulnerabilityCount++;
-                device.totalVpr += vuln.vpr_score || 0;
+
+                // HEX-356: VPR Deduplication Fix
+                const vprScore = vuln.vpr_score || 0;
+                const pluginKey = vuln.plugin_id || vuln.description?.substring(0, 100) || "unknown";
+                const existingVpr = device.vprByPlugin.get(pluginKey) || 0;
+
+                if (vprScore > existingVpr) {
+                    device.vprByPlugin.set(pluginKey, vprScore);
+                }
 
                 // Extract vendor from first vulnerability (all vulns for same device have same vendor)
                 if (!device.vendor && vuln.vendor) {
                     device.vendor = vuln.vendor;
                 }
 
-                // Update severity breakdown
+                // Update severity breakdown count (VPR will be calculated later from deduplicated data)
                 const severity = vuln.severity || "Low";
                 if (device.severityBreakdown[severity]) {
                     device.severityBreakdown[severity].count++;
-                    device.severityBreakdown[severity].vpr += vuln.vpr_score || 0;
                 }
 
                 // Track KEV status
                 if (vuln.isKev === "Yes") {
                     device.hasKev = true;
+                }
+
+                // HEX-351 Phase 2: Track highest CVSS score per device
+                const cvssScore = parseFloat(vuln.cvss_score) || 0;
+                if (cvssScore > device.highestCvss) {
+                    device.highestCvss = cvssScore;
                 }
 
                 // Extract version info (use first available)
@@ -1015,8 +1137,41 @@ class LocationDetailsModal {
                 }
             });
 
-            // Convert map to array and calculate highest severity
+            // Convert map to array and calculate highest severity + deduplicated VPR
             const devices = Array.from(deviceMap.values()).map(device => {
+                // HEX-356: Calculate deduplicated VPR totals
+                device.totalVpr = Array.from(device.vprByPlugin.values())
+                    .reduce((sum, vpr) => sum + vpr, 0);
+
+                // Calculate severity-specific VPR from deduplicated data
+                const severityVprMap = {
+                    Critical: new Map(),
+                    High: new Map(),
+                    Medium: new Map(),
+                    Low: new Map()
+                };
+
+                device.vulnerabilities.forEach(vuln => {
+                    const vprScore = vuln.vpr_score || 0;
+                    const pluginKey = vuln.plugin_id || vuln.description?.substring(0, 100) || "unknown";
+                    const severity = vuln.severity || "Low";
+
+                    if (severityVprMap[severity]) {
+                        const existingVpr = severityVprMap[severity].get(pluginKey) || 0;
+                        if (vprScore > existingVpr) {
+                            severityVprMap[severity].set(pluginKey, vprScore);
+                        }
+                    }
+                });
+
+                device.severityBreakdown.Critical.vpr = Array.from(severityVprMap.Critical.values()).reduce((sum, vpr) => sum + vpr, 0);
+                device.severityBreakdown.High.vpr = Array.from(severityVprMap.High.values()).reduce((sum, vpr) => sum + vpr, 0);
+                device.severityBreakdown.Medium.vpr = Array.from(severityVprMap.Medium.values()).reduce((sum, vpr) => sum + vpr, 0);
+                device.severityBreakdown.Low.vpr = Array.from(severityVprMap.Low.values()).reduce((sum, vpr) => sum + vpr, 0);
+
+                // Clean up temporary map
+                delete device.vprByPlugin;
+
                 // Determine highest severity based on counts
                 if (device.severityBreakdown.Critical.count > 0) {
                     device.highestSeverity = "Critical";
@@ -1048,7 +1203,11 @@ class LocationDetailsModal {
             return devices;
 
         } catch (error) {
-            console.error("[LocationDetailsModal] Error aggregating device data:", error);
+            if (window.logger?.error) {
+                window.logger.error("location", "Error aggregating device data", { error: error.message });
+            } else {
+                console.error("[LocationDetailsModal] Error aggregating device data:", error);
+            }
             return [];
         }
     }
@@ -1064,7 +1223,11 @@ class LocationDetailsModal {
         if (window.vulnManager && typeof window.vulnManager.viewDeviceDetails === "function") {
             window.vulnManager.viewDeviceDetails(hostname);
         } else {
-            console.error("[LocationDetailsModal] vulnManager.viewDeviceDetails not available");
+            if (window.logger?.error) {
+                window.logger.error("location", "vulnManager.viewDeviceDetails not available");
+            } else {
+                console.error("[LocationDetailsModal] vulnManager.viewDeviceDetails not available");
+            }
         }
     }
 
@@ -1081,7 +1244,7 @@ class LocationDetailsModal {
      * @since v1.0.89
      * @since v1.1.1 - Added power tools keyboard shortcut support (HEX-313)
      */
-    createTicket(event, hostname, isKev) {
+    async createTicket(event, hostname, isKev) {
         // Handle legacy calls without event parameter
         if (typeof event === "string") {
             // Old signature: createTicket(hostname, isKev)
@@ -1090,9 +1253,25 @@ class LocationDetailsModal {
             event = null;
         }
 
-        // Parse hostname to extract SITE and Location (ALL CAPS)
-        const site = hostname.substring(0, 4).toUpperCase();
-        const location = hostname.substring(0, 5).toUpperCase();
+        // HEX-350: Parse hostname using HostnameParserService API
+        // No fallback - internal API must work for app to function
+        let location = "";
+        let site = ""; // Blank unless found in tickets database
+
+        // Parse hostname via API
+        const parseResponse = await fetch(`/api/hostname/parse/${encodeURIComponent(hostname)}`);
+        const parseData = await parseResponse.json();
+        if (parseData.success && parseData.data) {
+            location = parseData.data.location.toUpperCase();
+
+            // Query tickets database for existing site (pre-fill if found)
+            const siteResponse = await fetch(`/api/tickets/site-by-location/${encodeURIComponent(location)}`);
+            const siteData = await siteResponse.json();
+            if (siteData.success && siteData.site) {
+                site = siteData.site.toUpperCase();
+            }
+            // If site not found, stays blank - user enters from Hexagon
+        }
 
         // Detect keyboard modifiers for power tools (HEX-313)
         let mode = "single";
@@ -1152,7 +1331,11 @@ class LocationDetailsModal {
         // Find device data to get ticket info
         const device = this.allDevices?.find(d => d.hostname === hostname);
         if (!device) {
-            console.error("[LocationDetailsModal] Device not found:", hostname);
+            if (window.logger?.error) {
+                window.logger.error("location", "Device not found", { hostname });
+            } else {
+                console.error("[LocationDetailsModal] Device not found:", hostname);
+            }
             return;
         }
 
@@ -1169,7 +1352,11 @@ class LocationDetailsModal {
             if (window.ticketManager && typeof window.ticketManager.editTicket === "function") {
                 window.ticketManager.editTicket(ticketId);
             } else {
-                console.error("[LocationDetailsModal] ticketManager.editTicket not available, falling back to navigation");
+                if (window.logger?.warn) {
+                    window.logger.warn("location", "ticketManager.editTicket not available, falling back to navigation");
+                } else {
+                    console.error("[LocationDetailsModal] ticketManager.editTicket not available, falling back to navigation");
+                }
                 window.location.href = `/tickets.html?openTicket=${ticketId}`;
             }
             return;
@@ -1191,7 +1378,11 @@ class LocationDetailsModal {
         if (window.ticketPickerModal && typeof window.ticketPickerModal.show === "function") {
             window.ticketPickerModal.show(hostname, tickets);
         } else {
-            console.error("[LocationDetailsModal] ticketPickerModal not available");
+            if (window.logger?.warn) {
+                window.logger.warn("location", "ticketPickerModal not available, using fallback navigation");
+            } else {
+                console.error("[LocationDetailsModal] ticketPickerModal not available");
+            }
             // Fallback: Navigate to tickets page filtered by device
             window.location.href = `/tickets.html?device=${encodeURIComponent(hostname)}`;
         }
@@ -1249,23 +1440,155 @@ class LocationDetailsModal {
             this.modal.show();
 
         } catch (error) {
-            console.error("[LocationDetailsModal] Error showing modal:", error);
+            if (window.logger?.error) {
+                window.logger.error("location", "Error showing modal", { error: error.message });
+            } else {
+                console.error("[LocationDetailsModal] Error showing modal:", error);
+            }
         }
     }
 
     /**
      * Initialize footer button event listeners
+     * HEX-347: Ticket button is now dynamic (populated by updateTicketButton)
      */
     initializeFooterButtons() {
         const exportBtn = document.getElementById("exportLocationCsvBtn");
-        const createTicketBtn = document.getElementById("createLocationTicketBtn");
 
         if (exportBtn) {
             exportBtn.addEventListener("click", () => this.exportLocationCsv());
         }
 
-        if (createTicketBtn) {
-            createTicketBtn.addEventListener("click", () => this.createLocationTicket());
+        // Ticket button is now dynamically created by updateTicketButton()
+    }
+
+    /**
+     * Update the dynamic ticket button based on location ticket count
+     * HEX-347: Implements 3-color system (Green/Orange/Red)
+     * Pattern source: device-security-modal.js:1246-1279 (updateTicketButton)
+     * @param {Object} location - Location object with open_tickets count
+     */
+    async updateTicketButton(location) {
+        const buttonContainer = document.getElementById("locationModalTicketButton");
+        if (!buttonContainer) {
+            if (window.logger?.warn) {
+                window.logger.warn("location", "Ticket button container not found");
+            } else {
+                console.warn("[LocationDetailsModal] Ticket button container not found");
+            }
+            return;
+        }
+
+        const ticketCount = location.open_tickets || 0;
+        const locationKey = location.location || "";
+
+        // Determine button configuration using 3-color system
+        let buttonText, buttonClass, buttonIcon;
+
+        if (ticketCount === 0) {
+            // GREEN: No tickets
+            buttonText = "Create Ticket";
+            buttonClass = "btn-outline-success";
+            buttonIcon = "fas fa-ticket-alt";
+        } else if (ticketCount === 1) {
+            // ORANGE or RED: Need to check if the ticket is overdue
+            // For now, default to ORANGE (we'd need to fetch ticket details to know if overdue)
+            buttonText = "View Ticket";
+            buttonClass = "btn-outline-warning";
+            buttonIcon = "fas fa-folder-open";
+        } else {
+            // ORANGE or RED: Multiple tickets
+            buttonText = `View Tickets (${ticketCount})`;
+            buttonClass = "btn-outline-warning";
+            buttonIcon = "fas fa-layer-group";
+        }
+
+        // Generate button HTML
+        buttonContainer.innerHTML = `
+            <button class="btn ${buttonClass}"
+                    data-location-key="${locationKey}"
+                    data-ticket-count="${ticketCount}"
+                    onclick="window.locationDetailsModal.handleTicketButtonClick(event, this)">
+                <i class="${buttonIcon} me-2"></i>${buttonText}
+            </button>
+        `;
+    }
+
+    /**
+     * Handle ticket button click from location details modal
+     * HEX-347: Routes to create/view based on ticket count
+     * Matches device modal pattern: 1 ticket = direct navigation, 2+ = picker modal
+     * @param {Event} event - Click event
+     * @param {HTMLElement} button - Button element
+     */
+    async handleTicketButtonClick(event, button) {
+        const ticketCount = parseInt(button.dataset.ticketCount) || 0;
+        const locationKey = button.dataset.locationKey || "";
+
+        if (ticketCount === 0) {
+            // No tickets - create new ticket
+            this.createLocationTicket();
+        } else if (ticketCount === 1) {
+            // Single ticket - fetch ticket ID and navigate directly
+            await this.viewSingleLocationTicket(locationKey);
+        } else {
+            // Multiple tickets - show picker modal
+            await this.viewLocationTickets(locationKey);
+        }
+    }
+
+    /**
+     * View single ticket for location (direct navigation)
+     * Fetches tickets for location and navigates to the single ticket
+     * @param {string} locationKey - Location identifier
+     */
+    async viewSingleLocationTicket(locationKey) {
+        try {
+            // Fetch tickets for this location
+            const response = await fetch(`/api/tickets/location/${locationKey}`, {
+                credentials: "include"
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch tickets: ${response.status}`);
+            }
+
+            const data = await response.json();
+            if (!data.success || !data.tickets || data.tickets.length === 0) {
+                throw new Error("No tickets found for location");
+            }
+
+            // Navigate directly to the single ticket
+            const ticketId = data.tickets[0].id;
+            window.location.href = `/tickets.html?openTicket=${ticketId}`;
+
+        } catch (error) {
+            if (window.logger?.error) {
+                window.logger.error("location", "Error fetching single ticket", { error: error.message });
+            } else {
+                console.error("[LocationDetailsModal] Error fetching single ticket:", error);
+            }
+            alert(`Failed to load ticket: ${error.message}`);
+        }
+    }
+
+    /**
+     * View tickets for location (opens picker modal)
+     * @param {string} locationKey - Location identifier
+     */
+    async viewLocationTickets(locationKey) {
+        // Close this modal first
+        this.hide();
+
+        // Use location cards manager to show ticket picker
+        if (window.locationCardsManager) {
+            await window.locationCardsManager.fetchAndShowLocationTicketModal(locationKey);
+        } else {
+            if (window.logger?.error) {
+                window.logger.error("location", "locationCardsManager not available");
+            } else {
+                console.error("[LocationDetailsModal] locationCardsManager not available");
+            }
         }
     }
 
@@ -1314,7 +1637,11 @@ class LocationDetailsModal {
             const fixedVersionPromises = uniqueCves.map(cve =>
                 advisoryHelper.getFixedVersion(cve, vendor, installedVersion)
                     .catch(err => {
-                        console.warn(`[LocationDetailsModal] Failed to get fixed version for ${cve}:`, err);
+                        if (window.logger?.warn) {
+                            window.logger.warn("location", `Failed to get fixed version for ${cve}`, { error: err.message });
+                        } else {
+                            console.warn(`[LocationDetailsModal] Failed to get fixed version for ${cve}:`, err);
+                        }
                         return null;
                     })
             );
@@ -1332,7 +1659,11 @@ class LocationDetailsModal {
                 return "No Fix";
             }
         } catch (error) {
-            console.error(`[LocationDetailsModal] Error calculating fixed version for ${device.hostname}:`, error);
+            if (window.logger?.error) {
+                window.logger.error("location", `Error calculating fixed version for ${device.hostname}`, { error: error.message });
+            } else {
+                console.error(`[LocationDetailsModal] Error calculating fixed version for ${device.hostname}:`, error);
+            }
             return "Error";
         }
     }
@@ -1491,10 +1822,26 @@ class LocationDetailsModal {
 
     /**
      * Create ticket for all devices at this location
+     * HEX-350: Uses site lookup from tickets database instead of substring
      */
-    createLocationTicket() {
+    async createLocationTicket() {
         const location = this.currentLocation.location?.toUpperCase() || "UNKNOWN";
-        const site = location.substring(0, 4);
+        let site = ""; // Will be populated from tickets database
+
+        // HEX-350: Query tickets database for existing site
+        try {
+            const siteResponse = await fetch(`/api/tickets/site-by-location/${encodeURIComponent(location)}`);
+            if (siteResponse.ok) {
+                const siteData = await siteResponse.json();
+                if (siteData.success && siteData.site) {
+                    site = siteData.site.toUpperCase();
+                }
+                // If site is null, leave blank (new location)
+            }
+        } catch (error) {
+            console.warn("HEX-350: Failed to fetch site for location, leaving blank", error);
+            // Graceful degradation - site stays empty string
+        }
 
         // Get all device hostnames at this location
         const deviceList = this.allDevices.map(d => d.hostname.toUpperCase());

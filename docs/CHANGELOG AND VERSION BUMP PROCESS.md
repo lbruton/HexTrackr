@@ -1,128 +1,140 @@
 ## Version Bump & Changelog Workflow
 
-**Used for**: Checkpoint/rewind workflow sessions (HEX-254), feature releases, hotfixes
+**Used for**: Feature releases, bug fixes, code cleanup, documentation updates
 
-### Version Bump Procedure
+**IMPORTANT**: This document describes the **AUTOMATED** workflow introduced in v1.1.0. The docs generator automatically handles changelog index management and version syncing.
 
-**Step 1: Edit package.json**
+---
+
+### Version Bump Procedure (Automated - One Command!)
+
+**Step 1: Update version in root package.json**
+
+Use npm version command (recommended) OR manual edit:
+
 ```bash
-# Manually update version in root package.json
-# Example: "version": "1.0.71" → "version": "1.0.72"
+# Option A: Use npm version (recommended - creates git tag automatically)
+npm version patch  # 1.1.6 → 1.1.7 (bug fixes, small changes)
+npm version minor  # 1.1.6 → 1.2.0 (new features)
+npm version major  # 1.1.6 → 2.0.0 (breaking changes)
+
+# Option B: Manual edit (no git tag)
+# Edit package.json: "version": "1.1.6" → "1.1.7"
 ```
 
-**Step 2: Run release script**
+**Step 2: Run ONE command to sync everything**
+
 ```bash
 npm run release
 ```
 
-This automatically syncs version across 5 files:
-- `package.json` (root)
-- `app/public/package.json`
-- `app/public/scripts/shared/footer.html`
-- `README.md`
-- `docker-compose.yml`
-- `app/public/login.html`
+**That's it!** This single command automatically:
 
-**Step 3: Verify sync**
-```bash
-# Check all 5 files have matching version
-grep -n "1.0.72" package.json app/public/package.json README.md docker-compose.yml app/public/login.html app/public/scripts/shared/footer.html
+1. ✅ **Syncs version** from root package.json to **7 files**:
+   - `app/public/package.json`
+   - `app/public/scripts/shared/footer.html`
+   - `app/public/server.js` (fallback version)
+   - `app/public/login.html`
+   - `README.md`
+   - `docker-compose.yml`
+   - All documentation markdown files
+
+2. ✅ **Regenerates changelog navigation**:
+   - `changelog/index.md` (last 10 versions with summaries)
+   - `changelog/archive.md` (all older versions in table)
+   - Rolling window dropdown (newest 10 only)
+
+3. ✅ **Converts all markdown → HTML**:
+   - 130+ documentation files
+   - Changelog versions with proper dates and summaries
+   - JSDoc API documentation with dark mode theme
+
+**Verification**: The script outputs what it updated:
+```
+ Updating all version references to v1.1.7...
+✓ All files already at v1.1.7
+  OR
+ Updated app/public/package.json version
+ Updated footer.html version badge
+ Updated README.md version
+(etc.)
 ```
 
-### Changelog Template Process
+**Note**: `npm run release` and `npm run docs:generate` are the same command (both run `html-content-updater.js`)
+
+---
+
+### Changelog Creation Process (Automated)
 
 **Step 1: Create new version file**
 
 **File**: `/app/public/docs-source/changelog/versions/[VERSION].md`
 
-**Template Structure**:
+**Use template**: `/docs/TEMPLATE_CHANGELOG.md`
+
+**CRITICAL**: Every changelog MUST include:
+1. **YAML frontmatter** (at top of file)
+2. **Overview section** (after metadata, before changelog sections)
+
+Without these, the docs generator will show "Unknown date" and HR lines (`---`) instead of summaries.
+
+**Minimal Required Structure**:
 ```markdown
 ---
-title: "Version [VERSION] - [Feature Name]: [Brief Description]"
+title: "Version X.Y.Z - Brief Description"
 date: "YYYY-MM-DD"
-version: "[VERSION]"
-status: "In Progress" | "Released"
-category: "Enhancement" | "Bug Fix" | "Security" | "Performance" | "Documentation"
+version: "X.Y.Z"
+status: "Released"
+category: "Bug Fix|Update|Maintenance|Feature"
 ---
 
-# Version [VERSION] - [Feature Name]: [Brief Description]
+# Version X.Y.Z - Brief Description
 
-**Release Status**: 🚧 In Progress | ✅ Released
-**Release Date**: TBD | YYYY-MM-DD
-**Parent Issue**: [HEX-XXX](https://linear.app/hextrackr/issue/HEX-XXX)
-**Implementation**: [HEX-XXX](https://linear.app/hextrackr/issue/HEX-XXX) Session N
+**Release Status**: ✅ Released
+**Release Date**: YYYY-MM-DD
+**Parent Issues**: [HEX-XXX](https://linear.app/hextrackr/issue/HEX-XXX)
 
 ## Overview
 
-[1-2 sentence description of what this version accomplishes]
+One concise paragraph (1-3 sentences) summarizing what this version accomplishes.
 
-## Implementation Tasks
+---
 
-### Planned
-- [ ] Task 1
-- [ ] Task 2
-- [ ] Task 3
+## [X.Y.Z]
 
-### Completed
-- [ ] TBD (updated during implementation)
+### Fixed
+- Fixed issue description
 
-## Technical Details
+### Added
+- Added feature description
 
-**Files Modified**:
-- `path/to/file.js` - Description of changes
-- `path/to/other.js` - Description of changes
-
-**Migration Pattern** (if applicable):
-```javascript
-// BEFORE
-console.log("Old pattern");
-
-// AFTER
-this._log('info', "New pattern", { context });
+(etc.)
 ```
 
-## Success Criteria
+**Step 2: Run release command**
 
-- [X] Version bumped to [VERSION] across 5 files
-- [ ] Specific success criterion 1
-- [ ] Specific success criterion 2
-- [ ] Testing verified
-
-## Related Issues
-
-- Parent: [HEX-XXX](link) - Parent issue title
-- Implementation: [HEX-XXX](link) - Implementation issue title
-- Session: [HEX-XXX](link) - Session-specific issue (if applicable)
-
-## Progress
-
-**Sessions Complete**: N/Total (X%)
-- Session 1: Description (vX.X.X)
-- Session 2: Description (vX.X.X)
-- Session N: Current session (vX.X.X)
+```bash
+npm run release
 ```
 
-**Step 2: Update changelog index**
+This single command automatically:
+- ✅ Syncs version from package.json to all 7 files
+- ✅ Adds your new version to `index.md` (auto-generated)
+- ✅ Updates archive table if needed (auto-generated)
+- ✅ Regenerates all HTML with proper summaries and dates
+- ✅ Updates rolling window dropdown (last 10 versions)
+- ✅ Regenerates JSDoc with dark mode theme
 
-**File**: `/app/public/docs-source/changelog/index.md`
+**⚠️ DO NOT manually edit**:
+- `changelog/index.md` (AUTO-GENERATED)
+- `changelog/archive.md` (AUTO-GENERATED)
 
-Update two sections:
+**Step 3: Commit changes**
 
-1. **Current Version** (top of file):
-```markdown
-**Current Version**: [v1.0.72](#changelog/versions/1.0.72) In Progress
-```
-
-2. **Latest Releases** (version list):
-```markdown
-- [**v1.0.72**](#changelog/versions/1.0.72) - 2025-10-17 - Feature Name: Brief Description
-- [**v1.0.71**](#changelog/versions/1.0.71) - 2025-10-17 - CHAPrevious Feature
-```
-
-**Step 3: Commit version bump**
 ```bash
 git add -A
-git commit -m "chore: Version bump to v[VERSION] for [HEX-XXX] Session N"
+git commit -m "release: v[VERSION] - [Brief Description] ([HEX-XXX])"
+git push origin dev
 ```
 
 ### Version Numbering Strategy

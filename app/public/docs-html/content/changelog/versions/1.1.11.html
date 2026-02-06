@@ -1,0 +1,175 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <hr>
+<h2>title: "Version 1.1.11 - Database Schema Cleanup & Backup System Fixes"
+date: "2025-10-31"
+version: "1.1.11"
+status: "Released"
+category: "Bug Fix"</h2><h1>Version 1.1.11 - Database Schema Cleanup & Backup System Fixes</h1><p><strong>Release Status</strong>: ✅ Released<br><strong>Release Date</strong>: 2025-10-31<br><strong>Parent Issues</strong>: <a href="https://linear.app/hextrackr/issue/HEX-359">HEX-359</a>, <a href="https://linear.app/hextrackr/issue/HEX-349">HEX-349</a></p>
+<h2>Overview</h2><p>Fixed critical vulnerability backup/restore system bugs that prevented 95K+ record recovery, and removed legacy <code>vulnerabilities</code> table from schema to complete HEX-300 rollover architecture migration. This release ensures data integrity during backup/restore operations and eliminates technical debt from unused database tables.</p>
+<hr>
+<h2>[1.1.11]</h2><h3>Fixed</h3><h4>Critical Backup/Restore System Bugs (HEX-359) - 2025-10-31</h4><p><strong>Description</strong>: Fixed four critical bugs in the vulnerability backup/restore system that would have caused catastrophic data loss during production recovery scenarios.</p>
+<p><strong>Problems Solved</strong>:</p>
+<ol>
+<li>Wrong table name - restore was inserting into legacy <code>vulnerabilities</code> instead of <code>vulnerabilities_current</code></li>
+<li>Missing chunked file support - couldn&#39;t restore datasets split into chunks (95K+ records hit JSON.stringify 500MB limits)</li>
+<li>Incomplete restore - only restored main vulnerability table, missing 9 related tables</li>
+<li>Incomplete clear - <code>clearAllData()</code> only cleared 6 tables, missing 4 vendor/advisory tables causing duplicates on restore</li>
+</ol>
+<p><strong>Root Cause</strong>:<br>During the HEX-300 rollover architecture migration, the backup/restore system was never fully updated to handle:</p>
+<ul>
+<li>New <code>vulnerabilities_current</code> table name</li>
+<li>Chunked backup files for large datasets (10K records per chunk)</li>
+<li>All 10 exported tables (snapshots, KEV status, Cisco/Palo Alto advisories, vendor totals)</li>
+</ul>
+<p><strong>Technical Fixes</strong>:</p>
+<ol>
+<li><p><strong>Fixed table name in restore</strong> (<code>app/services/backupService.js:555</code>)</p>
+<pre><code class="language-javascript"><span class="hljs-comment">// OLD: INSERT INTO vulnerabilities</span>
+<span class="hljs-comment">// NEW: INSERT INTO vulnerabilities_current</span></code></pre></li>
+<li><p><strong>Added chunked file support</strong> (<code>app/services/backupService.js:630-677</code>)</p>
+<ul>
+<li>New helper function <code>_readTableFromZip()</code> that:<ul>
+<li>Checks for <code>_chunks_index.json</code> files first</li>
+<li>Reads and reassembles all chunk files</li>
+<li>Falls back to single file if no chunks found</li>
+<li>Handles both chunked and non-chunked backups</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>Comprehensive restore logic</strong> (<code>app/services/backupService.js:508-705</code>)</p>
+<ul>
+<li>Now restores all 10 tables:<ul>
+<li><code>vulnerabilities_current</code> (main data)</li>
+<li><code>vulnerabilities_affected_devices</code> (device mappings)</li>
+<li><code>vulnerabilities_affected_locations</code> (location mappings)</li>
+<li><code>vulnerabilities_snapshots_history</code> (historical snapshots)</li>
+<li><code>vendor_daily_totals</code> (vendor aggregation)</li>
+<li><code>cisco_advisories</code> (Cisco PSIRT data)</li>
+<li><code>cisco_fixed_versions</code> (Cisco version mappings)</li>
+<li><code>palo_alto_advisories</code> (Palo Alto bulletins)</li>
+<li><code>kev_status</code> (CISA KEV correlations)</li>
+<li><code>daily_totals</code> (trend aggregation)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>Complete clear operation</strong> (<code>app/services/vulnerabilityService.js:522-550</code>)</p>
+<ul>
+<li>Added 4 missing DELETE statements:</li>
+</ul>
+<pre><code class="language-javascript"><span class="hljs-variable language_">this</span>.<span class="hljs-property">db</span>.<span class="hljs-title function_">run</span>(<span class="hljs-string">&quot;DELETE FROM vendor_daily_totals&quot;</span>);
+<span class="hljs-variable language_">this</span>.<span class="hljs-property">db</span>.<span class="hljs-title function_">run</span>(<span class="hljs-string">&quot;DELETE FROM cisco_advisories&quot;</span>);
+<span class="hljs-variable language_">this</span>.<span class="hljs-property">db</span>.<span class="hljs-title function_">run</span>(<span class="hljs-string">&quot;DELETE FROM palo_alto_advisories&quot;</span>);
+<span class="hljs-variable language_">this</span>.<span class="hljs-property">db</span>.<span class="hljs-title function_">run</span>(<span class="hljs-string">&quot;DELETE FROM kev_status&quot;</span>);</code></pre></li>
+</ol>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/services/backupService.js</code> (lines 400-705)</li>
+<li><code>app/services/vulnerabilityService.js</code> (lines 522-550)</li>
+</ul>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li>✅ Chunked file support working for 95K+ vulnerability records</li>
+<li>✅ All 10 exported tables restored successfully</li>
+<li>✅ Clear operation prevents duplicates by clearing all related tables</li>
+<li>✅ Ready for production backup/restore validation</li>
+</ul>
+<p><strong>Issues</strong>:</p>
+<ul>
+<li><a href="https://linear.app/hextrackr/issue/HEX-359">HEX-359</a> - Fix Incomplete Vulnerability Backup/Restore System</li>
+</ul>
+<hr>
+<h3>Changed</h3><h4>Removed Legacy Vulnerabilities Table (HEX-349) - 2025-10-31</h4><p><strong>Description</strong>: Removed unused legacy <code>vulnerabilities</code> table from schema, completing the HEX-300 rollover architecture migration and eliminating technical debt.</p>
+<p><strong>Background</strong>:</p>
+<ul>
+<li>Legacy <code>vulnerabilities</code> table: 0 rows, NOT backed up by BackupService, no production queries</li>
+<li>Active table: <code>vulnerabilities_current</code> - all production code uses this</li>
+<li>Junction table: <code>ticket_vulnerabilities</code> - had FK to legacy table (now updated to reference <code>vulnerabilities_current</code>)</li>
+</ul>
+<p><strong>Schema Changes</strong>:</p>
+<ol>
+<li><p><strong>databaseService.js</strong></p>
+<ul>
+<li>❌ Removed: <code>CREATE TABLE vulnerabilities</code></li>
+<li>✅ Updated: <code>ticket_vulnerabilities</code> foreign key now references <code>vulnerabilities_current</code></li>
+</ul>
+</li>
+<li><p><strong>init-database.js</strong></p>
+<ul>
+<li>❌ Removed: <code>CREATE TABLE vulnerabilities</code></li>
+<li>✅ Updated: <code>ticket_vulnerabilities</code> foreign key now references <code>vulnerabilities_current</code></li>
+<li>✅ Renumbered: All subsequent table comments (5→4, 6→5, etc.)</li>
+</ul>
+</li>
+<li><p><strong>init-database-v1.1.0.js</strong></p>
+<ul>
+<li>❌ Removed: <code>CREATE TABLE vulnerabilities</code></li>
+<li>✅ Updated: <code>ticket_vulnerabilities</code> foreign key now references <code>vulnerabilities_current</code></li>
+<li>✅ Renumbered: All subsequent table comments (TABLE 5→4 through TABLE 21→20)</li>
+</ul>
+</li>
+<li><p><strong>vulnerabilityService.js</strong></p>
+<ul>
+<li>❌ Removed line 529: <code>DELETE FROM vulnerabilities</code> (clearAllData function)</li>
+<li>❌ Removed lines 586-590: <code>DELETE FROM vulnerabilities</code> query object (deleteVulnerabilities function)</li>
+</ul>
+</li>
+</ol>
+<p><strong>Seed Database Rebuild</strong>:</p>
+<ul>
+<li>✅ Generated new seed at <code>app/data/hextrackr.seed.db</code></li>
+<li>✅ Dropped legacy <code>vulnerabilities</code> table from seed</li>
+<li>✅ Ran VACUUM to compact database</li>
+<li>✅ Regenerated SHA-256 checksum: <code>0d53b020094f91977c83cad9e956e28f15753d0f172235c3162045c992d273b2</code></li>
+<li>✅ Verified: 21 tables (down from 22)</li>
+<li>✅ Confirmed: Only <code>vulnerabilities_current</code> exists, no legacy <code>vulnerabilities</code> table</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/services/databaseService.js</code></li>
+<li><code>app/public/scripts/init-database.js</code></li>
+<li><code>app/public/scripts/init-database-v1.1.0.js</code></li>
+<li><code>app/services/vulnerabilityService.js</code></li>
+<li><code>app/data/hextrackr.seed.db</code> (rebuilt clean)</li>
+<li><code>app/data/hextrackr.seed.db.sha256</code> (new checksum)</li>
+</ul>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li>✅ Legacy table removed from all schema files</li>
+<li>✅ Foreign key updated to reference correct table</li>
+<li>✅ Legacy DELETE operations removed</li>
+<li>✅ Seed database contains only modern schema (21 tables)</li>
+<li>✅ No references to legacy table remain in codebase</li>
+</ul>
+<p><strong>Future Ready</strong>:</p>
+<ul>
+<li>Junction table <code>ticket_vulnerabilities</code> preserved with updated FK</li>
+<li>Ready for future mitigation tracking feature (currently in SRPI research phase)</li>
+</ul>
+<p><strong>Issues</strong>:</p>
+<ul>
+<li><a href="https://linear.app/hextrackr/issue/HEX-349">HEX-349</a> - Deprecate legacy <code>vulnerabilities</code> table - migrate to rollover architecture</li>
+</ul>
+<hr>
+<h2>Notes</h2><h3>Key Learning</h3><p><strong>Pattern Identified</strong>: When migrating to new architecture, always audit old schema files and remove unused tables to prevent confusion and technical debt.</p>
+<p><strong>Critical Discovery</strong>: The backup system was silently failing to restore 95K+ vulnerability records due to missing chunked file support. This would have caused catastrophic data loss in a production recovery scenario. Always validate backup/restore functionality after architectural changes.</p>
+<h3>Performance Improvements</h3><ul>
+<li>Reduced seed database size: 21 tables (down from 22)</li>
+<li>Cleaned up 6 files with legacy table references</li>
+<li>Simplified restore logic by removing unnecessary fallback paths</li>
+<li>Improved data integrity by ensuring complete table cleanup before restore</li>
+</ul>
+<h3>Security Improvements</h3><ul>
+<li>Backup/restore system now handles large datasets without memory overflow</li>
+<li>All related tables properly cleared before restore to prevent data corruption</li>
+<li>Junction table foreign keys now reference correct active table</li>
+</ul>
+<hr>
+<p><em>Changelog Entry: v1.1.11 | HEX-359 Backup/Restore Fixes + HEX-349 Legacy Table Removal</em></p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

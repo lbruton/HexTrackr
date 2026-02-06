@@ -1,0 +1,179 @@
+<!-- Audit Logs Modal (HEX-254 Session 13) -->
+<!-- Admin-only modal for viewing encrypted audit logs with filtering and export -->
+<div class="modal modal-blur fade" id="auditLogsModal" tabindex="-1" role="dialog" aria-labelledby="auditLogsModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="auditLogsModalTitle">
+                    <i class="fas fa-clipboard-list me-2"></i>Audit Logs Viewer
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <!-- Stats Summary Card -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="text-muted small">Total Logs</div>
+                                <div class="h3 mb-0" id="auditModalTotalLogs">-</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-muted small">Categories</div>
+                                <div class="h3 mb-0" id="auditModalCategories">-</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-muted small">Date Range</div>
+                                <div class="small" id="auditModalDateRange">-</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-muted small">Encryption</div>
+                                <div class="text-success">
+                                    <i class="fas fa-lock me-1"></i>AES-256-GCM
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters Card -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-filter me-2"></i>Filters
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="auditStartDate" class="form-label">Start Date</label>
+                                <input type="date" class="form-control" id="auditStartDate">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="auditEndDate" class="form-label">End Date</label>
+                                <input type="date" class="form-control" id="auditEndDate">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="auditCategory" class="form-label">Category</label>
+                                <select class="form-select" id="auditCategory">
+                                    <option value="">All Categories</option>
+                                    <!-- Dynamically populated -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row g-3 mt-2">
+                            <div class="col-md-12">
+                                <button type="button" class="btn btn-primary" id="auditApplyFilters">
+                                    <i class="fas fa-search me-2"></i>Apply Filters
+                                </button>
+                                <button type="button" class="btn btn-secondary" id="auditClearFilters">
+                                    <i class="fas fa-times me-2"></i>Clear Filters
+                                </button>
+                                <div class="btn-group float-end">
+                                    <button type="button" class="btn btn-success" id="auditExportJSON">
+                                        <i class="fas fa-download me-2"></i>Export JSON
+                                    </button>
+                                    <button type="button" class="btn btn-info" id="auditExportCSV">
+                                        <i class="fas fa-file-csv me-2"></i>Export CSV
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logs Table Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-list me-2"></i>Audit Logs
+                        </h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <!-- Loading Spinner -->
+                        <div id="auditLogsLoading" class="text-center p-4 d-none">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading audit logs...</span>
+                            </div>
+                            <p class="mt-2 text-muted">Loading audit logs...</p>
+                        </div>
+
+                        <!-- Error Alert -->
+                        <div id="auditLogsError" class="alert alert-danger m-3 d-none" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <span id="auditLogsErrorMessage"></span>
+                        </div>
+
+                        <!-- Logs Table -->
+                        <div class="table-responsive">
+                            <table class="table table-vcenter table-hover card-table" id="auditLogsTable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Timestamp</th>
+                                        <th>Category</th>
+                                        <th>Message</th>
+                                        <th>User</th>
+                                        <th>IP Address</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="auditLogsTableBody">
+                                    <!-- Dynamically populated -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Empty State -->
+                        <div id="auditLogsEmpty" class="text-center p-4 d-none">
+                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No audit logs found matching your filters.</p>
+                        </div>
+                    </div>
+
+                    <!-- Pagination Footer -->
+                    <div class="card-footer d-flex align-items-center">
+                        <p class="m-0 text-muted" id="auditLogsPaginationInfo">
+                            Showing <span id="auditLogsStart">0</span> to <span id="auditLogsEnd">0</span> of <span id="auditLogsTotal">0</span> entries
+                        </p>
+                        <ul class="pagination m-0 ms-auto" id="auditLogsPagination">
+                            <!-- Dynamically populated -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Log Details Modal (nested) -->
+<div class="modal modal-blur fade" id="auditLogDetailsModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-info-circle me-2"></i>Audit Log Details
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <dl class="row" id="auditLogDetailsContent">
+                    <!-- Dynamically populated -->
+                </dl>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
