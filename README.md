@@ -1,5 +1,6 @@
 # HexTrackr
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/94fc16031bed45e59977f4110f510335)](https://app.codacy.com/gh/lbruton/HexTrackr?utm_source=github.com&utm_medium=referral&utm_content=lbruton/HexTrackr&utm_campaign=Badge_Grade)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/b3f731f8d8244dabafabb39339014886)](https://app.codacy.com?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
 > Enterprise vulnerability management system for tracking security vulnerabilities, tickets, and Known Exploited Vulnerabilities (KEV)
