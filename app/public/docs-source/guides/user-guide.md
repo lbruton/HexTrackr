@@ -507,7 +507,7 @@ Configure ServiceNow to enable clickable ticket links:
 
 - **Documentation Portal**: Built-in at `/docs-html/`
 - **API Documentation**: Technical reference at `/docs-html/jsdocs/`
-- **GitHub Issues**: Report bugs at [HexTrackr GitHub](https://github.com/Lonnie-Bruton/HexTrackr/issues)
+- **GitHub Issues**: Report bugs at [HexTrackr GitHub](https://github.com/lbruton/HexTrackr/issues)
 
 ---
 

@@ -200,7 +200,7 @@ sudo dnf install -y git
 
 # Clone HexTrackr
 cd /opt  # or your preferred location
-sudo git clone https://github.com/Lonnie-Bruton/HexTrackr.git
+sudo git clone https://github.com/lbruton/HexTrackr.git
 cd HexTrackr
 ```
 
@@ -726,7 +726,7 @@ chmod +x install-rhel.sh
 
 - **RHEL Community**: https://www.reddit.com/r/redhat/
 - **Podman Community**: https://github.com/containers/podman/discussions
-- **HexTrackr Issues**: https://github.com/Lonnie-Bruton/HexTrackr/issues
+- **HexTrackr Issues**: https://github.com/lbruton/HexTrackr/issues
 
 ---
 
