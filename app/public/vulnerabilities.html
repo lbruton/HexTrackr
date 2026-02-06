@@ -697,10 +697,8 @@
                         <i class="fas fa-file-csv me-2"></i>
                         Export CSV
                     </button>
-                    <button type="button" class="btn btn-outline-success" id="createLocationTicketBtn">
-                        <i class="fas fa-ticket-alt me-2"></i>
-                        Create Ticket
-                    </button>
+                    <!-- HEX-347: Dynamic ticket button (matches device modal pattern) -->
+                    <div id="locationModalTicketButton" class="d-inline-block"></div>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         Close
                     </button>
@@ -962,6 +960,7 @@
     <script src="scripts/shared/footer-loader.js"></script>
     <script src="scripts/shared/settings-modal.js"></script>
     <script src="scripts/shared/backup-modal.js"></script>
+    <script src="scripts/shared/audit-logs.js"></script> <!-- HEX-254 Session 13: Audit Logs Modal -->
 
     <!-- Authentication State Manager (HEX-128 Task 3.5) -->
     <script src="scripts/shared/auth-state.js"></script>
@@ -990,6 +989,7 @@
     <script src="scripts/shared/vulnerability-statistics.js"></script>
     <script src="scripts/shared/vulnerability-search.js"></script>
     <script src="scripts/shared/vulnerability-grid.js"></script>
+    <script src="scripts/shared/hostname-parser-helper.js"></script>
     <script src="scripts/shared/cisco-advisory-helper.js"></script>
     <script src="scripts/shared/palo-advisory-helper.js"></script>
     <script src="scripts/shared/vulnerability-cards.js"></script>

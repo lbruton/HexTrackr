@@ -77,7 +77,11 @@ class PreferencesController {
             });
 
         } catch (error) {
-            console.error("Get preference error:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "preferences", "Get preference error", { error: error.message });
+            } else {
+                console.error("Get preference error:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to retrieve preference",
@@ -109,7 +113,11 @@ class PreferencesController {
             });
 
         } catch (error) {
-            console.error("Get all preferences error:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "preferences", "Get all preferences error", { error: error.message });
+            } else {
+                console.error("Get all preferences error:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to retrieve preferences",
@@ -163,7 +171,11 @@ class PreferencesController {
             });
 
         } catch (error) {
-            console.error("Set preference error:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "preferences", "Set preference error", { error: error.message, key, value });
+            } else {
+                console.error("Set preference error:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to set preference",
@@ -214,7 +226,11 @@ class PreferencesController {
             });
 
         } catch (error) {
-            console.error("Set multiple preferences error:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "preferences", "Set multiple preferences error", { error: error.message });
+            } else {
+                console.error("Set multiple preferences error:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to set preferences",
@@ -264,7 +280,11 @@ class PreferencesController {
             });
 
         } catch (error) {
-            console.error("Delete preference error:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "preferences", "Delete preference error", { error: error.message, key });
+            } else {
+                console.error("Delete preference error:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to delete preference",
@@ -295,7 +315,11 @@ class PreferencesController {
             });
 
         } catch (error) {
-            console.error("Delete all preferences error:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "preferences", "Delete all preferences error", { error: error.message });
+            } else {
+                console.error("Delete all preferences error:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to delete preferences",
@@ -347,7 +371,11 @@ class PreferencesController {
             }
 
         } catch (error) {
-            console.error("Has preference error:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "preferences", "Has preference error", { error: error.message, key });
+            } else {
+                console.error("Has preference error:", error);
+            }
             res.status(500).end();
         }
     }
@@ -385,7 +413,11 @@ class PreferencesController {
             });
 
         } catch (error) {
-            console.error("Get preference count error:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "preferences", "Get preference count error", { error: error.message });
+            } else {
+                console.error("Get preference count error:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to get preference count",
@@ -441,7 +473,11 @@ class PreferencesController {
             res.send(JSON.stringify(exportData, null, 2));
 
         } catch (error) {
-            console.error("Export user preferences error:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "preferences", "Export user preferences error", { error: error.message });
+            } else {
+                console.error("Export user preferences error:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to export user preferences",
@@ -484,7 +520,11 @@ class PreferencesController {
             });
 
         } catch (error) {
-            console.error("Import user preferences error:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "preferences", "Import user preferences error", { error: error.message });
+            } else {
+                console.error("Import user preferences error:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to import user preferences",

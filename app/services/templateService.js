@@ -202,14 +202,22 @@ class TemplateService {
             let tableName;
             if (category) {
                 tableName = this.getTemplateTableByCategory(category);
-                console.log(`[TemplateService] Using category '${category}' to determine table: ${tableName}`);
+                if (global.logger?.debug) {
+                    global.logger.debug("backend", "template", "Using category to determine table", { category, tableName });
+                }
             } else {
                 tableName = await this.getTemplateTableById(id);
-                console.log(`[TemplateService] Using ID lookup to determine table: ${tableName}`);
+                if (global.logger?.debug) {
+                    global.logger.debug("backend", "template", "Using ID lookup to determine table", { id, tableName });
+                }
             }
 
             if (!tableName) {
-                console.error(`[TemplateService] Could not determine table for template ID ${id}, category: ${category}`);
+                if (global.logger?.error) {
+                    global.logger.error("backend", "template", "Could not determine table for template", { id, category });
+                } else {
+                    console.error(`[TemplateService] Could not determine table for template ID ${id}, category: ${category}`);
+                }
                 return null;
             }
 
@@ -220,7 +228,11 @@ class TemplateService {
                 if (template_name && category) {
                     const expectedTable = this.getTemplateTableByCategory(category);
                     if (tableName !== expectedTable) {
-                        console.warn(`[TemplateService] Table mismatch detected! Expected ${expectedTable}, got ${tableName}. Using category-based table.`);
+                        if (global.logger?.warn) {
+                            global.logger.warn("backend", "template", "Table mismatch detected, using category-based table", { expectedTable, actualTable: tableName, category });
+                        } else {
+                            console.warn(`[TemplateService] Table mismatch detected! Expected ${expectedTable}, got ${tableName}. Using category-based table.`);
+                        }
                         tableName = expectedTable;
                     }
                 }
@@ -229,11 +241,17 @@ class TemplateService {
                 if (template_content && category) {
                     const validation = this.validateTemplateCategory(template_content, category);
                     if (validation.warnings.length > 0) {
-                        console.warn("[TemplateService] Template validation warnings:", validation.warnings);
+                        if (global.logger?.warn) {
+                            global.logger.warn("backend", "template", "Template validation warnings", { id, category, warnings: validation.warnings });
+                        } else {
+                            console.warn("[TemplateService] Template validation warnings:", validation.warnings);
+                        }
                     }
                 }
 
-                console.log(`[TemplateService] Updating template ID ${id} in table ${tableName} with category ${category}`);
+                if (global.logger?.debug) {
+                    global.logger.debug("backend", "template", "Updating template", { id, tableName, category });
+                }
 
                 this.db.run(
                     `UPDATE ${tableName}
@@ -321,7 +339,11 @@ class TemplateService {
                             category
                         }))
                         .catch(fetchError => {
-                            console.warn("TemplateService: Failed to read back created template:", fetchError.message);
+                            if (global.logger?.warn) {
+                                global.logger.warn("backend", "template", "Failed to read back created template", { error: fetchError.message, insertedId });
+                            } else {
+                                console.warn("TemplateService: Failed to read back created template:", fetchError.message);
+                            }
                             resolve({
                                 id: insertedId,
                                 name: templateData.name,
@@ -345,11 +367,17 @@ class TemplateService {
         try {
             const tableName = await this.getTemplateTableById(id);
             if (!tableName) {
-                console.error(`[TemplateService] Could not determine table for template ID ${id}`);
+                if (global.logger?.error) {
+                    global.logger.error("backend", "template", "Could not determine table for template reset", { id });
+                } else {
+                    console.error(`[TemplateService] Could not determine table for template ID ${id}`);
+                }
                 return null;
             }
 
-            console.log(`[TemplateService] Resetting template ID ${id} in table ${tableName}`);
+            if (global.logger?.info) {
+                global.logger.info("backend", "template", "Resetting template to default", { id, tableName });
+            }
 
             return new Promise((resolve, reject) => {
                 // First check if the template has default_content
@@ -358,21 +386,35 @@ class TemplateService {
                     [id],
                     (err, row) => {
                         if (err) {
-                            console.error(`[TemplateService] Error checking default_content for ID ${id}:`, err.message);
+                            if (global.logger?.error) {
+                                global.logger.error("backend", "template", "Error checking default_content", { error: err.message, id });
+                            } else {
+                                console.error(`[TemplateService] Error checking default_content for ID ${id}:`, err.message);
+                            }
                             return reject(new Error("Failed to check template: " + err.message));
                         }
 
                         if (!row) {
-                            console.error(`[TemplateService] Template not found for ID ${id}`);
+                            if (global.logger?.error) {
+                                global.logger.error("backend", "template", "Template not found for reset", { id });
+                            } else {
+                                console.error(`[TemplateService] Template not found for ID ${id}`);
+                            }
                             return resolve(null);
                         }
 
                         if (!row.default_content) {
-                            console.warn(`[TemplateService] No default_content found for template ID ${id}, cannot reset`);
+                            if (global.logger?.warn) {
+                                global.logger.warn("backend", "template", "No default_content found, cannot reset", { id });
+                            } else {
+                                console.warn(`[TemplateService] No default_content found for template ID ${id}, cannot reset`);
+                            }
                             return resolve(null);
                         }
 
-                        console.log(`[TemplateService] Found default_content, proceeding with reset for ID ${id}`);
+                        if (global.logger?.debug) {
+                            global.logger.debug("backend", "template", "Found default_content, proceeding with reset", { id });
+                        }
 
                         this.db.run(
                             `UPDATE ${tableName}
@@ -382,16 +424,26 @@ class TemplateService {
                             [id],
                             function(err) {
                                 if (err) {
-                                    console.error(`[TemplateService] Reset failed for ID ${id}:`, err.message);
+                                    if (global.logger?.error) {
+                                        global.logger.error("backend", "template", "Reset failed", { error: err.message, id });
+                                    } else {
+                                        console.error(`[TemplateService] Reset failed for ID ${id}:`, err.message);
+                                    }
                                     return reject(new Error("Failed to reset template: " + err.message));
                                 }
 
                                 if (this.changes === 0) {
-                                    console.warn(`[TemplateService] No rows affected when resetting template ID ${id}`);
+                                    if (global.logger?.warn) {
+                                        global.logger.warn("backend", "template", "No rows affected when resetting template", { id });
+                                    } else {
+                                        console.warn(`[TemplateService] No rows affected when resetting template ID ${id}`);
+                                    }
                                     return resolve(null);
                                 }
 
-                                console.log(`[TemplateService] Successfully reset template ID ${id}`);
+                                if (global.logger?.info) {
+                                    global.logger.info("backend", "template", "Successfully reset template", { id });
+                                }
                                 resolve({ id, reset: true });
                             }
                         );
@@ -399,7 +451,11 @@ class TemplateService {
                 );
             });
         } catch (error) {
-            console.error("[TemplateService] Error in resetTemplateToDefault:", error.message);
+            if (global.logger?.error) {
+                global.logger.error("backend", "template", "Error in resetTemplateToDefault", { error: error.message, stack: error.stack });
+            } else {
+                console.error("[TemplateService] Error in resetTemplateToDefault:", error.message);
+            }
             throw error;
         }
     }
@@ -519,7 +575,11 @@ class TemplateService {
             const template = await this.getTemplateById(id);
             if (!template) {
                 if (options.fallbackToHardcoded) {
-                    console.warn(`Template ${id} not found, using hardcoded fallback`);
+                    if (global.logger?.warn) {
+                        global.logger.warn("backend", "template", "Template not found, using hardcoded fallback", { id });
+                    } else {
+                        console.warn(`Template ${id} not found, using hardcoded fallback`);
+                    }
                     return this.processHardcodedTemplate(ticketData, options);
                 }
                 return null;
@@ -527,10 +587,18 @@ class TemplateService {
 
             return this.substituteVariables(template.template_content, ticketData, options);
         } catch (error) {
-            console.error(`Error processing template ${id}:`, error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "template", "Error processing template", { error: error.message, id });
+            } else {
+                console.error(`Error processing template ${id}:`, error);
+            }
 
             if (options.fallbackToHardcoded) {
-                console.warn("Database error, falling back to hardcoded template");
+                if (global.logger?.warn) {
+                    global.logger.warn("backend", "template", "Database error, falling back to hardcoded template", { id, error: error.message });
+                } else {
+                    console.warn("Database error, falling back to hardcoded template");
+                }
                 return this.processHardcodedTemplate(ticketData, options);
             }
 
@@ -602,11 +670,19 @@ Ticket ID: [XT_NUMBER]`;
             if (template) {
                 return this.substituteVariables(template.template_content, ticketData, options);
             } else {
-                console.warn(`Template '${templateName}' not found, using hardcoded fallback`);
+                if (global.logger?.warn) {
+                    global.logger.warn("backend", "template", "Template not found, using hardcoded fallback", { templateName });
+                } else {
+                    console.warn(`Template '${templateName}' not found, using hardcoded fallback`);
+                }
                 return this.processHardcodedTemplate(ticketData, options);
             }
         } catch (error) {
-            console.error("Database error getting template, using hardcoded fallback:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "template", "Database error getting template, using hardcoded fallback", { error: error.message, templateName });
+            } else {
+                console.error("Database error getting template, using hardcoded fallback:", error);
+            }
             return this.processHardcodedTemplate(ticketData, options);
         }
     }
@@ -769,7 +845,11 @@ Ticket ID: [XT_NUMBER]`;
                 processed = processed.replace(regex, String(value || config.fallback));
 
             } catch (error) {
-                console.error(`Error processing variable ${variable}:`, error);
+                if (global.logger?.error) {
+                    global.logger.error("backend", "template", "Error processing variable", { error: error.message, variable });
+                } else {
+                    console.error(`Error processing variable ${variable}:`, error);
+                }
                 // Use fallback on error
                 const regex = new RegExp(this.escapeRegex(variable), "g");
                 processed = processed.replace(regex, config.fallback);
@@ -779,7 +859,11 @@ Ticket ID: [XT_NUMBER]`;
         // Check for unprocessed variables and warn
         const remainingVariables = processed.match(/\[[A-Z_]+\]/g);
         if (remainingVariables) {
-            console.warn("Unprocessed variables found:", remainingVariables);
+            if (global.logger?.warn) {
+                global.logger.warn("backend", "template", "Unprocessed variables found in template", { remainingVariables });
+            } else {
+                console.warn("Unprocessed variables found:", remainingVariables);
+            }
         }
 
         return processed;

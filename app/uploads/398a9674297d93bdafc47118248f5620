@@ -1,6 +1,0 @@
-asset.name,asset.display_ipv4_address,definition.cve,definition.name,vulnerability.severity,definition.vpr.score,vulnerability.state,vulnerability.first_seen,vulnerability.last_seen,definition.id
-test-server-01,192.168.1.100,CVE-2025-99001,Test Critical Vulnerability,Critical,9.8,open,2025-09-23T13:00:00Z,2025-09-23T13:00:00Z,12345
-test-server-02,192.168.1.101,CVE-2025-99002,Test High Vulnerability,High,8.2,open,2025-09-23T13:00:00Z,2025-09-23T13:00:00Z,12346
-test-server-03,192.168.1.102,CVE-2025-99003,Test Medium Vulnerability,Medium,5.5,open,2025-09-23T13:00:00Z,2025-09-23T13:00:00Z,12347
-test-server-01,192.168.1.100,CVE-2025-99004,Test Low Vulnerability,Low,2.1,open,2025-09-23T13:00:00Z,2025-09-23T13:00:00Z,12348
-test-server-04,192.168.1.103,CVE-2025-99005,Another High Vulnerability,High,7.9,open,2025-09-23T13:00:00Z,2025-09-23T13:00:00Z,12349

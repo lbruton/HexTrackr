@@ -97,6 +97,8 @@
       "ticket.create",
       "ticket.update",
       "ticket.delete",
+      "ticket.status_change",
+      "ticket.migrate",
       "import.start",
       "import.complete",
       "import.failed",

@@ -6,7 +6,7 @@ html {
 }
 
 body {
-  background-color: var(--bs-body-bg, #f5f7fb);
+  background-color: var(--hextrackr-bg-primary);  /* Use HexTrackr theme variable for consistent depth */
 }
 
 /* Add spacing above navigation and body cards */

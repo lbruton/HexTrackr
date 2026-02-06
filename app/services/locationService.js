@@ -219,6 +219,7 @@ class LocationService {
                     location: loc.location,
                     location_display: loc.location_display,
                     device_count: loc.hostnames.size,
+                    device_hostnames: Array.from(loc.hostnames), // HEX-344: Required for ticket creation
                     device_ips: loc.device_ips,
                     kev_devices: kev_devices,
                     primary_vendor: primary_vendor,
@@ -241,7 +242,12 @@ class LocationService {
             };
 
         } catch (error) {
-            console.error("[LocationService] Error getting location stats:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "location", "Error getting location stats", { error: error.message, stack: error.stack });
+            } else {
+                console.error("[LocationService] Error getting location stats:", error);
+            }
+
             return {
                 success: false,
                 data: [],
@@ -258,12 +264,15 @@ class LocationService {
      */
     async _getTicketCountsByLocation() {
         try {
+            // HEX-347: Count all open tickets (exclude only Completed/Cancelled/Closed)
+            // Matches ticketService.js:838 query pattern for open tickets
             const query = `
                 SELECT
                     LOWER(location) as location,
                     COUNT(*) as ticket_count
                 FROM tickets
-                WHERE status IN ('Open', 'In Progress', 'Pending')
+                WHERE deleted = 0
+                  AND status NOT IN ('Completed', 'Cancelled', 'Closed')
                   AND location IS NOT NULL
                   AND location != ''
                 GROUP BY LOWER(location)
@@ -279,7 +288,11 @@ class LocationService {
             return ticketMap;
 
         } catch (error) {
-            console.error("[LocationService] Error getting ticket counts:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "location", "Error getting ticket counts", { error: error.message });
+            } else {
+                console.error("[LocationService] Error getting ticket counts:", error);
+            }
             return new Map(); // Return empty map on error
         }
     }

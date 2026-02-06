@@ -9,18 +9,19 @@
 /**
  * Defensive logging helpers
  * Safely log to LoggingService with fallback for initialization
+ * Migrated to unified LoggingService pattern (HEX-254 Session 12)
  */
 function _log(level, message, data = {}) {
-    if (global.logger && global.logger.integration && typeof global.logger.integration[level] === "function") {
-        global.logger.integration[level](message, data);
+    if (global.logger?.[level]) {
+        global.logger[level]("backend", "cisco", message, data);
     } else {
-        // Fallback to console for debugging HEX-272
+        // Fallback to console for debugging when logger not initialized
         console.log(`[cisco-advisory:${level}]`, message, data);
     }
 }
 
 function _audit(category, message, data = {}) {
-    if (global.logger && typeof global.logger.audit === "function") {
+    if (global.logger?.audit) {
         global.logger.audit(category, message, data, null, null);
     }
 }

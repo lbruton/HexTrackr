@@ -8,9 +8,15 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
 
 **Current Version**: See root `package.json` (auto-synced to 5 files via `npm run release`)
 
-**URL** https://dev.hextrackr.com 
+**Access Points**:
+- **Application**: https://dev.hextrackr.com (live instance for testing)
+- **User Documentation**: https://dev.hextrackr.com/docs-html/ (markdown → HTML, 130+ files)
+- **JSDoc API Reference**: https://dev.hextrackr.com/dev-docs-html (inline code comments → HTML)
 
----
+**Documentation Strategy**:
+- **JSDoc comments**: Already in codebase (searchable via `/codebase-search` and claude-context index)
+- **JSDoc HTML portal**: Auto-generated from inline comments, accessible via docs-html portal
+- **Result**: Full visibility into app through code search + rendered documentation portals
 
 ## 📊 Technical Baseline
 
@@ -55,16 +61,34 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
 * **ticket_templates**: Field ops markdown templates (restored in [HEX-286](https://linear.app/hextrackr/issue/HEX-286/ticket-markdown-templates-truncated-in-database))
 * **vulnerability_templates**: CVE templates
 * **backup_metadata**: Backup history with retention policy
-* **audit_logs**: [HEX-254](https://linear.app/hextrackr/issue/HEX-254/implement-unified-logging-system-with-audit-trail) logging system (Session 10/14 complete)
+* **audit_logs**: [HEX-254](https://linear.app/hextrackr/issue/HEX-254/implement-unified-logging-system-with-audit-trail) logging system with AES-256-GCM encryption (14/14 sessions complete)
+* **audit_log_config**: Encryption key storage and retention policy configuration
 * **cisco_fixed_versions**: Normalized Cisco fixed versions (HEX-287 Migration 007)
-
-
 
 ## Key Commands
 
 * Lint: `npm run lint`
 * Docs: `npm run docs:generate`
 * Database: `npm run db:backup`, `npm run db:restore`, `npm run db:migrate`
+
+## Audit Log System (HEX-254)
+
+**Admin Access**: Settings modal → "View Audit Logs" button (admin users only)
+**Features**: AES-256-GCM encrypted audit trail with filtering, search, CSV/JSON export
+**Categories Tracked**:
+- **Authentication**: `user.login`, `user.logout`, `user.failed_login`, `user.password_change`
+- **Tickets**: `ticket.create`, `ticket.update`, `ticket.delete`, `ticket.status_change`
+- **Imports**: `import.start`, `import.complete`, `import.failed`
+- **Backups**: `backup.create`, `backup.restore`
+- **System**: `settings.change`, `database.vacuum`, `sync.kev`, `sync.cisco`, `sync.palo_alto`
+
+**Quick Database Query**:
+```sql
+-- View recent audit logs (encrypted)
+SELECT category, username, timestamp FROM audit_logs ORDER BY timestamp DESC LIMIT 10;
+```
+
+**Documentation**: See `/docs/LOGGING_SYSTEM.md` for complete developer guide
 
 ## Testing & Development
 
@@ -85,8 +109,6 @@ Only use `npm run dev` if you're testing without Docker (rare).
 - Lint errors block CI; run `npm run eslint:fix` and `npm run stylelint:fix` before committing CSS or JS-heavy changes.
 - Folder naming mirrors feature areas (e.g., `controllers`, `services`); add new modules under the closest existing category for discoverability.
 
----
-
 ### SRPI (Specification → Research → Plan → Implement)
 **Use for**: New features, user-facing enhancements, cross-system changes
 - **Specification + Research** (combined phase): Define WHY (user requirements) + discover WHAT (codebase integration points, risks)
@@ -95,28 +117,77 @@ Only use `npm run dev` if you're testing without Docker (rare).
 - Full process guide: `/docs/SRPI_PROCESS.md`
 - Templates: `/docs/TEMPLATE_*.md` (Specification, Research, Plan, Implement, Changelog)
 
----
-
 ## Additional Documentation
 
+**Location**: All reference documentation is in `/docs/` folder
+
+**How to Search**: Use `/codebase-search` for semantic search across all documentation:
+```
+/codebase-search How do I use MCP servers with HexTrackr?
+/codebase-search What is the SRPI workflow for new features?
+/codebase-search How do I deploy HexTrackr to RHEL?
+```
+
+**Quick Reference Map**:
+
 **Core Reference**:
-- MCP Tools Guide: `/docs/MCP_TOOLS.md`
-- Taxonomy: `/docs/TAXONOMY.md` (Memento entity naming)
+- **MCP Tools Guide**: `/docs/MCP_TOOLS.md` - Complete guide to all MCP server integrations (Linear, Memento, Claude Context, etc.)
+- **Taxonomy**: `/docs/TAXONOMY.md` - Memento entity naming conventions and knowledge graph structure
+- **Git Workflow**: `/docs/GIT_WORKFLOW.md` - Branch strategy, commit conventions, PR process
 
 **Workflow Guides**:
-- SRPI Process: `/docs/SRPI_PROCESS.md`
-- CHANGELOG and Version Bump: `/docs/CHANGELOG AND VERSION BUMP PROCESS.md`
+- **SRPI Process**: `/docs/SRPI_PROCESS.md` - Specification → Research → Plan → Implement methodology
+- **CHANGELOG and Version Bump**: `/docs/CHANGELOG AND VERSION BUMP PROCESS.md` - Release workflow (one-button with `npm run release`)
+- **CSS Coding Standards**: `/docs/CSS_CODING_STANDARDS.md` - Styling guidelines, naming conventions, dark mode patterns
 
-**Documentation System**:
-- **Source of Truth**: ALL documentation edits MUST be made in markdown files under `/app/public/docs-source/`
-- **HTML Generation**: Run `npm run docs:generate` to convert markdown → HTML in `/app/public/docs-html/content/`
-- **CRITICAL**: Never edit HTML files directly - they are auto-generated and will be overwritten on next docs build
-- Markdown files are the canonical source; HTML files are build artifacts (like compiled code from source)
+**Architecture & Implementation**:
+- **Logging System**: `/docs/LOGGING_SYSTEM.md` - LoggingService architecture, audit trail, session tracking (HEX-254)
+- **Cisco Advisory Architecture**: `/docs/CISCO_ADVISORY_ARCHITECTURE.md` - OAuth2 integration, PSIRT API, advisory parsing
+- **Schema Evolution**: `/docs/SCHEMA_EVOLUTION.md` - Database migration patterns, versioning strategy
+
+**Deployment**:
+- **RHEL Deployment Guide**: `/docs/RHEL_DEPLOYMENT_GUIDE.md` - Production deployment on RHEL 8/9/10
+- **RHEL Quick Reference**: `/docs/RHEL_QUICK_REFERENCE.md` - Common commands, troubleshooting
+- **RHEL 10 Deployment**: `/docs/DEPLOYMENT_RHEL10.md` - RHEL 10 specific guide
+
+**Templates** (for creating new work):
+- **TEMPLATE_CHANGELOG.md** - Changelog version file template (with frontmatter + Overview)
+- **TEMPLATE_SPECIFICATION.md** - SRPI Specification phase template
+- **TEMPLATE_RESEARCH.md** - SRPI Research phase template
+- **TEMPLATE_PLAN.md** - SRPI Plan phase template
+- **TEMPLATE_IMPLEMENT.md** - SRPI Implementation session template
+
+**SRPI Work Examples**:
+- `/docs/srpi/HEX-324/` - Complete SRPI workflow example (Specification, Research, Plan phases)
 
 **Changelogs**:
 - Location: `/app/public/docs-source/changelog/versions/`
 - Format: Each version gets its own file (e.g., `1.0.67.md`)
 - Template: `/docs/TEMPLATE_CHANGELOG.md`
+- **CRITICAL REQUIREMENTS** for docs generator to work properly:
+
+  **1. YAML Frontmatter** (MUST be at top of file):
+  ```yaml
+  ---
+  title: "Version X.Y.Z - Brief Description"
+  date: "YYYY-MM-DD"
+  version: "X.Y.Z"
+  status: "Released"
+  category: "Bug Fix|Update|Maintenance|Feature"
+  ---
+  ```
+
+  **2. Overview Section** (MUST come after metadata, before changelog sections):
+  ```markdown
+  ## Overview
+
+  One concise paragraph (1-3 sentences) summarizing this version.
+  ```
+
+  **Why these are required**:
+  - Frontmatter provides date/version metadata → Without it: "Unknown date" in navigation
+  - Overview provides summary text → Without it: HR lines (`---`) appear in Recent Releases
+  - Docs generator (`html-content-updater.js`) extracts first non-heading paragraph as summary
 - **Rolling Window Architecture** (as of v1.1.0):
   - `index.md`: **AUTO-GENERATED** - Shows last 10 versions with summaries
   - `archive.md`: **AUTO-GENERATED** - Table of all versions older than last 10
@@ -125,14 +196,18 @@ Only use `npm run dev` if you're testing without Docker (rare).
   - **Never manually edit** `index.md` or `archive.md` - they regenerate on each `npm run docs:generate`
 - **Adding New Versions**:
   1. Create new version file in `/changelog/versions/` (e.g., `1.1.0.md`) using template
-  2. Run `npm run docs:generate` to regenerate index, archive, and HTML
-  3. System automatically updates dropdown and archive table
+  2. **MUST include YAML frontmatter at top of file** (see Critical Requirement above)
+  3. Run `npm run docs:generate` to regenerate index, archive, and HTML
+  4. System automatically updates dropdown and archive table
 - **Version Strategy**: Each major session/feature gets a new patch version
   - Session 3 → v1.0.67
   - Session 4 → v1.0.68
   - Major release → v1.1.0 (etc.)
 
----
+  **Documentation System**:
+  - **Source of Truth**: ALL documentation edits MUST be made in markdown files under `/app/public/docs-source/`
+  - **HTML Generation**: Run `npm run docs:generate` to convert markdown → HTML in `/app/public/docs-html/content/`
+  - Markdown files are the canonical source; HTML files are build artifacts (like compiled code from source)
 
 ## Git Branch Workflow
 
@@ -162,16 +237,12 @@ git push origin dev
 
 **Production Deployment**: Code flows dev → production deployment (not dev → main merge)
 
----
-
 ## Linear Issue Tracking
 
 **Team**: HexTrackr-Dev (primary development team)
 **Workflow**: Use Linear MCP (`mcp__linear-server__*`) to track all planning, tasks, and implementations
 **When to Use**: Check Linear for current work context, update issue status during sessions, link commits to issue IDs (e.g., `HEX-297`)
 **Status Flow**: Backlog → Todo → In Progress → In Review → Done
-
----
 
 ## Specialized Subagents
 
@@ -195,8 +266,6 @@ git push origin dev
 
 **Usage**: `Task(subagent_type: "Explore", prompt: "Find all WebSocket event handlers, thoroughness: medium")`
 
----
-
 ## Context Retrieval Strategy
 
 **Three-Tier Search Hierarchy** - Use these tools in order to maximize efficiency and prevent rebuilding solved problems:
@@ -213,8 +282,6 @@ git push origin dev
 - **IMPLEMENT Phase**: Use Linear issue descriptions (HEX-XXX) as authoritative source, update descriptions not comments
 
 **Temporal Filtering**: Memento graph contains 497K+ tokens across 100+ sessions. Use taxonomy tags to filter: `TAG: week-XX-2025` for recent work, `TAG: breakthrough` for critical patterns, `TAG: lesson-learned` for anti-patterns, `TAG: reusable` for cross-project patterns. Query recent context: `semantic_search("modal patterns", entity_types: ["HEXTRACKR:FRONTEND:PATTERN"], hybrid_search: true)`.
-
----
 
 ## MCP Tools & Slash Commands
 

@@ -57,10 +57,10 @@
 <li>Error handling for network operations</li>
 </ul>
 <p><strong>Key Methods</strong>:</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">async</span> <span class="hljs-title function_">fetchVulnerabilities</span>(params)
-<span class="hljs-keyword">async</span> <span class="hljs-title function_">fetchStatistics</span>()
-<span class="hljs-keyword">async</span> <span class="hljs-title function_">importCSV</span>(file, options)
-<span class="hljs-title function_">clearCache</span>()</code></pre><h3>2. VulnerabilityStatisticsManager</h3><p><strong>Location</strong>: <code>/app/public/scripts/shared/vulnerability-statistics.js</code></p>
+<pre><code class="language-javascript"><span class="hljs-keyword">async</span> <span class="hljs-title function_">loadData</span>(bustCache, options)      <span class="hljs-comment">// Load vulnerability data from API</span>
+<span class="hljs-keyword">async</span> <span class="hljs-title function_">loadStatistics</span>(bustCache)         <span class="hljs-comment">// Load statistics</span>
+<span class="hljs-keyword">async</span> <span class="hljs-title function_">refreshData</span>(bustCache)            <span class="hljs-comment">// Refresh all data</span>
+<span class="hljs-title function_">clearCache</span>()                            <span class="hljs-comment">// Clear cached data</span></code></pre><h3>2. VulnerabilityStatisticsManager</h3><p><strong>Location</strong>: <code>/app/public/scripts/shared/vulnerability-statistics.js</code></p>
 <p><strong>Responsibilities</strong>:</p>
 <ul>
 <li>Statistical calculations and aggregations</li>
@@ -223,7 +223,7 @@
 
     <span class="hljs-keyword">async</span> <span class="hljs-title function_">initializeModules</span>(<span class="hljs-params"></span>) {
         <span class="hljs-comment">// Delegate to orchestrator</span>
-        <span class="hljs-variable language_">this</span>.<span class="hljs-property">coreOrchestrator</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">VulnerabilityCoreOrchestrator</span>();
+        <span class="hljs-variable language_">this</span>.<span class="hljs-property">coreOrchestrator</span> = <span class="hljs-keyword">new</span> <span class="hljs-variable language_">window</span>.<span class="hljs-title class_">VulnerabilityCoreOrchestrator</span>();
         <span class="hljs-keyword">await</span> <span class="hljs-variable language_">this</span>.<span class="hljs-property">coreOrchestrator</span>.<span class="hljs-title function_">initializeAllModules</span>(<span class="hljs-variable language_">this</span>);
 
         <span class="hljs-comment">// Get module references for delegation</span>
@@ -337,7 +337,11 @@
 </ul>
 <h3>Development Tools</h3><ul>
 <li><strong>ES6 Modules</strong>: Native module system</li>
-<li><strong>Hot Reloading</strong>: Development server support</li>
+<li><strong>Docker Deployment</strong>: Containerized development environment<ul>
+<li>Frontend changes: Browser refresh (static files served from volume mount)</li>
+<li>Backend changes: <code>docker-compose restart hextrackr</code></li>
+</ul>
+</li>
 <li><strong>Source Maps</strong>: Debugging support</li>
 <li><strong>Code Splitting</strong>: Optimized loading</li>
 </ul>
