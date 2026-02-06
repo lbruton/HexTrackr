@@ -1,0 +1,34 @@
+---
+exclude_paths:
+  # Documentation (markdown/HTML - not application code)
+  - "docs/**"
+  - "app/public/docs-html/**"
+  - "app/public/docs-source/**"
+  - "docs-html/**"
+  - "docs-source/**"
+  - "docs-prototype/**"
+  - "docs-source-backup-*/**"
+  # Generated documentation
+  - "app/dev-docs-html/**"
+  # Third-party libraries (vendored)
+  - "app/public/libs/**"
+  - "node_modules/**"
+  # Screenshots and images
+  - "screenshots/**"
+  # Test data
+  - "test/**"
+  # Claude logs
+  - "claudelogs/**"
+  # HexTrackr specs (planning docs)
+  - "hextrackr-specs/**"
+  # Codacy CLI configs (not application code)
+  - ".codacy/cli.sh"
+  # Configuration files (linting, IDE, etc.)
+  - ".markdownlint*.json"
+  - ".markdownlintignore"
+  - ".stylelintrc.json"
+  - ".stylelintignore"
+  - "jsdoc.conf.json"
+  - "jsdoc.dev.json"
+  # Lock files
+  - "package-lock.json"
