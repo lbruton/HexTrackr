@@ -44,7 +44,26 @@ class TicketController {
     }
 
     /**
-     * Get singleton instance (for use in routes)
+     * Get singleton TicketController instance for use in route handlers
+     * Returns the initialized singleton instance created by initialize().
+     * Used by route modules to access controller methods without managing lifecycle.
+     *
+     * @static
+     * @returns {TicketController} The singleton TicketController instance
+     * @throws {Error} "TicketController not initialized. Call initialize() first." - If initialize() was never called
+     *
+     * @example
+     * // In app/routes/tickets.js
+     * const controller = TicketController.getInstance();
+     * const tickets = await controller.ticketService.getAllTickets();
+     *
+     * @example
+     * // Error case - calling before initialization
+     * try {
+     *     TicketController.getInstance(); // Throws error
+     * } catch (error) {
+     *     console.error(error.message); // "TicketController not initialized..."
+     * }
      */
     static getInstance() {
         if (!TicketController.instance) {
@@ -54,8 +73,28 @@ class TicketController {
     }
 
     /**
-     * Get all tickets
-     * Extracted from server.js line 3320-3344
+     * Get all active tickets - GET /api/tickets
+     * Retrieves all non-deleted tickets ordered by creation date (newest first)
+     * Used by tickets page to populate AG-Grid table view
+     * Extracted from server.js lines 3320-3344
+     *
+     * @static
+     * @async
+     * @param {Object} req - Express request object
+     * @param {Object} req.user - User from requireAuth middleware
+     * @param {Object} res - Express response object
+     * @returns {Promise<void>} Sends JSON response:
+     *   - 200: Array<Object> - Array of ticket records (non-deleted only, DESC by created_at)
+     *   - 500: {success: false, error: "Failed to fetch tickets", details: string}
+     * @throws {Error} Caught and returned as 500 response if:
+     *   - Database query fails (SELECT from tickets table)
+     *   - TicketService.getAllTickets() encounters errors
+     *   - Ticket transformation logic fails
+     * @route GET /api/tickets
+     * @middleware requireAuth - User must be authenticated
+     * @example
+     * // GET /api/tickets
+     * // Returns: [{id: "XT-001", status: "Open", priority: "High", ...}, ...]
      */
     static async getAllTickets(req, res) {
         try {
@@ -63,7 +102,11 @@ class TicketController {
             const tickets = await controller.ticketService.getAllTickets();
             res.json(tickets);
         } catch (error) {
-            console.error("Error fetching tickets:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "ticket", "Error fetching all tickets", { error: error.message });
+            } else {
+                console.error("Error fetching tickets:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to fetch tickets",
@@ -82,13 +125,36 @@ class TicketController {
             const ticket = req.body;
 
             const result = await controller.ticketService.createTicket(ticket);
+
+            // Audit: Ticket creation
+            if (global.logger?.audit) {
+                await global.logger.audit(
+                    "ticket.create",
+                    `Ticket ${ticket.xt_number} created`,
+                    {
+                        ticketId: result.id,
+                        xtNumber: ticket.xt_number,
+                        priority: ticket.priority,
+                        status: ticket.status || "open",
+                        site: ticket.site,
+                        location: ticket.location
+                    },
+                    req.user?.id || null,
+                    req
+                );
+            }
+
             res.json({
                 success: true,
                 id: result.id,
                 message: "Ticket saved successfully"
             });
         } catch (error) {
-            console.error("Error saving ticket:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "ticket", "Error creating new ticket", { error: error.message });
+            } else {
+                console.error("Error saving ticket:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to save ticket",
@@ -107,14 +173,67 @@ class TicketController {
             const ticketId = req.params.id;
             const ticket = req.body;
 
+            // Fetch existing ticket BEFORE update for change tracking
+            const existingTicket = await controller.ticketService.getTicketById(ticketId);
+
             const _result = await controller.ticketService.updateTicket(ticketId, ticket);
+
+            // Track changes for audit
+            const changes = {};
+            const trackFields = ["status", "priority", "assigned_to", "notes", "vulnerabilities", "site", "location"];
+            trackFields.forEach(field => {
+                if (ticket[field] !== undefined && ticket[field] !== existingTicket[field]) {
+                    changes[field] = {
+                        from: existingTicket[field],
+                        to: ticket[field]
+                    };
+                }
+            });
+
+            // Audit: Ticket update
+            if (global.logger?.audit) {
+                await global.logger.audit(
+                    "ticket.update",
+                    `Ticket ${existingTicket.xt_number} updated`,
+                    {
+                        ticketId: ticketId,
+                        xtNumber: existingTicket.xt_number,
+                        changes: changes,
+                        changeCount: Object.keys(changes).length
+                    },
+                    req.user?.id || null,
+                    req
+                );
+
+                // Special audit entry for status changes
+                if (changes.status) {
+                    await global.logger.audit(
+                        "ticket.status_change",
+                        `Ticket ${existingTicket.xt_number} status changed from ${changes.status.from} to ${changes.status.to}`,
+                        {
+                            ticketId: ticketId,
+                            xtNumber: existingTicket.xt_number,
+                            previousStatus: changes.status.from,
+                            newStatus: changes.status.to,
+                            transitionType: `${changes.status.from}_to_${changes.status.to}`
+                        },
+                        req.user?.id || null,
+                        req
+                    );
+                }
+            }
+
             res.json({
                 success: true,
                 id: ticketId,
                 message: "Ticket updated successfully"
             });
         } catch (error) {
-            console.error("Error updating ticket:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "ticket", "Error updating ticket", { error: error.message, ticketId: req.params.id });
+            } else {
+                console.error("Error updating ticket:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to update ticket",
@@ -134,18 +253,42 @@ class TicketController {
             const { deletion_reason } = req.body; // Accept reason from request body
             const deletedBy = req.user?.username || "system"; // From auth session
 
+            // Fetch ticket BEFORE deletion for audit
+            const ticket = await controller.ticketService.getTicketById(ticketId);
+
             const deletedCount = await controller.ticketService.deleteTicket(
                 ticketId,
                 deletion_reason,
                 deletedBy
             );
 
+            // Audit: Ticket deletion
+            if (global.logger?.audit) {
+                await global.logger.audit(
+                    "ticket.delete",
+                    `Ticket ${ticket.xt_number} deleted (soft delete)`,
+                    {
+                        ticketId: ticketId,
+                        xtNumber: ticket.xt_number,
+                        deletionReason: deletion_reason || "No reason provided",
+                        deletedBy: deletedBy,
+                        softDelete: true // HexTrackr uses soft deletes
+                    },
+                    req.user?.id || null,
+                    req
+                );
+            }
+
             res.json({
                 success: true,
                 deleted: deletedCount
             });
         } catch (error) {
-            console.error("Error deleting ticket:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "ticket", "Error soft-deleting ticket", { error: error.message, ticketId: req.params.id });
+            } else {
+                console.error("Error deleting ticket:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to delete ticket",
@@ -168,12 +311,33 @@ class TicketController {
             }
 
             const result = await controller.ticketService.migrateTickets(tickets);
+
+            // Audit: Ticket migration
+            if (global.logger?.audit) {
+                await global.logger.audit(
+                    "ticket.migrate",
+                    `Legacy ticket migration completed: ${result.successCount} tickets migrated`,
+                    {
+                        totalTickets: tickets.length,
+                        successCount: result.successCount,
+                        errorCount: result.errorCount,
+                        migrationSource: "legacy_import"
+                    },
+                    req.user?.id || null,
+                    req
+                );
+            }
+
             res.json({
                 success: true,
                 message: `Migration completed: ${result.successCount} tickets migrated, ${result.errorCount} errors`
             });
         } catch (error) {
-            console.error("Error migrating tickets:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "ticket", "Error migrating legacy tickets", { error: error.message });
+            } else {
+                console.error("Error migrating tickets:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to migrate tickets",
@@ -206,7 +370,11 @@ class TicketController {
                 errors: result.errors.length > 0 ? result.errors : undefined
             });
         } catch (error) {
-            console.error("Error importing tickets:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "ticket", "Error importing tickets from CSV", { error: error.message });
+            } else {
+                console.error("Error importing tickets:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Import failed",
@@ -225,7 +393,11 @@ class TicketController {
             const exportData = await controller.ticketService.exportTickets();
             res.json(exportData);
         } catch (error) {
-            console.error("Error exporting tickets for backup:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "ticket", "Error exporting tickets for backup", { error: error.message });
+            } else {
+                console.error("Error exporting tickets for backup:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to fetch tickets",
@@ -248,7 +420,11 @@ class TicketController {
                 nextXtNumber: nextXtNumber
             });
         } catch (error) {
-            console.error("Error generating next XT#:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "ticket", "Error generating next XT number", { error: error.message });
+            } else {
+                console.error("Error generating next XT#:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to generate next XT#",
@@ -283,7 +459,11 @@ class TicketController {
                 tickets: tickets
             });
         } catch (error) {
-            console.error(`Error fetching tickets for device ${req.params.hostname}:`, error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "ticket", "Error fetching tickets for device", { error: error.message, hostname: req.params.hostname });
+            } else {
+                console.error(`Error fetching tickets for device ${req.params.hostname}:`, error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to fetch tickets for device",
@@ -324,10 +504,53 @@ class TicketController {
                 data: ticketMap
             });
         } catch (error) {
-            console.error("Error fetching tickets for device batch:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "ticket", "Error fetching tickets for device batch", { error: error.message, batchSize: req.body.hostnames?.length });
+            } else {
+                console.error("Error fetching tickets for device batch:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to fetch tickets for device batch",
+                details: error.message
+            });
+        }
+    }
+
+    /**
+     * Get all tickets for devices at a specific location
+     * HEX-344: Location cards multi-ticket modal support
+     * Enables location cards to show full ticket details (with xt_number) in picker modal
+     * @param {string} req.params.locationKey - Location prefix (e.g., "WTULSA", "LAXB1")
+     * @returns {Array} List of tickets at location with full details
+     */
+    static async getTicketsByLocation(req, res) {
+        try {
+            const controller = TicketController.getInstance();
+            const { locationKey } = req.params;
+
+            if (!locationKey) {
+                return res.status(400).json({
+                    success: false,
+                    error: "Location key parameter is required"
+                });
+            }
+
+            const tickets = await controller.ticketService.getTicketsByLocation(locationKey);
+            res.json({
+                success: true,
+                count: tickets.length,
+                tickets: tickets
+            });
+        } catch (error) {
+            if (global.logger?.error) {
+                global.logger.error("backend", "ticket", "Error fetching tickets for location", { error: error.message, locationKey: req.params.locationKey });
+            } else {
+                console.error(`Error fetching tickets for location ${req.params.locationKey}:`, error);
+            }
+            res.status(500).json({
+                success: false,
+                error: "Failed to fetch tickets for location",
                 details: error.message
             });
         }
@@ -372,10 +595,69 @@ class TicketController {
                 data: addresses
             });
         } catch (error) {
-            console.error("Error fetching address suggestions:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "ticket", "Error fetching address suggestions", { error: error.message, site: req.query.site, location: req.query.location });
+            } else {
+                console.error("Error fetching address suggestions:", error);
+            }
             res.status(500).json({
                 success: false,
                 error: "Failed to fetch address suggestions",
+                details: error.message
+            });
+        }
+    }
+
+    /**
+     * Get site code by location from existing tickets
+     * HEX-350: Intelligent site field population based on existing tickets database
+     * Queries tickets table for most recent site associated with a location
+     * Used for auto-populating site field when creating tickets from vulnerabilities
+     *
+     * @async
+     * @param {Object} req - Express request object
+     * @param {Object} req.params - URL parameters
+     * @param {string} req.params.location - Location code (e.g., "NSWAN", "WTULSA")
+     * @param {Object} res - Express response object
+     * @returns {Promise<void>} Sends JSON response with site code:
+     *   - 200: {success: true, site: "TULS"} or {success: true, site: null}
+     *   - 400: {success: false, error: "Location parameter is required"}
+     *   - 500: {success: false, error: "Failed to fetch site for location", details: string}
+     * @throws {Error} Caught and returned as 500 response if TicketService.getSiteByLocation fails
+     * @route GET /api/tickets/site-by-location/:location
+     * @example
+     * // GET /api/tickets/site-by-location/WTULSA
+     * // Returns: {success: true, site: "TULS"}
+     * @example
+     * // GET /api/tickets/site-by-location/NEWLOC
+     * // Returns: {success: true, site: null} (no existing tickets for this location)
+     */
+    static async getSiteByLocation(req, res) {
+        try {
+            const controller = TicketController.getInstance();
+            const { location } = req.params;
+
+            if (!location) {
+                return res.status(400).json({
+                    success: false,
+                    error: "Location parameter is required"
+                });
+            }
+
+            const site = await controller.ticketService.getSiteByLocation(location);
+            res.json({
+                success: true,
+                site: site
+            });
+        } catch (error) {
+            if (global.logger?.error) {
+                global.logger.error("backend", "ticket", "Error fetching site for location", { error: error.message, location: req.params.location });
+            } else {
+                console.error(`Error fetching site for location ${req.params.location}:`, error);
+            }
+            res.status(500).json({
+                success: false,
+                error: "Failed to fetch site for location",
                 details: error.message
             });
         }

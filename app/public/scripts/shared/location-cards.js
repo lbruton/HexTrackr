@@ -195,14 +195,17 @@ class LocationCardsManager {
         // Get current page data
         const paginatedLocations = this.pagination.getCurrentPageData(this.filteredData);
 
-        // Render cards
-        container.innerHTML = this.generateLocationCardsHTML(paginatedLocations);
+        // Render cards (now async - HEX-344 Step 2)
+        this.generateLocationCardsHTML(paginatedLocations).then(html => {
+            container.innerHTML = html;
+        });
 
         // Render top controls (sort + items per page)
         // Standardized to match device/vulnerability cards naming
         const sortOptions = [
             { value: "kev_device_count", label: "KEV Priority" },
             { value: "vpr", label: "VPR Priority" },
+            { value: "tickets_priority", label: "Tickets Priority" },
             { value: "location_name_asc", label: "Name A-Z" },
             { value: "location_name_desc", label: "Name Z-A" },
             { value: "device_count", label: "Device Count (High-Low)" },
@@ -266,6 +269,13 @@ class LocationCardsManager {
                     bVal = (b.location_display || "").toLowerCase();
                     return bVal.localeCompare(aVal);
 
+                case "tickets_priority":
+                    // HEX-351: Tickets Priority (High-Low)
+                    aVal = a.open_tickets || 0;
+                    bVal = b.open_tickets || 0;
+                    // Descending (high first)
+                    return bVal - aVal;
+
                 case "device_count":
                     // Device Count (High-Low)
                     aVal = a.device_count || 0;
@@ -291,10 +301,11 @@ class LocationCardsManager {
 
     /**
      * Generate HTML for location cards with VPR mini-cards and vendor icons
+     * HEX-344: Now async to support batch ticket lookup
      * @param {Array} locations - Array of location stat objects
-     * @returns {string} HTML string for location cards
+     * @returns {Promise<string>} HTML string for location cards
      */
-    generateLocationCardsHTML(locations) {
+    async generateLocationCardsHTML(locations) {
         if (!locations || locations.length === 0) {
             return `
                 <div class="col-12">
@@ -305,6 +316,10 @@ class LocationCardsManager {
                 </div>
             `;
         }
+
+        // HEX-344 Step 2: Fetch ticket data for all devices across all locations
+        const allHostnames = locations.flatMap(loc => loc.device_hostnames || []);
+        const ticketMap = await this.checkTicketStatusBatch(allHostnames);
 
         return locations.map(location => {
             const totalVPR = location.total_vpr || 0;
@@ -448,10 +463,7 @@ class LocationCardsManager {
 
                         <div class="card-actions">
                             <span class="text-info font-monospace" style="font-size: 0.875rem;">${network}</span>
-                            <button class="btn btn-outline-info" style="font-size: 0.875rem; padding: 0.375rem 0.75rem;"
-                                    onclick="event.stopPropagation(); window.locationDetailsModal?.showLocationDetails(JSON.parse(this.closest('.card').dataset.location), window.vulnManager?.dataManager)">
-                                <i class="fas fa-eye me-1"></i>View Site Details
-                            </button>
+                            ${this.generateTicketButton(location, ticketMap)}
                         </div>
                     </div>
                 </div>
@@ -537,6 +549,355 @@ class LocationCardsManager {
         return mostCommon;
     }
 
+    /**
+     * Generate ticket button HTML for a location card
+     * Follows device card pattern from vulnerability-cards.js
+     * HEX-344 Step 3: Dynamic button based on ticket count
+     *
+     * @param {Object} location - Location data object
+     * @param {Object} ticketMap - Map of hostname to ticket data (from batch lookup)
+     * @returns {string} Button HTML
+     */
+    generateTicketButton(location, ticketMap) {
+        // Get ticket counts for ALL devices at this location
+        const deviceHostnames = location.device_hostnames || [];
+        const locationTickets = new Map(); // Track unique tickets
+
+        // HEX-350: Site should be left BLANK for new locations
+        // User will manually fill in accurate site data from Hexagon
+        // No substring extraction, no fallback - empty string is the correct value
+        const locationKey = location.location || "";
+        const site = ""; // Always blank - will be populated manually by user
+
+        deviceHostnames.forEach(hostname => {
+            // CRITICAL: Use lowercase for lookup (backend returns lowercase keys)
+            const ticketData = ticketMap[hostname.toLowerCase()] || { count: 0, tickets: [] };
+            if (ticketData.count > 0) {
+                ticketData.tickets.forEach(ticketId => {
+                    locationTickets.set(ticketId, {
+                        id: ticketId,
+                        status: ticketData.status,
+                        jobType: ticketData.jobType
+                    });
+                });
+            }
+        });
+
+        const uniqueTicketCount = locationTickets.size;
+        const ticketArray = Array.from(locationTickets.values());
+
+        // Button state configuration - HEX-347: Simplified 3-color system
+        // Green = No tickets | Orange = Has tickets | Red = Has overdue ticket(s)
+        let buttonText, buttonClass, buttonIcon;
+
+        if (uniqueTicketCount === 0) {
+            // GREEN: No tickets
+            buttonText = "Create Ticket";
+            buttonClass = "btn-outline-success";
+            buttonIcon = "fas fa-ticket-alt";
+        } else if (uniqueTicketCount === 1) {
+            // Single ticket: ORANGE or RED based on overdue status
+            const ticket = ticketArray[0];
+            const isOverdue = ticket.status === "Overdue";
+            buttonText = "View Ticket";
+            buttonClass = isOverdue ? "btn-outline-danger" : "btn-outline-warning";
+            buttonIcon = "fas fa-folder-open";
+        } else {
+            // Multiple tickets: ORANGE or RED (red if ANY ticket is overdue)
+            const hasOverdue = ticketArray.some(ticket => ticket.status === "Overdue");
+            buttonText = `View Tickets (${uniqueTicketCount})`;
+            buttonClass = hasOverdue ? "btn-outline-danger" : "btn-outline-warning";
+            buttonIcon = "fas fa-layer-group";
+        }
+
+        // Escape data for HTML attributes
+        const escapedLocation = locationKey.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+        const ticketsJson = JSON.stringify(ticketArray).replace(/"/g, "&quot;");
+
+        return `
+            <button class="btn ${buttonClass} location-ticket-btn"
+                    style="font-size: 0.875rem; padding: 0.375rem 0.75rem;"
+                    data-location-key="${escapedLocation}"
+                    data-site="${site}"
+                    data-ticket-count="${uniqueTicketCount}"
+                    data-tickets="${ticketsJson}"
+                    data-kev-devices="${JSON.stringify(location.kev_devices || []).replace(/"/g, "&quot;")}"
+                    data-all-devices="${JSON.stringify(deviceHostnames).replace(/"/g, "&quot;")}"
+                    onclick="event.stopPropagation(); window.locationCardsManager.handleLocationTicketClick(event, this)">
+                <i class="${buttonIcon} me-1"></i>${buttonText}
+            </button>
+        `;
+    }
+
+    /**
+     * Handle ticket button click on location card
+     * Implements 3-tier navigation: 0 tickets → Create, 1 → View, 2+ → Picker modal
+     * Supports keyboard shortcuts: Cmd+Shift for KEV-only filtering
+     * HEX-344 Step 4: Click handler with location context
+     * HEX-350: Use HostnameParserService API for intelligent location/site extraction
+     *
+     * @param {Event} event - Click event (needed for keyboard modifiers)
+     * @param {HTMLElement} button - Button element that was clicked
+     */
+    async handleLocationTicketClick(event, button) {
+        event.stopPropagation(); // Prevent card click
+
+        // Read data from button dataset
+        const ticketCount = parseInt(button.dataset.ticketCount) || 0;
+        const tickets = button.dataset.tickets ? JSON.parse(button.dataset.tickets) : [];
+        const site = button.dataset.site || "";
+        const locationKey = button.dataset.locationKey || "";
+
+        // TIER 1: Single ticket exists → Direct navigation
+        if (ticketCount === 1) {
+            const ticketId = tickets[0].id;
+            logger.info("tickets", `Navigating to single ticket: ${ticketId}`);
+            window.location.href = `/tickets.html?openTicket=${ticketId}`;
+            return;
+        }
+
+        // TIER 2: Multiple tickets exist → Show picker modal
+        // HEX-344: Fetch full ticket details and reuse device cards modal (same UX)
+        if (ticketCount > 1) {
+            logger.info("tickets", `Fetching ${ticketCount} tickets for ${locationKey}`);
+            this.fetchAndShowLocationTicketModal(locationKey);
+            return;
+        }
+
+        // TIER 3: No tickets exist → Create new ticket
+        logger.info("tickets", "Creating new ticket for location", { site, locationKey });
+
+        // Parse device lists from button data
+        const allDevices = JSON.parse(button.dataset.allDevices || "[]");
+        const kevDevices = JSON.parse(button.dataset.kevDevices || "[]");
+
+        // Determine mode based on keyboard modifiers
+        let mode = "bulk-all"; // Default: all devices at location
+        let deviceList = allDevices.map(h => h.toUpperCase()); // UPPERCASE for ticket form
+
+        // Cmd+Shift or Ctrl+Shift → KEV devices only
+        if ((event.metaKey || event.ctrlKey) && event.shiftKey) {
+            mode = "bulk-kev";
+            deviceList = kevDevices.map(d => d.hostname.toUpperCase());
+            logger.info("tickets", `[KEV Filter] Creating ticket with ${deviceList.length} KEV devices`);
+        } else {
+            logger.info("tickets", `Creating ticket with ${deviceList.length} devices at ${locationKey}`);
+        }
+
+        // HEX-350: Use HostnameParserService API for intelligent location extraction
+        // No fallback - internal API must work for app to function
+        let finalLocation = "";
+        let finalSite = ""; // Blank unless found in tickets database
+
+        if (deviceList.length > 0) {
+            // Use first device to parse location (all devices at same location)
+            const firstHostname = deviceList[0].toLowerCase();
+            const parseResponse = await fetch(`/api/hostname/parse/${encodeURIComponent(firstHostname)}`);
+            const parseData = await parseResponse.json();
+            if (parseData.success && parseData.data) {
+                finalLocation = parseData.data.location.toUpperCase();
+                logger.info("tickets", `[HEX-350] Parsed location from hostname: ${finalLocation}`, {
+                    hostname: firstHostname,
+                    confidence: parseData.data.confidence
+                });
+
+                // Lookup site from tickets database
+                const siteResponse = await fetch(`/api/tickets/site-by-location/${encodeURIComponent(finalLocation)}`);
+                const siteData = await siteResponse.json();
+                if (siteData.success && siteData.site) {
+                    finalSite = siteData.site.toUpperCase();
+                    logger.info("tickets", `[HEX-350] Found site for location: ${finalSite}`);
+                }
+                // If site not found, stays blank - user enters from Hexagon
+            }
+        }
+
+        // Build sessionStorage data for ticket creation
+        const ticketData = {
+            devices: deviceList,              // UPPERCASE hostnames
+            site: finalSite,                  // UPPERCASE site (or blank if no match)
+            location: finalLocation,          // UPPERCASE location (parsed or fallback)
+            mode: mode,
+            timestamp: Date.now()
+        };
+
+        // Store in sessionStorage and navigate to tickets page
+        sessionStorage.setItem("createTicketData", JSON.stringify(ticketData));
+        sessionStorage.setItem("autoOpenModal", "true");
+        window.location.href = "/tickets.html";
+    }
+
+    /**
+     * Fetch full ticket details for a location and show picker modal
+     * HEX-344: Reuses device cards modal implementation for consistent UX
+     * Fetches complete ticket objects (with xt_number, created_at, etc.)
+     * Then calls vulnerability-cards.js showTicketPickerModal() directly
+     *
+     * @param {string} locationKey - Location identifier (e.g., "WTULSA", "LAXB1")
+     */
+    async fetchAndShowLocationTicketModal(locationKey) {
+        try {
+            // Fetch full ticket details from backend
+            const response = await fetch(`/api/tickets/location/${locationKey}`);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            if (!data.success || !data.tickets) {
+                throw new Error(data.error || "Failed to fetch tickets");
+            }
+
+            // Reuse device cards modal - same UX, same data structure
+            // Call vulnerability-cards.js showTicketPickerModal() directly
+            if (window.vulnManager && window.vulnManager.cardsManager) {
+                window.vulnManager.cardsManager.showTicketPickerModal(locationKey.toUpperCase(), data.tickets);
+
+                // Override "Create New Ticket Anyway" button to handle location-based creation
+                // The device modal's button calls createTicketFromDevice(hostname) which only adds 1 device
+                // For locations, we need to add ALL devices at the location (same as "Create Ticket" button with 0 tickets)
+                setTimeout(() => {
+                    this.overrideModalCreateButton(locationKey);
+                }, 100); // Small delay to ensure modal DOM is rendered
+            } else {
+                logger.error("tickets", "VulnerabilityCardsManager not available");
+                alert("Unable to show ticket picker. Please refresh the page.");
+            }
+
+        } catch (error) {
+            logger.error("tickets", `Failed to fetch tickets for location ${locationKey}:`, error);
+            alert(`Failed to load tickets: ${error.message}`);
+        }
+    }
+
+    /**
+     * Override the "Create New Ticket Anyway" button in device modal for location context
+     * HEX-344: Make button behavior match "Create Ticket" button (add all devices at location)
+     * HEX-350: Use HostnameParserService API for intelligent location/site extraction
+     *
+     * @param {string} locationKey - Location identifier
+     */
+    overrideModalCreateButton(locationKey) {
+        const modal = document.getElementById("ticketPickerModal");
+        if (!modal) {return;}
+
+        // Find the "Create New Ticket Anyway" button
+        const createButton = modal.querySelector("button.btn-success");
+        if (!createButton) {
+            logger.warn("tickets", "Create button not found in modal");
+            return;
+        }
+
+        // Find the location card button to get device data
+        const locationButton = document.querySelector(`[data-location-key="${locationKey}"]`);
+        if (!locationButton) {
+            logger.error("tickets", `Location button not found for ${locationKey}`);
+            return;
+        }
+
+        // Replace onclick to use location-based creation (all devices at location)
+        createButton.onclick = async (event) => {
+            event.preventDefault();
+            logger.info("tickets", `Creating ticket with all devices at ${locationKey}`);
+
+            // Close modal
+            const bsModal = bootstrap.Modal.getInstance(modal);
+            if (bsModal) {
+                bsModal.hide();
+            }
+
+            // Get device data from location button
+            const allDevices = JSON.parse(locationButton.dataset.allDevices || "[]");
+            const deviceList = allDevices.map(h => h.toUpperCase());
+
+            // HEX-350: Use HostnameParserService API for intelligent location extraction
+            // No fallback - internal API must work for app to function
+            let finalLocation = "";
+            let finalSite = ""; // Blank unless found in tickets database
+
+            if (deviceList.length > 0) {
+                // Use first device to parse location
+                const firstHostname = deviceList[0].toLowerCase();
+                const parseResponse = await fetch(`/api/hostname/parse/${encodeURIComponent(firstHostname)}`);
+                const parseData = await parseResponse.json();
+                if (parseData.success && parseData.data) {
+                    finalLocation = parseData.data.location.toUpperCase();
+
+                    // Lookup site from tickets database
+                    const siteResponse = await fetch(`/api/tickets/site-by-location/${encodeURIComponent(finalLocation)}`);
+                    const siteData = await siteResponse.json();
+                    if (siteData.success && siteData.site) {
+                        finalSite = siteData.site.toUpperCase();
+                    }
+                    // If site not found, stays blank - user enters from Hexagon
+                }
+            }
+
+            // Build ticket data (same as TIER 3 in handleLocationTicketClick)
+            const ticketData = {
+                devices: deviceList,
+                site: finalSite,
+                location: finalLocation,
+                mode: "bulk-all",
+                timestamp: Date.now()
+            };
+
+            // Store and navigate
+            sessionStorage.setItem("createTicketData", JSON.stringify(ticketData));
+            sessionStorage.setItem("autoOpenModal", "true");
+            window.location.href = "/tickets.html";
+        };
+    }
+
+    /**
+     * Check ticket status for multiple devices in a single batch API call
+     * Performance optimization: HEX-216 batch lookup pattern
+     * Case-insensitive hostname handling: HEX-190 lessons learned
+     *
+     * @param {Array<string>} hostnames - Array of device hostnames to check
+     * @returns {Promise<Object>} Map of hostname (lowercase) to ticket data
+     *   Example: { "lax-fw01": { count: 2, status: "In Progress", jobType: "Firmware", tickets: [123, 456] } }
+     */
+    async checkTicketStatusBatch(hostnames) {
+        if (!hostnames || hostnames.length === 0) {
+            return {};
+        }
+
+        try {
+            // CRITICAL: Normalize hostnames to lowercase for API call
+            // Backend ticketService.js:822 returns lowercase keys
+            const normalizedHostnames = hostnames.map(h => h.toLowerCase());
+
+            // Get CSRF token first (required for POST requests)
+            const csrfResponse = await fetch("/api/auth/csrf", {
+                credentials: "include"
+            });
+            const { csrfToken } = await csrfResponse.json();
+
+            const response = await fetch("/api/tickets/batch-device-lookup", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-csrf-token": csrfToken
+                },
+                credentials: "include",
+                body: JSON.stringify({ hostnames: normalizedHostnames })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Batch ticket lookup failed: ${response.status}`);
+            }
+
+            const result = await response.json();
+
+            // Backend returns { success: true, data: { hostname: {count, status, ...} } }
+            // CRITICAL: Keys are lowercase in response
+            return result.data || {};
+        } catch (error) {
+            logger.error("tickets", "Failed to fetch batch ticket status", error);
+            return {}; // Return empty map on error - don't break card render
+        }
+    }
 
     /**
      * Update pagination info text
@@ -632,13 +993,13 @@ window.showLocationKevModal = function(location, kevDevices) {
             <div class="list-group-item list-group-item-action"
                  style="cursor: pointer;"
                  onclick="window.selectLocationKevDevice('${device.hostname}')"
-                 id="location-kev-item-${device.hostname.replace(/[^a-zA-Z0-9]/g, '-')}">
+                 id="location-kev-item-${device.hostname.replace(/[^a-zA-Z0-9]/g, "-")}">
                 <div class="row align-items-center g-2">
                     <div class="col-auto d-flex align-items-center">
                         <input type="radio" name="selected-location-kev-device"
                                class="form-check-input"
                                value="${device.hostname}"
-                               ${index === 0 ? 'checked' : ''}
+                               ${index === 0 ? "checked" : ""}
                                onclick="event.stopPropagation(); window.selectLocationKevDevice('${device.hostname}');">
                     </div>
                     <div class="col d-flex align-items-center">
@@ -727,7 +1088,7 @@ window.viewSelectedLocationKevDevice = function() {
     logger.info("ui", "Opening device details for:", window.selectedLocationKevDevice);
 
     // Close the location KEV modal
-    const locationKevModal = bootstrap.Modal.getInstance(document.getElementById('locationKevModal'));
+    const locationKevModal = bootstrap.Modal.getInstance(document.getElementById("locationKevModal"));
     if (locationKevModal) {
         locationKevModal.hide();
     }
@@ -735,15 +1096,15 @@ window.viewSelectedLocationKevDevice = function() {
     // Wait for modal to close, then open device details
     setTimeout(() => {
         // Clean up any stray modal backdrops
-        document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
-        document.body.classList.remove('modal-open');
-        document.body.style.overflow = '';
-        document.body.style.paddingRight = '';
+        document.querySelectorAll(".modal-backdrop").forEach(backdrop => backdrop.remove());
+        document.body.classList.remove("modal-open");
+        document.body.style.overflow = "";
+        document.body.style.paddingRight = "";
 
         // Open the device details modal
-        if (window.vulnManager && typeof window.vulnManager.viewDeviceDetails === 'function') {
+        if (window.vulnManager && typeof window.vulnManager.viewDeviceDetails === "function") {
             window.vulnManager.viewDeviceDetails(window.selectedLocationKevDevice);
-        } else if (window.openDeviceModal && typeof window.openDeviceModal === 'function') {
+        } else if (window.openDeviceModal && typeof window.openDeviceModal === "function") {
             window.openDeviceModal(window.selectedLocationKevDevice);
         } else {
             logger.error("ui", "Device modal functions not available");
@@ -759,7 +1120,7 @@ window.returnToLocationKevPicker = function() {
     logger.debug("ui", "Returning to location KEV picker modal");
 
     // Close the KEV details modal
-    const kevDetailsModal = bootstrap.Modal.getInstance(document.getElementById('kevDetailsModal'));
+    const kevDetailsModal = bootstrap.Modal.getInstance(document.getElementById("kevDetailsModal"));
     if (kevDetailsModal) {
         kevDetailsModal.hide();
     }
@@ -767,10 +1128,10 @@ window.returnToLocationKevPicker = function() {
     // Wait for modal to close, then re-open location picker
     setTimeout(() => {
         // Clean up any stray modal backdrops
-        document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
-        document.body.classList.remove('modal-open');
-        document.body.style.overflow = '';
-        document.body.style.paddingRight = '';
+        document.querySelectorAll(".modal-backdrop").forEach(backdrop => backdrop.remove());
+        document.body.classList.remove("modal-open");
+        document.body.style.overflow = "";
+        document.body.style.paddingRight = "";
 
         // Re-open the location KEV picker modal with stored context
         if (window.locationKevPickerContext) {

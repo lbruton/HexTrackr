@@ -136,12 +136,14 @@
    =========================== */
 
 .view-switcher {
-    background: white;
+    background: var(--hextrackr-surface-1);  /* Use CSS variable instead of hardcoded white */
     border-radius: 8px;
     padding: 0.5rem;
     margin-bottom: 1rem;
     display: inline-flex;
     gap: 0.25rem;
+    box-shadow: var(--hextrackr-shadow-sm);
+    border: 1px solid var(--hextrackr-border-subtle);
 }
 
 [data-bs-theme="dark"] .view-switcher {

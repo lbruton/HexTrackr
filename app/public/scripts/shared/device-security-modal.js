@@ -119,17 +119,23 @@ class DeviceSecurityModal {
             </div>
             <div class="mb-3">
                 <div class="row">
-                    <div class="col-sm-4 text-muted">Installed Software:</div>
+                    <div class="col-sm-4 text-muted">Location:</div>
                     <div class="col-sm-8">
-                        <span class="font-monospace text-info">${installedSoftware}</span>
+                        <a href="#" class="location-link text-primary"
+                           onclick="event.preventDefault(); event.stopPropagation(); window.deviceSecurityModal.openLocationModal('${device.hostname}'); return false;">
+                            <i class="fas fa-map-marker-alt me-1"></i>${window.hostnameParserHelper?.extractLocationFromHostname(device.hostname).toUpperCase() || device.hostname.substring(0, 5).toUpperCase()}
+                        </a>
                     </div>
                 </div>
             </div>
             <div class="mb-3">
                 <div class="row">
-                    <div class="col-sm-4 text-muted">Fixed Version(s):</div>
+                    <div class="col-sm-4 text-muted">Risk Level:</div>
                     <div class="col-sm-8">
-                        <span id="deviceFixedVersion" class="font-monospace text-muted">Loading...</span>
+                        ${device.criticalCount > 0 ? "<span class=\"badge bg-red\">Critical Risk</span>" :
+                          device.highCount > 5 ? "<span class=\"badge bg-orange\">High Risk</span>" :
+                          device.mediumCount > 10 ? "<span class=\"badge bg-yellow\">Medium Risk</span>" :
+                          "<span class=\"badge bg-green\">Low Risk</span>"}
                     </div>
                 </div>
             </div>
@@ -151,12 +157,17 @@ class DeviceSecurityModal {
             </div>
             <div class="mb-3">
                 <div class="row">
-                    <div class="col-sm-4 text-muted">Risk Level:</div>
+                    <div class="col-sm-4 text-muted">Installed Software:</div>
                     <div class="col-sm-8">
-                        ${device.criticalCount > 0 ? "<span class=\"badge bg-red\">Critical Risk</span>" :
-                          device.highCount > 5 ? "<span class=\"badge bg-orange\">High Risk</span>" :
-                          device.mediumCount > 10 ? "<span class=\"badge bg-yellow\">Medium Risk</span>" :
-                          "<span class=\"badge bg-green\">Low Risk</span>"}
+                        <span class="font-monospace text-info">${installedSoftware}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="row">
+                    <div class="col-sm-4 text-muted">Fixed Version(s):</div>
+                    <div class="col-sm-8">
+                        <span id="deviceFixedVersion" class="font-monospace text-muted">Loading...</span>
                     </div>
                 </div>
             </div>
@@ -453,6 +464,154 @@ class DeviceSecurityModal {
                 }
             },
             {
+                headerName: "Last Seen",
+                field: "last_seen",
+                colId: "last_seen",
+                width: 120,
+                cellRenderer: (params) => {
+                    const lastSeen = params.data.last_seen;
+                    const scanDate = params.data.scan_date;
+
+                    if (lastSeen && typeof lastSeen === "string" && lastSeen.trim() !== "") {
+                        return new Date(lastSeen).toLocaleDateString();
+                    } else if (scanDate && typeof scanDate === "string" && scanDate.trim() !== "") {
+                        return new Date(scanDate + "T00:00:00").toLocaleDateString();
+                    }
+                    return "N/A";
+                }
+            },
+            {
+                headerName: "VPR",
+                field: "vpr_score",
+                colId: "vpr_score",
+                width: 90,
+                cellRenderer: (params) => {
+                    const score = params.value || 0;
+                    const severity = params.data.severity || "Low";
+                    // HEX-351 Phase 2: Use severity-based colors (matches Location Details Modal and Risk Breakdown)
+                    let color = "#16a34a";  // Green for Low
+                    if (severity.toUpperCase() === "CRITICAL") {
+                        color = "#dc2626";   // Red for Critical
+                    } else if (severity.toUpperCase() === "HIGH") {
+                        color = "#f76707";   // Orange for High
+                    } else if (severity.toUpperCase() === "MEDIUM") {
+                        color = "#d97706";   // Yellow for Medium
+                    }
+                    return `<span style="color: ${color}; font-weight: 700;">${score.toFixed(1)}</span>`;
+                }
+            },
+            {
+                headerName: "CVSS",
+                field: "cvss_score",
+                colId: "cvss_score",
+                width: 90,
+                cellRenderer: (params) => {
+                    const cvss = parseFloat(params.value) || 0;
+                    // HEX-352: CVSS score with severity-based colors
+                    let color = "#16a34a";  // Green for Low (0-3.9)
+                    if (cvss >= 9.0) {
+                        color = "#dc2626";   // Red for Critical (9-10)
+                    } else if (cvss >= 7.0) {
+                        color = "#f76707";   // Orange for High (7-8.9)
+                    } else if (cvss >= 4.0) {
+                        color = "#d97706";   // Yellow for Medium (4-6.9)
+                    }
+                    // Show "N/A" if CVSS is 0 (not available)
+                    if (cvss === 0) {
+                        return "<span class=\"text-muted\">N/A</span>";
+                    }
+                    return `<span style="color: ${color}; font-weight: 700;">${cvss.toFixed(1)}</span>`;
+                }
+            },
+            {
+                headerName: "Severity",
+                field: "severity",
+                colId: "severity",
+                width: 110,
+                comparator: (valueA, valueB) => {
+                    // Custom sort: Critical > High > Medium > Low
+                    const severityOrder = { "Critical": 4, "High": 3, "Medium": 2, "Low": 1 };
+                    const orderA = severityOrder[valueA] || 0;
+                    const orderB = severityOrder[valueB] || 0;
+                    return orderB - orderA; // Descending order (highest first)
+                },
+                cellRenderer: (params) => {
+                    const severity = params.value || "Low";
+                    // Colored text based on severity - inline styles for AG-Grid override
+                    let color = "#16a34a";  // Green for Low
+                    if (severity.toUpperCase() === "CRITICAL") {
+                        color = "#dc2626";   // Red for Critical
+                    } else if (severity.toUpperCase() === "HIGH") {
+                        color = "#f76707";   // Orange for High
+                    } else if (severity.toUpperCase() === "MEDIUM") {
+                        color = "#d97706";   // Yellow for Medium
+                    }
+                    return `<span style="color: ${color}; font-weight: 700; text-transform: uppercase;">${severity}</span>`;
+                }
+            },
+            {
+                headerName: "KEV",
+                field: "isKev",
+                colId: "isKev",
+                width: 70,
+                cellRenderer: (params) => {
+                    const isKev = params.value === "Yes";
+                    // HEX-351 Phase 2: KEV column matches Location Details Modal pattern
+                    if (isKev) {
+                        return "<span style=\"color: #dc2626 !important; font-weight: 700;\">Yes</span>";
+                    }
+                    return "<span class=\"text-muted\">No</span>";
+                }
+            },
+            {
+                headerName: "Vulnerability",
+                field: "cve",
+                colId: "cve",
+                width: 140,
+                cellRenderer: (params) => {
+                    const cve = params.value;
+                    const pluginName = params.data.plugin_name;
+                    const isKev = params.data.isKev === "Yes";
+
+                    // HEX-351 Phase 2: Remove KEV-based coloring, use consistent link style
+                    // KEV status is now shown in dedicated KEV column
+                    const linkColor = "#3b82f6"; // Blue for all CVE links
+                    const kevTitle = isKev ? "Known Exploited Vulnerability - " : "";
+
+                    // Create unique ID for vulnerability modal data storage
+                    const vulnDataId = `device_vuln_${params.data.hostname}_${cve || params.data.plugin_id}_${Date.now()}`;
+                    if (!window.vulnModalData) {
+                        window.vulnModalData = {};
+                    }
+                    window.vulnModalData[vulnDataId] = params.data;
+
+                    // Single CVE handling - open vulnerability details modal
+                    if (cve && cve.startsWith("CVE-")) {
+                        return `<a href="#" style="color: ${linkColor} !important; text-decoration: none;"
+                                   onclick="vulnManager.viewVulnerabilityDetails('${vulnDataId}'); return false;"
+                                   title="${kevTitle}View vulnerability details">${cve}</a>`;
+                    }
+
+                    // Check for Cisco SA ID in plugin name - open vulnerability details modal
+                    if (pluginName && typeof pluginName === "string") {
+                        const ciscoSaMatch = pluginName.match(/cisco-sa-([a-zA-Z0-9-]+)/i);
+                        if (ciscoSaMatch) {
+                            const ciscoId = `cisco-sa-${ciscoSaMatch[1]}`;
+                            return `<a href="#" style="color: ${linkColor} !important; text-decoration: none;"
+                                       onclick="vulnManager.viewVulnerabilityDetails('${vulnDataId}'); return false;"
+                                       title="${kevTitle}View vulnerability details">${ciscoId}</a>`;
+                        }
+                    }
+
+                    // Fall back to Plugin ID (muted gray text, not clickable - same as main table)
+                    if (params.data.plugin_id) {
+                        return `<span style="color: #6b7280 !important;">Plugin ${params.data.plugin_id}</span>`;
+                    }
+
+                    return "-";
+                }
+            },
+            {
                 headerName: "Fixed Version",
                 field: "fixed_version",
                 colId: "fixed_version",
@@ -503,138 +662,6 @@ class DeviceSecurityModal {
                     }, 0);
 
                     return `<span id="${cellId}" class="font-monospace text-muted">Loading...</span>`;
-                }
-            },
-            {
-                headerName: "Vulnerability",
-                field: "cve",
-                colId: "cve",
-                width: 140,
-                cellRenderer: (params) => {
-                    const cve = params.value;
-                    const pluginName = params.data.plugin_name;
-                    const isKev = params.data.isKev === "Yes";
-
-                    // KEV indicator with inline styles to override AG-Grid defaults
-                    // Must use inline styles because AG-Grid applies its own styling that overrides Bootstrap classes
-                    const linkColor = isKev ? "#dc3545" : "#3b82f6"; // Red for KEV, blue for normal
-                    const fontWeight = isKev ? "700" : "400";
-                    const kevTitle = isKev ? "Known Exploited Vulnerability - " : "";
-
-                    // Create unique ID for vulnerability modal data storage
-                    const vulnDataId = `device_vuln_${params.data.hostname}_${cve || params.data.plugin_id}_${Date.now()}`;
-                    if (!window.vulnModalData) {
-                        window.vulnModalData = {};
-                    }
-                    window.vulnModalData[vulnDataId] = params.data;
-
-                    // Single CVE handling - open vulnerability details modal
-                    if (cve && cve.startsWith("CVE-")) {
-                        return `<a href="#" style="color: ${linkColor} !important; font-weight: ${fontWeight} !important; text-decoration: none;"
-                                   onclick="vulnManager.viewVulnerabilityDetails('${vulnDataId}'); return false;"
-                                   title="${kevTitle}View vulnerability details">${cve}</a>`;
-                    }
-
-                    // Check for Cisco SA ID in plugin name - open vulnerability details modal
-                    if (pluginName && typeof pluginName === "string") {
-                        const ciscoSaMatch = pluginName.match(/cisco-sa-([a-zA-Z0-9-]+)/i);
-                        if (ciscoSaMatch) {
-                            const ciscoId = `cisco-sa-${ciscoSaMatch[1]}`;
-                            return `<a href="#" style="color: ${linkColor} !important; font-weight: ${fontWeight} !important; text-decoration: none;"
-                                       onclick="vulnManager.viewVulnerabilityDetails('${vulnDataId}'); return false;"
-                                       title="${kevTitle}View vulnerability details">${ciscoId}</a>`;
-                        }
-                    }
-
-                    // Fall back to Plugin ID (muted gray text, not clickable - same as main table)
-                    if (params.data.plugin_id) {
-                        return `<span style="color: #6b7280 !important;">Plugin ${params.data.plugin_id}</span>`;
-                    }
-
-                    return "-";
-                }
-            },
-            {
-                headerName: "VPR",
-                field: "vpr_score",
-                colId: "vpr_score",
-                width: 90,
-                cellRenderer: (params) => {
-                    const score = params.value || 0;
-                    // Colored text based on score - inline styles for AG-Grid override
-                    let color = "#16a34a";  // Green for low (0-3.9)
-                    if (score >= 9.0) {
-                        color = "#dc2626";   // Red for critical (9-10)
-                    } else if (score >= 7.0) {
-                        color = "#f76707";   // Orange for high (7-8.9)
-                    } else if (score >= 4.0) {
-                        color = "#d97706";   // Yellow for medium (4-6.9)
-                    }
-                    return `<span style="color: ${color}; font-weight: 700;">${score.toFixed(1)}</span>`;
-                }
-            },
-            {
-                headerName: "Severity",
-                field: "severity",
-                colId: "severity",
-                width: 110,
-                comparator: (valueA, valueB) => {
-                    // Custom sort: Critical > High > Medium > Low
-                    const severityOrder = { "Critical": 4, "High": 3, "Medium": 2, "Low": 1 };
-                    const orderA = severityOrder[valueA] || 0;
-                    const orderB = severityOrder[valueB] || 0;
-                    return orderB - orderA; // Descending order (highest first)
-                },
-                cellRenderer: (params) => {
-                    const severity = params.value || "Low";
-                    // Colored text based on severity - inline styles for AG-Grid override
-                    let color = "#16a34a";  // Green for Low
-                    if (severity.toUpperCase() === "CRITICAL") {
-                        color = "#dc2626";   // Red for Critical
-                    } else if (severity.toUpperCase() === "HIGH") {
-                        color = "#f76707";   // Orange for High
-                    } else if (severity.toUpperCase() === "MEDIUM") {
-                        color = "#d97706";   // Yellow for Medium
-                    }
-                    return `<span style="color: ${color}; font-weight: 700; text-transform: uppercase;">${severity}</span>`;
-                }
-            },
-            {
-                headerName: "Info",
-                field: "info_icon",
-                colId: "info_icon",
-                width: 60,
-                minWidth: 50,
-                maxWidth: 80,
-                sortable: false,
-                filter: false,
-                resizable: false,
-                suppressHeaderMenuButton: true,
-                cellStyle: {
-                    textAlign: "center"
-                },
-                cellRenderer: (params) => {
-                    const cve = params.data.cve;
-                    const pluginName = params.data.plugin_name || "Vulnerability details";
-
-                    // If CVE exists, open external CVE.org link in popup
-                    if (cve && cve.startsWith("CVE-")) {
-                        const cveUrl = `https://cve.mitre.org/cgi-bin/cvename.cgi?name=${cve}`;
-                        return `<a href="#" class="text-primary" title="View ${cve} on CVE.org" onclick="window.open('${cveUrl}', 'cve_popup', 'width=1200,height=1200,scrollbars=yes,resizable=yes'); return false;">
-                            <i class="fas fa-external-link-alt"></i>
-                        </a>`;
-                    }
-
-                    // If Cisco SA ID, open external Cisco Security Advisory in popup
-                    if (cve && cve.startsWith("cisco-sa-")) {
-                        const ciscoUrl = `https://sec.cloudapps.cisco.com/security/center/content/CiscoSecurityAdvisory/${cve}`;
-                        return `<a href="#" class="text-warning" title="View ${cve} on Cisco Security" onclick="window.open('${ciscoUrl}', 'cisco_popup', 'width=1200,height=1200,scrollbars=yes,resizable=yes'); return false;">
-                            <i class="fas fa-external-link-alt"></i>
-                        </a>`;
-                    }
-
-                    // For non-CVE/non-Cisco entries, show disabled info icon
-                    return "<i class=\"fas fa-info-circle text-muted\" title=\"No external reference available\"></i>";
                 }
             }
         ];
@@ -993,34 +1020,16 @@ class DeviceSecurityModal {
     }
 
     /**
-     * Get button configuration based on ticket state (HEX-203)
+     * Get button configuration based on ticket state (HEX-203, HEX-347)
+     * Simplified 3-color system: Green = No tickets | Orange = Has tickets | Red = Has overdue
      * @param {number} count - Number of tickets
      * @param {string} status - Ticket status
-     * @param {string} jobType - Job type
+     * @param {string} jobType - Job type (kept for compatibility but not used for colors)
      * @returns {Object} Button configuration
      */
     getButtonConfig(count, status, jobType) {
-        // Status to Bootstrap color mapping (matches tickets.css actual statuses)
-        const statusColors = {
-            "Pending": "warning",      // Amber yellow
-            "Staged": "info",          // Purple (using info as closest Bootstrap match)
-            "Open": "primary",         // Blue
-            "Overdue": "danger",       // Red
-            "Completed": "success",    // Green
-            "Failed": "danger",        // Orange-red
-            "Closed": "secondary"      // Gray
-        };
-
-        // Job type to status-label class mapping (for text color)
-        const jobTypeTextColors = {
-            "Upgrade": "status-open",      // Blue
-            "Replace": "status-overdue",   // Orange/red
-            "Refresh": "status-pending",   // Purple
-            "Mitigate": "status-failed",   // Red
-            "Other": "status-generic"      // Gray
-        };
-
         if (count === 0) {
+            // GREEN: No tickets
             return {
                 text: "Create Ticket",
                 colorClass: "btn-outline-success",
@@ -1028,22 +1037,22 @@ class DeviceSecurityModal {
                 textColorClass: ""
             };
         } else if (count === 1) {
-            const colorClass = `btn-outline-${statusColors[status] || "primary"}`;
-            const textColorClass = jobType ? `status-label ${jobTypeTextColors[jobType] || "status-generic"}` : "";
+            // Single ticket: ORANGE or RED based on overdue status
+            const isOverdue = status === "Overdue";
             return {
                 text: "View Ticket",
-                colorClass: colorClass,
+                colorClass: isOverdue ? "btn-outline-danger" : "btn-outline-warning",
                 icon: "fas fa-folder-open",
-                textColorClass: textColorClass
+                textColorClass: ""
             };
         } else {
-            const colorClass = `btn-outline-${statusColors[status] || "primary"}`;
-            const textColorClass = jobType ? `status-label ${jobTypeTextColors[jobType] || "status-generic"}` : "";
+            // Multiple tickets: ORANGE or RED (backend sets status to "Overdue" if any ticket is overdue)
+            const isOverdue = status === "Overdue";
             return {
                 text: `View Tickets (${count})`,
-                colorClass: colorClass,
+                colorClass: isOverdue ? "btn-outline-danger" : "btn-outline-warning",
                 icon: "fas fa-layer-group",
-                textColorClass: textColorClass
+                textColorClass: ""
             };
         }
     }
@@ -1054,7 +1063,7 @@ class DeviceSecurityModal {
      * @param {MouseEvent} event - Click event with keyboard modifiers
      * @param {HTMLButtonElement} button - Button element with data attributes
      */
-    handleCreateTicketClick(event, button) {
+    async handleCreateTicketClick(event, button) {
         event.stopPropagation();
 
         // Read data from button attributes
@@ -1078,9 +1087,25 @@ class DeviceSecurityModal {
 
         // Original behavior: Create new ticket (ticketCount === 0)
 
-        // Parse hostname to extract SITE and Location (ALL CAPS)
-        const site = hostname.substring(0, 4).toUpperCase();
-        const location = hostname.substring(0, 5).toUpperCase();
+        // HEX-350: Parse hostname using HostnameParserService API
+        // No fallback - internal API must work for app to function
+        let location = "";
+        let site = ""; // Blank unless found in tickets database
+
+        // Parse hostname via API
+        const parseResponse = await fetch(`/api/hostname/parse/${encodeURIComponent(hostname)}`);
+        const parseData = await parseResponse.json();
+        if (parseData.success && parseData.data) {
+            location = parseData.data.location.toUpperCase();
+
+            // Query tickets database for existing site (pre-fill if found)
+            const siteResponse = await fetch(`/api/tickets/site-by-location/${encodeURIComponent(location)}`);
+            const siteData = await siteResponse.json();
+            if (siteData.success && siteData.site) {
+                site = siteData.site.toUpperCase();
+            }
+            // If site not found, stays blank - user enters from Hexagon
+        }
 
         // Detect keyboard modifiers to determine mode
         let mode = "single";
@@ -1295,6 +1320,62 @@ class DeviceSecurityModal {
      */
     setupReportWindowControls(reportWindow) {
         logger.warn("[Device Modal] setupReportWindowControls() has been deprecated");
+    }
+
+    /**
+     * Open location details modal for a given hostname
+     * HEX-351: Added to support location links in Device Security Modal
+     * Uses shared hostname-parser-helper.js for location extraction
+     * @param {string} hostname - Full device hostname (e.g., "stroudnswan01")
+     */
+    async openLocationModal(hostname) {
+        try {
+            // Extract location from hostname using shared helper
+            const locationCode = window.hostnameParserHelper?.extractLocationFromHostname(hostname) ||
+                                hostname.substring(0, 5).toLowerCase();
+
+            // Fetch location data from API
+            const response = await fetch("/api/locations/stats");
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            const result = await response.json();
+            if (!result.success || !result.data) {
+                throw new Error(result.error || "Failed to fetch location data");
+            }
+
+            // Find matching location (case-insensitive)
+            const normalizedCode = locationCode.toLowerCase();
+            const locationData = result.data.find(loc =>
+                (loc.location || "").toLowerCase() === normalizedCode ||
+                (loc.location_display || "").toLowerCase() === normalizedCode
+            );
+
+            if (!locationData) {
+                logger.warn(`[Device Modal] Location not found: ${locationCode}`);
+                this.showToast(`Location "${locationCode.toUpperCase()}" not found`, "warning");
+                return;
+            }
+
+            // HEX-351 Phase 2: Close Device Modal before opening Location Modal (prevents stacking)
+            const deviceModalElement = document.getElementById("deviceModal");
+            const deviceModalInstance = bootstrap.Modal.getInstance(deviceModalElement);
+            if (deviceModalInstance) {
+                deviceModalInstance.hide();
+            }
+
+            // Open Location Details Modal
+            if (window.locationDetailsModal && typeof window.locationDetailsModal.showLocationDetails === "function") {
+                window.locationDetailsModal.showLocationDetails(locationData, this.dataManager);
+            } else {
+                logger.error("[Device Modal] locationDetailsModal not available");
+            }
+
+        } catch (error) {
+            logger.error("[Device Modal] Failed to open location modal:", error);
+            this.showToast("Failed to load location details", "error");
+        }
     }
 
     /**

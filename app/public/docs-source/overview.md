@@ -4,7 +4,6 @@ Welcome to the HexTrackr documentation portal. This comprehensive guide covers e
 
 ## 📚 Navigation
 
-- **[Getting Started](guides/getting-started.md)**: New to HexTrackr? Start here.
 - **[User Guides](guides/user-guide.md)**: Detailed instructions for using application features.
 - **[Architecture](architecture/index.md)**: A deep dive into the system's architecture.
 - **[API Reference](api-reference/index.md)**: Complete reference for the HexTrackr REST API.

@@ -1,5 +1,5 @@
 {
-  "generated": "2025-10-24T02:04:30.723Z",
+  "generated": "2025-11-04T21:13:28.954Z",
   "sections": {
     "api-reference": {
       "title": "Api Reference",
@@ -70,6 +70,41 @@
       "icon": "fas fa-list",
       "indexFile": "changelog/index",
       "children": {
+        "1.1.12": {
+          "file": "changelog/versions/1.1.12",
+          "title": "1.1.12",
+          "path": "changelog/versions/1.1.12.html"
+        },
+        "1.1.11": {
+          "file": "changelog/versions/1.1.11",
+          "title": "1.1.11",
+          "path": "changelog/versions/1.1.11.html"
+        },
+        "1.1.10": {
+          "file": "changelog/versions/1.1.10",
+          "title": "1.1.10",
+          "path": "changelog/versions/1.1.10.html"
+        },
+        "1.1.9": {
+          "file": "changelog/versions/1.1.9",
+          "title": "1.1.9",
+          "path": "changelog/versions/1.1.9.html"
+        },
+        "1.1.8": {
+          "file": "changelog/versions/1.1.8",
+          "title": "1.1.8",
+          "path": "changelog/versions/1.1.8.html"
+        },
+        "1.1.7": {
+          "file": "changelog/versions/1.1.7",
+          "title": "1.1.7",
+          "path": "changelog/versions/1.1.7.html"
+        },
+        "1.1.6": {
+          "file": "changelog/versions/1.1.6",
+          "title": "1.1.6",
+          "path": "changelog/versions/1.1.6.html"
+        },
         "1.1.5": {
           "file": "changelog/versions/1.1.5",
           "title": "1.1.5",
@@ -84,7 +119,9 @@
           "file": "changelog/versions/1.1.3",
           "title": "1.1.3",
           "path": "changelog/versions/1.1.3.html"
-        },
+        }
+      },
+      "archivedVersions": {
         "1.1.2": {
           "file": "changelog/versions/1.1.2",
           "title": "1.1.2",
@@ -119,9 +156,7 @@
           "file": "changelog/versions/1.0.98",
           "title": "1.0.98",
           "path": "changelog/versions/1.0.98.html"
-        }
-      },
-      "archivedVersions": {
+        },
         "1.0.97": {
           "file": "changelog/versions/1.0.97",
           "title": "1.0.97",
@@ -658,5 +693,5 @@
       "path": "overview.html"
     }
   },
-  "totalFiles": 129
+  "totalFiles": 136
 }

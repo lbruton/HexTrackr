@@ -83,10 +83,10 @@ export class VulnerabilityCoreOrchestrator {
 **Key Methods**:
 
 ```javascript
-async fetchVulnerabilities(params)
-async fetchStatistics()
-async importCSV(file, options)
-clearCache()
+async loadData(bustCache, options)      // Load vulnerability data from API
+async loadStatistics(bustCache)         // Load statistics
+async refreshData(bustCache)            // Refresh all data
+clearCache()                            // Clear cached data
 ```
 
 ### 2. VulnerabilityStatisticsManager
@@ -309,7 +309,7 @@ export class ModernVulnManager {
 
     async initializeModules() {
         // Delegate to orchestrator
-        this.coreOrchestrator = new VulnerabilityCoreOrchestrator();
+        this.coreOrchestrator = new window.VulnerabilityCoreOrchestrator();
         await this.coreOrchestrator.initializeAllModules(this);
 
         // Get module references for delegation
@@ -465,7 +465,9 @@ async handleModuleError(moduleName, error) {
 ### Development Tools
 
 - **ES6 Modules**: Native module system
-- **Hot Reloading**: Development server support
+- **Docker Deployment**: Containerized development environment
+  - Frontend changes: Browser refresh (static files served from volume mount)
+  - Backend changes: `docker-compose restart hextrackr`
 - **Source Maps**: Debugging support
 - **Code Splitting**: Optimized loading
 

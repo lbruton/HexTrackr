@@ -1014,19 +1014,101 @@ function finalizeBatchProcessing(importId, currentDate, batchStats, responseData
                     _log("info", ` - Resolved: ${resolvedCount}`);
                     _log("info", ` - Errors: ${batchStats.errors}`);
 
-                    // Audit: Import completed successfully
-                    _audit("import.complete", "Batch CSV import operation completed successfully", {
-                        importId,
-                        sessionId,
-                        scanDate: currentDate,
-                        processedRows: batchStats.processedRows,
-                        insertedToCurrent: batchStats.insertedToCurrent,
-                        updatedInCurrent: batchStats.updatedInCurrent,
-                        insertedToSnapshots: batchStats.insertedToSnapshots,
-                        resolvedCount,
-                        totalProcessingTime: totalImportTime,
-                        rowsPerSecond: parseFloat((batchStats.processedRows / (totalImportTime / 1000)).toFixed(1))
-                    });
+                    // Query for distinct vendors in this import for better audit trail
+                    db.all(
+                        "SELECT DISTINCT vendor FROM vulnerabilities_current WHERE scan_date = ? AND vendor IS NOT NULL ORDER BY vendor",
+                        [currentDate],
+                        (vendorErr, vendorRows) => {
+                            if (vendorErr) {
+                                _log("warn", "Could not query vendors for audit trail:", vendorErr);
+                            }
+
+                            // Build vendor list (fallback to filename-detected vendor if query fails)
+                            const vendorList = vendorRows && vendorRows.length > 0
+                                ? vendorRows.map(row => row.vendor).filter(v => v)
+                                : [responseData.vendor].filter(v => v);
+
+                            const vendorSummary = vendorList.length > 0
+                                ? vendorList.join(", ")
+                                : responseData.vendor || "unknown";
+
+                            _log("info", ` - Vendors in import: ${vendorSummary}`);
+
+                    // Generate import summary BEFORE audit call to include diff data
+                    generateImportSummary(currentDate, responseData, finalStats)
+                        .then(summary => {
+                            // Enhanced audit: Import completed with comprehensive diff
+                            const auditData = {
+                                importId,
+                                sessionId,
+                                scanDate: currentDate,
+                                userId: responseData.userId || null, // Include user who uploaded CSV
+                                username: responseData.username || null, // Include username for display
+                                filename: responseData.filename,
+                                vendor: vendorSummary, // All vendors found in import (comma-separated)
+                                vendorList: vendorList, // Array of vendors for programmatic access
+
+                                // Processing stats
+                                processedRows: batchStats.processedRows,
+                                insertedToCurrent: batchStats.insertedToCurrent,
+                                updatedInCurrent: batchStats.updatedInCurrent,
+                                insertedToSnapshots: batchStats.insertedToSnapshots,
+                                resolvedCount,
+                                totalProcessingTime: totalImportTime,
+                                rowsPerSecond: parseFloat((batchStats.processedRows / (totalImportTime / 1000)).toFixed(1)),
+
+                                // Diff summary (condensed from generateImportSummary)
+                                diff: {
+                                    newCves: {
+                                        count: summary.cveDiscovery.totalNewCves,
+                                        totalVulnerabilities: summary.cveDiscovery.totalNewVulnerabilities,
+                                        totalVpr: summary.cveDiscovery.totalNewVpr,
+                                        topCritical: summary.cveDiscovery.newCves
+                                            .filter(c => c.severity === "Critical")
+                                            .slice(0, 5)
+                                            .map(c => ({cve: c.cve, hosts: c.hostCount}))
+                                    },
+                                    resolvedCves: {
+                                        count: summary.cveDiscovery.totalResolvedCves,
+                                        totalVulnerabilities: summary.cveDiscovery.totalResolvedVulnerabilities,
+                                        totalVpr: summary.cveDiscovery.totalResolvedVpr,
+                                        topCritical: summary.cveDiscovery.resolvedCves
+                                            .filter(c => c.severity === "Critical")
+                                            .slice(0, 5)
+                                            .map(c => ({cve: c.cve, hosts: c.hostCount}))
+                                    },
+                                    severityChanges: {
+                                        critical: summary.severityImpact.critical.netChange,
+                                        high: summary.severityImpact.high.netChange,
+                                        medium: summary.severityImpact.medium.netChange,
+                                        low: summary.severityImpact.low.netChange
+                                    },
+                                    netChange: summary.comparison.netChange,
+                                    percentageChange: summary.comparison.percentageChange,
+                                    significantChange: summary.comparison.significantChange
+                                }
+                            };
+
+                            _audit("import.complete", "Batch CSV import operation completed successfully", auditData);
+                            _log("info", "Enhanced audit log created with diff summary");
+                        })
+                        .catch(summaryErr => {
+                            // Fallback to basic audit if summary generation fails
+                            _log("error", "Error generating summary for audit, using basic audit:", summaryErr);
+                            _audit("import.complete", "Batch CSV import operation completed successfully", {
+                                importId,
+                                sessionId,
+                                scanDate: currentDate,
+                                userId: responseData.userId || null,
+                                processedRows: batchStats.processedRows,
+                                insertedToCurrent: batchStats.insertedToCurrent,
+                                updatedInCurrent: batchStats.updatedInCurrent,
+                                insertedToSnapshots: batchStats.insertedToSnapshots,
+                                resolvedCount,
+                                totalProcessingTime: totalImportTime,
+                                rowsPerSecond: parseFloat((batchStats.processedRows / (totalImportTime / 1000)).toFixed(1))
+                            });
+                        });
 
                     // Clear all caches after successful import
                     cacheService.clearAll();
@@ -1066,6 +1148,7 @@ function finalizeBatchProcessing(importId, currentDate, batchStats, responseData
                     } else {
                         _log("warn", ` No progressTracker available for session ${sessionId}, cannot send completion event`);
                     }
+                        }); // Close vendor query callback
                 });
             });
         });
@@ -1441,6 +1524,7 @@ async function importCSV(filepath, filename, vendor, scanDate, _options = {}) {
  */
 async function importCsvStaging(filepath, filename, vendor, scanDate, sessionId, progressTracker, _options = {}) {
     const startTime = Date.now();
+    const { userId = null, username = null } = _options; // Extract userId and username from options
 
     try {
         // Read and parse CSV
@@ -1475,7 +1559,8 @@ async function importCsvStaging(filepath, filename, vendor, scanDate, sessionId,
             scanDate: extractedDate,
             rowCount: rows.length,
             fileSize,
-            stagingMode: true
+            stagingMode: true,
+            userId: userId // ADD: Include userId in audit trail
         });
 
         // Update progress
@@ -1493,7 +1578,9 @@ async function importCsvStaging(filepath, filename, vendor, scanDate, sessionId,
             filename,
             vendor: extractedVendor,
             scanDate: extractedDate,
-            stagingMode: true
+            stagingMode: true,
+            userId: userId, // ADD: Include userId for propagation to final audit
+            username: username // ADD: Include username for better audit display
         };
 
         const result = await bulkLoadToStagingTable(
@@ -1812,6 +1899,37 @@ function cleanupOldSnapshots(retainCount = 3) {
     );
 }
 
+/**
+ * Wrapper function for staging import with options object pattern
+ * Used by importController to maintain clean API
+ */
+async function processStagingImport(options) {
+    const {
+        filePath,
+        filename,
+        vendor,
+        scanDate,
+        sessionId,
+        startTime,
+        progressTracker,
+        userId = null,
+        username = null
+    } = options;
+
+    // Add userId and username to response data for audit trail
+    const result = await importCsvStaging(
+        filePath,
+        filename,
+        vendor,
+        scanDate,
+        sessionId,
+        progressTracker,
+        { userId, username } // Pass userId and username as options
+    );
+
+    return result;
+}
+
 // Export the service functions
 module.exports = {
     extractDateFromFilename,
@@ -1819,6 +1937,7 @@ module.exports = {
     extractVendorFromFilename,
     importCSV,
     importCsvStaging,
+    processStagingImport,
     processVulnerabilitiesWithLifecycle,
     bulkLoadToStagingTable,
     processStagingToFinalTables,

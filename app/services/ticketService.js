@@ -763,6 +763,53 @@ class TicketService {
     }
 
     /**
+     * Get all tickets for devices at a specific location
+     * HEX-344: Location cards multi-ticket modal support
+     * Fetches full ticket objects (including xt_number) for all devices at a location
+     * Uses LIKE query to match location prefix (e.g., "WTULSA%" matches WTULSA-RTR-01, WTULSA-SW-02)
+     * @param {string} locationPrefix - Location prefix to match (e.g., "WTULSA", "LAXB1")
+     * @returns {Promise<Array>} List of tickets at location, sorted by creation date (newest first)
+     * @example
+     * // Returns: [{id, xt_number, job_type, created_at, status, devices: [...]}]
+     */
+    async getTicketsByLocation(locationPrefix) {
+        return new Promise((resolve, reject) => {
+            // Use LIKE with % wildcard to match location prefix
+            // DISTINCT ensures we don't get duplicate tickets when multiple devices from same location are on one ticket
+            const query = `
+                SELECT DISTINCT t.*
+                FROM tickets t, json_each(t.devices) AS device
+                WHERE lower(device.value) LIKE lower(?)
+                  AND t.deleted = 0
+                  AND t.status NOT IN ('Completed', 'Cancelled')
+                ORDER BY t.created_at DESC
+            `;
+
+            // Add % wildcard to match any device starting with location prefix
+            const searchPattern = `${locationPrefix}%`;
+
+            this.db.all(query, [searchPattern], (err, rows) => {
+                if (err) {
+                    return reject(new Error(`Failed to fetch tickets for location ${locationPrefix}: ${err.message}`));
+                }
+
+                // Parse devices JSON for each ticket
+                const tickets = rows.map(row => {
+                    try {
+                        row.devices = JSON.parse(row.devices);
+                    } catch (parseError) {
+                        _log("error", `Failed to parse devices for ticket ${row.id}:`, parseError);
+                        row.devices = [];
+                    }
+                    return row;
+                });
+
+                resolve(tickets);
+            });
+        });
+    }
+
+    /**
      * Get ticket summary for multiple devices in a single query (batch lookup)
      * HEX-216: Performance optimization to replace N+1 HTTP requests
      * @param {Array<string>} hostnames - Array of device hostnames
@@ -869,14 +916,26 @@ class TicketService {
 
                     // Add ticket details (status, job type, IDs) for each device
                     // Group by hostname and collect all ticket IDs
+                    // HEX-347: Simplified 3-color button logic
+                    //   - Green: No tickets (handled elsewhere)
+                    //   - Orange: Has tickets, none overdue
+                    //   - Red: Has at least one overdue ticket
                     const ticketMap = {};
                     detailRows.forEach(row => {
                         if (!ticketMap[row.hostname]) {
+                            // First ticket for this device
                             ticketMap[row.hostname] = {
                                 status: row.status,
                                 jobType: row.job_type,
-                                tickets: []
+                                tickets: [],
+                                hasOverdue: row.status === "Overdue"
                             };
+                        } else {
+                            // Multiple tickets - check if ANY are overdue
+                            if (row.status === "Overdue") {
+                                ticketMap[row.hostname].status = "Overdue";
+                                ticketMap[row.hostname].hasOverdue = true;
+                            }
                         }
                         ticketMap[row.hostname].tickets.push(row.id);
                     });
@@ -920,6 +979,41 @@ class TicketService {
                     return reject(new Error("Failed to fetch address suggestions: " + err.message));
                 }
                 resolve(row || null);
+            });
+        });
+    }
+
+    /**
+     * Get site code by location from existing tickets
+     * HEX-350: Intelligent site field population based on existing tickets database
+     * Queries tickets table for most recent site associated with a location
+     * Used for auto-populating site field when creating tickets from vulnerabilities
+     * @param {string} location - Location code (e.g., "NSWAN", "WTULSA")
+     * @returns {Promise<string|null>} Site code (e.g., "TULS") or null if no match found
+     * @example
+     * const site = await getSiteByLocation("WTULSA");
+     * // Returns: "TULS" (from existing tickets) or null (new location)
+     */
+    async getSiteByLocation(location) {
+        return new Promise((resolve, reject) => {
+            // Query for most recent ticket with this location
+            // Use LOWER() for case-insensitive matching
+            // Filter by deleted=0 to only use active tickets
+            const sql = `SELECT site
+                FROM tickets
+                WHERE LOWER(location) = LOWER(?)
+                  AND deleted = 0
+                  AND site IS NOT NULL
+                  AND site != ''
+                ORDER BY created_at DESC
+                LIMIT 1`;
+
+            this.db.get(sql, [location], (err, row) => {
+                if (err) {
+                    return reject(new Error(`Failed to fetch site for location ${location}: ${err.message}`));
+                }
+                // Return site or null if no match found
+                resolve(row ? row.site : null);
             });
         });
     }

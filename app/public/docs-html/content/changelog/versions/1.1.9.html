@@ -1,0 +1,171 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <hr>
+<h2>title: "Version 1.1.9 - UI/UX Refinements (Team Presentation Feedback Phase 1)"
+date: "2025-10-28"
+version: "1.1.9"
+status: "Released"
+category: "Update"</h2><h1>Version 1.1.9 - UI/UX Refinements (Team Presentation Feedback Phase 1)</h1><p><strong>Release Status</strong>: ✅ Released<br><strong>Release Date</strong>: 2025-10-28<br><strong>Parent Issues</strong>: <a href="https://linear.app/hextrackr/issue/HEX-351">HEX-351</a></p>
+<h2>Overview</h2><p>Implemented Phase 1 of UI/UX refinements based on team presentation feedback from October 28, 2025. Added enhanced sort options for Devices and Locations views, cleaned up redundant Cisco advisory descriptions, created shared hostname parsing utilities for location extraction, and added clickable location links in Device Security Modal with proper AG-Grid async cell rendering.</p>
+<hr>
+<h2>[1.1.9]</h2><h3>Added</h3><h4>Enhanced Sort Options (HEX-351) - 2025-10-28</h4><p><strong>Description</strong>: Added &quot;Vulnerability Count&quot; sort option to Devices view and &quot;Tickets Priority&quot; sort option to Locations view based on team presentation feedback.</p>
+<p><strong>Key Features</strong>:</p>
+<ul>
+<li><strong>Devices View</strong>: New &quot;Vulnerability Count&quot; sort option (vulnerability count → VPR → alphabetical)</li>
+<li><strong>Locations View</strong>: New &quot;Tickets Priority&quot; sort option (open tickets count, high to low)</li>
+<li>Integrated seamlessly with existing PaginationController dropdown pattern</li>
+</ul>
+<p><strong>Technical Implementation</strong>:</p>
+<ul>
+<li>Added sort case in <code>vulnerability-cards.js:477-495</code> for vulnerability count sorting</li>
+<li>Added sort case in <code>location-cards.js:271-276</code> for tickets priority sorting</li>
+<li>Extended dropdown options arrays with new sort choices</li>
+<li>Maintained consistent sort behavior with existing patterns</li>
+</ul>
+<p><strong>Use Case</strong>: Network admins can now quickly identify devices with the most vulnerabilities and locations with the highest ticket workload, improving prioritization during team meetings and planning sessions.</p>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/vulnerability-cards.js</code>: Added vulnerability count sort logic and dropdown option</li>
+<li><code>app/public/scripts/shared/location-cards.js</code>: Added tickets priority sort logic and dropdown option</li>
+</ul>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li>✅ Sort options appear in dropdowns correctly</li>
+<li>✅ Vulnerability Count sort orders devices as expected (count → VPR → alphabetical)</li>
+<li>✅ Tickets Priority sort orders locations as expected (high to low ticket count)</li>
+<li>✅ No console errors or warnings</li>
+<li>✅ Dark/light theme compatibility verified</li>
+</ul>
+<p><strong>Issues</strong>:</p>
+<ul>
+<li><a href="https://linear.app/hextrackr/issue/HEX-351">HEX-351</a> - UI/UX Refinements (Team Presentation Feedback)</li>
+</ul>
+<hr>
+<h4>Hostname Parser Helper Utility (HEX-351) - 2025-10-28</h4><p><strong>Description</strong>: Created shared hostname parsing helper utility for pattern-based location extraction from device hostnames, supporting reuse across modals, cards, and future ticket generation workflows.</p>
+<p><strong>Key Features</strong>:</p>
+<ul>
+<li>Pattern-based location extraction using device type patterns (nswan, nrwan, nfpan, etc.)</li>
+<li>Prevents truncation bugs (e.g., &quot;STROU&quot; → &quot;STROUD&quot;)</li>
+<li>Exported via <code>window.hostnameParserHelper</code> for global access</li>
+<li>Comprehensive JSDoc documentation with examples</li>
+<li>Supports both browser and Node.js module systems</li>
+</ul>
+<p><strong>Technical Implementation</strong>:</p>
+<ul>
+<li>Created <code>app/public/scripts/shared/hostname-parser-helper.js</code> with three core functions</li>
+<li><code>extractLocationFromHostname()</code>: Pattern-based extraction with fallback to substring(0,5)</li>
+<li><code>extractSiteCode()</code>: Derives 4-character site code from location</li>
+<li><code>parseHostname()</code>: Convenience function returning both location and site</li>
+<li>Added script tag to <code>vulnerabilities.html</code> before other advisory helpers</li>
+</ul>
+<p><strong>Use Case</strong>: Consistent location extraction across Device Security Modal, Location Details Modal, and upcoming ticket generation features (HEX-350). Eliminates code duplication and ensures uniform location parsing behavior.</p>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/hostname-parser-helper.js</code>: <strong>NEW</strong> - Shared hostname parsing utility</li>
+<li><code>app/public/scripts/shared/device-security-modal.js</code>: Updated to use shared helper</li>
+<li><code>app/public/vulnerabilities.html</code>: Added script tag for hostname parser helper</li>
+</ul>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li>✅ Location extraction works correctly for various hostname patterns</li>
+<li>✅ Prevents truncation bugs (STROUD not STROU)</li>
+<li>✅ Helper loads and initializes without errors</li>
+<li>✅ Compatible with existing modal and card implementations</li>
+</ul>
+<p><strong>Issues</strong>:</p>
+<ul>
+<li><a href="https://linear.app/hextrackr/issue/HEX-351">HEX-351</a> - UI/UX Refinements (Team Presentation Feedback)</li>
+</ul>
+<hr>
+<h4>Device Security Modal Location Link (HEX-351) - 2025-10-28</h4><p><strong>Description</strong>: Added clickable location link in Device Security Modal that extracts location from hostname and opens Location Details Modal with full location data.</p>
+<p><strong>Key Features</strong>:</p>
+<ul>
+<li>Clickable location link with map marker icon in Device Information card</li>
+<li>Uses shared hostname-parser-helper.js for accurate location extraction</li>
+<li>Fetches full location data from API and opens Location Details Modal</li>
+<li>Graceful error handling with toast notifications</li>
+<li>Prevents truncation bugs with pattern-based extraction</li>
+</ul>
+<p><strong>Technical Implementation</strong>:</p>
+<ul>
+<li>Added Location row in <code>device-security-modal.js:128-138</code> template</li>
+<li>Created <code>openLocationModal()</code> method at lines 1293-1373</li>
+<li>Fetches <code>/api/locations/stats</code> and finds matching location (case-insensitive)</li>
+<li>Calls <code>window.locationDetailsModal.showLocationDetails()</code> with full location object</li>
+<li>Uses hostname parser helper for accurate location code extraction</li>
+</ul>
+<p><strong>Use Case</strong>: Network admins can quickly navigate from a device&#39;s security details to its location overview, seeing all devices at that site, their vulnerabilities, and open tickets - streamlining cross-device analysis.</p>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/device-security-modal.js</code>: Added location link and modal opener method</li>
+</ul>
+<p><strong>Validation</strong>:</p>
+<ul>
+<li>✅ Location link displays correct location code (not truncated)</li>
+<li>✅ Clicking link opens Location Details Modal with correct data</li>
+<li>✅ Works with various hostname patterns (stroudnswan01, tulsatowernswan01, etc.)</li>
+<li>✅ Error handling works for invalid/missing locations</li>
+<li>✅ Toast notifications display appropriately</li>
+</ul>
+<p><strong>Issues</strong>:</p>
+<ul>
+<li><a href="https://linear.app/hextrackr/issue/HEX-351">HEX-351</a> - UI/UX Refinements (Team Presentation Feedback)</li>
+</ul>
+<hr>
+<h3>Fixed</h3><h4>Description Prefix Filtering (HEX-351) - 2025-10-28</h4><ul>
+<li>Fixed redundant Cisco advisory description prefixes cluttering vulnerability cards</li>
+<li>Strips &quot;According to its self-reported version, the IOS is affected by one or more vulnerabilities&quot; prefix</li>
+<li>Implemented extensible <code>filterDescriptionPrefixes()</code> method supporting multiple vendors</li>
+<li>Applied filter at <code>vulnerability-cards.js:1147-1149</code> during card rendering</li>
+<li>Preserves original description if filtering produces empty result</li>
+</ul>
+<p><strong>Technical Fix</strong>:</p>
+<ul>
+<li>Added <code>filterDescriptionPrefixes()</code> method at <code>vulnerability-cards.js:1494-1531</code></li>
+<li>Uses regex pattern matching for vendor-specific prefixes</li>
+<li>Case-insensitive matching with trim and empty string protection</li>
+<li>Easily extensible for additional vendors (Palo Alto, Fortinet, etc.)</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/vulnerability-cards.js</code>: Added description filter method and applied to card rendering</li>
+</ul>
+<hr>
+<h4>AG-Grid Async Cell Renderer Race Condition (HEX-351) - 2025-10-28</h4><ul>
+<li>Fixed Location Details Modal &quot;Fixed&quot; column stuck on &quot;Loading...&quot; permanently</li>
+<li>Root cause: <code>cellRenderer</code> returned HTML <strong>string</strong> with ID, then tried to find element before AG-Grid rendered it</li>
+<li>Solution: Return actual <strong>DOM element</strong> created with <code>document.createElement()</code> that can be updated directly</li>
+<li>Eliminated <code>setTimeout</code> and <code>getElementById</code> pattern in favor of direct DOM reference manipulation</li>
+<li>Fixed version data now loads within 100-200ms after cell renders</li>
+</ul>
+<p><strong>Technical Fix</strong>:</p>
+<ul>
+<li>Changed <code>location-details-modal.js:658-752</code> cellRenderer to return DOM element instead of string</li>
+<li>Created <code>container</code> element with <code>document.createElement(&quot;span&quot;)</code></li>
+<li>Updated <code>container.textContent</code> and <code>container.className</code> directly in async callback</li>
+<li>Proper AG-Grid pattern for async cell rendering without race conditions</li>
+</ul>
+<p><strong>Files Modified</strong>:</p>
+<ul>
+<li><code>app/public/scripts/shared/location-details-modal.js</code>: Rewrote Fixed column cellRenderer with proper DOM element pattern</li>
+</ul>
+<hr>
+<h3>Changed</h3><ul>
+<li>Updated Device Security Modal to use shared hostname-parser-helper.js instead of local extraction method</li>
+<li>Improved PaginationController integration with new sort options for Devices and Locations views</li>
+<li>Enhanced vulnerability card rendering with description prefix filtering</li>
+</ul>
+<hr>
+<h2>Notes</h2><h3>Performance Improvements</h3><ul>
+<li>Fixed version lookups in Location Details Modal now complete within 100-200ms (was stuck indefinitely)</li>
+<li>Eliminated unnecessary <code>setTimeout</code> delays and <code>getElementById</code> DOM queries in AG-Grid cells</li>
+<li>Direct DOM element manipulation reduces browser reflow/repaint cycles</li>
+</ul>
+<h3>Known Issues</h3><p>None identified in this release.</p>
+<hr>
+<p><em>Changelog Entry: v1.1.9 | HEX-351 Phase 1 UI/UX Refinements</em></p>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

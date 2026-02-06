@@ -47,17 +47,22 @@
     --hextrackr-info-active: #1e40af;
 
     /* Backgrounds */
-    --hextrackr-bg-primary: #ffffff;
-    --hextrackr-bg-secondary: #f7fafc;
-    --hextrackr-bg-tertiary: #f8f9fa;
+    --hextrackr-bg-primary: #d0dae6;   /* Darker blue-gray page background - creates strong foundation (like dark mode) */
+    --hextrackr-bg-secondary: #c8d4e0; /* Even deeper blue-gray for stronger contrast */
+    --hextrackr-bg-tertiary: #e8eef5;  /* Lighter blue-gray for elevated elements */
     --hextrackr-bg-inverse: #1f2937;
 
     /* Surface Hierarchy */
-    --hextrackr-surface-0: #f8f9fa;    /* Base level - page background */
-    --hextrackr-surface-1: #ffffff;    /* Cards - elevated from base */
-    --hextrackr-surface-2: #ffffff;    /* Elevated surfaces */
-    --hextrackr-surface-3: #f5f5f5;    /* Modals */
-    --hextrackr-surface-4: #f0f0f0;    /* Highest elevation */
+    --hextrackr-surface-0: #d0dae6;    /* Base level - page background (darker foundation) */
+    --hextrackr-surface-1: #ffffff;    /* Cards - crisp white elevated and popping from darker background */
+    --hextrackr-surface-2: #f9fafb;    /* Elevated surfaces - subtle off-white */
+    --hextrackr-surface-3: #ffffff;    /* Modals - pure white for prominence */
+    --hextrackr-surface-4: #f5f7fa;    /* Highest elevation - very light blue-gray */
+
+    /* Card Component Surfaces */
+    --hextrackr-card-header-bg: #e8eef5;  /* Card headers - lighter blue-gray (cards pop from darker page) */
+    --hextrackr-card-body-bg: #ffffff;    /* Card bodies - pure white (maximum contrast) */
+    --hextrackr-card-footer-bg: #f5f7fa;  /* Card footers - very light blue-gray */
 
     /* Text Colors */
     --hextrackr-text: #2d3748;
@@ -90,14 +95,14 @@
     --hextrackr-border-dark: #cbd5e0;
 
     /* Border Hierarchy for Cards */
-    --hextrackr-border-subtle: rgb(0, 0, 0, 0.08);   /* Subtle card borders */
-    --hextrackr-border-muted: rgb(0, 0, 0, 0.12);    /* Muted card borders */
-    --hextrackr-border-strong: rgb(0, 0, 0, 0.16);   /* Strong card borders */
+    --hextrackr-border-subtle: rgb(0, 0, 0, 0.12);   /* Subtle card borders - increased for visibility */
+    --hextrackr-border-muted: rgb(0, 0, 0, 0.15);    /* Muted card borders - increased for visibility */
+    --hextrackr-border-strong: rgb(0, 0, 0, 0.20);   /* Strong card borders - increased for visibility */
 
     /* Shadow Hierarchy */
-    --hextrackr-shadow-sm: 0 1px 3px rgb(0, 0, 0, 0.1);    /* Small shadows */
-    --hextrackr-shadow-md: 0 4px 12px rgb(0, 0, 0, 0.15);  /* Medium shadows */
-    --hextrackr-shadow-lg: 0 8px 24px rgb(0, 0, 0, 0.2);   /* Large shadows */
+    --hextrackr-shadow-sm: 0 1px 3px 0 rgb(0, 0, 0, 0.12), 0 1px 2px 0 rgb(0, 0, 0, 0.06);    /* Small layered shadow */
+    --hextrackr-shadow-md: 0 4px 6px -1px rgb(0, 0, 0, 0.1), 0 2px 4px -1px rgb(0, 0, 0, 0.06);  /* Medium layered shadow */
+    --hextrackr-shadow-lg: 0 10px 15px -3px rgb(0, 0, 0, 0.1), 0 4px 6px -2px rgb(0, 0, 0, 0.05);   /* Large layered shadow */
 
     /* =================
        VPR Score Colors (Light Mode)
@@ -232,15 +237,15 @@
     /* =================
        Extended Shadows (Light Mode)
        ================= */
-    --hextrackr-shadow-xs: 0 1px 2px rgb(0, 0, 0, 0.05);
-    --hextrackr-shadow-xl: 0 12px 48px rgb(0, 0, 0, 0.25);
-    --hextrackr-shadow-inner: inset 0 2px 4px rgb(0, 0, 0, 0.06);
+    --hextrackr-shadow-xs: 0 1px 2px 0 rgb(0, 0, 0, 0.05);
+    --hextrackr-shadow-xl: 0 20px 25px -5px rgb(0, 0, 0, 0.1), 0 10px 10px -5px rgb(0, 0, 0, 0.04);
+    --hextrackr-shadow-inner: inset 0 2px 4px 0 rgb(0, 0, 0, 0.06);
 
-    /* Colored shadows */
-    --hextrackr-shadow-primary: 0 4px 12px rgb(32, 107, 196, 0.15);
-    --hextrackr-shadow-success: 0 4px 12px rgb(22, 163, 74, 0.15);
-    --hextrackr-shadow-warning: 0 4px 12px rgb(217, 119, 6, 0.15);
-    --hextrackr-shadow-danger: 0 4px 12px rgb(220, 38, 38, 0.15);
+    /* Colored shadows - enhanced for visibility */
+    --hextrackr-shadow-primary: 0 4px 12px rgb(32, 107, 196, 0.2);
+    --hextrackr-shadow-success: 0 4px 12px rgb(22, 163, 74, 0.2);
+    --hextrackr-shadow-warning: 0 4px 12px rgb(217, 119, 6, 0.2);
+    --hextrackr-shadow-danger: 0 4px 12px rgb(220, 38, 38, 0.2);
 
     /* =================
        Transitions
@@ -371,6 +376,11 @@
     --hextrackr-surface-2: #202c42;    /* Elevated surfaces */
     --hextrackr-surface-3: #1a2234;    /* Modals */
     --hextrackr-surface-4: #334155;    /* Highest elevation */
+
+    /* Card Component Surfaces (Dark Mode) */
+    --hextrackr-card-header-bg: #1d273b;  /* Card headers - slightly lighter than card body for distinction */
+    --hextrackr-card-body-bg: #1a2234;    /* Card bodies - match surface-1 */
+    --hextrackr-card-footer-bg: #1d273b;  /* Card footers - match headers */
 
     /* Text Colors */
     --hextrackr-text: #ffffff;

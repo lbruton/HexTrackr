@@ -31,7 +31,7 @@
     --chart-vuln-low-color: #16a34a;          /* Low: Green */
 
     /* Chart Background and Grid - Light Theme */
-    --chart-background: #ffffff;              /* Chart background */
+    --chart-background: var(--hextrackr-surface-1);  /* Chart background - use surface variable */
     --chart-grid-color: #e5e7eb;              /* Grid lines */
     --chart-text-color: #6b7280;              /* Chart text */
     --chart-title-color: #111827;             /* Chart titles */
@@ -42,7 +42,7 @@
      * =========================================== */
 
     /* AG-Grid Quartz Theme Variables for Light Mode */
-    --ag-background-color: #ffffff;
+    --ag-background-color: var(--hextrackr-surface-1);  /* Use surface variable */
     --ag-foreground-color: #000000;
     --ag-border-color: #dde2e6;
     --ag-header-background-color: #f8f9fa;
@@ -55,9 +55,34 @@
      * =========================================== */
 
     /* Surface elevation hierarchy for light mode */
-    --hextrackr-surface-base: #f8f9fa;        /* Page background */
-    --hextrackr-surface-1: #ffffff;           /* Cards */
-    --hextrackr-surface-2: #ffffff;           /* Tables */
-    --hextrackr-surface-3: #ffffff;           /* Modals */
-    --hextrackr-surface-4: #f8f9fa;           /* Modal containers */
+    --hextrackr-surface-base: #d0dae6;        /* Page background - darker blue-gray foundation (like dark mode hierarchy) */
+    --hextrackr-surface-1: #ffffff;           /* Cards - crisp white popping from darker background */
+    --hextrackr-surface-2: #f9fafb;           /* Tables - subtle off-white */
+    --hextrackr-surface-3: #ffffff;           /* Modals - pure white */
+    --hextrackr-surface-4: #f5f7fa;           /* Modal containers - very light blue-gray */
+}
+
+/* ===========================================
+ * NAVBAR/HEADER - LIGHT MODE DEPTH
+ * =========================================== */
+
+/* Enhanced header distinction in light mode */
+[data-bs-theme="light"] .navbar,
+.theme-light .navbar {
+    background-color: #ffffff !important;
+    border-bottom: 1px solid rgb(0, 0, 0, 0.1);
+    box-shadow: 0 1px 3px 0 rgb(0, 0, 0, 0.1), 0 1px 2px 0 rgb(0, 0, 0, 0.06);
+}
+
+/* Stats cards at top of page need more depth */
+[data-bs-theme="light"] .card.stats-card,
+.theme-light .card.stats-card {
+    background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+    border: 1px solid rgb(0, 0, 0, 0.1);
+}
+
+[data-bs-theme="light"] .card.stats-card:hover,
+.theme-light .card.stats-card:hover {
+    box-shadow: 0 4px 6px -1px rgb(0, 0, 0, 0.1), 0 2px 4px -1px rgb(0, 0, 0, 0.06);
+    transform: translateY(-1px);
 }

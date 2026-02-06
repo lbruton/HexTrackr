@@ -2,17 +2,20 @@
 node_modules/
 npm-debug.log*
 
-# Environment variables
+# Environment variables (SECRETS - never commit)
 .env
 .env.local
 .env.production
 
-# SSL Certificates (security - never commit)
+# SSL Certificates (SECRETS - never commit)
 certs/
 *.pem
 *.key
 *.crt
 *.cert
+
+# Secrets directory (Docker secrets, API keys)
+secrets/
 
 # Database files
 data/*.db
@@ -26,11 +29,11 @@ data/*.sqlite
 app/public/data/
 !app/public/data/.gitkeep
 
-# Database backups (should never be committed - too large)
+# Database backups (too large for GitHub)
 app/data/*.backup*
 app/data/*.bak
 
-# Deprecated database files (corrupt/recovery files - too large for GitHub)
+# Deprecated database files (corrupt/recovery files)
 app/data/deprecated/
 
 # Log files
@@ -47,19 +50,19 @@ app/dev-docs-html/
 tmp/
 temp/
 
-# Prime context handoff file (session-specific intelligence)
+# Prime context handoff file (session-specific)
 prime_handoff.json
 
 # Playwright test artifacts
 .playwright-mcp/
 test-results/
 
-# CSV uploads (keep sample files)
-uploads/*.csv
-!uploads/sample*.csv
-!uploads/test*.csv
+# Uploads (binary blobs - too large for GitHub)
+uploads/
+app/uploads/
+app/public/uploads/
 
-# Large CSV files (keep smaller test files)
+# CSV files (keep smaller test files)
 *vulnerabilities*.csv
 !test-import.csv
 
@@ -72,17 +75,76 @@ uploads/*.csv
 ehthumbs.db
 Thumbs.db
 
-# IDE files
-.vscode/settings.json
+# IDE / Editor files
+.vscode/
 .idea/
 *.swp
 *.swo
 
-# Backup files
+# Backup files (timestamped backups of source files)
 *.backup
+*.backup.*
 *.bak
 
-# Development environment (exclude from public pushes)
+# Archive files (too large for GitHub)
+*.zip
+
+# ============================================
+# AI Tool Configurations (local dev only)
+# ============================================
+
+# Claude Code (session-specific config, agents, commands)
+.claude/
+
+# Cursor IDE rules
+.cursor/
+
+# Crush AI tool
+.crush/
+
+# MCP configuration (contains API keys - SECRETS)
+.mcp.json
+.mcp*.json.zip
+
+# OpenCode configuration (may contain API keys)
+opencode.json
+opencode-config-update.json
+broken_opencode.json
+.opencode.json
+
+# Claude session rewind logs
+.rewindlog_*
+
+# Claude agent description (local dev reference)
+AGENTS.md
+
+# Codacy AI rules (already handled by .codacy/.gitignore)
+.github/instructions/codacy.instructions.md
+
+# rMemory
+.rMemory
+
+# ============================================
+# Project-specific ignores
+# ============================================
+
+# Stooge analysis reports (temporary outputs)
+stooges/
+
+# Athena conversation logs (keep directory structure)
+claudelogs/sessions/*.md
+!claudelogs/sessions/.gitkeep
+
+# Claudelogs embeddings (57-81 MB files)
+claudelogs/embeddings/
+
+# Memento shared database
+memento/
+
+# Deprecated scripts directory
+depreciated/
+
+# Development environment
 docker-compose.dev.yml
 scripts/start-dev-env.sh
 scripts/stop-dev-env.sh
@@ -100,45 +162,12 @@ __tests__/playwright-report/
 __tests__/test-results.json
 **/*.lcov
 
-#Ignore vscode AI rules
-.github/instructions/codacy.instructions.md
-.rMemory
-
-# Stooge analysis reports (temporary outputs)
-stooges/
-
-# Athena's Library of Sacred Scrolls
-# Keep the directory structure but not the actual conversation logs
-claudelogs/sessions/*.md
-!claudelogs/sessions/.gitkeep
-
-# Athena tracking file (preserve to avoid reprocessing)
-# scripts/.athena-processed-scrolls.json
-
-# Memento shared database
-memento/
-
-# OpenCode configuration (may contain API keys)
-opencode.json
-opencode-config-update.json
-broken_opencode.json
-.opencode.json
-
-# Claude Code MCP configuration (contains API keys)
-.mcp.json
-
-
-#Ignore cursor AI rules
-.cursor/rules/codacy.mdc
-# SSL certificates and private keys
-certs/*.pem
-certs/*.key
-
-# Secrets directory (Docker secrets, API keys)
-secrets/
+# Backups directory
 backups/
-/backups/commands/
 
 # Utility scripts with potential secrets (use npm scripts instead)
 app/scripts/
 !app/scripts/.gitkeep
+
+# Duplicate Dockerfiles (keep only primary)
+Dockerfile.node.backup

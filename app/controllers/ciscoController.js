@@ -35,7 +35,11 @@ class CiscoController {
      */
     async syncCiscoAdvisories(req, res) {
         try {
-            console.log("Cisco advisory sync requested via API");
+            if (global.logger?.info) {
+                global.logger.info("backend", "cisco", "Cisco advisory sync requested via API");
+            } else {
+                console.log("Cisco advisory sync requested via API");
+            }
 
             // Check if sync is already in progress
             const status = await this.ciscoAdvisoryService.getSyncStatus();
@@ -49,7 +53,11 @@ class CiscoController {
             // Perform sync (pass userId from session for credential fetch)
             const result = await this.ciscoAdvisoryService.syncCiscoAdvisories(req.session.userId);
 
-            console.log(` Cisco advisory sync completed: ${result.totalAdvisories} advisories, ${result.matchedCount} matched`);
+            if (global.logger?.info) {
+                global.logger.info("backend", "cisco", "Cisco advisory sync completed", { totalAdvisories: result.totalAdvisories, matchedCount: result.matchedCount });
+            } else {
+                console.log(` Cisco advisory sync completed: ${result.totalAdvisories} advisories, ${result.matchedCount} matched`);
+            }
 
             // Clear all caches after sync (vulnerabilities may have new fix data)
             cacheService.clearAll();
@@ -64,7 +72,11 @@ class CiscoController {
             });
 
         } catch (error) {
-            console.error("Cisco advisory sync failed:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "cisco", "Cisco advisory sync failed", { error: error.message });
+            } else {
+                console.error("Cisco advisory sync failed:", error);
+            }
             res.status(500).json({
                 error: "Failed to sync Cisco advisory data",
                 message: error.message
@@ -84,7 +96,11 @@ class CiscoController {
             const status = await this.ciscoAdvisoryService.getSyncStatus();
             res.json(status);
         } catch (error) {
-            console.error("Failed to get Cisco advisory status:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "cisco", "Failed to get Cisco advisory status", { error: error.message });
+            } else {
+                console.error("Failed to get Cisco advisory status:", error);
+            }
             res.status(500).json({
                 error: "Failed to get Cisco advisory status",
                 message: error.message
@@ -122,7 +138,11 @@ class CiscoController {
             return res.json(advisoryData || null);
 
         } catch (error) {
-            console.error(` Failed to get Cisco advisory for CVE ${req.params.cveId}:`, error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "cisco", "Failed to get Cisco advisory", { cveId: req.params.cveId, error: error.message });
+            } else {
+                console.error(` Failed to get Cisco advisory for CVE ${req.params.cveId}:`, error);
+            }
             res.status(500).json({
                 error: "Failed to get Cisco advisory data",
                 message: error.message
@@ -148,7 +168,11 @@ class CiscoController {
             });
 
         } catch (error) {
-            console.error("Failed to check Cisco auto-sync status:", error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "cisco", "Failed to check Cisco auto-sync status", { error: error.message });
+            } else {
+                console.error("Failed to check Cisco auto-sync status:", error);
+            }
             res.status(500).json({
                 error: "Failed to check auto-sync status",
                 message: error.message
@@ -183,7 +207,11 @@ class CiscoController {
             res.json(versions);
 
         } catch (error) {
-            console.error(` Failed to get fixed versions for ${req.params.cveId}:`, error);
+            if (global.logger?.error) {
+                global.logger.error("backend", "cisco", "Failed to get fixed versions", { cveId: req.params.cveId, error: error.message });
+            } else {
+                console.error(` Failed to get fixed versions for ${req.params.cveId}:`, error);
+            }
             res.status(500).json({
                 error: "Failed to get fixed versions",
                 message: error.message

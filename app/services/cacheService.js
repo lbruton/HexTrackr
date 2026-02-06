@@ -338,7 +338,16 @@ class CacheService {
         this.clearStatsCache();
         this.clearTrendsCache();
         this.clearVulnerabilitiesCache();
-        console.log("All caches cleared");
+
+        if (global.logger?.info) {
+            global.logger.info("backend", "cache", "All caches cleared", {
+                statsKeys: this.statsCache.keys().length,
+                trendsKeys: this.trendsCache.keys().length,
+                vulnKeys: this.vulnerabilityCache.keys().length
+            });
+        } else {
+            console.log("All caches cleared");
+        }
     }
 
     /**
