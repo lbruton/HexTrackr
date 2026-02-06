@@ -127,7 +127,7 @@ function createFallbackFooter(container) {
     const githubLi = document.createElement("li");
     githubLi.className = "list-inline-item";
     const githubA = document.createElement("a");
-    githubA.href = "https://github.com/Lonnie-Bruton/HexTrackr";
+    githubA.href = "https://github.com/lbruton/HexTrackr";
     githubA.target = "_blank";
     githubA.title = "Source Code Repository";
     const githubImg = document.createElement("img");
@@ -142,11 +142,11 @@ function createFallbackFooter(container) {
     const codacyLi = document.createElement("li");
     codacyLi.className = "list-inline-item";
     const codacyA = document.createElement("a");
-    codacyA.href = "https://app.codacy.com?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade";
+    codacyA.href = "https://app.codacy.com/gh/lbruton/HexTrackr/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade";
     codacyA.target = "_blank";
     codacyA.title = "Code Quality Grade A";
     const codacyImg = document.createElement("img");
-    codacyImg.src = "https://app.codacy.com/project/badge/Grade/b3f731f8d8244dabafabb39339014886";
+    codacyImg.src = "https://app.codacy.com/project/badge/Grade/80ae81dcc5fc499097b7d80a0e2610d0";
     codacyImg.alt = "Codacy Grade A";
     codacyImg.style.height = "20px";
     codacyImg.className = "img-fluid";

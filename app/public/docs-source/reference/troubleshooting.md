@@ -913,7 +913,7 @@ fetch('/api/protected-endpoint', {
 
 If issues persist after trying these solutions:
 
-1. **Check GitHub Issues**: [HexTrackr Issues](https://github.com/Lonnie-Bruton/HexTrackr/issues)
+1. **Check GitHub Issues**: [HexTrackr Issues](https://github.com/lbruton/HexTrackr/issues)
 
 2. **Gather diagnostic information**:
    - Docker logs: `docker-compose logs > logs.txt`
