@@ -9,7 +9,7 @@
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/Lonnie-Bruton/HexTrackr.git
+git clone https://github.com/lbruton/HexTrackr.git
 cd HexTrackr
 
 # 2. Run RHEL installer (handles everything automatically)
@@ -387,7 +387,7 @@ If you have an existing Ubuntu deployment:
 - **Full Guide**: `docs/RHEL_DEPLOYMENT_GUIDE.md` (comprehensive 800+ line guide)
 - **RHEL Documentation**: https://docs.redhat.com/en/rhel/9
 - **Podman Docs**: https://docs.podman.io/
-- **HexTrackr Issues**: https://github.com/Lonnie-Bruton/HexTrackr/issues
+- **HexTrackr Issues**: https://github.com/lbruton/HexTrackr/issues
 
 ---
 

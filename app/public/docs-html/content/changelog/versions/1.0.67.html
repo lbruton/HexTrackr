@@ -104,7 +104,7 @@ category: "Feature - Infrastructure"</h2><h1>Version 1.0.67 - Unified Logging Sy
 );</code></pre><p><strong>Indexes for Performance</strong>:</p>
 <pre><code class="language-sql"><span class="hljs-keyword">CREATE</span> INDEX IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> idx_audit_logs_category <span class="hljs-keyword">ON</span> audit_logs(category);
 <span class="hljs-keyword">CREATE</span> INDEX IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> idx_audit_logs_user_id <span class="hljs-keyword">ON</span> audit_logs(user_id);
-<span class="hljs-keyword">CREATE</span> INDEX IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> idx_audit_logs_created_at <span class="hljs-keyword">ON</span> audit_logs(created_at);</code></pre><p><strong>Commit</strong>: <a href="https://github.com/Lonnie-Bruton/HexTrackr-Dev/commit/df0aa192">`df0aa192`</a></p>
+<span class="hljs-keyword">CREATE</span> INDEX IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> idx_audit_logs_created_at <span class="hljs-keyword">ON</span> audit_logs(created_at);</code></pre><p><strong>Commit</strong>: <a href="https://github.com/lbruton/HexTrackr/commit/df0aa192">`df0aa192`</a></p>
 <hr>
 <h3>Session 2: Backend LoggingService ✅</h3><p><strong>Completed</strong>: 2025-10-17</p>
 <h4>LoggingService Implementation</h4><p><strong>Created</strong>: <code>/app/services/loggingService.js</code> (535 lines)</p>
@@ -171,7 +171,7 @@ logger.<span class="hljs-title function_">debug</span>(<span class="hljs-string"
 <li>✅ Category-aware logging (debug/info/warn/error)</li>
 <li>✅ Configuration verification (8 backend + 7 frontend categories)</li>
 </ol>
-<p><strong>Commit</strong>: <a href="https://github.com/Lonnie-Bruton/HexTrackr-Dev/commit/03ca6fb1">`03ca6fb1`</a></p>
+<p><strong>Commit</strong>: <a href="https://github.com/lbruton/HexTrackr/commit/03ca6fb1">`03ca6fb1`</a></p>
 <hr>
 <h3>Session 3: Frontend Logger & Audit API ✅</h3><p><strong>Completed</strong>: 2025-10-17</p>
 <h4>Enhanced Frontend Logger</h4><p><strong>Modified</strong>: <code>/app/public/scripts/shared/logger.js</code> (enhanced with +198 lines)</p>
@@ -270,7 +270,7 @@ router.<span class="hljs-title function_">post</span>(<span class="hljs-string">
 <li>✅ Encrypted storage verification in database</li>
 <li>✅ End-to-end flow: Frontend → API → Encrypted DB</li>
 </ul>
-<p><strong>Commit</strong>: <a href="https://github.com/Lonnie-Bruton/HexTrackr-Dev/commit/7dfe36b3">`7dfe36b3`</a></p>
+<p><strong>Commit</strong>: <a href="https://github.com/lbruton/HexTrackr/commit/7dfe36b3">`7dfe36b3`</a></p>
 <hr>
 <h2>Technical Implementation</h2><h3>Encryption Security</h3><p><strong>AES-256-GCM Features</strong>:</p>
 <ul>
