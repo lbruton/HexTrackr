@@ -171,3 +171,7 @@ app/scripts/
 
 # Duplicate Dockerfiles (keep only primary)
 Dockerfile.node.backup
+
+
+#Ignore cursor AI rules
+.cursor/rules/codacy.mdc

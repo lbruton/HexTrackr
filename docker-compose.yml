@@ -5,76 +5,40 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8989:8080"  # External port 8989 -> Internal port 8080 (prevents test conflicts)
-      - "8443:8443"  # HTTPS port
+      - "8989:8080"
     volumes:
-      # Mount entire application for development hot-reload
-      - ./app:/app/app
-      # Exclude node_modules to use container's version
-      - /app/node_modules
-      # CRITICAL: Exclude app/data directory - NEVER bind mount database files from macOS
-      # macOS fcntl locking WILL corrupt SQLite databases on Docker restart
-      - /app/app/data
-      # Mount config directory for import patterns (HEX-241)
-      - ./config:/app/config:ro
-      # HEX-280: Database uses named volume (isolated from macOS filesystem)
-      # Named volume prevents corruption from macOS fcntl locking issues with SQLite
-      # Database is at /app/app/data/ to match application mount structure
+      # Persistent data — all named volumes
       - hextrackr-database:/app/app/data
-      # Mount backups directory for automated backups (HEX-270)
-      - ./backups:/app/backups:rw
-      # Mount uploads directory for file persistence
-      - ./app/uploads:/app/app/uploads:rw
-      # Mount SSL certificates for HTTPS
-      - ./certs:/app/certs:ro
+      - hextrackr-backups:/app/backups
+      - hextrackr-uploads:/app/app/uploads
+      # Config from repo (read-only)
+      - ./config:/app/config:ro
     environment:
-      - NODE_ENV=${NODE_ENV:-development}
+      - NODE_ENV=${NODE_ENV:-production}
       - HEXTRACKR_VERSION=1.1.12
-      - PORT=${PORT:-8080}
-      - DATABASE_PATH=${DATABASE_PATH:-data/hextrackr.db}
-      - USE_HTTPS=${USE_HTTPS:-false}
-      - SSL_KEY_PATH=/app/certs/key.pem
-      - SSL_CERT_PATH=/app/certs/cert.pem
-      - NODE_OPTIONS=--max-old-space-size=4096  # HEX-218: 4GB heap for large backup exports (858MB DB, 95K vulnerabilities)
-    env_file:
-      - .env
+      - PORT=8080
+      - DATABASE_PATH=data/hextrackr.db
+      - SESSION_SECRET=${SESSION_SECRET}
+      - TRUST_PROXY=true
+      - USE_HTTPS=false
+      - ENABLE_WEBSOCKET=true
+      - ENABLE_COMPRESSION=true
+      - ENABLE_RATE_LIMITING=true
+      - LOG_LEVEL=info
+      - NODE_OPTIONS=--max-old-space-size=4096
     restart: unless-stopped
-    stop_grace_period: 30s  # HEX-272: Give app 30 seconds to close DB connection cleanly
+    stop_grace_period: 30s
     healthcheck:
-      test: ["CMD", "node", "-e", "const protocol = process.env.USE_HTTPS === 'true' ? 'https' : 'http'; const https = require(protocol); const options = protocol === 'https' ? {rejectUnauthorized: false} : {}; https.get(protocol + '://127.0.0.1:' + (process.env.PORT || 8080) + '/health', options, (res) => process.exit(res.statusCode === 200 ? 0 : 1))"]
+      test: ["CMD", "node", "-e", "const http = require('http'); http.get('http://127.0.0.1:8080/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1))"]
       interval: 30s
       timeout: 3s
       retries: 3
-      start_period: 5s
-    networks:
-      - hextrackr-network
-
-  nginx:
-    container_name: hextrackr-nginx
-    image: nginx:alpine
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./certs:/etc/nginx/certs:ro
-      - ./app/public:/usr/share/nginx/html:ro
-    depends_on:
-      - hextrackr
-    networks:
-      - hextrackr-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
-      interval: 30s
-      timeout: 3s
-      retries: 3
-      start_period: 5s
-
-networks:
-  hextrackr-network:
-    driver: bridge
+      start_period: 10s
 
 volumes:
   hextrackr-database:
+    driver: local
+  hextrackr-backups:
+    driver: local
+  hextrackr-uploads:
     driver: local

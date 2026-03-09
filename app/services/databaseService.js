@@ -554,12 +554,13 @@ class DatabaseService {
             }
 
             const startTime = Date.now();
+            const self = this;
 
             this.db.run(sql, params, function(err) {
                 const duration = Date.now() - startTime;
 
                 if (err) {
-                    this._log("error", "Database execution error", {
+                    self._log("error", "Database execution error", {
                         error: err.message,
                         sql: sql.substring(0, 200),
                         params: params,
@@ -569,7 +570,7 @@ class DatabaseService {
                 } else {
                     // Log slow operations (>500ms)
                     if (duration > 500) {
-                        this._log("warn", "Slow database operation detected", {
+                        self._log("warn", "Slow database operation detected", {
                             duration: `${duration}ms`,
                             sql: sql.substring(0, 200),
                             params: params,
