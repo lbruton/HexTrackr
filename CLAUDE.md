@@ -81,7 +81,7 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
 
 ## Deployment Architecture
 
-**Host**: Portainer VM (192.168.1.81) — Docker via snap, project at `/home/portainer/hextrackr`
+**Host**: Portainer VM (192.168.1.81) — Docker via snap
 **Reverse Proxy**: Nginx Proxy Manager (NPM) on LXC 109 (192.168.1.40) — handles SSL termination
 **Port Rule**: NPM owns 80/443. HexTrackr exposes HTTP 8989 only. No app binds 80/443 on Portainer host.
 **SSL**: Sectigo cert (hextrackr.com, dev.hextrackr.com, www.hextrackr.com) — expires Nov 2026, uploaded to NPM
@@ -89,22 +89,30 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
 
 **Traffic Flow**: Browser → NPM (443, SSL) → Portainer VM (8989, HTTP) → hextrackr-app container (8080)
 
-**Deploy Pattern**: Push to GitHub → SSH into Portainer → `cd /home/portainer/hextrackr && git pull && sudo docker compose up --build -d`
+**Portainer Stack**: ID 11, repo-based deployment from `lbruton/HexTrackr` branch `dev`, Total control.
 
-**No nginx sidecar**: The `docker-compose.yml` includes an nginx service for Mac dev, but production on Portainer skips it — NPM handles reverse proxy and SSL.
+**Deploy Pattern**: PR to `dev` → merge → Portainer redeploy (pulls latest, rebuilds image, restarts).
+Redeploy via API: `PUT /api/stacks/11/git/redeploy?endpointId=3` with `SESSION_SECRET` env var.
+Redeploy via UI: Stacks → hextrackr → Pull and redeploy.
+
+**Secrets**: `SESSION_SECRET` injected as Portainer env var (source: Infisical project `4f9838fa-c87d-4728-8766-4c99652ab110`, key `HEXTRACKR_SESSION_SECRET`).
+
+**Volume Mounts** (all named volumes, no bind mounts for data):
+
+- `hextrackr-database` → `/app/app/data` (SQLite DB — MUST be /app/app/data, not /app/data)
+- `hextrackr-backups` → `/app/backups`
+- `hextrackr-uploads` → `/app/app/uploads`
+- `./config` → `/app/config:ro` (from repo)
+
+**CRITICAL**: Database volume mounts at `/app/app/data` because server.js resolves the default DB path via `path.join(__dirname, '..', 'data', 'hextrackr.db')` from `/app/app/public/server.js` → `/app/app/data/hextrackr.db`. Do NOT set `DATABASE_PATH` env var — let the app use its default.
 
 ## Testing & Development
 
-**Local Dev (Mac)**: `docker-compose up` runs hextrackr + nginx sidecar on port 8989
 **Production (Portainer)**: Container `hextrackr-app` on Portainer VM, accessed via https://hextrackr.com
-
-**Testing Workflow**:
-
-- **Frontend changes**: Refresh browser (no restart needed — app dir is bind-mounted)
-- **Backend changes**: `ssh -T portainer 'cd /home/portainer/hextrackr && sudo docker compose restart hextrackr'`
-- **Database changes**: Use `npm run db:migrate` (runs inside container)
+**Testing after deploy**: PR to `dev` → merge → redeploy in Portainer → test at https://hextrackr.com
 
 **Important**: Do NOT run `npm run dev` for testing — Docker is already running the server.
+**No local dev compose**: The single `docker-compose.yml` is production-oriented (no bind mounts, no nginx sidecar). Local development uses the Portainer deploy cycle.
 
 ## Coding Style & Naming Conventions
 

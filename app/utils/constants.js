@@ -55,8 +55,8 @@ const EXPRESS_URLENCODED_LIMIT = "100mb";
 // With cache-aware rate limiting, cache HITs don't count toward limit
 // Reduced from 100 to 60 (40% reduction) since cached responses are now excluded
 const IS_PRODUCTION = process.env.NODE_ENV === "production";
-const RATE_LIMIT_WINDOW_MS = IS_PRODUCTION ? 15 * 60 * 1000 : 1 * 60 * 1000; // 15 min (prod) / 1 min (dev)
-const RATE_LIMIT_MAX_REQUESTS = IS_PRODUCTION ? 60 : 10000; // 60 (prod) / 10000 (dev) - cache HITs excluded
+const RATE_LIMIT_WINDOW_MS = IS_PRODUCTION ? 1 * 60 * 1000 : 1 * 60 * 1000; // 1 min (prod) / 1 min (dev)
+const RATE_LIMIT_MAX_REQUESTS = IS_PRODUCTION ? 1000 : 10000; // 1000 (prod) / 10000 (dev) - cache HITs excluded
 const RATE_LIMIT_MESSAGE = "Too many requests from this IP, please try again later.";
 
 // ================================
