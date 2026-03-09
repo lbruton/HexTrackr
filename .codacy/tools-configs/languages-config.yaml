@@ -1,21 +1,25 @@
 tools:
     - name: eslint
-      languages: [Javascript]
-      extensions: [.js, .jsm, .jsx, .mjs, .vue]
+      languages: [Javascript, TypeScript]
+      extensions: [.js, .jsm, .jsx, .mjs, .ts, .tsx, .vue]
       files: []
     - name: lizard
-      languages: [Javascript]
-      extensions: [.js, .jsm, .jsx, .mjs, .vue]
+      languages: [Javascript, Python, TypeScript]
+      extensions: [.js, .jsm, .jsx, .mjs, .py, .ts, .tsx, .vue]
       files: []
     - name: pmd
       languages: [Javascript, SQL, XML]
       extensions: [.js, .jsm, .jsx, .mjs, .pom, .sql, .vue, .wsdl, .xml, .xsl]
       files: []
+    - name: pylint
+      languages: [Python]
+      extensions: [.py]
+      files: []
     - name: semgrep
-      languages: [Dockerfile, Javascript, SQL, Shell, YAML]
-      extensions: [.bash, .dockerfile, .js, .jsm, .jsx, .mjs, .sh, .sql, .vue, .yaml, .yml]
+      languages: [Dockerfile, Javascript, Python, SQL, Shell, TypeScript, YAML]
+      extensions: [.bash, .dockerfile, .js, .jsm, .jsx, .mjs, .py, .sh, .sql, .ts, .tsx, .vue, .yaml, .yml]
       files: []
     - name: trivy
-      languages: [Dockerfile, JSON, Javascript, XML, YAML]
-      extensions: [.dockerfile, .js, .jsm, .json, .jsx, .mjs, .pom, .vue, .wsdl, .xml, .xsl, .yaml, .yml]
-      files: [Dockerfile, package-lock.json, package.json, pnpm-lock.yaml, yarn.lock]
+      languages: [Dockerfile, JSON, Javascript, Python, TypeScript, XML, YAML]
+      extensions: [.dockerfile, .js, .jsm, .json, .jsx, .mjs, .pom, .py, .ts, .tsx, .vue, .wsdl, .xml, .xsl, .yaml, .yml]
+      files: [Dockerfile, Pipfile.lock, package-lock.json, package.json, pnpm-lock.yaml, poetry.lock, requirements.txt, uv.lock, yarn.lock]
