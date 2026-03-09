@@ -8,7 +8,7 @@ services:
       - "8989:8080"
     volumes:
       # Persistent data — all named volumes
-      - hextrackr-database:/app/data
+      - hextrackr-database:/app/app/data
       - hextrackr-backups:/app/backups
       - hextrackr-uploads:/app/app/uploads
       # Config from repo (read-only)
@@ -17,7 +17,6 @@ services:
       - NODE_ENV=${NODE_ENV:-production}
       - HEXTRACKR_VERSION=1.1.12
       - PORT=8080
-      - DATABASE_PATH=data/hextrackr.db
       - SESSION_SECRET=${SESSION_SECRET}
       - TRUST_PROXY=true
       - USE_HTTPS=false
