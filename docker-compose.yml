@@ -8,7 +8,7 @@ services:
       - "8989:8080"
     volumes:
       # Persistent data — all named volumes
-      - hextrackr-database:/app/app/data
+      - hextrackr-database:/app/data
       - hextrackr-backups:/app/backups
       - hextrackr-uploads:/app/app/uploads
       # Config from repo (read-only)
