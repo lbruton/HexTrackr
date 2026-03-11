@@ -81,21 +81,13 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
 
 ## Deployment Architecture
 
-**Host**: Portainer VM (192.168.1.81) — Docker via snap
-**Reverse Proxy**: Nginx Proxy Manager (NPM) on LXC 109 (192.168.1.40) — handles SSL termination
-**Port Rule**: NPM owns 80/443. HexTrackr exposes HTTP 8989 only. No app binds 80/443 on Portainer host.
-**SSL**: Sectigo cert (hextrackr.com, dev.hextrackr.com, www.hextrackr.com) — expires Nov 2026, uploaded to NPM
-**DNS**: pfSense resolves hextrackr.com → 192.168.1.40 (NPM)
-
-**Traffic Flow**: Browser → NPM (443, SSL) → Portainer VM (8989, HTTP) → hextrackr-app container (8080)
-
-**Portainer Stack**: ID 11, repo-based deployment from `lbruton/HexTrackr` branch `dev`, Total control.
+> Infrastructure details (IPs, ports, stack IDs, proxy hosts, SSL certs) live in **DocVault** — see `[[HexTrackr Overview]]`, `[[Portainer]]`, `[[NPM]]`, `[[Stack Registry]]`.
 
 **Deploy Pattern**: PR to `dev` → merge → Portainer redeploy (pulls latest, rebuilds image, restarts).
 Redeploy via API: `PUT /api/stacks/11/git/redeploy?endpointId=3` with `SESSION_SECRET` env var.
 Redeploy via UI: Stacks → hextrackr → Pull and redeploy.
 
-**Secrets**: `SESSION_SECRET` injected as Portainer env var (source: Infisical project `4f9838fa-c87d-4728-8766-4c99652ab110`, key `HEXTRACKR_SESSION_SECRET`).
+**Secrets**: `SESSION_SECRET` injected as Portainer env var (source: Infisical key `HEXTRACKR_SESSION_SECRET`).
 
 **Volume Mounts** (all named volumes, no bind mounts for data):
 
@@ -137,7 +129,7 @@ Redeploy via UI: Stacks → hextrackr → Pull and redeploy.
 **Quick Reference Map**:
 
 - **MCP Tools Guide**: `/docs/MCP_TOOLS.md`
-- **Taxonomy**: `/docs/TAXONOMY.md` — Memento entity naming conventions (archived, Memento retired)
+- **Taxonomy**: `/docs/TAXONOMY.md` — (archived, historical reference only)
 - **Git Workflow**: `/docs/GIT_WORKFLOW.md`
 - **SRPI Process**: `/docs/SRPI_PROCESS.md`
 - **CHANGELOG and Version Bump**: `/docs/CHANGELOG AND VERSION BUMP PROCESS.md`
@@ -170,23 +162,14 @@ Redeploy via UI: Stacks → hextrackr → Pull and redeploy.
 **Team**: HexTrackr-Dev (primary development team)
 **Status Flow**: Backlog → Todo → In Progress → In Review → Done
 
-## Specialized Subagents
+## Code Search
 
-**Search Strategy** (use in this order):
+> See global `~/.claude/CLAUDE.md` for the full code search tier order (HARD GATE).
 
-1. `/codebase-search` — Fast semantic search (if codebase indexed)
-2. **Explore agent** — Grep/glob-based keyword search (fallback)
-3. **codebase-navigator** — claude-context semantic search + file reads
-
-**Available Agents**: Explore, codebase-navigator, linear-librarian, hextrackr-fullstack-dev
+**Project search path**: `/Volumes/DATA/GitHub/HexTrackr`
 
 **CRITICAL**: Never assume code exists or works a certain way — always search first.
 
 ## Memory Backend
 
 **Active**: mem0 cloud (`mcp__mem0__*`) with `agent_id: "hextrackr"` for project-scoped memories.
-**Retired**: Memento (Neo4j) — no longer in the MCP stack. Historical entity types (`HEXTRACKR:DEVELOPMENT:SESSION`, etc.) are archived in `/docs/TAXONOMY.md`.
-
-## Code Search Path
-
-`mcp__claude-context__search_code` path: `/Volumes/DATA/GitHub/HexTrackr`
