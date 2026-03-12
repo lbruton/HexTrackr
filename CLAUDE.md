@@ -111,16 +111,11 @@ Redeploy via UI: Stacks → hextrackr → Pull and redeploy.
 - JavaScript: 4-space indentation, double quotes, required semicolons. Prefer `const`/`let`; `no-var` is enforced.
 - Lint errors block CI; run `npm run eslint:fix` and `npm run stylelint:fix` before committing.
 
-### SRPI (Specification → Research → Plan → Implement)
+### Development Process
 
-**HexTrackr uses SRPI** (see DocVault `[[SRPI Process]]`) — this is a project-specific override to the global spec-workflow.
+**HexTrackr uses the global spec-workflow** for features and enhancements. See `~/.claude/CLAUDE.md` for the full Spec Flow Lifecycle.
 
-**Use for**: New features, user-facing enhancements, cross-system changes
-
-- **Specification + Research** (combined phase): Define WHY + discover WHAT
-- **Plan**: Define HOW using Context7 standards, Codacy linting, proper frameworks
-- **Implement**: Break into bite-sized sessions, use specialized agents, checkpoint/rewind workflow
-- Templates: `/docs/TEMPLATE_*.md`
+SRPI was the previous project-specific process — archived to `/docs/archive/`. Historical reference in DocVault `[[SRPI Process]]`.
 
 ## Additional Documentation
 
@@ -140,7 +135,7 @@ Redeploy via UI: Stacks → hextrackr → Pull and redeploy.
 - `[[MCP Tools]]` — MCP server tools and Claude Code hooks
 - `[[Turso Migration]]` — Future cloud database migration
 
-**In-repo `/docs/`** contains only: SRPI templates (`TEMPLATE_*.md`), active research (`issues/`, `srpi/`), and archived docs (`archive/`).
+**In-repo `/docs/`** contains only: active research (`issues/`, `srpi/`) and archived docs (`archive/`).
 
 ## Changelog Rolling Window
 
