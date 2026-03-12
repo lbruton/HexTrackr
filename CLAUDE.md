@@ -14,7 +14,7 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
 
 - **Application**: https://hextrackr.com (production, via NPM reverse proxy)
 - **Dev alias**: https://dev.hextrackr.com (same instance, alternate domain)
-- **User Documentation**: https://hextrackr.com/docs-html/ (markdown → HTML, 130+ files)
+- **User Documentation**: https://hextrackr.com/docs-html/ (user guides, reference, changelog)
 - **JSDoc API Reference**: https://hextrackr.com/dev-docs-html (inline code comments → HTML)
 
 **Future Direction**: Migration to Turso hosted DB, eventual "bring your own backend" public web app with cloud sync credentials replacing admin/user auth.
@@ -77,7 +77,7 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
 **Admin Access**: Settings modal → "View Audit Logs" button (admin users only)
 **Features**: AES-256-GCM encrypted audit trail with filtering, search, CSV/JSON export
 **Categories Tracked**: Authentication, Tickets, Imports, Backups, System
-**Documentation**: See `/docs/LOGGING_SYSTEM.md` for complete developer guide
+**Documentation**: See DocVault `[[Logging System]]` for complete developer guide
 
 ## Deployment Architecture
 
@@ -113,7 +113,7 @@ Redeploy via UI: Stacks → hextrackr → Pull and redeploy.
 
 ### SRPI (Specification → Research → Plan → Implement)
 
-**HexTrackr uses SRPI, see `/docs/SRPI_PROCESS.md`** — this is a project-specific override to the global spec-workflow.
+**HexTrackr uses SRPI** (see DocVault `[[SRPI Process]]`) — this is a project-specific override to the global spec-workflow.
 
 **Use for**: New features, user-facing enhancements, cross-system changes
 
@@ -124,20 +124,23 @@ Redeploy via UI: Stacks → hextrackr → Pull and redeploy.
 
 ## Additional Documentation
 
-**Location**: All reference documentation is in `/docs/` folder. Use `/codebase-search` for semantic search.
+**Developer/technical documentation lives in DocVault** (`/Volumes/DATA/GitHub/DocVault/Projects/HexTrackr/`). See DocVault `[[Overview]]` for the full index.
 
-**Quick Reference Map**:
+**Key DocVault pages**:
 
-- **MCP Tools Guide**: `/docs/MCP_TOOLS.md`
-- **Taxonomy**: `/docs/TAXONOMY.md` — (archived, historical reference only)
-- **Git Workflow**: `/docs/GIT_WORKFLOW.md`
-- **SRPI Process**: `/docs/SRPI_PROCESS.md`
-- **CHANGELOG and Version Bump**: `/docs/CHANGELOG AND VERSION BUMP PROCESS.md`
-- **CSS Coding Standards**: `/docs/CSS_CODING_STANDARDS.md`
-- **Logging System**: `/docs/LOGGING_SYSTEM.md`
-- **Cisco Advisory Architecture**: `/docs/CISCO_ADVISORY_ARCHITECTURE.md`
-- **Schema Evolution**: `/docs/SCHEMA_EVOLUTION.md`
-- **RHEL Deployment** (archived — RHEL VM 102 decommissioned): `/docs/RHEL_DEPLOYMENT_GUIDE.md`, `/docs/RHEL_QUICK_REFERENCE.md`, `/docs/DEPLOYMENT_RHEL10.md`
+- `[[Architecture]]` — Technology stack, system overview
+- `[[Database Schema]]` — Current schema with SQL snapshot
+- `[[Logging System]]` — Audit logging with AES-256-GCM
+- `[[Cisco Advisory Architecture]]` — OAuth2 PSIRT integration
+- `[[Security Architecture]]` — Auth flow, CSRF, rate limiting
+- `[[SRPI Process]]` — Specification → Research → Plan → Implement
+- `[[Git Workflow]]` — Branch model, PR lifecycle
+- `[[Version Management]]` — Changelog and version bump process
+- `[[CSS Coding Standards]]` — Styling conventions
+- `[[MCP Tools]]` — MCP server tools and Claude Code hooks
+- `[[Turso Migration]]` — Future cloud database migration
+
+**In-repo `/docs/`** contains only: SRPI templates (`TEMPLATE_*.md`), active research (`issues/`, `srpi/`), and archived docs (`archive/`).
 
 ## Changelog Rolling Window
 
@@ -147,7 +150,7 @@ Redeploy via UI: Stacks → hextrackr → Pull and redeploy.
 - `index.md` and `archive.md` are AUTO-GENERATED — never manually edit
 - Run `npm run docs:generate` after adding new version files
 
-**Documentation System**: ALL edits in markdown under `/app/public/docs-source/`. HTML files are build artifacts.
+**Documentation System**: User-facing docs in `/app/public/docs-source/` (guides, reference, changelog). HTML files are build artifacts. Developer/technical docs in DocVault.
 
 ## Git Branch Workflow
 
