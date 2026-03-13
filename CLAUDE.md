@@ -155,10 +155,10 @@ SRPI was the previous project-specific process — archived to `/docs/archive/`.
 - `main`: Production branch (protected, deploy-only)
 - `feature/*`: Feature branches (create from dev, merge back to dev)
 
-## Linear Issue Tracking
+## Issue Tracking
 
-**Team**: HexTrackr-Dev (primary development team)
-**Status Flow**: Backlog → Todo → In Progress → In Review → Done
+Issues tracked in DocVault vault. Prefix: `HEX` (see `issue` skill).
+**Status Flow**: backlog → todo → in-progress → in-review → done
 
 ## Code Search
 
