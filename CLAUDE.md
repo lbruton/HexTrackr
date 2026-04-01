@@ -17,7 +17,7 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
 - **User Documentation**: https://hextrackr.com/docs-html/ (user guides, reference, changelog)
 - **JSDoc API Reference**: https://hextrackr.com/dev-docs-html (inline code comments → HTML)
 
-**Future Direction**: Migration to Turso hosted DB, eventual "bring your own backend" public web app with cloud sync credentials replacing admin/user auth.
+**Status**: Stable production system. SQLite is the long-term database — no migration planned.
 
 ## Technical Baseline
 
@@ -115,11 +115,11 @@ Redeploy via UI: Stacks → hextrackr → Pull and redeploy.
 
 **HexTrackr uses the global spec-workflow** for features and enhancements. See `~/.claude/CLAUDE.md` for the full Spec Flow Lifecycle.
 
-SRPI was the previous project-specific process — archived to `/docs/archive/`. Historical reference in DocVault `[[SRPI Process]]`.
+SRPI was the previous project-specific process (retired). Historical reference in DocVault `[[SRPI Process]]`.
 
 ## Additional Documentation
 
-**Developer/technical documentation lives in DocVault** (`/Volumes/DATA/GitHub/DocVault/Projects/HexTrackr/`). See DocVault `[[Overview]]` for the full index.
+**Developer/technical documentation lives in DocVault** (`/Volumes/DATA/GitHub/DocVault/Projects/HexTrackr/`). mem0 supplements with session context and past decisions. See DocVault `[[Overview]]` for the full index.
 
 **Key DocVault pages**:
 
@@ -128,14 +128,10 @@ SRPI was the previous project-specific process — archived to `/docs/archive/`.
 - `[[Logging System]]` — Audit logging with AES-256-GCM
 - `[[Cisco Advisory Architecture]]` — OAuth2 PSIRT integration
 - `[[Security Architecture]]` — Auth flow, CSRF, rate limiting
-- `[[SRPI Process]]` — Specification → Research → Plan → Implement
 - `[[Git Workflow]]` — Branch model, PR lifecycle
 - `[[Version Management]]` — Changelog and version bump process
 - `[[CSS Coding Standards]]` — Styling conventions
 - `[[MCP Tools]]` — MCP server tools and Claude Code hooks
-- `[[Turso Migration]]` — Future cloud database migration
-
-**In-repo `/docs/`** contains only: active research (`issues/`, `srpi/`) and archived docs (`archive/`).
 
 ## Changelog Rolling Window
 
