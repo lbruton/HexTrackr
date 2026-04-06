@@ -26,45 +26,11 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
 **Database**: SQLite (WAL journal mode, Docker named volume) at `/app/app/data/hextrackr.db`
 **Services**: 20 service files | **Routes**: 14 route modules
 
-## Core Services
+## Core Services & Database
 
-* **DatabaseService**: `services/databaseService.js:23` (WAL journal mode with Docker named volume isolation, backup/restore, schema migrations)
-* **LoggingService**: `services/loggingService.js:45` (category-based, rotating logs, audit trail)
-* **VulnerabilityService**: `services/vulnerabilityService.js:67` (CRUD + stats aggregation)
-* **TicketService**: `services/ticketService.js:89` (full CRUD, soft delete, field operations ticketing)
-* **BackupService**: `services/backupService.js:34` (automated backups, retention policy)
-* **ImportService**: `services/importService.js:12` (CSV import with validation)
-* **TemplateService**: `services/templateService.js:56` (email/ticket/vulnerability templates)
-* **AuthService**: `services/authService.js:78` (Argon2id password hashing, session management)
-* **PreferencesService**: `services/preferencesService.js:23` (cross-device user settings)
-* **KevService**: `services/kevService.js:45` (CISA KEV integration, 24h background sync)
-* **CiscoService**: `services/ciscoService.js:123` (OAuth2, PSIRT API, advisory parsing)
-* **PaloAltoService**: `services/paloAltoService.js:89` (advisory scraping, version matching)
-* **CacheService**: `services/cacheService.js:12` (in-memory TTL cache, 5-min default)
-* **FileService**: `services/fileService.js:34` (safe file operations, path validation)
-* **LocationService**: `services/locationService.js:45` (site aggregation, hostname parsing)
-* **DocsService**: `services/docsService.js:23` (markdown rendering, version docs)
-* **HostnameParserService**: `services/hostnameParserService.js:15` (Pattern 1/2/3 hostname normalization)
+20 service files in `services/`, 17 database tables. See DocVault `[[Architecture]]` for the full service index and `[[Database Schema]]` for the current schema with SQL snapshot.
 
-## Database Tables
-
-* **tickets**: Field operations ticketing (soft delete)
-* **vulnerabilities**: Primary vuln data
-* **vulnerabilities_affected_devices**: Many-to-many device mapping
-* **vulnerabilities_affected_locations**: Many-to-many location mapping
-* **daily_totals**: Historical trend aggregation (365-day retention)
-* **kev_status**: CISA KEV correlation tracking
-* **cisco_advisories**: Cisco PSIRT advisories (OAuth2 synced)
-* **palo_alto_advisories**: Palo Alto security bulletins (web scraped)
-* **users**: Authentication (Argon2id hashed passwords)
-* **user_preferences**: Cross-device settings (JSON blob)
-* **email_templates**: Notification templates (4 types)
-* **ticket_templates**: Field ops markdown templates
-* **vulnerability_templates**: CVE templates
-* **backup_metadata**: Backup history with retention policy
-* **audit_logs**: Logging system with AES-256-GCM encryption
-* **audit_log_config**: Encryption key storage and retention policy configuration
-* **cisco_fixed_versions**: Normalized Cisco fixed versions (HEX-287 Migration 007)
+Key services to know: DatabaseService (WAL mode), AuthService (Argon2id), CiscoService (OAuth2 PSIRT), HostnameParserService (Pattern 1/2/3 normalization).
 
 ## Key Commands
 
@@ -121,17 +87,7 @@ SRPI was the previous project-specific process (retired). Historical reference i
 
 **Developer/technical documentation lives in DocVault** (`/Volumes/DATA/GitHub/DocVault/Projects/HexTrackr/`). mem0 supplements with session context and past decisions. See DocVault `[[Overview]]` for the full index.
 
-**Key DocVault pages**:
-
-- `[[Architecture]]` — Technology stack, system overview
-- `[[Database Schema]]` — Current schema with SQL snapshot
-- `[[Logging System]]` — Audit logging with AES-256-GCM
-- `[[Cisco Advisory Architecture]]` — OAuth2 PSIRT integration
-- `[[Security Architecture]]` — Auth flow, CSRF, rate limiting
-- `[[Git Workflow]]` — Branch model, PR lifecycle
-- `[[Version Management]]` — Changelog and version bump process
-- `[[CSS Coding Standards]]` — Styling conventions
-- `[[MCP Tools]]` — MCP server tools and Claude Code hooks
+Key pages: Start at `/Volumes/DATA/GitHub/DocVault/Projects/HexTrackr/_Index.md` and follow the index.
 
 ## Changelog Rolling Window
 
