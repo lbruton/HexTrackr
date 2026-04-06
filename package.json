@@ -28,7 +28,7 @@
     "db:seed:validate": "node app/scripts/validate-seed-database.js"
   },
   "dependencies": {
-    "argon2": "^0.31.2",
+    "argon2": "^0.44.0",
     "better-sqlite3": "^12.4.1",
     "better-sqlite3-session-store": "^0.1.0",
     "compression": "^1.7.4",
@@ -47,7 +47,7 @@
     "node-cache": "^5.1.2",
     "papaparse": "^5.4.1",
     "socket.io": "^4.8.1",
-    "sqlite3": "^5.1.7",
+    "sqlite3": "^6.0.1",
     "uuid": "^12.0.0"
   },
   "devDependencies": {
@@ -55,7 +55,7 @@
     "eslint": "^9.34.0",
     "eslint-formatter-compact": "^8.40.0",
     "jsdoc": "^4.0.4",
-    "markdownlint-cli": "^0.41.0",
+    "markdownlint-cli": "^0.48.0",
     "nodemon": "^3.0.1",
     "socket.io-client": "^4.8.1",
     "stylelint": "^16.23.1",
