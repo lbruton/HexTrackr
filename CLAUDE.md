@@ -12,12 +12,11 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
 
 **Access Points**:
 
-- **Application**: https://hextrackr.com (production, via NPM reverse proxy)
-- **Dev alias**: https://dev.hextrackr.com (same instance, alternate domain)
-- **User Documentation**: https://hextrackr.com/docs-html/ (user guides, reference, changelog)
-- **JSDoc API Reference**: https://hextrackr.com/dev-docs-html (inline code comments → HTML)
+- **Application**: https://hextrackr.lbruton.cc (production, Cloudflare Zero Trust tunnel, team 2FA)
+- **Legacy aliases**: hextrackr.com, dev.hextrackr.com (NPM reverse proxy, home network only)
+- **User Documentation**: https://hextrackr.lbruton.cc/docs-html/ (user guides, reference, changelog)
 
-**Status**: Stable production system. SQLite is the long-term database — no migration planned.
+**Status**: Stable production system undergoing v2 planning. SQLite is the current database; PostgreSQL under evaluation for v2.
 
 ## Technical Baseline
 
