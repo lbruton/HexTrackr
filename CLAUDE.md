@@ -111,6 +111,11 @@ Key pages: Start at `/Volumes/DATA/GitHub/DocVault/Projects/HexTrackr/_Index.md`
 Issues tracked in DocVault vault. Prefix: `HEX` (see `issue` skill).
 **Status Flow**: backlog → todo → in-progress → in-review → done
 
+## Hooks
+
+- **gitleaks**: Pre-commit hook scans for accidental secret commits. Runs via `pre-commit` framework. Installed 2026-04-14 (OPS-116).
+- **HexTrackr pre-commit checks**: Markdown/CSS auto-fix + ESLint warning check. Preserved from `.githooks/pre-commit` in `.pre-commit-config.yaml`.
+
 ## Code Search
 
 > See global `~/.claude/CLAUDE.md` for the full code search tier order (HARD GATE).
