@@ -58,6 +58,45 @@ else
     echo "✅ JavaScript clean"
 fi
 
+# Layer 3: Gitleaks secret detection (security check - cannot be bypassed)
+echo ""
+echo "🔒 Running gitleaks secret detection..."
+echo ""
+
+# Ensure gitleaks is installed
+if ! command -v gitleaks &> /dev/null; then
+    echo "⚠️  gitleaks not found. Installing..."
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        if command -v brew &> /dev/null; then
+            brew install gitleaks
+        else
+            echo "❌ Homebrew not found. Please install gitleaks manually:"
+            echo "   brew install gitleaks"
+            exit 1
+        fi
+    else
+        echo "❌ Please install gitleaks manually:"
+        echo "   Visit https://github.com/gitleaks/gitleaks?tab=readme-ov-file#installing"
+        exit 1
+    fi
+fi
+
+# Run gitleaks detect on the repository
+if gitleaks detect --source . --no-git --verbose 2>&1 | grep -q "leaks found: [1-9]"; then
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "🚨 GITLEAKS DETECTED SECRETS IN YOUR CHANGES"
+    echo ""
+    echo "Commit blocked for security reasons."
+    echo "Please remove the secrets before committing."
+    echo ""
+    echo "💡 Tip: To bypass in emergency: git commit --no-verify"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+    exit 1
+else
+    echo "✅ No secrets detected"
+fi
+
 # Stage the auto-fixed files (only markdown and CSS)
 git add -u
 
