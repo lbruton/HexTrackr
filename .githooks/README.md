@@ -6,11 +6,12 @@ This directory contains git hooks that enforce code quality without breaking fun
 
 ## Philosophy: Defense-in-Depth
 
-Our hooks use a **three-layer safety system**:
+Our hooks use a **four-layer safety system**:
 
 1. **Layer 1: Safe Auto-Fixes** - Only formatting (markdown, CSS)
 2. **Layer 2: Manual Review** - JavaScript warnings but no auto-fix
-3. **Layer 3: Documentation** - Guidelines to prevent Codacy false positives
+3. **Layer 3: Secret Detection** - Gitleaks security check (cannot be bypassed)
+4. **Layer 4: Documentation** - Guidelines to prevent Codacy false positives
 
 ## Current Hooks
 
@@ -23,6 +24,11 @@ Our hooks use a **three-layer safety system**:
 **Warnings Only (NO auto-fix):**
 - ⚠️  ESLint JavaScript issues
 - 📚 Directs developer to `.github/CODACY_GUIDELINES.md`
+
+**Security Check (cannot be bypassed):**
+- 🔒 Gitleaks secret detection (v8.21.2+)
+- Automatically installs gitleaks if not present
+- Blocks commit if secrets are detected
 
 **Interactive:**
 - Asks user permission to commit with ESLint warnings
@@ -122,6 +128,8 @@ git commit --no-verify -m "emergency: critical hotfix"
 - Critical security hotfixes
 - When hooks themselves are broken
 
+**⚠️ WARNING**: Bypassing hooks skips security checks (gitleaks). Use only in genuine emergencies.
+
 ## Hook Behavior
 
 ### Successful Commit (no issues)
@@ -133,6 +141,8 @@ git commit --no-verify -m "emergency: critical hotfix"
      ✅ CSS clean
 ⚠️  Checking JavaScript (warnings only, no auto-fix)...
 ✅ JavaScript clean
+🔒 Running gitleaks secret detection...
+✅ No secrets detected
 
 ✅ Safe fixes applied and staged
 ```
@@ -233,7 +243,12 @@ npm install
   - Protects against "forgot to commit" scenarios
   - Three usage options: direct, shell alias, git alias
 
-- **v1.0.0** (2025-09-30): Initial safe hooks implementation
-  - Safe auto-fixes for markdown and CSS
-  - Warning-only for JavaScript
-  - Codacy false positive documentation
+ - **v1.0.0** (2025-09-30): Initial safe hooks implementation
+   - Safe auto-fixes for markdown and CSS
+   - Warning-only for JavaScript
+   - Codacy false positive documentation
+
+- **v1.1.1** (2026-04-14): Gitleaks integration (OPS-116)
+   - Added gitleaks secret detection to pre-commit hook
+   - Automatic installation of gitleaks if not present
+   - Blocks commits with detected secrets (security check cannot be bypassed)
