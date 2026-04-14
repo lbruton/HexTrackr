@@ -243,12 +243,12 @@ npm install
   - Protects against "forgot to commit" scenarios
   - Three usage options: direct, shell alias, git alias
 
- - **v1.0.0** (2025-09-30): Initial safe hooks implementation
-   - Safe auto-fixes for markdown and CSS
-   - Warning-only for JavaScript
-   - Codacy false positive documentation
+- **v1.0.0** (2025-09-30): Initial safe hooks implementation
+  - Safe auto-fixes for markdown and CSS
+  - Warning-only for JavaScript
+  - Codacy false positive documentation
 
 - **v1.1.1** (2026-04-14): Gitleaks integration (OPS-116)
-   - Added gitleaks secret detection to pre-commit hook
-   - Automatic installation of gitleaks if not present
-   - Blocks commits with detected secrets (security check cannot be bypassed)
+  - Added gitleaks secret detection to pre-commit hook
+  - Automatic installation of gitleaks if not present
+  - Blocks commits with detected secrets (security check cannot be bypassed)
