@@ -23,10 +23,10 @@
 
 /* Card Header */
 .card-header {
-    background: var(--hextrackr-card-header-bg);  /* Use themed card header background */
+    background: var(--hextrackr-card-header-bg); /* Use themed card header background */
     border-bottom: 1px solid var(--tblr-border-color);
     padding: 1rem 1.25rem;
-    border-radius: 8px 8px 0 0 !important;  /* Match parent .card top corners (HEX-122) */
+    border-radius: 8px 8px 0 0 !important; /* Match parent .card top corners (HEX-122) */
 }
 
 .card-header .card-title {
@@ -43,23 +43,23 @@
 /* Card Body */
 .card-body {
     padding: 1.25rem;
-    border-radius: 8px;  /* Match parent .card border-radius (HEX-122) */
+    border-radius: 8px; /* Match parent .card border-radius (HEX-122) */
 }
 
 /* Only add margin when there's a card-header for proper spacing */
 .card-header + .card-body {
-    margin-top: 1rem;  /* Spacing between header and content */
+    margin-top: 1rem; /* Spacing between header and content */
 }
 
 /* Specific margin fixes for vulnerability/device cards that may need visual balance */
 .vulnerability-card .card-body,
 .device-card .card-body {
-    margin-top: 1rem;  /* Preserve spacing for proper visual balance with KEV badges */
+    margin-top: 1rem; /* Preserve spacing for proper visual balance with KEV badges */
 }
 
 /* Card Footer */
 .card-footer {
-    background: var(--hextrackr-card-footer-bg);  /* Use themed card footer background */
+    background: var(--hextrackr-card-footer-bg); /* Use themed card footer background */
     border-top: 1px solid var(--tblr-border-color);
     padding: 0.75rem 1.25rem;
 }
@@ -214,7 +214,7 @@
    =========================== */
 
 .chart-container {
-    background: var(--hextrackr-surface-1);  /* Use CSS variable instead of hardcoded white */
+    background: var(--hextrackr-surface-1); /* Use CSS variable instead of hardcoded white */
     border-radius: 12px;
     box-shadow: var(--hextrackr-shadow-sm);
     padding: 2rem;
@@ -232,7 +232,7 @@
    =========================== */
 
 .workspace-container {
-    background: var(--hextrackr-surface-1);  /* Use CSS variable instead of hardcoded white */
+    background: var(--hextrackr-surface-1); /* Use CSS variable instead of hardcoded white */
     border-radius: 12px;
     box-shadow: var(--hextrackr-shadow-sm);
     overflow: hidden;
@@ -440,8 +440,8 @@
 /* Equal height and width for all Third Party Integration cards */
 #thirdPartyContent [data-integration] {
     flex: 1;
-    max-width: 50%;  /* Force equal column widths */
-    min-width: 50%;  /* Prevent shrinking */
+    max-width: 50%; /* Force equal column widths */
+    min-width: 50%; /* Prevent shrinking */
 }
 
 #thirdPartyContent [data-integration] .card {

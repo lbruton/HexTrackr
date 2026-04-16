@@ -29,7 +29,7 @@ function createSyncRouter(db, preferencesService) {
             const [ciscoStatus, paloStatus, kevStatus] = await Promise.all([
                 ciscoService.getSyncStatus(),
                 paloService.getSyncStatus(),
-                kevService.getSyncStatus()
+                kevService.getSyncStatus(),
             ]);
 
             res.json({
@@ -42,8 +42,8 @@ function createSyncRouter(db, preferencesService) {
                         synced: ciscoStatus.totalAdvisories,
                         matched: ciscoStatus.matchedCount,
                         noFix: ciscoStatus.noFixAvailable,
-                        unsynced: ciscoStatus.unsyncedCount
-                    }
+                        unsynced: ciscoStatus.unsyncedCount,
+                    },
                 },
                 palo: {
                     lastSync: paloStatus.lastSync,
@@ -54,8 +54,8 @@ function createSyncRouter(db, preferencesService) {
                         synced: paloStatus.totalAdvisories,
                         matched: paloStatus.matchedCount,
                         noFix: paloStatus.noFixAvailable,
-                        unsynced: paloStatus.unsyncedCount
-                    }
+                        unsynced: paloStatus.unsyncedCount,
+                    },
                 },
                 kev: {
                     lastSync: kevStatus.lastSync,
@@ -64,15 +64,15 @@ function createSyncRouter(db, preferencesService) {
                     stats: {
                         total: kevStatus.totalKevs,
                         matched: kevStatus.matchedCount,
-                        version: kevStatus.catalogVersion
-                    }
-                }
+                        version: kevStatus.catalogVersion,
+                    },
+                },
             });
         } catch (error) {
             console.error("Failed to get sync status:", error);
             res.status(500).json({
                 error: "Failed to get sync status",
-                message: error.message
+                message: error.message,
             });
         }
     });

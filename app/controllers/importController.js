@@ -62,7 +62,7 @@ async function importVulnerabilities(req, res) {
         // Parse CSV file
         const csvData = PathValidator.safeReadFileSync(req.file.path, "utf8");
         const results = await importService.parseCSV(csvData);
-        const rows = results.data.filter(row => Object.values(row).some(val => val && val.trim()));
+        const rows = results.data.filter((row) => Object.values(row).some((val) => val && val.trim()));
 
         if (global.logger?.info) {
             global.logger.info("backend", "import", "CSV parsed successfully", { rowCount: rows.length });
@@ -77,7 +77,7 @@ async function importVulnerabilities(req, res) {
             scanDate,
             rowCount: rows.length,
             fileSize: req.file.size,
-            headers: results.meta.fields
+            headers: results.meta.fields,
         });
 
         // Process vulnerabilities using enhanced lifecycle
@@ -85,7 +85,7 @@ async function importVulnerabilities(req, res) {
             rows,
             importRecord.importId,
             req.file.path,
-            scanDate
+            scanDate,
         );
 
         // Clean up uploaded file
@@ -107,9 +107,8 @@ async function importVulnerabilities(req, res) {
             filename,
             vendor,
             scanDate,
-            ...result
+            ...result,
         });
-
     } catch (error) {
         if (global.logger?.error) {
             global.logger.error("backend", "import", "Vulnerability import failed", { error: error.message });
@@ -133,7 +132,7 @@ async function importVulnerabilities(req, res) {
         res.status(500).json({
             success: false,
             error: "Import failed",
-            details: error.message
+            details: error.message,
         });
     }
 }
@@ -159,23 +158,23 @@ async function importVulnerabilitiesStaging(req, res) {
 
         // Use frontend sessionId or create new one
         const frontendSessionId = req.body.sessionId;
-        const sessionId = frontendSessionId ?
-            progressTracker.createSessionWithId(frontendSessionId, {
-                operation: "csv-import",
-                filename: filename,
-                vendor: vendor,
-                scanDate: scanDate,
-                totalSteps: 3, // 1. Parse CSV, 2. Load to staging, 3. Process to final tables
-                currentStep: 0
-            }) :
-            progressTracker.createSession({
-                operation: "csv-import",
-                filename: filename,
-                vendor: vendor,
-                scanDate: scanDate,
-                totalSteps: 3,
-                currentStep: 0
-            });
+        const sessionId = frontendSessionId
+            ? progressTracker.createSessionWithId(frontendSessionId, {
+                  operation: "csv-import",
+                  filename: filename,
+                  vendor: vendor,
+                  scanDate: scanDate,
+                  totalSteps: 3, // 1. Parse CSV, 2. Load to staging, 3. Process to final tables
+                  currentStep: 0,
+              })
+            : progressTracker.createSession({
+                  operation: "csv-import",
+                  filename: filename,
+                  vendor: vendor,
+                  scanDate: scanDate,
+                  totalSteps: 3,
+                  currentStep: 0,
+              });
 
         // Immediately return session ID to client
         res.json({
@@ -184,7 +183,7 @@ async function importVulnerabilitiesStaging(req, res) {
             message: "CSV import started",
             filename: filename,
             vendor: vendor,
-            scanDate: scanDate
+            scanDate: scanDate,
         });
 
         // Continue processing asynchronously
@@ -196,10 +195,9 @@ async function importVulnerabilitiesStaging(req, res) {
             sessionId,
             startTime,
             progressTracker,
-            userId: req.session?.userId || null,  // FIX: Use req.session.userId (HexTrackr uses express-session auth)
-            username: req.session?.username || null  // ADD: Include username for better audit trail display
+            userId: req.session?.userId || null, // FIX: Use req.session.userId (HexTrackr uses express-session auth)
+            username: req.session?.username || null, // ADD: Include username for better audit trail display
         });
-
     } catch (error) {
         if (global.logger?.error) {
             global.logger.error("backend", "import", "Staging import failed", { error: error.message });
@@ -216,7 +214,7 @@ async function importVulnerabilitiesStaging(req, res) {
             res.status(500).json({
                 success: false,
                 error: "Import failed",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -242,9 +240,8 @@ async function importVulnerabilitiesJSON(req, res) {
             imported: result.imported,
             total: csvData.length,
             importId: result.importId,
-            errors: result.errors.length > 0 ? result.errors : undefined
+            errors: result.errors.length > 0 ? result.errors : undefined,
         });
-
     } catch (error) {
         if (global.logger?.error) {
             global.logger.error("backend", "import", "JSON vulnerability import failed", { error: error.message });
@@ -254,7 +251,7 @@ async function importVulnerabilitiesJSON(req, res) {
         res.status(500).json({
             success: false,
             error: "Import failed",
-            details: error.message
+            details: error.message,
         });
     }
 }
@@ -278,9 +275,8 @@ async function importTicketsJSON(req, res) {
             success: true,
             imported: result.imported,
             total: csvData.length,
-            errors: result.errors.length > 0 ? result.errors : undefined
+            errors: result.errors.length > 0 ? result.errors : undefined,
         });
-
     } catch (error) {
         if (global.logger?.error) {
             global.logger.error("backend", "import", "JSON ticket import failed", { error: error.message });
@@ -290,7 +286,7 @@ async function importTicketsJSON(req, res) {
         res.status(500).json({
             success: false,
             error: "Import failed",
-            details: error.message
+            details: error.message,
         });
     }
 }
@@ -305,7 +301,7 @@ async function getImportHistory(req, res) {
         const imports = await importService.getImportHistory();
         res.json({
             success: true,
-            data: imports
+            data: imports,
         });
     } catch (error) {
         if (global.logger?.error) {
@@ -316,7 +312,7 @@ async function getImportHistory(req, res) {
         res.status(500).json({
             success: false,
             error: "Failed to fetch import history",
-            details: error.message
+            details: error.message,
         });
     }
 }
@@ -332,7 +328,7 @@ async function checkImportProgress(req, res) {
     if (!sessionId) {
         return res.status(400).json({
             success: false,
-            error: "Session ID required"
+            error: "Session ID required",
         });
     }
 
@@ -342,7 +338,7 @@ async function checkImportProgress(req, res) {
         if (!session) {
             return res.status(404).json({
                 success: false,
-                error: "Session not found"
+                error: "Session not found",
             });
         }
 
@@ -352,9 +348,8 @@ async function checkImportProgress(req, res) {
             progress: session.progress,
             status: session.status,
             message: session.metadata.message,
-            metadata: session.metadata
+            metadata: session.metadata,
         });
-
     } catch (error) {
         if (global.logger?.error) {
             global.logger.error("backend", "import", "Error checking import progress", { error: error.message });
@@ -364,7 +359,7 @@ async function checkImportProgress(req, res) {
         res.status(500).json({
             success: false,
             error: "Failed to check progress",
-            details: error.message
+            details: error.message,
         });
     }
 }
@@ -376,5 +371,5 @@ module.exports = {
     importVulnerabilitiesJSON,
     importTicketsJSON,
     getImportHistory,
-    checkImportProgress
+    checkImportProgress,
 };

@@ -34,48 +34,43 @@ class AuthService {
     async authenticateUser(username, password) {
         return new Promise((resolve, reject) => {
             // Fetch user by username
-            this.db.get(
-                "SELECT * FROM users WHERE username = ?",
-                [username],
-                async (err, user) => {
-                    if (err) {
-                        return reject(new Error("Database error during authentication: " + err.message));
+            this.db.get("SELECT * FROM users WHERE username = ?", [username], async (err, user) => {
+                if (err) {
+                    return reject(new Error("Database error during authentication: " + err.message));
+                }
+
+                // User not found - return null (don't reveal if username exists)
+                if (!user) {
+                    return resolve(null);
+                }
+
+                try {
+                    // Check if account is locked
+                    const isLocked = await this.checkAccountLockout(user.id);
+                    if (isLocked) {
+                        return resolve({ locked: true, userId: user.id });
                     }
 
-                    // User not found - return null (don't reveal if username exists)
-                    if (!user) {
+                    // Verify password with Argon2id (timing-safe comparison built-in)
+                    const isValid = await argon2.verify(user.password_hash, password);
+
+                    if (!isValid) {
+                        // Increment failed attempts on password mismatch
+                        await this.incrementFailedAttempts(user.id);
                         return resolve(null);
                     }
 
-                    try {
-                        // Check if account is locked
-                        const isLocked = await this.checkAccountLockout(user.id);
-                        if (isLocked) {
-                            return resolve({ locked: true, userId: user.id });
-                        }
+                    // Authentication successful - reset failed attempts and update last login
+                    await this.resetFailedAttempts(user.id);
+                    await this.updateLastLogin(user.id);
 
-                        // Verify password with Argon2id (timing-safe comparison built-in)
-                        const isValid = await argon2.verify(user.password_hash, password);
-
-                        if (!isValid) {
-                            // Increment failed attempts on password mismatch
-                            await this.incrementFailedAttempts(user.id);
-                            return resolve(null);
-                        }
-
-                        // Authentication successful - reset failed attempts and update last login
-                        await this.resetFailedAttempts(user.id);
-                        await this.updateLastLogin(user.id);
-
-                        // Return user object without password hash
-                        const { password_hash, ...userWithoutPassword } = user;
-                        resolve(userWithoutPassword);
-
-                    } catch (verifyError) {
-                        reject(new Error("Password verification failed: " + verifyError.message));
-                    }
+                    // Return user object without password hash
+                    const { password_hash, ...userWithoutPassword } = user;
+                    resolve(userWithoutPassword);
+                } catch (verifyError) {
+                    reject(new Error("Password verification failed: " + verifyError.message));
                 }
-            );
+            });
         });
     }
 
@@ -86,16 +81,12 @@ class AuthService {
      */
     async validateSession(sessionUserId) {
         return new Promise((resolve, reject) => {
-            this.db.get(
-                "SELECT id FROM users WHERE id = ?",
-                [sessionUserId],
-                (err, user) => {
-                    if (err) {
-                        return reject(new Error("Database error during session validation: " + err.message));
-                    }
-                    resolve(!!user);
+            this.db.get("SELECT id FROM users WHERE id = ?", [sessionUserId], (err, user) => {
+                if (err) {
+                    return reject(new Error("Database error during session validation: " + err.message));
                 }
-            );
+                resolve(!!user);
+            });
         });
     }
 
@@ -126,21 +117,16 @@ class AuthService {
                     type: argon2.argon2id,
                     memoryCost: 65536, // 64 MiB
                     timeCost: 3,
-                    parallelism: 4
+                    parallelism: 4,
                 });
 
                 // Update password hash in database
-                this.db.run(
-                    "UPDATE users SET password_hash = ? WHERE id = ?",
-                    [newHash, userId],
-                    function(err) {
-                        if (err) {
-                            return reject(new Error("Failed to update password: " + err.message));
-                        }
-                        resolve({ success: true, message: "Password updated successfully" });
+                this.db.run("UPDATE users SET password_hash = ? WHERE id = ?", [newHash, userId], function (err) {
+                    if (err) {
+                        return reject(new Error("Failed to update password: " + err.message));
                     }
-                );
-
+                    resolve({ success: true, message: "Password updated successfully" });
+                });
             } catch (error) {
                 reject(new Error("Password change failed: " + error.message));
             }
@@ -154,16 +140,12 @@ class AuthService {
      */
     async getUserById(userId) {
         return new Promise((resolve, reject) => {
-            this.db.get(
-                "SELECT * FROM users WHERE id = ?",
-                [userId],
-                (err, user) => {
-                    if (err) {
-                        return reject(new Error("Database error fetching user: " + err.message));
-                    }
-                    resolve(user || null);
+            this.db.get("SELECT * FROM users WHERE id = ?", [userId], (err, user) => {
+                if (err) {
+                    return reject(new Error("Database error fetching user: " + err.message));
                 }
-            );
+                resolve(user || null);
+            });
         });
     }
 
@@ -175,16 +157,12 @@ class AuthService {
     async updateLastLogin(userId) {
         return new Promise((resolve, reject) => {
             const now = new Date().toISOString();
-            this.db.run(
-                "UPDATE users SET last_login = ? WHERE id = ?",
-                [now, userId],
-                function(err) {
-                    if (err) {
-                        return reject(new Error("Failed to update last login: " + err.message));
-                    }
-                    resolve();
+            this.db.run("UPDATE users SET last_login = ? WHERE id = ?", [now, userId], function (err) {
+                if (err) {
+                    return reject(new Error("Failed to update last login: " + err.message));
                 }
-            );
+                resolve();
+            });
         });
     }
 
@@ -219,14 +197,14 @@ class AuthService {
                     this.db.run(
                         "UPDATE users SET failed_attempts = ?, failed_login_timestamp = ? WHERE id = ?",
                         [currentCount + 1, needsTimestampReset ? now : currentTimestamp, userId],
-                        function(updateErr) {
+                        function (updateErr) {
                             if (updateErr) {
                                 return reject(new Error("Failed to increment login attempts: " + updateErr.message));
                             }
                             resolve();
-                        }
+                        },
                     );
-                }
+                },
             );
         });
     }
@@ -241,12 +219,12 @@ class AuthService {
             this.db.run(
                 "UPDATE users SET failed_attempts = 0, failed_login_timestamp = NULL WHERE id = ?",
                 [userId],
-                function(err) {
+                function (err) {
                     if (err) {
                         return reject(new Error("Failed to reset failed attempts: " + err.message));
                     }
                     resolve();
-                }
+                },
             );
         });
     }
@@ -295,12 +273,12 @@ class AuthService {
                     if (now >= lockoutExpiresAt) {
                         this.resetFailedAttempts(userId)
                             .then(() => resolve(false))
-                            .catch(resetErr => reject(resetErr));
+                            .catch((resetErr) => reject(resetErr));
                     } else {
                         // Account is still locked
                         resolve(true);
                     }
-                }
+                },
             );
         });
     }
@@ -312,23 +290,19 @@ class AuthService {
      */
     async getRemainingAttempts(userId) {
         return new Promise((resolve, reject) => {
-            this.db.get(
-                "SELECT failed_attempts FROM users WHERE id = ?",
-                [userId],
-                (err, user) => {
-                    if (err) {
-                        return reject(new Error("Database error getting remaining attempts: " + err.message));
-                    }
-
-                    if (!user) {
-                        return resolve(5); // Default to 5 if user not found
-                    }
-
-                    const failedCount = user.failed_attempts || 0;
-                    const remaining = Math.max(0, 5 - failedCount);
-                    resolve(remaining);
+            this.db.get("SELECT failed_attempts FROM users WHERE id = ?", [userId], (err, user) => {
+                if (err) {
+                    return reject(new Error("Database error getting remaining attempts: " + err.message));
                 }
-            );
+
+                if (!user) {
+                    return resolve(5); // Default to 5 if user not found
+                }
+
+                const failedCount = user.failed_attempts || 0;
+                const remaining = Math.max(0, 5 - failedCount);
+                resolve(remaining);
+            });
         });
     }
 
@@ -347,7 +321,7 @@ class AuthService {
                     type: argon2.argon2id,
                     memoryCost: 65536, // 64 MiB
                     timeCost: 3,
-                    parallelism: 4
+                    parallelism: 4,
                 });
 
                 // Update admin user password and reset failed attempts
@@ -359,7 +333,7 @@ class AuthService {
                          last_login = NULL
                      WHERE username = 'admin'`,
                     [passwordHash],
-                    function(err) {
+                    function (err) {
                         if (err) {
                             return reject(new Error("Failed to reset admin password: " + err.message));
                         }
@@ -370,11 +344,10 @@ class AuthService {
 
                         resolve({
                             success: true,
-                            message: "Admin password reset to 'admin123!' successfully"
+                            message: "Admin password reset to 'admin123!' successfully",
                         });
-                    }
+                    },
                 );
-
             } catch (error) {
                 reject(new Error("Admin password reset failed: " + error.message));
             }

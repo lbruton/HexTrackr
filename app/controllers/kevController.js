@@ -48,7 +48,7 @@ class KevController {
             if (status.syncInProgress) {
                 return res.status(409).json({
                     error: "Sync already in progress",
-                    status: status
+                    status: status,
                 });
             }
 
@@ -59,7 +59,7 @@ class KevController {
                 global.logger.kev.info("KEV sync completed", {
                     totalKevs: result.totalKevs,
                     matchedCount: result.matchedCount,
-                    source: "controller"
+                    source: "controller",
                 });
             }
 
@@ -72,20 +72,19 @@ class KevController {
                 totalKevs: result.totalKevs,
                 matchedCount: result.matchedCount,
                 lastSync: result.lastSync,
-                catalogVersion: result.catalogVersion
+                catalogVersion: result.catalogVersion,
             });
-
         } catch (error) {
             if (global.logger && global.logger.kev) {
                 global.logger.kev.error("KEV sync failed", {
                     error: error.message,
                     stack: error.stack,
-                    source: "controller"
+                    source: "controller",
                 });
             }
             res.status(500).json({
                 error: "Failed to sync KEV data",
-                message: error.message
+                message: error.message,
             });
         }
     }
@@ -110,12 +109,12 @@ class KevController {
                 global.logger.kev.error("Failed to get KEV status", {
                     error: error.message,
                     stack: error.stack,
-                    source: "controller"
+                    source: "controller",
                 });
             }
             res.status(500).json({
                 error: "Failed to get KEV status",
-                message: error.message
+                message: error.message,
             });
         }
     }
@@ -145,7 +144,7 @@ class KevController {
 
             if (!cveId) {
                 return res.status(400).json({
-                    error: "CVE ID is required"
+                    error: "CVE ID is required",
                 });
             }
 
@@ -153,24 +152,23 @@ class KevController {
 
             if (!kevData) {
                 return res.status(404).json({
-                    error: "CVE not found in KEV catalog"
+                    error: "CVE not found in KEV catalog",
                 });
             }
 
             res.json(kevData);
-
         } catch (error) {
             if (global.logger && global.logger.kev) {
                 global.logger.kev.error("Failed to get KEV data for CVE", {
                     cveId: req.params.cveId,
                     error: error.message,
                     stack: error.stack,
-                    source: "controller"
+                    source: "controller",
                 });
             }
             res.status(500).json({
                 error: "Failed to get KEV data",
-                message: error.message
+                message: error.message,
             });
         }
     }
@@ -195,19 +193,19 @@ class KevController {
             const kevs = await this.kevService.getAllKevs();
             res.json({
                 count: kevs.length,
-                kevs: kevs
+                kevs: kevs,
             });
         } catch (error) {
             if (global.logger && global.logger.kev) {
                 global.logger.kev.error("Failed to get all KEVs", {
                     error: error.message,
                     stack: error.stack,
-                    source: "controller"
+                    source: "controller",
                 });
             }
             res.status(500).json({
                 error: "Failed to get KEV list",
-                message: error.message
+                message: error.message,
             });
         }
     }
@@ -239,20 +237,19 @@ class KevController {
             res.json({
                 count: matched.length,
                 limit: limit,
-                vulnerabilities: matched
+                vulnerabilities: matched,
             });
-
         } catch (error) {
             if (global.logger && global.logger.kev) {
                 global.logger.kev.error("Failed to get matched KEVs", {
                     error: error.message,
                     stack: error.stack,
-                    source: "controller"
+                    source: "controller",
                 });
             }
             res.status(500).json({
                 error: "Failed to get matched KEVs",
-                message: error.message
+                message: error.message,
             });
         }
     }
@@ -283,12 +280,12 @@ class KevController {
                 global.logger.kev.error("Failed to get KEV stats", {
                     error: error.message,
                     stack: error.stack,
-                    source: "controller"
+                    source: "controller",
                 });
             }
             res.status(500).json({
                 error: "Failed to get KEV statistics",
-                message: error.message
+                message: error.message,
             });
         }
     }
@@ -326,20 +323,19 @@ class KevController {
 
             res.json({
                 autoSyncNeeded: needed,
-                hoursThreshold: hoursThreshold
+                hoursThreshold: hoursThreshold,
             });
-
         } catch (error) {
             if (global.logger && global.logger.kev) {
                 global.logger.kev.error("Failed to check auto-sync status", {
                     error: error.message,
                     stack: error.stack,
-                    source: "controller"
+                    source: "controller",
                 });
             }
             res.status(500).json({
                 error: "Failed to check auto-sync status",
-                message: error.message
+                message: error.message,
             });
         }
     }

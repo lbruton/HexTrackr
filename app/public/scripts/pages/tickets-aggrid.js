@@ -7,7 +7,7 @@
  * a modern AG Grid v33 presentation that matches the Quartz theme used
  * by the vulnerabilities workspace.
  */
-(function() {
+(function () {
     if (typeof HexagonTicketsManager === "undefined" || typeof agGrid === "undefined") {
         logger.warn("ui", "HexagonTicketsManager or AG Grid not available for tickets.html.");
         return;
@@ -34,7 +34,9 @@
                 throw new Error(`Failed to load config: ${response.status}`);
             }
             deviceNamingConfig = await response.json();
-            logger.debug("ui", "Loaded device naming config:", { patternCount: deviceNamingConfig.deviceTypePatterns.length });
+            logger.debug("ui", "Loaded device naming config:", {
+                patternCount: deviceNamingConfig.deviceTypePatterns.length,
+            });
             return deviceNamingConfig;
         } catch (error) {
             logger.error("ui", "Failed to load device naming config:", { error: error.message });
@@ -45,12 +47,12 @@
                     { pattern: "swan", vendor: "CISCO" },
                     { pattern: "rtr", vendor: "CISCO" },
                     { pattern: "fw", vendor: "CISCO" },
-                    { pattern: "asa", vendor: "CISCO" }
+                    { pattern: "asa", vendor: "CISCO" },
                 ],
                 vendorKeywords: {
-                    "CISCO": ["cisco"],
-                    "Palo Alto": ["pan", "palo"]
-                }
+                    CISCO: ["cisco"],
+                    "Palo Alto": ["pan", "palo"],
+                },
             };
             return deviceNamingConfig;
         }
@@ -114,7 +116,7 @@
                     borderColor: "#2a3f5f", // Subtle navy border
                     selectedRowBackgroundColor: "#2563eb", // Bright blue for selection
                     rowHoverColor: "rgba(37, 99, 235, 0.15)", // Blue hover effect
-                    rangeSelectionBackgroundColor: "rgba(37, 99, 235, 0.2)"
+                    rangeSelectionBackgroundColor: "rgba(37, 99, 235, 0.2)",
                 });
             } else {
                 // Light mode Quartz theme - matching AG-Grid Theme Builder
@@ -131,7 +133,7 @@
                     borderColor: "#e2e8f0",
                     selectedRowBackgroundColor: "#3182ce",
                     rowHoverColor: "rgba(49, 130, 206, 0.1)",
-                    rangeSelectionBackgroundColor: "rgba(49, 130, 206, 0.2)"
+                    rangeSelectionBackgroundColor: "rgba(49, 130, 206, 0.2)",
                 });
             }
         }
@@ -157,7 +159,7 @@
         // Fallback hash implementation (should not be hit in practice).
         let hash = 0;
         for (let i = 0; i < value.length; i += 1) {
-            hash = ((hash << 5) - hash) + value.charCodeAt(i);
+            hash = (hash << 5) - hash + value.charCodeAt(i);
             hash |= 0;
         }
         return `ticket-grid-color-${Math.abs(hash) % COLOR_CLASS_COUNT}`;
@@ -208,7 +210,7 @@
         // Check vendor keywords first (e.g., "cisco", "pan", "palo")
         if (deviceNamingConfig.vendorKeywords) {
             for (const [vendor, keywords] of Object.entries(deviceNamingConfig.vendorKeywords)) {
-                if (keywords.some(keyword => lower.includes(keyword))) {
+                if (keywords.some((keyword) => lower.includes(keyword))) {
                     return vendor;
                 }
             }
@@ -279,7 +281,7 @@
                     const a = valueA || "";
                     const b = valueB || "";
                     return a.localeCompare(b, "en", { sensitivity: "base" });
-                }
+                },
             },
             {
                 headerName: "Submitted",
@@ -299,7 +301,7 @@
                     const a = dateA ? new Date(dateA + "T00:00:00").getTime() : 0;
                     const b = dateB ? new Date(dateB + "T00:00:00").getTime() : 0;
                     return a - b;
-                }
+                },
             },
             {
                 headerName: "Due",
@@ -319,7 +321,7 @@
                     const a = dateA ? new Date(dateA + "T00:00:00").getTime() : 0;
                     const b = dateB ? new Date(dateB + "T00:00:00").getTime() : 0;
                     return a - b;
-                }
+                },
             },
             {
                 headerName: "Hexagon #",
@@ -335,7 +337,7 @@
                     span.className = "ticket-grid-strong";
                     span.innerHTML = manager.highlightSearch(params.value || "N/A");
                     return span;
-                }
+                },
             },
             {
                 headerName: "Service Now #",
@@ -350,7 +352,7 @@
                     const wrapper = document.createElement("span");
                     wrapper.innerHTML = manager.createServiceNowDisplay(params.value || "");
                     return wrapper;
-                }
+                },
             },
             {
                 headerName: "Site",
@@ -367,7 +369,7 @@
                     span.className = `ticket-grid-strong ${getColorClass(manager, value)}`;
                     span.innerHTML = manager.highlightSearch(value);
                     return span;
-                }
+                },
             },
             {
                 headerName: "Location",
@@ -384,7 +386,7 @@
                     span.className = `ticket-grid-strong ${getColorClass(manager, value)}`;
                     span.innerHTML = manager.highlightSearch(value);
                     return span;
-                }
+                },
             },
             {
                 headerName: "Supervisor",
@@ -427,7 +429,7 @@
                     }
 
                     return container;
-                }
+                },
             },
             {
                 headerName: "Status",
@@ -450,7 +452,7 @@
                         "overdue",
                         "completed",
                         "failed",
-                        "closed"
+                        "closed",
                     ]);
 
                     const classes = ["status-label"];
@@ -467,7 +469,7 @@
                     label.appendChild(strong);
 
                     return label;
-                }
+                },
             },
             {
                 headerName: "Job Type",
@@ -489,11 +491,11 @@
 
                     // Map job types to existing status classes for color-coding
                     const classMap = {
-                        "upgrade": "status-open",         // Blue (patch-only)
-                        "replace": "status-overdue",      // Orange (equipment swap)
-                        "refresh": "status-pending",      // Purple (new model)
-                        "mitigate": "status-failed",      // Red (urgent KEV)
-                        "other": "status-generic"         // Gray (fallback)
+                        upgrade: "status-open", // Blue (patch-only)
+                        replace: "status-overdue", // Orange (equipment swap)
+                        refresh: "status-pending", // Purple (new model)
+                        mitigate: "status-failed", // Red (urgent KEV)
+                        other: "status-generic", // Gray (fallback)
                     };
 
                     label.className = `status-label ${classMap[slug] || "status-generic"}`;
@@ -503,7 +505,7 @@
                     label.appendChild(strong);
 
                     return label;
-                }
+                },
             },
             {
                 headerName: "Devices",
@@ -529,8 +531,12 @@
                 },
                 comparator: (valueA, valueB) => {
                     // Sort by device count (HEX-241)
-                    const countA = Array.isArray(valueA) ? valueA.filter(d => d && typeof d === "string" && d.trim()).length : 0;
-                    const countB = Array.isArray(valueB) ? valueB.filter(d => d && typeof d === "string" && d.trim()).length : 0;
+                    const countA = Array.isArray(valueA)
+                        ? valueA.filter((d) => d && typeof d === "string" && d.trim()).length
+                        : 0;
+                    const countB = Array.isArray(valueB)
+                        ? valueB.filter((d) => d && typeof d === "string" && d.trim()).length
+                        : 0;
                     return countA - countB;
                 },
                 cellRenderer: (params) => {
@@ -543,13 +549,13 @@
                         .filter(Boolean);
 
                     if (cleaned.length === 0) {
-                        container.innerHTML = "<span class=\"text-muted\">N/A</span>";
+                        container.innerHTML = '<span class="text-muted">N/A</span>';
                         return container;
                     }
 
                     // Detect vendor for color coding (HEX-241)
                     const vendors = new Set();
-                    cleaned.forEach(hostname => {
+                    cleaned.forEach((hostname) => {
                         const vendor = normalizeVendor(hostname);
                         vendors.add(vendor);
                     });
@@ -584,7 +590,7 @@
                     container.appendChild(badge);
 
                     return container;
-                }
+                },
             },
             {
                 headerName: "Actions",
@@ -627,17 +633,45 @@
                         return emptyWrapper;
                     }
 
-                    group.appendChild(buildButton("fas fa-eye", "btn-outline-primary", () => window.ticketManager.viewTicket(id), "View"));
-                    group.appendChild(buildButton("fas fa-edit", "btn-outline-warning", () => window.ticketManager.editTicket(id), "Edit"));
-                    group.appendChild(buildButton("fas fa-download", "btn-outline-success", () => window.ticketManager.bundleTicketFiles(id), "Download Bundle"));
-                    group.appendChild(buildButton("fas fa-trash", "btn-outline-danger", () => window.ticketManager.deleteTicket(id), "Delete"));
+                    group.appendChild(
+                        buildButton(
+                            "fas fa-eye",
+                            "btn-outline-primary",
+                            () => window.ticketManager.viewTicket(id),
+                            "View",
+                        ),
+                    );
+                    group.appendChild(
+                        buildButton(
+                            "fas fa-edit",
+                            "btn-outline-warning",
+                            () => window.ticketManager.editTicket(id),
+                            "Edit",
+                        ),
+                    );
+                    group.appendChild(
+                        buildButton(
+                            "fas fa-download",
+                            "btn-outline-success",
+                            () => window.ticketManager.bundleTicketFiles(id),
+                            "Download Bundle",
+                        ),
+                    );
+                    group.appendChild(
+                        buildButton(
+                            "fas fa-trash",
+                            "btn-outline-danger",
+                            () => window.ticketManager.deleteTicket(id),
+                            "Delete",
+                        ),
+                    );
 
                     const wrapper = document.createElement("div");
                     wrapper.className = "ticket-grid-actions-wrapper";
                     wrapper.appendChild(group);
                     return wrapper;
-                }
-            }
+                },
+            },
         ];
     }
 
@@ -647,7 +681,9 @@
      * @param {number} size - Desired page size.
      */
     function setPaginationPageSize(api, size) {
-        if (!api) {return;}
+        if (!api) {
+            return;
+        }
         if (typeof api.paginationSetPageSize === "function") {
             api.paginationSetPageSize(size);
             return;
@@ -664,7 +700,9 @@
      * @returns {number}
      */
     function getPaginationPageSize(api, fallback) {
-        if (!api) {return fallback;}
+        if (!api) {
+            return fallback;
+        }
         if (typeof api.paginationGetPageSize === "function") {
             return api.paginationGetPageSize();
         }
@@ -683,7 +721,9 @@
      * @returns {number}
      */
     function getCurrentPaginationPage(api) {
-        if (!api) {return 0;}
+        if (!api) {
+            return 0;
+        }
         if (typeof api.paginationGetCurrentPage === "function") {
             return api.paginationGetCurrentPage();
         }
@@ -702,7 +742,9 @@
      * @param {number} index - Zero-based page index.
      */
     function goToPaginationPage(api, index) {
-        if (!api) {return;}
+        if (!api) {
+            return;
+        }
         if (typeof api.paginationGoToPage === "function") {
             api.paginationGoToPage(index);
             return;
@@ -728,7 +770,7 @@
                 filter: true,
                 minWidth: 80,
                 wrapHeaderText: false,
-                autoHeaderHeight: false
+                autoHeaderHeight: false,
             },
             pagination: true,
             paginationPageSize: manager.rowsPerPage || 10,
@@ -740,9 +782,11 @@
             rowSelection: { mode: "singleRow", checkboxes: false, enableClickSelection: true },
             rowClassRules: {
                 "ticket-row-overdue": (params) => {
-                    if (!params.data) {return false;}
+                    if (!params.data) {
+                        return false;
+                    }
                     return Boolean(params.data.isOverdue || params.data.status === "Overdue");
-                }
+                },
             },
             onGridReady: (params) => {
                 manager.gridApi = params.api;
@@ -762,10 +806,13 @@
                 manager.updatePaginationDisplay();
 
                 // Initialize Bootstrap tooltips for device count cells (HEX-241)
-                const tooltipTriggerList = document.querySelectorAll("[data-bs-toggle=\"tooltip\"]");
-                [...tooltipTriggerList].map(el => new bootstrap.Tooltip(el, {
-                    delay: { show: 100, hide: 0 } // Fast tooltip display (100ms show, instant hide)
-                }));
+                const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+                [...tooltipTriggerList].map(
+                    (el) =>
+                        new bootstrap.Tooltip(el, {
+                            delay: { show: 100, hide: 0 }, // Fast tooltip display (100ms show, instant hide)
+                        }),
+                );
             },
             onModelUpdated: () => {
                 manager.updatePaginationDisplay();
@@ -775,7 +822,7 @@
             },
             onGridSizeChanged: () => {
                 manager.sizeTicketsGridColumns();
-            }
+            },
         };
     }
 
@@ -800,7 +847,7 @@
         }
 
         // Load device naming config for vendor detection
-        loadDeviceNamingConfig().catch(err => {
+        loadDeviceNamingConfig().catch((err) => {
             logger.warn("ui", "Config load failed, using fallback patterns:", { error: err.message });
         });
 
@@ -845,7 +892,7 @@
                             this.gridApi.refreshCells({ force: true });
                         }
                     }
-                }
+                },
             };
             window.agGridThemeManager.registerGrid("ticketsAgGrid", this.gridApi, customThemeAdapter);
         }
@@ -902,7 +949,7 @@
             emptyState.setAttribute("aria-hidden", "true");
         } else {
             emptyState.classList.add("active");
-             emptyState.style.display = "flex";
+            emptyState.style.display = "flex";
             emptyState.setAttribute("aria-hidden", "false");
         }
     };
@@ -974,7 +1021,7 @@
         const rowData = filteredTickets.map((ticket) => ({
             ...ticket,
             dateSubmitted: ticket.dateSubmitted,
-            dateDue: ticket.dateDue
+            dateDue: ticket.dateDue,
         }));
 
         if (this.gridApi) {
@@ -1028,7 +1075,7 @@
             try {
                 this.gridColumnApi.applyColumnState({
                     defaultState: { sort: null },
-                    state: [{ colId: column, sort: this.sortDirection }]
+                    state: [{ colId: column, sort: this.sortDirection }],
                 });
             } catch (error) {
                 logger.debug("ui", "tickets-aggrid: unable to synchronize sort state", { error: error.message });

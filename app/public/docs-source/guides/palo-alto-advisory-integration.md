@@ -67,22 +67,26 @@ By default, background sync is **enabled**. To control it:
 5. Setting is stored in database (survives server restarts)
 
 **When Enabled**:
+
 - Sync runs on server startup (after 10-second initialization delay)
 - Sync repeats every 24 hours automatically
 - Only syncs CVEs from devices with vendor="Palo Alto"
 
 **When Disabled**:
+
 - Background worker skips Palo Alto sync (no errors logged)
 - Manual sync still available via "Sync Now" button
 
 #### Step 2: Initial Sync
 
 **Option A: Automatic** (Recommended)
+
 - Restart Docker container: `docker-compose restart`
 - Background worker runs within 10 seconds
 - Check logs: `docker-compose logs -f hextrackr-app`
 
 **Option B: Manual**
+
 - Click **"Sync Now"** button in Settings
 - Wait ~1-2 minutes for sync to complete
 - Statistics update automatically when complete
@@ -96,6 +100,7 @@ By default, background sync is **enabled**. To control it:
 Palo Alto's API is simpler than Cisco's two-stage pattern:
 
 #### Direct CVE Lookup
+
 ```
 GET https://security.paloaltonetworks.com/json/{cveId}
 
@@ -126,6 +131,7 @@ Example Response:
 ```
 
 **Extraction Logic**:
+
 1. Query API with CVE ID
 2. Navigate to `containers.cna.affected[].versions[]`
 3. Extract `changes[]` array where `status === "unaffected"`
@@ -137,19 +143,22 @@ Example Response:
 ### Version Matching Strategy
 
 **PAN-OS Version Format**:
+
 - Standard: `10.2.0-h3` (major.minor.patch-hotfix)
 - Azure Marketplace: `11.1.203` (major.minor + combined patch/hotfix)
 
 **Smart Matching Logic**:
+
 ```javascript
 // Installed: 10.2.0, Fixed: ["10.2.0-h3", "10.2.9-h1", "11.0.0-h1"]
 // Returns: "10.2.0-h3" (matches major.minor family)
 
-normalizeVersion("11.1.203")  // → "11.1.2-h3"
-matchFixedVersion("10.2.0", fixedVersionsArray)  // → "10.2.0-h3"
+normalizeVersion("11.1.203"); // → "11.1.2-h3"
+matchFixedVersion("10.2.0", fixedVersionsArray); // → "10.2.0-h3"
 ```
 
 **Major.Minor Family Matching**:
+
 - Extracts major.minor from installed version (10.2.0 → 10.2)
 - Filters fixed versions matching same family
 - Returns minimum (first) matching version
@@ -188,6 +197,7 @@ ON palo_alto_advisories(last_synced);
 **File**: `app/public/scripts/migrations/006-palo-advisories.sql`
 
 Adds:
+
 - `palo_alto_advisories` table
 - Indexes for performance
 - `last_palo_sync` column in `daily_totals` table
@@ -201,21 +211,25 @@ Adds:
 Fixed versions display automatically for both Cisco and Palo Alto devices:
 
 **Device Cards**:
+
 - Green text with "+" suffix: "10.2.0-h3+"
 - Searchable in card view search bar
 - Cached for filter performance
 
 **Device Security Modal**:
+
 - Info card shows fixed version
 - AG-Grid "Fixed" column with async loading
 - Searchable, filterable, sortable
 
 **Vulnerability Details Modal**:
+
 - AG-Grid "Fixed" column for all affected devices
 - Shows both Cisco and Palo Alto fixes in same table
 - Column filters work on both vendors
 
 **Main Vulnerabilities Table**:
+
 - Fixed Version column with async population
 - Quick filter searches both vendor types
 - Natural version sorting
@@ -225,19 +239,18 @@ Fixed versions display automatically for both Cisco and Palo Alto devices:
 ```javascript
 // Automatic vendor detection
 let advisoryHelper = null;
-if (vendor?.toLowerCase().includes('cisco')) {
+if (vendor?.toLowerCase().includes("cisco")) {
     advisoryHelper = window.ciscoAdvisoryHelper;
-} else if (vendor?.toLowerCase().includes('palo')) {
+} else if (vendor?.toLowerCase().includes("palo")) {
     advisoryHelper = window.paloAdvisoryHelper;
 }
 
 // Universal API call
-const fixedVersion = await advisoryHelper.getFixedVersion(
-    cveId, vendor, installedVersion
-);
+const fixedVersion = await advisoryHelper.getFixedVersion(cveId, vendor, installedVersion);
 ```
 
 **Supported Vendors**:
+
 - ✅ Cisco (IOS, IOS XE, IOS XR, NX-OS)
 - ✅ Palo Alto (PAN-OS)
 - 🔄 Future: Microsoft, Juniper, Fortinet
@@ -247,12 +260,14 @@ const fixedVersion = await advisoryHelper.getFixedVersion(
 ## Statistics
 
 **Current Results**:
+
 - Total Palo Alto CVEs: 54
 - Advisories Synced: 20
 - With Fixed Versions: 19 (95%)
 - Without Fixed Versions: 1 (5%)
 
 **Sample Advisory**:
+
 ```
 CVE-2024-3400: PAN-OS GlobalProtect RCE
 ├── Advisory URL: security.paloaltonetworks.com/CVE-2024-3400
@@ -269,17 +284,20 @@ CVE-2024-3400: PAN-OS GlobalProtect RCE
 ### Sync Not Running
 
 **Check 1: Background Sync Enabled?**
+
 ```bash
 sqlite3 app/data/hextrackr.db "SELECT * FROM user_preferences WHERE preference_key = 'palo_background_sync_enabled';"
 # Should return: "true" or no row (defaults to enabled)
 ```
 
 **Check 2: Check Logs**
+
 ```bash
 docker-compose logs -f hextrackr-app | grep -i palo
 ```
 
 **Check 3: Verify Palo Alto Devices Exist**
+
 ```bash
 sqlite3 app/data/hextrackr.db "SELECT COUNT(*) FROM vulnerabilities_current WHERE vendor LIKE '%Palo%';"
 ```
@@ -287,6 +305,7 @@ sqlite3 app/data/hextrackr.db "SELECT COUNT(*) FROM vulnerabilities_current WHER
 ### No Fixed Versions Found
 
 **5% of CVEs don't have fixed versions** (by design):
+
 - Some vulnerabilities are configuration issues (no software patch)
 - Some affect end-of-life versions (no fix available)
 - API returns empty `changes[]` array
@@ -296,19 +315,21 @@ sqlite3 app/data/hextrackr.db "SELECT COUNT(*) FROM vulnerabilities_current WHER
 **The API is public and highly reliable**, but if you encounter issues:
 
 1. Test direct API access:
-   ```bash
-   curl https://security.paloaltonetworks.com/json/CVE-2024-3400
-   ```
+
+    ```bash
+    curl https://security.paloaltonetworks.com/json/CVE-2024-3400
+    ```
 
 2. Check DNS resolution:
-   ```bash
-   nslookup security.paloaltonetworks.com
-   ```
+
+    ```bash
+    nslookup security.paloaltonetworks.com
+    ```
 
 3. Verify Docker network connectivity:
-   ```bash
-   docker-compose exec hextrackr-app curl https://security.paloaltonetworks.com/json/
-   ```
+    ```bash
+    docker-compose exec hextrackr-app curl https://security.paloaltonetworks.com/json/
+    ```
 
 ---
 
@@ -319,6 +340,7 @@ sqlite3 app/data/hextrackr.db "SELECT COUNT(*) FROM vulnerabilities_current WHER
 **Base URL**: `https://security.paloaltonetworks.com`
 
 **Endpoints Used**:
+
 - `/json/{CVE-ID}` - Single CVE lookup
 - `/json/` - List all advisories (health check)
 - `/json/?product=PAN-OS&severity=CRITICAL` - Filtered queries (future use)
@@ -349,7 +371,7 @@ function startPaloBackgroundSync(db) {
 class PaloAdvisoryHelper {
     constructor() {
         this.advisoryCache = new Map();
-        this.cacheTTL = 5 * 60 * 1000;  // 5 minutes
+        this.cacheTTL = 5 * 60 * 1000; // 5 minutes
     }
 
     async getFixedVersion(cveId, vendor, installedVersion) {
@@ -366,33 +388,36 @@ class PaloAdvisoryHelper {
 
 ## Comparison: Cisco vs Palo Alto
 
-| Feature | Cisco PSIRT | Palo Alto Security |
-|---------|-------------|-------------------|
-| Authentication | OAuth2 (client credentials) | None (public) |
-| API Complexity | 2-stage (advisory → version) | 1-stage (direct lookup) |
-| Rate Limits | 30 requests/minute | None |
-| Version Matching | OS-type aware (IOS/IOS XE/IOS XR/NX-OS) | Major.minor family matching |
-| Special Formats | Train notation (15.2(7)E8) | Azure marketplace (11.1.203) |
-| Response Format | Custom JSON | CVE 5.0 standard |
-| API Stability | Stable | BETA (defensive error handling) |
-| Sync Time | ~3-4 minutes (63 CVEs, rate-limited) | ~1-2 minutes (20 CVEs, no limits) |
+| Feature          | Cisco PSIRT                             | Palo Alto Security                |
+| ---------------- | --------------------------------------- | --------------------------------- |
+| Authentication   | OAuth2 (client credentials)             | None (public)                     |
+| API Complexity   | 2-stage (advisory → version)            | 1-stage (direct lookup)           |
+| Rate Limits      | 30 requests/minute                      | None                              |
+| Version Matching | OS-type aware (IOS/IOS XE/IOS XR/NX-OS) | Major.minor family matching       |
+| Special Formats  | Train notation (15.2(7)E8)              | Azure marketplace (11.1.203)      |
+| Response Format  | Custom JSON                             | CVE 5.0 standard                  |
+| API Stability    | Stable                                  | BETA (defensive error handling)   |
+| Sync Time        | ~3-4 minutes (63 CVEs, rate-limited)    | ~1-2 minutes (20 CVEs, no limits) |
 
 ---
 
 ## Future Enhancements
 
 ### Additional Palo Alto Products
+
 - Panorama advisory support
 - Cortex XDR integration
 - Prisma Access advisories
 
 ### Enhanced UI Features
+
 - Advisory age indicator (stale data warning)
 - "Last Synced" timestamp in modal
 - Export advisory data to CSV
 - Historical advisory tracking
 
 ### Multi-Product Expansion
+
 - Fortinet FortiOS advisories
 - Juniper SIRT integration
 - Microsoft Update Catalog
@@ -415,6 +440,7 @@ class PaloAdvisoryHelper {
 ## Support
 
 ### Linear Issues
+
 - [HEX-205: Palo Alto Advisory Integration (SPECIFICATION)](https://linear.app/hextrackr/issue/HEX-205)
 - [HEX-207: Palo Alto Advisory Integration (RESEARCH)](https://linear.app/hextrackr/issue/HEX-207)
 - [HEX-208: Palo Alto Advisory Integration (PLAN)](https://linear.app/hextrackr/issue/HEX-208)
@@ -422,9 +448,11 @@ class PaloAdvisoryHelper {
 - [HEX-210: Palo Alto Advisory Integration (IMPLEMENT - Frontend)](https://linear.app/hextrackr/issue/HEX-210)
 
 ### Changelog
+
 - [v1.0.65 Release Notes](../changelog/versions/1.0.65.md) - Complete implementation details
 
 ### Memento Insight
+
 - Insight ID: `HEXTRACKR-PALO-ALTO-INTEGRATION-20251012`
 - Tags: `public-api`, `multi-vendor`, `frontend-caching`, `vendor-routing`
 

@@ -58,7 +58,7 @@ class AuditLogController {
             if (!category || !message) {
                 return res.status(400).json({
                     success: false,
-                    error: "Category and message are required"
+                    error: "Category and message are required",
                 });
             }
 
@@ -73,19 +73,12 @@ class AuditLogController {
             const controller = AuditLogController.getInstance();
 
             // Write audit log via LoggingService
-            await controller.loggingService.audit(
-                category,
-                message,
-                data,
-                userId,
-                { username, ipAddress, userAgent }
-            );
+            await controller.loggingService.audit(category, message, data, userId, { username, ipAddress, userAgent });
 
             res.json({
                 success: true,
-                message: "Audit log created"
+                message: "Audit log created",
             });
-
         } catch (error) {
             if (global.logger?.error) {
                 global.logger.error("backend", "audit", "Error creating audit log", { error: error.message });
@@ -95,7 +88,7 @@ class AuditLogController {
             res.status(500).json({
                 success: false,
                 error: "Failed to create audit log",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -114,9 +107,8 @@ class AuditLogController {
 
             res.json({
                 success: true,
-                data: stats
+                data: stats,
             });
-
         } catch (error) {
             if (global.logger?.error) {
                 global.logger.error("backend", "audit", "Get audit log stats error", { error: error.message });
@@ -126,7 +118,7 @@ class AuditLogController {
             res.status(500).json({
                 success: false,
                 error: "Failed to retrieve audit log statistics",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -155,7 +147,7 @@ class AuditLogController {
                 severity: req.query.severity || null,
                 scope: req.query.scope || null,
                 page: parseInt(req.query.page) || 1,
-                limit: parseInt(req.query.limit) || 100
+                limit: parseInt(req.query.limit) || 100,
             };
 
             const controller = AuditLogController.getInstance();
@@ -163,9 +155,8 @@ class AuditLogController {
 
             res.json({
                 success: true,
-                data: result
+                data: result,
             });
-
         } catch (error) {
             if (global.logger?.error) {
                 global.logger.error("backend", "audit", "Get audit logs error", { error: error.message });
@@ -175,7 +166,7 @@ class AuditLogController {
             res.status(500).json({
                 success: false,
                 error: "Failed to retrieve audit logs",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -198,7 +189,7 @@ class AuditLogController {
                 endDate: req.query.endDate || null,
                 category: req.query.category || null,
                 page: 1,
-                limit: parseInt(req.query.limit) || 10000 // Large limit for export
+                limit: parseInt(req.query.limit) || 10000, // Large limit for export
             };
 
             const controller = AuditLogController.getInstance();
@@ -216,7 +207,6 @@ class AuditLogController {
                 res.setHeader("Content-Type", "text/csv");
                 res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
                 res.send(csv);
-
             } else {
                 // Generate JSON
                 const exportData = {
@@ -224,10 +214,10 @@ class AuditLogController {
                     filters: {
                         startDate: filters.startDate,
                         endDate: filters.endDate,
-                        category: filters.category
+                        category: filters.category,
                     },
                     totalRecords: result.logs.length,
-                    logs: result.logs
+                    logs: result.logs,
                 };
 
                 const filename = `hextrackr_audit_logs_${dateStr}_${timeStr}.json`;
@@ -236,7 +226,6 @@ class AuditLogController {
                 res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
                 res.send(JSON.stringify(exportData, null, 2));
             }
-
         } catch (error) {
             if (global.logger?.error) {
                 global.logger.error("backend", "audit", "Export audit logs error", { error: error.message });
@@ -246,7 +235,7 @@ class AuditLogController {
             res.status(500).json({
                 success: false,
                 error: "Failed to export audit logs",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -258,10 +247,20 @@ class AuditLogController {
      * @returns {string} CSV content
      */
     _generateCSV(logs) {
-        const headers = ["ID", "Timestamp", "Category", "Message", "User ID", "Username", "IP Address", "User Agent", "Request ID"];
+        const headers = [
+            "ID",
+            "Timestamp",
+            "Category",
+            "Message",
+            "User ID",
+            "Username",
+            "IP Address",
+            "User Agent",
+            "Request ID",
+        ];
         const rows = [headers.join(",")];
 
-        logs.forEach(log => {
+        logs.forEach((log) => {
             // Handle message - could be object or string
             let messageStr = "";
             if (typeof log.message === "object" && log.message !== null) {
@@ -279,7 +278,7 @@ class AuditLogController {
                 log.username || "",
                 log.ip_address || "",
                 `"${(log.user_agent || "").replace(/"/g, '""')}"`, // Escape quotes
-                log.request_id || ""
+                log.request_id || "",
             ];
             rows.push(row.join(","));
         });

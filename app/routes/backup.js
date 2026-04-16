@@ -29,17 +29,16 @@ const upload = multer({
             "application/x-zip-compressed",
             "application/octet-stream",
             "multipart/x-zip",
-            "text/plain"
+            "text/plain",
         ];
-        const isAllowedExtension = file.originalname.endsWith(".json") ||
-                                   file.originalname.endsWith(".zip");
+        const isAllowedExtension = file.originalname.endsWith(".json") || file.originalname.endsWith(".zip");
 
         if (allowedTypes.includes(file.mimetype) || isAllowedExtension) {
             cb(null, true);
         } else {
             cb(new Error("Only JSON and ZIP files are allowed for backup restore"));
         }
-    }
+    },
 });
 
 // Backup statistics endpoint

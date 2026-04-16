@@ -15,7 +15,7 @@ class FileService {
         // Configure upload middleware with Multer
         this.upload = multer({
             dest: "uploads/",
-            limits: { fileSize: 100 * 1024 * 1024 } // 100MB limit
+            limits: { fileSize: 100 * 1024 * 1024 }, // 100MB limit
         });
     }
 
@@ -181,7 +181,7 @@ class FileService {
                 fileName: file.filename,
                 path: file.path,
                 size: file.size,
-                mimetype: file.mimetype
+                mimetype: file.mimetype,
             };
 
             // Clean up temporary file if not keeping original
@@ -207,7 +207,10 @@ class FileService {
             }
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "file", "Error cleaning up uploaded file", { error: error.message, filePath });
+                global.logger.error("backend", "file", "Error cleaning up uploaded file", {
+                    error: error.message,
+                    filePath,
+                });
             } else {
                 console.error("Error cleaning up uploaded file:", error);
             }
@@ -230,18 +233,18 @@ class FileService {
                     skipEmptyLines: true,
                     complete: (results) => {
                         // Filter out empty rows
-                        const filteredData = results.data.filter(row =>
-                            Object.values(row).some(val => val && val.toString().trim())
+                        const filteredData = results.data.filter((row) =>
+                            Object.values(row).some((val) => val && val.toString().trim()),
                         );
                         resolve({
                             data: filteredData,
                             meta: results.meta,
-                            errors: results.errors
+                            errors: results.errors,
                         });
                     },
                     error: (error) => {
                         reject(new Error(`CSV parsing failed: ${error.message}`));
-                    }
+                    },
                 };
 
                 const parseOptions = { ...defaultOptions, ...options };
@@ -270,8 +273,8 @@ class FileService {
                     chunk: (results, parser) => {
                         try {
                             // Filter out empty rows
-                            const filteredData = results.data.filter(row =>
-                                Object.values(row).some(val => val && val.toString().trim())
+                            const filteredData = results.data.filter((row) =>
+                                Object.values(row).some((val) => val && val.toString().trim()),
                             );
 
                             if (filteredData.length > 0) {
@@ -287,7 +290,7 @@ class FileService {
                     },
                     error: (error) => {
                         reject(new Error(`Large CSV parsing failed: ${error.message}`));
-                    }
+                    },
                 };
 
                 const parseOptions = { ...defaultOptions, ...options };
@@ -386,7 +389,10 @@ class FileService {
                     if (now - stats.mtime.getTime() > maxAge) {
                         this.deleteFile(filePath);
                         if (global.logger?.info) {
-                            global.logger.info("backend", "file", "Cleaned up temporary file", { filePath, ageMs: now - stats.mtime.getTime() });
+                            global.logger.info("backend", "file", "Cleaned up temporary file", {
+                                filePath,
+                                ageMs: now - stats.mtime.getTime(),
+                            });
                         } else {
                             console.log(`Cleaned up temporary file: ${filePath}`);
                         }
@@ -395,7 +401,10 @@ class FileService {
             }
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "file", "Failed to cleanup temp files", { error: error.message, directory });
+                global.logger.error("backend", "file", "Failed to cleanup temp files", {
+                    error: error.message,
+                    directory,
+                });
             } else {
                 console.error(`Failed to cleanup temp files in ${directory}:`, error);
             }
@@ -429,7 +438,9 @@ class FileService {
      * @returns {string} Human readable file size
      */
     formatFileSize(bytes) {
-        if (bytes === 0) {return "0 Bytes";}
+        if (bytes === 0) {
+            return "0 Bytes";
+        }
 
         const k = 1024;
         const sizes = ["Bytes", "KB", "MB", "GB", "TB"];

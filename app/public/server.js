@@ -92,7 +92,7 @@ let server;
 if (useHTTPS) {
     const httpsOptions = {
         key: fs.readFileSync(process.env.SSL_KEY_PATH || "./certs/key.pem"),
-        cert: fs.readFileSync(process.env.SSL_CERT_PATH || "./certs/cert.pem")
+        cert: fs.readFileSync(process.env.SSL_CERT_PATH || "./certs/cert.pem"),
     };
     server = https.createServer(httpsOptions, app);
 } else {
@@ -149,7 +149,7 @@ io.on("connection", (socket) => {
                     progress: session.progress,
                     status: session.status,
                     message: session.metadata.message,
-                    metadata: session.metadata
+                    metadata: session.metadata,
                 });
             }
         }
@@ -222,15 +222,15 @@ async function initializeApplication() {
     const { csrfSynchronisedProtection, generateToken } = csrfSync({
         getTokenFromRequest: (req) => {
             // Check multiple locations for CSRF token (header, body, query)
-            return req.headers["x-csrf-token"] ||
-                   req.body?._csrf ||
-                   req.query?._csrf;
+            return req.headers["x-csrf-token"] || req.body?._csrf || req.query?._csrf;
         },
         ignoredMethods: ["GET", "HEAD", "OPTIONS"],
         // csrf-sync stores tokens in session, retrieves from req.session.csrfToken
         getTokenFromState: (req) => req.session.csrfToken,
-        storeTokenInState: (req, token) => { req.session.csrfToken = token; },
-        size: 128 // Token size in bits
+        storeTokenInState: (req, token) => {
+            req.session.csrfToken = token;
+        },
+        size: 128, // Token size in bits
     });
 
     // Make generateToken available to routes via app.locals
@@ -280,7 +280,12 @@ async function initializeApplication() {
             res.json({ status: "ok", version, db: dbExists, uptime: process.uptime() });
         } catch (error) {
             console.error("Health endpoint error:", error.message);
-            res.json({ status: "ok", version: process.env.HEXTRACKR_VERSION || "unknown", db: false, uptime: process.uptime() });
+            res.json({
+                status: "ok",
+                version: process.env.HEXTRACKR_VERSION || "unknown",
+                db: false,
+                uptime: process.uptime(),
+            });
         }
     });
 
@@ -335,24 +340,54 @@ async function initializeApplication() {
         }
 
         const validSections = [
-            "getting-started", "user-guides", "development", "architecture",
-            "api-reference", "project-management", "security", "index",
-            "getting-started/index", "getting-started/installation",
-            "user-guides/index", "user-guides/ticket-management", "user-guides/vulnerability-management",
-            "development/index", "development/coding-standards", "development/contributing",
-            "development/development-setup", "development/docs-portal-guide", "development/memory-system", "development/pre-commit-hooks",
-            "architecture/index", "architecture/backend", "architecture/database", "architecture/deployment",
-            "architecture/frameworks", "architecture/frontend",
-            "api-reference/index", "api-reference/backup-api", "api-reference/tickets-api", "api-reference/vulnerabilities-api",
-            "project-management/index", "project-management/codacy-compliance", "project-management/quality-badges",
-            "project-management/roadmap-to-sprint-system", "project-management/strategic-roadmap",
-            "security/index", "security/overview", "security/vulnerability-disclosure",
-            "html-update-report", "CHANGELOG", "ROADMAP"
+            "getting-started",
+            "user-guides",
+            "development",
+            "architecture",
+            "api-reference",
+            "project-management",
+            "security",
+            "index",
+            "getting-started/index",
+            "getting-started/installation",
+            "user-guides/index",
+            "user-guides/ticket-management",
+            "user-guides/vulnerability-management",
+            "development/index",
+            "development/coding-standards",
+            "development/contributing",
+            "development/development-setup",
+            "development/docs-portal-guide",
+            "development/memory-system",
+            "development/pre-commit-hooks",
+            "architecture/index",
+            "architecture/backend",
+            "architecture/database",
+            "architecture/deployment",
+            "architecture/frameworks",
+            "architecture/frontend",
+            "api-reference/index",
+            "api-reference/backup-api",
+            "api-reference/tickets-api",
+            "api-reference/vulnerabilities-api",
+            "project-management/index",
+            "project-management/codacy-compliance",
+            "project-management/quality-badges",
+            "project-management/roadmap-to-sprint-system",
+            "project-management/strategic-roadmap",
+            "security/index",
+            "security/overview",
+            "security/vulnerability-disclosure",
+            "html-update-report",
+            "CHANGELOG",
+            "ROADMAP",
         ];
 
         if (!section.includes("/")) {
             const resolved = DocsController.findDocsSectionForFilename(`${section}.html`);
-            if (resolved) {section = resolved;}
+            if (resolved) {
+                section = resolved;
+            }
         }
 
         if (!validSections.includes(section)) {
@@ -363,22 +398,28 @@ async function initializeApplication() {
     });
 
     // Static assets for documentation portal and SPA shell
-    app.use("/docs-html", express.static(path.join(__dirname, "docs-html"), {
-        setHeaders: (res, filePath) => {
-            if (filePath.endsWith(".html")) {
-                res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-            }
-        }
-    }));
+    app.use(
+        "/docs-html",
+        express.static(path.join(__dirname, "docs-html"), {
+            setHeaders: (res, filePath) => {
+                if (filePath.endsWith(".html")) {
+                    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+                }
+            },
+        }),
+    );
 
     // Serve developer documentation (JSDoc)
-    app.use("/dev-docs-html", express.static(path.join(__dirname, "../dev-docs-html"), {
-        setHeaders: (res, filePath) => {
-            if (filePath.endsWith(".html")) {
-                res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-            }
-        }
-    }));
+    app.use(
+        "/dev-docs-html",
+        express.static(path.join(__dirname, "../dev-docs-html"), {
+            setHeaders: (res, filePath) => {
+                if (filePath.endsWith(".html")) {
+                    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+                }
+            },
+        }),
+    );
 
     // HEX-133: Block access to /data directory (databases moved outside public root)
     app.use("/data", (req, res) => {
@@ -386,22 +427,27 @@ async function initializeApplication() {
     });
 
     // HEX-241: Serve device naming patterns config
-    app.use("/config", express.static(path.join(__dirname, "../../config"), {
-        setHeaders: (res, filePath) => {
-            if (filePath.endsWith(".json")) {
-                res.setHeader("Cache-Control", "public, max-age=300"); // 5 minute cache
-                res.setHeader("Content-Type", "application/json");
-            }
-        }
-    }));
+    app.use(
+        "/config",
+        express.static(path.join(__dirname, "../../config"), {
+            setHeaders: (res, filePath) => {
+                if (filePath.endsWith(".json")) {
+                    res.setHeader("Cache-Control", "public, max-age=300"); // 5 minute cache
+                    res.setHeader("Content-Type", "application/json");
+                }
+            },
+        }),
+    );
 
-    app.use(express.static(__dirname, {
-        setHeaders: (res, filePath) => {
-            if (filePath.endsWith(".html")) {
-                res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-            }
-        }
-    }));
+    app.use(
+        express.static(__dirname, {
+            setHeaders: (res, filePath) => {
+                if (filePath.endsWith(".html")) {
+                    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+                }
+            },
+        }),
+    );
 
     // Root redirect handler (HEX-128 Task 3.5)
     // Serves index.html which redirects based on authentication status
@@ -415,7 +461,7 @@ async function initializeApplication() {
         res.status(500).json({
             success: false,
             error: "Internal server error",
-            details: process.env.NODE_ENV === "development" ? error.message : undefined
+            details: process.env.NODE_ENV === "development" ? error.message : undefined,
         });
     });
 
@@ -464,8 +510,9 @@ function startCiscoBackgroundSync(db) {
     const paloService = new PaloAltoService(db, preferencesService); // HEX-209: Palo Alto background sync
 
     // Initialize preference with default value if it doesn't exist (HEX-141)
-    preferencesService.getPreference(ADMIN_USER_ID, "cisco_background_sync_enabled")
-        .then(result => {
+    preferencesService
+        .getPreference(ADMIN_USER_ID, "cisco_background_sync_enabled")
+        .then((result) => {
             if (!result.success) {
                 // Preference doesn't exist - create it with default value "true"
                 return preferencesService.setPreference(ADMIN_USER_ID, "cisco_background_sync_enabled", "true");
@@ -474,7 +521,7 @@ function startCiscoBackgroundSync(db) {
         .then(() => {
             console.log("Cisco background sync preference initialized");
         })
-        .catch(err => {
+        .catch((err) => {
             console.warn("Failed to initialize Cisco background sync preference:", err.message);
         });
 
@@ -485,9 +532,10 @@ function startCiscoBackgroundSync(db) {
         try {
             // Check if background sync is enabled (default: true)
             const bgSyncPref = await preferencesService.getPreference(ADMIN_USER_ID, "cisco_background_sync_enabled");
-            const isEnabled = bgSyncPref.success && bgSyncPref.data
-                ? (bgSyncPref.data.value === "true" || bgSyncPref.data.value === true)
-                : true; // Default enabled if preference doesn't exist
+            const isEnabled =
+                bgSyncPref.success && bgSyncPref.data
+                    ? bgSyncPref.data.value === "true" || bgSyncPref.data.value === true
+                    : true; // Default enabled if preference doesn't exist
 
             if (!isEnabled) {
                 console.log("Cisco background sync skipped: Disabled by user preference");
@@ -505,8 +553,9 @@ function startCiscoBackgroundSync(db) {
             console.log("Starting Cisco advisory background sync...");
             const result = await ciscoService.syncCiscoAdvisories(ADMIN_USER_ID);
 
-            console.log(` Cisco background sync completed: ${result.matchedCount}/${result.totalCvesChecked} CVEs synced`);
-
+            console.log(
+                ` Cisco background sync completed: ${result.matchedCount}/${result.totalCvesChecked} CVEs synced`,
+            );
         } catch (error) {
             console.error("Cisco background sync failed:", error.message);
             // Don't crash the server on sync failure - just log and continue
@@ -529,7 +578,7 @@ function startCiscoBackgroundSync(db) {
             if (err) {
                 console.warn("Failed to store initial Cisco sync metadata:", err.message);
             }
-        }
+        },
     );
 
     // Schedule recurring sync every 24 hours
@@ -540,8 +589,9 @@ function startCiscoBackgroundSync(db) {
     // ========================================
 
     // Initialize Palo Alto background sync preference (default: true)
-    preferencesService.getPreference(ADMIN_USER_ID, "palo_background_sync_enabled")
-        .then(result => {
+    preferencesService
+        .getPreference(ADMIN_USER_ID, "palo_background_sync_enabled")
+        .then((result) => {
             if (!result.success) {
                 // Preference doesn't exist - create it with default value "true"
                 return preferencesService.setPreference(ADMIN_USER_ID, "palo_background_sync_enabled", "true");
@@ -550,7 +600,7 @@ function startCiscoBackgroundSync(db) {
         .then(() => {
             console.log("Palo Alto background sync preference initialized");
         })
-        .catch(err => {
+        .catch((err) => {
             console.warn("Failed to initialize Palo Alto background sync preference:", err.message);
         });
 
@@ -562,9 +612,10 @@ function startCiscoBackgroundSync(db) {
         try {
             // Check if background sync is enabled (default: true)
             const bgSyncPref = await preferencesService.getPreference(ADMIN_USER_ID, "palo_background_sync_enabled");
-            const isEnabled = bgSyncPref.success && bgSyncPref.data
-                ? (bgSyncPref.data.value === "true" || bgSyncPref.data.value === true)
-                : true; // Default enabled if preference doesn't exist
+            const isEnabled =
+                bgSyncPref.success && bgSyncPref.data
+                    ? bgSyncPref.data.value === "true" || bgSyncPref.data.value === true
+                    : true; // Default enabled if preference doesn't exist
 
             if (!isEnabled) {
                 console.log("Palo Alto background sync skipped: Disabled by user preference");
@@ -574,8 +625,9 @@ function startCiscoBackgroundSync(db) {
             console.log("Starting Palo Alto advisory background sync...");
             const result = await paloService.syncPaloAdvisories(ADMIN_USER_ID);
 
-            console.log(` Palo Alto background sync completed: ${result.matchedCount}/${result.totalCvesChecked} CVEs synced`);
-
+            console.log(
+                ` Palo Alto background sync completed: ${result.matchedCount}/${result.totalCvesChecked} CVEs synced`,
+            );
         } catch (error) {
             console.error("Palo Alto background sync failed:", error.message);
             // Don't crash the server on sync failure - just log and continue
@@ -599,7 +651,7 @@ function startCiscoBackgroundSync(db) {
             if (err) {
                 console.warn("Failed to store initial Palo Alto sync metadata:", err.message);
             }
-        }
+        },
     );
 
     // Schedule recurring sync every 24 hours
@@ -614,8 +666,9 @@ function startCiscoBackgroundSync(db) {
     const kevService = new KEVService(db);
 
     // Initialize KEV background sync preference (default: true)
-    preferencesService.getPreference(ADMIN_USER_ID, "kev_background_sync_enabled")
-        .then(result => {
+    preferencesService
+        .getPreference(ADMIN_USER_ID, "kev_background_sync_enabled")
+        .then((result) => {
             if (!result.success) {
                 // Preference doesn't exist - create it with default value "true"
                 return preferencesService.setPreference(ADMIN_USER_ID, "kev_background_sync_enabled", "true");
@@ -624,7 +677,7 @@ function startCiscoBackgroundSync(db) {
         .then(() => {
             console.log("KEV background sync preference initialized");
         })
-        .catch(err => {
+        .catch((err) => {
             console.warn("Failed to initialize KEV background sync preference:", err.message);
         });
 
@@ -636,9 +689,10 @@ function startCiscoBackgroundSync(db) {
         try {
             // Check if background sync is enabled (default: true)
             const bgSyncPref = await preferencesService.getPreference(ADMIN_USER_ID, "kev_background_sync_enabled");
-            const isEnabled = bgSyncPref.success && bgSyncPref.data
-                ? (bgSyncPref.data.value === "true" || bgSyncPref.data.value === true)
-                : true; // Default enabled if preference doesn't exist
+            const isEnabled =
+                bgSyncPref.success && bgSyncPref.data
+                    ? bgSyncPref.data.value === "true" || bgSyncPref.data.value === true
+                    : true; // Default enabled if preference doesn't exist
 
             if (!isEnabled) {
                 console.log("KEV background sync skipped: Disabled by user preference");
@@ -648,8 +702,9 @@ function startCiscoBackgroundSync(db) {
             console.log("Starting CISA KEV background sync...");
             const result = await kevService.syncKevData();
 
-            console.log(` KEV background sync completed: ${result.totalRecords} KEVs synced, ${result.matchedCount} matched`);
-
+            console.log(
+                ` KEV background sync completed: ${result.totalRecords} KEVs synced, ${result.matchedCount} matched`,
+            );
         } catch (error) {
             console.error("KEV background sync failed:", error.message);
             // Don't crash the server on sync failure - just log and continue
@@ -673,7 +728,7 @@ function startCiscoBackgroundSync(db) {
             if (err) {
                 console.warn("Failed to store initial KEV sync metadata:", err.message);
             }
-        }
+        },
     );
 
     // Schedule recurring sync every 24 hours
@@ -706,7 +761,9 @@ function startAutomatedBackups(db) {
             console.log("Running startup backup cleanup...");
             const cleanupResult = await backupService.cleanupOldBackups();
             if (cleanupResult.deleted > 0) {
-                console.log(` Startup cleanup: ${cleanupResult.deleted} old backups deleted, ${cleanupResult.freed_mb}MB freed`);
+                console.log(
+                    ` Startup cleanup: ${cleanupResult.deleted} old backups deleted, ${cleanupResult.freed_mb}MB freed`,
+                );
             } else {
                 console.log(" Startup cleanup: No old backups to delete");
             }
@@ -716,8 +773,9 @@ function startAutomatedBackups(db) {
     }, 5000); // Run 5 seconds after startup
 
     // Initialize preference with default value if it doesn't exist
-    preferencesService.getPreference(ADMIN_USER_ID, "automated_backups_enabled")
-        .then(result => {
+    preferencesService
+        .getPreference(ADMIN_USER_ID, "automated_backups_enabled")
+        .then((result) => {
             if (!result.success) {
                 // Preference doesn't exist - create it with default value "true"
                 return preferencesService.setPreference(ADMIN_USER_ID, "automated_backups_enabled", "true");
@@ -726,7 +784,7 @@ function startAutomatedBackups(db) {
         .then(() => {
             console.log("Automated backup preference initialized");
         })
-        .catch(err => {
+        .catch((err) => {
             console.warn("Failed to initialize automated backup preference:", err.message);
         });
 
@@ -737,9 +795,10 @@ function startAutomatedBackups(db) {
         try {
             // Check if automated backups are enabled (default: true)
             const bgBackupPref = await preferencesService.getPreference(ADMIN_USER_ID, "automated_backups_enabled");
-            const isEnabled = bgBackupPref.success && bgBackupPref.data
-                ? (bgBackupPref.data.value === "true" || bgBackupPref.data.value === true)
-                : true; // Default enabled if preference doesn't exist
+            const isEnabled =
+                bgBackupPref.success && bgBackupPref.data
+                    ? bgBackupPref.data.value === "true" || bgBackupPref.data.value === true
+                    : true; // Default enabled if preference doesn't exist
 
             if (!isEnabled) {
                 console.log("Automated backup skipped: Disabled by user preference");
@@ -756,9 +815,10 @@ function startAutomatedBackups(db) {
             // Run cleanup to maintain 7-day retention
             const cleanupResult = await backupService.cleanupOldBackups();
             if (cleanupResult.deleted > 0) {
-                console.log(` Backup cleanup: ${cleanupResult.deleted} old backups deleted, ${cleanupResult.freed_mb}MB freed`);
+                console.log(
+                    ` Backup cleanup: ${cleanupResult.deleted} old backups deleted, ${cleanupResult.freed_mb}MB freed`,
+                );
             }
-
         } catch (error) {
             console.error("Automated backup failed:", error.message);
             // Don't crash the server on backup failure - just log and continue
@@ -810,7 +870,6 @@ async function gracefulShutdown(signal) {
         // 4. Exit cleanly
         console.log("Graceful shutdown complete");
         process.exit(0);
-
     } catch (error) {
         console.error("Error during graceful shutdown:", error);
         process.exit(1);
@@ -821,7 +880,7 @@ async function gracefulShutdown(signal) {
 process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
 process.on("SIGINT", () => gracefulShutdown("SIGINT"));
 
-initializeApplication().catch(error => {
+initializeApplication().catch((error) => {
     console.error("Failed to start server:", error);
     process.exit(1);
 });

@@ -1,7 +1,7 @@
 /**
  * @fileoverview Enhanced Toast Manager for HexTrackr - User feedback system
  * Provides loading states, error feedback, and visual notifications
- * 
+ *
  * @version 1.0.0
  * @date 2025-09-10
  * @spec 004-cve-link-system-fix
@@ -11,7 +11,7 @@
 
 /* global bootstrap, generateSecureId */
 
-(function(global) {
+(function (global) {
     "use strict";
 
     /**
@@ -65,7 +65,9 @@
          */
         showToast(message, type = "info", options = {}) {
             // Map error to danger for Bootstrap
-            if (type === "error") {type = "danger";}
+            if (type === "error") {
+                type = "danger";
+            }
 
             const defaults = {
                 duration: this.defaultDuration,
@@ -73,7 +75,7 @@
                 showProgress: false,
                 icon: this.getIconForType(type),
                 dismissible: true,
-                animation: true
+                animation: true,
             };
 
             const settings = Object.assign({}, defaults, options);
@@ -88,7 +90,7 @@
 
             // Create toast element
             const toast = this.createToastElement(toastId, message, type, settings);
-            
+
             // Add to container
             if (options.priority) {
                 this.container.insertBefore(toast, this.container.firstChild);
@@ -100,7 +102,7 @@
             const bsToast = new bootstrap.Toast(toast, {
                 autohide: settings.autohide,
                 delay: settings.duration,
-                animation: settings.animation
+                animation: settings.animation,
             });
 
             // Track active toast
@@ -142,8 +144,9 @@
             // Build toast content
             const iconHtml = settings.icon ? `<i class="${settings.icon} me-2"></i>` : "";
             const progressHtml = settings.showProgress ? this.createProgressBar() : "";
-            const closeButton = settings.dismissible ? 
-                "<button type=\"button\" class=\"btn-close btn-close-white me-2 m-auto\" data-bs-dismiss=\"toast\" aria-label=\"Close\"></button>" : "";
+            const closeButton = settings.dismissible
+                ? '<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>'
+                : "";
 
             toast.innerHTML = `
                 <div class="d-flex">
@@ -178,7 +181,7 @@
                 dismissible: false,
                 icon: "spinner-border spinner-border-sm",
                 showProgress: false,
-                priority: true
+                priority: true,
             });
 
             this.loadingToast = this.showToast(message, "info", loadingOptions);
@@ -216,7 +219,7 @@
          */
         showError(message, error = null, options = {}) {
             let fullMessage = message;
-            
+
             if (error) {
                 if (error.message) {
                     fullMessage += `: ${error.message}`;
@@ -229,7 +232,7 @@
             const errorOptions = Object.assign({}, options, {
                 duration: 8000,
                 priority: true,
-                icon: "bi bi-exclamation-triangle-fill"
+                icon: "bi bi-exclamation-triangle-fill",
             });
 
             return this.showToast(fullMessage, "danger", errorOptions);
@@ -242,7 +245,7 @@
          */
         showSuccess(message, options = {}) {
             const successOptions = Object.assign({}, options, {
-                icon: "bi bi-check-circle-fill"
+                icon: "bi bi-check-circle-fill",
             });
             return this.showToast(message, "success", successOptions);
         }
@@ -255,7 +258,7 @@
         showWarning(message, options = {}) {
             const warningOptions = Object.assign({}, options, {
                 icon: "bi bi-exclamation-circle-fill",
-                duration: 6000
+                duration: 6000,
             });
             return this.showToast(message, "warning", warningOptions);
         }
@@ -267,7 +270,7 @@
          */
         showInfo(message, options = {}) {
             const infoOptions = Object.assign({}, options, {
-                icon: "bi bi-info-circle-fill"
+                icon: "bi bi-info-circle-fill",
             });
             return this.showToast(message, "info", infoOptions);
         }
@@ -336,7 +339,7 @@
                 warning: "bg-warning",
                 info: "bg-info",
                 primary: "bg-primary",
-                secondary: "bg-secondary"
+                secondary: "bg-secondary",
             };
             return classes[type] || "bg-secondary";
         }
@@ -351,7 +354,7 @@
                 danger: "bi bi-x-circle",
                 error: "bi bi-x-circle",
                 warning: "bi bi-exclamation-triangle",
-                info: "bi bi-info-circle"
+                info: "bi bi-info-circle",
             };
             return icons[type] || "";
         }
@@ -393,10 +396,10 @@
                 "&": "&amp;",
                 "<": "&lt;",
                 ">": "&gt;",
-                "\"": "&quot;",
-                "'": "&#039;"
+                '"': "&quot;",
+                "'": "&#039;",
             };
-            return String(text).replace(/[&<>"']/g, m => map[m]);
+            return String(text).replace(/[&<>"']/g, (m) => map[m]);
         }
 
         /**
@@ -407,7 +410,9 @@
          */
         showModalError(modalId, message, options = {}) {
             const modal = document.getElementById(modalId);
-            if (!modal) {return;}
+            if (!modal) {
+                return;
+            }
 
             // Find or create error container in modal
             let errorContainer = modal.querySelector(".modal-error-container");
@@ -415,7 +420,7 @@
                 errorContainer = document.createElement("div");
                 errorContainer.className = "modal-error-container alert alert-danger alert-dismissible fade show m-3";
                 errorContainer.setAttribute("role", "alert");
-                
+
                 const modalBody = modal.querySelector(".modal-body");
                 if (modalBody) {
                     modalBody.insertBefore(errorContainer, modalBody.firstChild);
@@ -444,10 +449,12 @@
          */
         clearModalErrors(modalId) {
             const modal = document.getElementById(modalId);
-            if (!modal) {return;}
+            if (!modal) {
+                return;
+            }
 
             const errorContainers = modal.querySelectorAll(".modal-error-container");
-            errorContainers.forEach(container => container.remove());
+            errorContainers.forEach((container) => container.remove());
         }
     }
 
@@ -458,12 +465,11 @@
     if (typeof module !== "undefined" && module.exports) {
         module.exports = toastManager;
     } else if (typeof define === "function" && define.amd) {
-        define([], function() {
+        define([], function () {
             return toastManager;
         });
     } else {
         global.ToastManager = ToastManager;
         global.toastManager = toastManager;
     }
-
 })(typeof window !== "undefined" ? window : global);

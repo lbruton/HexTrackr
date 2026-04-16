@@ -20,7 +20,7 @@ class TicketMarkdownEditor {
         this.isEditMode = false;
         this.currentTemplate = null;
         this.currentTicketData = null;
-        this.currentVariant = "upgrade";  // Default variant
+        this.currentVariant = "upgrade"; // Default variant
         this.validationTimeout = null;
         this.isRestoring = false;
 
@@ -37,19 +37,19 @@ class TicketMarkdownEditor {
      */
     getTemplateVariant(jobType) {
         if (!jobType) {
-            return "upgrade";  // Default fallback
+            return "upgrade"; // Default fallback
         }
 
         switch (jobType.toLowerCase()) {
             case "replace":
             case "refresh":
-                return "replacement";  // Both use same template (equipment swap workflow)
+                return "replacement"; // Both use same template (equipment swap workflow)
             case "mitigate":
-                return "mitigate";     // KEV emergency patching
+                return "mitigate"; // KEV emergency patching
             case "upgrade":
             case "other":
             default:
-                return "upgrade";      // Default for Upgrade and Other job types
+                return "upgrade"; // Default for Upgrade and Other job types
         }
     }
 
@@ -157,7 +157,11 @@ class TicketMarkdownEditor {
             // TODO: Implement more robust template validation that doesn't interfere with user edits
             if (!this.isRestoring && !this.isTemplateContentValid(this.currentTemplate.template_content)) {
                 logger.warn("ui", "Template content validation failed, but allowing user content to load for editing.");
-                logger.debug("ui", "Template content preview:", this.currentTemplate.template_content.substring(0, 100));
+                logger.debug(
+                    "ui",
+                    "Template content preview:",
+                    this.currentTemplate.template_content.substring(0, 100),
+                );
             }
 
             const editor = document.getElementById("ticketTemplateEditor");
@@ -215,15 +219,15 @@ Generated: [GENERATED_TIME]`;
                 template_content: defaultContent,
                 default_content: defaultContent,
                 variables: JSON.stringify(this.variables),
-                category: "ticket"
+                category: "ticket",
             };
 
             const response = await authState.authenticatedFetch("/api/templates", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
-                body: JSON.stringify(templateData)
+                body: JSON.stringify(templateData),
             });
 
             if (response.status === 409) {
@@ -265,7 +269,7 @@ Generated: [GENERATED_TIME]`;
             this.currentTemplate = {
                 id: null,
                 name: "default_ticket",
-                template_content: defaultContent
+                template_content: defaultContent,
             };
         }
     }
@@ -275,7 +279,9 @@ Generated: [GENERATED_TIME]`;
      */
     populateVariablePanel() {
         const dropdown = document.getElementById("ticketVariableDropdown");
-        if (!dropdown) {return;}
+        if (!dropdown) {
+            return;
+        }
 
         dropdown.innerHTML = "";
         dropdown.className = "dropdown-menu variable-dropdown";
@@ -285,7 +291,7 @@ Generated: [GENERATED_TIME]`;
 
         // Group variables by category
         const variablesByCategory = {};
-        this.variables.forEach(variable => {
+        this.variables.forEach((variable) => {
             const category = variable.category || "other";
             if (!variablesByCategory[category]) {
                 variablesByCategory[category] = [];
@@ -309,7 +315,7 @@ Generated: [GENERATED_TIME]`;
             dropdown.appendChild(categoryHeader);
 
             // Add variables for this category
-            variables.forEach(variable => {
+            variables.forEach((variable) => {
                 const item = document.createElement("li");
                 const button = document.createElement("button");
                 button.type = "button";
@@ -329,7 +335,7 @@ Generated: [GENERATED_TIME]`;
             // Add divider between categories (except for last category)
             if (index < Object.keys(variablesByCategory).length - 1) {
                 const divider = document.createElement("li");
-                divider.innerHTML = "<hr class=\"dropdown-divider\">";
+                divider.innerHTML = '<hr class="dropdown-divider">';
                 dropdown.appendChild(divider);
             }
         });
@@ -341,7 +347,9 @@ Generated: [GENERATED_TIME]`;
      */
     insertVariable(variable) {
         const editor = document.getElementById("ticketTemplateEditor");
-        if (!editor) {return;}
+        if (!editor) {
+            return;
+        }
 
         const start = editor.selectionStart;
         const end = editor.selectionEnd;
@@ -415,26 +423,32 @@ Generated: [GENERATED_TIME]`;
             "[NOTES]": ticket.notes || ticket.additional_notes || "N/A",
             "[GENERATED_TIME]": new Date().toLocaleString(),
             "[VULNERABILITY_SUMMARY]": this.generateVulnerabilitySummary(ticket),
-            "[SITE_ADDRESS]": ticket.site_address || this.formatAddress(
-                ticket.shipping_line1 || ticket.shippingLine1,
-                ticket.shipping_line2 || ticket.shippingLine2,
-                ticket.shipping_city || ticket.shippingCity,
-                ticket.shipping_state || ticket.shippingState,
-                ticket.shipping_zip || ticket.shippingZip
-            ) || "N/A",
-            "[RETURN_ADDRESS]": ticket.return_address || this.formatAddress(
-                ticket.return_line1 || ticket.returnLine1,
-                ticket.return_line2 || ticket.returnLine2,
-                ticket.return_city || ticket.returnCity,
-                ticket.return_state || ticket.returnState,
-                ticket.return_zip || ticket.returnZip
-            ) || "N/A",
+            "[SITE_ADDRESS]":
+                ticket.site_address ||
+                this.formatAddress(
+                    ticket.shipping_line1 || ticket.shippingLine1,
+                    ticket.shipping_line2 || ticket.shippingLine2,
+                    ticket.shipping_city || ticket.shippingCity,
+                    ticket.shipping_state || ticket.shippingState,
+                    ticket.shipping_zip || ticket.shippingZip,
+                ) ||
+                "N/A",
+            "[RETURN_ADDRESS]":
+                ticket.return_address ||
+                this.formatAddress(
+                    ticket.return_line1 || ticket.returnLine1,
+                    ticket.return_line2 || ticket.returnLine2,
+                    ticket.return_city || ticket.returnCity,
+                    ticket.return_state || ticket.returnState,
+                    ticket.return_zip || ticket.returnZip,
+                ) ||
+                "N/A",
             "[TRACKING_NUMBER]": ticket.outbound_tracking || ticket.outboundTracking || ticket.tracking_number || "N/A",
             "[RETURN_TRACKING]": ticket.return_tracking || ticket.returnTracking || "N/A",
-            "[MITIGATION_DETAILS]": ticket.mitigation_details || "[MITIGATION DETAILS - TBD]"
+            "[MITIGATION_DETAILS]": ticket.mitigation_details || "[MITIGATION DETAILS - TBD]",
         };
 
-        Object.keys(replacements).forEach(variable => {
+        Object.keys(replacements).forEach((variable) => {
             const regex = new RegExp(this.escapeRegex(variable), "g");
             processed = processed.replace(regex, replacements[variable]);
         });
@@ -448,7 +462,9 @@ Generated: [GENERATED_TIME]`;
      * @returns {string} Formatted device list
      */
     formatDeviceList(devices) {
-        if (!devices || devices.length === 0) {return "No devices specified";}
+        if (!devices || devices.length === 0) {
+            return "No devices specified";
+        }
 
         return devices.map((device, index) => `${index + 1}. ${device}`).join("\\n");
     }
@@ -459,7 +475,9 @@ Generated: [GENERATED_TIME]`;
      * @returns {string} Formatted date
      */
     formatDate(dateString) {
-        if (!dateString) {return "N/A";}
+        if (!dateString) {
+            return "N/A";
+        }
 
         try {
             return new Date(dateString).toLocaleDateString();
@@ -480,14 +498,20 @@ Generated: [GENERATED_TIME]`;
     formatAddress(line1, line2, city, state, zip) {
         const parts = [];
 
-        if (line1) {parts.push(line1);}
-        if (line2) {parts.push(line2);}
+        if (line1) {
+            parts.push(line1);
+        }
+        if (line2) {
+            parts.push(line2);
+        }
         if (city && state && zip) {
             parts.push(`${city}, ${state} ${zip}`);
         } else if (city || state || zip) {
             // Handle partial city/state/zip
             const cityStateZip = [city, state, zip].filter(Boolean).join(" ");
-            if (cityStateZip) {parts.push(cityStateZip);}
+            if (cityStateZip) {
+                parts.push(cityStateZip);
+            }
         }
 
         return parts.length > 0 ? parts.join("\n") : null;
@@ -590,7 +614,7 @@ Generated: [GENERATED_TIME]`;
         previewModal.show();
 
         // Clean up when modal is hidden
-        document.getElementById("ticketTemplatePreviewModal").addEventListener("hidden.bs.modal", function() {
+        document.getElementById("ticketTemplatePreviewModal").addEventListener("hidden.bs.modal", function () {
             this.remove();
         });
     }
@@ -600,7 +624,9 @@ Generated: [GENERATED_TIME]`;
      */
     async saveTemplate() {
         const editor = document.getElementById("ticketTemplateEditor");
-        if (!editor) {return;}
+        if (!editor) {
+            return;
+        }
 
         try {
             const templateContent = editor.value;
@@ -617,19 +643,25 @@ Generated: [GENERATED_TIME]`;
                 await this.createDefaultTemplate();
             }
 
-            logger.debug("ui", `[TicketMarkdownEditor] Saving template with ID: ${this.currentTemplate.id}, category: 'ticket', name: 'default_ticket'`);
-            logger.debug("ui", `[TicketMarkdownEditor] Template content preview: ${templateContent.substring(0, 100)}...`);
+            logger.debug(
+                "ui",
+                `[TicketMarkdownEditor] Saving template with ID: ${this.currentTemplate.id}, category: 'ticket', name: 'default_ticket'`,
+            );
+            logger.debug(
+                "ui",
+                `[TicketMarkdownEditor] Template content preview: ${templateContent.substring(0, 100)}...`,
+            );
 
             const response = await authState.authenticatedFetch(`/api/templates/${this.currentTemplate.id}`, {
                 method: "PUT",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
                     template_content: templateContent,
                     category: "ticket",
-                    template_name: "default_ticket"
-                })
+                    template_name: "default_ticket",
+                }),
             });
 
             if (!response.ok) {
@@ -679,7 +711,7 @@ Generated: [GENERATED_TIME]`;
         this.isRestoring = true;
         try {
             const response = await authState.authenticatedFetch(`/api/templates/${this.currentTemplate.id}/reset`, {
-                method: "POST"
+                method: "POST",
             });
 
             if (!response.ok) {
@@ -708,13 +740,15 @@ Generated: [GENERATED_TIME]`;
      */
     cacheTemplate(template) {
         try {
-            if (!template?.name) {return;}
+            if (!template?.name) {
+                return;
+            }
             const cacheKey = `hextrackr_ticket_template_${template.name}`;
             const cacheData = {
                 template,
                 timestamp: Date.now(),
-                expires: Date.now() + (60 * 60 * 1000),
-                category: "ticket"
+                expires: Date.now() + 60 * 60 * 1000,
+                category: "ticket",
             };
             localStorage.setItem(cacheKey, JSON.stringify(cacheData));
             logger.debug("ui", `[TicketMarkdownEditor] Cached template with key: ${cacheKey}`);
@@ -765,7 +799,7 @@ Generated: [GENERATED_TIME]`;
                 return;
             }
 
-            Object.keys(localStorage).forEach(key => {
+            Object.keys(localStorage).forEach((key) => {
                 if (key.startsWith("hextrackr_ticket_template_")) {
                     localStorage.removeItem(key);
                     logger.debug("ui", `[TicketMarkdownEditor] Cleared cache for key: ${key}`);
@@ -799,7 +833,9 @@ Generated: [GENERATED_TIME]`;
         this.isRestoring = true;
         try {
             if (this.currentTemplate?.id) {
-                await authState.authenticatedFetch(`/api/templates/${this.currentTemplate.id}/reset`, { method: "POST" });
+                await authState.authenticatedFetch(`/api/templates/${this.currentTemplate.id}/reset`, {
+                    method: "POST",
+                });
             }
         } catch (resetError) {
             logger.warn("ui", "Failed to reset ticket template on server:", resetError.message);
@@ -842,7 +878,9 @@ Generated: [GENERATED_TIME]`;
         const editor = document.getElementById("ticketTemplateEditor");
         const validationDiv = document.getElementById("ticketTemplateValidation");
 
-        if (!editor || !validationDiv) {return;}
+        if (!editor || !validationDiv) {
+            return;
+        }
 
         const content = editor.value;
         if (!content.trim()) {
@@ -883,10 +921,10 @@ Generated: [GENERATED_TIME]`;
         // Extract variables
         const variableMatches = content.match(/\\[[A-Z_]+\\]/g) || [];
         const uniqueVariables = [...new Set(variableMatches)];
-        const knownVariables = this.variables.map(v => v.name);
+        const knownVariables = this.variables.map((v) => v.name);
 
         // Check for unknown variables
-        const unknownVariables = uniqueVariables.filter(v => !knownVariables.includes(v));
+        const unknownVariables = uniqueVariables.filter((v) => !knownVariables.includes(v));
         if (unknownVariables.length > 0) {
             warnings.push(`Unknown variables: ${unknownVariables.join(", ")}`);
         }
@@ -897,8 +935,8 @@ Generated: [GENERATED_TIME]`;
             warnings,
             variables: {
                 found: uniqueVariables,
-                unknown: unknownVariables
-            }
+                unknown: unknownVariables,
+            },
         };
     }
 
@@ -908,7 +946,9 @@ Generated: [GENERATED_TIME]`;
      */
     displayValidationResults(validation) {
         const validationDiv = document.getElementById("ticketTemplateValidation");
-        if (!validationDiv) {return;}
+        if (!validationDiv) {
+            return;
+        }
 
         let html = "";
 
@@ -945,7 +985,10 @@ Generated: [GENERATED_TIME]`;
         // Determine variant based on job type
         if (ticketData && ticketData.jobType) {
             this.currentVariant = this.getTemplateVariant(ticketData.jobType);
-            logger.debug("ui", `[TicketMarkdownEditor] Set variant to '${this.currentVariant}' based on job type '${ticketData.jobType}'`);
+            logger.debug(
+                "ui",
+                `[TicketMarkdownEditor] Set variant to '${this.currentVariant}' based on job type '${ticketData.jobType}'`,
+            );
         }
     }
 

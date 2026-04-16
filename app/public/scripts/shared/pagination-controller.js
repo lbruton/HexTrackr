@@ -5,13 +5,13 @@
  * @fileoverview
  * Reusable pagination controller for managing paginated data display.
  * Extracted from vulnerability-manager.js as part of modularization effort.
- * 
+ *
  * This class provides:
  * - Pagination logic and state management
  * - Dynamic UI generation with Bootstrap styling
  * - Page size selection and navigation controls
  * - Smart page number display with ellipsis for large datasets
- * 
+ *
  * @version 1.0.0
  * @author HexTrackr Team
  * @date 2025-09-05
@@ -19,13 +19,13 @@
 
 /**
  * PaginationController - Handles pagination logic and UI generation
- * 
+ *
  * Usage:
  * ```javascript
  * const pagination = new PaginationController(12, [6, 12, 24, 48]);
  * pagination.setTotalItems(150);
- * pagination.renderPaginationControls('pagination-container', 
- *   () => renderCurrentPage(), 
+ * pagination.renderPaginationControls('pagination-container',
+ *   () => renderCurrentPage(),
  *   () => renderCurrentPage()
  * );
  * ```
@@ -58,7 +58,9 @@ class PaginationController {
     }
 
     setPageSize(size) {
-        const validSize = this.availableSizes.includes(parseInt(size, 10)) ? parseInt(size, 10) : this.availableSizes[0];
+        const validSize = this.availableSizes.includes(parseInt(size, 10))
+            ? parseInt(size, 10)
+            : this.availableSizes[0];
         this.pageSize = validSize;
         this.currentPage = 1; // Reset to first page when changing page size
     }
@@ -82,7 +84,7 @@ class PaginationController {
             totalItems: this.totalItems,
             startItem,
             endItem,
-            availableSizes: this.availableSizes
+            availableSizes: this.availableSizes,
         };
     }
 
@@ -114,24 +116,30 @@ class PaginationController {
         const itemType = options.itemType || "Items";
 
         // Find current sort label
-        const currentSortObj = sortOptions.find(opt => opt.value === currentSort);
+        const currentSortObj = sortOptions.find((opt) => opt.value === currentSort);
         const currentSortLabel = currentSortObj ? currentSortObj.label : "Sort by";
 
         // Tabler.io dropdown for sort options
-        const sortDropdownHTML = sortOptions.length > 0 ? `
+        const sortDropdownHTML =
+            sortOptions.length > 0
+                ? `
             <div class="dropdown">
                 <button class="btn btn-sm dropdown-toggle" type="button" id="${containerId}SortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                     ${currentSortLabel}
                 </button>
                 <div class="dropdown-menu" aria-labelledby="${containerId}SortDropdown">
-                    ${sortOptions.map(opt =>
-                        `<a class="dropdown-item ${opt.value === currentSort ? "active" : ""}" href="#" data-sort-value="${opt.value}">
+                    ${sortOptions
+                        .map(
+                            (opt) =>
+                                `<a class="dropdown-item ${opt.value === currentSort ? "active" : ""}" href="#" data-sort-value="${opt.value}">
                             ${opt.label}
-                        </a>`
-                    ).join("")}
+                        </a>`,
+                        )
+                        .join("")}
                 </div>
             </div>
-        ` : "";
+        `
+                : "";
 
         // Tabler.io dropdown for items per page
         const itemsDropdownHTML = `
@@ -140,11 +148,14 @@ class PaginationController {
                     ${info.pageSize} ${itemType}
                 </button>
                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="${containerId}PageSizeDropdown">
-                    ${info.availableSizes.map(size =>
-                        `<a class="dropdown-item ${size === info.pageSize ? "active" : ""}" href="#" data-page-size="${size}">
+                    ${info.availableSizes
+                        .map(
+                            (size) =>
+                                `<a class="dropdown-item ${size === info.pageSize ? "active" : ""}" href="#" data-page-size="${size}">
                             ${size} ${itemType}
-                        </a>`
-                    ).join("")}
+                        </a>`,
+                        )
+                        .join("")}
                 </div>
             </div>
         `;
@@ -156,7 +167,7 @@ class PaginationController {
 
         // Add event listeners for page size dropdown items
         const pageSizeItems = container.querySelectorAll("[data-page-size]");
-        pageSizeItems.forEach(item => {
+        pageSizeItems.forEach((item) => {
             item.addEventListener("click", (e) => {
                 e.preventDefault();
                 const size = e.target.getAttribute("data-page-size");
@@ -168,7 +179,7 @@ class PaginationController {
         // Add event listeners for sort dropdown items
         if (sortOptions.length > 0) {
             const sortItems = container.querySelectorAll("[data-sort-value]");
-            sortItems.forEach(item => {
+            sortItems.forEach((item) => {
                 item.addEventListener("click", (e) => {
                     e.preventDefault();
                     const sortValue = e.target.getAttribute("data-sort-value");
@@ -211,15 +222,17 @@ class PaginationController {
                             </button>
                         </li>
 
-                        ${this.generatePageNumbers(info).map(page => {
-                            if (page === "...") {
-                                return "<li class=\"page-item disabled\"><span class=\"page-link\">...</span></li>";
-                            }
-                            const isActive = page === info.currentPage ? "active" : "";
-                            return `<li class="page-item ${isActive}">
+                        ${this.generatePageNumbers(info)
+                            .map((page) => {
+                                if (page === "...") {
+                                    return '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                                }
+                                const isActive = page === info.currentPage ? "active" : "";
+                                return `<li class="page-item ${isActive}">
                                 <button class="page-link" data-page="${page}">${page}</button>
                             </li>`;
-                        }).join("")}
+                            })
+                            .join("")}
 
                         <li class="page-item ${nextDisabled}">
                             <button class="page-link" data-page="${info.currentPage + 1}" ${nextDisabled ? "disabled" : ""}>
@@ -244,7 +257,7 @@ class PaginationController {
         `;
 
         // Add event listeners for pagination buttons
-        container.querySelectorAll(".page-link[data-page]").forEach(btn => {
+        container.querySelectorAll(".page-link[data-page]").forEach((btn) => {
             btn.addEventListener("click", (e) => {
                 e.preventDefault();
                 if (!btn.disabled) {
@@ -259,7 +272,7 @@ class PaginationController {
         const pages = [];
         const current = info.currentPage;
         const total = info.totalPages;
-        
+
         if (total <= 7) {
             for (let i = 1; i <= total; i++) {
                 pages.push(i);
@@ -287,7 +300,7 @@ class PaginationController {
                 pages.push(total);
             }
         }
-        
+
         return pages;
     }
 }

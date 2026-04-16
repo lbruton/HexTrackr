@@ -26,13 +26,13 @@ function createCiscoRouter(db, preferencesService) {
         max: 10, // Max 10 sync requests per 10 minutes per IP (increased for testing)
         message: {
             error: "Too many sync requests",
-            message: "Please wait before requesting another Cisco advisory sync"
+            message: "Please wait before requesting another Cisco advisory sync",
         },
         standardHeaders: true,
         legacyHeaders: false,
         // Trust proxy configuration for nginx reverse proxy
         // Uses leftmost IP from X-Forwarded-For header (our nginx config)
-        validate: { trustProxy: false } // Disable trust proxy validation (we know our setup is secure)
+        validate: { trustProxy: false }, // Disable trust proxy validation (we know our setup is secure)
     });
 
     // API Routes

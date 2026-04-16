@@ -31,7 +31,7 @@ class DocsController {
                 apiEndpoints: stats.apiEndpoints,
                 jsFunctions: stats.jsFunctions,
                 frameworks: stats.frameworks,
-                computedAt: new Date().toISOString()
+                computedAt: new Date().toISOString(),
             };
         } catch (error) {
             if (global.logger?.error) {
@@ -115,5 +115,5 @@ module.exports = {
      * const section = findDocsSectionForFilename("nonexistent.html");
      * // Returns: null
      */
-    findDocsSectionForFilename
+    findDocsSectionForFilename,
 };
