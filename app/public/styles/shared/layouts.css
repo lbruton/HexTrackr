@@ -101,7 +101,7 @@
 .terminal-content {
     background-color: #0d1117 !important;
     color: #00ff00 !important;
-    font-family: Consolas, Monaco, 'Courier New', monospace !important;
+    font-family: Consolas, Monaco, "Courier New", monospace !important;
     font-size: 13px !important;
     line-height: 1.4 !important;
     border: 1px solid #30363d !important;
@@ -136,7 +136,7 @@
    =========================== */
 
 .view-switcher {
-    background: var(--hextrackr-surface-1);  /* Use CSS variable instead of hardcoded white */
+    background: var(--hextrackr-surface-1); /* Use CSS variable instead of hardcoded white */
     border-radius: 8px;
     padding: 0.5rem;
     margin-bottom: 1rem;
@@ -290,17 +290,45 @@ input[type="file"].hidden-input {
    Spacing Utilities
    =========================== */
 
-.space-y-1 > * + * { margin-top: 0.25rem; }
-.space-y-2 > * + * { margin-top: 0.5rem; }
-.space-y-3 > * + * { margin-top: 0.75rem; }
-.space-y-4 > * + * { margin-top: 1rem; }
-.space-y-5 > * + * { margin-top: 1.25rem; }
+.space-y-1 > * + * {
+    margin-top: 0.25rem;
+}
 
-.space-x-1 > * + * { margin-left: 0.25rem; }
-.space-x-2 > * + * { margin-left: 0.5rem; }
-.space-x-3 > * + * { margin-left: 0.75rem; }
-.space-x-4 > * + * { margin-left: 1rem; }
-.space-x-5 > * + * { margin-left: 1.25rem; }
+.space-y-2 > * + * {
+    margin-top: 0.5rem;
+}
+
+.space-y-3 > * + * {
+    margin-top: 0.75rem;
+}
+
+.space-y-4 > * + * {
+    margin-top: 1rem;
+}
+
+.space-y-5 > * + * {
+    margin-top: 1.25rem;
+}
+
+.space-x-1 > * + * {
+    margin-left: 0.25rem;
+}
+
+.space-x-2 > * + * {
+    margin-left: 0.5rem;
+}
+
+.space-x-3 > * + * {
+    margin-left: 0.75rem;
+}
+
+.space-x-4 > * + * {
+    margin-left: 1rem;
+}
+
+.space-x-5 > * + * {
+    margin-left: 1.25rem;
+}
 
 /* ===========================
    Utility Classes
@@ -338,7 +366,7 @@ input[type="file"].hidden-input {
 
 .scroll-shadow::before,
 .scroll-shadow::after {
-    content: '';
+    content: "";
     position: absolute;
     left: 0;
     right: 0;

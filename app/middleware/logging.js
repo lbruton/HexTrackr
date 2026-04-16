@@ -12,7 +12,7 @@ const LOG_LEVELS = {
     ERROR: 0,
     WARN: 1,
     INFO: 2,
-    DEBUG: 3
+    DEBUG: 3,
 };
 
 class LoggingManager {
@@ -90,7 +90,7 @@ class LoggingManager {
         const timer = {
             operation,
             startTime: Date.now(),
-            requestId
+            requestId,
         };
 
         this.requestStats.set(timerId, timer);
@@ -110,7 +110,7 @@ class LoggingManager {
         const logData = {
             operation: timer.operation,
             duration: `${duration}ms`,
-            ...additionalData
+            ...additionalData,
         };
 
         this.requestStats.delete(timerId);
@@ -129,7 +129,7 @@ class LoggingManager {
         const logData = {
             operation,
             duration: `${duration}ms`,
-            query: query ? query.substring(0, 100) + (query.length > 100 ? "..." : "") : null
+            query: query ? query.substring(0, 100) + (query.length > 100 ? "..." : "") : null,
         };
 
         if (error) {
@@ -147,7 +147,7 @@ class LoggingManager {
         const logData = {
             operation,
             progress: `${current}/${total} (${percentage}%)`,
-            ...additionalStats
+            ...additionalStats,
         };
 
         // Log every 10% or every 1000 items for large batches
@@ -162,7 +162,7 @@ class LoggingManager {
     logImportProgress(phase, stats, requestId = null) {
         const logData = {
             phase,
-            ...stats
+            ...stats,
         };
 
         this.info(`Import progress: ${phase}`, logData, requestId);
@@ -172,7 +172,7 @@ class LoggingManager {
         const logData = {
             operation,
             totalDuration: `${duration}ms`,
-            ...finalStats
+            ...finalStats,
         };
 
         this.info(`Import completed: ${operation}`, logData, requestId);
@@ -185,7 +185,7 @@ class LoggingManager {
             operation,
             heap: `${Math.round(memUsage.heapUsed / 1024 / 1024)}MB`,
             rss: `${Math.round(memUsage.rss / 1024 / 1024)}MB`,
-            external: `${Math.round(memUsage.external / 1024 / 1024)}MB`
+            external: `${Math.round(memUsage.external / 1024 / 1024)}MB`,
         };
 
         this.debug(`Memory usage: ${operation}`, logData, requestId);
@@ -195,7 +195,7 @@ class LoggingManager {
     logPerformanceSummary(operation, stats, requestId = null) {
         const summary = {
             operation,
-            ...stats
+            ...stats,
         };
 
         this.info(`Performance summary: ${operation}`, summary, requestId);
@@ -221,10 +221,14 @@ function requestLoggingMiddleware(req, res, next) {
     const ip = req.ip || req.connection.remoteAddress || "unknown";
 
     // Log incoming request
-    logger.info(`${method} ${url}`, {
-        ip,
-        userAgent: userAgent.substring(0, 100)
-    }, requestId);
+    logger.info(
+        `${method} ${url}`,
+        {
+            ip,
+            userAgent: userAgent.substring(0, 100),
+        },
+        requestId,
+    );
 
     // Track response
     res.on("finish", () => {
@@ -235,7 +239,7 @@ function requestLoggingMiddleware(req, res, next) {
         const responseData = {
             statusCode,
             duration: `${duration}ms`,
-            contentLength: `${contentLength} bytes`
+            contentLength: `${contentLength} bytes`,
         };
 
         if (statusCode >= 400) {
@@ -257,20 +261,24 @@ function requestLoggingMiddleware(req, res, next) {
 function errorLoggingMiddleware(err, req, res, _next) {
     const requestId = req.requestId || "unknown";
 
-    logger.error("Unhandled request error", {
-        message: err.message,
-        stack: process.env.NODE_ENV === "development" ? err.stack : undefined,
-        method: req.method,
-        url: req.url,
-        body: process.env.NODE_ENV === "development" ? req.body : undefined
-    }, requestId);
+    logger.error(
+        "Unhandled request error",
+        {
+            message: err.message,
+            stack: process.env.NODE_ENV === "development" ? err.stack : undefined,
+            method: req.method,
+            url: req.url,
+            body: process.env.NODE_ENV === "development" ? req.body : undefined,
+        },
+        requestId,
+    );
 
     // Don't call next() to prevent default Express error handler
     if (!res.headersSent) {
         res.status(500).json({
             success: false,
             error: "Internal server error",
-            requestId
+            requestId,
         });
     }
 }
@@ -283,17 +291,25 @@ function logApiResponse(req, res, operation, result, error = null) {
     const requestId = req.requestId || "unknown";
 
     if (error) {
-        logger.error(`API operation failed: ${operation}`, {
-            error: error.message,
-            method: req.method,
-            url: req.url
-        }, requestId);
+        logger.error(
+            `API operation failed: ${operation}`,
+            {
+                error: error.message,
+                method: req.method,
+                url: req.url,
+            },
+            requestId,
+        );
     } else {
-        logger.debug(`API operation success: ${operation}`, {
-            method: req.method,
-            url: req.url,
-            resultSize: typeof result === "object" ? Object.keys(result).length : "scalar"
-        }, requestId);
+        logger.debug(
+            `API operation success: ${operation}`,
+            {
+                method: req.method,
+                url: req.url,
+                resultSize: typeof result === "object" ? Object.keys(result).length : "scalar",
+            },
+            requestId,
+        );
     }
 }
 
@@ -305,7 +321,7 @@ function logServerStartup(port, features = []) {
         port,
         environment: process.env.NODE_ENV || "development",
         nodeVersion: process.version,
-        features
+        features,
     });
 }
 
@@ -315,7 +331,7 @@ function logServerStartup(port, features = []) {
 function logServerReady(port, endpoints = []) {
     logger.info("✅ HexTrackr server ready", {
         url: `http://localhost:${port}`,
-        endpoints
+        endpoints,
     });
 }
 
@@ -326,5 +342,5 @@ module.exports = {
     logApiResponse,
     logServerStartup,
     logServerReady,
-    LOG_LEVELS
+    LOG_LEVELS,
 };

@@ -52,31 +52,35 @@ The Cybersecurity and Infrastructure Security Agency (CISA) maintains a catalog 
 KEV badges appear consistently across multiple UI components:
 
 #### 1. Vulnerability Table (v1.0.22)
+
 - Dedicated KEV column with filterable YES/NO badges
 - Click badges to open KEV details modal
 
 #### 2. Vulnerability Cards (v1.0.22)
+
 - Red KEV badge in upper-right corner
 - Appears when vulnerability is in CISA catalog
 - Click opens KEV details modal
 
 #### 3. Device Cards (v1.0.27)
+
 - KEV badge displays when ANY vulnerability on device is KEV
 - Same visual style as vulnerability cards
 - Click opens KEV modal with first KEV vulnerability details
 - Fixed in v1.0.28 to open correct modal
 
 #### 4. Vulnerability Details Modal (v1.0.30)
+
 - KEV badge in modal header next to "Vulnerability Information"
 - Only appears for KEV vulnerabilities
 - Maintains visual consistency across all badge locations
 
 ### KEV Column Indicators
 
-| Badge | Meaning | Action Required |
-|-------|---------|-----------------|
+| Badge                                                                                             | Meaning                              | Action Required                 |
+| ------------------------------------------------------------------------------------------------- | ------------------------------------ | ------------------------------- |
 | <span style="background: #dc2626; color: white; padding: 2px 6px; border-radius: 4px;">YES</span> | Vulnerability is in CISA KEV catalog | **Urgent remediation required** |
-| <span style="background: #3b82f6; color: white; padding: 2px 6px; border-radius: 4px;">NO</span> | Vulnerability not in KEV catalog | Standard prioritization applies |
+| <span style="background: #3b82f6; color: white; padding: 2px 6px; border-radius: 4px;">NO</span>  | Vulnerability not in KEV catalog     | Standard prioritization applies |
 
 ### KEV Modal Features (Enhanced in v1.0.22)
 
@@ -105,16 +109,19 @@ KEV filtering is available in multiple locations:
 ### Recent Enhancements (v1.0.27-v1.0.30)
 
 #### Device Card KEV Tracking (v1.0.27)
+
 - Modified `getFilteredDevices()` to track `hasKev` property
 - Device aggregation includes KEV status from all vulnerabilities
 - Badge displays when ANY vulnerability is KEV
 
 #### Modal Fix (v1.0.28)
+
 - Corrected event handlers on device card KEV badges
 - Fixed onclick from `viewDeviceDetails()` to `showKevDetails()`
 - Tracks first KEV CVE per device for modal display
 
 #### Vulnerability Details Modal Badge (v1.0.30)
+
 - Added `updateKevBadge()` method to modal component
 - Dynamic badge insertion in card header
 - Reuses existing `.kev-badge` CSS classes
@@ -140,33 +147,33 @@ The KEV integration adds dedicated tables for tracking exploited vulnerabilities
 
 Stores CISA Known Exploited Vulnerabilities metadata from the KEV catalog:
 
-| Column | Type | Description |
-|--------|------|-------------|
-| `cve_id` | TEXT | **Primary key** - CVE identifier (e.g., CVE-2021-44228) |
-| `date_added` | DATE | When CISA added vulnerability to KEV catalog (NOT NULL) |
-| `vulnerability_name` | TEXT | CISA-provided vulnerability name |
-| `vendor_project` | TEXT | Affected vendor or project |
-| `product` | TEXT | Specific product affected |
-| `required_action` | TEXT | CISA-mandated remediation action |
-| `due_date` | DATE | Federal agency remediation deadline |
-| `known_ransomware_use` | BOOLEAN | Whether used in ransomware campaigns (1/0) |
-| `notes` | TEXT | Additional CISA context and guidance |
-| `last_synced` | TIMESTAMP | Last synchronization timestamp |
+| Column                 | Type      | Description                                             |
+| ---------------------- | --------- | ------------------------------------------------------- |
+| `cve_id`               | TEXT      | **Primary key** - CVE identifier (e.g., CVE-2021-44228) |
+| `date_added`           | DATE      | When CISA added vulnerability to KEV catalog (NOT NULL) |
+| `vulnerability_name`   | TEXT      | CISA-provided vulnerability name                        |
+| `vendor_project`       | TEXT      | Affected vendor or project                              |
+| `product`              | TEXT      | Specific product affected                               |
+| `required_action`      | TEXT      | CISA-mandated remediation action                        |
+| `due_date`             | DATE      | Federal agency remediation deadline                     |
+| `known_ransomware_use` | BOOLEAN   | Whether used in ransomware campaigns (1/0)              |
+| `notes`                | TEXT      | Additional CISA context and guidance                    |
+| `last_synced`          | TIMESTAMP | Last synchronization timestamp                          |
 
 #### `sync_metadata` Table
 
 Tracks KEV catalog synchronization history and status:
 
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | INTEGER | **Primary key** - Sync record identifier (AUTOINCREMENT) |
-| `sync_type` | TEXT | Type of sync operation (e.g., 'kev_catalog') - NOT NULL |
-| `sync_time` | TIMESTAMP | Sync execution timestamp (NOT NULL) |
-| `version` | TEXT | Catalog version or timestamp from CISA |
-| `record_count` | INTEGER | Number of KEV records synced |
-| `status` | TEXT | Sync status (completed/failed/in_progress) |
-| `error_message` | TEXT | Error details if sync failed |
-| `created_at` | TIMESTAMP | Record creation timestamp |
+| Column          | Type      | Description                                              |
+| --------------- | --------- | -------------------------------------------------------- |
+| `id`            | INTEGER   | **Primary key** - Sync record identifier (AUTOINCREMENT) |
+| `sync_type`     | TEXT      | Type of sync operation (e.g., 'kev_catalog') - NOT NULL  |
+| `sync_time`     | TIMESTAMP | Sync execution timestamp (NOT NULL)                      |
+| `version`       | TEXT      | Catalog version or timestamp from CISA                   |
+| `record_count`  | INTEGER   | Number of KEV records synced                             |
+| `status`        | TEXT      | Sync status (completed/failed/in_progress)               |
+| `error_message` | TEXT      | Error details if sync failed                             |
+| `created_at`    | TIMESTAMP | Record creation timestamp                                |
 
 **Relationship**: `vulnerabilities_current` LEFT JOINed with `kev_status` on `cve` = `cve_id` to enrich vulnerability data with KEV flags and due dates
 
@@ -315,4 +322,4 @@ Access KEV settings through **Settings > KEV Integration**:
 
 ---
 
-*Last Updated: v1.1.3 - October 2025*
+_Last Updated: v1.1.3 - October 2025_

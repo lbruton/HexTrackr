@@ -110,7 +110,7 @@ class TicketController {
             res.status(500).json({
                 success: false,
                 error: "Failed to fetch tickets",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -137,17 +137,17 @@ class TicketController {
                         priority: ticket.priority,
                         status: ticket.status || "open",
                         site: ticket.site,
-                        location: ticket.location
+                        location: ticket.location,
                     },
                     req.user?.id || null,
-                    req
+                    req,
                 );
             }
 
             res.json({
                 success: true,
                 id: result.id,
-                message: "Ticket saved successfully"
+                message: "Ticket saved successfully",
             });
         } catch (error) {
             if (global.logger?.error) {
@@ -158,7 +158,7 @@ class TicketController {
             res.status(500).json({
                 success: false,
                 error: "Failed to save ticket",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -181,11 +181,11 @@ class TicketController {
             // Track changes for audit
             const changes = {};
             const trackFields = ["status", "priority", "assigned_to", "notes", "vulnerabilities", "site", "location"];
-            trackFields.forEach(field => {
+            trackFields.forEach((field) => {
                 if (ticket[field] !== undefined && ticket[field] !== existingTicket[field]) {
                     changes[field] = {
                         from: existingTicket[field],
-                        to: ticket[field]
+                        to: ticket[field],
                     };
                 }
             });
@@ -199,10 +199,10 @@ class TicketController {
                         ticketId: ticketId,
                         xtNumber: existingTicket.xt_number,
                         changes: changes,
-                        changeCount: Object.keys(changes).length
+                        changeCount: Object.keys(changes).length,
                     },
                     req.user?.id || null,
-                    req
+                    req,
                 );
 
                 // Special audit entry for status changes
@@ -215,10 +215,10 @@ class TicketController {
                             xtNumber: existingTicket.xt_number,
                             previousStatus: changes.status.from,
                             newStatus: changes.status.to,
-                            transitionType: `${changes.status.from}_to_${changes.status.to}`
+                            transitionType: `${changes.status.from}_to_${changes.status.to}`,
                         },
                         req.user?.id || null,
-                        req
+                        req,
                     );
                 }
             }
@@ -226,18 +226,21 @@ class TicketController {
             res.json({
                 success: true,
                 id: ticketId,
-                message: "Ticket updated successfully"
+                message: "Ticket updated successfully",
             });
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "ticket", "Error updating ticket", { error: error.message, ticketId: req.params.id });
+                global.logger.error("backend", "ticket", "Error updating ticket", {
+                    error: error.message,
+                    ticketId: req.params.id,
+                });
             } else {
                 console.error("Error updating ticket:", error);
             }
             res.status(500).json({
                 success: false,
                 error: "Failed to update ticket",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -256,11 +259,7 @@ class TicketController {
             // Fetch ticket BEFORE deletion for audit
             const ticket = await controller.ticketService.getTicketById(ticketId);
 
-            const deletedCount = await controller.ticketService.deleteTicket(
-                ticketId,
-                deletion_reason,
-                deletedBy
-            );
+            const deletedCount = await controller.ticketService.deleteTicket(ticketId, deletion_reason, deletedBy);
 
             // Audit: Ticket deletion
             if (global.logger?.audit) {
@@ -272,27 +271,30 @@ class TicketController {
                         xtNumber: ticket.xt_number,
                         deletionReason: deletion_reason || "No reason provided",
                         deletedBy: deletedBy,
-                        softDelete: true // HexTrackr uses soft deletes
+                        softDelete: true, // HexTrackr uses soft deletes
                     },
                     req.user?.id || null,
-                    req
+                    req,
                 );
             }
 
             res.json({
                 success: true,
-                deleted: deletedCount
+                deleted: deletedCount,
             });
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "ticket", "Error soft-deleting ticket", { error: error.message, ticketId: req.params.id });
+                global.logger.error("backend", "ticket", "Error soft-deleting ticket", {
+                    error: error.message,
+                    ticketId: req.params.id,
+                });
             } else {
                 console.error("Error deleting ticket:", error);
             }
             res.status(500).json({
                 success: false,
                 error: "Failed to delete ticket",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -321,16 +323,16 @@ class TicketController {
                         totalTickets: tickets.length,
                         successCount: result.successCount,
                         errorCount: result.errorCount,
-                        migrationSource: "legacy_import"
+                        migrationSource: "legacy_import",
                     },
                     req.user?.id || null,
-                    req
+                    req,
                 );
             }
 
             res.json({
                 success: true,
-                message: `Migration completed: ${result.successCount} tickets migrated, ${result.errorCount} errors`
+                message: `Migration completed: ${result.successCount} tickets migrated, ${result.errorCount} errors`,
             });
         } catch (error) {
             if (global.logger?.error) {
@@ -341,7 +343,7 @@ class TicketController {
             res.status(500).json({
                 success: false,
                 error: "Failed to migrate tickets",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -358,7 +360,7 @@ class TicketController {
             if (!Array.isArray(csvData) || csvData.length === 0) {
                 return res.status(400).json({
                     success: false,
-                    error: "No data provided"
+                    error: "No data provided",
                 });
             }
 
@@ -367,7 +369,7 @@ class TicketController {
                 success: true,
                 imported: result.imported,
                 total: csvData.length,
-                errors: result.errors.length > 0 ? result.errors : undefined
+                errors: result.errors.length > 0 ? result.errors : undefined,
             });
         } catch (error) {
             if (global.logger?.error) {
@@ -378,7 +380,7 @@ class TicketController {
             res.status(500).json({
                 success: false,
                 error: "Import failed",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -394,14 +396,16 @@ class TicketController {
             res.json(exportData);
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "ticket", "Error exporting tickets for backup", { error: error.message });
+                global.logger.error("backend", "ticket", "Error exporting tickets for backup", {
+                    error: error.message,
+                });
             } else {
                 console.error("Error exporting tickets for backup:", error);
             }
             res.status(500).json({
                 success: false,
                 error: "Failed to fetch tickets",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -417,7 +421,7 @@ class TicketController {
             const nextXtNumber = await controller.ticketService.generateNextXTNumber();
             res.json({
                 success: true,
-                nextXtNumber: nextXtNumber
+                nextXtNumber: nextXtNumber,
             });
         } catch (error) {
             if (global.logger?.error) {
@@ -428,7 +432,7 @@ class TicketController {
             res.status(500).json({
                 success: false,
                 error: "Failed to generate next XT#",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -448,7 +452,7 @@ class TicketController {
             if (!hostname) {
                 return res.status(400).json({
                     success: false,
-                    error: "Hostname parameter is required"
+                    error: "Hostname parameter is required",
                 });
             }
 
@@ -456,18 +460,21 @@ class TicketController {
             res.json({
                 success: true,
                 count: tickets.length,
-                tickets: tickets
+                tickets: tickets,
             });
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "ticket", "Error fetching tickets for device", { error: error.message, hostname: req.params.hostname });
+                global.logger.error("backend", "ticket", "Error fetching tickets for device", {
+                    error: error.message,
+                    hostname: req.params.hostname,
+                });
             } else {
                 console.error(`Error fetching tickets for device ${req.params.hostname}:`, error);
             }
             res.status(500).json({
                 success: false,
                 error: "Failed to fetch tickets for device",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -487,32 +494,35 @@ class TicketController {
             if (!hostnames || !Array.isArray(hostnames)) {
                 return res.status(400).json({
                     success: false,
-                    error: "hostnames array is required in request body"
+                    error: "hostnames array is required in request body",
                 });
             }
 
             if (hostnames.length === 0) {
                 return res.json({
                     success: true,
-                    data: {}
+                    data: {},
                 });
             }
 
             const ticketMap = await controller.ticketService.getTicketsByDeviceBatch(hostnames);
             res.json({
                 success: true,
-                data: ticketMap
+                data: ticketMap,
             });
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "ticket", "Error fetching tickets for device batch", { error: error.message, batchSize: req.body.hostnames?.length });
+                global.logger.error("backend", "ticket", "Error fetching tickets for device batch", {
+                    error: error.message,
+                    batchSize: req.body.hostnames?.length,
+                });
             } else {
                 console.error("Error fetching tickets for device batch:", error);
             }
             res.status(500).json({
                 success: false,
                 error: "Failed to fetch tickets for device batch",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -532,7 +542,7 @@ class TicketController {
             if (!locationKey) {
                 return res.status(400).json({
                     success: false,
-                    error: "Location key parameter is required"
+                    error: "Location key parameter is required",
                 });
             }
 
@@ -540,18 +550,21 @@ class TicketController {
             res.json({
                 success: true,
                 count: tickets.length,
-                tickets: tickets
+                tickets: tickets,
             });
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "ticket", "Error fetching tickets for location", { error: error.message, locationKey: req.params.locationKey });
+                global.logger.error("backend", "ticket", "Error fetching tickets for location", {
+                    error: error.message,
+                    locationKey: req.params.locationKey,
+                });
             } else {
                 console.error(`Error fetching tickets for location ${req.params.locationKey}:`, error);
             }
             res.status(500).json({
                 success: false,
                 error: "Failed to fetch tickets for location",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -585,25 +598,29 @@ class TicketController {
             if (!site || !location) {
                 return res.status(400).json({
                     success: false,
-                    error: "site and location query parameters are required"
+                    error: "site and location query parameters are required",
                 });
             }
 
             const addresses = await controller.ticketService.getAddressesBySiteLocation(site, location);
             res.json({
                 success: true,
-                data: addresses
+                data: addresses,
             });
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "ticket", "Error fetching address suggestions", { error: error.message, site: req.query.site, location: req.query.location });
+                global.logger.error("backend", "ticket", "Error fetching address suggestions", {
+                    error: error.message,
+                    site: req.query.site,
+                    location: req.query.location,
+                });
             } else {
                 console.error("Error fetching address suggestions:", error);
             }
             res.status(500).json({
                 success: false,
                 error: "Failed to fetch address suggestions",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -640,25 +657,28 @@ class TicketController {
             if (!location) {
                 return res.status(400).json({
                     success: false,
-                    error: "Location parameter is required"
+                    error: "Location parameter is required",
                 });
             }
 
             const site = await controller.ticketService.getSiteByLocation(location);
             res.json({
                 success: true,
-                site: site
+                site: site,
             });
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "ticket", "Error fetching site for location", { error: error.message, location: req.params.location });
+                global.logger.error("backend", "ticket", "Error fetching site for location", {
+                    error: error.message,
+                    location: req.params.location,
+                });
             } else {
                 console.error(`Error fetching site for location ${req.params.location}:`, error);
             }
             res.status(500).json({
                 success: false,
                 error: "Failed to fetch site for location",
-                details: error.message
+                details: error.message,
             });
         }
     }

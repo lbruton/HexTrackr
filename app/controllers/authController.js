@@ -56,7 +56,7 @@ class AuthController {
             if (!username || !password) {
                 return res.status(400).json({
                     success: false,
-                    error: "Username and password are required"
+                    error: "Username and password are required",
                 });
             }
 
@@ -67,24 +67,30 @@ class AuthController {
             if (!result) {
                 // Audit failed login attempt
                 if (global.logger?.audit) {
-                    global.logger.audit("user.failed_login", "Failed login attempt", {
-                        username,
-                        reason: "Invalid credentials",
-                        ip: req.ip,
-                        userAgent: req.headers["user-agent"]
-                    }, null, req);
+                    global.logger.audit(
+                        "user.failed_login",
+                        "Failed login attempt",
+                        {
+                            username,
+                            reason: "Invalid credentials",
+                            ip: req.ip,
+                            userAgent: req.headers["user-agent"],
+                        },
+                        null,
+                        req,
+                    );
                 }
 
                 if (global.logger?.auth?.warn) {
                     global.logger.auth.warn("Authentication failed: Invalid credentials", {
                         username,
-                        ip: req.ip
+                        ip: req.ip,
                     });
                 }
 
                 return res.status(401).json({
                     success: false,
-                    error: "Invalid username or password"
+                    error: "Invalid username or password",
                 });
             }
 
@@ -95,19 +101,25 @@ class AuthController {
 
                 // Audit account lockout event
                 if (global.logger?.audit) {
-                    global.logger.audit("user.account_locked", "Account locked due to failed login attempts", {
-                        userId: result.userId,
-                        lockoutMinutes: 15,
-                        ip: req.ip,
-                        userAgent: req.headers["user-agent"]
-                    }, result.userId, req);
+                    global.logger.audit(
+                        "user.account_locked",
+                        "Account locked due to failed login attempts",
+                        {
+                            userId: result.userId,
+                            lockoutMinutes: 15,
+                            ip: req.ip,
+                            userAgent: req.headers["user-agent"],
+                        },
+                        result.userId,
+                        req,
+                    );
                 }
 
                 if (global.logger?.auth?.warn) {
                     global.logger.auth.warn("Account locked due to failed attempts", {
                         userId: result.userId,
                         lockoutMinutes: 15,
-                        attemptsRemaining
+                        attemptsRemaining,
                     });
                 }
 
@@ -116,8 +128,8 @@ class AuthController {
                     error: "Account locked due to too many failed login attempts",
                     details: {
                         lockoutMinutes: 15,
-                        attemptsRemaining
-                    }
+                        attemptsRemaining,
+                    },
                 });
             }
 
@@ -137,33 +149,39 @@ class AuthController {
                     if (global.logger?.auth?.error) {
                         global.logger.auth.error("Session save failed during login", {
                             username,
-                            error: err.message
+                            error: err.message,
                         });
                     } else {
                         console.error("Session save failed during login:", err);
                     }
                     return res.status(500).json({
                         success: false,
-                        error: "Failed to create session"
+                        error: "Failed to create session",
                     });
                 }
 
                 // Audit successful login
                 if (global.logger?.audit) {
-                    global.logger.audit("user.login", "User logged in successfully", {
-                        userId: result.id,
-                        username: result.username,
-                        rememberMe: !!rememberMe,
-                        ip: req.ip,
-                        userAgent: req.headers["user-agent"]
-                    }, result.id, req);
+                    global.logger.audit(
+                        "user.login",
+                        "User logged in successfully",
+                        {
+                            userId: result.id,
+                            username: result.username,
+                            rememberMe: !!rememberMe,
+                            ip: req.ip,
+                            userAgent: req.headers["user-agent"],
+                        },
+                        result.id,
+                        req,
+                    );
                 }
 
                 if (global.logger?.auth?.info) {
                     global.logger.auth.info("User authenticated successfully", {
                         userId: result.id,
                         username: result.username,
-                        rememberMe: !!rememberMe
+                        rememberMe: !!rememberMe,
                     });
                 }
 
@@ -175,18 +193,17 @@ class AuthController {
                             id: result.id,
                             username: result.username,
                             role: result.role,
-                            last_login: result.last_login
-                        }
-                    }
+                            last_login: result.last_login,
+                        },
+                    },
                 });
             });
-
         } catch (error) {
             // Defensive logging (global.logger may not be initialized yet)
             if (global.logger?.auth?.error) {
                 global.logger.auth.error("Login exception occurred", {
                     error: error.message,
-                    stack: error.stack
+                    stack: error.stack,
                 });
             } else {
                 console.error("Login exception occurred:", error);
@@ -194,7 +211,7 @@ class AuthController {
             res.status(500).json({
                 success: false,
                 error: "Login failed",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -216,7 +233,7 @@ class AuthController {
                     if (global.logger?.auth?.error) {
                         global.logger.auth.error("Session destruction failed during logout", {
                             userId,
-                            error: err.message
+                            error: err.message,
                         });
                     } else {
                         console.error("Session destruction failed during logout:", err);
@@ -226,23 +243,29 @@ class AuthController {
                     return res.status(500).json({
                         success: false,
                         error: "Logout failed",
-                        details: err.message
+                        details: err.message,
                     });
                 }
 
                 // Audit successful logout
                 if (global.logger?.audit) {
-                    global.logger.audit("user.logout", "User logged out", {
+                    global.logger.audit(
+                        "user.logout",
+                        "User logged out",
+                        {
+                            userId,
+                            username,
+                            ip: req.ip,
+                        },
                         userId,
-                        username,
-                        ip: req.ip
-                    }, userId, req);
+                        req,
+                    );
                 }
 
                 if (global.logger?.auth?.info) {
                     global.logger.auth.info("User logged out successfully", {
                         userId,
-                        username
+                        username,
                     });
                 }
 
@@ -252,16 +275,15 @@ class AuthController {
                 res.json({
                     success: true,
                     data: {
-                        message: "Logged out successfully"
-                    }
+                        message: "Logged out successfully",
+                    },
                 });
             });
-
         } catch (error) {
             if (global.logger?.auth?.error) {
                 global.logger.auth.error("Logout exception occurred", {
                     error: error.message,
-                    stack: error.stack
+                    stack: error.stack,
                 });
             } else {
                 console.error("Logout exception occurred:", error);
@@ -271,7 +293,7 @@ class AuthController {
             res.status(500).json({
                 success: false,
                 error: "Logout failed",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -289,8 +311,8 @@ class AuthController {
                 return res.json({
                     success: true,
                     data: {
-                        authenticated: false
-                    }
+                        authenticated: false,
+                    },
                 });
             }
 
@@ -304,8 +326,8 @@ class AuthController {
                 return res.json({
                     success: true,
                     data: {
-                        authenticated: false
-                    }
+                        authenticated: false,
+                    },
                 });
             }
 
@@ -317,15 +339,14 @@ class AuthController {
                     user: {
                         id: req.session.userId,
                         username: req.session.username,
-                        role: req.session.role
-                    }
-                }
+                        role: req.session.role,
+                    },
+                },
             });
-
         } catch (error) {
             if (global.logger?.auth?.error) {
                 global.logger.auth.error("Status check exception occurred", {
-                    error: error.message
+                    error: error.message,
                 });
             } else {
                 console.error("Status check exception occurred:", error);
@@ -333,7 +354,7 @@ class AuthController {
             res.status(500).json({
                 success: false,
                 error: "Status check failed",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -359,7 +380,7 @@ class AuthController {
             if (!oldPassword || !newPassword) {
                 return res.status(400).json({
                     success: false,
-                    error: "Old password and new password are required"
+                    error: "Old password and new password are required",
                 });
             }
 
@@ -367,7 +388,7 @@ class AuthController {
             if (newPassword.length < 8) {
                 return res.status(400).json({
                     success: false,
-                    error: "New password must be at least 8 characters long"
+                    error: "New password must be at least 8 characters long",
                 });
             }
 
@@ -378,44 +399,49 @@ class AuthController {
                 if (global.logger?.auth?.warn) {
                     global.logger.auth.warn("Password change failed: Incorrect old password", {
                         userId,
-                        username: req.user.username
+                        username: req.user.username,
                     });
                 }
                 return res.status(401).json({
                     success: false,
-                    error: result.error
+                    error: result.error,
                 });
             }
 
             // Audit successful password change
             if (global.logger?.audit) {
-                global.logger.audit("user.password_change", "User password changed", {
+                global.logger.audit(
+                    "user.password_change",
+                    "User password changed",
+                    {
+                        userId,
+                        username: req.user.username,
+                        ip: req.ip,
+                    },
                     userId,
-                    username: req.user.username,
-                    ip: req.ip
-                }, userId, req);
+                    req,
+                );
             }
 
             if (global.logger?.auth?.info) {
                 global.logger.auth.info("Password changed successfully", {
                     userId,
-                    username: req.user.username
+                    username: req.user.username,
                 });
             }
 
             res.json({
                 success: true,
                 data: {
-                    message: result.message
-                }
+                    message: result.message,
+                },
             });
-
         } catch (error) {
             if (global.logger?.auth?.error) {
                 global.logger.auth.error("Password change exception occurred", {
                     userId,
                     error: error.message,
-                    stack: error.stack
+                    stack: error.stack,
                 });
             } else {
                 console.error("Password change exception occurred:", error);
@@ -423,7 +449,7 @@ class AuthController {
             res.status(500).json({
                 success: false,
                 error: "Password change failed",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -470,7 +496,7 @@ class AuthController {
                 req.session.destroy(() => {});
                 return res.status(404).json({
                     success: false,
-                    error: "User not found"
+                    error: "User not found",
                 });
             }
 
@@ -480,14 +506,13 @@ class AuthController {
             res.json({
                 success: true,
                 data: {
-                    user: profile
-                }
+                    user: profile,
+                },
             });
-
         } catch (error) {
             if (global.logger?.auth?.error) {
                 global.logger.auth.error("Get profile exception occurred", {
-                    error: error.message
+                    error: error.message,
                 });
             } else {
                 console.error("Get profile exception occurred:", error);
@@ -495,7 +520,7 @@ class AuthController {
             res.status(500).json({
                 success: false,
                 error: "Failed to retrieve profile",
-                details: error.message
+                details: error.message,
             });
         }
     }

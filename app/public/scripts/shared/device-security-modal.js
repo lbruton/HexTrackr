@@ -1,9 +1,9 @@
 /**
  * Device Security Modal Module for HexTrackr
- * 
+ *
  * This module provides an enhanced device security overview modal with improved UI/UX,
  * Tabler.io styling, and comprehensive report generation capabilities.
- * 
+ *
  * @fileoverview Device security modal management and display
  * @author HexTrackr Development Team
  * @version 1.0.0
@@ -77,22 +77,19 @@ class DeviceSecurityModal {
     populateDeviceInfo(device) {
         // HEX-174: Get IP from first vulnerability that has one (mirrors AG-Grid table behavior)
         // This is a short-term fix until database-first device endpoint is implemented
-        const ipAddress = device.vulnerabilities?.find(v => v.ip_address)?.ip_address || device.ipAddress || "N/A";
+        const ipAddress = device.vulnerabilities?.find((v) => v.ip_address)?.ip_address || device.ipAddress || "N/A";
 
         // HEX-204: Use vendor from device object (already set during aggregation from database)
         // This preserves the sophisticated hostname+plugin pattern matching from CSV import
         // Fallback to checking vulnerabilities array if device.vendor is missing
-        const vendor = device.vendor ||
-                       device.vulnerabilities?.find(v => v.vendor)?.vendor ||
-                       "Other";
+        const vendor = device.vendor || device.vulnerabilities?.find((v) => v.vendor)?.vendor || "Other";
 
         // HEX-204: Get installed software/OS from vulnerability data (use first non-null value)
-        const installedSoftware = device.vulnerabilities?.find(v => v.operating_system)?.operating_system || "N/A";
+        const installedSoftware = device.vulnerabilities?.find((v) => v.operating_system)?.operating_system || "N/A";
 
         // Vendor badge color logic (matches card view styling)
-        const vendorBadgeClass = vendor === "CISCO" ? "bg-primary" :
-                                 vendor === "Palo Alto" ? "bg-warning" :
-                                 "bg-secondary";
+        const vendorBadgeClass =
+            vendor === "CISCO" ? "bg-primary" : vendor === "Palo Alto" ? "bg-warning" : "bg-secondary";
 
         document.getElementById("deviceInfo").innerHTML = `
             <div class="mb-3">
@@ -132,10 +129,15 @@ class DeviceSecurityModal {
                 <div class="row">
                     <div class="col-sm-4 text-muted">Risk Level:</div>
                     <div class="col-sm-8">
-                        ${device.criticalCount > 0 ? "<span class=\"badge bg-red\">Critical Risk</span>" :
-                          device.highCount > 5 ? "<span class=\"badge bg-orange\">High Risk</span>" :
-                          device.mediumCount > 10 ? "<span class=\"badge bg-yellow\">Medium Risk</span>" :
-                          "<span class=\"badge bg-green\">Low Risk</span>"}
+                        ${
+                            device.criticalCount > 0
+                                ? '<span class="badge bg-red">Critical Risk</span>'
+                                : device.highCount > 5
+                                  ? '<span class="badge bg-orange">High Risk</span>'
+                                  : device.mediumCount > 10
+                                    ? '<span class="badge bg-yellow">Medium Risk</span>'
+                                    : '<span class="badge bg-green">Low Risk</span>'
+                        }
                     </div>
                 </div>
             </div>
@@ -187,12 +189,12 @@ class DeviceSecurityModal {
 
     async loadDeviceFixedVersion(device) {
         const fixedVersionElement = document.getElementById("deviceFixedVersion");
-        if (!fixedVersionElement) {return;}
+        if (!fixedVersionElement) {
+            return;
+        }
 
         // Use same vendor detection as populateDeviceInfo (with fallback to vulnerabilities)
-        const vendor = device.vendor ||
-                       device.vulnerabilities?.find(v => v.vendor)?.vendor ||
-                       "Other";
+        const vendor = device.vendor || device.vulnerabilities?.find((v) => v.vendor)?.vendor || "Other";
 
         // Determine which advisory helper to use based on vendor
         let advisoryHelper = null;
@@ -204,51 +206,50 @@ class DeviceSecurityModal {
 
         // Unsupported vendor or helper not loaded
         if (!advisoryHelper) {
-            fixedVersionElement.innerHTML = "<span class=\"font-monospace text-muted\">N/A</span>";
+            fixedVersionElement.innerHTML = '<span class="font-monospace text-muted">N/A</span>';
             return;
         }
 
         try {
             // Get unique CVEs from device vulnerabilities
-            const uniqueCves = [...new Set(device.vulnerabilities
-                .filter(v => v.cve && v.cve.startsWith("CVE-"))
-                .map(v => v.cve))];
+            const uniqueCves = [
+                ...new Set(device.vulnerabilities.filter((v) => v.cve && v.cve.startsWith("CVE-")).map((v) => v.cve)),
+            ];
 
             if (uniqueCves.length === 0) {
-                fixedVersionElement.innerHTML = "<span class=\"font-monospace text-muted\">No CVEs</span>";
+                fixedVersionElement.innerHTML = '<span class="font-monospace text-muted">No CVEs</span>';
                 return;
             }
 
             // Get installed version for OS-aware matching
-            const installedVersion = device.vulnerabilities?.find(v => v.operating_system)?.operating_system || null;
+            const installedVersion = device.vulnerabilities?.find((v) => v.operating_system)?.operating_system || null;
 
             // Query all CVEs in parallel
-            const fixedVersionPromises = uniqueCves.map(cve =>
-                advisoryHelper.getFixedVersion(cve, vendor, installedVersion)
-                    .catch(err => {
-                        logger.warn(`Failed to get fixed version for ${cve}:`, err);
-                        return null;
-                    })
+            const fixedVersionPromises = uniqueCves.map((cve) =>
+                advisoryHelper.getFixedVersion(cve, vendor, installedVersion).catch((err) => {
+                    logger.warn(`Failed to get fixed version for ${cve}:`, err);
+                    return null;
+                }),
             );
 
             const fixedVersions = await Promise.all(fixedVersionPromises);
 
             // Filter out nulls and deduplicate
-            const validVersions = [...new Set(fixedVersions.filter(v => v !== null && v !== "No Fix"))];
+            const validVersions = [...new Set(fixedVersions.filter((v) => v !== null && v !== "No Fix"))];
 
             if (validVersions.length > 0) {
                 // Sort versions (highest/most recent first) using shared function - HEX-246
                 validVersions.sort((a, b) => window.ciscoAdvisoryHelper.compareVersions(a, b));
 
                 // Display all unique versions, comma-separated
-                const versionList = validVersions.map(v => DOMPurify.sanitize(v)).join(", ");
+                const versionList = validVersions.map((v) => DOMPurify.sanitize(v)).join(", ");
                 fixedVersionElement.innerHTML = `<span class="font-monospace text-success">${versionList}</span>`;
             } else {
-                fixedVersionElement.innerHTML = "<span class=\"font-monospace text-muted\">No Fix</span>";
+                fixedVersionElement.innerHTML = '<span class="font-monospace text-muted">No Fix</span>';
             }
         } catch (error) {
             logger.error("Failed to load device fixed version:", error);
-            fixedVersionElement.innerHTML = "<span class=\"font-monospace text-danger\">Error</span>";
+            fixedVersionElement.innerHTML = '<span class="font-monospace text-danger">Error</span>';
         }
     }
 
@@ -282,7 +283,7 @@ class DeviceSecurityModal {
         }
 
         // Get ALL KEV vulnerabilities for this device
-        const kevVulns = device.vulnerabilities?.filter(v => v.isKev === "Yes") || [];
+        const kevVulns = device.vulnerabilities?.filter((v) => v.isKev === "Yes") || [];
         const kevCount = kevVulns.length;
 
         if (kevCount === 0) {
@@ -302,9 +303,10 @@ class DeviceSecurityModal {
         window.kevModalData[kevDataId] = kevVulns;
 
         // Determine click handler based on KEV count
-        const clickHandler = kevCount === 1
-            ? `showKevDetails('${kevVulns[0].cve}')`
-            : `showKevPickerModal('${device.hostname}', window.kevModalData['${kevDataId}'])`;
+        const clickHandler =
+            kevCount === 1
+                ? `showKevDetails('${kevVulns[0].cve}')`
+                : `showKevPickerModal('${device.hostname}', window.kevModalData['${kevDataId}'])`;
 
         // Add KEV badge with count indicator if multiple
         const kevBadgeHtml = `
@@ -397,7 +399,7 @@ class DeviceSecurityModal {
             this.activeFilter = null;
 
             // HEX-298: Reset all card styles using CSS classes
-            document.querySelectorAll(".vpr-filter-card").forEach(card => {
+            document.querySelectorAll(".vpr-filter-card").forEach((card) => {
                 card.classList.remove("active-critical", "active-high", "active-medium", "active-low");
             });
 
@@ -411,12 +413,12 @@ class DeviceSecurityModal {
                 severity: {
                     filterType: "text",
                     type: "equals",
-                    filter: severity
-                }
+                    filter: severity,
+                },
             });
 
             // HEX-298: Update card visual states using CSS classes (matches HEX-297 vendor filter pattern)
-            document.querySelectorAll(".vpr-filter-card").forEach(card => {
+            document.querySelectorAll(".vpr-filter-card").forEach((card) => {
                 const cardSeverity = card.getAttribute("data-severity");
                 const activeClass = `active-${cardSeverity.toLowerCase()}`;
 
@@ -461,7 +463,7 @@ class DeviceSecurityModal {
                         return new Date(params.value).toLocaleDateString();
                     }
                     return "N/A";
-                }
+                },
             },
             {
                 headerName: "Last Seen",
@@ -478,7 +480,7 @@ class DeviceSecurityModal {
                         return new Date(scanDate + "T00:00:00").toLocaleDateString();
                     }
                     return "N/A";
-                }
+                },
             },
             {
                 headerName: "VPR",
@@ -489,16 +491,16 @@ class DeviceSecurityModal {
                     const score = params.value || 0;
                     const severity = params.data.severity || "Low";
                     // HEX-351 Phase 2: Use severity-based colors (matches Location Details Modal and Risk Breakdown)
-                    let color = "#16a34a";  // Green for Low
+                    let color = "#16a34a"; // Green for Low
                     if (severity.toUpperCase() === "CRITICAL") {
-                        color = "#dc2626";   // Red for Critical
+                        color = "#dc2626"; // Red for Critical
                     } else if (severity.toUpperCase() === "HIGH") {
-                        color = "#f76707";   // Orange for High
+                        color = "#f76707"; // Orange for High
                     } else if (severity.toUpperCase() === "MEDIUM") {
-                        color = "#d97706";   // Yellow for Medium
+                        color = "#d97706"; // Yellow for Medium
                     }
                     return `<span style="color: ${color}; font-weight: 700;">${score.toFixed(1)}</span>`;
-                }
+                },
             },
             {
                 headerName: "CVSS",
@@ -508,20 +510,20 @@ class DeviceSecurityModal {
                 cellRenderer: (params) => {
                     const cvss = parseFloat(params.value) || 0;
                     // HEX-352: CVSS score with severity-based colors
-                    let color = "#16a34a";  // Green for Low (0-3.9)
+                    let color = "#16a34a"; // Green for Low (0-3.9)
                     if (cvss >= 9.0) {
-                        color = "#dc2626";   // Red for Critical (9-10)
+                        color = "#dc2626"; // Red for Critical (9-10)
                     } else if (cvss >= 7.0) {
-                        color = "#f76707";   // Orange for High (7-8.9)
+                        color = "#f76707"; // Orange for High (7-8.9)
                     } else if (cvss >= 4.0) {
-                        color = "#d97706";   // Yellow for Medium (4-6.9)
+                        color = "#d97706"; // Yellow for Medium (4-6.9)
                     }
                     // Show "N/A" if CVSS is 0 (not available)
                     if (cvss === 0) {
-                        return "<span class=\"text-muted\">N/A</span>";
+                        return '<span class="text-muted">N/A</span>';
                     }
                     return `<span style="color: ${color}; font-weight: 700;">${cvss.toFixed(1)}</span>`;
-                }
+                },
             },
             {
                 headerName: "Severity",
@@ -530,7 +532,7 @@ class DeviceSecurityModal {
                 width: 110,
                 comparator: (valueA, valueB) => {
                     // Custom sort: Critical > High > Medium > Low
-                    const severityOrder = { "Critical": 4, "High": 3, "Medium": 2, "Low": 1 };
+                    const severityOrder = { Critical: 4, High: 3, Medium: 2, Low: 1 };
                     const orderA = severityOrder[valueA] || 0;
                     const orderB = severityOrder[valueB] || 0;
                     return orderB - orderA; // Descending order (highest first)
@@ -538,16 +540,16 @@ class DeviceSecurityModal {
                 cellRenderer: (params) => {
                     const severity = params.value || "Low";
                     // Colored text based on severity - inline styles for AG-Grid override
-                    let color = "#16a34a";  // Green for Low
+                    let color = "#16a34a"; // Green for Low
                     if (severity.toUpperCase() === "CRITICAL") {
-                        color = "#dc2626";   // Red for Critical
+                        color = "#dc2626"; // Red for Critical
                     } else if (severity.toUpperCase() === "HIGH") {
-                        color = "#f76707";   // Orange for High
+                        color = "#f76707"; // Orange for High
                     } else if (severity.toUpperCase() === "MEDIUM") {
-                        color = "#d97706";   // Yellow for Medium
+                        color = "#d97706"; // Yellow for Medium
                     }
                     return `<span style="color: ${color}; font-weight: 700; text-transform: uppercase;">${severity}</span>`;
-                }
+                },
             },
             {
                 headerName: "KEV",
@@ -558,10 +560,10 @@ class DeviceSecurityModal {
                     const isKev = params.value === "Yes";
                     // HEX-351 Phase 2: KEV column matches Location Details Modal pattern
                     if (isKev) {
-                        return "<span style=\"color: #dc2626 !important; font-weight: 700;\">Yes</span>";
+                        return '<span style="color: #dc2626 !important; font-weight: 700;">Yes</span>';
                     }
-                    return "<span class=\"text-muted\">No</span>";
-                }
+                    return '<span class="text-muted">No</span>';
+                },
             },
             {
                 headerName: "Vulnerability",
@@ -609,7 +611,7 @@ class DeviceSecurityModal {
                     }
 
                     return "-";
-                }
+                },
             },
             {
                 headerName: "Fixed Version",
@@ -624,7 +626,9 @@ class DeviceSecurityModal {
                     // Return placeholder with unique ID for async update
                     setTimeout(async () => {
                         const cell = document.getElementById(cellId);
-                        if (!cell) {return;}
+                        if (!cell) {
+                            return;
+                        }
 
                         // Determine which advisory helper to use based on vendor
                         let advisoryHelper = null;
@@ -636,34 +640,32 @@ class DeviceSecurityModal {
 
                         // Unsupported vendor or helper not loaded
                         if (!advisoryHelper) {
-                            cell.innerHTML = "<span class=\"font-monospace text-muted\">N/A</span>";
+                            cell.innerHTML = '<span class="font-monospace text-muted">N/A</span>';
                             params.node.setDataValue("fixed_version", "N/A");
                             return;
                         }
 
                         try {
                             const installedVersion = params.data.operating_system;
-                            const fixedVersion = await advisoryHelper.getFixedVersion(
-                                cveId, vendor, installedVersion
-                            );
+                            const fixedVersion = await advisoryHelper.getFixedVersion(cveId, vendor, installedVersion);
 
                             if (fixedVersion) {
                                 cell.innerHTML = `<span class="font-monospace text-success">${DOMPurify.sanitize(fixedVersion)}</span>`;
                                 params.node.setDataValue("fixed_version", fixedVersion);
                             } else {
-                                cell.innerHTML = "<span class=\"font-monospace text-muted\">No Fix</span>";
+                                cell.innerHTML = '<span class="font-monospace text-muted">No Fix</span>';
                                 params.node.setDataValue("fixed_version", "No Fix");
                             }
                         } catch (error) {
                             logger.error("Fixed version lookup failed:", error);
-                            cell.innerHTML = "<span class=\"font-monospace text-muted\">Error</span>";
+                            cell.innerHTML = '<span class="font-monospace text-muted">Error</span>';
                             params.node.setDataValue("fixed_version", "Error");
                         }
                     }, 0);
 
                     return `<span id="${cellId}" class="font-monospace text-muted">Loading...</span>`;
-                }
-            }
+                },
+            },
         ];
 
         // Detect current theme for v33 theming
@@ -690,7 +692,7 @@ class DeviceSecurityModal {
                     borderColor: "#2a3f5f",
                     selectedRowBackgroundColor: "#2563eb",
                     rowHoverColor: "rgba(37, 99, 235, 0.15)",
-                    rangeSelectionBackgroundColor: "rgba(37, 99, 235, 0.2)"
+                    rangeSelectionBackgroundColor: "rgba(37, 99, 235, 0.2)",
                 });
             } else {
                 quartzTheme = window.agGrid.themeQuartz.withParams({
@@ -708,7 +710,7 @@ class DeviceSecurityModal {
                     borderColor: "#e2e8f0",
                     selectedRowBackgroundColor: "#3182ce",
                     rowHoverColor: "rgba(49, 130, 206, 0.1)",
-                    rangeSelectionBackgroundColor: "rgba(49, 130, 206, 0.2)"
+                    rangeSelectionBackgroundColor: "rgba(49, 130, 206, 0.2)",
                 });
             }
         }
@@ -722,17 +724,15 @@ class DeviceSecurityModal {
                 sortable: true,
                 filter: true,
                 wrapHeaderText: false,
-                autoHeaderHeight: false
+                autoHeaderHeight: false,
             },
             domLayout: "normal", // Enable vertical scrolling for all rows
             animateRows: true,
             // Default sort: VPR Score descending (highest risk first)
             initialState: {
                 sort: {
-                    sortModel: [
-                        { colId: "vpr_score", sort: "desc" }
-                    ]
-                }
+                    sortModel: [{ colId: "vpr_score", sort: "desc" }],
+                },
             },
             onGridReady: (params) => {
                 this.deviceGridApi = params.api;
@@ -760,12 +760,11 @@ class DeviceSecurityModal {
                 if (params.api) {
                     params.api.sizeColumnsToFit();
                 }
-            }
+            },
         };
 
         this.deviceGrid = agGrid.createGrid(deviceGridDiv, deviceGridOptions);
     }
-
 
     /**
      * Detect current theme from DOM
@@ -781,9 +780,15 @@ class DeviceSecurityModal {
      * @returns {string} Severity class name
      */
     getVprSeverityClass(score) {
-        if (score >= 9.0) {return "critical";}
-        if (score >= 7.0) {return "high";}
-        if (score >= 4.0) {return "medium";}
+        if (score >= 9.0) {
+            return "critical";
+        }
+        if (score >= 7.0) {
+            return "high";
+        }
+        if (score >= 4.0) {
+            return "medium";
+        }
         return "low";
     }
 
@@ -825,15 +830,16 @@ class DeviceSecurityModal {
      */
     async calculateAllFixedVersions(vulnerabilities, vendor, installedVersion) {
         // Filter to only CVEs that need advisory lookups
-        const vulnsNeedingLookup = vulnerabilities.filter(vuln => {
-            const hasVendor = vendor && (vendor.toLowerCase().includes("cisco") || vendor.toLowerCase().includes("palo"));
+        const vulnsNeedingLookup = vulnerabilities.filter((vuln) => {
+            const hasVendor =
+                vendor && (vendor.toLowerCase().includes("cisco") || vendor.toLowerCase().includes("palo"));
             const hasCve = vuln.cve && vuln.cve.startsWith("CVE-");
             return hasVendor && hasCve;
         });
 
         if (vulnsNeedingLookup.length === 0) {
             // No vulnerabilities need lookup - set all to N/A
-            vulnerabilities.forEach(vuln => {
+            vulnerabilities.forEach((vuln) => {
                 if (!vuln.fixed_version) {
                     vuln.fixed_version = "N/A";
                 }
@@ -850,7 +856,7 @@ class DeviceSecurityModal {
         }
 
         if (!advisoryHelper) {
-            vulnerabilities.forEach(vuln => {
+            vulnerabilities.forEach((vuln) => {
                 if (!vuln.fixed_version) {
                     vuln.fixed_version = "N/A";
                 }
@@ -879,7 +885,7 @@ class DeviceSecurityModal {
         await Promise.all(lookupPromises);
 
         // Set N/A for vulnerabilities that didn't need lookup
-        vulnerabilities.forEach(vuln => {
+        vulnerabilities.forEach((vuln) => {
             if (!vuln.fixed_version) {
                 vuln.fixed_version = "N/A";
             }
@@ -908,7 +914,7 @@ class DeviceSecurityModal {
         this.showToast("Calculating fixed versions for all vulnerabilities...", "info");
 
         // Clone vulnerabilities array to avoid modifying grid state
-        const vulnerabilities = device.vulnerabilities.map(v => ({...v}));
+        const vulnerabilities = device.vulnerabilities.map((v) => ({ ...v }));
 
         // Get device vendor and installed version
         const vendor = device.vendor || "N/A";
@@ -918,17 +924,21 @@ class DeviceSecurityModal {
         await this.calculateAllFixedVersions(vulnerabilities, vendor, installedVersion);
 
         // Calculate KEV count
-        const kevCount = device.vulnerabilities.filter(v => v.isKev === "Yes").length;
+        const kevCount = device.vulnerabilities.filter((v) => v.isKev === "Yes").length;
 
         // Determine risk level based on VPR score
         const totalVPR = device.totalVPR || 0;
         let riskLevel = "Low Risk";
-        if (totalVPR >= 90) {riskLevel = "Critical Risk";}
-        else if (totalVPR >= 70) {riskLevel = "High Risk";}
-        else if (totalVPR >= 40) {riskLevel = "Medium Risk";}
+        if (totalVPR >= 90) {
+            riskLevel = "Critical Risk";
+        } else if (totalVPR >= 70) {
+            riskLevel = "High Risk";
+        } else if (totalVPR >= 40) {
+            riskLevel = "Medium Risk";
+        }
 
         // Get IP address (prioritize from first vulnerability)
-        const ipAddress = device.vulnerabilities?.find(v => v.ip_address)?.ip_address || device.ipAddress || "N/A";
+        const ipAddress = device.vulnerabilities?.find((v) => v.ip_address)?.ip_address || device.ipAddress || "N/A";
 
         // Prepare CSV data with comprehensive device information
         const csvData = [];
@@ -951,9 +961,20 @@ class DeviceSecurityModal {
 
         // Add vulnerability data (use calculated vulnerabilities with fixed versions)
         csvData.push(["Vulnerabilities"]);
-        csvData.push(["First Seen", "Fixed Version", "VPR Score", "Severity", "CVE/ID", "KEV", "Vulnerability Name", "Plugin ID", "IP Address", "Port"]);
+        csvData.push([
+            "First Seen",
+            "Fixed Version",
+            "VPR Score",
+            "Severity",
+            "CVE/ID",
+            "KEV",
+            "Vulnerability Name",
+            "Plugin ID",
+            "IP Address",
+            "Port",
+        ]);
 
-        vulnerabilities.forEach(vuln => {
+        vulnerabilities.forEach((vuln) => {
             csvData.push([
                 vuln.first_seen || "N/A",
                 vuln.fixed_version || "N/A",
@@ -964,14 +985,14 @@ class DeviceSecurityModal {
                 vuln.plugin_name || "N/A",
                 vuln.plugin_id || "N/A",
                 vuln.ip_address || "N/A",
-                vuln.port || "N/A"
+                vuln.port || "N/A",
             ]);
         });
 
         // Convert to CSV format
-        const csvContent = csvData.map(row => 
-            row.map(field => `"${String(field).replace(/"/g, "\"\"")}"`).join(",")
-        ).join("\n");
+        const csvContent = csvData
+            .map((row) => row.map((field) => `"${String(field).replace(/"/g, '""')}"`).join(","))
+            .join("\n");
 
         // Create and download the file
         const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
@@ -984,7 +1005,10 @@ class DeviceSecurityModal {
         link.click();
         document.body.removeChild(link);
 
-        this.showToast(`Exported ${vulnerabilities.length} vulnerabilities with fixed versions for ${device.hostname}`, "success");
+        this.showToast(
+            `Exported ${vulnerabilities.length} vulnerabilities with fixed versions for ${device.hostname}`,
+            "success",
+        );
     }
 
     /**
@@ -1011,7 +1035,7 @@ class DeviceSecurityModal {
                 count: count,
                 tickets: tickets,
                 status: tickets[0]?.status,
-                jobType: tickets[0]?.job_type
+                jobType: tickets[0]?.job_type,
             };
         } catch (error) {
             logger.error(`[Device Modal] Error checking ticket state for ${hostname}:`, error);
@@ -1034,7 +1058,7 @@ class DeviceSecurityModal {
                 text: "Create Ticket",
                 colorClass: "btn-outline-success",
                 icon: "fas fa-ticket-alt",
-                textColorClass: ""
+                textColorClass: "",
             };
         } else if (count === 1) {
             // Single ticket: ORANGE or RED based on overdue status
@@ -1043,7 +1067,7 @@ class DeviceSecurityModal {
                 text: "View Ticket",
                 colorClass: isOverdue ? "btn-outline-danger" : "btn-outline-warning",
                 icon: "fas fa-folder-open",
-                textColorClass: ""
+                textColorClass: "",
             };
         } else {
             // Multiple tickets: ORANGE or RED (backend sets status to "Overdue" if any ticket is overdue)
@@ -1052,7 +1076,7 @@ class DeviceSecurityModal {
                 text: `View Tickets (${count})`,
                 colorClass: isOverdue ? "btn-outline-danger" : "btn-outline-warning",
                 icon: "fas fa-layer-group",
-                textColorClass: ""
+                textColorClass: "",
             };
         }
     }
@@ -1125,8 +1149,11 @@ class DeviceSecurityModal {
 
             // Filter for KEV devices at same location
             deviceList = allDevices
-                .filter(device => device.hostname.toLowerCase().startsWith(location.toLowerCase()) && device.hasKev === true)
-                .map(device => device.hostname.toUpperCase())
+                .filter(
+                    (device) =>
+                        device.hostname.toLowerCase().startsWith(location.toLowerCase()) && device.hasKev === true,
+                )
+                .map((device) => device.hostname.toUpperCase())
                 .sort(); // HEX-313: Alphabetical sorting for boot order planning
         }
         // Mode 3: All devices at location (Alt + Shift)
@@ -1143,8 +1170,8 @@ class DeviceSecurityModal {
 
             // Filter for all devices at same location
             deviceList = allDevices
-                .filter(device => device.hostname.toLowerCase().startsWith(location.toLowerCase()))
-                .map(device => device.hostname.toUpperCase())
+                .filter((device) => device.hostname.toLowerCase().startsWith(location.toLowerCase()))
+                .map((device) => device.hostname.toUpperCase())
                 .sort(); // HEX-313: Alphabetical sorting for boot order planning
         }
 
@@ -1161,7 +1188,7 @@ class DeviceSecurityModal {
             site: site,
             location: location,
             mode: mode,
-            timestamp: Date.now()
+            timestamp: Date.now(),
         };
 
         // Set new JSON format
@@ -1173,11 +1200,12 @@ class DeviceSecurityModal {
 
         // Enhanced toast message showing device count and mode
         const deviceCount = deviceList.length;
-        const modeLabel = {
-            "single": "device",
-            "bulk-all": `devices at ${location}`,
-            "bulk-kev": `KEV devices at ${location}`
-        }[mode] || "device";
+        const modeLabel =
+            {
+                single: "device",
+                "bulk-all": `devices at ${location}`,
+                "bulk-kev": `KEV devices at ${location}`,
+            }[mode] || "device";
 
         logger.debug(`[Device Modal] Creating ticket for ${deviceCount} ${modeLabel}...`);
 
@@ -1196,7 +1224,7 @@ class DeviceSecurityModal {
     showTicketPickerModal(hostname, tickets) {
         logger.debug(`[Device Modal] Opening picker for ${hostname} with ${tickets.length} tickets:`, tickets);
 
-        const validTickets = tickets.filter(t => t !== null && t.id);
+        const validTickets = tickets.filter((t) => t !== null && t.id);
         logger.debug(`[Device Modal] Valid tickets: ${validTickets.length}`, validTickets);
 
         if (validTickets.length === 0) {
@@ -1216,7 +1244,9 @@ class DeviceSecurityModal {
                 <strong>${hostname}</strong> has <strong>${validTickets.length}</strong> open tickets. Which would you like to view?
             </p>
             <div class="list-group">
-                ${validTickets.map(ticket => `
+                ${validTickets
+                    .map(
+                        (ticket) => `
                     <button type="button" class="list-group-item list-group-item-action"
                             onclick="window.location.href='/tickets.html?openTicket=${ticket.id}';">
                         <div class="d-flex w-100 justify-content-between align-items-center">
@@ -1227,7 +1257,9 @@ class DeviceSecurityModal {
                             <span class="badge bg-${this.getStatusBadgeColor(ticket.status)}">${ticket.status}</span>
                         </div>
                     </button>
-                `).join("")}
+                `,
+                    )
+                    .join("")}
             </div>
             <hr>
             <button type="button" class="btn btn-success w-100"
@@ -1261,13 +1293,13 @@ class DeviceSecurityModal {
      */
     getStatusBadgeColor(status) {
         const colorMap = {
-            "Pending": "warning",
-            "Staged": "info",
-            "Open": "primary",
-            "Overdue": "danger",
-            "Completed": "success",
-            "Failed": "danger",
-            "Closed": "secondary"
+            Pending: "warning",
+            Staged: "info",
+            Open: "primary",
+            Overdue: "danger",
+            Completed: "success",
+            Failed: "danger",
+            Closed: "secondary",
         };
         return colorMap[status] || "primary";
     }
@@ -1286,11 +1318,7 @@ class DeviceSecurityModal {
 
         // Check ticket state
         const ticketState = await this.checkTicketState(hostname);
-        const buttonConfig = this.getButtonConfig(
-            ticketState.count,
-            ticketState.status,
-            ticketState.jobType
-        );
+        const buttonConfig = this.getButtonConfig(ticketState.count, ticketState.status, ticketState.jobType);
 
         // Generate button HTML
         buttonContainer.innerHTML = `
@@ -1331,8 +1359,9 @@ class DeviceSecurityModal {
     async openLocationModal(hostname) {
         try {
             // Extract location from hostname using shared helper
-            const locationCode = window.hostnameParserHelper?.extractLocationFromHostname(hostname) ||
-                                hostname.substring(0, 5).toLowerCase();
+            const locationCode =
+                window.hostnameParserHelper?.extractLocationFromHostname(hostname) ||
+                hostname.substring(0, 5).toLowerCase();
 
             // Fetch location data from API
             const response = await fetch("/api/locations/stats");
@@ -1347,9 +1376,10 @@ class DeviceSecurityModal {
 
             // Find matching location (case-insensitive)
             const normalizedCode = locationCode.toLowerCase();
-            const locationData = result.data.find(loc =>
-                (loc.location || "").toLowerCase() === normalizedCode ||
-                (loc.location_display || "").toLowerCase() === normalizedCode
+            const locationData = result.data.find(
+                (loc) =>
+                    (loc.location || "").toLowerCase() === normalizedCode ||
+                    (loc.location_display || "").toLowerCase() === normalizedCode,
             );
 
             if (!locationData) {
@@ -1371,7 +1401,6 @@ class DeviceSecurityModal {
             } else {
                 logger.error("[Device Modal] locationDetailsModal not available");
             }
-
         } catch (error) {
             logger.error("[Device Modal] Failed to open location modal:", error);
             this.showToast("Failed to load location details", "error");

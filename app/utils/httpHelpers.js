@@ -89,5 +89,5 @@ function sendBypassResponse(res, payload) {
 
 module.exports = {
     shouldBypassCache,
-    sendBypassResponse
+    sendBypassResponse,
 };

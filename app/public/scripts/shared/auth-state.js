@@ -95,7 +95,7 @@ class AuthState {
         try {
             const response = await fetch("/api/auth/status", {
                 method: "GET",
-                credentials: "include"
+                credentials: "include",
             });
 
             if (!response.ok) {
@@ -120,7 +120,6 @@ class AuthState {
 
             logger.debug(`✅ Authenticated as: ${this.user?.username || "Unknown"}`);
             return true;
-
         } catch (error) {
             logger.error("Error checking authentication status:", error);
             this.authenticated = false;
@@ -146,9 +145,11 @@ class AuthState {
         const currentPath = window.location.pathname;
 
         // Skip redirect if already on public pages
-        if (currentPath.includes("/login.html") ||
+        if (
+            currentPath.includes("/login.html") ||
             currentPath.includes("/health") ||
-            currentPath.includes("/docs-html/")) {
+            currentPath.includes("/docs-html/")
+        ) {
             return;
         }
 
@@ -218,7 +219,7 @@ class AuthState {
         try {
             // Use authenticatedFetch to include CSRF token
             const response = await this.authenticatedFetch("/api/auth/logout", {
-                method: "POST"
+                method: "POST",
             });
 
             if (!response.ok) {
@@ -237,7 +238,6 @@ class AuthState {
 
             // Redirect to login
             window.location.href = "/login.html";
-
         } catch (error) {
             logger.error("Error during logout:", error);
             // Clear state and redirect anyway
@@ -274,7 +274,7 @@ class AuthState {
             try {
                 const response = await fetch("/api/auth/status", {
                     method: "GET",
-                    credentials: "include"
+                    credentials: "include",
                 });
 
                 if (!response.ok) {
@@ -288,7 +288,6 @@ class AuthState {
                     logger.warn("Session expired");
                     this.showSessionExpiredModal();
                 }
-
             } catch (error) {
                 logger.error("Error checking session:", error);
                 // Don't show modal for network errors - may be temporary
@@ -735,18 +734,18 @@ class AuthState {
         try {
             // Set loading state
             submitBtn.disabled = true;
-            submitBtn.innerHTML = "<span class=\"spinner-border spinner-border-sm me-2\"></span>Changing...";
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Changing...';
 
             // Call API
             const response = await this.authenticatedFetch("/api/auth/change-password", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
                     oldPassword: currentPassword, // HEX-133 Task 1.4: Backend expects "oldPassword"
-                    newPassword
-                })
+                    newPassword,
+                }),
             });
 
             const data = await response.json();
@@ -809,7 +808,7 @@ class AuthState {
                     if (tokenData.success && tokenData.csrfToken) {
                         options.headers = {
                             ...options.headers,
-                            "X-CSRF-Token": tokenData.csrfToken
+                            "X-CSRF-Token": tokenData.csrfToken,
                         };
                     }
                 } catch (csrfError) {
@@ -821,7 +820,7 @@ class AuthState {
             // Merge options with credentials
             const fetchOptions = {
                 ...options,
-                credentials: "include"
+                credentials: "include",
             };
 
             const response = await fetch(url, fetchOptions);
@@ -840,7 +839,6 @@ class AuthState {
             }
 
             return response;
-
         } catch (error) {
             // Re-throw error after logging
             logger.error("Authenticated fetch error:", error);

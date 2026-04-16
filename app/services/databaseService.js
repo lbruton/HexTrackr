@@ -28,7 +28,7 @@ class DatabaseService {
         this.connectionPool = {
             maxConnections: 1,
             currentConnections: 0,
-            queue: []
+            queue: [],
         };
     }
 
@@ -74,7 +74,7 @@ class DatabaseService {
                     if (err) {
                         this._log("error", "Failed to connect to database", {
                             error: err.message,
-                            path: this.dbPath
+                            path: this.dbPath,
                         });
                         reject(err);
                         return;
@@ -82,8 +82,8 @@ class DatabaseService {
 
                     this._log("info", "Database connection established", {
                         path: this.dbPath,
-                        journalMode: "WAL",  // HEX-280: WAL mode with named volume (not macOS bind mount)
-                        cacheSize: "64MB"
+                        journalMode: "WAL", // HEX-280: WAL mode with named volume (not macOS bind mount)
+                        cacheSize: "64MB",
                     });
                     this.connectionPool.currentConnections = 1;
                     this.isInitialized = true;
@@ -93,16 +93,16 @@ class DatabaseService {
                     // HEX-280: WAL mode with Docker named volume (isolated from macOS filesystem)
                     // Named volumes don't have fcntl locking issues, WAL allows concurrent reads during writes
                     this.db.run("PRAGMA journal_mode = WAL");
-                    this.db.run("PRAGMA synchronous = NORMAL");  // NORMAL is safe with WAL mode
-                    this.db.run("PRAGMA busy_timeout = 10000");  // Wait 10s for locks
-                    this.db.run("PRAGMA wal_autocheckpoint = 1000");  // Checkpoint every 1000 pages
+                    this.db.run("PRAGMA synchronous = NORMAL"); // NORMAL is safe with WAL mode
+                    this.db.run("PRAGMA busy_timeout = 10000"); // Wait 10s for locks
+                    this.db.run("PRAGMA wal_autocheckpoint = 1000"); // Checkpoint every 1000 pages
 
                     // Performance optimizations for large databases (858MB, 95K+ records)
                     // These pragmas dramatically improve query performance on production hardware
-                    this.db.run("PRAGMA cache_size = -64000");      // 64MB cache (default ~2MB) - 32x improvement
-                    this.db.run("PRAGMA mmap_size = 268435456");    // 256MB memory-mapped I/O - reduces syscalls
-                    this.db.run("PRAGMA temp_store = MEMORY");      // Keep temp tables in RAM - faster aggregations
-                    this.db.run("PRAGMA page_size = 4096");         // Optimal page size for most systems
+                    this.db.run("PRAGMA cache_size = -64000"); // 64MB cache (default ~2MB) - 32x improvement
+                    this.db.run("PRAGMA mmap_size = 268435456"); // 256MB memory-mapped I/O - reduces syscalls
+                    this.db.run("PRAGMA temp_store = MEMORY"); // Keep temp tables in RAM - faster aggregations
+                    this.db.run("PRAGMA page_size = 4096"); // Optimal page size for most systems
 
                     // Initialize schema (from server.js initDb function lines 2785+)
                     this._initializeSchema()
@@ -116,7 +116,6 @@ class DatabaseService {
                         })
                         .catch(reject);
                 });
-
             } catch (error) {
                 reject(error);
             }
@@ -147,15 +146,15 @@ class DatabaseService {
                     "ALTER TABLE vulnerability_snapshots ADD COLUMN dedup_tier INTEGER DEFAULT 4",
                     "ALTER TABLE vulnerability_snapshots ADD COLUMN enhanced_unique_key TEXT",
                     "ALTER TABLE vulnerability_daily_totals ADD COLUMN resolved_count INTEGER DEFAULT 0",
-                    "ALTER TABLE vulnerability_daily_totals ADD COLUMN reopened_count INTEGER DEFAULT 0"
+                    "ALTER TABLE vulnerability_daily_totals ADD COLUMN reopened_count INTEGER DEFAULT 0",
                 ];
 
-                alterStatements.forEach(sql => {
+                alterStatements.forEach((sql) => {
                     this.db.run(sql, (err) => {
                         if (err && !err.message.includes("duplicate column")) {
                             this._log("error", "Schema update failed", {
                                 error: err.message,
-                                sql: sql.substring(0, 100)
+                                sql: sql.substring(0, 100),
                             });
                         }
                     });
@@ -396,10 +395,10 @@ class DatabaseService {
                 is_active BOOLEAN DEFAULT 1,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-            )`
+            )`,
         ];
 
-        return Promise.all(tables.map(sql => this.run(sql)));
+        return Promise.all(tables.map((sql) => this.run(sql)));
     }
 
     /**
@@ -457,10 +456,10 @@ class DatabaseService {
             // Vulnerability templates indexes
             "CREATE INDEX IF NOT EXISTS idx_vulnerability_templates_name ON vulnerability_templates (name)",
             "CREATE INDEX IF NOT EXISTS idx_vulnerability_templates_category ON vulnerability_templates (category)",
-            "CREATE INDEX IF NOT EXISTS idx_vulnerability_templates_active ON vulnerability_templates (is_active)"
+            "CREATE INDEX IF NOT EXISTS idx_vulnerability_templates_active ON vulnerability_templates (is_active)",
         ];
 
-        return Promise.all(indexes.map(sql => this.run(sql)));
+        return Promise.all(indexes.map((sql) => this.run(sql)));
     }
 
     /**
@@ -484,7 +483,7 @@ class DatabaseService {
                         error: err.message,
                         sql: sql.substring(0, 200),
                         params: params,
-                        duration: `${duration}ms`
+                        duration: `${duration}ms`,
                     });
                     reject(err);
                 } else {
@@ -494,7 +493,7 @@ class DatabaseService {
                             duration: `${duration}ms`,
                             sql: sql.substring(0, 200),
                             params: params,
-                            rowCount: rows ? rows.length : 0
+                            rowCount: rows ? rows.length : 0,
                         });
                     }
                     resolve(rows);
@@ -524,7 +523,7 @@ class DatabaseService {
                         error: err.message,
                         sql: sql.substring(0, 200),
                         params: params,
-                        duration: `${duration}ms`
+                        duration: `${duration}ms`,
                     });
                     reject(err);
                 } else {
@@ -533,7 +532,7 @@ class DatabaseService {
                         this._log("warn", "Slow query detected", {
                             duration: `${duration}ms`,
                             sql: sql.substring(0, 200),
-                            params: params
+                            params: params,
                         });
                     }
                     resolve(row);
@@ -556,7 +555,7 @@ class DatabaseService {
             const startTime = Date.now();
             const self = this;
 
-            this.db.run(sql, params, function(err) {
+            this.db.run(sql, params, function (err) {
                 const duration = Date.now() - startTime;
 
                 if (err) {
@@ -564,7 +563,7 @@ class DatabaseService {
                         error: err.message,
                         sql: sql.substring(0, 200),
                         params: params,
-                        duration: `${duration}ms`
+                        duration: `${duration}ms`,
                     });
                     reject(err);
                 } else {
@@ -574,12 +573,12 @@ class DatabaseService {
                             duration: `${duration}ms`,
                             sql: sql.substring(0, 200),
                             params: params,
-                            changes: this.changes
+                            changes: this.changes,
                         });
                     }
                     resolve({
                         lastID: this.lastID,
-                        changes: this.changes
+                        changes: this.changes,
                     });
                 }
             });
@@ -774,8 +773,8 @@ class DatabaseService {
             activeTransactions: this.activeTransactions.size,
             connectionPool: {
                 ...this.connectionPool,
-                activeConnections: this.connectionPool.currentConnections
-            }
+                activeConnections: this.connectionPool.currentConnections,
+            },
         };
     }
 
@@ -792,7 +791,7 @@ class DatabaseService {
 
         try {
             const result = await this.get(
-                "SELECT sync_time FROM sync_metadata WHERE sync_type = 'vacuum' ORDER BY sync_time DESC LIMIT 1"
+                "SELECT sync_time FROM sync_metadata WHERE sync_type = 'vacuum' ORDER BY sync_time DESC LIMIT 1",
             );
 
             if (!result) {
@@ -807,7 +806,7 @@ class DatabaseService {
             return daysSinceLastVacuum >= config.maintenance.vacuumIntervalDays;
         } catch (error) {
             this._log("warn", "Error checking VACUUM status", {
-                error: error.message
+                error: error.message,
             });
             return false;
         }
@@ -825,7 +824,7 @@ class DatabaseService {
             this.db.run("VACUUM", async (vacuumErr) => {
                 if (vacuumErr) {
                     this._log("error", "VACUUM operation failed", {
-                        error: vacuumErr.message
+                        error: vacuumErr.message,
                     });
                     reject(vacuumErr);
                     return;
@@ -833,25 +832,31 @@ class DatabaseService {
 
                 const duration = ((Date.now() - startTime) / 1000).toFixed(2);
                 this._log("info", "Database VACUUM completed successfully", {
-                    duration: `${duration}s`
+                    duration: `${duration}s`,
                 });
 
                 // Audit log for VACUUM operation
-                this._audit("database.vacuum", "Database VACUUM operation completed", {
-                    duration: `${duration}s`,
-                    startTime: new Date(startTime).toISOString()
-                }, null, null);
+                this._audit(
+                    "database.vacuum",
+                    "Database VACUUM operation completed",
+                    {
+                        duration: `${duration}s`,
+                        startTime: new Date(startTime).toISOString(),
+                    },
+                    null,
+                    null,
+                );
 
                 // Record in sync_metadata
                 try {
                     await this.run(
                         "INSERT INTO sync_metadata (sync_type, sync_time, record_count) VALUES ('vacuum', ?, ?)",
-                        [new Date().toISOString(), duration]
+                        [new Date().toISOString(), duration],
                     );
                     resolve({ success: true, duration });
                 } catch (metadataErr) {
                     this._log("warn", "Failed to record VACUUM in sync_metadata", {
-                        error: metadataErr.message
+                        error: metadataErr.message,
                     });
                     resolve({ success: true, duration }); // VACUUM succeeded even if metadata failed
                 }
@@ -872,7 +877,7 @@ class DatabaseService {
         }
 
         this._log("info", "Auto-VACUUM scheduler started", {
-            intervalDays: config.maintenance.vacuumIntervalDays
+            intervalDays: config.maintenance.vacuumIntervalDays,
         });
 
         // Check immediately on startup
@@ -884,7 +889,7 @@ class DatabaseService {
             }
         } catch (error) {
             this._log("error", "Startup VACUUM check failed", {
-                error: error.message
+                error: error.message,
             });
         }
 
@@ -893,7 +898,8 @@ class DatabaseService {
         setInterval(async () => {
             try {
                 const now = new Date();
-                if (now.getHours() === 2) { // Run at 2 AM
+                if (now.getHours() === 2) {
+                    // Run at 2 AM
                     const shouldRun = await this.shouldRunVacuum();
                     if (shouldRun) {
                         this._log("info", "Running scheduled VACUUM");
@@ -902,7 +908,7 @@ class DatabaseService {
                 }
             } catch (error) {
                 this._log("error", "Scheduled VACUUM check failed", {
-                    error: error.message
+                    error: error.message,
                 });
             }
         }, checkInterval);
@@ -921,7 +927,7 @@ class DatabaseService {
             // Wait for active transactions to complete
             if (this.activeTransactions.size > 0) {
                 this._log("info", "Waiting for active transactions to complete", {
-                    activeTransactions: this.activeTransactions.size
+                    activeTransactions: this.activeTransactions.size,
                 });
                 setTimeout(() => this.close().then(resolve).catch(reject), 1000);
                 return;
@@ -930,7 +936,7 @@ class DatabaseService {
             this.db.close((err) => {
                 if (err) {
                     this._log("error", "Error closing database connection", {
-                        error: err.message
+                        error: err.message,
                     });
                     reject(err);
                 } else {
