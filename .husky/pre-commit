@@ -1,0 +1,110 @@
+#!/bin/bash
+# HexTrackr Pre-Commit Hook (managed by husky)
+# Layer 0: Prettier via lint-staged (staged files only)
+# Layer 1: Markdown + CSS auto-fixes
+# Layer 2: ESLint warning check
+# Layer 3: Gitleaks secret detection
+
+set -e
+
+# --- Layer 0: lint-staged (prettier on staged files) ---
+npx lint-staged
+
+# --- Layer 1: Safe Auto-Fixes (formatting only, cannot break code) ---
+echo ""
+echo "  Fixing markdown formatting..."
+if npm run lint:md:fix --silent 2>&1 | grep -q "error"; then
+    echo "     Markdown fixes applied"
+else
+    echo "     Markdown clean"
+fi
+
+echo ""
+echo "  Fixing CSS formatting..."
+if npm run stylelint:fix --silent 2>&1 | grep -q "error"; then
+    echo "     CSS fixes applied"
+else
+    echo "     CSS clean"
+fi
+
+# Stage markdown/CSS auto-fixes
+git add -u
+
+# --- Layer 2: Check JavaScript (warn only - NO AUTO-FIX) ---
+echo ""
+echo "  Checking JavaScript (warnings only, no auto-fix)..."
+echo ""
+
+ESLINT_OUTPUT=$(npm run eslint --silent 2>&1 || true)
+ESLINT_EXIT_CODE=$?
+
+if [ $ESLINT_EXIT_CODE -ne 0 ]; then
+    echo "-----------------------------------------------------------"
+    echo "  ESLint found issues (NOT auto-fixed for safety)"
+    echo ""
+    echo "$ESLINT_OUTPUT" | head -20
+    echo ""
+    echo "Review manually with: npm run eslint"
+    echo ""
+    echo "CRITICAL: Read .github/CODACY_GUIDELINES.md before"
+    echo "   fixing 'undefined variable' warnings!"
+    echo ""
+    echo "-----------------------------------------------------------"
+    echo ""
+
+    # Interactive prompt — skipped in non-interactive contexts (CI)
+    if [ -t 0 ]; then
+        read -p "Commit with ESLint warnings? (y/N): " -n 1 -r
+        echo ""
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            echo "Commit cancelled. Fix ESLint issues and try again."
+            exit 1
+        fi
+        echo "Proceeding with warnings (developer reviewed)"
+    else
+        echo "Non-interactive mode — proceeding with ESLint warnings"
+    fi
+else
+    echo "  JavaScript clean"
+fi
+
+# --- Layer 3: Gitleaks secret detection ---
+echo ""
+echo "  Running gitleaks secret detection..."
+echo ""
+
+if ! command -v gitleaks &> /dev/null; then
+    echo "  gitleaks not found. Installing..."
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        if command -v brew &> /dev/null; then
+            brew install gitleaks
+        else
+            echo "  Homebrew not found. Please install gitleaks manually:"
+            echo "   brew install gitleaks"
+            exit 1
+        fi
+    else
+        echo "  Please install gitleaks manually:"
+        echo "   Visit https://github.com/gitleaks/gitleaks?tab=readme-ov-file#installing"
+        exit 1
+    fi
+fi
+
+if gitleaks detect --source . --no-git --verbose 2>&1 | grep -q "leaks found: [1-9]"; then
+    echo "-----------------------------------------------------------"
+    echo "  GITLEAKS DETECTED SECRETS IN YOUR CHANGES"
+    echo ""
+    echo "Commit blocked for security reasons."
+    echo "Please remove the secrets before committing."
+    echo ""
+    echo "Tip: To bypass in emergency: git commit --no-verify"
+    echo "-----------------------------------------------------------"
+    echo ""
+    exit 1
+else
+    echo "  No secrets detected"
+fi
+
+echo ""
+echo "  Pre-commit checks passed"
+echo ""
