@@ -55,7 +55,7 @@ module.exports = {
         options: {
             maxAge: "1m", // Short cache for development
             etag: true,
-            lastModified: true
+            lastModified: true,
         },
 
         /**
@@ -82,9 +82,9 @@ module.exports = {
             options: {
                 maxAge: "1m",
                 etag: true,
-                lastModified: true
-            }
-        }
+                lastModified: true,
+            },
+        },
     },
 
     /**
@@ -102,7 +102,7 @@ module.exports = {
          * API version (for future versioning)
          * @type {string}
          */
-        version: "v1"
+        version: "v1",
     },
 
     /**
@@ -161,8 +161,8 @@ module.exports = {
              * Disable legacy headers
              * @type {boolean}
              */
-            legacyHeaders: false
-        }
+            legacyHeaders: false,
+        },
     },
 
     /**
@@ -192,7 +192,7 @@ module.exports = {
          * Enable credentials in CORS requests
          * @type {boolean}
          */
-        credentials: true
+        credentials: true,
     },
 
     /**
@@ -216,7 +216,7 @@ module.exports = {
          * X-XSS-Protection header
          * @type {string}
          */
-        xssProtection: "1; mode=block"
+        xssProtection: "1; mode=block",
     },
 
     /**
@@ -239,8 +239,8 @@ module.exports = {
              * Maximum file size in bytes
              * @type {number}
              */
-            fileSize: 100 * 1024 * 1024 // 100MB limit
-        }
+            fileSize: 100 * 1024 * 1024, // 100MB limit
+        },
     },
 
     /**
@@ -258,7 +258,7 @@ module.exports = {
          * Headers timeout (not currently set in server.js)
          * @type {number}
          */
-        headersTimeout: 66000 // 66 seconds (should be > keepAlive)
+        headersTimeout: 66000, // 66 seconds (should be > keepAlive)
     },
 
     /**
@@ -270,7 +270,7 @@ module.exports = {
          * Database file path relative to server root
          * @type {string}
          */
-        path: "data/hextrackr.db"
+        path: "data/hextrackr.db",
     },
 
     /**
@@ -282,7 +282,7 @@ module.exports = {
          * Enable compression
          * @type {boolean}
          */
-        enabled: true
+        enabled: true,
     },
 
     /**
@@ -294,6 +294,6 @@ module.exports = {
          * Health check endpoint path
          * @type {string}
          */
-        endpoint: "/health"
-    }
+        endpoint: "/health",
+    },
 };

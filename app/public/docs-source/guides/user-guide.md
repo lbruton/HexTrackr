@@ -36,6 +36,7 @@ At the top of the dashboard, you'll see four risk cards displaying vulnerability
 - **Low** (Blue): Lower-priority vulnerabilities for routine maintenance
 
 **Toggle Between Views**: Click any card to switch between:
+
 - **VPR Totals** (default): Sum of Vulnerability Priority Rating scores (risk-based view)
 - **Vulnerability Counts**: Total number of vulnerabilities in each severity level
 
@@ -58,6 +59,7 @@ Filter vulnerabilities by vendor to focus on specific technology stacks:
 - **Other**: All other vendors (Tenable plugins, third-party software, etc.)
 
 **Two Ways to Filter**:
+
 1. **Toggle Buttons**: Click vendor buttons above the statistics cards
 2. **Dropdown Menu**: Use the vendor dropdown in the filter bar
 
@@ -106,19 +108,21 @@ Group by unique vulnerabilities (CVE, Cisco SA, or Plugin ID):
 KEV vulnerabilities are marked throughout the interface:
 
 - **Table View**: Dedicated KEV column with YES/NO badges
-  - Red "YES" badge = In CISA catalog (prioritize!)
-  - Blue "NO" badge = Not in KEV catalog
+    - Red "YES" badge = In CISA catalog (prioritize!)
+    - Blue "NO" badge = Not in KEV catalog
 - **Vulnerability Cards**: Red KEV badge in upper-right corner
 - **Device Cards**: KEV badge appears if ANY vulnerability on that device is a KEV
 
 #### Using KEV Information
 
 **Why KEV Matters**:
+
 - **Active Exploitation**: These vulnerabilities are being exploited right now
 - **Higher Priority**: Should be remediated before non-KEV vulnerabilities
 - **Compliance**: Many frameworks require tracking KEV vulnerabilities
 
 **How to Use**:
+
 1. **Filter by KEV**: Use the KEV column filter or severity dropdown
 2. **Click for Details**: Click any KEV badge to see full CISA information
 3. **Cross-Reference**: Links to NIST NVD for complete CVE details
@@ -139,12 +143,12 @@ The tickets page at `/tickets.html` helps you manage remediation work with a sop
 1. Click **Add New Ticket** button
 2. **Ticket Number** is auto-generated (4-digit format: 0001, 0002, etc.)
 3. Fill in required fields:
-   - **Date Submitted**: When the ticket was created
-   - **Date Due**: Remediation deadline
-   - **Site**: Physical location or network zone
-   - **Location**: Specific building/datacenter
-   - **Supervisor**: Who owns the work
-   - **Tech**: Who will perform the work
+    - **Date Submitted**: When the ticket was created
+    - **Date Due**: Remediation deadline
+    - **Site**: Physical location or network zone
+    - **Location**: Specific building/datacenter
+    - **Supervisor**: Who owns the work
+    - **Tech**: Who will perform the work
 4. Add devices using the device management interface (see below)
 5. Click **Save Ticket**
 
@@ -162,10 +166,11 @@ The device management interface in the ticket modal provides powerful tools for 
 #### Adding Devices
 
 **Manual Entry**:
+
 - Click the **+** button to add a new device row
 - **Smart Increment**: System automatically suggests the next device name
-  - Example: Adding after `host01` suggests `host02`
-  - Example: Adding after `server-a` suggests `server-b`
+    - Example: Adding after `host01` suggests `host02`
+    - Example: Adding after `server-a` suggests `server-b`
 
 **Bulk Import**: Add comma-separated or line-separated device lists
 
@@ -178,6 +183,7 @@ Device order matters for sequential operations (reboots, patching, etc.). Three 
 3. **Reverse Order**: Click **Reverse** button to flip the entire list
 
 **Why Order Matters**:
+
 - Boot sequences for cluster failover
 - Patching order to maintain service availability
 - Troubleshooting flow documentation
@@ -191,19 +197,21 @@ Click the **-** button next to any device to remove it from the list.
 Generate complete documentation packages for remediation work:
 
 **Download Ticket Bundle**:
+
 1. Find the ticket in the main table
 2. Click the **Download Bundle** (download) icon
 3. Receive a ZIP file containing:
-   - Ticket details in PDF format
-   - Ticket details in Markdown format
-   - Any shared documentation uploaded during the session
-   - File attachments stored with the ticket
+    - Ticket details in PDF format
+    - Ticket details in Markdown format
+    - Any shared documentation uploaded during the session
+    - File attachments stored with the ticket
 
 **Perfect for**: Handoffs to field technicians, audit documentation, ServiceNow attachments
 
 ### Filtering and Searching
 
 **Global Search Bar**: Filters tickets by:
+
 - Ticket number
 - Hexagon number
 - ServiceNow number
@@ -248,13 +256,14 @@ HexTrackr provides comprehensive import/export capabilities for data migration, 
 
 1. Click **Import** button on Vulnerabilities page
 2. **Select Scan Date**: Choose when the vulnerability scan was performed
-   - This date is critical for accurate trend analysis
-   - Use the scan completion date from your vulnerability scanner
+    - This date is critical for accurate trend analysis
+    - Use the scan completion date from your vulnerability scanner
 3. **Choose CSV File**: Select your export from Tenable, Cisco, or compatible scanner
 4. **Watch Progress**: Real-time progress modal shows import status
 5. **Review Results**: Dashboard updates automatically with new data
 
 **Supported Formats**:
+
 - Tenable.io comprehensive exports
 - Cisco vulnerability exports (standard and legacy)
 - Any CSV with standard vulnerability fields
@@ -264,11 +273,12 @@ HexTrackr provides comprehensive import/export capabilities for data migration, 
 1. Click **Import CSV** button on Tickets page
 2. **Select File**: Choose your ticket data CSV
 3. **Choose Import Mode**:
-   - **Replace All Data**: Clears existing tickets, imports new dataset
-   - **Add to Existing**: Merges with current tickets (upsert mode)
+    - **Replace All Data**: Clears existing tickets, imports new dataset
+    - **Add to Existing**: Merges with current tickets (upsert mode)
 4. **Review Progress**: Import summary shows migrated and failed rows
 
 **CSV Requirements**:
+
 - Include ticket number, dates, site, location
 - Device lists can be comma-separated or line-separated
 - Missing ticket numbers are auto-generated
@@ -320,6 +330,7 @@ The main chart on the Vulnerabilities page shows trends over time:
 - **Vendor Filtering**: Trends update when you filter by vendor
 
 **Use Cases**:
+
 - Track remediation progress over time
 - Identify periods of increased risk
 - Measure security improvement initiatives
@@ -337,11 +348,13 @@ Click through the interface seamlessly:
 ### Keyboard Shortcuts
 
 **VPR Card Export Shortcuts**:
+
 - **Cmd+Alt+Click** (Mac) or **Ctrl+Alt+Click** (Windows): Export latest vs previous (1-day)
 - **Cmd+Shift+Click** (Mac) or **Ctrl+Shift+Click** (Windows): Export 7-day trend comparison
 - **Alt+Shift+Click** (opt+shift on Mac): Export 30-day trend comparison
 
 **General Navigation**:
+
 - **Escape**: Close open modals
 - **Tab**: Navigate through form fields
 
@@ -364,6 +377,7 @@ The Settings modal has **4 tabs** for different configuration areas:
 ### Theme Settings
 
 **Dark/Light Mode** (Header toggle):
+
 - Toggle between dark and light themes using the moon/sun icon
 - Automatically detects your system preference on first visit
 - Theme choice persists across all pages
@@ -372,11 +386,13 @@ The Settings modal has **4 tabs** for different configuration areas:
 ### API Configuration Tab
 
 **Cisco PSIRT Integration**:
+
 - Configure Cisco Product Security Incident Response Team (PSIRT) API access
 - Retrieve fixed versions for Cisco vulnerabilities
 - API client ID and secret management
 
 **KEV Synchronization**:
+
 - **Enable/Disable Auto-Sync**: Control automatic CISA KEV catalog updates
 - **Manual Sync Button**: Force immediate update from CISA
 - **Sync Status**: View last update time and record count
@@ -389,7 +405,7 @@ The Settings modal has **4 tabs** for different configuration areas:
 Configure ServiceNow to enable clickable ticket links:
 
 1. Enter your **ServiceNow instance URL**
-   - Example: `https://yourcompany.service-now.com`
+    - Example: `https://yourcompany.service-now.com`
 2. Click **Test Link** to verify the URL format
 3. **Save Settings**
 
@@ -398,10 +414,12 @@ Configure ServiceNow to enable clickable ticket links:
 ### Data Management Tab
 
 **Backup Operations**:
+
 - **Download Full Backup**: Export complete database (all tickets and vulnerabilities) as ZIP archive
 - **Import Backup**: Restore data from previously exported backup files
 
 **Data Cleanup** (Destructive Operations):
+
 - **Clear All Tickets**: Remove all ticket records (requires confirmation)
 - **Clear All Vulnerabilities**: Remove all vulnerability data (requires confirmation)
 - **Clear All Data**: Complete database reset (requires confirmation)
@@ -411,6 +429,7 @@ Configure ServiceNow to enable clickable ticket links:
 ### System Configuration Tab
 
 **Future Enhancements**:
+
 - Placeholder for additional system-level settings
 - Reserved for future configuration options
 
@@ -421,6 +440,7 @@ Configure ServiceNow to enable clickable ticket links:
 ### Vulnerability Management
 
 **Daily Workflow**:
+
 1. Check VPR cards for total risk overview
 2. Filter by vendor to focus on specific technology stacks
 3. Check KEV vulnerabilities first (active exploitation)
@@ -428,6 +448,7 @@ Configure ServiceNow to enable clickable ticket links:
 5. Create tickets for high-priority items
 
 **Weekly Workflow**:
+
 1. Import latest vulnerability scans
 2. Review trend chart for progress
 3. Identify devices with highest vulnerability counts
@@ -436,12 +457,14 @@ Configure ServiceNow to enable clickable ticket links:
 ### Ticket Management
 
 **Creating Effective Tickets**:
+
 - Use specific, descriptive locations
 - Order devices by patching sequence
 - Include supervisor and tech assignments
 - Set realistic due dates based on complexity
 
 **Tracking Progress**:
+
 - Update ticket status as work progresses
 - Use bundle downloads for documentation
 - Link to ServiceNow for external coordination
@@ -449,11 +472,13 @@ Configure ServiceNow to enable clickable ticket links:
 ### Import Best Practices
 
 **Before Importing**:
+
 - Verify scan date is correct (critical for trends)
 - Check CSV file size (large files may take longer)
 - Have previous import available for comparison
 
 **After Importing**:
+
 - Review import summary for any errors
 - Check vulnerability counts match expectations
 - Verify new vulnerabilities appear in Table view
@@ -462,11 +487,13 @@ Configure ServiceNow to enable clickable ticket links:
 ### Export Best Practices
 
 **Regular Backups**:
+
 - Export complete data monthly (CSV or JSON)
 - Store exports in version control or backup system
 - Test restore process periodically
 
 **Reporting**:
+
 - Use vendor filtering + export for vendor-specific reports
 - Export KEV vulnerabilities separately for compliance
 - Generate HTML reports for non-technical stakeholders

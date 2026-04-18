@@ -36,7 +36,7 @@ const upload = multer({
     dest: "uploads/",
     limits: {
         fileSize: 100 * 1024 * 1024, // 100MB
-        fieldSize: 50 * 1024 * 1024 // 50MB for JSON payloads
+        fieldSize: 50 * 1024 * 1024, // 50MB for JSON payloads
     },
     fileFilter: (req, file, cb) => {
         if (file.mimetype === "text/csv" || file.mimetype === "application/vnd.ms-excel") {
@@ -44,7 +44,7 @@ const upload = multer({
         } else {
             cb(new Error("Only CSV files are allowed"));
         }
-    }
+    },
 });
 
 // Statistics and Analytics Endpoints

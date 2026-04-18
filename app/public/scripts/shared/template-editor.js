@@ -21,7 +21,7 @@ class TemplateEditor {
         this.isEditMode = false;
         this.currentTemplate = null;
         this.currentTicketData = null;
-        this.currentVariant = "upgrade";  // Default variant
+        this.currentVariant = "upgrade"; // Default variant
         this.validationTimeout = null;
         this.isRestoring = false;
 
@@ -38,19 +38,19 @@ class TemplateEditor {
      */
     getTemplateVariant(jobType) {
         if (!jobType) {
-            return "upgrade";  // Default fallback
+            return "upgrade"; // Default fallback
         }
 
         switch (jobType.toLowerCase()) {
             case "replace":
             case "refresh":
-                return "replacement";  // Both use same template (equipment swap workflow)
+                return "replacement"; // Both use same template (equipment swap workflow)
             case "mitigate":
-                return "mitigate";     // KEV emergency patching
+                return "mitigate"; // KEV emergency patching
             case "upgrade":
             case "other":
             default:
-                return "upgrade";      // Default for Upgrade and Other job types
+                return "upgrade"; // Default for Upgrade and Other job types
         }
     }
 
@@ -172,9 +172,17 @@ class TemplateEditor {
 
             // Temporarily disable aggressive template validation to prevent unwanted restoration
             // TODO: Implement more robust template validation that doesn't interfere with user edits
-            if (!this.isRestoring && this.currentTemplate && !this.isTemplateContentValid(this.currentTemplate.template_content)) {
+            if (
+                !this.isRestoring &&
+                this.currentTemplate &&
+                !this.isTemplateContentValid(this.currentTemplate.template_content)
+            ) {
                 logger.warn("ui", "Template content validation failed, but allowing user content to load for editing.");
-                logger.debug("ui", "Template content preview:", this.currentTemplate.template_content.substring(0, 100));
+                logger.debug(
+                    "ui",
+                    "Template content preview:",
+                    this.currentTemplate.template_content.substring(0, 100),
+                );
             }
 
             const editor = document.getElementById("templateEditor");
@@ -200,7 +208,9 @@ class TemplateEditor {
      */
     populateVariablePanel() {
         const dropdown = document.getElementById("emailVariableDropdown");
-        if (!dropdown) {return;}
+        if (!dropdown) {
+            return;
+        }
 
         dropdown.innerHTML = "";
         dropdown.className = "dropdown-menu variable-dropdown";
@@ -210,7 +220,7 @@ class TemplateEditor {
 
         // Group variables by category
         const variablesByCategory = {};
-        this.variables.forEach(variable => {
+        this.variables.forEach((variable) => {
             const category = variable.category || "other";
             if (!variablesByCategory[category]) {
                 variablesByCategory[category] = [];
@@ -234,7 +244,7 @@ class TemplateEditor {
             dropdown.appendChild(categoryHeader);
 
             // Add variables for this category
-            variables.forEach(variable => {
+            variables.forEach((variable) => {
                 const item = document.createElement("li");
                 const button = document.createElement("button");
                 button.type = "button";
@@ -254,7 +264,7 @@ class TemplateEditor {
             // Add divider between categories (except for last category)
             if (index < Object.keys(variablesByCategory).length - 1) {
                 const divider = document.createElement("li");
-                divider.innerHTML = "<hr class=\"dropdown-divider\">";
+                divider.innerHTML = '<hr class="dropdown-divider">';
                 dropdown.appendChild(divider);
             }
         });
@@ -266,7 +276,9 @@ class TemplateEditor {
      */
     insertVariable(variable) {
         const editor = document.getElementById("templateEditor");
-        if (!editor) {return;}
+        if (!editor) {
+            return;
+        }
 
         const start = editor.selectionStart;
         const end = editor.selectionEnd;
@@ -303,16 +315,19 @@ class TemplateEditor {
             // If we have a current template ID, try server-side processing
             if (this.currentTemplate?.id) {
                 try {
-                    const response = await authState.authenticatedFetch(`/api/templates/${this.currentTemplate.id}/preview`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
+                    const response = await authState.authenticatedFetch(
+                        `/api/templates/${this.currentTemplate.id}/preview`,
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({
+                                template_content: templateContent,
+                                ticketData: this.currentTicketData,
+                            }),
                         },
-                        body: JSON.stringify({
-                            template_content: templateContent,
-                            ticketData: this.currentTicketData
-                        })
-                    });
+                    );
 
                     if (response.ok) {
                         const result = await response.json();
@@ -329,7 +344,6 @@ class TemplateEditor {
             // Fallback to client-side processing
             const processedContent = this.processTemplate(templateContent, this.currentTicketData);
             this.showPreviewModal(processedContent);
-
         } catch (error) {
             logger.error("ui", "Error previewing template:", error);
             this.showToast("Failed to generate preview", "error");
@@ -377,7 +391,7 @@ class TemplateEditor {
         previewModal.show();
 
         // Clean up when modal is hidden
-        document.getElementById("templatePreviewModal").addEventListener("hidden.bs.modal", function() {
+        document.getElementById("templatePreviewModal").addEventListener("hidden.bs.modal", function () {
             this.remove();
         });
     }
@@ -411,19 +425,22 @@ class TemplateEditor {
                 }
             }
 
-            logger.debug("ui", `[TemplateEditor] Saving template with ID: ${this.currentTemplate.id}, category: 'email', name: 'default_email'`);
+            logger.debug(
+                "ui",
+                `[TemplateEditor] Saving template with ID: ${this.currentTemplate.id}, category: 'email', name: 'default_email'`,
+            );
             logger.debug("ui", `[TemplateEditor] Template content preview: ${templateContent.substring(0, 100)}...`);
 
             const response = await authState.authenticatedFetch(`/api/templates/${this.currentTemplate.id}`, {
                 method: "PUT",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
                     template_content: templateContent,
                     category: "email",
-                    template_name: "default_email"
-                })
+                    template_name: "default_email",
+                }),
             });
 
             if (!response.ok) {
@@ -457,7 +474,9 @@ class TemplateEditor {
      * Reset template to default
      */
     async resetToDefault() {
-        if (!this.currentTemplate) {return;}
+        if (!this.currentTemplate) {
+            return;
+        }
 
         if (!confirm("Reset template to default? This will lose all custom changes.")) {
             return;
@@ -466,7 +485,7 @@ class TemplateEditor {
         try {
             this.isRestoring = true;
             const response = await authState.authenticatedFetch(`/api/templates/${this.currentTemplate.id}/reset`, {
-                method: "POST"
+                method: "POST",
             });
 
             if (!response.ok) {
@@ -523,7 +542,9 @@ class TemplateEditor {
         const editor = document.getElementById("templateEditor");
         const validationDiv = document.getElementById("templateValidation");
 
-        if (!editor || !validationDiv) {return;}
+        if (!editor || !validationDiv) {
+            return;
+        }
 
         const content = editor.value;
         if (!content.trim()) {
@@ -567,10 +588,10 @@ class TemplateEditor {
         // Extract variables
         const variableMatches = content.match(/\[[A-Z_]+\]/g) || [];
         const uniqueVariables = [...new Set(variableMatches)];
-        const knownVariables = this.variables.map(v => v.name);
+        const knownVariables = this.variables.map((v) => v.name);
 
         // Check for unknown variables
-        const unknownVariables = uniqueVariables.filter(v => !knownVariables.includes(v));
+        const unknownVariables = uniqueVariables.filter((v) => !knownVariables.includes(v));
         if (unknownVariables.length > 0) {
             warnings.push(`Unknown variables: ${unknownVariables.join(", ")}`);
         }
@@ -581,8 +602,8 @@ class TemplateEditor {
             warnings,
             variables: {
                 found: uniqueVariables,
-                unknown: unknownVariables
-            }
+                unknown: unknownVariables,
+            },
         };
     }
 
@@ -592,7 +613,9 @@ class TemplateEditor {
      */
     displayValidationResults(validation) {
         const validationDiv = document.getElementById("templateValidation");
-        if (!validationDiv) {return;}
+        if (!validationDiv) {
+            return;
+        }
 
         let html = "";
 
@@ -629,7 +652,10 @@ class TemplateEditor {
         // Determine variant based on job type
         if (ticketData && ticketData.jobType) {
             this.currentVariant = this.getTemplateVariant(ticketData.jobType);
-            logger.debug("ui", `[TemplateEditor] Set variant to '${this.currentVariant}' based on job type '${ticketData.jobType}'`);
+            logger.debug(
+                "ui",
+                `[TemplateEditor] Set variant to '${this.currentVariant}' based on job type '${ticketData.jobType}'`,
+            );
         }
     }
 
@@ -681,10 +707,10 @@ class TemplateEditor {
             "[SITE_ADDRESS]": ticket.site_address || "[SITE ADDRESS - TBD]",
             "[RETURN_ADDRESS]": ticket.return_address || "[RETURN ADDRESS - TBD]",
             "[TRACKING_NUMBER]": ticket.tracking_number || "[TRACKING NUMBER - TBD]",
-            "[MITIGATION_DETAILS]": ticket.mitigation_details || "[MITIGATION DETAILS - TBD]"
+            "[MITIGATION_DETAILS]": ticket.mitigation_details || "[MITIGATION DETAILS - TBD]",
         };
 
-        Object.keys(replacements).forEach(variable => {
+        Object.keys(replacements).forEach((variable) => {
             const regex = new RegExp(this.escapeRegex(variable), "g");
             processed = processed.replace(regex, replacements[variable]);
         });
@@ -713,7 +739,7 @@ class TemplateEditor {
         // Single supervisor - try to extract first name
         let name = trimmed;
         if (trimmed.includes(",")) {
-            const parts = trimmed.split(",").map(p => p.trim());
+            const parts = trimmed.split(",").map((p) => p.trim());
             name = parts.length > 1 ? parts[1] : parts[0];
         }
 
@@ -739,7 +765,9 @@ class TemplateEditor {
      * @returns {string} Formatted date
      */
     formatDate(dateString) {
-        if (!dateString) {return "N/A";}
+        if (!dateString) {
+            return "N/A";
+        }
         try {
             return new Date(dateString).toLocaleDateString();
         } catch (_error) {
@@ -775,8 +803,8 @@ class TemplateEditor {
             const cacheData = {
                 template: template,
                 timestamp: Date.now(),
-                expires: Date.now() + (60 * 60 * 1000), // 1 hour expiry
-                category: "email"
+                expires: Date.now() + 60 * 60 * 1000, // 1 hour expiry
+                category: "email",
             };
             localStorage.setItem(cacheKey, JSON.stringify(cacheData));
             logger.debug("ui", `[TemplateEditor] Cached template with key: ${cacheKey}`);
@@ -830,7 +858,7 @@ class TemplateEditor {
             } else {
                 // Clear all email template caches
                 const keys = Object.keys(localStorage);
-                keys.forEach(key => {
+                keys.forEach((key) => {
                     if (key.startsWith("hextrackr_email_template_")) {
                         localStorage.removeItem(key);
                         logger.debug("ui", `[TemplateEditor] Cleared cache for key: ${key}`);
@@ -865,7 +893,9 @@ class TemplateEditor {
         this.isRestoring = true;
         try {
             if (this.currentTemplate?.id) {
-                await authState.authenticatedFetch(`/api/templates/${this.currentTemplate.id}/reset`, { method: "POST" });
+                await authState.authenticatedFetch(`/api/templates/${this.currentTemplate.id}/reset`, {
+                    method: "POST",
+                });
             }
         } catch (resetError) {
             logger.warn("ui", "Failed to reset email template on server:", resetError.message);
@@ -926,15 +956,15 @@ Ticket ID: [XT_NUMBER]`;
                 template_content: defaultContent,
                 default_content: defaultContent,
                 variables: JSON.stringify(this.variables),
-                category: "email"
+                category: "email",
             };
 
             const response = await authState.authenticatedFetch("/api/templates", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
-                body: JSON.stringify(templateData)
+                body: JSON.stringify(templateData),
             });
 
             if (!response.ok) {

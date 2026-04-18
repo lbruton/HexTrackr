@@ -24,7 +24,7 @@ router.use((error, req, res, _next) => {
     res.status(500).json({
         success: false,
         error: "Documentation service error",
-        details: error.message
+        details: error.message,
     });
 });
 

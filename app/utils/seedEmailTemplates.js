@@ -313,27 +313,67 @@ Generated: [GENERATED_TIME]
 *This report was generated automatically from vulnerability scan data. Please review all findings and coordinate with the security team for remediation planning.*`;
 
 const emailTemplateVariables = [
-    { name: "[GREETING]", description: "Supervisor first name or 'Team'", required: false, fallback: "[Supervisor First Name]" },
+    {
+        name: "[GREETING]",
+        description: "Supervisor first name or 'Team'",
+        required: false,
+        fallback: "[Supervisor First Name]",
+    },
     { name: "[SITE_NAME]", description: "Site name from ticket", required: true, fallback: "[Site Name]" },
     { name: "[LOCATION]", description: "Location from ticket", required: true, fallback: "[Location]" },
     { name: "[HEXAGON_NUM]", description: "Hexagon ticket number", required: false, fallback: "[Hexagon #]" },
     { name: "[SERVICENOW_NUM]", description: "ServiceNow ticket number", required: false, fallback: "[ServiceNow #]" },
     { name: "[XT_NUMBER]", description: "Internal XT number", required: true, fallback: "XT#[ID]" },
     { name: "[DEVICE_COUNT]", description: "Number of devices", required: true, fallback: "0" },
-    { name: "[DEVICE_LIST]", description: "Enumerated device list", required: true, fallback: "Device list to be confirmed" },
+    {
+        name: "[DEVICE_LIST]",
+        description: "Enumerated device list",
+        required: true,
+        fallback: "Device list to be confirmed",
+    },
     { name: "[DATE_DUE]", description: "Due date formatted", required: true, fallback: "[Due Date]" },
-    { name: "[DATE_SUBMITTED]", description: "Submission date formatted", required: true, fallback: "[Submitted Date]" },
+    {
+        name: "[DATE_SUBMITTED]",
+        description: "Submission date formatted",
+        required: true,
+        fallback: "[Submitted Date]",
+    },
     { name: "[VULNERABILITY_SUMMARY]", description: "Runtime vulnerability summary", required: false, fallback: "" },
-    { name: "[SITE_ADDRESS]", description: "Physical shipping address", required: false, fallback: "[SITE ADDRESS - TBD]" },
-    { name: "[RETURN_ADDRESS]", description: "Return shipping address", required: false, fallback: "[RETURN ADDRESS - TBD]" },
-    { name: "[TRACKING_NUMBER]", description: "Shipping tracking number", required: false, fallback: "[TRACKING NUMBER - TBD]" },
+    {
+        name: "[SITE_ADDRESS]",
+        description: "Physical shipping address",
+        required: false,
+        fallback: "[SITE ADDRESS - TBD]",
+    },
+    {
+        name: "[RETURN_ADDRESS]",
+        description: "Return shipping address",
+        required: false,
+        fallback: "[RETURN ADDRESS - TBD]",
+    },
+    {
+        name: "[TRACKING_NUMBER]",
+        description: "Shipping tracking number",
+        required: false,
+        fallback: "[TRACKING NUMBER - TBD]",
+    },
     { name: "[SOFTWARE_VERSIONS]", description: "Software versions for upgrade", required: false, fallback: "N/A" },
-    { name: "[MITIGATION_DETAILS]", description: "Mitigation details", required: false, fallback: "[MITIGATION DETAILS - TBD]" }
+    {
+        name: "[MITIGATION_DETAILS]",
+        description: "Mitigation details",
+        required: false,
+        fallback: "[MITIGATION DETAILS - TBD]",
+    },
 ];
 
 const ticketTemplateVariables = [
     { name: "[HEXAGON_TICKET]", description: "Hexagon ticket number", required: false, fallback: "[Hexagon Ticket]" },
-    { name: "[SERVICENOW_TICKET]", description: "ServiceNow ticket number", required: false, fallback: "[ServiceNow Ticket]" },
+    {
+        name: "[SERVICENOW_TICKET]",
+        description: "ServiceNow ticket number",
+        required: false,
+        fallback: "[ServiceNow Ticket]",
+    },
     { name: "[XT_NUMBER]", description: "Internal XT number", required: true, fallback: "XT#[ID]" },
     { name: "[SITE_NAME]", description: "Site name", required: true, fallback: "[Site]" },
     { name: "[LOCATION]", description: "Location name", required: true, fallback: "[Location]" },
@@ -341,34 +381,74 @@ const ticketTemplateVariables = [
     { name: "[JOB_TYPE]", description: "Job type", required: false, fallback: "Upgrade" },
     { name: "[DATE_SUBMITTED]", description: "Submission date", required: true, fallback: "[Date Submitted]" },
     { name: "[DATE_DUE]", description: "Due date", required: true, fallback: "[Due Date]" },
-    { name: "[DEVICE_LIST]", description: "Formatted device list", required: true, fallback: "Device list to be confirmed" },
+    {
+        name: "[DEVICE_LIST]",
+        description: "Formatted device list",
+        required: true,
+        fallback: "Device list to be confirmed",
+    },
     { name: "[DEVICE_COUNT]", description: "Device count", required: true, fallback: "0" },
     { name: "[SUPERVISOR]", description: "Supervisor name", required: false, fallback: "[Supervisor]" },
     { name: "[TECHNICIAN]", description: "Technician name", required: false, fallback: "[Technician]" },
     { name: "[NOTES]", description: "Additional notes", required: false, fallback: "N/A" },
-    { name: "[GENERATED_TIME]", description: "Generation timestamp", required: false, fallback: "[Generated Timestamp]" },
+    {
+        name: "[GENERATED_TIME]",
+        description: "Generation timestamp",
+        required: false,
+        fallback: "[Generated Timestamp]",
+    },
     { name: "[GREETING]", description: "Supervisor greeting", required: false, fallback: "Team" },
     { name: "[VULNERABILITY_SUMMARY]", description: "Vulnerability summary section", required: false, fallback: "" },
-    { name: "[SITE_ADDRESS]", description: "Physical shipping address", required: false, fallback: "[SITE ADDRESS - TBD]" },
-    { name: "[RETURN_ADDRESS]", description: "Return shipping address", required: false, fallback: "[RETURN ADDRESS - TBD]" },
-    { name: "[TRACKING_NUMBER]", description: "Shipping tracking number", required: false, fallback: "[TRACKING NUMBER - TBD]" },
+    {
+        name: "[SITE_ADDRESS]",
+        description: "Physical shipping address",
+        required: false,
+        fallback: "[SITE ADDRESS - TBD]",
+    },
+    {
+        name: "[RETURN_ADDRESS]",
+        description: "Return shipping address",
+        required: false,
+        fallback: "[RETURN ADDRESS - TBD]",
+    },
+    {
+        name: "[TRACKING_NUMBER]",
+        description: "Shipping tracking number",
+        required: false,
+        fallback: "[TRACKING NUMBER - TBD]",
+    },
     { name: "[SOFTWARE_VERSIONS]", description: "Software versions for upgrade", required: false, fallback: "N/A" },
-    { name: "[MITIGATION_DETAILS]", description: "Mitigation details", required: false, fallback: "[MITIGATION DETAILS - TBD]" }
+    {
+        name: "[MITIGATION_DETAILS]",
+        description: "Mitigation details",
+        required: false,
+        fallback: "[MITIGATION DETAILS - TBD]",
+    },
 ];
 
 const vulnerabilityTemplateVariables = [
     { name: "[LOCATION]", description: "Location or site name", required: true, fallback: "[Location]" },
     { name: "[XT_NUMBER]", description: "Internal XT number", required: true, fallback: "XT#[ID]" },
     { name: "[HEXAGON_TICKET]", description: "Hexagon ticket number", required: false, fallback: "[Hexagon Ticket]" },
-    { name: "[SERVICENOW_TICKET]", description: "ServiceNow ticket number", required: false, fallback: "[ServiceNow Ticket]" },
+    {
+        name: "[SERVICENOW_TICKET]",
+        description: "ServiceNow ticket number",
+        required: false,
+        fallback: "[ServiceNow Ticket]",
+    },
     { name: "[GENERATED_TIME]", description: "Report timestamp", required: false, fallback: "[Generated Timestamp]" },
-    { name: "[VULNERABILITY_DETAILS]", description: "Per-device vulnerability details", required: true, fallback: "No vulnerability data available." },
+    {
+        name: "[VULNERABILITY_DETAILS]",
+        description: "Per-device vulnerability details",
+        required: true,
+        fallback: "No vulnerability data available.",
+    },
     { name: "[TOTAL_VULNERABILITIES]", description: "Total vulnerability count", required: false, fallback: "0" },
     { name: "[CRITICAL_COUNT]", description: "Critical vulnerability count", required: false, fallback: "0" },
     { name: "[HIGH_COUNT]", description: "High vulnerability count", required: false, fallback: "0" },
     { name: "[MEDIUM_COUNT]", description: "Medium vulnerability count", required: false, fallback: "0" },
     { name: "[LOW_COUNT]", description: "Low vulnerability count", required: false, fallback: "0" },
-    { name: "[DEVICE_COUNT]", description: "Devices with vulnerabilities", required: false, fallback: "0" }
+    { name: "[DEVICE_COUNT]", description: "Devices with vulnerabilities", required: false, fallback: "0" },
 ];
 
 /**
@@ -377,7 +457,7 @@ const vulnerabilityTemplateVariables = [
 const templateSignatures = {
     email: ["Subject: Hexagon Work Order", "[DEVICE_LIST]"],
     ticket: ["# Hexagon Work Request", "Generated:"],
-    vulnerability: ["# Vulnerability Report", "[VULNERABILITY_DETAILS]", "[TOTAL_VULNERABILITIES]"]
+    vulnerability: ["# Vulnerability Report", "[VULNERABILITY_DETAILS]", "[TOTAL_VULNERABILITIES]"],
 };
 
 function contentLooksMismatched(content, category) {
@@ -391,8 +471,8 @@ function contentLooksMismatched(content, category) {
         .filter(([key]) => key !== normalizedCategory)
         .flatMap(([, tokens]) => tokens);
 
-    const containsExpected = expectedTokens.some(token => content.includes(token));
-    const containsForeign = foreignTokens.some(token => content.includes(token));
+    const containsExpected = expectedTokens.some((token) => content.includes(token));
+    const containsForeign = foreignTokens.some((token) => content.includes(token));
 
     if (containsForeign) {
         return true;
@@ -434,24 +514,17 @@ async function seedTemplate(db, { table, name, description, defaultContent, vari
 
                 db.run(
                     insertSql,
-                    [
-                        name,
-                        description,
-                        defaultContent,
-                        defaultContent,
-                        JSON.stringify(variables),
-                        category
-                    ],
-                    function(insertErr) {
+                    [name, description, defaultContent, defaultContent, JSON.stringify(variables), category],
+                    function (insertErr) {
                         if (insertErr) {
                             return reject(new Error(`Failed to insert template '${name}': ${insertErr.message}`));
                         }
 
                         console.log(` Seeded template '${name}' (ID: ${this.lastID}) in ${table}`);
                         resolve();
-                    }
+                    },
                 );
-            }
+            },
         );
     });
 }
@@ -463,7 +536,7 @@ async function seedEmailTemplates(db) {
         description: "Email template for Upgrade job type (patch-only maintenance)",
         defaultContent: emailUpgradeTemplate,
         variables: emailTemplateVariables,
-        category: "email"
+        category: "email",
     });
 
     await seedTemplate(db, {
@@ -472,7 +545,7 @@ async function seedEmailTemplates(db) {
         description: "Email template for Replace/Refresh job types (equipment swap)",
         defaultContent: emailReplacementTemplate,
         variables: emailTemplateVariables,
-        category: "email"
+        category: "email",
     });
 
     await seedTemplate(db, {
@@ -481,7 +554,7 @@ async function seedEmailTemplates(db) {
         description: "Email template for Mitigate job type (KEV emergency patching)",
         defaultContent: emailMitigateTemplate,
         variables: emailTemplateVariables,
-        category: "email"
+        category: "email",
     });
 }
 
@@ -492,7 +565,7 @@ async function seedTicketTemplates(db) {
         description: "Markdown template for Upgrade job type (patch-only maintenance)",
         defaultContent: markdownUpgradeTemplate,
         variables: ticketTemplateVariables,
-        category: "ticket"
+        category: "ticket",
     });
 
     await seedTemplate(db, {
@@ -501,7 +574,7 @@ async function seedTicketTemplates(db) {
         description: "Markdown template for Replace/Refresh job types (equipment swap)",
         defaultContent: markdownReplacementTemplate,
         variables: ticketTemplateVariables,
-        category: "ticket"
+        category: "ticket",
     });
 
     await seedTemplate(db, {
@@ -510,7 +583,7 @@ async function seedTicketTemplates(db) {
         description: "Markdown template for Mitigate job type (KEV emergency patching)",
         defaultContent: markdownMitigateTemplate,
         variables: ticketTemplateVariables,
-        category: "ticket"
+        category: "ticket",
     });
 }
 
@@ -521,7 +594,7 @@ async function seedVulnerabilityTemplates(db) {
         description: "Default vulnerability report template",
         defaultContent: defaultVulnerabilityTemplate,
         variables: vulnerabilityTemplateVariables,
-        category: "vulnerability"
+        category: "vulnerability",
     });
 }
 
@@ -547,7 +620,7 @@ async function resetTemplateToDefault(db, table, templateName) {
             WHERE name = ?
         `;
 
-        db.run(updateSql, [templateName], function(err) {
+        db.run(updateSql, [templateName], function (err) {
             if (err) {
                 return reject(new Error("Failed to reset template: " + err.message));
             }
@@ -579,5 +652,5 @@ module.exports = {
     emailTemplateVariables,
     ticketTemplateVariables,
     vulnerabilityTemplateVariables,
-    contentLooksMismatched
+    contentLooksMismatched,
 };

@@ -21,7 +21,7 @@ const {
     EXPRESS_URLENCODED_LIMIT,
     UPLOADS_DIRECTORY,
     MAX_FILE_SIZE,
-    SECURITY_HEADERS
+    SECURITY_HEADERS,
 } = require("../utils/constants");
 
 /**
@@ -32,7 +32,7 @@ const cors = {
     origin: CORS_ORIGINS,
     methods: CORS_METHODS,
     allowedHeaders: CORS_HEADERS,
-    credentials: true
+    credentials: true,
 };
 
 /**
@@ -52,7 +52,7 @@ const rateLimit = {
     message: RATE_LIMIT_MESSAGE,
     standardHeaders: true,
     legacyHeaders: false,
-    validate: { trustProxy: false }  // Disable validation - we trust nginx reverse proxy
+    validate: { trustProxy: false }, // Disable validation - we trust nginx reverse proxy
 };
 
 /**
@@ -61,12 +61,12 @@ const rateLimit = {
  */
 const bodyParser = {
     json: {
-        limit: EXPRESS_JSON_LIMIT
+        limit: EXPRESS_JSON_LIMIT,
     },
     urlencoded: {
         limit: EXPRESS_URLENCODED_LIMIT,
-        extended: true
-    }
+        extended: true,
+    },
 };
 
 /**
@@ -76,7 +76,7 @@ const bodyParser = {
 const upload = {
     dest: UPLOADS_DIRECTORY,
     limits: {
-        fileSize: MAX_FILE_SIZE
+        fileSize: MAX_FILE_SIZE,
     },
     fileFilter: (req, file, cb) => {
         // Only allow CSV files for vulnerability imports
@@ -84,7 +84,7 @@ const upload = {
             return cb(new Error("Only CSV files are allowed"), false);
         }
         cb(null, true);
-    }
+    },
 };
 
 /**
@@ -95,8 +95,8 @@ const security = {
     headers: {
         "X-Content-Type-Options": SECURITY_HEADERS.X_CONTENT_TYPE_OPTIONS,
         "X-Frame-Options": SECURITY_HEADERS.X_FRAME_OPTIONS,
-        "X-XSS-Protection": SECURITY_HEADERS.X_XSS_PROTECTION
-    }
+        "X-XSS-Protection": SECURITY_HEADERS.X_XSS_PROTECTION,
+    },
 };
 
 /**
@@ -119,8 +119,8 @@ const websocket = {
     cors: {
         origin: CORS_ORIGINS,
         methods: ["GET", "POST"],
-        credentials: true
-    }
+        credentials: true,
+    },
 };
 
 /**
@@ -134,5 +134,5 @@ module.exports = {
     upload,
     security,
     compression,
-    websocket
+    websocket,
 };

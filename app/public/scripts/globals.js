@@ -26,30 +26,30 @@
  * @namespace BrowserAPIs
  */
 const BROWSER_GLOBALS = [
-    "window",           // Browser window object - main application container
-    "document",         // DOM manipulation and element access
-    "localStorage",     // Persistent client-side storage
-    "sessionStorage",   // Session-based client-side storage
-    "fetch",           // Modern AJAX/fetch API for HTTP requests
-    "console",         // Browser console for debugging and logging
-    "setTimeout",      // Timer functions for delayed execution
-    "clearTimeout",    // Clear delayed execution timers
-    "setInterval",     // Interval timers for repeated execution
-    "clearInterval",   // Clear interval timers
-    "alert",           // Browser alert dialogs
-    "confirm",         // Browser confirmation dialogs
-    "prompt",          // Browser input prompts
-    "btoa",            // Base64 encoding
-    "atob",            // Base64 decoding
-    "URL",             // URL manipulation utilities
-    "Blob",            // Binary data objects
-    "File",            // File objects for file uploads
-    "FileReader",      // File reading utilities
-    "FormData",        // Form data handling for HTTP requests
-    "location",        // Browser location/URL information
-    "history",         // Browser history manipulation
-    "navigator",       // Browser and system information
-    "XMLHttpRequest"   // Legacy AJAX API (for compatibility)
+    "window", // Browser window object - main application container
+    "document", // DOM manipulation and element access
+    "localStorage", // Persistent client-side storage
+    "sessionStorage", // Session-based client-side storage
+    "fetch", // Modern AJAX/fetch API for HTTP requests
+    "console", // Browser console for debugging and logging
+    "setTimeout", // Timer functions for delayed execution
+    "clearTimeout", // Clear delayed execution timers
+    "setInterval", // Interval timers for repeated execution
+    "clearInterval", // Clear interval timers
+    "alert", // Browser alert dialogs
+    "confirm", // Browser confirmation dialogs
+    "prompt", // Browser input prompts
+    "btoa", // Base64 encoding
+    "atob", // Base64 decoding
+    "URL", // URL manipulation utilities
+    "Blob", // Binary data objects
+    "File", // File objects for file uploads
+    "FileReader", // File reading utilities
+    "FormData", // Form data handling for HTTP requests
+    "location", // Browser location/URL information
+    "history", // Browser history manipulation
+    "navigator", // Browser and system information
+    "XMLHttpRequest", // Legacy AJAX API (for compatibility)
 ];
 
 /**
@@ -58,13 +58,13 @@ const BROWSER_GLOBALS = [
  * @namespace ThirdPartyLibs
  */
 const LIBRARY_GLOBALS = [
-    "bootstrap",       // Bootstrap 5 - UI components and utilities
-    "Papa",           // Papa Parse - CSV parsing and generation
-    "agGrid",         // AG Grid - Advanced data grid component
-    "ApexCharts",     // ApexCharts - Chart and visualization library
-    "DOMPurify",      // DOMPurify - HTML sanitization for XSS prevention
-    "jsPDF",          // jsPDF - PDF generation library
-    "html2canvas"     // html2canvas - HTML to canvas conversion
+    "bootstrap", // Bootstrap 5 - UI components and utilities
+    "Papa", // Papa Parse - CSV parsing and generation
+    "agGrid", // AG Grid - Advanced data grid component
+    "ApexCharts", // ApexCharts - Chart and visualization library
+    "DOMPurify", // DOMPurify - HTML sanitization for XSS prevention
+    "jsPDF", // jsPDF - PDF generation library
+    "html2canvas", // html2canvas - HTML to canvas conversion
 ];
 
 /**
@@ -135,7 +135,7 @@ const GLOBAL_CONSTANTS = {
 
     // Grid Configuration
     GRID_DEFAULT_PAGE_SIZE: 50,
-    GRID_MAX_PAGE_SIZE: 1000
+    GRID_MAX_PAGE_SIZE: 1000,
 };
 
 /**
@@ -150,7 +150,7 @@ const GLOBAL_UTILS = {
      * @param {number} wait - Wait time in milliseconds
      * @returns {Function} Debounced function
      */
-    debounce: function(func, wait) {
+    debounce: function (func, wait) {
         let timeout;
         return function executedFunction(...args) {
             const later = () => {
@@ -167,8 +167,10 @@ const GLOBAL_UTILS = {
      * @param {number} bytes - Size in bytes
      * @returns {string} Formatted size string
      */
-    formatFileSize: function(bytes) {
-        if (bytes === 0) {return "0 Bytes";}
+    formatFileSize: function (bytes) {
+        if (bytes === 0) {
+            return "0 Bytes";
+        }
         const k = 1024;
         const sizes = ["Bytes", "KB", "MB", "GB"];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
@@ -180,7 +182,9 @@ const GLOBAL_UTILS = {
      * @param {number} length - Length of the ID
      * @returns {string} Random ID string
      */
-    generateId: function(length = 8) {
-        return Math.random().toString(36).substring(2, length + 2);
-    }
+    generateId: function (length = 8) {
+        return Math.random()
+            .toString(36)
+            .substring(2, length + 2);
+    },
 };

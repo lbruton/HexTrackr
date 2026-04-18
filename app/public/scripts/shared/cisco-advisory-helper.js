@@ -43,39 +43,69 @@ class CiscoAdvisoryHelper {
      * @returns {string} OS type identifier
      */
     parseOSType(versionString) {
-        if (!versionString) {return "Unknown";}
+        if (!versionString) {
+            return "Unknown";
+        }
 
         const versionUpper = versionString.toUpperCase();
 
         // Explicit OS type mentions
-        if (versionUpper.includes("IOS XE")) {return "IOS XE";}
-        if (versionUpper.includes("IOS-XE")) {return "IOS XE";}
-        if (versionUpper.includes("IOSXE")) {return "IOS XE";}
+        if (versionUpper.includes("IOS XE")) {
+            return "IOS XE";
+        }
+        if (versionUpper.includes("IOS-XE")) {
+            return "IOS XE";
+        }
+        if (versionUpper.includes("IOSXE")) {
+            return "IOS XE";
+        }
 
-        if (versionUpper.includes("IOS XR")) {return "IOS XR";}
-        if (versionUpper.includes("IOS-XR")) {return "IOS XR";}
-        if (versionUpper.includes("IOSXR")) {return "IOS XR";}
+        if (versionUpper.includes("IOS XR")) {
+            return "IOS XR";
+        }
+        if (versionUpper.includes("IOS-XR")) {
+            return "IOS XR";
+        }
+        if (versionUpper.includes("IOSXR")) {
+            return "IOS XR";
+        }
 
-        if (versionUpper.includes("NX-OS")) {return "NX-OS";}
-        if (versionUpper.includes("NXOS")) {return "NX-OS";}
+        if (versionUpper.includes("NX-OS")) {
+            return "NX-OS";
+        }
+        if (versionUpper.includes("NXOS")) {
+            return "NX-OS";
+        }
 
         // Pattern-based detection (when OS not explicitly stated)
 
         // IOS: Train notation with parentheses like 15.2(8)E8 (check BEFORE IOS XE patterns)
-        if (/\d+\.\d+\([^\)]+\)[a-zA-Z]*\d*/.test(versionString)) {return "IOS";}
+        if (/\d+\.\d+\([^\)]+\)[a-zA-Z]*\d*/.test(versionString)) {
+            return "IOS";
+        }
 
         // IOS: Train releases with capital letter suffix like 3.13.10S, 12.2.55SE
-        if (/\d+\.\d+\.\d+[A-Z]+\d*/.test(versionString)) {return "IOS";}
+        if (/\d+\.\d+\.\d+[A-Z]+\d*/.test(versionString)) {
+            return "IOS";
+        }
 
         // IOS XE: Clean 16.x, 17.x, or 3.x format WITHOUT train letters
-        if (/\b(16|17|3)\.\d+\.\d+$/.test(versionString)) {return "IOS XE";}
-        if (/\b(16|17|3)\.\d+\.\d+[a-z]$/.test(versionString)) {return "IOS XE";} // lowercase letter ok (like 16.3.1a)
+        if (/\b(16|17|3)\.\d+\.\d+$/.test(versionString)) {
+            return "IOS XE";
+        }
+        if (/\b(16|17|3)\.\d+\.\d+[a-z]$/.test(versionString)) {
+            return "IOS XE";
+        } // lowercase letter ok (like 16.3.1a)
 
         // IOS XR: 6.x or 7.x with simple format
-        if (/\b[67]\.\d+\.\d+/.test(versionString)) {return "IOS XR";}
+        if (/\b[67]\.\d+\.\d+/.test(versionString)) {
+            return "IOS XR";
+        }
 
         // NX-OS: 9.x format
-        if (/\b9\.\d+\(\d+\)/.test(versionString)) {return "NX-OS";}
+        if (/\b9\.\d+\(\d+\)/.test(versionString)) {
+            return "NX-OS";
+        }
 
         return "Unknown";
     }
@@ -92,12 +122,12 @@ class CiscoAdvisoryHelper {
     mapOSToAPIFormat(osType) {
         const osMap = {
             "IOS XE": "iosxe",
-            "IOS": "ios",
+            IOS: "ios",
             "IOS XR": "iosxr",
             "NX-OS": "nxos",
-            "ASA": "asa",
-            "FTD": "ftd",
-            "FX-OS": "fxos"
+            ASA: "asa",
+            FTD: "ftd",
+            "FX-OS": "fxos",
         };
 
         return osMap[osType] || null;
@@ -125,7 +155,7 @@ class CiscoAdvisoryHelper {
                     maint: parseInt(match[3], 10),
                     maintLetter: match[4] || "",
                     train: match[5] || "",
-                    subrelease: match[6] || ""
+                    subrelease: match[6] || "",
                 };
             }
 
@@ -138,7 +168,7 @@ class CiscoAdvisoryHelper {
                     maint: parseInt(match[3], 10),
                     maintLetter: match[4] || "",
                     train: "",
-                    subrelease: match[5] || ""
+                    subrelease: match[5] || "",
                 };
             }
 
@@ -150,9 +180,15 @@ class CiscoAdvisoryHelper {
         const vB = parseVersion(b);
 
         // Compare major, minor, maintenance in order
-        if (vA.major !== vB.major) {return vB.major - vA.major;}
-        if (vA.minor !== vB.minor) {return vB.minor - vA.minor;}
-        if (vA.maint !== vB.maint) {return vB.maint - vA.maint;}
+        if (vA.major !== vB.major) {
+            return vB.major - vA.major;
+        }
+        if (vA.minor !== vB.minor) {
+            return vB.minor - vA.minor;
+        }
+        if (vA.maint !== vB.maint) {
+            return vB.maint - vA.maint;
+        }
 
         // Compare maintenance letter (e.g., 7b vs 7)
         if (vA.maintLetter !== vB.maintLetter) {
@@ -178,7 +214,9 @@ class CiscoAdvisoryHelper {
      * @returns {string|null} Train letter (E, M, S, etc.) or null
      */
     extractTrain(versionString) {
-        if (!versionString) {return null;}
+        if (!versionString) {
+            return null;
+        }
 
         // Match train letter: 15.2(8)E8 → "E", 15.9(3)M11 → "M"
         const match = versionString.match(/\d+\.\d+\([^)]+\)([A-Z]+)/);
@@ -197,7 +235,9 @@ class CiscoAdvisoryHelper {
      * @returns {string} Normalized train family (E, M, S, etc.)
      */
     normalizeTrainFamily(train) {
-        if (!train) {return null;}
+        if (!train) {
+            return null;
+        }
 
         // Enterprise family variants (check specific patterns first)
         // SE = Switching Enterprise (Catalyst switches)
@@ -209,10 +249,14 @@ class CiscoAdvisoryHelper {
         }
 
         // Mainline family: M, MA
-        if (train.startsWith("M")) {return "M";}
+        if (train.startsWith("M")) {
+            return "M";
+        }
 
         // Service Provider family: S, SA (but NOT SE/SG which are Enterprise)
-        if (train === "S" || train === "SA") {return "S";}
+        if (train === "S" || train === "SA") {
+            return "S";
+        }
 
         // Others: T (Throttle), etc. - return as-is
         return train;
@@ -248,9 +292,11 @@ class CiscoAdvisoryHelper {
         const installedFamily = this.normalizeTrainFamily(installedTrain);
 
         // Filter to versions with matching train family
-        const trainMatches = fixedVersionsArray.filter(v => {
+        const trainMatches = fixedVersionsArray.filter((v) => {
             const fixTrain = this.extractTrain(v);
-            if (!fixTrain) {return false;}
+            if (!fixTrain) {
+                return false;
+            }
 
             // Normalize fixed version train to base family
             const fixFamily = this.normalizeTrainFamily(fixTrain);
@@ -265,7 +311,10 @@ class CiscoAdvisoryHelper {
         }
 
         // No train match - return highest version as fallback
-        logger.debug("ui", `No ${installedFamily}-family match for ${installedVersion} (train: ${installedTrain}), using highest version`);
+        logger.debug(
+            "ui",
+            `No ${installedFamily}-family match for ${installedVersion} (train: ${installedTrain}), using highest version`,
+        );
         return fixedVersionsArray[0];
     }
 
@@ -304,7 +353,7 @@ class CiscoAdvisoryHelper {
 
         // Check cache first
         const cached = this.advisoryCache.get(cacheKey);
-        if (cached && (Date.now() - cached.timestamp) < this.cacheTTL) {
+        if (cached && Date.now() - cached.timestamp < this.cacheTTL) {
             // Apply train matching if installed version provided (HEX-287)
             if (installedVersion && cached.fixedVersionsArray && cached.fixedVersionsArray.length > 0) {
                 return this.matchFixedVersion(installedVersion, cached.fixedVersionsArray);
@@ -331,7 +380,7 @@ class CiscoAdvisoryHelper {
                 // Cache empty result to prevent repeated failures
                 this.advisoryCache.set(cacheKey, {
                     fixedVersionsArray: [],
-                    timestamp: Date.now()
+                    timestamp: Date.now(),
                 });
                 return null;
             }
@@ -342,14 +391,14 @@ class CiscoAdvisoryHelper {
             if (!versions || versions.length === 0) {
                 this.advisoryCache.set(cacheKey, {
                     fixedVersionsArray: [],
-                    timestamp: Date.now()
+                    timestamp: Date.now(),
                 });
                 return null;
             }
 
             // Extract fixed_version strings from normalized table rows
             // Each row: { id, cve_id, os_family, fixed_version, affected_version, last_synced }
-            const fixedVersionStrings = versions.map(v => v.fixed_version);
+            const fixedVersionStrings = versions.map((v) => v.fixed_version);
 
             // Sort versions semantically (descending - newest first)
             // Backend uses ASCII sort which doesn't handle Cisco versions correctly
@@ -358,7 +407,7 @@ class CiscoAdvisoryHelper {
             // Cache the sorted version strings
             this.advisoryCache.set(cacheKey, {
                 fixedVersionsArray: fixedVersionStrings,
-                timestamp: Date.now()
+                timestamp: Date.now(),
             });
 
             // Filter by train if we have installed version (HEX-287)
@@ -368,14 +417,13 @@ class CiscoAdvisoryHelper {
 
             // Return first version (highest/newest version after sorting)
             return fixedVersionStrings.length > 0 ? fixedVersionStrings[0] : null;
-
         } catch (error) {
             logger.warn("ui", `Failed to fetch fixed versions for ${cveId}:`, error.message);
 
             // Cache empty result to prevent repeated failures
             this.advisoryCache.set(cacheKey, {
                 fixedVersionsArray: [],
-                timestamp: Date.now()
+                timestamp: Date.now(),
             });
 
             return null;
@@ -399,7 +447,7 @@ class CiscoAdvisoryHelper {
         }
 
         // Get unique CVEs for this device
-        const cves = [...new Set(device.vulnerabilities.map(v => v.cve))];
+        const cves = [...new Set(device.vulnerabilities.map((v) => v.cve))];
 
         if (cves.length === 0) {
             return null;
@@ -408,11 +456,11 @@ class CiscoAdvisoryHelper {
         // Fetch advisories for all CVEs in parallel
         // Pass device.operating_system for OS-aware matching
         const advisories = await Promise.all(
-            cves.map(cve => this.getFixedVersion(cve, device.vendor, device.operating_system))
+            cves.map((cve) => this.getFixedVersion(cve, device.vendor, device.operating_system)),
         );
 
         // Filter out nulls and deduplicate
-        const validVersions = [...new Set(advisories.filter(v => v !== null))];
+        const validVersions = [...new Set(advisories.filter((v) => v !== null))];
 
         if (validVersions.length === 0) {
             return null;
@@ -441,7 +489,7 @@ class CiscoAdvisoryHelper {
     getCacheStats() {
         return {
             size: this.advisoryCache.size,
-            entries: Array.from(this.advisoryCache.keys())
+            entries: Array.from(this.advisoryCache.keys()),
         };
     }
 }

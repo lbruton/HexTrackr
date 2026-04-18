@@ -1,11 +1,11 @@
 /**
  * Smart Hostname Parser Service
- * 
+ *
  * Parses device hostnames using configurable patterns to extract:
  * - Site code (4 chars for Hexagon EAM)
  * - Location code (variable length)
  * - Device type
- * 
+ *
  * @module services/hostnameParserService
  */
 
@@ -28,7 +28,10 @@ class HostnameParserService {
             this.config = JSON.parse(configData);
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "hostname", "Failed to load device naming patterns config", { error: error.message, configPath: "config/device-naming-patterns.json" });
+                global.logger.error("backend", "hostname", "Failed to load device naming patterns config", {
+                    error: error.message,
+                    configPath: "config/device-naming-patterns.json",
+                });
             } else {
                 console.error("Failed to load device naming patterns config:", error.message);
             }
@@ -38,19 +41,19 @@ class HostnameParserService {
                 deviceTypePatterns: [
                     { pattern: "nswan", type: "switch", precedence: 1 },
                     { pattern: "nrwan", type: "router", precedence: 2 },
-                    { pattern: "nfpan", type: "firewall", precedence: 3 }
+                    { pattern: "nfpan", type: "firewall", precedence: 3 },
                 ],
                 fallbackRules: {
                     site_code_length: 4,
-                    location_code_length: 5
-                }
+                    location_code_length: 5,
+                },
             };
         }
     }
 
     /**
      * Parse hostname and extract site/location information
-     * 
+     *
      * @param {string} hostname - Device hostname (e.g., "tulsatowernswan01")
      * @returns {{
      *   hostname: string,
@@ -60,7 +63,7 @@ class HostnameParserService {
      *   parsing_method: string,
      *   confidence: number
      * }}
-     * 
+     *
      * @example
      * parseHostname("tulsatowernswan01")
      * // Returns:
@@ -96,8 +99,7 @@ class HostnameParserService {
      */
     extractViaPattern(hostname) {
         // Sort patterns by precedence (try most specific first)
-        const patterns = this.config.deviceTypePatterns
-            .sort((a, b) => (a.precedence || 99) - (b.precedence || 99));
+        const patterns = this.config.deviceTypePatterns.sort((a, b) => (a.precedence || 99) - (b.precedence || 99));
 
         for (const patternDef of patterns) {
             const pattern = patternDef.pattern.toLowerCase();
@@ -136,11 +138,11 @@ class HostnameParserService {
 
                 return {
                     hostname: hostname,
-                    location: normalizedLocation,  // Use normalized location
+                    location: normalizedLocation, // Use normalized location
                     site_code: siteCodeMapping ? siteCodeMapping.site_code : this.deriveSiteCode(location),
                     device_type: patternDef.type || null,
                     parsing_method: "regex_pattern",
-                    confidence: siteCodeMapping ? siteCodeMapping.confidence : 0.7
+                    confidence: siteCodeMapping ? siteCodeMapping.confidence : 0.7,
                 };
             }
         }
@@ -165,7 +167,7 @@ class HostnameParserService {
             site_code: site,
             device_type: null,
             parsing_method: "substring_fallback",
-            confidence: 0.5
+            confidence: 0.5,
         };
     }
 
@@ -193,7 +195,7 @@ class HostnameParserService {
                     if (alias.toLowerCase() === lower) {
                         return {
                             ...mapping,
-                            confidence: mapping.confidence * 0.9  // Slightly lower for alias match
+                            confidence: mapping.confidence * 0.9, // Slightly lower for alias match
                         };
                     }
                 }
@@ -222,14 +224,14 @@ class HostnameParserService {
             site_code: "",
             device_type: null,
             parsing_method: "failed",
-            confidence: 0
+            confidence: 0,
         };
     }
 
     /**
      * Fuzzy search for site/location codes
      * Used when user types manually and we want to suggest matches
-     * 
+     *
      * @param {string} query - User input (e.g., "tuls", "stro")
      * @param {number} maxResults - Maximum results to return
      * @returns {Array<{location: string, site_code: string, similarity: number}>}
@@ -250,7 +252,7 @@ class HostnameParserService {
                     location: mapping.location,
                     site_code: mapping.site_code,
                     similarity: similarity,
-                    match_type: "location"
+                    match_type: "location",
                 });
             }
 
@@ -261,7 +263,7 @@ class HostnameParserService {
                     location: mapping.location,
                     site_code: mapping.site_code,
                     similarity: similarity,
-                    match_type: "site_code"
+                    match_type: "site_code",
                 });
             }
 
@@ -274,7 +276,7 @@ class HostnameParserService {
                             location: mapping.location,
                             site_code: mapping.site_code,
                             similarity: similarity,
-                            match_type: "alias"
+                            match_type: "alias",
                         });
                     }
                 }
@@ -284,11 +286,11 @@ class HostnameParserService {
         // Sort by similarity (highest first), deduplicate, limit results
         const minSimilarity = this.config.fuzzyMatchSettings?.min_similarity || 0.6;
         const unique = new Map();
-        
+
         results
-            .filter(r => r.similarity >= minSimilarity)
+            .filter((r) => r.similarity >= minSimilarity)
             .sort((a, b) => b.similarity - a.similarity)
-            .forEach(r => {
+            .forEach((r) => {
                 const key = `${r.site_code}_${r.location}`;
                 if (!unique.has(key) || unique.get(key).similarity < r.similarity) {
                     unique.set(key, r);
@@ -304,21 +306,29 @@ class HostnameParserService {
      */
     calculateSimilarity(query, target) {
         // Exact match
-        if (query === target) {return 1.0;}
+        if (query === target) {
+            return 1.0;
+        }
 
         // Starts with query (high confidence)
-        if (target.startsWith(query)) {return 0.9;}
+        if (target.startsWith(query)) {
+            return 0.9;
+        }
 
         // Query starts with target (medium confidence)
-        if (query.startsWith(target)) {return 0.8;}
+        if (query.startsWith(target)) {
+            return 0.8;
+        }
 
         // Contains query (lower confidence)
-        if (target.includes(query)) {return 0.7;}
+        if (target.includes(query)) {
+            return 0.7;
+        }
 
         // Levenshtein distance for fuzzy match (basic)
         const distance = this.levenshteinDistance(query, target);
         const maxLength = Math.max(query.length, target.length);
-        const similarity = 1 - (distance / maxLength);
+        const similarity = 1 - distance / maxLength;
 
         return similarity > 0.6 ? similarity : 0;
     }
@@ -342,11 +352,7 @@ class HostnameParserService {
                 if (b.charAt(i - 1) === a.charAt(j - 1)) {
                     matrix[i][j] = matrix[i - 1][j - 1];
                 } else {
-                    matrix[i][j] = Math.min(
-                        matrix[i - 1][j - 1] + 1,
-                        matrix[i][j - 1] + 1,
-                        matrix[i - 1][j] + 1
-                    );
+                    matrix[i][j] = Math.min(matrix[i - 1][j - 1] + 1, matrix[i][j - 1] + 1, matrix[i - 1][j] + 1);
                 }
             }
         }
@@ -422,5 +428,5 @@ function getHostnameParserService() {
 
 module.exports = {
     HostnameParserService,
-    getHostnameParserService
+    getHostnameParserService,
 };

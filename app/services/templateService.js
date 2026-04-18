@@ -34,7 +34,11 @@ class TemplateService {
     getTemplateTable(templateName) {
         if (templateName.includes("_email") || templateName === "default_email") {
             return "email_templates";
-        } else if (templateName.includes("_ticket") || templateName === "default_ticket" || templateName.startsWith("markdown_")) {
+        } else if (
+            templateName.includes("_ticket") ||
+            templateName === "default_ticket" ||
+            templateName.startsWith("markdown_")
+        ) {
             return "ticket_templates";
         } else if (templateName.includes("_vulnerability") || templateName === "default_vulnerability") {
             return "vulnerability_templates";
@@ -71,7 +75,7 @@ class TemplateService {
             let found = false;
             let completed = 0;
 
-            tables.forEach(tableName => {
+            tables.forEach((tableName) => {
                 this.db.get(`SELECT id FROM ${tableName} WHERE id = ? AND is_active = 1`, [id], (err, row) => {
                     completed++;
                     if (err) {
@@ -98,7 +102,7 @@ class TemplateService {
             const queries = [
                 "SELECT *, 'email' as template_type FROM email_templates WHERE is_active = 1",
                 "SELECT *, 'ticket' as template_type FROM ticket_templates WHERE is_active = 1",
-                "SELECT *, 'vulnerability' as template_type FROM vulnerability_templates WHERE is_active = 1"
+                "SELECT *, 'vulnerability' as template_type FROM vulnerability_templates WHERE is_active = 1",
             ];
 
             const unionQuery = queries.join(" UNION ALL ") + " ORDER BY name";
@@ -109,9 +113,9 @@ class TemplateService {
                 }
 
                 // Parse variables JSON for each template
-                const templates = rows.map(row => ({
+                const templates = rows.map((row) => ({
                     ...row,
-                    variables: JSON.parse(row.variables || "[]")
+                    variables: JSON.parse(row.variables || "[]"),
                 }));
 
                 resolve(templates);
@@ -132,25 +136,21 @@ class TemplateService {
             }
 
             return new Promise((resolve, reject) => {
-                this.db.get(
-                    `SELECT * FROM ${tableName} WHERE id = ? AND is_active = 1`,
-                    [id],
-                    (err, row) => {
-                        if (err) {
-                            return reject(new Error("Failed to fetch template: " + err.message));
-                        }
-
-                        if (!row) {
-                            return resolve(null);
-                        }
-
-                        // Parse variables JSON
-                        resolve({
-                            ...row,
-                            variables: JSON.parse(row.variables || "[]")
-                        });
+                this.db.get(`SELECT * FROM ${tableName} WHERE id = ? AND is_active = 1`, [id], (err, row) => {
+                    if (err) {
+                        return reject(new Error("Failed to fetch template: " + err.message));
                     }
-                );
+
+                    if (!row) {
+                        return resolve(null);
+                    }
+
+                    // Parse variables JSON
+                    resolve({
+                        ...row,
+                        variables: JSON.parse(row.variables || "[]"),
+                    });
+                });
             });
         } catch (error) {
             throw error;
@@ -166,25 +166,21 @@ class TemplateService {
         return new Promise((resolve, reject) => {
             const tableName = this.getTemplateTable(name);
 
-            this.db.get(
-                `SELECT * FROM ${tableName} WHERE name = ? AND is_active = 1`,
-                [name],
-                (err, row) => {
-                    if (err) {
-                        return reject(new Error("Failed to fetch template: " + err.message));
-                    }
-
-                    if (!row) {
-                        return resolve(null);
-                    }
-
-                    // Parse variables JSON
-                    resolve({
-                        ...row,
-                        variables: JSON.parse(row.variables || "[]")
-                    });
+            this.db.get(`SELECT * FROM ${tableName} WHERE name = ? AND is_active = 1`, [name], (err, row) => {
+                if (err) {
+                    return reject(new Error("Failed to fetch template: " + err.message));
                 }
-            );
+
+                if (!row) {
+                    return resolve(null);
+                }
+
+                // Parse variables JSON
+                resolve({
+                    ...row,
+                    variables: JSON.parse(row.variables || "[]"),
+                });
+            });
         });
     }
 
@@ -203,7 +199,10 @@ class TemplateService {
             if (category) {
                 tableName = this.getTemplateTableByCategory(category);
                 if (global.logger?.debug) {
-                    global.logger.debug("backend", "template", "Using category to determine table", { category, tableName });
+                    global.logger.debug("backend", "template", "Using category to determine table", {
+                        category,
+                        tableName,
+                    });
                 }
             } else {
                 tableName = await this.getTemplateTableById(id);
@@ -214,9 +213,14 @@ class TemplateService {
 
             if (!tableName) {
                 if (global.logger?.error) {
-                    global.logger.error("backend", "template", "Could not determine table for template", { id, category });
+                    global.logger.error("backend", "template", "Could not determine table for template", {
+                        id,
+                        category,
+                    });
                 } else {
-                    console.error(`[TemplateService] Could not determine table for template ID ${id}, category: ${category}`);
+                    console.error(
+                        `[TemplateService] Could not determine table for template ID ${id}, category: ${category}`,
+                    );
                 }
                 return null;
             }
@@ -229,9 +233,16 @@ class TemplateService {
                     const expectedTable = this.getTemplateTableByCategory(category);
                     if (tableName !== expectedTable) {
                         if (global.logger?.warn) {
-                            global.logger.warn("backend", "template", "Table mismatch detected, using category-based table", { expectedTable, actualTable: tableName, category });
+                            global.logger.warn(
+                                "backend",
+                                "template",
+                                "Table mismatch detected, using category-based table",
+                                { expectedTable, actualTable: tableName, category },
+                            );
                         } else {
-                            console.warn(`[TemplateService] Table mismatch detected! Expected ${expectedTable}, got ${tableName}. Using category-based table.`);
+                            console.warn(
+                                `[TemplateService] Table mismatch detected! Expected ${expectedTable}, got ${tableName}. Using category-based table.`,
+                            );
                         }
                         tableName = expectedTable;
                     }
@@ -242,7 +253,11 @@ class TemplateService {
                     const validation = this.validateTemplateCategory(template_content, category);
                     if (validation.warnings.length > 0) {
                         if (global.logger?.warn) {
-                            global.logger.warn("backend", "template", "Template validation warnings", { id, category, warnings: validation.warnings });
+                            global.logger.warn("backend", "template", "Template validation warnings", {
+                                id,
+                                category,
+                                warnings: validation.warnings,
+                            });
                         } else {
                             console.warn("[TemplateService] Template validation warnings:", validation.warnings);
                         }
@@ -260,18 +275,18 @@ class TemplateService {
                          updated_at = CURRENT_TIMESTAMP
                      WHERE id = ? AND is_active = 1`,
                     [template_content, description, id],
-                    function(err) {
+                    function (err) {
                         if (err) {
                             return reject(new Error("Failed to update template: " + err.message));
                         }
 
-                    if (this.changes === 0) {
-                        return resolve(null);
-                    }
+                        if (this.changes === 0) {
+                            return resolve(null);
+                        }
 
-                    // Return the updated template
-                    resolve({ id, template_content, description, updated: true });
-                }
+                        // Return the updated template
+                        resolve({ id, template_content, description, updated: true });
+                    },
                 );
             });
         } catch (error) {
@@ -296,9 +311,10 @@ class TemplateService {
         }
 
         const tableName = this.getTemplateTableByCategory(templateData.category || templateData.template_type);
-        const variables = typeof templateData.variables === "string"
-            ? templateData.variables
-            : JSON.stringify(templateData.variables || []);
+        const variables =
+            typeof templateData.variables === "string"
+                ? templateData.variables
+                : JSON.stringify(templateData.variables || []);
         const defaultContent = templateData.default_content || templateData.template_content;
         const description = templateData.description || null;
         const category = (templateData.category || "email").toLowerCase();
@@ -314,35 +330,39 @@ class TemplateService {
                     variables,
                     category,
                     is_active
-                ) VALUES (?, ?, ?, ?, ?, ?, 1)` ,
-                [
-                    templateData.name,
-                    description,
-                    templateData.template_content,
-                    defaultContent,
-                    variables,
-                    category
-                ],
-                function(err) {
+                ) VALUES (?, ?, ?, ?, ?, ?, 1)`,
+                [templateData.name, description, templateData.template_content, defaultContent, variables, category],
+                function (err) {
                     if (err) {
                         return reject(new Error("Failed to create template: " + err.message));
                     }
 
                     const insertedId = this.lastID;
-                    service.getTemplateById(insertedId)
-                        .then(template => resolve(template || {
-                            id: insertedId,
-                            name: templateData.name,
-                            template_content: templateData.template_content,
-                            default_content: defaultContent,
-                            variables: JSON.parse(variables || "[]"),
-                            category
-                        }))
-                        .catch(fetchError => {
+                    service
+                        .getTemplateById(insertedId)
+                        .then((template) =>
+                            resolve(
+                                template || {
+                                    id: insertedId,
+                                    name: templateData.name,
+                                    template_content: templateData.template_content,
+                                    default_content: defaultContent,
+                                    variables: JSON.parse(variables || "[]"),
+                                    category,
+                                },
+                            ),
+                        )
+                        .catch((fetchError) => {
                             if (global.logger?.warn) {
-                                global.logger.warn("backend", "template", "Failed to read back created template", { error: fetchError.message, insertedId });
+                                global.logger.warn("backend", "template", "Failed to read back created template", {
+                                    error: fetchError.message,
+                                    insertedId,
+                                });
                             } else {
-                                console.warn("TemplateService: Failed to read back created template:", fetchError.message);
+                                console.warn(
+                                    "TemplateService: Failed to read back created template:",
+                                    fetchError.message,
+                                );
                             }
                             resolve({
                                 id: insertedId,
@@ -350,10 +370,10 @@ class TemplateService {
                                 template_content: templateData.template_content,
                                 default_content: defaultContent,
                                 variables: JSON.parse(variables || "[]"),
-                                category
+                                category,
                             });
                         });
-                }
+                },
             );
         });
     }
@@ -387,9 +407,15 @@ class TemplateService {
                     (err, row) => {
                         if (err) {
                             if (global.logger?.error) {
-                                global.logger.error("backend", "template", "Error checking default_content", { error: err.message, id });
+                                global.logger.error("backend", "template", "Error checking default_content", {
+                                    error: err.message,
+                                    id,
+                                });
                             } else {
-                                console.error(`[TemplateService] Error checking default_content for ID ${id}:`, err.message);
+                                console.error(
+                                    `[TemplateService] Error checking default_content for ID ${id}:`,
+                                    err.message,
+                                );
                             }
                             return reject(new Error("Failed to check template: " + err.message));
                         }
@@ -405,15 +431,21 @@ class TemplateService {
 
                         if (!row.default_content) {
                             if (global.logger?.warn) {
-                                global.logger.warn("backend", "template", "No default_content found, cannot reset", { id });
+                                global.logger.warn("backend", "template", "No default_content found, cannot reset", {
+                                    id,
+                                });
                             } else {
-                                console.warn(`[TemplateService] No default_content found for template ID ${id}, cannot reset`);
+                                console.warn(
+                                    `[TemplateService] No default_content found for template ID ${id}, cannot reset`,
+                                );
                             }
                             return resolve(null);
                         }
 
                         if (global.logger?.debug) {
-                            global.logger.debug("backend", "template", "Found default_content, proceeding with reset", { id });
+                            global.logger.debug("backend", "template", "Found default_content, proceeding with reset", {
+                                id,
+                            });
                         }
 
                         this.db.run(
@@ -422,10 +454,13 @@ class TemplateService {
                                  updated_at = CURRENT_TIMESTAMP
                              WHERE id = ? AND is_active = 1`,
                             [id],
-                            function(err) {
+                            function (err) {
                                 if (err) {
                                     if (global.logger?.error) {
-                                        global.logger.error("backend", "template", "Reset failed", { error: err.message, id });
+                                        global.logger.error("backend", "template", "Reset failed", {
+                                            error: err.message,
+                                            id,
+                                        });
                                     } else {
                                         console.error(`[TemplateService] Reset failed for ID ${id}:`, err.message);
                                     }
@@ -434,9 +469,16 @@ class TemplateService {
 
                                 if (this.changes === 0) {
                                     if (global.logger?.warn) {
-                                        global.logger.warn("backend", "template", "No rows affected when resetting template", { id });
+                                        global.logger.warn(
+                                            "backend",
+                                            "template",
+                                            "No rows affected when resetting template",
+                                            { id },
+                                        );
                                     } else {
-                                        console.warn(`[TemplateService] No rows affected when resetting template ID ${id}`);
+                                        console.warn(
+                                            `[TemplateService] No rows affected when resetting template ID ${id}`,
+                                        );
                                     }
                                     return resolve(null);
                                 }
@@ -445,14 +487,17 @@ class TemplateService {
                                     global.logger.info("backend", "template", "Successfully reset template", { id });
                                 }
                                 resolve({ id, reset: true });
-                            }
+                            },
                         );
-                    }
+                    },
                 );
             });
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "template", "Error in resetTemplateToDefault", { error: error.message, stack: error.stack });
+                global.logger.error("backend", "template", "Error in resetTemplateToDefault", {
+                    error: error.message,
+                    stack: error.stack,
+                });
             } else {
                 console.error("[TemplateService] Error in resetTemplateToDefault:", error.message);
             }
@@ -500,19 +545,15 @@ class TemplateService {
         const uniqueVariables = [...new Set(variableMatches)];
 
         // Check for unknown variables
-        const unknownVariables = uniqueVariables.filter(variable =>
-            !knownVariables.includes(variable)
-        );
+        const unknownVariables = uniqueVariables.filter((variable) => !knownVariables.includes(variable));
 
         if (unknownVariables.length > 0) {
             warnings.push(`Unknown variables: ${unknownVariables.join(", ")}`);
         }
 
         // Check for unused known variables
-        const usedVariables = uniqueVariables.filter(variable =>
-            knownVariables.includes(variable)
-        );
-        const unusedRequiredVariables = knownVariables.filter(variable => {
+        const usedVariables = uniqueVariables.filter((variable) => knownVariables.includes(variable));
+        const unusedRequiredVariables = knownVariables.filter((variable) => {
             const config = variableMapping[variable];
             return config.required && !usedVariables.includes(variable);
         });
@@ -541,7 +582,7 @@ class TemplateService {
         const dangerousPatterns = [
             /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
             /javascript:/gi,
-            /on\w+\s*=/gi
+            /on\w+\s*=/gi,
         ];
 
         for (const pattern of dangerousPatterns) {
@@ -558,8 +599,8 @@ class TemplateService {
             variables: {
                 found: uniqueVariables,
                 unknown: unknownVariables,
-                missing_required: unusedRequiredVariables
-            }
+                missing_required: unusedRequiredVariables,
+            },
         };
     }
 
@@ -576,7 +617,9 @@ class TemplateService {
             if (!template) {
                 if (options.fallbackToHardcoded) {
                     if (global.logger?.warn) {
-                        global.logger.warn("backend", "template", "Template not found, using hardcoded fallback", { id });
+                        global.logger.warn("backend", "template", "Template not found, using hardcoded fallback", {
+                            id,
+                        });
                     } else {
                         console.warn(`Template ${id} not found, using hardcoded fallback`);
                     }
@@ -595,7 +638,10 @@ class TemplateService {
 
             if (options.fallbackToHardcoded) {
                 if (global.logger?.warn) {
-                    global.logger.warn("backend", "template", "Database error, falling back to hardcoded template", { id, error: error.message });
+                    global.logger.warn("backend", "template", "Database error, falling back to hardcoded template", {
+                        id,
+                        error: error.message,
+                    });
                 } else {
                     console.warn("Database error, falling back to hardcoded template");
                 }
@@ -671,7 +717,9 @@ Ticket ID: [XT_NUMBER]`;
                 return this.substituteVariables(template.template_content, ticketData, options);
             } else {
                 if (global.logger?.warn) {
-                    global.logger.warn("backend", "template", "Template not found, using hardcoded fallback", { templateName });
+                    global.logger.warn("backend", "template", "Template not found, using hardcoded fallback", {
+                        templateName,
+                    });
                 } else {
                     console.warn(`Template '${templateName}' not found, using hardcoded fallback`);
                 }
@@ -679,7 +727,12 @@ Ticket ID: [XT_NUMBER]`;
             }
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "template", "Database error getting template, using hardcoded fallback", { error: error.message, templateName });
+                global.logger.error(
+                    "backend",
+                    "template",
+                    "Database error getting template, using hardcoded fallback",
+                    { error: error.message, templateName },
+                );
             } else {
                 console.error("Database error getting template, using hardcoded fallback:", error);
             }
@@ -697,109 +750,118 @@ Ticket ID: [XT_NUMBER]`;
                 description: "Supervisor first name or Team for multiple supervisors",
                 required: false,
                 fallback: "[Supervisor First Name]",
-                processor: (ticketData) => this.getSupervisorGreeting(ticketData && ticketData.supervisor)
+                processor: (ticketData) => this.getSupervisorGreeting(ticketData && ticketData.supervisor),
             },
             "[SITE_NAME]": {
                 description: "Site name from ticket",
                 required: true,
                 fallback: "[Site Name]",
-                processor: (ticketData) => (ticketData && ticketData.site) || "[Site Name]"
+                processor: (ticketData) => (ticketData && ticketData.site) || "[Site Name]",
             },
             "[SITE]": {
                 description: "Site name from ticket (alias)",
                 required: true,
                 fallback: "[Site]",
-                processor: (ticketData) => (ticketData && ticketData.site) || "[Site]"
+                processor: (ticketData) => (ticketData && ticketData.site) || "[Site]",
             },
             "[LOCATION]": {
                 description: "Location from ticket",
                 required: true,
                 fallback: "[Location]",
-                processor: (ticketData) => (ticketData && ticketData.location) || "[Location]"
+                processor: (ticketData) => (ticketData && ticketData.location) || "[Location]",
             },
             "[STATUS]": {
                 description: "Ticket status",
                 required: true,
                 fallback: "[Status]",
-                processor: (ticketData) => (ticketData && ticketData.status) || "[Status]"
+                processor: (ticketData) => (ticketData && ticketData.status) || "[Status]",
             },
             "[HEXAGON_NUM]": {
                 description: "Hexagon ticket number",
                 required: false,
                 fallback: "[Hexagon #]",
-                processor: (ticketData) => (ticketData && (ticketData.hexagon_ticket || ticketData.hexagonTicket)) || "[Hexagon #]"
+                processor: (ticketData) =>
+                    (ticketData && (ticketData.hexagon_ticket || ticketData.hexagonTicket)) || "[Hexagon #]",
             },
             "[HEXAGON_TICKET]": {
                 description: "Hexagon ticket number (alias)",
                 required: false,
                 fallback: "[Hexagon Ticket]",
-                processor: (ticketData) => (ticketData && (ticketData.hexagon_ticket || ticketData.hexagonTicket)) || "[Hexagon Ticket]"
+                processor: (ticketData) =>
+                    (ticketData && (ticketData.hexagon_ticket || ticketData.hexagonTicket)) || "[Hexagon Ticket]",
             },
             "[SERVICENOW_NUM]": {
                 description: "ServiceNow ticket number",
                 required: false,
                 fallback: "[ServiceNow #]",
-                processor: (ticketData) => (ticketData && (ticketData.servicenow_ticket || ticketData.serviceNowTicket)) || "[ServiceNow #]"
+                processor: (ticketData) =>
+                    (ticketData && (ticketData.servicenow_ticket || ticketData.serviceNowTicket)) || "[ServiceNow #]",
             },
             "[SERVICENOW_TICKET]": {
                 description: "ServiceNow ticket number (alias)",
                 required: false,
                 fallback: "[ServiceNow Ticket]",
-                processor: (ticketData) => (ticketData && (ticketData.servicenow_ticket || ticketData.serviceNowTicket)) || "[ServiceNow Ticket]"
+                processor: (ticketData) =>
+                    (ticketData && (ticketData.servicenow_ticket || ticketData.serviceNowTicket)) ||
+                    "[ServiceNow Ticket]",
             },
             "[XT_NUMBER]": {
                 description: "Internal XT number",
                 required: true,
                 fallback: "XT#[ID]",
-                processor: (ticketData) => (ticketData && ticketData.xt_number) || `XT#${(ticketData && ticketData.id) || "UNKNOWN"}`
+                processor: (ticketData) =>
+                    (ticketData && ticketData.xt_number) || `XT#${(ticketData && ticketData.id) || "UNKNOWN"}`,
             },
             "[DEVICE_COUNT]": {
                 description: "Number of devices in ticket",
                 required: true,
                 fallback: "0",
-                processor: (ticketData) => String((ticketData && ticketData.devices) ? ticketData.devices.length : 0)
+                processor: (ticketData) => String(ticketData && ticketData.devices ? ticketData.devices.length : 0),
             },
             "[DEVICE_LIST]": {
                 description: "Enumerated list of devices",
                 required: true,
                 fallback: "Device list to be confirmed",
-                processor: (ticketData) => this.generateDeviceList(ticketData && ticketData.devices)
+                processor: (ticketData) => this.generateDeviceList(ticketData && ticketData.devices),
             },
             "[DATE_DUE]": {
                 description: "Due date formatted",
                 required: true,
                 fallback: "[Due Date]",
-                processor: (ticketData) => this.formatDate(ticketData && (ticketData.date_due || ticketData.dateDue)) || "[Due Date]"
+                processor: (ticketData) =>
+                    this.formatDate(ticketData && (ticketData.date_due || ticketData.dateDue)) || "[Due Date]",
             },
             "[DATE_SUBMITTED]": {
                 description: "Submission date formatted",
                 required: true,
                 fallback: "[Submitted Date]",
-                processor: (ticketData) => this.formatDate(ticketData && (ticketData.date_submitted || ticketData.dateSubmitted)) || "[Submitted Date]"
+                processor: (ticketData) =>
+                    this.formatDate(ticketData && (ticketData.date_submitted || ticketData.dateSubmitted)) ||
+                    "[Submitted Date]",
             },
             "[SUPERVISOR]": {
                 description: "Supervisor name (normalized format: First Last; First Last)",
                 required: false,
                 fallback: "N/A",
-                processor: (ticketData) => (ticketData && ticketData.supervisor) || "N/A"
+                processor: (ticketData) => (ticketData && ticketData.supervisor) || "N/A",
             },
             "[TECHNICIAN]": {
                 description: "Technician name (normalized format: First Last; First Last)",
                 required: false,
                 fallback: "N/A",
-                processor: (ticketData) => (ticketData && ticketData.technician) || "N/A"
+                processor: (ticketData) => (ticketData && ticketData.technician) || "N/A",
             },
             "[NOTES]": {
                 description: "Additional notes",
                 required: false,
                 fallback: "N/A",
-                processor: (ticketData) => (ticketData && (ticketData.notes || ticketData.additional_notes)) || "N/A"
+                processor: (ticketData) => (ticketData && (ticketData.notes || ticketData.additional_notes)) || "N/A",
             },
             "[GENERATED_TIME]": {
                 description: "Current date and time",
                 required: false,
                 fallback: new Date().toLocaleString(),
-                processor: () => new Date().toLocaleString()
+                processor: () => new Date().toLocaleString(),
             },
             "[VULNERABILITY_SUMMARY]": {
                 description: "Dynamic vulnerability summary (generated at runtime)",
@@ -810,8 +872,8 @@ Ticket ID: [XT_NUMBER]`;
                         return this.generateVulnerabilitySummary(ticketData, vulnerabilityData);
                     }
                     return "";
-                }
-            }
+                },
+            },
         };
     }
 
@@ -843,10 +905,12 @@ Ticket ID: [XT_NUMBER]`;
                 // Replace all instances of the variable
                 const regex = new RegExp(this.escapeRegex(variable), "g");
                 processed = processed.replace(regex, String(value || config.fallback));
-
             } catch (error) {
                 if (global.logger?.error) {
-                    global.logger.error("backend", "template", "Error processing variable", { error: error.message, variable });
+                    global.logger.error("backend", "template", "Error processing variable", {
+                        error: error.message,
+                        variable,
+                    });
                 } else {
                     console.error(`Error processing variable ${variable}:`, error);
                 }
@@ -860,7 +924,9 @@ Ticket ID: [XT_NUMBER]`;
         const remainingVariables = processed.match(/\[[A-Z_]+\]/g);
         if (remainingVariables) {
             if (global.logger?.warn) {
-                global.logger.warn("backend", "template", "Unprocessed variables found in template", { remainingVariables });
+                global.logger.warn("backend", "template", "Unprocessed variables found in template", {
+                    remainingVariables,
+                });
             } else {
                 console.warn("Unprocessed variables found:", remainingVariables);
             }
@@ -892,7 +958,9 @@ Ticket ID: [XT_NUMBER]`;
             const parts = trimmed.split(",");
             if (parts.length >= 2) {
                 const firstName = parts[1].trim().split(" ")[0];
-                if (firstName) {return firstName;}
+                if (firstName) {
+                    return firstName;
+                }
             }
         }
 
@@ -931,7 +999,7 @@ Ticket ID: [XT_NUMBER]`;
 
         // Group vulnerabilities by device and severity
         const deviceSummary = {};
-        vulnerabilityData.forEach(vuln => {
+        vulnerabilityData.forEach((vuln) => {
             const device = vuln.hostname || "Unknown Device";
             if (!deviceSummary[device]) {
                 deviceSummary[device] = { total: 0, critical: 0, high: 0, medium: 0, low: 0 };
@@ -950,10 +1018,18 @@ Ticket ID: [XT_NUMBER]`;
             summary += `• ${device}: ${counts.total} vulnerabilities`;
 
             const severityBreakdown = [];
-            if (counts.critical > 0) {severityBreakdown.push(`${counts.critical} Critical`);}
-            if (counts.high > 0) {severityBreakdown.push(`${counts.high} High`);}
-            if (counts.medium > 0) {severityBreakdown.push(`${counts.medium} Medium`);}
-            if (counts.low > 0) {severityBreakdown.push(`${counts.low} Low`);}
+            if (counts.critical > 0) {
+                severityBreakdown.push(`${counts.critical} Critical`);
+            }
+            if (counts.high > 0) {
+                severityBreakdown.push(`${counts.high} High`);
+            }
+            if (counts.medium > 0) {
+                severityBreakdown.push(`${counts.medium} Medium`);
+            }
+            if (counts.low > 0) {
+                severityBreakdown.push(`${counts.low} Low`);
+            }
 
             if (severityBreakdown.length > 0) {
                 summary += ` (${severityBreakdown.join(", ")})`;
@@ -970,7 +1046,9 @@ Ticket ID: [XT_NUMBER]`;
      * @returns {string} Formatted date
      */
     formatDate(dateString) {
-        if (!dateString) {return "[Date]";}
+        if (!dateString) {
+            return "[Date]";
+        }
 
         try {
             const date = new Date(dateString);
@@ -999,27 +1077,21 @@ Ticket ID: [XT_NUMBER]`;
         const result = {
             valid: true,
             warnings: [],
-            suggestedCategory: null
+            suggestedCategory: null,
         };
 
         // Define category-specific variable patterns
         const categoryPatterns = {
-            email: [
-                "[GREETING]", "[HEXAGON_NUM]", "[VULNERABILITY_SUMMARY]"
-            ],
-            ticket: [
-                "[HEXAGON_TICKET]", "[SERVICENOW_TICKET]", "[SUPERVISOR]", "[TECHNICIAN]"
-            ],
-            vulnerability: [
-                "[VULNERABILITY_DETAILS]", "[CRITICAL_COUNT]", "[HIGH_COUNT]", "[DEVICE_COUNT]"
-            ]
+            email: ["[GREETING]", "[HEXAGON_NUM]", "[VULNERABILITY_SUMMARY]"],
+            ticket: ["[HEXAGON_TICKET]", "[SERVICENOW_TICKET]", "[SUPERVISOR]", "[TECHNICIAN]"],
+            vulnerability: ["[VULNERABILITY_DETAILS]", "[CRITICAL_COUNT]", "[HIGH_COUNT]", "[DEVICE_COUNT]"],
         };
 
         // Count matches for each category
         const categoryScores = {};
-        Object.keys(categoryPatterns).forEach(cat => {
+        Object.keys(categoryPatterns).forEach((cat) => {
             categoryScores[cat] = 0;
-            categoryPatterns[cat].forEach(pattern => {
+            categoryPatterns[cat].forEach((pattern) => {
                 if (content.includes(pattern)) {
                     categoryScores[cat]++;
                 }
@@ -1027,13 +1099,13 @@ Ticket ID: [XT_NUMBER]`;
         });
 
         // Determine best match
-        const bestMatch = Object.keys(categoryScores).reduce((a, b) =>
-            categoryScores[a] > categoryScores[b] ? a : b
-        );
+        const bestMatch = Object.keys(categoryScores).reduce((a, b) => (categoryScores[a] > categoryScores[b] ? a : b));
 
         // Check if content matches expected category
         if (category && bestMatch !== category && categoryScores[bestMatch] > 0) {
-            result.warnings.push(`Template content appears to contain ${bestMatch} variables but is being saved as ${category} template`);
+            result.warnings.push(
+                `Template content appears to contain ${bestMatch} variables but is being saved as ${category} template`,
+            );
             result.suggestedCategory = bestMatch;
         }
 

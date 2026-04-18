@@ -34,7 +34,9 @@ class PathValidator {
 
     static safeReadFileSync(filePath, options = "utf8") {
         const validatedPath = PathValidator.validatePath(filePath);
-        if (!fs.existsSync(validatedPath)) {throw new Error(`File not found: ${validatedPath}`);}
+        if (!fs.existsSync(validatedPath)) {
+            throw new Error(`File not found: ${validatedPath}`);
+        }
         return fs.readFileSync(validatedPath, options);
     }
 
@@ -50,7 +52,7 @@ const _VERSION_FILES = [
     "vulnerabilities.html",
     "scripts/shared/footer.html",
     "CLAUDE.md",
-    "hextrackr-specs/roadmap.json"
+    "hextrackr-specs/roadmap.json",
 ];
 
 /**
@@ -70,49 +72,43 @@ function getCurrentVersion() {
  */
 function updateVersion(newVersion) {
     console.log(` Updating HexTrackr to version ${newVersion}`);
-    
+
     // Update package.json
     const packagePath = path.join(__dirname, "..", "package.json");
     const packageContent = JSON.parse(PathValidator.safeReadFileSync(packagePath, "utf8"));
     packageContent.version = newVersion;
     PathValidator.safeWriteFileSync(packagePath, JSON.stringify(packageContent, null, 2) + "\n");
     console.log("Updated package.json");
-    
+
     // Update HTML files with version spans
     const htmlFiles = ["tickets.html", "vulnerabilities.html"];
-    htmlFiles.forEach(file => {
+    htmlFiles.forEach((file) => {
         const filePath = path.join(__dirname, "..", file);
         let content = PathValidator.safeReadFileSync(filePath, "utf8");
         content = content.replace(
             /<span id="app-version">[\d.]+<\/span>/g,
-            `<span id="app-version">${newVersion}</span>`
+            `<span id="app-version">${newVersion}</span>`,
         );
         PathValidator.safeWriteFileSync(filePath, content);
         console.log(` Updated ${file}`);
     });
-    
+
     // Update footer badge URL
     const footerPath = path.join(__dirname, "..", "scripts", "shared", "footer.html");
     let footerContent = PathValidator.safeReadFileSync(footerPath, "utf8");
-    footerContent = footerContent.replace(
-        /HexTrackr-v[\d.]+(-blue\?style=flat)/g,
-        `HexTrackr-v${newVersion}$1`
-    );
+    footerContent = footerContent.replace(/HexTrackr-v[\d.]+(-blue\?style=flat)/g, `HexTrackr-v${newVersion}$1`);
     PathValidator.safeWriteFileSync(footerPath, footerContent);
     console.log("Updated scripts/shared/footer.html");
-    
+
     // Update CLAUDE.md header
     const claudePath = path.join(__dirname, "..", "..", "..", "CLAUDE.md");
     if (fs.existsSync(claudePath)) {
         let claudeContent = PathValidator.safeReadFileSync(claudePath, "utf8");
-        claudeContent = claudeContent.replace(
-            /\*\*Version\*\*: v[\d.]+/,
-            `**Version**: v${newVersion}`
-        );
+        claudeContent = claudeContent.replace(/\*\*Version\*\*: v[\d.]+/, `**Version**: v${newVersion}`);
         PathValidator.safeWriteFileSync(claudePath, claudeContent);
         console.log("Updated CLAUDE.md");
     }
-    
+
     // Update roadmap.json
     const roadmapPath = path.join(__dirname, "..", "..", "..", "hextrackr-specs", "roadmap.json");
     if (fs.existsSync(roadmapPath)) {
@@ -122,7 +118,7 @@ function updateVersion(newVersion) {
         PathValidator.safeWriteFileSync(roadmapPath, JSON.stringify(roadmapContent, null, 2) + "\n");
         console.log("Updated hextrackr-specs/roadmap.json");
     }
-    
+
     console.log(` Version update complete: v${newVersion}`);
 }
 

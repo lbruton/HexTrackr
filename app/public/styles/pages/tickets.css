@@ -95,68 +95,68 @@
 
 /* Light mode status colors - vibrant and semantic */
 .status-label.status-overdue {
-    color: #dc2626;  /* Bright red for urgent attention */
+    color: #dc2626; /* Bright red for urgent attention */
 }
 
 .status-label.status-failed {
-    color: #ea580c;  /* Orange-red for failures */
+    color: #ea580c; /* Orange-red for failures */
 }
 
 .status-label.status-pending {
-    color: #f59e0b;  /* Amber for waiting/pending */
+    color: #f59e0b; /* Amber for waiting/pending */
 }
 
 .status-label.status-staged {
-    color: #8b5cf6;  /* Purple for staged/preparing */
+    color: #8b5cf6; /* Purple for staged/preparing */
 }
 
 .status-label.status-open {
-    color: #3b82f6;  /* Bright blue for active work */
+    color: #3b82f6; /* Bright blue for active work */
 }
 
 .status-label.status-completed {
-    color: #10b981;  /* Green for success */
+    color: #10b981; /* Green for success */
 }
 
 .status-label.status-closed {
-    color: #6b7280;  /* Gray for inactive/archived */
+    color: #6b7280; /* Gray for inactive/archived */
 }
 
 .status-label.status-generic {
-    color: #9ca3af;  /* Muted gray for unknown states */
+    color: #9ca3af; /* Muted gray for unknown states */
 }
 
 /* Dark mode status colors - adjusted for dark backgrounds */
 [data-bs-theme="dark"] .status-label.status-overdue {
-    color: #f87171;  /* Bright red-pink for visibility */
+    color: #f87171; /* Bright red-pink for visibility */
 }
 
 [data-bs-theme="dark"] .status-label.status-failed {
-    color: #fb923c;  /* Orange for failures */
+    color: #fb923c; /* Orange for failures */
 }
 
 [data-bs-theme="dark"] .status-label.status-pending {
-    color: #fbbf24;  /* Golden yellow for pending */
+    color: #fbbf24; /* Golden yellow for pending */
 }
 
 [data-bs-theme="dark"] .status-label.status-staged {
-    color: #a78bfa;  /* Light purple for staged */
+    color: #a78bfa; /* Light purple for staged */
 }
 
 [data-bs-theme="dark"] .status-label.status-open {
-    color: #60a5fa;  /* Sky blue for active */
+    color: #60a5fa; /* Sky blue for active */
 }
 
 [data-bs-theme="dark"] .status-label.status-completed {
-    color: #34d399;  /* Emerald green for success */
+    color: #34d399; /* Emerald green for success */
 }
 
 [data-bs-theme="dark"] .status-label.status-closed {
-    color: #9ca3af;  /* Light gray for closed */
+    color: #9ca3af; /* Light gray for closed */
 }
 
 [data-bs-theme="dark"] .status-label.status-generic {
-    color: #6b7280;  /* Medium gray for unknown */
+    color: #6b7280; /* Medium gray for unknown */
 }
 
 .ticket-status-cell {
@@ -187,7 +187,6 @@
 /* Theme is now handled entirely by JavaScript themeQuartz.withParams()
    matching the vulnerabilities table configuration exactly */
 
-
 /* Link styles moved to shared/tables.css for consistency */
 
 /* Text color utilities moved to shared/tables.css */
@@ -197,7 +196,6 @@
     #ticketsAgGrid {
         height: 500px; /* Slightly shorter on mobile */
     }
-
 }
 
 @media (max-width: 576px) {

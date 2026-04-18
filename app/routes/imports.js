@@ -34,7 +34,7 @@ const router = express.Router();
 const upload = multer({
     dest: "uploads/",
     limits: {
-        fileSize: 100 * 1024 * 1024 // 100MB limit
+        fileSize: 100 * 1024 * 1024, // 100MB limit
     },
     fileFilter: (req, file, cb) => {
         // Accept CSV files with various MIME types
@@ -42,14 +42,14 @@ const upload = multer({
         const allowedExtensions = [".csv"];
 
         const hasAllowedMime = allowedMimes.includes(file.mimetype);
-        const hasAllowedExt = allowedExtensions.some(ext => file.originalname.toLowerCase().endsWith(ext));
+        const hasAllowedExt = allowedExtensions.some((ext) => file.originalname.toLowerCase().endsWith(ext));
 
         if (hasAllowedMime || hasAllowedExt) {
             cb(null, true);
         } else {
             cb(new Error("Only CSV files allowed"));
         }
-    }
+    },
 });
 
 // ===============================
@@ -68,7 +68,12 @@ router.post("/vulnerabilities/import", requireAuth, upload.single("csvFile"), Im
  * High-performance vulnerability import using staging table for batch processing
  * From server.js lines 2403-2531
  */
-router.post("/vulnerabilities/import-staging", requireAuth, upload.single("csvFile"), ImportController.importVulnerabilitiesStaging);
+router.post(
+    "/vulnerabilities/import-staging",
+    requireAuth,
+    upload.single("csvFile"),
+    ImportController.importVulnerabilitiesStaging,
+);
 
 /**
  * POST /api/import/vulnerabilities
@@ -111,11 +116,11 @@ router.post("/import", requireAuth, upload.single("file"), async (req, res) => {
             const Papa = require("papaparse");
             const parseResult = Papa.parse(csvContent, {
                 header: true,
-                skipEmptyLines: true
+                skipEmptyLines: true,
             });
 
             if (parseResult.errors.length > 0) {
-                throw new Error(`CSV parsing errors: ${parseResult.errors.map(e => e.message).join(", ")}`);
+                throw new Error(`CSV parsing errors: ${parseResult.errors.map((e) => e.message).join(", ")}`);
             }
 
             // Import tickets using CSV import method
@@ -127,7 +132,7 @@ router.post("/import", requireAuth, upload.single("file"), async (req, res) => {
             return res.json({
                 success: true,
                 message: `Successfully imported ${result.imported} tickets`,
-                imported: result.imported
+                imported: result.imported,
             });
         } else if (type === "vulnerabilities") {
             // Forward to existing vulnerability import handler
@@ -149,7 +154,7 @@ router.post("/import", requireAuth, upload.single("file"), async (req, res) => {
 
         return res.status(500).json({
             error: error.message || "Import failed",
-            message: error.message || "Import failed"
+            message: error.message || "Import failed",
         });
     }
 });

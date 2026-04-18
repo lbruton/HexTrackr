@@ -40,7 +40,7 @@ class PaloAltoController {
             if (status.syncInProgress) {
                 return res.status(409).json({
                     error: "Sync already in progress",
-                    status: status
+                    status: status,
                 });
             }
 
@@ -48,9 +48,14 @@ class PaloAltoController {
             const result = await this.paloAdvisoryService.syncPaloAdvisories(req.session.userId);
 
             if (global.logger?.info) {
-                global.logger.info("backend", "paloalto", "Palo Alto advisory sync completed", { totalAdvisories: result.totalAdvisories, matchedCount: result.matchedCount });
+                global.logger.info("backend", "paloalto", "Palo Alto advisory sync completed", {
+                    totalAdvisories: result.totalAdvisories,
+                    matchedCount: result.matchedCount,
+                });
             } else {
-                console.log(` Palo Alto advisory sync completed: ${result.totalAdvisories} advisories, ${result.matchedCount} matched`);
+                console.log(
+                    ` Palo Alto advisory sync completed: ${result.totalAdvisories} advisories, ${result.matchedCount} matched`,
+                );
             }
 
             // Clear all caches after sync (vulnerabilities may have new fix data)
@@ -62,9 +67,8 @@ class PaloAltoController {
                 totalAdvisories: result.totalAdvisories,
                 matchedCount: result.matchedCount,
                 totalCvesChecked: result.totalCvesChecked,
-                lastSync: result.lastSync
+                lastSync: result.lastSync,
             });
-
         } catch (error) {
             if (global.logger?.error) {
                 global.logger.error("backend", "paloalto", "Palo Alto advisory sync failed", { error: error.message });
@@ -73,7 +77,7 @@ class PaloAltoController {
             }
             res.status(500).json({
                 error: "Failed to sync Palo Alto advisory data",
-                message: error.message
+                message: error.message,
             });
         }
     }
@@ -91,13 +95,15 @@ class PaloAltoController {
             res.json(status);
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "paloalto", "Failed to get Palo Alto advisory status", { error: error.message });
+                global.logger.error("backend", "paloalto", "Failed to get Palo Alto advisory status", {
+                    error: error.message,
+                });
             } else {
                 console.error("Failed to get Palo Alto advisory status:", error);
             }
             res.status(500).json({
                 error: "Failed to get Palo Alto advisory status",
-                message: error.message
+                message: error.message,
             });
         }
     }
@@ -115,7 +121,7 @@ class PaloAltoController {
 
             if (!cveId) {
                 return res.status(400).json({
-                    error: "CVE ID is required"
+                    error: "CVE ID is required",
                 });
             }
 
@@ -123,23 +129,32 @@ class PaloAltoController {
             // Advisory data is static (syncs every 24 hours), so 5-minute cache is conservative
             // Note: 404s (null responses) are also cached to reduce database load
             const cacheKey = `palo-advisory:${cveId}`;
-            await cacheService.withCaching(res, "stats", cacheKey, 300, async () => {
-                const advisoryData = await this.paloAdvisoryService.getPaloAdvisory(cveId);
+            await cacheService.withCaching(
+                res,
+                "stats",
+                cacheKey,
+                300,
+                async () => {
+                    const advisoryData = await this.paloAdvisoryService.getPaloAdvisory(cveId);
 
-                // Return null for 404s (frontend handles this gracefully)
-                // Both null and valid data are cached for 5 minutes
-                return advisoryData || null;
-            }, 60);
-
+                    // Return null for 404s (frontend handles this gracefully)
+                    // Both null and valid data are cached for 5 minutes
+                    return advisoryData || null;
+                },
+                60,
+            );
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "paloalto", "Failed to get Palo Alto advisory", { cveId: req.params.cveId, error: error.message });
+                global.logger.error("backend", "paloalto", "Failed to get Palo Alto advisory", {
+                    cveId: req.params.cveId,
+                    error: error.message,
+                });
             } else {
                 console.error(` Failed to get Palo Alto advisory for CVE ${req.params.cveId}:`, error);
             }
             res.status(500).json({
                 error: "Failed to get Palo Alto advisory data",
-                message: error.message
+                message: error.message,
             });
         }
     }
@@ -158,18 +173,19 @@ class PaloAltoController {
 
             res.json({
                 autoSyncNeeded: needed,
-                hoursThreshold: hoursThreshold
+                hoursThreshold: hoursThreshold,
             });
-
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "paloalto", "Failed to check Palo Alto auto-sync status", { error: error.message });
+                global.logger.error("backend", "paloalto", "Failed to check Palo Alto auto-sync status", {
+                    error: error.message,
+                });
             } else {
                 console.error("Failed to check Palo Alto auto-sync status:", error);
             }
             res.status(500).json({
                 error: "Failed to check auto-sync status",
-                message: error.message
+                message: error.message,
             });
         }
     }

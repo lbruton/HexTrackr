@@ -4,12 +4,12 @@ const path = require("path");
 const DEFAULT_CONFIG = {
     familyVendorPatterns: [
         { pattern: "cisco", vendor: "CISCO", flags: "i" },
-        { pattern: "palo\\s*alto", vendor: "Palo Alto", flags: "i" }
+        { pattern: "palo\\s*alto", vendor: "Palo Alto", flags: "i" },
     ],
     hostnameVendorPatterns: [
         { pattern: "nfpan", vendor: "Palo Alto", flags: "i" },
-        { pattern: "n[rs]wan", vendor: "CISCO", flags: "i" }
-    ]
+        { pattern: "n[rs]wan", vendor: "CISCO", flags: "i" },
+    ],
 };
 
 let cachedConfig = null;
@@ -25,13 +25,13 @@ function resolveConfigPath() {
 
 function preparePatterns(patterns = []) {
     return patterns
-        .filter(entry => entry && entry.pattern && entry.vendor)
-        .map(entry => {
+        .filter((entry) => entry && entry.pattern && entry.vendor)
+        .map((entry) => {
             try {
                 const flags = entry.flags || "i";
                 return {
                     vendor: entry.vendor,
-                    regex: new RegExp(entry.pattern, flags)
+                    regex: new RegExp(entry.pattern, flags),
                 };
             } catch (error) {
                 console.warn(` Invalid vendor pattern '${entry.pattern}': ${error.message}`);
@@ -48,7 +48,9 @@ function loadConfigFromDisk(configPath) {
 
         return {
             familyVendorPatterns: preparePatterns(parsed.familyVendorPatterns ?? DEFAULT_CONFIG.familyVendorPatterns),
-            hostnameVendorPatterns: preparePatterns(parsed.hostnameVendorPatterns ?? DEFAULT_CONFIG.hostnameVendorPatterns)
+            hostnameVendorPatterns: preparePatterns(
+                parsed.hostnameVendorPatterns ?? DEFAULT_CONFIG.hostnameVendorPatterns,
+            ),
         };
     } catch (error) {
         if (error.code !== "ENOENT") {
@@ -57,7 +59,7 @@ function loadConfigFromDisk(configPath) {
 
         return {
             familyVendorPatterns: preparePatterns(DEFAULT_CONFIG.familyVendorPatterns),
-            hostnameVendorPatterns: preparePatterns(DEFAULT_CONFIG.hostnameVendorPatterns)
+            hostnameVendorPatterns: preparePatterns(DEFAULT_CONFIG.hostnameVendorPatterns),
         };
     }
 }
@@ -81,5 +83,5 @@ function refreshImportConfig() {
 
 module.exports = {
     getImportConfig,
-    refreshImportConfig
+    refreshImportConfig,
 };
