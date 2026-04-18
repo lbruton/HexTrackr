@@ -53,8 +53,8 @@ Key services to know: `databaseService.js` (SQLite WAL, sqlite3 callback API), `
 
 ## Key Commands
 
-* Lint: `npm run lint`
-* Database: `npm run db:backup`, `npm run db:restore`, `npm run db:migrate`
+* Lint: `npm run lint:all`
+* Database: `npm run db:cleanup`, `npm run db:seed:create`, `npm run db:seed:validate`
 
 ## Audit Log System (HEX-254)
 
@@ -137,7 +137,7 @@ Issues tracked in DocVault vault. Prefix: `HEX` (see `issue` skill).
 ## Hooks
 
 - **Active hook**: `.githooks/pre-commit` (enforced via `core.hooksPath .githooks`). Three layers, all in one script:
-  1. Markdown auto-fix (`markdownlint-cli2 --fix`)
+  1. Markdown auto-fix (`npm run lint:md:fix`)
   2. Stylelint auto-fix + ESLint warning check
   3. **gitleaks** secret scan (installed OPS-116, commit `62028a51`, 2026-04-14)
 - `.pre-commit-config.yaml` does NOT exist — conflicts with `core.hooksPath` so gitleaks was inlined into the existing `.githooks/pre-commit` instead of using the `pre-commit` framework.

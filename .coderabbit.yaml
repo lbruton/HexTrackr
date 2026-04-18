@@ -41,7 +41,6 @@ reviews:
     - "!**/.spec-workflow/**"
     - "!**/.specflow/**"
     - "!**/.codacy/**"
-    - "!**/.github/**"
     - "!**/.worktrees/**"
     - "!**/vendor/**"
     - "!**/deprecated/**"
