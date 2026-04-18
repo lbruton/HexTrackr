@@ -1,0 +1,122 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+#
+# CodeRabbit configuration for HexTrackr
+# Base: Devops/.coderabbit.base.yaml
+# Profile: assertive (includes nitpick comments — good for solo dev)
+
+language: "en-US"
+early_access: false
+
+reviews:
+  profile: "assertive"
+
+  # PR summary features
+  high_level_summary: true
+  review_status: true
+  poem: false
+  collapse_walkthrough: false
+
+  # Workflow
+  request_changes_workflow: false
+  abort_on_close: true
+
+  # Auto-review settings
+  auto_review:
+    enabled: true
+    auto_incremental_review: true
+    drafts: false
+    ignore_title_keywords:
+      - "WIP"
+      - "DO NOT MERGE"
+    base_branches: []
+
+  # Global path filters — exclude noise
+  path_filters:
+    - "!**/node_modules/**"
+    - "!**/dist/**"
+    - "!**/build/**"
+    - "!**/.claude/**"
+    - "!**/.gemini/**"
+    - "!**/.agents/**"
+    - "!**/.spec-workflow/**"
+    - "!**/.specflow/**"
+    - "!**/.codacy/**"
+    - "!**/.github/**"
+    - "!**/.worktrees/**"
+    - "!**/vendor/**"
+    - "!**/deprecated/**"
+    - "!**/*.min.js"
+    - "!**/*.min.css"
+    - "!**/package-lock.json"
+    - "!**/screenshots/**"
+    - "!**/*.png"
+    - "!**/*.jpg"
+    - "!**/*.svg"
+    - "!**/docs-html/**"
+
+  # Path-specific review instructions
+  path_instructions:
+    - path: "**/*.js"
+      instructions: |
+        - HexTrackr uses Node.js/Express MVC: controllers → services → database (sqlite3 callback API).
+        - Check for proper error handling on async operations and sqlite3 callbacks.
+        - Verify the sqlite3 `this` context pattern: regular function callbacks for `this.lastID`/`this.changes`, `const self = this` for service method access.
+        - Flag missing input validation on route handlers.
+        - Check for SQL injection risks in dynamic queries.
+    - path: "app/services/**"
+      instructions: |
+        - Services use sqlite3 callback API (not promises). Verify `self` pattern for `this` context in callbacks.
+        - Check WAL mode compatibility for concurrent operations.
+    - path: "app/routes/**"
+      instructions: |
+        - Verify authentication middleware is applied to protected routes.
+        - Check CSRF token validation on state-changing endpoints.
+        - Verify rate limiting on public endpoints.
+    - path: "app/public/**/*.js"
+      instructions: |
+        - Frontend is vanilla JavaScript (no framework). Check for XSS risks in DOM manipulation.
+        - Verify WebSocket message handling includes error cases.
+    - path: "**/Dockerfile*"
+      instructions: |
+        - Check for pinned base image versions (no :latest tags).
+        - Verify multi-stage builds where appropriate.
+        - Flag any secrets or credentials in build args.
+    - path: "**/*.css"
+      instructions: |
+        - HexTrackr uses Bootstrap 5 with CSS custom properties for theming.
+        - Verify dark/light mode compatibility via `data-bs-theme` attribute.
+    - path: "tests/**"
+      instructions: |
+        - Verify meaningful assertions (not just "it runs without error").
+        - Check for proper cleanup/teardown.
+
+  # Finishing touches
+  finishing_touches:
+    docstrings:
+      enabled: false
+    autofix:
+      enabled: true
+
+  # Static analysis tools
+  tools:
+    eslint:
+      enabled: true
+    markdownlint:
+      enabled: true
+    gitleaks:
+      enabled: true
+    actionlint:
+      enabled: true
+    yamllint:
+      enabled: true
+    opengrep:
+      enabled: true
+
+# Knowledge base — learn from feedback over time
+knowledge_base:
+  learnings:
+    enabled: true
+
+# Chat — allow @coderabbitai interactions in PR comments
+chat:
+  auto_reply: true
