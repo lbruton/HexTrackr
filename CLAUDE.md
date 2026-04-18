@@ -54,7 +54,7 @@ Key services to know: `databaseService.js` (SQLite WAL, sqlite3 callback API), `
 ## Key Commands
 
 * Lint: `npm run lint:all`
-* Database: `npm run db:cleanup`, `npm run db:seed:create`, `npm run db:seed:validate`
+- Database: `npm run db:cleanup`, `npm run db:seed:create`, `npm run db:seed:validate`
 
 ## Audit Log System (HEX-254)
 
