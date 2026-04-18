@@ -13,18 +13,26 @@ npx lint-staged
 # --- Layer 1: Safe Auto-Fixes (formatting only, cannot break code) ---
 echo ""
 echo "  Fixing markdown formatting..."
-if npm run lint:md:fix --silent 2>&1 | grep -q "error"; then
-    echo "     Markdown fixes applied"
-else
+set +e
+npm run lint:md:fix --silent > /dev/null 2>&1
+MARKDOWN_EXIT=$?
+set -e
+if [ $MARKDOWN_EXIT -eq 0 ]; then
     echo "     Markdown clean"
+else
+    echo "     Markdown fixes applied (or errors found)"
 fi
 
 echo ""
 echo "  Fixing CSS formatting..."
-if npm run stylelint:fix --silent 2>&1 | grep -q "error"; then
-    echo "     CSS fixes applied"
-else
+set +e
+npm run stylelint:fix --silent > /dev/null 2>&1
+CSS_EXIT=$?
+set -e
+if [ $CSS_EXIT -eq 0 ]; then
     echo "     CSS clean"
+else
+    echo "     CSS fixes applied (or errors found)"
 fi
 
 # Stage markdown/CSS auto-fixes
@@ -35,8 +43,10 @@ echo ""
 echo "  Checking JavaScript (warnings only, no auto-fix)..."
 echo ""
 
-ESLINT_OUTPUT=$(npm run eslint --silent 2>&1 || true)
+set +e
+ESLINT_OUTPUT=$(npm run eslint --silent 2>&1)
 ESLINT_EXIT_CODE=$?
+set -e
 
 if [ $ESLINT_EXIT_CODE -ne 0 ]; then
     echo "-----------------------------------------------------------"
@@ -90,7 +100,12 @@ if ! command -v gitleaks &> /dev/null; then
     fi
 fi
 
-if gitleaks detect --source . --no-git --verbose 2>&1 | grep -q "leaks found: [1-9]"; then
+set +e
+gitleaks protect --staged --verbose 2>&1
+GITLEAKS_EXIT=$?
+set -e
+
+if [ $GITLEAKS_EXIT -ne 0 ]; then
     echo "-----------------------------------------------------------"
     echo "  GITLEAKS DETECTED SECRETS IN YOUR CHANGES"
     echo ""
