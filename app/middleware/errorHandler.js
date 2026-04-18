@@ -18,13 +18,13 @@ function globalErrorHandler(err, req, res, next) {
         url: req.url,
         userAgent: req.get("User-Agent"),
         timestamp: new Date().toISOString(),
-        sessionId: req.sessionID || "unknown"
+        sessionId: req.sessionID || "unknown",
     };
 
     console.error("Global error handler caught:", {
         error: err.message,
         stack: process.env.NODE_ENV === "development" ? err.stack : undefined,
-        context: errorContext
+        context: errorContext,
     });
 
     // Don't send response if headers already sent
@@ -61,7 +61,7 @@ function globalErrorHandler(err, req, res, next) {
     const errorResponse = {
         success: false,
         error: errorMessage,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
     };
 
     // Include details in development mode or if explicitly provided
@@ -88,7 +88,7 @@ function notFoundHandler(req, res) {
     const errorResponse = {
         success: false,
         error: "Route not found",
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
     };
 
     if (process.env.NODE_ENV === "development") {
@@ -100,7 +100,7 @@ function notFoundHandler(req, res) {
             "GET /health",
             "GET /api/vulnerabilities",
             "GET /api/tickets",
-            "POST /api/vulnerabilities/import"
+            "POST /api/vulnerabilities/import",
         ];
     }
 
@@ -149,9 +149,9 @@ function formatValidationError(err) {
         return formattedErrors;
     } else if (err.details && Array.isArray(err.details)) {
         // Joi-style validation errors
-        return err.details.map(detail => ({
+        return err.details.map((detail) => ({
             field: detail.path ? detail.path.join(".") : "unknown",
-            message: detail.message
+            message: detail.message,
         }));
     }
 
@@ -209,13 +209,13 @@ function handleDatabaseError(err, res, operation = "Database operation", additio
     console.error(`${operation} failed:`, {
         error: err.message,
         context: additionalContext,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
     });
 
     const errorResponse = {
         success: false,
         error: `${operation} failed`,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
     };
 
     if (process.env.NODE_ENV === "development") {
@@ -255,7 +255,7 @@ function handleFileError(err, res, operation = "File operation") {
     const errorResponse = {
         success: false,
         error: errorMessage,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
     };
 
     if (process.env.NODE_ENV === "development") {
@@ -277,7 +277,7 @@ function handleCSVError(err, res) {
     const errorResponse = {
         success: false,
         error: "CSV parsing failed",
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
     };
 
     if (process.env.NODE_ENV === "development") {
@@ -301,7 +301,7 @@ function handleValidationError(message, res, details = null) {
     const errorResponse = {
         success: false,
         error: message,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
     };
 
     if (details && (process.env.NODE_ENV === "development" || typeof details === "string")) {
@@ -320,5 +320,5 @@ module.exports = {
     handleDatabaseError,
     handleFileError,
     handleCSVError,
-    handleValidationError
+    handleValidationError,
 };

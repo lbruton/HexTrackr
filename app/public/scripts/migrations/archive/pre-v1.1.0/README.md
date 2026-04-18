@@ -46,12 +46,12 @@ This directory contains migration scripts that were **consolidated into the v1.1
 
 HexTrackr follows a **periodic consolidation pattern**:
 
-| Version | Migration Strategy |
-|---------|-------------------|
-| v1.0.0 - v1.0.99 | Incremental migrations (001-015) |
-| v1.1.0 | **Consolidation Point** - All migrations → baseline |
-| v1.1.1 - v1.1.99 | Incremental migrations (016+) |
-| v1.2.0 | **Next Consolidation** - All v1.1.x migrations → baseline |
+| Version          | Migration Strategy                                        |
+| ---------------- | --------------------------------------------------------- |
+| v1.0.0 - v1.0.99 | Incremental migrations (001-015)                          |
+| v1.1.0           | **Consolidation Point** - All migrations → baseline       |
+| v1.1.1 - v1.1.99 | Incremental migrations (016+)                             |
+| v1.2.0           | **Next Consolidation** - All v1.1.x migrations → baseline |
 
 **Benefits**:
 

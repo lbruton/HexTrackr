@@ -68,7 +68,7 @@ class PreferencesService {
     async fetchCsrfToken() {
         try {
             const response = await fetch("/api/auth/csrf", {
-                credentials: "include"
+                credentials: "include",
             });
             const data = await response.json();
             return data.success ? data.csrfToken : null;
@@ -96,7 +96,7 @@ class PreferencesService {
             if (csrfToken) {
                 options.headers = {
                     ...options.headers,
-                    "X-CSRF-Token": csrfToken
+                    "X-CSRF-Token": csrfToken,
                 };
             }
         }
@@ -104,7 +104,7 @@ class PreferencesService {
         // Always include credentials for session management
         const fetchOptions = {
             ...options,
-            credentials: "include"
+            credentials: "include",
         };
 
         return fetch(url, fetchOptions);
@@ -135,7 +135,7 @@ class PreferencesService {
             logger.error("ui", "Response parse error:", error);
             return {
                 success: false,
-                error: "Failed to parse server response"
+                error: "Failed to parse server response",
             };
         }
     }
@@ -161,7 +161,7 @@ class PreferencesService {
             logger.error("ui", `Error fetching preference '${key}':`, error);
             return {
                 success: false,
-                error: error.message || "Network error"
+                error: error.message || "Network error",
             };
         }
     }
@@ -188,7 +188,7 @@ class PreferencesService {
             logger.error("ui", "Error fetching all preferences:", error);
             return {
                 success: false,
-                error: error.message || "Network error"
+                error: error.message || "Network error",
             };
         }
     }
@@ -212,16 +212,16 @@ class PreferencesService {
             const response = await this.authenticatedFetch(`${this.baseUrl}/${encodeURIComponent(key)}`, {
                 method: "PUT",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ value })
+                body: JSON.stringify({ value }),
             });
             return await this.parseResponse(response);
         } catch (error) {
             logger.error("ui", `Error setting preference '${key}':`, error);
             return {
                 success: false,
-                error: error.message || "Network error"
+                error: error.message || "Network error",
             };
         }
     }
@@ -248,16 +248,16 @@ class PreferencesService {
             const response = await this.authenticatedFetch(`${this.baseUrl}/bulk`, {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ preferences })
+                body: JSON.stringify({ preferences }),
             });
             return await this.parseResponse(response);
         } catch (error) {
             logger.error("ui", "Error setting multiple preferences:", error);
             return {
                 success: false,
-                error: error.message || "Network error"
+                error: error.message || "Network error",
             };
         }
     }
@@ -278,14 +278,14 @@ class PreferencesService {
     async deletePreference(key) {
         try {
             const response = await this.authenticatedFetch(`${this.baseUrl}/${encodeURIComponent(key)}`, {
-                method: "DELETE"
+                method: "DELETE",
             });
             return await this.parseResponse(response);
         } catch (error) {
             logger.error("ui", `Error deleting preference '${key}':`, error);
             return {
                 success: false,
-                error: error.message || "Network error"
+                error: error.message || "Network error",
             };
         }
     }
@@ -305,14 +305,14 @@ class PreferencesService {
     async deleteAllPreferences() {
         try {
             const response = await this.authenticatedFetch(this.baseUrl, {
-                method: "DELETE"
+                method: "DELETE",
             });
             return await this.parseResponse(response);
         } catch (error) {
             logger.error("ui", "Error deleting all preferences:", error);
             return {
                 success: false,
-                error: error.message || "Network error"
+                error: error.message || "Network error",
             };
         }
     }
@@ -333,7 +333,7 @@ class PreferencesService {
     async hasPreference(key) {
         try {
             const response = await this.authenticatedFetch(`${this.baseUrl}/${encodeURIComponent(key)}`, {
-                method: "HEAD"
+                method: "HEAD",
             });
             return response.status === 200;
         } catch (error) {

@@ -52,10 +52,10 @@ The Cisco Product Security Incident Response Team (PSIRT) manages security vulne
 ### Prerequisites
 
 1. **Cisco API Credentials** (Required)
-   - Sign up at: [https://apiconsole.cisco.com](https://apiconsole.cisco.com)
-   - Create an application in "My Apps & Keys"
-   - Copy your **Client ID** and **Client Secret**
-   - Credentials use OAuth2 authentication (no IP restrictions)
+    - Sign up at: [https://apiconsole.cisco.com](https://apiconsole.cisco.com)
+    - Create an application in "My Apps & Keys"
+    - Copy your **Client ID** and **Client Secret**
+    - Credentials use OAuth2 authentication (no IP restrictions)
 
 ### Configuration Steps
 
@@ -78,22 +78,26 @@ By default, background sync is **enabled**. To control it:
 3. Setting is stored in database (survives server restarts)
 
 **When Enabled**:
+
 - Sync runs on server startup (after **5-minute initialization delay** to prevent database corruption)
 - Sync repeats every 24 hours automatically
 - Automatically refreshes advisories older than 90 days
 
 **When Disabled**:
+
 - Background worker skips Cisco sync (no errors logged)
 - Manual sync still available via "Sync Now" button
 
 #### Step 3: Initial Sync
 
 **Option A: Automatic** (Recommended)
+
 - Restart Docker container: `docker-compose restart`
 - Background worker runs within **5 minutes** (prevents database corruption on rapid restarts)
 - Check logs: `docker-compose logs -f hextrackr-app`
 
 **Option B: Manual**
+
 - Click **"Sync Now"** button in Settings
 - Sync time varies based on your Cisco CVE count (typically 5-15 minutes)
 - Statistics update automatically when complete
@@ -107,6 +111,7 @@ By default, background sync is **enabled**. To control it:
 Cisco's API requires a two-stage lookup pattern:
 
 #### Stage 1: CVE Endpoint → Parse OS Context
+
 ```
 GET /v2/security/advisories/cve/{cveId}
 
@@ -118,6 +123,7 @@ Parse: Extract OS type and version
 ```
 
 #### Stage 2: Software Checker → Fetch Fixed Versions
+
 ```
 GET /v2/security/advisories/OSType/{osType}?version={version}
 
@@ -126,6 +132,7 @@ Example: ["12.2(22)S1", "12.2(30)S", "15.3(3)S8", ...]
 ```
 
 **Why Two Stages?**
+
 - CVE endpoint doesn't include fixed versions directly
 - Software Checker requires OS type + version as input
 - Parsing product names provides the context needed for Stage 2
@@ -133,12 +140,14 @@ Example: ["12.2(22)S1", "12.2(30)S", "15.3(3)S8", ...]
 ### Rate Limiting Strategy
 
 **Sequential Processing**:
+
 - Processes CVEs one at a time (no parallel batching)
 - 3-second delay between each CVE
 - Each CVE requires 2 API calls (6 seconds total per CVE)
 - Sync time varies based on Cisco CVE count in your environment
 
 **Why Not Parallel?**
+
 - Parallel batch processing triggered 429 errors after ~19 CVEs
 - Two-stage pattern amplifies API call volume (2x)
 - Conservative delay ensures reliability over speed
@@ -146,6 +155,7 @@ Example: ["12.2(22)S1", "12.2(30)S", "15.3(3)S8", ...]
 ### Resilience Pattern
 
 **Per-CVE Auto-Commits**:
+
 ```javascript
 for (let cveId of cveIds) {
     // Fetch advisory from Cisco API
@@ -157,6 +167,7 @@ for (let cveId of cveIds) {
 ```
 
 **Benefits**:
+
 - Container restarts don't lose progress
 - Network failures only affect current CVE
 - Database always reflects latest successful sync
@@ -179,6 +190,7 @@ WHERE vc.lifecycle_state IN ('active', 'reopened')
 ```
 
 **Why 90 Days?**
+
 - Cisco advisories can be updated with new fixed versions
 - Balances freshness with API usage
 - Automatic refresh requires zero user intervention
@@ -247,6 +259,7 @@ ON vulnerabilities_current(is_fix_available);
 ```
 
 **Vendor-Neutral Flag**:
+
 - `is_fix_available`: Boolean (0/1) for fast filtering
 - Set to `1` when ANY vendor (Cisco, Microsoft, etc.) has a fix
 - Allows queries like: `WHERE is_fix_available = 1` (instant, indexed)
@@ -272,6 +285,7 @@ When viewing a vulnerability with Cisco advisory data:
 ```
 
 **Query Pattern**:
+
 ```javascript
 const advisory = await fetch(`/api/cisco/advisory/${cveId}`);
 
@@ -293,17 +307,20 @@ const advisory = await fetch(`/api/cisco/advisory/${cveId}`);
 ### Sync Not Running
 
 **Check 1: Credentials Configured?**
+
 ```bash
 sqlite3 app/data/hextrackr.db "SELECT * FROM user_preferences WHERE preference_key = 'cisco_api_key';"
 ```
 
 **Check 2: Background Sync Enabled?**
+
 ```bash
 sqlite3 app/data/hextrackr.db "SELECT * FROM user_preferences WHERE preference_key = 'cisco_background_sync_enabled';"
 # Should return: "true" or no row (defaults to enabled)
 ```
 
 **Check 3: Check Logs**
+
 ```bash
 docker-compose logs -f hextrackr-app | grep -i cisco
 ```
@@ -311,6 +328,7 @@ docker-compose logs -f hextrackr-app | grep -i cisco
 ### 429 Rate Limiting Errors
 
 If you see "429 Too Many Requests" in logs:
+
 - This is expected if you manually trigger sync multiple times rapidly
 - Background worker is configured conservatively (3s delays) to avoid this
 - Wait 10 minutes before trying again (rate limit window)
@@ -318,6 +336,7 @@ If you see "429 Too Many Requests" in logs:
 ### 504 Gateway Timeout
 
 If sync times out in browser but continues in background:
+
 - This is normal for the first sync (typically 5-15 minutes depending on CVE count)
 - Nginx configured for 10-minute timeout
 - Check logs to see sync completion: `docker-compose logs hextrackr-app`
@@ -325,6 +344,7 @@ If sync times out in browser but continues in background:
 ### No Fixed Versions Found
 
 **Some CVEs don't have fixed versions** (by design):
+
 - Some vulnerabilities are configuration issues (no software patch)
 - Some affect end-of-life products (no fix available)
 - Cisco's Software Checker API returns empty array
@@ -339,11 +359,11 @@ If sync times out in browser but continues in background:
 2. Credentials stored in `user_preferences` table as `cisco_api_key`
 3. On sync, service fetches credentials from database
 4. Service requests OAuth2 token from Cisco Identity Services:
-   ```
-   POST https://id.cisco.com/oauth2/default/v1/token
-   Headers: Authorization: Basic {base64(clientId:clientSecret)}
-   Body: grant_type=client_credentials
-   ```
+    ```
+    POST https://id.cisco.com/oauth2/default/v1/token
+    Headers: Authorization: Basic {base64(clientId:clientSecret)}
+    Body: grant_type=client_credentials
+    ```
 5. Token used for all PSIRT API requests in sync batch
 6. Token discarded after sync completes (not cached for security)
 
@@ -386,17 +406,20 @@ function startCiscoBackgroundSync(db) {
 ## Future Enhancements
 
 ### Phase 3: API Endpoint (Next Release)
+
 - Create `/api/cisco/advisory/:cveId` endpoint
 - Test manual sync flow from Settings
 - Verify background worker runs on container restart
 
 ### Phase 4: UI Display
+
 - Update Vulnerability Details Modal with Cisco fix info
 - Add "Fixed in: X.X.X or later" display
 - Link to Cisco advisory URL
 - Test responsive layout
 
 ### Multi-Vendor Expansion
+
 - Microsoft Update Catalog integration
 - Juniper SIRT advisories
 - Fortinet PSIRT
@@ -417,12 +440,15 @@ function startCiscoBackgroundSync(db) {
 ## Support
 
 ### Linear Issue
+
 - [HEX-141: Cisco PSIRT Advisory Sync](https://linear.app/hextrackr/issue/HEX-141)
 
 ### Changelog
+
 - [v1.0.63 Release Notes](../changelog/versions/1.0.63.md) - Complete implementation details
 
 ### Memento Insight
+
 - Insight ID: `HEXTRACKR-INSIGHT-20251012-010900`
 - Recall: `/recall-insight id:HEXTRACKR-INSIGHT-20251012-010900`
 - Tags: `two-stage-api`, `rate-limiting`, `resilience`, `background-worker`

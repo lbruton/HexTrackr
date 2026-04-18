@@ -11,7 +11,7 @@ class BackupModalManager {
         this.backups = {
             tickets: [],
             vulnerabilities: [],
-            database: []
+            database: [],
         };
         this.csrfToken = null;
 
@@ -19,13 +19,13 @@ class BackupModalManager {
         this.selectedBackup = {
             tickets: null,
             vulnerabilities: null,
-            database: null
+            database: null,
         };
 
         // Track backup queue status
         this.queueStatus = {
             tickets: { inProgress: false, message: "Ready to create backup" },
-            vulnerabilities: { inProgress: false, message: "Ready to create backup" }
+            vulnerabilities: { inProgress: false, message: "Ready to create backup" },
         };
 
         // Bind methods
@@ -72,18 +72,16 @@ class BackupModalManager {
 
             // Filter backups by type
             // Support both legacy "JSON ZIP" type and new specific types ("Tickets", "Vulnerabilities")
-            this.backups.tickets = data.backups.filter(b =>
-                b.type === "Tickets" || (b.type === "JSON ZIP" && b.filename.includes("tickets"))
+            this.backups.tickets = data.backups.filter(
+                (b) => b.type === "Tickets" || (b.type === "JSON ZIP" && b.filename.includes("tickets")),
             );
-            this.backups.vulnerabilities = data.backups.filter(b =>
-                b.type === "Vulnerabilities" || (b.type === "JSON ZIP" && b.filename.includes("vulnerabilities"))
+            this.backups.vulnerabilities = data.backups.filter(
+                (b) =>
+                    b.type === "Vulnerabilities" || (b.type === "JSON ZIP" && b.filename.includes("vulnerabilities")),
             );
-            this.backups.database = data.backups.filter(b =>
-                b.type === "Database"
-            );
+            this.backups.database = data.backups.filter((b) => b.type === "Database");
 
             return data.backups;
-
         } catch (error) {
             logger.error("backup", "Failed to load backup history:", error);
             throw error;
@@ -111,7 +109,7 @@ class BackupModalManager {
             modalBody.innerHTML = this.renderBackupList(
                 this.backups.tickets,
                 "Tickets",
-                "No ticket backups found. Create your first backup to get started."
+                "No ticket backups found. Create your first backup to get started.",
             );
 
             // Show modal
@@ -120,7 +118,6 @@ class BackupModalManager {
                 const modal = new bootstrap.Modal(modalElement);
                 modal.show();
             }
-
         } catch (error) {
             logger.error("backup", "Failed to show tickets backup modal:", error);
             window.window.showNotification(`Failed to load backup history: ${error.message}`, "danger");
@@ -148,7 +145,7 @@ class BackupModalManager {
             modalBody.innerHTML = this.renderBackupList(
                 this.backups.vulnerabilities,
                 "Vulnerabilities",
-                "No vulnerability backups found. Create your first backup to get started."
+                "No vulnerability backups found. Create your first backup to get started.",
             );
 
             // Show modal
@@ -157,7 +154,6 @@ class BackupModalManager {
                 const modal = new bootstrap.Modal(modalElement);
                 modal.show();
             }
-
         } catch (error) {
             logger.error("backup", "Failed to show vulnerabilities backup modal:", error);
             window.window.showNotification(`Failed to load backup history: ${error.message}`, "danger");
@@ -185,7 +181,7 @@ class BackupModalManager {
             modalBody.innerHTML = this.renderBackupList(
                 this.backups.database,
                 "Database",
-                "No database backups found. Create your first backup to get started."
+                "No database backups found. Create your first backup to get started.",
             );
 
             // Show modal
@@ -194,7 +190,6 @@ class BackupModalManager {
                 const modal = new bootstrap.Modal(modalElement);
                 modal.show();
             }
-
         } catch (error) {
             logger.error("backup", "Failed to show database backup modal:", error);
             window.window.showNotification(`Failed to load backup history: ${error.message}`, "danger");
@@ -223,25 +218,26 @@ class BackupModalManager {
                 <strong>${backups.length}</strong> ${type.toLowerCase()} backup${backups.length !== 1 ? "s" : ""} available on disk.
             </p>
             <div class="list-group">
-                ${backups.map(backup => {
-                    // Parse timestamp: format is "2025-10-17_22-30-50" or "YYYY-MM-DDTHH-MM-SS"
-                    const timestampStr = backup.timestamp
-                        .replace(/_/g, " ")  // Replace underscore with space
-                        .replace(/-/g, "-"); // Keep hyphens for date, replace time hyphens with colons below
+                ${backups
+                    .map((backup) => {
+                        // Parse timestamp: format is "2025-10-17_22-30-50" or "YYYY-MM-DDTHH-MM-SS"
+                        const timestampStr = backup.timestamp
+                            .replace(/_/g, " ") // Replace underscore with space
+                            .replace(/-/g, "-"); // Keep hyphens for date, replace time hyphens with colons below
 
-                    // Convert time portion hyphens to colons: "22-30-50" -> "22:30:50"
-                    const parts = timestampStr.split(" ");
-                    const dateStr = parts[0];
-                    const timeStr = parts[1] ? parts[1].replace(/-/g, ":") : "00:00:00";
+                        // Convert time portion hyphens to colons: "22-30-50" -> "22:30:50"
+                        const parts = timestampStr.split(" ");
+                        const dateStr = parts[0];
+                        const timeStr = parts[1] ? parts[1].replace(/-/g, ":") : "00:00:00";
 
-                    const timestamp = new Date(`${dateStr}T${timeStr}`);
-                    const formattedDate = timestamp.toLocaleString();
-                    const sourceBadge = backup.is_manual
-                        ? "<span class=\"badge bg-warning ms-2\">Manual</span>"
-                        : "<span class=\"badge bg-secondary ms-2\">Automated</span>";
+                        const timestamp = new Date(`${dateStr}T${timeStr}`);
+                        const formattedDate = timestamp.toLocaleString();
+                        const sourceBadge = backup.is_manual
+                            ? '<span class="badge bg-warning ms-2">Manual</span>'
+                            : '<span class="badge bg-secondary ms-2">Automated</span>';
 
-                    const backupType = type.toLowerCase().replace(" ", "-");
-                    return `
+                        const backupType = type.toLowerCase().replace(" ", "-");
+                        return `
                         <div class="list-group-item list-group-item-action"
                              style="cursor: pointer;"
                              onclick="window.backupModalManager.selectBackup('${backupType}', '${backup.filename}')"
@@ -272,7 +268,8 @@ class BackupModalManager {
                             </div>
                         </div>
                     `;
-                }).join("")}
+                    })
+                    .join("")}
             </div>
         `;
     }
@@ -289,7 +286,6 @@ class BackupModalManager {
             window.location.href = `/api/backup/download/${filename}`;
 
             window.showNotification(`Downloading backup: ${filename}`, "success");
-
         } catch (error) {
             logger.error("backup", "Failed to download backup:", error);
             window.showNotification(`Failed to download backup: ${error.message}`, "danger");
@@ -319,7 +315,7 @@ class BackupModalManager {
             btn = evt?.target?.closest("button");
             if (btn) {
                 btn.disabled = true;
-                btn.innerHTML = "<span class=\"spinner-border spinner-border-sm me-1\"></span>Creating...";
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Creating...';
             }
 
             logger.info("backup", `Creating fresh ${backupType} backup...`);
@@ -329,8 +325,8 @@ class BackupModalManager {
             const response = await window.authState.authenticatedFetch("/api/backup/trigger-manual", {
                 method: "POST",
                 headers: {
-                    "X-CSRF-Token": csrfToken
-                }
+                    "X-CSRF-Token": csrfToken,
+                },
             });
 
             if (!response.ok) {
@@ -353,14 +349,13 @@ class BackupModalManager {
             } else {
                 await this.showDatabaseBackupModal();
             }
-
         } catch (error) {
             logger.error("backup", "Fresh backup failed:", error);
             window.showNotification(`Failed to create backup: ${error.message}`, "danger");
         } finally {
             if (btn) {
                 btn.disabled = false;
-                btn.innerHTML = "<i class=\"fas fa-plus me-1\"></i>Create Fresh Backup";
+                btn.innerHTML = '<i class="fas fa-plus me-1"></i>Create Fresh Backup';
             }
         }
     }
@@ -399,7 +394,7 @@ class BackupModalManager {
             // Update status
             this.queueStatus[type] = {
                 inProgress: true,
-                message: "Backup in progress..."
+                message: "Backup in progress...",
             };
 
             // Update UI
@@ -407,7 +402,7 @@ class BackupModalManager {
             const queueBtn = document.getElementById(`queue${type.charAt(0).toUpperCase() + type.slice(1)}Backup`);
 
             if (statusElement) {
-                statusElement.innerHTML = "<i class=\"fas fa-spinner fa-spin me-1\"></i>Backup in progress...";
+                statusElement.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Backup in progress...';
                 statusElement.className = "mt-2 small text-warning";
             }
 
@@ -428,15 +423,18 @@ class BackupModalManager {
             // Update status
             this.queueStatus[type] = {
                 inProgress: false,
-                message: "Backup complete! Refresh to see it in the list."
+                message: "Backup complete! Refresh to see it in the list.",
             };
 
             if (statusElement) {
-                statusElement.innerHTML = "<i class=\"fas fa-check-circle me-1\"></i>Backup complete! Refreshing...";
+                statusElement.innerHTML = '<i class="fas fa-check-circle me-1"></i>Backup complete! Refreshing...';
                 statusElement.className = "mt-2 small text-success";
             }
 
-            window.showNotification(`${type.charAt(0).toUpperCase() + type.slice(1)} backup queued successfully`, "success");
+            window.showNotification(
+                `${type.charAt(0).toUpperCase() + type.slice(1)} backup queued successfully`,
+                "success",
+            );
 
             // Reload backup history after short delay
             setTimeout(async () => {
@@ -449,7 +447,7 @@ class BackupModalManager {
                         modalBody.innerHTML = this.renderBackupList(
                             this.backups.tickets,
                             "Tickets",
-                            "No ticket backups found. Click \"Queue Backup\" to create your first backup."
+                            'No ticket backups found. Click "Queue Backup" to create your first backup.',
                         );
                     }
                 } else {
@@ -458,7 +456,7 @@ class BackupModalManager {
                         modalBody.innerHTML = this.renderBackupList(
                             this.backups.vulnerabilities,
                             "Vulnerabilities",
-                            "No vulnerability backups found. Click \"Queue Backup\" to create your first backup."
+                            'No vulnerability backups found. Click "Queue Backup" to create your first backup.',
                         );
                     }
                 }
@@ -473,14 +471,13 @@ class BackupModalManager {
                     queueBtn.disabled = false;
                 }
             }, 2000);
-
         } catch (error) {
             logger.error("backup", "Failed to queue backup:", error);
 
             // Reset status
             this.queueStatus[type] = {
                 inProgress: false,
-                message: "Ready to create backup"
+                message: "Ready to create backup",
             };
 
             const statusElement = document.getElementById(`${type}BackupStatus`);
@@ -514,13 +511,15 @@ class BackupModalManager {
 
             fileInput.onchange = async (e) => {
                 const file = e.target.files[0];
-                if (!file) {return;}
+                if (!file) {
+                    return;
+                }
 
                 try {
                     logger.info("backup", `Uploading file: ${file.name}`);
 
                     const formData = new FormData();
-                    formData.append("file", file);  // Must be 'file' to match multer config
+                    formData.append("file", file); // Must be 'file' to match multer config
                     formData.append("type", type);
                     formData.append("clearExisting", "false"); // Don't clear by default
 
@@ -528,9 +527,9 @@ class BackupModalManager {
                     const response = await window.authState.authenticatedFetch("/api/backup/restore", {
                         method: "POST",
                         headers: {
-                            "X-CSRF-Token": csrfToken
+                            "X-CSRF-Token": csrfToken,
                         },
-                        body: formData
+                        body: formData,
                     });
 
                     if (!response.ok) {
@@ -544,7 +543,6 @@ class BackupModalManager {
                     }
 
                     window.showNotification(`✅ Restored ${data.count} ${type} from backup`, "success");
-
                 } catch (error) {
                     logger.error("backup", "Restore from file failed:", error);
                     window.showNotification(`❌ Restore failed: ${error.message}`, "danger");
@@ -552,7 +550,6 @@ class BackupModalManager {
             };
 
             fileInput.click();
-
         } catch (error) {
             logger.error("backup", "Failed to restore from file:", error);
             window.showNotification(`Failed to restore from file: ${error.message}`, "danger");
@@ -588,7 +585,7 @@ class BackupModalManager {
 
             // Upload it to restore endpoint
             const formData = new FormData();
-            formData.append("file", file);  // Must be 'file' to match multer config
+            formData.append("file", file); // Must be 'file' to match multer config
             formData.append("type", type);
             formData.append("clearExisting", "false");
 
@@ -596,9 +593,9 @@ class BackupModalManager {
             const restoreResponse = await window.authState.authenticatedFetch("/api/backup/restore", {
                 method: "POST",
                 headers: {
-                    "X-CSRF-Token": csrfToken
+                    "X-CSRF-Token": csrfToken,
                 },
-                body: formData
+                body: formData,
             });
 
             if (!restoreResponse.ok) {
@@ -612,7 +609,6 @@ class BackupModalManager {
             }
 
             window.showNotification(`✅ Restored ${data.count} ${type} from ${selectedFilename}`, "success");
-
         } catch (error) {
             logger.error("backup", "Restore from server failed:", error);
             window.showNotification(`❌ Restore failed: ${error.message}`, "danger");

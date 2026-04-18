@@ -33,7 +33,7 @@ class LocationDetailsModal {
             cisco: false,
             palo: false,
             other: false,
-            kev: false
+            kev: false,
         };
         this.allDevices = []; // Store unfiltered device data for filtering
     }
@@ -67,7 +67,7 @@ class LocationDetailsModal {
             this.allDevices = deviceData; // Store for later grid creation
 
             // Calculate KEV device count from aggregated data (not from backend kev_count which is vulnerability count)
-            const kevDeviceCount = deviceData.filter(device => device.hasKev === true).length;
+            const kevDeviceCount = deviceData.filter((device) => device.hasKev === true).length;
 
             // Populate modal sections with corrected KEV count
             this.populateLocationInfo(location, kevDeviceCount);
@@ -77,7 +77,6 @@ class LocationDetailsModal {
 
             // Show modal with theme propagation
             this.showModal();
-
         } catch (error) {
             if (window.logger?.error) {
                 window.logger.error("location", "Error showing location details", { error: error.message });
@@ -102,15 +101,20 @@ class LocationDetailsModal {
             const deviceCount = location.device_count || 0;
             const totalVPR = location.total_vpr || 0;
             // HEX-351 Phase 2: Use passed kevDeviceCount (calculated from aggregated devices) instead of backend kev_count
-            const kevCount = (kevDeviceCount !== undefined && kevDeviceCount !== null) ? kevDeviceCount : (location.kev_count || 0);
+            const kevCount =
+                kevDeviceCount !== undefined && kevDeviceCount !== null ? kevDeviceCount : location.kev_count || 0;
             const openTickets = location.open_tickets || 0;
 
             // VPR severity badge
             const vprSeverityClass = this.getVprSeverityClass(totalVPR);
-            const vprBadgeClass = vprSeverityClass === "critical" ? "bg-red" :
-                                  vprSeverityClass === "high" ? "bg-orange" :
-                                  vprSeverityClass === "medium" ? "bg-yellow" :
-                                  "bg-green";
+            const vprBadgeClass =
+                vprSeverityClass === "critical"
+                    ? "bg-red"
+                    : vprSeverityClass === "high"
+                      ? "bg-orange"
+                      : vprSeverityClass === "medium"
+                        ? "bg-yellow"
+                        : "bg-green";
 
             // Risk level badge and severity breakdown data
             const severityBreakdown = location.severity_breakdown || {};
@@ -125,19 +129,18 @@ class LocationDetailsModal {
 
             let riskBadge = "";
             if (criticalCount > 0) {
-                riskBadge = "<span class=\"badge bg-red\">Critical Risk</span>";
+                riskBadge = '<span class="badge bg-red">Critical Risk</span>';
             } else if (highCount > 5) {
-                riskBadge = "<span class=\"badge bg-orange\">High Risk</span>";
+                riskBadge = '<span class="badge bg-orange">High Risk</span>';
             } else if (mediumCount > 10) {
-                riskBadge = "<span class=\"badge bg-yellow\">Medium Risk</span>";
+                riskBadge = '<span class="badge bg-yellow">Medium Risk</span>';
             } else {
-                riskBadge = "<span class=\"badge bg-green\">Low Risk</span>";
+                riskBadge = '<span class="badge bg-green">Low Risk</span>';
             }
 
             // KEV badge
-            const kevBadge = kevCount > 0
-                ? `<span class="badge bg-red">${kevCount}</span>`
-                : "<span class=\"text-muted\">0</span>";
+            const kevBadge =
+                kevCount > 0 ? `<span class="badge bg-red">${kevCount}</span>` : '<span class="text-muted">0</span>';
 
             // Calculate network subnet
             const networkSubnet = this.calculateNetworkSubnet(location.device_ips || []);
@@ -255,18 +258,18 @@ class LocationDetailsModal {
             document.getElementById("locationInfo").innerHTML = infoHtml;
 
             // Initialize tooltips
-            const tooltipTriggerList = [].slice.call(document.querySelectorAll("[data-bs-toggle=\"tooltip\"]"));
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
-
         } catch (error) {
             if (window.logger?.error) {
                 window.logger.error("location", "Error populating location info", { error: error.message });
             } else {
                 console.error("[LocationDetailsModal] Error populating location info:", error);
             }
-            document.getElementById("locationInfo").innerHTML = "<p class=\"text-danger\">Error loading location information</p>";
+            document.getElementById("locationInfo").innerHTML =
+                '<p class="text-danger">Error loading location information</p>';
         }
     }
 
@@ -292,8 +295,10 @@ class LocationDetailsModal {
         // Count frequency of management networks (fallback)
         const managementNetworkCounts = {};
 
-        ipAddresses.forEach(ip => {
-            if (!ip) {return;}
+        ipAddresses.forEach((ip) => {
+            if (!ip) {
+                return;
+            }
 
             // Extract first 3 octets
             const parts = ip.split(".");
@@ -301,7 +306,7 @@ class LocationDetailsModal {
                 const network = `${parts[0]}.${parts[1]}.${parts[2]}.0/24`;
 
                 // Check if this IP is in a management subnet
-                const isManagementIP = managementSubnets.some(subnet => ip.startsWith(subnet + "."));
+                const isManagementIP = managementSubnets.some((subnet) => ip.startsWith(subnet + "."));
 
                 if (isManagementIP) {
                     managementNetworkCounts[network] = (managementNetworkCounts[network] || 0) + 1;
@@ -344,9 +349,15 @@ class LocationDetailsModal {
      * @returns {string} Severity class name ("critical", "high", "medium", "low")
      */
     getVprSeverityClass(score) {
-        if (score >= 9.0) {return "critical";}
-        if (score >= 7.0) {return "high";}
-        if (score >= 4.0) {return "medium";}
+        if (score >= 9.0) {
+            return "critical";
+        }
+        if (score >= 7.0) {
+            return "high";
+        }
+        if (score >= 4.0) {
+            return "medium";
+        }
         return "low";
     }
 
@@ -365,7 +376,7 @@ class LocationDetailsModal {
             const otherCount = vendorBreakdown["Other"] || 0;
 
             // KEV count - count devices in allDevices with hasKev
-            const kevCount = this.allDevices.filter(d => d.hasKev === true).length;
+            const kevCount = this.allDevices.filter((d) => d.hasKev === true).length;
 
             // Build HTML for 4 vendor breakdown cards (clickable filters)
             document.getElementById("vprSummaryCards").innerHTML = `
@@ -466,7 +477,7 @@ class LocationDetailsModal {
 
         // Count filtered rows for display
         let filteredCount = 0;
-        this.gridApi.forEachNodeAfterFilter(_node => {
+        this.gridApi.forEachNodeAfterFilter((_node) => {
             filteredCount++;
         });
 
@@ -478,10 +489,9 @@ class LocationDetailsModal {
      * @returns {boolean} True if any filter is active
      */
     isExternalFilterPresent() {
-        return this.activeFilters.cisco ||
-               this.activeFilters.palo ||
-               this.activeFilters.other ||
-               this.activeFilters.kev;
+        return (
+            this.activeFilters.cisco || this.activeFilters.palo || this.activeFilters.other || this.activeFilters.kev
+        );
     }
 
     /**
@@ -493,9 +503,7 @@ class LocationDetailsModal {
         const device = node.data;
 
         // Step 1: Check vendor filters (OR logic)
-        const vendorActive = this.activeFilters.cisco ||
-                             this.activeFilters.palo ||
-                             this.activeFilters.other;
+        const vendorActive = this.activeFilters.cisco || this.activeFilters.palo || this.activeFilters.other;
 
         if (vendorActive) {
             const vendor = device.vendor || "";
@@ -504,9 +512,10 @@ class LocationDetailsModal {
             const isPalo = vendor === "Palo Alto" || vendorUpper.includes("PALO");
             const isOther = !isCisco && !isPalo;
 
-            const vendorMatches = (this.activeFilters.cisco && isCisco) ||
-                                 (this.activeFilters.palo && isPalo) ||
-                                 (this.activeFilters.other && isOther);
+            const vendorMatches =
+                (this.activeFilters.cisco && isCisco) ||
+                (this.activeFilters.palo && isPalo) ||
+                (this.activeFilters.other && isOther);
 
             if (!vendorMatches) {
                 return false; // Vendor doesn't match, filter out
@@ -530,8 +539,8 @@ class LocationDetailsModal {
      */
     updateFilterCountDisplay(filteredCount, totalCount) {
         const activeFilterNames = Object.keys(this.activeFilters)
-            .filter(key => this.activeFilters[key])
-            .map(key => key.toUpperCase());
+            .filter((key) => this.activeFilters[key])
+            .map((key) => key.toUpperCase());
 
         let message = `Showing ${filteredCount} of ${totalCount} devices`;
         if (activeFilterNames.length > 0) {
@@ -613,7 +622,7 @@ class LocationDetailsModal {
                                    onclick="window.locationDetailsModal.navigateToDevice('${hostname}'); return false;">
                                    ${hostname}
                                 </a>`;
-                    }
+                    },
                 },
                 {
                     headerName: "Vendor",
@@ -629,7 +638,7 @@ class LocationDetailsModal {
                             color = "#FF6B35"; // Orange for Palo Alto
                         }
                         return `<span style="color: ${color} !important; font-weight: 600;">${vendor}</span>`;
-                    }
+                    },
                 },
                 {
                     headerName: "CVSS",
@@ -649,11 +658,11 @@ class LocationDetailsModal {
 
                         // Show "N/A" if CVSS is 0 (not available)
                         if (cvss === 0) {
-                            return "<span class=\"text-muted\">N/A</span>";
+                            return '<span class="text-muted">N/A</span>';
                         }
 
                         return `<span style="color: ${color} !important; font-weight: 700;">${cvss.toFixed(1)}</span>`;
-                    }
+                    },
                 },
                 {
                     headerName: "VPR",
@@ -672,7 +681,7 @@ class LocationDetailsModal {
                             color = "#d97706"; // Yellow for Medium
                         }
                         return `<span style="color: ${color} !important; font-weight: 700;">${vpr.toFixed(1)}</span>`;
-                    }
+                    },
                 },
                 {
                     headerName: "KEV",
@@ -682,10 +691,10 @@ class LocationDetailsModal {
                         const hasKev = params.value === true;
                         // HEX-351 Phase 2 Fix: Colored text instead of badges for cleaner table
                         if (hasKev) {
-                            return "<span style=\"color: #dc2626 !important; font-weight: 700;\">Yes</span>";
+                            return '<span style="color: #dc2626 !important; font-weight: 700;">Yes</span>';
                         }
-                        return "<span class=\"text-muted\">No</span>";
-                    }
+                        return '<span class="text-muted">No</span>';
+                    },
                 },
                 {
                     headerName: "Installed",
@@ -694,7 +703,7 @@ class LocationDetailsModal {
                     cellRenderer: (params) => {
                         const os = params.value;
                         if (!os || os === "N/A") {
-                            return "<span class=\"font-monospace text-muted\">N/A</span>";
+                            return '<span class="font-monospace text-muted">N/A</span>';
                         }
 
                         // Extract version number from OS string (matches main table pattern)
@@ -706,7 +715,7 @@ class LocationDetailsModal {
                         }
 
                         return `<span class=\"font-monospace text-info\">${displayVersion}</span>`;
-                    }
+                    },
                 },
                 {
                     headerName: "Fixed",
@@ -748,9 +757,13 @@ class LocationDetailsModal {
 
                             try {
                                 // Get ALL unique CVEs (not just first) - matches Device Security Modal pattern
-                                const uniqueCves = [...new Set(device.vulnerabilities
-                                    .filter(v => v.cve && v.cve.startsWith("CVE-"))
-                                    .map(v => v.cve))];
+                                const uniqueCves = [
+                                    ...new Set(
+                                        device.vulnerabilities
+                                            .filter((v) => v.cve && v.cve.startsWith("CVE-"))
+                                            .map((v) => v.cve),
+                                    ),
+                                ];
 
                                 if (uniqueCves.length === 0) {
                                     container.className = "font-monospace text-muted";
@@ -762,22 +775,28 @@ class LocationDetailsModal {
                                 const installedVersion = device.installedVersion;
 
                                 // Query ALL CVEs in parallel (matches device-security-modal.js:204-214)
-                                const fixedVersionPromises = uniqueCves.map(cve =>
-                                    advisoryHelper.getFixedVersion(cve, vendor, installedVersion)
-                                        .catch(err => {
-                                            if (window.logger?.warn) {
-                                                window.logger.warn("location", `Failed to get fixed version for ${cve}`, { error: err.message });
-                                            } else {
-                                                console.warn(`[LocationDetailsModal] Failed to get fixed version for ${cve}:`, err);
-                                            }
-                                            return null;
-                                        })
+                                const fixedVersionPromises = uniqueCves.map((cve) =>
+                                    advisoryHelper.getFixedVersion(cve, vendor, installedVersion).catch((err) => {
+                                        if (window.logger?.warn) {
+                                            window.logger.warn("location", `Failed to get fixed version for ${cve}`, {
+                                                error: err.message,
+                                            });
+                                        } else {
+                                            console.warn(
+                                                `[LocationDetailsModal] Failed to get fixed version for ${cve}:`,
+                                                err,
+                                            );
+                                        }
+                                        return null;
+                                    }),
                                 );
 
                                 const fixedVersions = await Promise.all(fixedVersionPromises);
 
                                 // Filter out nulls and deduplicate
-                                const validVersions = [...new Set(fixedVersions.filter(v => v !== null && v !== "No Fix"))];
+                                const validVersions = [
+                                    ...new Set(fixedVersions.filter((v) => v !== null && v !== "No Fix")),
+                                ];
 
                                 if (validVersions.length > 0) {
                                     // Sort versions (highest/most recent first) using advisory helper's compareVersions
@@ -795,7 +814,9 @@ class LocationDetailsModal {
                                 }
                             } catch (error) {
                                 if (window.logger?.error) {
-                                    window.logger.error("location", "Fixed version lookup failed", { error: error.message });
+                                    window.logger.error("location", "Fixed version lookup failed", {
+                                        error: error.message,
+                                    });
                                 } else {
                                     console.error("[LocationDetailsModal] Fixed version lookup failed:", error);
                                 }
@@ -806,11 +827,11 @@ class LocationDetailsModal {
                         })();
 
                         return container;
-                    }
+                    },
                 },
                 {
-                    headerName: "",  // Empty header - will show icon via CSS
-                    headerClass: "ticket-header-icon",  // Custom class for icon styling
+                    headerName: "", // Empty header - will show icon via CSS
+                    headerClass: "ticket-header-icon", // Custom class for icon styling
                     field: "ticketStatus",
                     width: 80,
                     sortable: true,
@@ -825,7 +846,7 @@ class LocationDetailsModal {
 
                         // No open tickets - check for closed tickets in history
                         if (ticketCount === 0) {
-                            const closedTickets = allTickets.filter(t => ["Completed", "Closed"].includes(t.status));
+                            const closedTickets = allTickets.filter((t) => ["Completed", "Closed"].includes(t.status));
                             const closedCount = closedTickets.length;
 
                             let tooltipText = `Create ticket for ${hostname}`;
@@ -834,7 +855,8 @@ class LocationDetailsModal {
                             }
 
                             // HEX-313: Add keyboard shortcut hints to tooltip
-                            tooltipText += "&#13;&#10;Cmd+Shift: KEV devices at location&#13;&#10;Alt+Shift: All devices at location";
+                            tooltipText +=
+                                "&#13;&#10;Cmd+Shift: KEV devices at location&#13;&#10;Alt+Shift: All devices at location";
 
                             return `<a href="#" class="text-muted"
                                        onclick="event.stopPropagation(); window.locationDetailsModal.createTicket(event, '${hostname}', ${isKev}); return false;"
@@ -844,15 +866,15 @@ class LocationDetailsModal {
                         }
 
                         // Has open tickets - show colored icon based on status
-                        let colorClass = "text-secondary";  // Gray for unknown
+                        let colorClass = "text-secondary"; // Gray for unknown
                         if (ticketStatus === "Overdue") {
-                            colorClass = "text-danger";     // Red
+                            colorClass = "text-danger"; // Red
                         } else if (ticketStatus === "Pending") {
-                            colorClass = "text-warning";    // Yellow
+                            colorClass = "text-warning"; // Yellow
                         } else if (ticketStatus === "Open") {
-                            colorClass = "text-primary";    // Blue
+                            colorClass = "text-primary"; // Blue
                         } else if (ticketStatus === "Completed" || ticketStatus === "Closed") {
-                            colorClass = "text-success";    // Green
+                            colorClass = "text-success"; // Green
                         }
 
                         const tooltipText = `${ticketStatus} - ${ticketCount} ticket${ticketCount > 1 ? "s" : ""} - click to view/edit`;
@@ -862,8 +884,8 @@ class LocationDetailsModal {
                                    title="${tooltipText}">
                                    <i class="fas fa-ticket-alt"></i>
                                 </a>`;
-                    }
-                }
+                    },
+                },
             ];
 
             // Detect current theme for AG-Grid theming
@@ -890,7 +912,7 @@ class LocationDetailsModal {
                         borderColor: "#2a3f5f",
                         selectedRowBackgroundColor: "#2563eb",
                         rowHoverColor: "rgba(37, 99, 235, 0.15)",
-                        rangeSelectionBackgroundColor: "rgba(37, 99, 235, 0.2)"
+                        rangeSelectionBackgroundColor: "rgba(37, 99, 235, 0.2)",
                     });
                 } else {
                     quartzTheme = window.agGrid.themeQuartz.withParams({
@@ -908,7 +930,7 @@ class LocationDetailsModal {
                         borderColor: "#e2e8f0",
                         selectedRowBackgroundColor: "#3182ce",
                         rowHoverColor: "rgba(49, 130, 206, 0.1)",
-                        rangeSelectionBackgroundColor: "rgba(49, 130, 206, 0.2)"
+                        rangeSelectionBackgroundColor: "rgba(49, 130, 206, 0.2)",
                     });
                 }
             }
@@ -923,7 +945,7 @@ class LocationDetailsModal {
                     sortable: true,
                     filter: true,
                     wrapHeaderText: false,
-                    autoHeaderHeight: false
+                    autoHeaderHeight: false,
                 },
                 domLayout: "normal",
                 animateRows: true,
@@ -934,8 +956,8 @@ class LocationDetailsModal {
                 initialState: {
                     sort: {
                         // HEX-351 Phase 2: Default sort by hostname A-Z for cleaner display
-                        sortModel: [{ colId: "hostname", sort: "asc" }]
-                    }
+                        sortModel: [{ colId: "hostname", sort: "asc" }],
+                    },
                 },
                 onGridReady: (params) => {
                     this.gridApi = params.api;
@@ -961,12 +983,11 @@ class LocationDetailsModal {
                     if (params.api) {
                         params.api.sizeColumnsToFit();
                     }
-                }
+                },
             };
 
             // Create grid
             this.grid = agGrid.createGrid(gridContainer, gridOptions);
-
         } catch (error) {
             if (window.logger?.error) {
                 window.logger.error("location", "Error creating device grid", { error: error.message });
@@ -987,7 +1008,7 @@ class LocationDetailsModal {
         try {
             // Get CSRF token first (required for POST requests)
             const csrfResponse = await fetch("/api/auth/csrf", {
-                credentials: "include"
+                credentials: "include",
             });
             const { csrfToken } = await csrfResponse.json();
 
@@ -996,21 +1017,23 @@ class LocationDetailsModal {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "x-csrf-token": csrfToken
+                    "x-csrf-token": csrfToken,
                 },
                 credentials: "include",
-                body: JSON.stringify({ hostnames })
+                body: JSON.stringify({ hostnames }),
             });
 
             if (!response.ok) {
                 if (window.logger?.error) {
-                    window.logger.error("location", "Failed to fetch batch ticket data", { status: response.statusText });
+                    window.logger.error("location", "Failed to fetch batch ticket data", {
+                        status: response.statusText,
+                    });
                 } else {
                     console.error("[LocationDetailsModal] Failed to fetch batch ticket data:", response.statusText);
                 }
                 // Return empty map on error
                 const emptyMap = {};
-                hostnames.forEach(hostname => {
+                hostnames.forEach((hostname) => {
                     emptyMap[hostname.toLowerCase()] = { count: 0, status: null, jobType: null, tickets: [] };
                 });
                 return emptyMap;
@@ -1026,7 +1049,7 @@ class LocationDetailsModal {
             }
             // Return empty map on error
             const emptyMap = {};
-            hostnames.forEach(hostname => {
+            hostnames.forEach((hostname) => {
                 emptyMap[hostname.toLowerCase()] = { count: 0, status: null, jobType: null, tickets: [] };
             });
             return emptyMap;
@@ -1047,7 +1070,7 @@ class LocationDetailsModal {
             const allVulnerabilities = this.dataManager?.vulnerabilities || [];
 
             // Filter vulnerabilities for this location (case-insensitive match - HEX-296 Fix #2)
-            const locationVulns = allVulnerabilities.filter(vuln => {
+            const locationVulns = allVulnerabilities.filter((vuln) => {
                 if (!vuln.normalized_location) {
                     return false;
                 }
@@ -1059,7 +1082,7 @@ class LocationDetailsModal {
             // Group by hostname (each vulnerability has ONE hostname, not an array)
             const deviceMap = new Map();
 
-            locationVulns.forEach(vuln => {
+            locationVulns.forEach((vuln) => {
                 const hostname = vuln.hostname;
                 if (!hostname) {
                     return; // Skip vulnerabilities without hostname
@@ -1076,7 +1099,7 @@ class LocationDetailsModal {
                             Critical: { count: 0, vpr: 0 },
                             High: { count: 0, vpr: 0 },
                             Medium: { count: 0, vpr: 0 },
-                            Low: { count: 0, vpr: 0 }
+                            Low: { count: 0, vpr: 0 },
                         },
                         hasKev: false,
                         highestCvss: 0, // HEX-351 Phase 2: Track highest CVSS score per device
@@ -1085,7 +1108,7 @@ class LocationDetailsModal {
                         ticketCount: 0,
                         ticketStatus: null,
                         highestSeverity: "Low",
-                        vprByPlugin: new Map()  // HEX-356: Track VPR per plugin for deduplication
+                        vprByPlugin: new Map(), // HEX-356: Track VPR per plugin for deduplication
                     });
                 }
 
@@ -1138,20 +1161,19 @@ class LocationDetailsModal {
             });
 
             // Convert map to array and calculate highest severity + deduplicated VPR
-            const devices = Array.from(deviceMap.values()).map(device => {
+            const devices = Array.from(deviceMap.values()).map((device) => {
                 // HEX-356: Calculate deduplicated VPR totals
-                device.totalVpr = Array.from(device.vprByPlugin.values())
-                    .reduce((sum, vpr) => sum + vpr, 0);
+                device.totalVpr = Array.from(device.vprByPlugin.values()).reduce((sum, vpr) => sum + vpr, 0);
 
                 // Calculate severity-specific VPR from deduplicated data
                 const severityVprMap = {
                     Critical: new Map(),
                     High: new Map(),
                     Medium: new Map(),
-                    Low: new Map()
+                    Low: new Map(),
                 };
 
-                device.vulnerabilities.forEach(vuln => {
+                device.vulnerabilities.forEach((vuln) => {
                     const vprScore = vuln.vpr_score || 0;
                     const pluginKey = vuln.plugin_id || vuln.description?.substring(0, 100) || "unknown";
                     const severity = vuln.severity || "Low";
@@ -1164,10 +1186,22 @@ class LocationDetailsModal {
                     }
                 });
 
-                device.severityBreakdown.Critical.vpr = Array.from(severityVprMap.Critical.values()).reduce((sum, vpr) => sum + vpr, 0);
-                device.severityBreakdown.High.vpr = Array.from(severityVprMap.High.values()).reduce((sum, vpr) => sum + vpr, 0);
-                device.severityBreakdown.Medium.vpr = Array.from(severityVprMap.Medium.values()).reduce((sum, vpr) => sum + vpr, 0);
-                device.severityBreakdown.Low.vpr = Array.from(severityVprMap.Low.values()).reduce((sum, vpr) => sum + vpr, 0);
+                device.severityBreakdown.Critical.vpr = Array.from(severityVprMap.Critical.values()).reduce(
+                    (sum, vpr) => sum + vpr,
+                    0,
+                );
+                device.severityBreakdown.High.vpr = Array.from(severityVprMap.High.values()).reduce(
+                    (sum, vpr) => sum + vpr,
+                    0,
+                );
+                device.severityBreakdown.Medium.vpr = Array.from(severityVprMap.Medium.values()).reduce(
+                    (sum, vpr) => sum + vpr,
+                    0,
+                );
+                device.severityBreakdown.Low.vpr = Array.from(severityVprMap.Low.values()).reduce(
+                    (sum, vpr) => sum + vpr,
+                    0,
+                );
 
                 // Clean up temporary map
                 delete device.vprByPlugin;
@@ -1187,13 +1221,18 @@ class LocationDetailsModal {
             });
 
             // Session 3: Fetch ticket counts in batch (HEX-216 pattern)
-            const hostnames = devices.map(d => d.hostname);
+            const hostnames = devices.map((d) => d.hostname);
             if (hostnames.length > 0) {
                 const ticketMap = await this.checkTicketStateBatch(hostnames);
 
                 // Enrich devices with ticket data
-                devices.forEach(device => {
-                    const ticketData = ticketMap[device.hostname.toLowerCase()] || { count: 0, status: null, jobType: null, tickets: [] };
+                devices.forEach((device) => {
+                    const ticketData = ticketMap[device.hostname.toLowerCase()] || {
+                        count: 0,
+                        status: null,
+                        jobType: null,
+                        tickets: [],
+                    };
                     device.ticketCount = ticketData.count;
                     device.ticketStatus = ticketData.status;
                     device.tickets = ticketData.tickets || [];
@@ -1201,7 +1240,6 @@ class LocationDetailsModal {
             }
 
             return devices;
-
         } catch (error) {
             if (window.logger?.error) {
                 window.logger.error("location", "Error aggregating device data", { error: error.message });
@@ -1285,8 +1323,12 @@ class LocationDetailsModal {
                 if (this.allDevices) {
                     // Filter for KEV devices at same location
                     deviceList = this.allDevices
-                        .filter(device => device.hostname.toLowerCase().startsWith(location.toLowerCase()) && device.hasKev === true)
-                        .map(device => device.hostname.toUpperCase())
+                        .filter(
+                            (device) =>
+                                device.hostname.toLowerCase().startsWith(location.toLowerCase()) &&
+                                device.hasKev === true,
+                        )
+                        .map((device) => device.hostname.toUpperCase())
                         .sort(); // HEX-313: Alphabetical sorting for boot order planning
                 }
             }
@@ -1297,8 +1339,8 @@ class LocationDetailsModal {
                 if (this.allDevices) {
                     // Filter for all devices at same location
                     deviceList = this.allDevices
-                        .filter(device => device.hostname.toLowerCase().startsWith(location.toLowerCase()))
-                        .map(device => device.hostname.toUpperCase())
+                        .filter((device) => device.hostname.toLowerCase().startsWith(location.toLowerCase()))
+                        .map((device) => device.hostname.toUpperCase())
                         .sort(); // HEX-313: Alphabetical sorting for boot order planning
                 }
             }
@@ -1310,7 +1352,7 @@ class LocationDetailsModal {
             site: site,
             location: location,
             mode: mode,
-            timestamp: Date.now()
+            timestamp: Date.now(),
         };
 
         // Store data in sessionStorage for tickets.html to consume
@@ -1329,7 +1371,7 @@ class LocationDetailsModal {
      */
     viewTickets(hostname) {
         // Find device data to get ticket info
-        const device = this.allDevices?.find(d => d.hostname === hostname);
+        const device = this.allDevices?.find((d) => d.hostname === hostname);
         if (!device) {
             if (window.logger?.error) {
                 window.logger.error("location", "Device not found", { hostname });
@@ -1353,9 +1395,14 @@ class LocationDetailsModal {
                 window.ticketManager.editTicket(ticketId);
             } else {
                 if (window.logger?.warn) {
-                    window.logger.warn("location", "ticketManager.editTicket not available, falling back to navigation");
+                    window.logger.warn(
+                        "location",
+                        "ticketManager.editTicket not available, falling back to navigation",
+                    );
                 } else {
-                    console.error("[LocationDetailsModal] ticketManager.editTicket not available, falling back to navigation");
+                    console.error(
+                        "[LocationDetailsModal] ticketManager.editTicket not available, falling back to navigation",
+                    );
                 }
                 window.location.href = `/tickets.html?openTicket=${ticketId}`;
             }
@@ -1432,13 +1479,16 @@ class LocationDetailsModal {
             this.initializeFooterButtons();
 
             // Add cleanup listener for modal close
-            modalElement.addEventListener("hidden.bs.modal", () => {
-                this.destroy();
-            }, { once: true }); // Use once: true to prevent multiple listeners
+            modalElement.addEventListener(
+                "hidden.bs.modal",
+                () => {
+                    this.destroy();
+                },
+                { once: true },
+            ); // Use once: true to prevent multiple listeners
 
             // Show modal
             this.modal.show();
-
         } catch (error) {
             if (window.logger?.error) {
                 window.logger.error("location", "Error showing modal", { error: error.message });
@@ -1546,7 +1596,7 @@ class LocationDetailsModal {
         try {
             // Fetch tickets for this location
             const response = await fetch(`/api/tickets/location/${locationKey}`, {
-                credentials: "include"
+                credentials: "include",
             });
 
             if (!response.ok) {
@@ -1561,7 +1611,6 @@ class LocationDetailsModal {
             // Navigate directly to the single ticket
             const ticketId = data.tickets[0].id;
             window.location.href = `/tickets.html?openTicket=${ticketId}`;
-
         } catch (error) {
             if (window.logger?.error) {
                 window.logger.error("location", "Error fetching single ticket", { error: error.message });
@@ -1603,9 +1652,7 @@ class LocationDetailsModal {
         const installedVersion = device.installedVersion;
 
         // Filter to CVEs only
-        const cves = device.vulnerabilities
-            .filter(v => v.cve && v.cve.startsWith("CVE-"))
-            .map(v => v.cve);
+        const cves = device.vulnerabilities.filter((v) => v.cve && v.cve.startsWith("CVE-")).map((v) => v.cve);
 
         if (cves.length === 0) {
             return "N/A";
@@ -1634,33 +1681,38 @@ class LocationDetailsModal {
 
         try {
             // Query all CVEs in parallel
-            const fixedVersionPromises = uniqueCves.map(cve =>
-                advisoryHelper.getFixedVersion(cve, vendor, installedVersion)
-                    .catch(err => {
-                        if (window.logger?.warn) {
-                            window.logger.warn("location", `Failed to get fixed version for ${cve}`, { error: err.message });
-                        } else {
-                            console.warn(`[LocationDetailsModal] Failed to get fixed version for ${cve}:`, err);
-                        }
-                        return null;
-                    })
+            const fixedVersionPromises = uniqueCves.map((cve) =>
+                advisoryHelper.getFixedVersion(cve, vendor, installedVersion).catch((err) => {
+                    if (window.logger?.warn) {
+                        window.logger.warn("location", `Failed to get fixed version for ${cve}`, {
+                            error: err.message,
+                        });
+                    } else {
+                        console.warn(`[LocationDetailsModal] Failed to get fixed version for ${cve}:`, err);
+                    }
+                    return null;
+                }),
             );
 
             const fixedVersions = await Promise.all(fixedVersionPromises);
 
             // Filter out nulls and deduplicate
-            const validVersions = [...new Set(fixedVersions.filter(v => v !== null && v !== "No Fix"))];
+            const validVersions = [...new Set(fixedVersions.filter((v) => v !== null && v !== "No Fix"))];
 
             if (validVersions.length > 0) {
                 // Sort and return highest version
-                validVersions.sort((a, b) => advisoryHelper.compareVersions ? advisoryHelper.compareVersions(a, b) : a.localeCompare(b));
+                validVersions.sort((a, b) =>
+                    advisoryHelper.compareVersions ? advisoryHelper.compareVersions(a, b) : a.localeCompare(b),
+                );
                 return validVersions[0];
             } else {
                 return "No Fix";
             }
         } catch (error) {
             if (window.logger?.error) {
-                window.logger.error("location", `Error calculating fixed version for ${device.hostname}`, { error: error.message });
+                window.logger.error("location", `Error calculating fixed version for ${device.hostname}`, {
+                    error: error.message,
+                });
             } else {
                 console.error(`[LocationDetailsModal] Error calculating fixed version for ${device.hostname}:`, error);
             }
@@ -1714,7 +1766,9 @@ class LocationDetailsModal {
         const location = this.currentLocation;
 
         // Clone allDevices to avoid modifying grid state
-        const devices = this.allDevices ? this.allDevices.map(d => ({...d, vulnerabilities: [...(d.vulnerabilities || [])]})) : [];
+        const devices = this.allDevices
+            ? this.allDevices.map((d) => ({ ...d, vulnerabilities: [...(d.vulnerabilities || [])] }))
+            : [];
 
         // Perform async fixed version lookup for ALL devices
         await this.calculateAllDeviceFixedVersions(devices);
@@ -1731,9 +1785,13 @@ class LocationDetailsModal {
 
         // Calculate risk level from VPR
         let riskLevel = "Low Risk";
-        if (totalVPR >= 90) {riskLevel = "Critical Risk";}
-        else if (totalVPR >= 70) {riskLevel = "High Risk";}
-        else if (totalVPR >= 40) {riskLevel = "Medium Risk";}
+        if (totalVPR >= 90) {
+            riskLevel = "Critical Risk";
+        } else if (totalVPR >= 70) {
+            riskLevel = "High Risk";
+        } else if (totalVPR >= 40) {
+            riskLevel = "Medium Risk";
+        }
 
         // Severity breakdown
         const severityBreakdown = location.severity_breakdown || {};
@@ -1780,10 +1838,20 @@ class LocationDetailsModal {
 
         // Device data section (use calculated devices with fixed versions)
         csvData.push(["Devices"]);
-        csvData.push(["Hostname", "Vendor", "Installed Version", "Fixed Version", "CVE Count", "Total VPR", "KEV", "Ticket Count", "Ticket Status"]);
+        csvData.push([
+            "Hostname",
+            "Vendor",
+            "Installed Version",
+            "Fixed Version",
+            "CVE Count",
+            "Total VPR",
+            "KEV",
+            "Ticket Count",
+            "Ticket Status",
+        ]);
 
         if (devices && devices.length > 0) {
-            devices.forEach(device => {
+            devices.forEach((device) => {
                 csvData.push([
                     device.hostname || "N/A",
                     device.vendor || "N/A",
@@ -1793,15 +1861,15 @@ class LocationDetailsModal {
                     (device.totalVpr || 0).toFixed(1),
                     device.hasKev ? "Yes" : "No",
                     device.ticketCount || 0,
-                    device.ticketStatus || "None"
+                    device.ticketStatus || "None",
                 ]);
             });
         }
 
         // Convert to CSV format with proper escaping
-        const csvContent = csvData.map(row =>
-            row.map(field => `"${String(field).replace(/"/g, "\"\"")}"`).join(",")
-        ).join("\n");
+        const csvContent = csvData
+            .map((row) => row.map((field) => `"${String(field).replace(/"/g, '""')}"`).join(","))
+            .join("\n");
 
         // Create and download the file
         const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
@@ -1816,7 +1884,10 @@ class LocationDetailsModal {
         document.body.removeChild(link);
 
         if (window.vulnManager && typeof window.vulnManager.showToast === "function") {
-            window.vulnManager.showToast(`Exported ${devices.length} devices with fixed versions for ${locationDisplay}`, "success");
+            window.vulnManager.showToast(
+                `Exported ${devices.length} devices with fixed versions for ${locationDisplay}`,
+                "success",
+            );
         }
     }
 
@@ -1844,14 +1915,14 @@ class LocationDetailsModal {
         }
 
         // Get all device hostnames at this location
-        const deviceList = this.allDevices.map(d => d.hostname.toUpperCase());
+        const deviceList = this.allDevices.map((d) => d.hostname.toUpperCase());
 
         const ticketData = {
             devices: deviceList,
             site: site,
             location: location,
             mode: "bulk-all",
-            timestamp: Date.now()
+            timestamp: Date.now(),
         };
 
         sessionStorage.setItem("createTicketData", JSON.stringify(ticketData));
@@ -1891,8 +1962,8 @@ class LocationDetailsModal {
         this.activeFilter = null;
 
         // Dispose tooltips
-        const tooltips = document.querySelectorAll("#locationInfo [data-bs-toggle=\"tooltip\"]");
-        tooltips.forEach(tooltipEl => {
+        const tooltips = document.querySelectorAll('#locationInfo [data-bs-toggle="tooltip"]');
+        tooltips.forEach((tooltipEl) => {
             const tooltip = bootstrap.Tooltip.getInstance(tooltipEl);
             if (tooltip) {
                 tooltip.dispose();

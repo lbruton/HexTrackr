@@ -1,11 +1,10 @@
 # HexTrackr Development Roadmap
 
-*A public overview of upcoming features and improvements*
+_A public overview of upcoming features and improvements_
 
 ## Overview
 
 HexTrackr is an enterprise vulnerability management platform that helps organizations track, prioritize, and remediate security vulnerabilities across their infrastructure. This roadmap provides visibility into planned features and improvements.
-
 
 ### Advanced Reporting
 
@@ -17,7 +16,6 @@ Enhanced reporting capabilities for security teams and management dashboards.
 - Trend analysis and metrics
 - Compliance reporting templates
 - Automated report scheduling
-
 
 ## Development Philosophy
 
@@ -34,4 +32,4 @@ Features move from this roadmap to production based on priority, security requir
 
 ---
 
-*This roadmap is subject to change based on security priorities, user feedback, and technical considerations. Features are listed in planned development order but may be adjusted based on critical security requirements.*
+_This roadmap is subject to change based on security priorities, user feedback, and technical considerations. Features are listed in planned development order but may be adjusted based on critical security requirements._

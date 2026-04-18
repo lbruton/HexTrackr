@@ -56,7 +56,6 @@ class PaloAltoService {
         // (palo_alto_advisories created by init-database-v1.1.0.js)
     }
 
-
     /**
      * Fallback HTTPS client for environments without global fetch
      * @private
@@ -72,7 +71,7 @@ class PaloAltoService {
                     port: urlObj.port || 443,
                     path: urlObj.pathname + urlObj.search,
                     method: options.method || "GET",
-                    headers: options.headers || {}
+                    headers: options.headers || {},
                 };
 
                 if (options.body) {
@@ -92,7 +91,7 @@ class PaloAltoService {
                             status: response.statusCode,
                             statusText: response.statusMessage,
                             json: () => Promise.resolve(JSON.parse(data)),
-                            text: () => Promise.resolve(data)
+                            text: () => Promise.resolve(data),
                         });
                     });
                 });
@@ -117,20 +116,24 @@ class PaloAltoService {
      */
     async getAllPaloCveIds() {
         return await new Promise((resolve, reject) => {
-            this.db.all(`
+            this.db.all(
+                `
                 SELECT DISTINCT cve
                 FROM vulnerabilities_current
                 WHERE cve IS NOT NULL
                   AND cve LIKE 'CVE-%'
                   AND vendor LIKE '%Palo Alto%'
                   AND lifecycle_state IN ('active', 'reopened')
-            `, [], (err, rows) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(rows.map(row => row.cve));
-                }
-            });
+            `,
+                [],
+                (err, rows) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(rows.map((row) => row.cve));
+                    }
+                },
+            );
         });
     }
 
@@ -145,7 +148,8 @@ class PaloAltoService {
      */
     async getAllCveIds(ttlDays = 30) {
         return await new Promise((resolve, reject) => {
-            this.db.all(`
+            this.db.all(
+                `
                 SELECT DISTINCT vc.cve
                 FROM vulnerabilities_current vc
                 LEFT JOIN palo_alto_advisories pa ON vc.cve = pa.cve_id
@@ -157,13 +161,16 @@ class PaloAltoService {
                       pa.cve_id IS NULL  -- Never synced
                       OR julianday('now') - julianday(pa.last_synced) > ?  -- Stale (>TTL days)
                   )
-            `, [ttlDays], (err, rows) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(rows.map(row => row.cve));
-                }
-            });
+            `,
+                [ttlDays],
+                (err, rows) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(rows.map((row) => row.cve));
+                    }
+                },
+            );
         });
     }
 
@@ -177,8 +184,8 @@ class PaloAltoService {
         try {
             const response = await this.fetch(`${this.paloApiBaseUrl}/${cveId}`, {
                 headers: {
-                    "Accept": "application/json"
-                }
+                    Accept: "application/json",
+                },
             });
 
             if (response.status === 404) {
@@ -289,7 +296,10 @@ class PaloAltoService {
 
         _log("info", ` Severity: ${severity || "unknown"}`);
         _log("info", ` CVSS Score: ${cvssScore || "unknown"}`);
-        _log("info", ` Fixed versions: ${fixedVersions.length > 0 ? fixedVersions.slice(0, 3).join(", ") : "none"}${fixedVersions.length > 3 ? "..." : ""}`);
+        _log(
+            "info",
+            ` Fixed versions: ${fixedVersions.length > 0 ? fixedVersions.slice(0, 3).join(", ") : "none"}${fixedVersions.length > 3 ? "..." : ""}`,
+        );
         _log("info", ` Affected versions: ${affectedVersions.length}`);
 
         return {
@@ -301,7 +311,7 @@ class PaloAltoService {
             first_fixed: JSON.stringify(fixedVersions), // JSON array
             affected_versions: JSON.stringify(affectedVersions), // JSON array
             product_name: productName,
-            publication_url: `https://security.paloaltonetworks.com/${cveId}`
+            publication_url: `https://security.paloaltonetworks.com/${cveId}`,
         };
     }
 
@@ -333,7 +343,7 @@ class PaloAltoService {
                     totalAdvisories: 0,
                     matchedCount: 0,
                     totalCvesChecked: 0,
-                    lastSync: this.lastSyncTime
+                    lastSync: this.lastSyncTime,
                 };
             }
 
@@ -354,7 +364,7 @@ class PaloAltoService {
                     _log("info", ` No advisory found for ${cveId}`);
                     // Rate limiting: small delay even for 404s
                     if (i < cveIds.length - 1) {
-                        await new Promise(resolve => setTimeout(resolve, delayBetweenCalls));
+                        await new Promise((resolve) => setTimeout(resolve, delayBetweenCalls));
                     }
                     continue;
                 }
@@ -364,47 +374,55 @@ class PaloAltoService {
                 if (parsed) {
                     // Insert or replace advisory data
                     await new Promise((resolve, reject) => {
-                        this.db.run(`
+                        this.db.run(
+                            `
                             INSERT OR REPLACE INTO palo_alto_advisories (
                                 cve_id, advisory_id, advisory_title, severity, cvss_score,
                                 first_fixed, affected_versions, product_name, publication_url, last_synced
                             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-                        `, [
-                            parsed.cve_id,
-                            parsed.advisory_id,
-                            parsed.advisory_title,
-                            parsed.severity,
-                            parsed.cvss_score,
-                            parsed.first_fixed,
-                            parsed.affected_versions,
-                            parsed.product_name,
-                            parsed.publication_url
-                        ], (err) => {
-                            if (err) {
-                                _log("error", ` Insert failed for ${cveId}:`, err);
-                                reject(err);
-                            } else {
-                                resolve();
-                            }
-                        });
+                        `,
+                            [
+                                parsed.cve_id,
+                                parsed.advisory_id,
+                                parsed.advisory_title,
+                                parsed.severity,
+                                parsed.cvss_score,
+                                parsed.first_fixed,
+                                parsed.affected_versions,
+                                parsed.product_name,
+                                parsed.publication_url,
+                            ],
+                            (err) => {
+                                if (err) {
+                                    _log("error", ` Insert failed for ${cveId}:`, err);
+                                    reject(err);
+                                } else {
+                                    resolve();
+                                }
+                            },
+                        );
                     });
 
                     // Update vulnerabilities_current with vendor-neutral fix flag
                     const fixedVersionsArray = JSON.parse(parsed.first_fixed);
-                    const hasFixAvailable = (fixedVersionsArray.length > 0) ? 1 : 0;
+                    const hasFixAvailable = fixedVersionsArray.length > 0 ? 1 : 0;
                     await new Promise((resolve, reject) => {
-                        this.db.run(`
+                        this.db.run(
+                            `
                             UPDATE vulnerabilities_current
                             SET is_fix_available = ?
                             WHERE cve = ?
-                        `, [hasFixAvailable, cveId], (err) => {
-                            if (err) {
-                                _log("error", ` Update failed for ${cveId}:`, err);
-                                reject(err);
-                            } else {
-                                resolve();
-                            }
-                        });
+                        `,
+                            [hasFixAvailable, cveId],
+                            (err) => {
+                                if (err) {
+                                    _log("error", ` Update failed for ${cveId}:`, err);
+                                    reject(err);
+                                } else {
+                                    resolve();
+                                }
+                            },
+                        );
                     });
 
                     advisoryCount++;
@@ -417,7 +435,7 @@ class PaloAltoService {
 
                 // Rate limiting: wait between calls
                 if (i < cveIds.length - 1) {
-                    await new Promise(resolve => setTimeout(resolve, delayBetweenCalls));
+                    await new Promise((resolve) => setTimeout(resolve, delayBetweenCalls));
                 }
             }
 
@@ -428,12 +446,18 @@ class PaloAltoService {
             // Get actual database count
             const actualDbCount = await new Promise((resolve, reject) => {
                 this.db.get("SELECT COUNT(*) as count FROM palo_alto_advisories", (err, row) => {
-                    if (err) {reject(err);}
-                    else {resolve(row?.count || 0);}
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(row?.count || 0);
+                    }
                 });
             });
 
-            _log("info", ` Palo Alto advisory sync completed: ${advisoryCount} advisories processed (${actualDbCount} unique CVEs in DB), ${matchedCount} with fixes`);
+            _log(
+                "info",
+                ` Palo Alto advisory sync completed: ${advisoryCount} advisories processed (${actualDbCount} unique CVEs in DB), ${matchedCount} with fixes`,
+            );
 
             this.syncInProgress = false;
 
@@ -442,9 +466,8 @@ class PaloAltoService {
                 totalAdvisories: actualDbCount,
                 matchedCount: matchedCount,
                 totalCvesChecked: cveIds.length,
-                lastSync: this.lastSyncTime
+                lastSync: this.lastSyncTime,
             };
-
         } catch (error) {
             _log("error", "Palo Alto advisory sync failed:", error);
             this.syncInProgress = false;
@@ -482,18 +505,21 @@ class PaloAltoService {
      */
     async getMatchedVulnerabilitiesCount() {
         const result = await new Promise((resolve, reject) => {
-            this.db.get(`
+            this.db.get(
+                `
                 SELECT COUNT(*) as count
                 FROM palo_alto_advisories
                 WHERE first_fixed IS NOT NULL
                   AND first_fixed != '[]'
-            `, (err, row) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(row);
-                }
-            });
+            `,
+                (err, row) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(row);
+                    }
+                },
+            );
         });
 
         return result?.count || 0;
@@ -521,44 +547,53 @@ class PaloAltoService {
 
         // Get total Palo Alto CVEs count from vulnerabilities table
         const totalPaloCvesResult = await new Promise((resolve, reject) => {
-            this.db.get(`
+            this.db.get(
+                `
                 SELECT COUNT(DISTINCT cve) as count
                 FROM vulnerabilities_current
                 WHERE vendor LIKE '%Palo Alto%'
                   AND lifecycle_state IN ('active', 'reopened')
-            `, (err, row) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(row);
-                }
-            });
+            `,
+                (err, row) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(row);
+                    }
+                },
+            );
         });
 
         // Get count of synced advisories with no fixes available yet
         const noFixAvailableResult = await new Promise((resolve, reject) => {
-            this.db.get(`
+            this.db.get(
+                `
                 SELECT COUNT(*) as count
                 FROM palo_alto_advisories
                 WHERE (first_fixed IS NULL OR first_fixed = '[]')
-            `, (err, row) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(row);
-                }
-            });
+            `,
+                (err, row) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(row);
+                    }
+                },
+            );
         });
 
         // Get sync metadata
         const metadata = await new Promise((resolve, reject) => {
-            this.db.get("SELECT * FROM sync_metadata WHERE sync_type = 'palo_alto' ORDER BY sync_time DESC LIMIT 1", (err, row) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(row);
-                }
-            });
+            this.db.get(
+                "SELECT * FROM sync_metadata WHERE sync_type = 'palo_alto' ORDER BY sync_time DESC LIMIT 1",
+                (err, row) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(row);
+                    }
+                },
+            );
         });
 
         const totalPaloCves = totalPaloCvesResult?.count || 0;
@@ -575,7 +610,7 @@ class PaloAltoService {
             lastSync: metadata?.sync_time || null,
             nextSync: metadata?.next_sync_time || null,
             recordCount: metadata?.record_count || 0,
-            syncInProgress: this.syncInProgress
+            syncInProgress: this.syncInProgress,
         };
     }
 
@@ -587,19 +622,23 @@ class PaloAltoService {
      */
     async updateSyncMetadata(recordCount) {
         // Calculate next sync time (24 hours from now)
-        const nextSyncTime = new Date(Date.now() + (24 * 60 * 60 * 1000)).toISOString();
+        const nextSyncTime = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
         await new Promise((resolve, reject) => {
-            this.db.run(`
+            this.db.run(
+                `
                 INSERT INTO sync_metadata (sync_type, sync_time, next_sync_time, version, record_count)
                 VALUES ('palo_alto', ?, ?, NULL, ?)
-            `, [this.lastSyncTime, nextSyncTime, recordCount], (err) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve();
-                }
-            });
+            `,
+                [this.lastSyncTime, nextSyncTime, recordCount],
+                (err) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve();
+                    }
+                },
+            );
         });
     }
 
@@ -611,13 +650,16 @@ class PaloAltoService {
      */
     async isAutoSyncNeeded(hoursThreshold = 24) {
         const metadata = await new Promise((resolve, reject) => {
-            this.db.get("SELECT sync_time FROM sync_metadata WHERE sync_type = 'palo_alto' ORDER BY sync_time DESC LIMIT 1", (err, row) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(row);
-                }
-            });
+            this.db.get(
+                "SELECT sync_time FROM sync_metadata WHERE sync_type = 'palo_alto' ORDER BY sync_time DESC LIMIT 1",
+                (err, row) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(row);
+                    }
+                },
+            );
         });
 
         if (!metadata?.sync_time) {

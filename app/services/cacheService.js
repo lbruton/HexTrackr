@@ -41,7 +41,7 @@ class CacheService {
             stdTTL: 1800, // 30 minutes (data changes infrequently, cleared on imports)
             checkperiod: 30, // Check for expired keys every 30s
             useClones: false, // Disabled: Controllers use res.json() which serializes anyway (40-50% faster)
-            maxKeys: 100 // Safety limit
+            maxKeys: 100, // Safety limit
         });
 
         /**
@@ -54,7 +54,7 @@ class CacheService {
             stdTTL: 1800, // 30 minutes (data changes infrequently, cleared on imports)
             checkperiod: 30, // Check for expired keys every 30s
             useClones: false, // Disabled: Controllers use res.json() which serializes anyway (40-50% faster)
-            maxKeys: 100
+            maxKeys: 100,
         });
 
         /**
@@ -67,14 +67,14 @@ class CacheService {
             stdTTL: 1800, // 30 minutes (data changes infrequently, cleared on imports)
             checkperiod: 30, // Check for expired keys every 30s
             useClones: false, // Disabled: Controllers use res.json() which serializes anyway (40-50% faster)
-            maxKeys: 50 // Fewer keys (larger payloads)
+            maxKeys: 50, // Fewer keys (larger payloads)
         });
 
         // Track cache hits/misses for monitoring
         this.stats = {
             hits: 0,
             misses: 0,
-            invalidations: 0
+            invalidations: 0,
         };
 
         CacheService.instance = this;
@@ -343,7 +343,7 @@ class CacheService {
             global.logger.info("backend", "cache", "All caches cleared", {
                 statsKeys: this.statsCache.keys().length,
                 trendsKeys: this.trendsCache.keys().length,
-                vulnKeys: this.vulnerabilityCache.keys().length
+                vulnKeys: this.vulnerabilityCache.keys().length,
             });
         } else {
             console.log("All caches cleared");
@@ -368,16 +368,16 @@ class CacheService {
             hitRate: total > 0 ? this.stats.hits / total : 0,
             statsCache: {
                 keys: this.statsCache.keys().length,
-                stats: this.statsCache.getStats()
+                stats: this.statsCache.getStats(),
             },
             trendsCache: {
                 keys: this.trendsCache.keys().length,
-                stats: this.trendsCache.getStats()
+                stats: this.trendsCache.getStats(),
             },
             vulnerabilityCache: {
                 keys: this.vulnerabilityCache.keys().length,
-                stats: this.vulnerabilityCache.getStats()
-            }
+                stats: this.vulnerabilityCache.getStats(),
+            },
         };
     }
 

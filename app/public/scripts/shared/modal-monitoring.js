@@ -12,7 +12,7 @@
 /* global generateSecureId */
 /* exported ModalMonitor, ModalMonitorIntegration */
 
-(function(global) {
+(function (global) {
     "use strict";
 
     /**
@@ -29,7 +29,7 @@
                 memoryThreshold: options.memoryThreshold || 10 * 1024 * 1024, // 10MB
                 reportInterval: options.reportInterval || 60000, // 1 minute
                 maxLogEntries: options.maxLogEntries || 1000,
-                enableDebugLogging: options.enableDebugLogging || false
+                enableDebugLogging: options.enableDebugLogging || false,
             };
 
             // Performance metrics storage
@@ -42,17 +42,17 @@
                     modalOpens: 0,
                     modalCloses: 0,
                     errors: 0,
-                    memoryLeaks: 0
+                    memoryLeaks: 0,
                 },
                 sessionStart: performance.now(),
-                lastReport: performance.now()
+                lastReport: performance.now(),
             };
 
             // Active monitoring state
             this.monitoring = {
                 activeOperations: new Map(),
                 memoryBaseline: 0,
-                isMonitoring: false
+                isMonitoring: false,
             };
 
             this.init();
@@ -76,9 +76,9 @@
 
             // Start periodic reporting
             this.startPeriodicReporting();
-            
+
             this.monitoring.isMonitoring = true;
-            
+
             if (this.config.enableDebugLogging) {
                 logger.debug("ui", "Modal Monitor initialized with configuration:", this.config);
             }
@@ -94,14 +94,18 @@
             }
 
             this.monitoring.memoryBaseline = performance.memory.usedJSHeapSize;
-            
+
             // Monitor memory every 5 seconds
             setInterval(() => {
                 this.recordMemorySnapshot();
             }, 5000);
 
             if (this.config.enableDebugLogging) {
-                logger.debug("ui", "🧠 Memory monitoring started, baseline:", this.formatBytes(this.monitoring.memoryBaseline));
+                logger.debug(
+                    "ui",
+                    "🧠 Memory monitoring started, baseline:",
+                    this.formatBytes(this.monitoring.memoryBaseline),
+                );
             }
         }
 
@@ -109,14 +113,16 @@
          * Record memory snapshot
          */
         recordMemorySnapshot() {
-            if (!performance.memory) {return;}
+            if (!performance.memory) {
+                return;
+            }
 
             const snapshot = {
                 timestamp: performance.now(),
                 used: performance.memory.usedJSHeapSize,
                 total: performance.memory.totalJSHeapSize,
                 limit: performance.memory.jsHeapSizeLimit,
-                growth: performance.memory.usedJSHeapSize - this.monitoring.memoryBaseline
+                growth: performance.memory.usedJSHeapSize - this.monitoring.memoryBaseline,
             };
 
             this.metrics.memorySnapshots.push(snapshot);
@@ -137,7 +143,7 @@
          */
         reportMemoryLeak(snapshot) {
             this.metrics.operationCounts.memoryLeaks++;
-            
+
             const error = {
                 type: "MEMORY_LEAK",
                 timestamp: new Date().toISOString(),
@@ -146,12 +152,12 @@
                     memoryGrowth: snapshot.growth,
                     currentUsage: snapshot.used,
                     threshold: this.config.memoryThreshold,
-                    duration: snapshot.timestamp - this.metrics.sessionStart
-                }
+                    duration: snapshot.timestamp - this.metrics.sessionStart,
+                },
             };
 
             this.logError(error);
-            
+
             if (this.config.enableDebugLogging) {
                 logger.warn("ui", "🚨 Memory leak detected:", error.details);
             }
@@ -172,7 +178,7 @@
                 return {
                     name: name,
                     startTime: performance.now(),
-                    data: data || {}
+                    data: data || {},
                 };
             };
 
@@ -194,7 +200,7 @@
                     duration: duration,
                     startTime: startMark.startTime,
                     endTime: endTime,
-                    data: startMark.data
+                    data: startMark.data,
                 };
             };
 
@@ -219,7 +225,7 @@
                         source: source,
                         line: lineno,
                         column: colno,
-                        stack: error ? error.stack : null
+                        stack: error ? error.stack : null,
                     });
                 }
 
@@ -238,7 +244,7 @@
                         timestamp: new Date().toISOString(),
                         severity: "MEDIUM",
                         reason: event.reason.toString(),
-                        stack: event.reason.stack || null
+                        stack: event.reason.stack || null,
                     });
                 }
 
@@ -259,14 +265,14 @@
             const mark = this.createPerformanceMark(`modal-${operationType}-${operationId}`, {
                 operationType: operationType,
                 operationId: operationId,
-                ...data
+                ...data,
             });
 
             this.monitoring.activeOperations.set(operationId, {
                 type: operationType,
                 startTime: mark.startTime,
                 startMark: mark,
-                data: data
+                data: data,
             });
 
             if (this.config.enableDebugLogging) {
@@ -286,10 +292,7 @@
                 return null;
             }
 
-            const measure = this.createPerformanceMeasure(
-                `modal-${operation.type}-complete`,
-                operation.startMark
-            );
+            const measure = this.createPerformanceMeasure(`modal-${operation.type}-complete`, operation.startMark);
 
             const result = {
                 operationId: operationId,
@@ -298,7 +301,7 @@
                 success: success,
                 timestamp: new Date().toISOString(),
                 data: operation.data,
-                error: errorInfo
+                error: errorInfo,
             };
 
             // Store metrics based on operation type
@@ -324,7 +327,7 @@
                     operationType: operation.type,
                     operationId: operationId,
                     duration: measure.duration,
-                    error: errorInfo
+                    error: errorInfo,
                 });
             }
 
@@ -353,8 +356,8 @@
                     operationType: result.type,
                     duration: result.duration,
                     threshold: this.config.performanceThreshold,
-                    operationData: result.data
-                }
+                    operationData: result.data,
+                },
             };
 
             this.logError(error);
@@ -426,7 +429,7 @@
                 performance: this.calculatePerformanceStats(),
                 memory: this.calculateMemoryStats(),
                 errors: this.getRecentErrors(),
-                health: this.calculateHealthScore()
+                health: this.calculateHealthScore(),
             };
 
             this.metrics.lastReport = now;
@@ -445,20 +448,17 @@
          * Calculate performance statistics
          */
         calculatePerformanceStats() {
-            const recentOpenTimes = this.metrics.modalOpenTimes
-                .filter(op => op.success)
-                .map(op => op.duration);
+            const recentOpenTimes = this.metrics.modalOpenTimes.filter((op) => op.success).map((op) => op.duration);
 
-            const recentCloseTimes = this.metrics.modalCloseTimes
-                .filter(op => op.success)
-                .map(op => op.duration);
+            const recentCloseTimes = this.metrics.modalCloseTimes.filter((op) => op.success).map((op) => op.duration);
 
             return {
                 modalOpen: this.calculateStats(recentOpenTimes),
                 modalClose: this.calculateStats(recentCloseTimes),
                 threshold: this.config.performanceThreshold,
-                violationCount: [...recentOpenTimes, ...recentCloseTimes]
-                    .filter(time => time > this.config.performanceThreshold).length
+                violationCount: [...recentOpenTimes, ...recentCloseTimes].filter(
+                    (time) => time > this.config.performanceThreshold,
+                ).length,
             };
         }
 
@@ -471,8 +471,8 @@
             }
 
             const recent = this.metrics.memorySnapshots.slice(-20); // Last 20 snapshots
-            const growth = recent.map(s => s.growth);
-            const usage = recent.map(s => s.used);
+            const growth = recent.map((s) => s.growth);
+            const usage = recent.map((s) => s.used);
 
             return {
                 available: true,
@@ -481,7 +481,7 @@
                 growth: this.calculateStats(growth),
                 usage: this.calculateStats(usage),
                 threshold: this.config.memoryThreshold,
-                leakCount: this.metrics.operationCounts.memoryLeaks
+                leakCount: this.metrics.operationCounts.memoryLeaks,
             };
         }
 
@@ -502,7 +502,7 @@
                 min: sorted[0],
                 max: sorted[sorted.length - 1],
                 p95: sorted[Math.floor(sorted.length * 0.95)] || sorted[sorted.length - 1],
-                p99: sorted[Math.floor(sorted.length * 0.99)] || sorted[sorted.length - 1]
+                p99: sorted[Math.floor(sorted.length * 0.99)] || sorted[sorted.length - 1],
             };
         }
 
@@ -511,7 +511,7 @@
          */
         getRecentErrors() {
             const recentThreshold = Date.now() - this.config.reportInterval;
-            return this.metrics.errorLog.filter(error => {
+            return this.metrics.errorLog.filter((error) => {
                 const errorTime = new Date(error.timestamp).getTime();
                 return errorTime > recentThreshold;
             });
@@ -561,7 +561,7 @@
                 totalErrors: this.metrics.operationCounts.errors,
                 sessionDuration: performance.now() - this.metrics.sessionStart,
                 memoryBaseline: this.monitoring.memoryBaseline,
-                config: this.config
+                config: this.config,
             };
         }
 
@@ -571,7 +571,7 @@
         getMetrics() {
             return {
                 ...this.metrics,
-                currentReport: this.generatePerformanceReport()
+                currentReport: this.generatePerformanceReport(),
             };
         }
 
@@ -589,7 +589,9 @@
          * Format bytes for human reading
          */
         formatBytes(bytes) {
-            if (bytes === 0) {return "0 B";}
+            if (bytes === 0) {
+                return "0 B";
+            }
             const k = 1024;
             const sizes = ["B", "KB", "MB", "GB"];
             const i = Math.floor(Math.log(bytes) / Math.log(k));
@@ -602,7 +604,7 @@
         destroy() {
             this.monitoring.isMonitoring = false;
             this.monitoring.activeOperations.clear();
-            
+
             if (this.config.enableDebugLogging) {
                 logger.debug("ui", "Modal Monitor destroyed");
             }
@@ -617,7 +619,7 @@
         constructor(modalInstance, monitorOptions = {}) {
             this.modal = modalInstance;
             this.monitor = new ModalMonitor(monitorOptions);
-            
+
             this.setupIntegration();
         }
 
@@ -649,20 +651,20 @@
                 // Track operation start
                 this.monitor.trackModalOperationStart(operationId, operationType, {
                     method: methodName,
-                    args: args.length
+                    args: args.length,
                 });
 
                 try {
                     const result = originalMethod.apply(this.modal, args);
-                    
+
                     // Handle promise result
                     if (result && typeof result.then === "function") {
                         return result
-                            .then(value => {
+                            .then((value) => {
                                 this.monitor.trackModalOperationEnd(operationId, true);
                                 return value;
                             })
-                            .catch(error => {
+                            .catch((error) => {
                                 this.monitor.trackModalOperationEnd(operationId, false, error.message);
                                 throw error;
                             });
@@ -694,5 +696,4 @@
     }
 
     logger.debug("ui", "Modal Monitoring system loaded and ready!");
-
 })(window);

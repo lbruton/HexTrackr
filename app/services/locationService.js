@@ -103,7 +103,7 @@ class LocationService {
                 return {
                     success: true,
                     data: [],
-                    error: null
+                    error: null,
                 };
             }
 
@@ -133,18 +133,18 @@ class LocationService {
                         vendor_devices: {
                             CISCO: new Set(),
                             "Palo Alto": new Set(),
-                            Other: new Set()
+                            Other: new Set(),
                         },
                         total_vpr: 0,
                         severity_breakdown: {
                             Critical: { count: 0, vpr: 0 },
                             High: { count: 0, vpr: 0 },
                             Medium: { count: 0, vpr: 0 },
-                            Low: { count: 0, vpr: 0 }
+                            Low: { count: 0, vpr: 0 },
                         },
                         kev_cves: new Set(),
                         confidence_sum: 0,
-                        confidence_count: 0
+                        confidence_count: 0,
                     });
                 }
 
@@ -192,27 +192,25 @@ class LocationService {
             const ticketCounts = await this._getTicketCountsByLocation();
 
             // Transform map to array and finalize metrics
-            const locations = Array.from(locationMap.values()).map(loc => {
+            const locations = Array.from(locationMap.values()).map((loc) => {
                 // Calculate vendor breakdown (counts only)
                 const vendor_breakdown = {
                     CISCO: loc.vendor_devices.CISCO.size,
                     "Palo Alto": loc.vendor_devices["Palo Alto"].size,
-                    Other: loc.vendor_devices.Other.size
+                    Other: loc.vendor_devices.Other.size,
                 };
 
                 // Determine primary vendor (most devices)
                 const primary_vendor = this._determinePrimaryVendor(vendor_breakdown);
 
                 // Calculate average parsing confidence
-                const avg_confidence = loc.confidence_count > 0
-                    ? loc.confidence_sum / loc.confidence_count
-                    : 0.5;
+                const avg_confidence = loc.confidence_count > 0 ? loc.confidence_sum / loc.confidence_count : 0.5;
 
                 // Convert KEV devices Map to array of objects for frontend
                 const kev_devices = Array.from(loc.kev_devices.entries()).map(([hostname, cves]) => ({
                     hostname,
                     cves: Array.from(cves),
-                    cve_count: cves.size
+                    cve_count: cves.size,
                 }));
 
                 return {
@@ -228,7 +226,7 @@ class LocationService {
                     severity_breakdown: loc.severity_breakdown,
                     kev_count: loc.kev_cves.size,
                     open_tickets: ticketCounts.get(loc.location) || 0,
-                    confidence: Math.round(avg_confidence * 100) / 100 // Round to 2 decimals
+                    confidence: Math.round(avg_confidence * 100) / 100, // Round to 2 decimals
                 };
             });
 
@@ -238,12 +236,14 @@ class LocationService {
             return {
                 success: true,
                 data: locations,
-                error: null
+                error: null,
             };
-
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "location", "Error getting location stats", { error: error.message, stack: error.stack });
+                global.logger.error("backend", "location", "Error getting location stats", {
+                    error: error.message,
+                    stack: error.stack,
+                });
             } else {
                 console.error("[LocationService] Error getting location stats:", error);
             }
@@ -251,7 +251,7 @@ class LocationService {
             return {
                 success: false,
                 data: [],
-                error: error.message
+                error: error.message,
             };
         }
     }
@@ -286,7 +286,6 @@ class LocationService {
             }
 
             return ticketMap;
-
         } catch (error) {
             if (global.logger?.error) {
                 global.logger.error("backend", "location", "Error getting ticket counts", { error: error.message });
@@ -305,7 +304,9 @@ class LocationService {
      * @returns {string} Normalized vendor: "CISCO", "Palo Alto", or "Other"
      */
     _normalizeVendor(vendor) {
-        if (!vendor) {return "Other";}
+        if (!vendor) {
+            return "Other";
+        }
 
         const vendorLower = vendor.toLowerCase();
 
@@ -376,5 +377,5 @@ function getLocationService() {
 
 module.exports = {
     LocationService,
-    getLocationService
+    getLocationService,
 };
