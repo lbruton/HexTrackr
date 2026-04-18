@@ -37,18 +37,15 @@ const dbPath = path.join(__dirname, "..", "..", "data", "hextrackr.db");
  * @returns {Promise<boolean>} True if schema exists
  */
 async function checkExistingSchema(db) {
-  return new Promise((resolve, reject) => {
-    db.get(
-      "SELECT COUNT(*) as count FROM sqlite_master WHERE type='table' AND name='users'",
-      (err, row) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(row.count > 0);
-        }
-      }
-    );
-  });
+    return new Promise((resolve, reject) => {
+        db.get("SELECT COUNT(*) as count FROM sqlite_master WHERE type='table' AND name='users'", (err, row) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(row.count > 0);
+            }
+        });
+    });
 }
 
 /**
@@ -56,54 +53,54 @@ async function checkExistingSchema(db) {
  * @returns {Promise<void>}
  */
 async function initializeDatabase() {
-  return new Promise((resolve, reject) => {
-    // Create database and tables
-    const db = new sqlite3.Database(dbPath, async (err) => {
-      if (err) {
-        console.error("Error opening database:", err.message);
-        reject(err);
-        return;
-      }
-      console.log("Connected to SQLite database");
+    return new Promise((resolve, reject) => {
+        // Create database and tables
+        const db = new sqlite3.Database(dbPath, async (err) => {
+            if (err) {
+                console.error("Error opening database:", err.message);
+                reject(err);
+                return;
+            }
+            console.log("Connected to SQLite database");
 
-      try {
-        // Check if schema already exists
-        const schemaExists = await checkExistingSchema(db);
-        if (schemaExists) {
-          console.log("");
-          console.log("═══════════════════════════════════════════════════════");
-          console.log("EXISTING DATABASE DETECTED");
-          console.log("═══════════════════════════════════════════════════════");
-          console.log("Schema already initialized - use migrations for upgrades");
-          console.log("To reinitialize, delete the database file first");
-          console.log("═══════════════════════════════════════════════════════");
-          console.log("");
-          db.close();
-          resolve();
-          return;
-        }
+            try {
+                // Check if schema already exists
+                const schemaExists = await checkExistingSchema(db);
+                if (schemaExists) {
+                    console.log("");
+                    console.log("═══════════════════════════════════════════════════════");
+                    console.log("EXISTING DATABASE DETECTED");
+                    console.log("═══════════════════════════════════════════════════════");
+                    console.log("Schema already initialized - use migrations for upgrades");
+                    console.log("To reinitialize, delete the database file first");
+                    console.log("═══════════════════════════════════════════════════════");
+                    console.log("");
+                    db.close();
+                    resolve();
+                    return;
+                }
 
-        // Create fresh schema
-        await createTables(db);
-        await seedInitialData(db);
+                // Create fresh schema
+                await createTables(db);
+                await seedInitialData(db);
 
-        // Close database
-        db.close((closeErr) => {
-          if (closeErr) {
-            console.error("Error closing database:", closeErr.message);
-            reject(closeErr);
-          } else {
-            console.log("Database connection closed");
-            resolve();
-          }
+                // Close database
+                db.close((closeErr) => {
+                    if (closeErr) {
+                        console.error("Error closing database:", closeErr.message);
+                        reject(closeErr);
+                    } else {
+                        console.log("Database connection closed");
+                        resolve();
+                    }
+                });
+            } catch (error) {
+                console.error("Error during database initialization:", error);
+                db.close();
+                reject(error);
+            }
         });
-      } catch (error) {
-        console.error("Error during database initialization:", error);
-        db.close();
-        reject(error);
-      }
     });
-  });
 }
 
 /**
@@ -112,19 +109,19 @@ async function initializeDatabase() {
  * @returns {Promise<void>}
  */
 function createTables(db) {
-  return new Promise((resolve, reject) => {
-    db.serialize(() => {
-  // ============================================================================
-  // PRAGMA SETTINGS - WAL Mode + Foreign Keys
-  // ============================================================================
-  db.run("PRAGMA foreign_keys = ON");
-  db.run("PRAGMA journal_mode = WAL");
-  db.run("PRAGMA synchronous = NORMAL");
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            // ============================================================================
+            // PRAGMA SETTINGS - WAL Mode + Foreign Keys
+            // ============================================================================
+            db.run("PRAGMA foreign_keys = ON");
+            db.run("PRAGMA journal_mode = WAL");
+            db.run("PRAGMA synchronous = NORMAL");
 
-  // ============================================================================
-  // TABLE 1: tickets - Field operations ticketing system
-  // ============================================================================
-  db.run(`CREATE TABLE IF NOT EXISTS tickets (
+            // ============================================================================
+            // TABLE 1: tickets - Field operations ticketing system
+            // ============================================================================
+            db.run(`CREATE TABLE IF NOT EXISTS tickets (
     id TEXT PRIMARY KEY,
     xt_number TEXT,
     date_submitted TEXT,
@@ -169,10 +166,10 @@ function createTables(db) {
     device_status TEXT
   )`);
 
-  // ============================================================================
-  // TABLE 2: vulnerability_imports - CSV import tracking
-  // ============================================================================
-  db.run(`CREATE TABLE IF NOT EXISTS vulnerability_imports (
+            // ============================================================================
+            // TABLE 2: vulnerability_imports - CSV import tracking
+            // ============================================================================
+            db.run(`CREATE TABLE IF NOT EXISTS vulnerability_imports (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     filename TEXT NOT NULL,
     import_date TEXT NOT NULL,
@@ -184,11 +181,11 @@ function createTables(db) {
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
 
-  // ============================================================================
-  // TABLE 3: ticket_vulnerabilities - Junction table for ticket-vuln mapping
-  // References vulnerabilities_current for future mitigation tracking feature
-  // ============================================================================
-  db.run(`CREATE TABLE IF NOT EXISTS ticket_vulnerabilities (
+            // ============================================================================
+            // TABLE 3: ticket_vulnerabilities - Junction table for ticket-vuln mapping
+            // References vulnerabilities_current for future mitigation tracking feature
+            // ============================================================================
+            db.run(`CREATE TABLE IF NOT EXISTS ticket_vulnerabilities (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     ticket_id TEXT NOT NULL,
     vulnerability_id INTEGER NOT NULL,
@@ -199,10 +196,10 @@ function createTables(db) {
     FOREIGN KEY (vulnerability_id) REFERENCES vulnerabilities_current (id)
   )`);
 
-  // ============================================================================
-  // TABLE 4: vulnerability_snapshots - Historical vulnerability data
-  // ============================================================================
-  db.run(`CREATE TABLE IF NOT EXISTS vulnerability_snapshots (
+            // ============================================================================
+            // TABLE 4: vulnerability_snapshots - Historical vulnerability data
+            // ============================================================================
+            db.run(`CREATE TABLE IF NOT EXISTS vulnerability_snapshots (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     import_id INTEGER NOT NULL,
     scan_date TEXT NOT NULL,
@@ -232,10 +229,10 @@ function createTables(db) {
     FOREIGN KEY (import_id) REFERENCES vulnerability_imports (id)
   )`);
 
-  // ============================================================================
-  // TABLE 5: vulnerabilities_current - Active vulnerability data
-  // ============================================================================
-  db.run(`CREATE TABLE IF NOT EXISTS vulnerabilities_current (
+            // ============================================================================
+            // TABLE 5: vulnerabilities_current - Active vulnerability data
+            // ============================================================================
+            db.run(`CREATE TABLE IF NOT EXISTS vulnerabilities_current (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     import_id INTEGER NOT NULL,
     scan_date TEXT NOT NULL,
@@ -269,10 +266,10 @@ function createTables(db) {
     FOREIGN KEY (import_id) REFERENCES vulnerability_imports (id)
   )`);
 
-  // ============================================================================
-  // TABLE 6: vulnerability_daily_totals - Aggregated trend metrics
-  // ============================================================================
-  db.run(`CREATE TABLE IF NOT EXISTS vulnerability_daily_totals (
+            // ============================================================================
+            // TABLE 6: vulnerability_daily_totals - Aggregated trend metrics
+            // ============================================================================
+            db.run(`CREATE TABLE IF NOT EXISTS vulnerability_daily_totals (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     scan_date TEXT NOT NULL UNIQUE,
     critical_count INTEGER DEFAULT 0,
@@ -290,10 +287,10 @@ function createTables(db) {
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
 
-  // ============================================================================
-  // TABLE 7: vendor_daily_totals - Vendor-specific trend metrics (Migration 008)
-  // ============================================================================
-  db.run(`CREATE TABLE IF NOT EXISTS vendor_daily_totals (
+            // ============================================================================
+            // TABLE 7: vendor_daily_totals - Vendor-specific trend metrics (Migration 008)
+            // ============================================================================
+            db.run(`CREATE TABLE IF NOT EXISTS vendor_daily_totals (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     scan_date TEXT NOT NULL,
     vendor TEXT NOT NULL,
@@ -311,10 +308,10 @@ function createTables(db) {
     UNIQUE(scan_date, vendor)
   )`);
 
-  // ============================================================================
-  // TABLE 8: vulnerability_staging - Import staging area
-  // ============================================================================
-  db.run(`CREATE TABLE IF NOT EXISTS vulnerability_staging (
+            // ============================================================================
+            // TABLE 8: vulnerability_staging - Import staging area
+            // ============================================================================
+            db.run(`CREATE TABLE IF NOT EXISTS vulnerability_staging (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     import_id INTEGER NOT NULL,
     hostname TEXT,
@@ -346,10 +343,10 @@ function createTables(db) {
     FOREIGN KEY (import_id) REFERENCES vulnerability_imports (id)
   )`);
 
-  // ============================================================================
-  // TABLE 9: email_templates - Email notification templates
-  // ============================================================================
-  db.run(`CREATE TABLE IF NOT EXISTS email_templates (
+            // ============================================================================
+            // TABLE 9: email_templates - Email notification templates
+            // ============================================================================
+            db.run(`CREATE TABLE IF NOT EXISTS email_templates (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL UNIQUE,
     description TEXT,
@@ -362,10 +359,10 @@ function createTables(db) {
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
 
-  // ============================================================================
-  // TABLE 10: kev_status - CISA Known Exploited Vulnerabilities
-  // ============================================================================
-  db.run(`CREATE TABLE IF NOT EXISTS kev_status (
+            // ============================================================================
+            // TABLE 10: kev_status - CISA Known Exploited Vulnerabilities
+            // ============================================================================
+            db.run(`CREATE TABLE IF NOT EXISTS kev_status (
     cve_id TEXT PRIMARY KEY,
     date_added DATE NOT NULL,
     vulnerability_name TEXT,
@@ -378,10 +375,10 @@ function createTables(db) {
     last_synced TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`);
 
-  // ============================================================================
-  // TABLE 11: sync_metadata - Background sync tracking
-  // ============================================================================
-  db.run(`CREATE TABLE IF NOT EXISTS sync_metadata (
+            // ============================================================================
+            // TABLE 11: sync_metadata - Background sync tracking
+            // ============================================================================
+            db.run(`CREATE TABLE IF NOT EXISTS sync_metadata (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     sync_type TEXT NOT NULL,
     sync_time TIMESTAMP NOT NULL,
@@ -393,10 +390,10 @@ function createTables(db) {
     next_sync_time TEXT
   )`);
 
-  // ============================================================================
-  // TABLE 12: ticket_templates - Ticket markdown templates
-  // ============================================================================
-  db.run(`CREATE TABLE IF NOT EXISTS ticket_templates (
+            // ============================================================================
+            // TABLE 12: ticket_templates - Ticket markdown templates
+            // ============================================================================
+            db.run(`CREATE TABLE IF NOT EXISTS ticket_templates (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL UNIQUE,
     description TEXT,
@@ -409,10 +406,10 @@ function createTables(db) {
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
 
-  // ============================================================================
-  // TABLE 13: vulnerability_templates - CVE templates
-  // ============================================================================
-  db.run(`CREATE TABLE IF NOT EXISTS vulnerability_templates (
+            // ============================================================================
+            // TABLE 13: vulnerability_templates - CVE templates
+            // ============================================================================
+            db.run(`CREATE TABLE IF NOT EXISTS vulnerability_templates (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL UNIQUE,
     description TEXT,
@@ -425,10 +422,10 @@ function createTables(db) {
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
 
-  // ============================================================================
-  // TABLE 14: users - Authentication and authorization
-  // ============================================================================
-  db.run(`CREATE TABLE IF NOT EXISTS users (
+            // ============================================================================
+            // TABLE 14: users - Authentication and authorization
+            // ============================================================================
+            db.run(`CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,
     username TEXT UNIQUE NOT NULL,
     email TEXT,
@@ -442,10 +439,10 @@ function createTables(db) {
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
 
-  // ============================================================================
-  // TABLE 15: user_preferences - Cross-device settings (HEX-138)
-  // ============================================================================
-  db.run(`CREATE TABLE IF NOT EXISTS user_preferences (
+            // ============================================================================
+            // TABLE 15: user_preferences - Cross-device settings (HEX-138)
+            // ============================================================================
+            db.run(`CREATE TABLE IF NOT EXISTS user_preferences (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id TEXT NOT NULL,
     preference_key TEXT NOT NULL,
@@ -456,10 +453,10 @@ function createTables(db) {
     UNIQUE(user_id, preference_key)
   )`);
 
-  // ============================================================================
-  // TABLE 16: cisco_advisories - Cisco PSIRT advisory data
-  // ============================================================================
-  db.run(`CREATE TABLE IF NOT EXISTS cisco_advisories (
+            // ============================================================================
+            // TABLE 16: cisco_advisories - Cisco PSIRT advisory data
+            // ============================================================================
+            db.run(`CREATE TABLE IF NOT EXISTS cisco_advisories (
     cve_id TEXT PRIMARY KEY,
     advisory_id TEXT,
     advisory_title TEXT,
@@ -472,10 +469,10 @@ function createTables(db) {
     last_synced TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`);
 
-  // ============================================================================
-  // TABLE 17: cisco_fixed_versions - Normalized Cisco fixed versions (Migration 007)
-  // ============================================================================
-  db.run(`CREATE TABLE IF NOT EXISTS cisco_fixed_versions (
+            // ============================================================================
+            // TABLE 17: cisco_fixed_versions - Normalized Cisco fixed versions (Migration 007)
+            // ============================================================================
+            db.run(`CREATE TABLE IF NOT EXISTS cisco_fixed_versions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     cve_id TEXT NOT NULL,
     os_family TEXT NOT NULL,
@@ -486,10 +483,10 @@ function createTables(db) {
     UNIQUE(cve_id, os_family, fixed_version)
   )`);
 
-  // ============================================================================
-  // TABLE 18: palo_alto_advisories - Palo Alto security bulletins
-  // ============================================================================
-  db.run(`CREATE TABLE IF NOT EXISTS palo_alto_advisories (
+            // ============================================================================
+            // TABLE 18: palo_alto_advisories - Palo Alto security bulletins
+            // ============================================================================
+            db.run(`CREATE TABLE IF NOT EXISTS palo_alto_advisories (
     cve_id TEXT PRIMARY KEY,
     advisory_id TEXT,
     advisory_title TEXT,
@@ -502,10 +499,10 @@ function createTables(db) {
     last_synced TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`);
 
-  // ============================================================================
-  // TABLE 19: audit_logs - Encrypted audit trail (Migration 012)
-  // ============================================================================
-  db.run(`CREATE TABLE IF NOT EXISTS audit_logs (
+            // ============================================================================
+            // TABLE 19: audit_logs - Encrypted audit trail (Migration 012)
+            // ============================================================================
+            db.run(`CREATE TABLE IF NOT EXISTS audit_logs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     category TEXT NOT NULL,
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -520,10 +517,10 @@ function createTables(db) {
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
 
-  // ============================================================================
-  // TABLE 20: audit_log_config - Audit configuration (Migration 012)
-  // ============================================================================
-  db.run(`CREATE TABLE IF NOT EXISTS audit_log_config (
+            // ============================================================================
+            // TABLE 20: audit_log_config - Audit configuration (Migration 012)
+            // ============================================================================
+            db.run(`CREATE TABLE IF NOT EXISTS audit_log_config (
     id INTEGER PRIMARY KEY CHECK (id = 1),
     encryption_key BLOB NOT NULL,
     key_created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -536,169 +533,198 @@ function createTables(db) {
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
 
-  // ============================================================================
-  // INDEXES - 68 Performance Indexes
-  // ============================================================================
+            // ============================================================================
+            // INDEXES - 68 Performance Indexes
+            // ============================================================================
 
-  // Tickets indexes (11 total)
-  db.run("CREATE INDEX IF NOT EXISTS idx_tickets_status ON tickets (status)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_tickets_site ON tickets (site)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_tickets_location ON tickets (location)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_tickets_xt ON tickets (xt_number)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_tickets_deleted ON tickets(deleted)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_tickets_xt_number ON tickets(xt_number)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_tickets_job_type ON tickets(job_type)");
-  db.run("CREATE UNIQUE INDEX IF NOT EXISTS idx_tickets_xt_unique_active ON tickets(xt_number) WHERE deleted = 0");
+            // Tickets indexes (11 total)
+            db.run("CREATE INDEX IF NOT EXISTS idx_tickets_status ON tickets (status)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_tickets_site ON tickets (site)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_tickets_location ON tickets (location)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_tickets_xt ON tickets (xt_number)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_tickets_deleted ON tickets(deleted)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_tickets_xt_number ON tickets(xt_number)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_tickets_job_type ON tickets(job_type)");
+            db.run(
+                "CREATE UNIQUE INDEX IF NOT EXISTS idx_tickets_xt_unique_active ON tickets(xt_number) WHERE deleted = 0",
+            );
 
-  // Vulnerabilities indexes (6 total)
-  db.run("CREATE INDEX IF NOT EXISTS idx_vulnerabilities_hostname ON vulnerabilities (hostname)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_vulnerabilities_severity ON vulnerabilities (severity)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_vulnerabilities_cve ON vulnerabilities (cve)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_vulnerabilities_import ON vulnerabilities (import_id)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_vulnerabilities_is_fixed ON vulnerabilities(is_fixed) WHERE is_fixed = 1");
+            // Vulnerabilities indexes (6 total)
+            db.run("CREATE INDEX IF NOT EXISTS idx_vulnerabilities_hostname ON vulnerabilities (hostname)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_vulnerabilities_severity ON vulnerabilities (severity)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_vulnerabilities_cve ON vulnerabilities (cve)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_vulnerabilities_import ON vulnerabilities (import_id)");
+            db.run(
+                "CREATE INDEX IF NOT EXISTS idx_vulnerabilities_is_fixed ON vulnerabilities(is_fixed) WHERE is_fixed = 1",
+            );
 
-  // Ticket-vulnerability junction indexes (2 total)
-  db.run("CREATE INDEX IF NOT EXISTS idx_ticket_vulns_ticket ON ticket_vulnerabilities (ticket_id)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_ticket_vulns_vuln ON ticket_vulnerabilities (vulnerability_id)");
+            // Ticket-vulnerability junction indexes (2 total)
+            db.run("CREATE INDEX IF NOT EXISTS idx_ticket_vulns_ticket ON ticket_vulnerabilities (ticket_id)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_ticket_vulns_vuln ON ticket_vulnerabilities (vulnerability_id)");
 
-  // Vulnerability snapshots indexes (5 total)
-  db.run("CREATE INDEX IF NOT EXISTS idx_snapshots_scan_date ON vulnerability_snapshots (scan_date)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_snapshots_hostname ON vulnerability_snapshots (hostname)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_snapshots_severity ON vulnerability_snapshots (severity)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_snapshots_enhanced_key ON vulnerability_snapshots (enhanced_unique_key)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_snapshots_cve ON vulnerability_snapshots (cve)");
+            // Vulnerability snapshots indexes (5 total)
+            db.run("CREATE INDEX IF NOT EXISTS idx_snapshots_scan_date ON vulnerability_snapshots (scan_date)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_snapshots_hostname ON vulnerability_snapshots (hostname)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_snapshots_severity ON vulnerability_snapshots (severity)");
+            db.run(
+                "CREATE INDEX IF NOT EXISTS idx_snapshots_enhanced_key ON vulnerability_snapshots (enhanced_unique_key)",
+            );
+            db.run("CREATE INDEX IF NOT EXISTS idx_snapshots_cve ON vulnerability_snapshots (cve)");
 
-  // Vulnerabilities current indexes (11 total)
-  db.run("CREATE INDEX IF NOT EXISTS idx_current_unique_key ON vulnerabilities_current (unique_key)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_current_scan_date ON vulnerabilities_current (scan_date)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_current_enhanced_unique_key ON vulnerabilities_current (enhanced_unique_key)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_current_lifecycle_scan ON vulnerabilities_current (lifecycle_state, scan_date)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_current_confidence_tier ON vulnerabilities_current (confidence_score, dedup_tier)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_current_active_severity ON vulnerabilities_current (lifecycle_state, severity)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_current_resolved_date ON vulnerabilities_current (resolved_date)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_current_cve ON vulnerabilities_current (cve)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_current_vendor ON vulnerabilities_current (vendor)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_vulnerabilities_current_fix_available ON vulnerabilities_current(is_fix_available) WHERE is_fix_available = 1");
+            // Vulnerabilities current indexes (11 total)
+            db.run("CREATE INDEX IF NOT EXISTS idx_current_unique_key ON vulnerabilities_current (unique_key)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_current_scan_date ON vulnerabilities_current (scan_date)");
+            db.run(
+                "CREATE INDEX IF NOT EXISTS idx_current_enhanced_unique_key ON vulnerabilities_current (enhanced_unique_key)",
+            );
+            db.run(
+                "CREATE INDEX IF NOT EXISTS idx_current_lifecycle_scan ON vulnerabilities_current (lifecycle_state, scan_date)",
+            );
+            db.run(
+                "CREATE INDEX IF NOT EXISTS idx_current_confidence_tier ON vulnerabilities_current (confidence_score, dedup_tier)",
+            );
+            db.run(
+                "CREATE INDEX IF NOT EXISTS idx_current_active_severity ON vulnerabilities_current (lifecycle_state, severity)",
+            );
+            db.run("CREATE INDEX IF NOT EXISTS idx_current_resolved_date ON vulnerabilities_current (resolved_date)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_current_cve ON vulnerabilities_current (cve)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_current_vendor ON vulnerabilities_current (vendor)");
+            db.run(
+                "CREATE INDEX IF NOT EXISTS idx_vulnerabilities_current_fix_available ON vulnerabilities_current(is_fix_available) WHERE is_fix_available = 1",
+            );
 
-  // Vulnerability staging indexes (4 total)
-  db.run("CREATE INDEX IF NOT EXISTS idx_staging_import_id ON vulnerability_staging (import_id)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_staging_processed ON vulnerability_staging (processed)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_staging_batch_id ON vulnerability_staging (batch_id)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_staging_unprocessed_batch ON vulnerability_staging (processed, batch_id)");
+            // Vulnerability staging indexes (4 total)
+            db.run("CREATE INDEX IF NOT EXISTS idx_staging_import_id ON vulnerability_staging (import_id)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_staging_processed ON vulnerability_staging (processed)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_staging_batch_id ON vulnerability_staging (batch_id)");
+            db.run(
+                "CREATE INDEX IF NOT EXISTS idx_staging_unprocessed_batch ON vulnerability_staging (processed, batch_id)",
+            );
 
-  // Vendor daily totals indexes (3 total)
-  db.run("CREATE INDEX IF NOT EXISTS idx_vendor_daily_scan_date ON vendor_daily_totals(scan_date)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_vendor_daily_vendor ON vendor_daily_totals(vendor)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_vendor_daily_composite ON vendor_daily_totals(vendor, scan_date)");
+            // Vendor daily totals indexes (3 total)
+            db.run("CREATE INDEX IF NOT EXISTS idx_vendor_daily_scan_date ON vendor_daily_totals(scan_date)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_vendor_daily_vendor ON vendor_daily_totals(vendor)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_vendor_daily_composite ON vendor_daily_totals(vendor, scan_date)");
 
-  // Email templates indexes (3 total)
-  db.run("CREATE INDEX IF NOT EXISTS idx_email_templates_name ON email_templates (name)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_email_templates_active ON email_templates (is_active)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_email_templates_category ON email_templates (category)");
+            // Email templates indexes (3 total)
+            db.run("CREATE INDEX IF NOT EXISTS idx_email_templates_name ON email_templates (name)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_email_templates_active ON email_templates (is_active)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_email_templates_category ON email_templates (category)");
 
-  // KEV status indexes (4 total)
-  db.run("CREATE INDEX IF NOT EXISTS idx_kev_status_ransomware ON kev_status(known_ransomware_use) WHERE known_ransomware_use = 1");
-  db.run("CREATE INDEX IF NOT EXISTS idx_kev_status_date_added ON kev_status(date_added)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_kev_status_cve_id ON kev_status(cve_id)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_kev_status_due_date ON kev_status(due_date)");
+            // KEV status indexes (4 total)
+            db.run(
+                "CREATE INDEX IF NOT EXISTS idx_kev_status_ransomware ON kev_status(known_ransomware_use) WHERE known_ransomware_use = 1",
+            );
+            db.run("CREATE INDEX IF NOT EXISTS idx_kev_status_date_added ON kev_status(date_added)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_kev_status_cve_id ON kev_status(cve_id)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_kev_status_due_date ON kev_status(due_date)");
 
-  // Sync metadata indexes (1 total)
-  db.run("CREATE INDEX IF NOT EXISTS idx_sync_metadata_type_time ON sync_metadata(sync_type, sync_time DESC)");
+            // Sync metadata indexes (1 total)
+            db.run(
+                "CREATE INDEX IF NOT EXISTS idx_sync_metadata_type_time ON sync_metadata(sync_type, sync_time DESC)",
+            );
 
-  // Ticket templates indexes (3 total)
-  db.run("CREATE INDEX IF NOT EXISTS idx_ticket_templates_name ON ticket_templates (name)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_ticket_templates_category ON ticket_templates (category)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_ticket_templates_active ON ticket_templates (is_active)");
+            // Ticket templates indexes (3 total)
+            db.run("CREATE INDEX IF NOT EXISTS idx_ticket_templates_name ON ticket_templates (name)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_ticket_templates_category ON ticket_templates (category)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_ticket_templates_active ON ticket_templates (is_active)");
 
-  // Vulnerability templates indexes (3 total)
-  db.run("CREATE INDEX IF NOT EXISTS idx_vulnerability_templates_name ON vulnerability_templates (name)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_vulnerability_templates_category ON vulnerability_templates (category)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_vulnerability_templates_active ON vulnerability_templates (is_active)");
+            // Vulnerability templates indexes (3 total)
+            db.run("CREATE INDEX IF NOT EXISTS idx_vulnerability_templates_name ON vulnerability_templates (name)");
+            db.run(
+                "CREATE INDEX IF NOT EXISTS idx_vulnerability_templates_category ON vulnerability_templates (category)",
+            );
+            db.run(
+                "CREATE INDEX IF NOT EXISTS idx_vulnerability_templates_active ON vulnerability_templates (is_active)",
+            );
 
-  // Users indexes (2 total)
-  db.run("CREATE INDEX IF NOT EXISTS idx_users_username ON users (username)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_users_email ON users (email)");
+            // Users indexes (2 total)
+            db.run("CREATE INDEX IF NOT EXISTS idx_users_username ON users (username)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_users_email ON users (email)");
 
-  // User preferences indexes (2 total)
-  db.run("CREATE INDEX IF NOT EXISTS idx_user_preferences_user_id ON user_preferences (user_id)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_user_preferences_key ON user_preferences (user_id, preference_key)");
+            // User preferences indexes (2 total)
+            db.run("CREATE INDEX IF NOT EXISTS idx_user_preferences_user_id ON user_preferences (user_id)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_user_preferences_key ON user_preferences (user_id, preference_key)");
 
-  // Cisco advisories indexes (2 total)
-  db.run("CREATE INDEX IF NOT EXISTS idx_cisco_advisories_cve ON cisco_advisories(cve_id)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_cisco_advisories_synced ON cisco_advisories(last_synced)");
+            // Cisco advisories indexes (2 total)
+            db.run("CREATE INDEX IF NOT EXISTS idx_cisco_advisories_cve ON cisco_advisories(cve_id)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_cisco_advisories_synced ON cisco_advisories(last_synced)");
 
-  // Cisco fixed versions indexes (3 total)
-  db.run("CREATE INDEX IF NOT EXISTS idx_fixed_versions_cve ON cisco_fixed_versions(cve_id)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_fixed_versions_os_family ON cisco_fixed_versions(os_family)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_fixed_versions_lookup ON cisco_fixed_versions(cve_id, os_family)");
+            // Cisco fixed versions indexes (3 total)
+            db.run("CREATE INDEX IF NOT EXISTS idx_fixed_versions_cve ON cisco_fixed_versions(cve_id)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_fixed_versions_os_family ON cisco_fixed_versions(os_family)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_fixed_versions_lookup ON cisco_fixed_versions(cve_id, os_family)");
 
-  // Palo Alto advisories indexes (2 total)
-  db.run("CREATE INDEX IF NOT EXISTS idx_palo_advisories_cve ON palo_alto_advisories(cve_id)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_palo_advisories_synced ON palo_alto_advisories(last_synced)");
+            // Palo Alto advisories indexes (2 total)
+            db.run("CREATE INDEX IF NOT EXISTS idx_palo_advisories_cve ON palo_alto_advisories(cve_id)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_palo_advisories_synced ON palo_alto_advisories(last_synced)");
 
-  // Audit logs indexes (6 total) - last index triggers completion callback
-  db.run("CREATE INDEX IF NOT EXISTS idx_audit_logs_category ON audit_logs(category)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_audit_logs_timestamp ON audit_logs(timestamp)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_audit_logs_user_id ON audit_logs(user_id)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_audit_logs_username ON audit_logs(username)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_audit_logs_created_at ON audit_logs(created_at)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_audit_logs_category_timestamp ON audit_logs(category, timestamp)");
+            // Audit logs indexes (6 total) - last index triggers completion callback
+            db.run("CREATE INDEX IF NOT EXISTS idx_audit_logs_category ON audit_logs(category)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_audit_logs_timestamp ON audit_logs(timestamp)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_audit_logs_user_id ON audit_logs(user_id)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_audit_logs_username ON audit_logs(username)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_audit_logs_created_at ON audit_logs(created_at)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_audit_logs_category_timestamp ON audit_logs(category, timestamp)");
 
-  // ============================================================================
-  // TRIGGERS - 1 Trigger
-  // ============================================================================
-  db.run(`CREATE TRIGGER IF NOT EXISTS user_preferences_updated_at
+            // ============================================================================
+            // TRIGGERS - 1 Trigger
+            // ============================================================================
+            db.run(
+                `CREATE TRIGGER IF NOT EXISTS user_preferences_updated_at
     AFTER UPDATE ON user_preferences
     FOR EACH ROW
   BEGIN
     UPDATE user_preferences
     SET updated_at = CURRENT_TIMESTAMP
     WHERE id = NEW.id;
-  END`, (err) => {
-    if (err) {
-      console.error("Error creating trigger:", err.message);
-      reject(err);
-      return;
-    }
+  END`,
+                (err) => {
+                    if (err) {
+                        console.error("Error creating trigger:", err.message);
+                        reject(err);
+                        return;
+                    }
 
-    console.log("");
-    console.log("═══════════════════════════════════════════════════════");
-    console.log("DATABASE INITIALIZED SUCCESSFULLY - v1.1.0 BASELINE");
-    console.log("═══════════════════════════════════════════════════════");
-    console.log("Schema Version: v1.1.0 (consolidated)");
-    console.log("Tables Created: 21 application tables");
-    console.log("Indexes Created: 68 performance indexes");
-    console.log("Triggers Created: 1 (user_preferences_updated_at)");
-    console.log("");
-    console.log("Tables:");
-    console.log(" - tickets (field operations ticketing)");
-    console.log(" - vulnerability_imports (import tracking)");
-    console.log(" - vulnerabilities (legacy vulnerability data)");
-    console.log(" - ticket_vulnerabilities (cross-referencing)");
-    console.log(" - vulnerability_snapshots (historical data)");
-    console.log(" - vulnerabilities_current (active vulnerabilities)");
-    console.log(" - vulnerability_daily_totals (aggregated metrics)");
-    console.log(" - vendor_daily_totals (vendor-specific metrics)");
-    console.log(" - vulnerability_staging (import staging)");
-    console.log(" - email_templates (email templates)");
-    console.log(" - kev_status (CISA KEV data)");
-    console.log(" - sync_metadata (sync tracking)");
-    console.log(" - ticket_templates (ticket templates)");
-    console.log(" - vulnerability_templates (vulnerability templates)");
-    console.log(" - users (authentication and authorization)");
-    console.log(" - user_preferences (cross-device settings)");
-    console.log(" - cisco_advisories (Cisco PSIRT advisories)");
-    console.log(" - cisco_fixed_versions (normalized Cisco versions)");
-    console.log(" - palo_alto_advisories (Palo Alto security bulletins)");
-    console.log(" - audit_logs (encrypted audit trail)");
-    console.log(" - audit_log_config (audit configuration)");
-    console.log("═══════════════════════════════════════════════════════");
-    console.log("");
+                    console.log("");
+                    console.log("═══════════════════════════════════════════════════════");
+                    console.log("DATABASE INITIALIZED SUCCESSFULLY - v1.1.0 BASELINE");
+                    console.log("═══════════════════════════════════════════════════════");
+                    console.log("Schema Version: v1.1.0 (consolidated)");
+                    console.log("Tables Created: 21 application tables");
+                    console.log("Indexes Created: 68 performance indexes");
+                    console.log("Triggers Created: 1 (user_preferences_updated_at)");
+                    console.log("");
+                    console.log("Tables:");
+                    console.log(" - tickets (field operations ticketing)");
+                    console.log(" - vulnerability_imports (import tracking)");
+                    console.log(" - vulnerabilities (legacy vulnerability data)");
+                    console.log(" - ticket_vulnerabilities (cross-referencing)");
+                    console.log(" - vulnerability_snapshots (historical data)");
+                    console.log(" - vulnerabilities_current (active vulnerabilities)");
+                    console.log(" - vulnerability_daily_totals (aggregated metrics)");
+                    console.log(" - vendor_daily_totals (vendor-specific metrics)");
+                    console.log(" - vulnerability_staging (import staging)");
+                    console.log(" - email_templates (email templates)");
+                    console.log(" - kev_status (CISA KEV data)");
+                    console.log(" - sync_metadata (sync tracking)");
+                    console.log(" - ticket_templates (ticket templates)");
+                    console.log(" - vulnerability_templates (vulnerability templates)");
+                    console.log(" - users (authentication and authorization)");
+                    console.log(" - user_preferences (cross-device settings)");
+                    console.log(" - cisco_advisories (Cisco PSIRT advisories)");
+                    console.log(" - cisco_fixed_versions (normalized Cisco versions)");
+                    console.log(" - palo_alto_advisories (Palo Alto security bulletins)");
+                    console.log(" - audit_logs (encrypted audit trail)");
+                    console.log(" - audit_log_config (audit configuration)");
+                    console.log("═══════════════════════════════════════════════════════");
+                    console.log("");
 
-    resolve();
-  });
+                    resolve();
+                },
+            );
+        });
     });
-  });
 }
 
 /**
@@ -707,81 +733,81 @@ function createTables(db) {
  * @returns {Promise<void>}
  */
 async function seedInitialData(db) {
-  return new Promise((resolve, reject) => {
-    db.get("SELECT COUNT(*) as count FROM users WHERE username = ?", ["admin"], async (err, row) => {
-      if (err) {
-        console.error("Error checking for admin user:", err.message);
-        reject(err);
-        return;
-      }
-
-      // Only seed admin if it doesn't exist
-      if (!row || row.count === 0) {
-        try {
-          // Default initial password (MUST be changed after first login)
-          const initialPassword = "admin123!";
-
-          // Hash password with Argon2id
-          const passwordHash = await argon2.hash(initialPassword, {
-            type: argon2.argon2id,
-            memoryCost: 19456,
-            timeCost: 2,
-            parallelism: 1
-          });
-
-          // Insert admin user
-          db.run(
-            `INSERT INTO users (id, username, email, password_hash, role)
-             VALUES (?, ?, ?, ?, ?)`,
-            [
-              "00000000-0000-0000-0000-000000000001",
-              "admin",
-              "admin@hextrackr.local",
-              passwordHash,
-              "superadmin"
-            ],
-            (insertErr) => {
-              if (insertErr) {
-                console.error("Error creating admin user:", insertErr.message);
-                reject(insertErr);
+    return new Promise((resolve, reject) => {
+        db.get("SELECT COUNT(*) as count FROM users WHERE username = ?", ["admin"], async (err, row) => {
+            if (err) {
+                console.error("Error checking for admin user:", err.message);
+                reject(err);
                 return;
-              }
-
-              console.log("");
-              console.log("═══════════════════════════════════════════════════════");
-              console.log("INITIAL ADMIN CREDENTIALS (SAVE THESE!)");
-              console.log("═══════════════════════════════════════════════════════");
-              console.log("Username: admin");
-              console.log(`Password: ${initialPassword}`);
-              console.log("═══════════════════════════════════════════════════════");
-              console.log("CHANGE THIS PASSWORD IMMEDIATELY AFTER FIRST LOGIN!");
-              console.log("═══════════════════════════════════════════════════════");
-              console.log("");
-
-              resolve();
             }
-          );
-        } catch (hashError) {
-          console.error("Error hashing password:", hashError.message);
-          reject(hashError);
-        }
-      } else {
-        console.log("Admin user already exists - skipping seed");
-        resolve();
-      }
+
+            // Only seed admin if it doesn't exist
+            if (!row || row.count === 0) {
+                try {
+                    // Default initial password (MUST be changed after first login)
+                    const initialPassword = "admin123!";
+
+                    // Hash password with Argon2id
+                    const passwordHash = await argon2.hash(initialPassword, {
+                        type: argon2.argon2id,
+                        memoryCost: 19456,
+                        timeCost: 2,
+                        parallelism: 1,
+                    });
+
+                    // Insert admin user
+                    db.run(
+                        `INSERT INTO users (id, username, email, password_hash, role)
+             VALUES (?, ?, ?, ?, ?)`,
+                        [
+                            "00000000-0000-0000-0000-000000000001",
+                            "admin",
+                            "admin@hextrackr.local",
+                            passwordHash,
+                            "superadmin",
+                        ],
+                        (insertErr) => {
+                            if (insertErr) {
+                                console.error("Error creating admin user:", insertErr.message);
+                                reject(insertErr);
+                                return;
+                            }
+
+                            console.log("");
+                            console.log("═══════════════════════════════════════════════════════");
+                            console.log("INITIAL ADMIN CREDENTIALS (SAVE THESE!)");
+                            console.log("═══════════════════════════════════════════════════════");
+                            console.log("Username: admin");
+                            console.log(`Password: ${initialPassword}`);
+                            console.log("═══════════════════════════════════════════════════════");
+                            console.log("CHANGE THIS PASSWORD IMMEDIATELY AFTER FIRST LOGIN!");
+                            console.log("═══════════════════════════════════════════════════════");
+                            console.log("");
+
+                            resolve();
+                        },
+                    );
+                } catch (hashError) {
+                    console.error("Error hashing password:", hashError.message);
+                    reject(hashError);
+                }
+            } else {
+                console.log("Admin user already exists - skipping seed");
+                resolve();
+            }
+        });
     });
-  });
 }
 
 // ============================================================================
 // EXECUTION - Main Entry Point
 // ============================================================================
 initializeDatabase()
-  .then(() => {
-    console.log("Database initialization completed successfully");
-    process.exit(0);
-  })
-  .catch((error) => {
-    console.error("Database initialization failed:", error);
-    process.exit(1);
-  });
+    .then(() => {
+        console.log("Database initialization completed successfully");
+        process.exit(0);
+    })
+    .catch((error) => {
+        console.error("Database initialization failed:", error);
+        process.exit(1);
+    });

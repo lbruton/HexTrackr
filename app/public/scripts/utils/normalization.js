@@ -153,7 +153,7 @@ function saveNormalizationState(state) {
     try {
         const stateToSave = {
             ...state,
-            lastUpdated: new Date().toISOString()
+            lastUpdated: new Date().toISOString(),
         };
         localStorage.setItem("hextrackr.chartViewState", JSON.stringify(stateToSave));
         return true;
@@ -185,5 +185,5 @@ export {
     formatNormalizedTooltip,
     validateNormalizationSettings,
     saveNormalizationState,
-    loadNormalizationState
+    loadNormalizationState,
 };

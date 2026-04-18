@@ -30,7 +30,7 @@ function normalizeHostname(hostname) {
     if (ipRegex.test(cleanHostname)) {
         // Validate that all octets are between 0-255
         const octets = cleanHostname.split(".").map(Number);
-        const isValidIP = octets.every(octet => octet >= 0 && octet <= 255);
+        const isValidIP = octets.every((octet) => octet >= 0 && octet <= 255);
 
         if (isValidIP) {
             // For valid IP addresses, return the full IP - don't split on periods
@@ -87,10 +87,12 @@ function normalizeVendor(vendor, hostname = "") {
  * @returns {string|null} First valid IP address or null
  */
 function normalizeIPAddress(ipAddress) {
-    if (!ipAddress) {return null;}
+    if (!ipAddress) {
+        return null;
+    }
 
     // Handle multiple IPs (take first valid one)
-    const ips = ipAddress.split(",").map(ip => ip.trim());
+    const ips = ipAddress.split(",").map((ip) => ip.trim());
     for (const ip of ips) {
         if (isValidIPAddress(ip)) {
             return ip.toLowerCase();
@@ -105,15 +107,19 @@ function normalizeIPAddress(ipAddress) {
  * @returns {boolean} True if valid IP address
  */
 function isValidIPAddress(ip) {
-    if (!ip) {return false;}
+    if (!ip) {
+        return false;
+    }
 
     // Check if IP address is valid (x.x.x.x pattern with valid octets)
     const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
-    if (!ipRegex.test(ip)) {return false;}
+    if (!ipRegex.test(ip)) {
+        return false;
+    }
 
     // Validate that all octets are between 0-255
     const octets = ip.split(".").map(Number);
-    return octets.every(octet => octet >= 0 && octet <= 255);
+    return octets.every((octet) => octet >= 0 && octet <= 255);
 }
 
 // =============================================================================
@@ -126,12 +132,12 @@ function isValidIPAddress(ip) {
  * @returns {string} Short hash string
  */
 function createDescriptionHash(description) {
-    if (!description) {return "empty";}
+    if (!description) {
+        return "empty";
+    }
 
     // Create stable hash from description (first 50 chars, normalized)
-    const normalized = description.trim().toLowerCase()
-        .replace(/\s+/g, " ")
-        .substring(0, 50);
+    const normalized = description.trim().toLowerCase().replace(/\s+/g, " ").substring(0, 50);
 
     // Simple hash function using crypto if available
     try {
@@ -141,7 +147,7 @@ function createDescriptionHash(description) {
         let hash = 0;
         for (let i = 0; i < normalized.length; i++) {
             const char = normalized.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
+            hash = (hash << 5) - hash + char;
             hash = hash & hash; // Convert to 32-bit integer
         }
         return Math.abs(hash).toString(36);
@@ -154,7 +160,9 @@ function createDescriptionHash(description) {
  * @returns {string|null} Date in YYYY-MM-DD format or null if no pattern matches
  */
 function extractScanDateFromFilename(filename) {
-    if (!filename) {return null;}
+    if (!filename) {
+        return null;
+    }
 
     const currentYear = new Date().getFullYear();
 
@@ -162,8 +170,19 @@ function extractScanDateFromFilename(filename) {
     const monthAbbrMatch = filename.match(/(jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)(\d{1,2})/i);
     if (monthAbbrMatch) {
         const monthMap = {
-            "jan": "01", "feb": "02", "mar": "03", "apr": "04", "may": "05", "jun": "06",
-            "jul": "07", "aug": "08", "sep": "09", "sept": "09", "oct": "10", "nov": "11", "dec": "12"
+            jan: "01",
+            feb: "02",
+            mar: "03",
+            apr: "04",
+            may: "05",
+            jun: "06",
+            jul: "07",
+            aug: "08",
+            sep: "09",
+            sept: "09",
+            oct: "10",
+            nov: "11",
+            dec: "12",
         };
         const month = monthMap[monthAbbrMatch[1].toLowerCase()];
         const day = monthAbbrMatch[2].padStart(2, "0");
@@ -209,10 +228,18 @@ function extractScanDateFromFilename(filename) {
  * @returns {number} Confidence percentage (0-100)
  */
 function calculateDeduplicationConfidence(uniqueKey) {
-    if (uniqueKey.startsWith("asset:")) {return 95;} // Highest confidence
-    if (uniqueKey.startsWith("cve:")) {return 85;}   // High confidence
-    if (uniqueKey.startsWith("plugin:")) {return 70;} // Medium confidence
-    if (uniqueKey.startsWith("desc:")) {return 50;}   // Low confidence
+    if (uniqueKey.startsWith("asset:")) {
+        return 95;
+    } // Highest confidence
+    if (uniqueKey.startsWith("cve:")) {
+        return 85;
+    } // High confidence
+    if (uniqueKey.startsWith("plugin:")) {
+        return 70;
+    } // Medium confidence
+    if (uniqueKey.startsWith("desc:")) {
+        return 50;
+    } // Low confidence
     return 25; // Very low confidence
 }
 
@@ -222,10 +249,18 @@ function calculateDeduplicationConfidence(uniqueKey) {
  * @returns {number} Tier number (1 = most stable, 5 = least stable)
  */
 function getDeduplicationTier(uniqueKey) {
-    if (uniqueKey.startsWith("asset:")) {return 1;} // Most stable
-    if (uniqueKey.startsWith("cve:")) {return 2;}   // High reliability
-    if (uniqueKey.startsWith("plugin:")) {return 3;} // Medium reliability
-    if (uniqueKey.startsWith("desc:")) {return 4;}   // Least reliable
+    if (uniqueKey.startsWith("asset:")) {
+        return 1;
+    } // Most stable
+    if (uniqueKey.startsWith("cve:")) {
+        return 2;
+    } // High reliability
+    if (uniqueKey.startsWith("plugin:")) {
+        return 3;
+    } // Medium reliability
+    if (uniqueKey.startsWith("desc:")) {
+        return 4;
+    } // Least reliable
     return 5; // Unknown/legacy
 }
 
@@ -323,17 +358,34 @@ function mapVulnerabilityRow(row) {
     hostname = normalizeHostname(hostname);
 
     // Enhanced IP address handling for multiple formats
-    let ipAddress = row["asset.display_ipv4_address"] || row["asset.ipv4_addresses"] || row["ip_address"] || row["IP Address"] || "";
+    let ipAddress =
+        row["asset.display_ipv4_address"] ||
+        row["asset.ipv4_addresses"] ||
+        row["ip_address"] ||
+        row["IP Address"] ||
+        "";
     if (ipAddress && ipAddress.includes(",")) {
-        const ips = ipAddress.split(",").map(ip => ip.trim());
+        const ips = ipAddress.split(",").map((ip) => ip.trim());
         ipAddress = ips[0];
     }
 
     // Prefer Tenable description, fallback to plugin name/description fields
-    const description = row["definition.description"] || row["definition.name"] || row["plugin_name"] || row["description"] || row["Description"] || "";
+    const description =
+        row["definition.description"] ||
+        row["definition.name"] ||
+        row["plugin_name"] ||
+        row["description"] ||
+        row["Description"] ||
+        "";
     const pluginName = row["definition.name"] || row["plugin_name"] || row["description"] || row["Description"] || "";
 
-    const vprValue = row["definition.vpr.score"] || row["definition.vpr_v2.score"] || row["vpr_score"] || row["VPR Score"] || row["vpr"] || row["VPR"];
+    const vprValue =
+        row["definition.vpr.score"] ||
+        row["definition.vpr_v2.score"] ||
+        row["vpr_score"] ||
+        row["VPR Score"] ||
+        row["vpr"] ||
+        row["VPR"];
     const parsedVpr = vprValue !== undefined && vprValue !== null && vprValue !== "" ? parseFloat(vprValue) : null;
     const vprScore = Number.isFinite(parsedVpr) ? parsedVpr : null;
 
@@ -344,7 +396,13 @@ function mapVulnerabilityRow(row) {
     const state = row["state"] || row["State"] || "ACTIVE";
     const vendor = normalizeVendor(row["definition.family"] || row["vendor"] || row["Vendor"] || "", hostname);
     const pluginId = row["definition.id"] || row["plugin_id"] || row["Plugin ID"] || "";
-    const pluginPublished = row["definition.plugin_published"] || row["definition.plugin_updated"] || row["definition.vulnerability_published"] || row["vulnerability_date"] || row["plugin_published"] || "";
+    const pluginPublished =
+        row["definition.plugin_published"] ||
+        row["definition.plugin_updated"] ||
+        row["definition.vulnerability_published"] ||
+        row["vulnerability_date"] ||
+        row["plugin_published"] ||
+        "";
     const firstSeen = row["first_seen"] || row["First Seen"] || "";
     const lastSeen = row["last_seen"] || row["Last Seen"] || "";
 
@@ -375,7 +433,7 @@ function mapVulnerabilityRow(row) {
         pluginPublished,
         // NEW (Migration 006): Operating system and solution text
         operatingSystem,
-        solutionText
+        solutionText,
     };
 
     // Parse multiple CVEs and create separate records for each
@@ -386,13 +444,15 @@ function mapVulnerabilityRow(row) {
     const allCVEs = [...cveMatches, ...ciscoMatches];
 
     if (allCVEs.length === 0) {
-        return [{
-            ...baseRecord,
-            cve: ""
-        }];
+        return [
+            {
+                ...baseRecord,
+                cve: "",
+            },
+        ];
     }
 
-    return allCVEs.map(individualCVE => {
+    return allCVEs.map((individualCVE) => {
         let augmentedDescription = description;
         if (description && !description.includes(individualCVE)) {
             augmentedDescription = `${description} (${individualCVE})`;
@@ -401,7 +461,7 @@ function mapVulnerabilityRow(row) {
         return {
             ...baseRecord,
             description: augmentedDescription,
-            cve: individualCVE
+            cve: individualCVE,
         };
     });
 }
@@ -432,7 +492,7 @@ function mapTicketRow(row, index) {
         status: row.status || row["Status"] || "Open",
         notes: row.notes || row["Notes"] || "",
         createdAt: row.created_at || now,
-        updatedAt: now
+        updatedAt: now,
     };
 }
 
@@ -447,7 +507,9 @@ function normalizeXtNumber(value) {
     }
 
     const match = String(value).match(/\d+/);
-    if (!match) {return undefined;}
+    if (!match) {
+        return undefined;
+    }
 
     return match[0].padStart(4, "0");
 }
@@ -512,5 +574,5 @@ module.exports = {
     normalizeXtNumber,
 
     // Documentation helpers
-    findDocsSectionForFilename
+    findDocsSectionForFilename,
 };

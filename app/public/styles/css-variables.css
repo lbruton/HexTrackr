@@ -47,22 +47,22 @@
     --hextrackr-info-active: #1e40af;
 
     /* Backgrounds */
-    --hextrackr-bg-primary: #d0dae6;   /* Darker blue-gray page background - creates strong foundation (like dark mode) */
+    --hextrackr-bg-primary: #d0dae6; /* Darker blue-gray page background - creates strong foundation (like dark mode) */
     --hextrackr-bg-secondary: #c8d4e0; /* Even deeper blue-gray for stronger contrast */
-    --hextrackr-bg-tertiary: #e8eef5;  /* Lighter blue-gray for elevated elements */
+    --hextrackr-bg-tertiary: #e8eef5; /* Lighter blue-gray for elevated elements */
     --hextrackr-bg-inverse: #1f2937;
 
     /* Surface Hierarchy */
-    --hextrackr-surface-0: #d0dae6;    /* Base level - page background (darker foundation) */
-    --hextrackr-surface-1: #ffffff;    /* Cards - crisp white elevated and popping from darker background */
-    --hextrackr-surface-2: #f9fafb;    /* Elevated surfaces - subtle off-white */
-    --hextrackr-surface-3: #ffffff;    /* Modals - pure white for prominence */
-    --hextrackr-surface-4: #f5f7fa;    /* Highest elevation - very light blue-gray */
+    --hextrackr-surface-0: #d0dae6; /* Base level - page background (darker foundation) */
+    --hextrackr-surface-1: #ffffff; /* Cards - crisp white elevated and popping from darker background */
+    --hextrackr-surface-2: #f9fafb; /* Elevated surfaces - subtle off-white */
+    --hextrackr-surface-3: #ffffff; /* Modals - pure white for prominence */
+    --hextrackr-surface-4: #f5f7fa; /* Highest elevation - very light blue-gray */
 
     /* Card Component Surfaces */
-    --hextrackr-card-header-bg: #e8eef5;  /* Card headers - lighter blue-gray (cards pop from darker page) */
-    --hextrackr-card-body-bg: #ffffff;    /* Card bodies - pure white (maximum contrast) */
-    --hextrackr-card-footer-bg: #f5f7fa;  /* Card footers - very light blue-gray */
+    --hextrackr-card-header-bg: #e8eef5; /* Card headers - lighter blue-gray (cards pop from darker page) */
+    --hextrackr-card-body-bg: #ffffff; /* Card bodies - pure white (maximum contrast) */
+    --hextrackr-card-footer-bg: #f5f7fa; /* Card footers - very light blue-gray */
 
     /* Text Colors */
     --hextrackr-text: #2d3748;
@@ -95,14 +95,17 @@
     --hextrackr-border-dark: #cbd5e0;
 
     /* Border Hierarchy for Cards */
-    --hextrackr-border-subtle: rgb(0, 0, 0, 0.12);   /* Subtle card borders - increased for visibility */
-    --hextrackr-border-muted: rgb(0, 0, 0, 0.15);    /* Muted card borders - increased for visibility */
-    --hextrackr-border-strong: rgb(0, 0, 0, 0.20);   /* Strong card borders - increased for visibility */
+    --hextrackr-border-subtle: rgb(0, 0, 0, 0.12); /* Subtle card borders - increased for visibility */
+    --hextrackr-border-muted: rgb(0, 0, 0, 0.15); /* Muted card borders - increased for visibility */
+    --hextrackr-border-strong: rgb(0, 0, 0, 0.2); /* Strong card borders - increased for visibility */
 
     /* Shadow Hierarchy */
-    --hextrackr-shadow-sm: 0 1px 3px 0 rgb(0, 0, 0, 0.12), 0 1px 2px 0 rgb(0, 0, 0, 0.06);    /* Small layered shadow */
-    --hextrackr-shadow-md: 0 4px 6px -1px rgb(0, 0, 0, 0.1), 0 2px 4px -1px rgb(0, 0, 0, 0.06);  /* Medium layered shadow */
-    --hextrackr-shadow-lg: 0 10px 15px -3px rgb(0, 0, 0, 0.1), 0 4px 6px -2px rgb(0, 0, 0, 0.05);   /* Large layered shadow */
+    --hextrackr-shadow-sm: 0 1px 3px 0 rgb(0, 0, 0, 0.12), 0 1px 2px 0 rgb(0, 0, 0, 0.06); /* Small layered shadow */
+    --hextrackr-shadow-md:
+        0 4px 6px -1px rgb(0, 0, 0, 0.1), 0 2px 4px -1px rgb(0, 0, 0, 0.06); /* Medium layered shadow */
+
+    --hextrackr-shadow-lg:
+        0 10px 15px -3px rgb(0, 0, 0, 0.1), 0 4px 6px -2px rgb(0, 0, 0, 0.05); /* Large layered shadow */
 
     /* =================
        VPR Score Colors (Light Mode)
@@ -184,14 +187,14 @@
     --hextrackr-font-family-mono: sfmono-regular, menlo, monaco, consolas, "Liberation Mono", "Courier New", monospace;
 
     /* Font Sizes */
-    --hextrackr-text-xs: 0.75rem;      /* 12px */
-    --hextrackr-text-sm: 0.875rem;     /* 14px */
-    --hextrackr-text-base: 1rem;       /* 16px */
-    --hextrackr-text-lg: 1.125rem;     /* 18px */
-    --hextrackr-text-xl: 1.25rem;      /* 20px */
-    --hextrackr-text-2xl: 1.5rem;      /* 24px */
-    --hextrackr-text-3xl: 1.875rem;    /* 30px */
-    --hextrackr-text-4xl: 2.25rem;     /* 36px */
+    --hextrackr-text-xs: 0.75rem; /* 12px */
+    --hextrackr-text-sm: 0.875rem; /* 14px */
+    --hextrackr-text-base: 1rem; /* 16px */
+    --hextrackr-text-lg: 1.125rem; /* 18px */
+    --hextrackr-text-xl: 1.25rem; /* 20px */
+    --hextrackr-text-2xl: 1.5rem; /* 24px */
+    --hextrackr-text-3xl: 1.875rem; /* 30px */
+    --hextrackr-text-4xl: 2.25rem; /* 36px */
 
     /* Font Weights */
     --hextrackr-font-normal: 400;
@@ -209,16 +212,16 @@
        Spacing
        ================= */
     --hextrackr-space-0: 0;
-    --hextrackr-space-1: 0.25rem;      /* 4px */
-    --hextrackr-space-2: 0.5rem;       /* 8px */
-    --hextrackr-space-3: 0.75rem;      /* 12px */
-    --hextrackr-space-4: 1rem;         /* 16px */
-    --hextrackr-space-5: 1.25rem;      /* 20px */
-    --hextrackr-space-6: 1.5rem;       /* 24px */
-    --hextrackr-space-8: 2rem;         /* 32px */
-    --hextrackr-space-10: 2.5rem;      /* 40px */
-    --hextrackr-space-12: 3rem;        /* 48px */
-    --hextrackr-space-16: 4rem;        /* 64px */
+    --hextrackr-space-1: 0.25rem; /* 4px */
+    --hextrackr-space-2: 0.5rem; /* 8px */
+    --hextrackr-space-3: 0.75rem; /* 12px */
+    --hextrackr-space-4: 1rem; /* 16px */
+    --hextrackr-space-5: 1.25rem; /* 20px */
+    --hextrackr-space-6: 1.5rem; /* 24px */
+    --hextrackr-space-8: 2rem; /* 32px */
+    --hextrackr-space-10: 2.5rem; /* 40px */
+    --hextrackr-space-12: 3rem; /* 48px */
+    --hextrackr-space-16: 4rem; /* 64px */
 
     /* =================
        Borders & Radius
@@ -227,11 +230,11 @@
     --hextrackr-border-width-2: 2px;
     --hextrackr-border-width-4: 4px;
     --hextrackr-radius-none: 0;
-    --hextrackr-radius-sm: 0.125rem;   /* 2px */
-    --hextrackr-radius-md: 0.375rem;   /* 6px */
-    --hextrackr-radius-lg: 0.5rem;     /* 8px */
-    --hextrackr-radius-xl: 0.75rem;    /* 12px */
-    --hextrackr-radius-2xl: 1rem;      /* 16px */
+    --hextrackr-radius-sm: 0.125rem; /* 2px */
+    --hextrackr-radius-md: 0.375rem; /* 6px */
+    --hextrackr-radius-lg: 0.5rem; /* 8px */
+    --hextrackr-radius-xl: 0.75rem; /* 12px */
+    --hextrackr-radius-2xl: 1rem; /* 16px */
     --hextrackr-radius-full: 9999px;
 
     /* =================
@@ -316,12 +319,12 @@
        Ticket Accent Colors (Light Mode)
        ================= */
     /* Ticket accent colors for light backgrounds with WCAG AA contrast */
-    --ticket-accent-blue: #2563eb;     /* 7.1:1 contrast */
-    --ticket-accent-purple: #7c3aed;   /* 5.8:1 contrast */
-    --ticket-accent-teal: #0891b2;     /* 9.5:1 contrast */
-    --ticket-accent-amber: #d97706;    /* 11.2:1 contrast */
-    --ticket-accent-rose: #be185d;     /* 8.3:1 contrast */
-    --ticket-accent-slate: #475569;    /* 10.2:1 contrast */
+    --ticket-accent-blue: #2563eb; /* 7.1:1 contrast */
+    --ticket-accent-purple: #7c3aed; /* 5.8:1 contrast */
+    --ticket-accent-teal: #0891b2; /* 9.5:1 contrast */
+    --ticket-accent-amber: #d97706; /* 11.2:1 contrast */
+    --ticket-accent-rose: #be185d; /* 8.3:1 contrast */
+    --ticket-accent-slate: #475569; /* 10.2:1 contrast */
 }
 
 /* ===========================
@@ -364,30 +367,30 @@
 
     /* Navy Theme Backgrounds */
     /* CORRECTED: Body uses #1a2234, header/cards use #1d273b */
-    --hextrackr-bg-primary: #1a2234;   /* Actual body background */
+    --hextrackr-bg-primary: #1a2234; /* Actual body background */
     --hextrackr-bg-secondary: #1a2744;
     --hextrackr-bg-tertiary: #1e293b;
     --hextrackr-bg-inverse: #ffffff;
 
     /* Surface Hierarchy */
     /* CORRECTED: Body background is #1a2234 (darker than cards) */
-    --hextrackr-surface-0: #1a2234;    /* Base level - page background (actual body color) */
-    --hextrackr-surface-1: #1a2234;    /* Cards - elevated from base */
-    --hextrackr-surface-2: #202c42;    /* Elevated surfaces */
-    --hextrackr-surface-3: #1a2234;    /* Modals */
-    --hextrackr-surface-4: #334155;    /* Highest elevation */
+    --hextrackr-surface-0: #1a2234; /* Base level - page background (actual body color) */
+    --hextrackr-surface-1: #1a2234; /* Cards - elevated from base */
+    --hextrackr-surface-2: #202c42; /* Elevated surfaces */
+    --hextrackr-surface-3: #1a2234; /* Modals */
+    --hextrackr-surface-4: #334155; /* Highest elevation */
 
     /* Card Component Surfaces (Dark Mode) */
-    --hextrackr-card-header-bg: #1d273b;  /* Card headers - slightly lighter than card body for distinction */
-    --hextrackr-card-body-bg: #1a2234;    /* Card bodies - match surface-1 */
-    --hextrackr-card-footer-bg: #1d273b;  /* Card footers - match headers */
+    --hextrackr-card-header-bg: #1d273b; /* Card headers - slightly lighter than card body for distinction */
+    --hextrackr-card-body-bg: #1a2234; /* Card bodies - match surface-1 */
+    --hextrackr-card-footer-bg: #1d273b; /* Card footers - match headers */
 
     /* Text Colors */
     --hextrackr-text: #ffffff;
     --hextrackr-text-rgb: 255, 255, 255;
     --hextrackr-text-muted: #94a3b8;
     --hextrackr-text-disabled: #64748b;
-    --hextrackr-text-inverse: #0F1C31;
+    --hextrackr-text-inverse: #0f1c31;
 
     /* Tooltip Colors (Dark Mode) */
     --hextrackr-tooltip-bg: #1a2234;
@@ -413,9 +416,9 @@
     --hextrackr-border-dark: #1e293b;
 
     /* Border Hierarchy for Cards (Dark Mode) */
-    --hextrackr-border-subtle: rgb(255, 255, 255, 0.08);   /* Subtle card borders */
-    --hextrackr-border-muted: rgb(255, 255, 255, 0.12);    /* Muted card borders */
-    --hextrackr-border-strong: rgb(255, 255, 255, 0.16);   /* Strong card borders */
+    --hextrackr-border-subtle: rgb(255, 255, 255, 0.08); /* Subtle card borders */
+    --hextrackr-border-muted: rgb(255, 255, 255, 0.12); /* Muted card borders */
+    --hextrackr-border-strong: rgb(255, 255, 255, 0.16); /* Strong card borders */
 
     /* NOTE: Shadow hierarchy is defined below in the comprehensive shadows section */
 
@@ -546,12 +549,12 @@
        Ticket Accent Colors (Dark Mode)
        ================= */
     /* Ticket accent colors for dark backgrounds with WCAG AA contrast */
-    --ticket-accent-blue: #60a5fa;     /* 7.1:1 contrast - good visibility */
-    --ticket-accent-purple: #a78bfa;   /* 5.8:1 contrast - good visibility */
-    --ticket-accent-teal: #5eead4;     /* 9.5:1 contrast - improved from #2dd4bf */
-    --ticket-accent-amber: #fcd34d;    /* 11.2:1 contrast - softer than #fbbf24 */
-    --ticket-accent-rose: #f9a8d4;     /* 8.3:1 contrast - lighter than #f472b6 */
-    --ticket-accent-slate: #cbd5e1;    /* 10.2:1 contrast - much lighter than #94a3b8 */
+    --ticket-accent-blue: #60a5fa; /* 7.1:1 contrast - good visibility */
+    --ticket-accent-purple: #a78bfa; /* 5.8:1 contrast - good visibility */
+    --ticket-accent-teal: #5eead4; /* 9.5:1 contrast - improved from #2dd4bf */
+    --ticket-accent-amber: #fcd34d; /* 11.2:1 contrast - softer than #fbbf24 */
+    --ticket-accent-rose: #f9a8d4; /* 8.3:1 contrast - lighter than #f472b6 */
+    --ticket-accent-slate: #cbd5e1; /* 10.2:1 contrast - much lighter than #94a3b8 */
 }
 
 /* ===========================
@@ -559,21 +562,58 @@
    =========================== */
 
 /* Quick access to CSS variables */
-.bg-primary-var { background-color: var(--hextrackr-bg-primary); }
-.bg-secondary-var { background-color: var(--hextrackr-bg-secondary); }
-.text-primary-var { color: var(--hextrackr-primary); }
-.text-muted-var { color: var(--hextrackr-text-muted); }
-.border-var { border-color: var(--hextrackr-border); }
-.shadow-sm-var { box-shadow: var(--hextrackr-shadow-sm); }
-.shadow-md-var { box-shadow: var(--hextrackr-shadow-md); }
-.shadow-lg-var { box-shadow: var(--hextrackr-shadow-lg); }
+.bg-primary-var {
+    background-color: var(--hextrackr-bg-primary);
+}
+
+.bg-secondary-var {
+    background-color: var(--hextrackr-bg-secondary);
+}
+
+.text-primary-var {
+    color: var(--hextrackr-primary);
+}
+
+.text-muted-var {
+    color: var(--hextrackr-text-muted);
+}
+
+.border-var {
+    border-color: var(--hextrackr-border);
+}
+
+.shadow-sm-var {
+    box-shadow: var(--hextrackr-shadow-sm);
+}
+
+.shadow-md-var {
+    box-shadow: var(--hextrackr-shadow-md);
+}
+
+.shadow-lg-var {
+    box-shadow: var(--hextrackr-shadow-lg);
+}
 
 /* Surface hierarchy utilities */
-.surface-0 { background-color: var(--hextrackr-surface-0); }
-.surface-1 { background-color: var(--hextrackr-surface-1); }
-.surface-2 { background-color: var(--hextrackr-surface-2); }
-.surface-3 { background-color: var(--hextrackr-surface-3); }
-.surface-4 { background-color: var(--hextrackr-surface-4); }
+.surface-0 {
+    background-color: var(--hextrackr-surface-0);
+}
+
+.surface-1 {
+    background-color: var(--hextrackr-surface-1);
+}
+
+.surface-2 {
+    background-color: var(--hextrackr-surface-2);
+}
+
+.surface-3 {
+    background-color: var(--hextrackr-surface-3);
+}
+
+.surface-4 {
+    background-color: var(--hextrackr-surface-4);
+}
 
 /* Link utilities */
 .link-primary {

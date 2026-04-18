@@ -21,8 +21,8 @@ const sessionMiddleware = session({
         client: new Database("/app/app/data/sessions.db"),
         expired: {
             clear: true,
-            intervalMs: 900000 // Clean expired sessions every 15 minutes
-        }
+            intervalMs: 900000, // Clean expired sessions every 15 minutes
+        },
     }),
     secret: process.env.SESSION_SECRET,
     name: "hextrackr.sid",
@@ -39,9 +39,9 @@ const sessionMiddleware = session({
         secure: true, // Required for HTTPS - browsers enforce this (HEX-128 Task 3.5)
         httpOnly: true,
         sameSite: "lax", // Allow cookies on top-level navigation (login redirect)
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
     },
-    proxy: true // ALWAYS true - we always run behind nginx reverse proxy (HEX-128 CRITICAL FIX)
+    proxy: true, // ALWAYS true - we always run behind nginx reverse proxy (HEX-128 CRITICAL FIX)
 });
 
 /**
@@ -56,12 +56,12 @@ function requireAuth(req, res, next) {
             global.logger.auth.warn("Unauthorized access attempt to protected route", {
                 path: req.path,
                 method: req.method,
-                ip: req.ip
+                ip: req.ip,
             });
         }
         return res.status(401).json({
             error: "Authentication required",
-            authenticated: false
+            authenticated: false,
         });
     }
 
@@ -69,7 +69,7 @@ function requireAuth(req, res, next) {
     req.user = {
         id: req.session.userId,
         username: req.session.username,
-        role: req.session.role
+        role: req.session.role,
     };
 
     next();
@@ -92,14 +92,14 @@ function requireAdmin(req, res, next) {
                 path: req.path,
                 method: req.method,
                 userId: req.user?.id,
-                userRole: req.user?.role
+                userRole: req.user?.role,
             });
         } else {
             console.error("Non-admin access attempt:", req.path);
         }
         return res.status(403).json({
             success: false,
-            error: "Admin access required"
+            error: "Admin access required",
         });
     }
 
@@ -121,5 +121,5 @@ module.exports = {
     sessionMiddleware,
     requireAuth,
     requireAdmin,
-    extendSession
+    extendSession,
 };

@@ -12,38 +12,38 @@ const dbPath = path.join(__dirname, "..", "..", "data", "hextrackr.db");
  * @returns {Promise<void>}
  */
 async function initializeDatabase() {
-  return new Promise((resolve, reject) => {
-    // Create database and tables
-    const db = new sqlite3.Database(dbPath, async (err) => {
-      if (err) {
-        console.error("Error opening database:", err.message);
-        reject(err);
-        return;
-      }
-      console.log("Connected to SQLite database");
+    return new Promise((resolve, reject) => {
+        // Create database and tables
+        const db = new sqlite3.Database(dbPath, async (err) => {
+            if (err) {
+                console.error("Error opening database:", err.message);
+                reject(err);
+                return;
+            }
+            console.log("Connected to SQLite database");
 
-      try {
-        // Create tables with complete schema
-        await createTables(db);
-        await seedInitialData(db);
+            try {
+                // Create tables with complete schema
+                await createTables(db);
+                await seedInitialData(db);
 
-        // Close database
-        db.close((closeErr) => {
-          if (closeErr) {
-            console.error("Error closing database:", closeErr.message);
-            reject(closeErr);
-          } else {
-            console.log("Database connection closed");
-            resolve();
-          }
+                // Close database
+                db.close((closeErr) => {
+                    if (closeErr) {
+                        console.error("Error closing database:", closeErr.message);
+                        reject(closeErr);
+                    } else {
+                        console.log("Database connection closed");
+                        resolve();
+                    }
+                });
+            } catch (error) {
+                console.error("Error during database initialization:", error);
+                db.close();
+                reject(error);
+            }
         });
-      } catch (error) {
-        console.error("Error during database initialization:", error);
-        db.close();
-        reject(error);
-      }
     });
-  });
 }
 
 /**
@@ -52,15 +52,15 @@ async function initializeDatabase() {
  * @returns {Promise<void>}
  */
 function createTables(db) {
-  return new Promise((resolve, reject) => {
-    db.serialize(() => {
-  // Enable foreign keys
-  db.run("PRAGMA foreign_keys = ON");
-  db.run("PRAGMA journal_mode = WAL");
-  db.run("PRAGMA synchronous = NORMAL");
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            // Enable foreign keys
+            db.run("PRAGMA foreign_keys = ON");
+            db.run("PRAGMA journal_mode = WAL");
+            db.run("PRAGMA synchronous = NORMAL");
 
-  // 1. Tickets table - core business entity
-  db.run(`CREATE TABLE IF NOT EXISTS tickets (
+            // 1. Tickets table - core business entity
+            db.run(`CREATE TABLE IF NOT EXISTS tickets (
     id TEXT PRIMARY KEY,
     xt_number TEXT UNIQUE,
     date_submitted TEXT,
@@ -81,8 +81,8 @@ function createTables(db) {
     location_id TEXT
   )`);
 
-  // 2. Vulnerability imports - tracking CSV imports
-  db.run(`CREATE TABLE IF NOT EXISTS vulnerability_imports (
+            // 2. Vulnerability imports - tracking CSV imports
+            db.run(`CREATE TABLE IF NOT EXISTS vulnerability_imports (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     filename TEXT NOT NULL,
     import_date TEXT NOT NULL,
@@ -94,9 +94,9 @@ function createTables(db) {
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
 
-  // 3. Ticket-vulnerability junction table
-  // References vulnerabilities_current for future mitigation tracking feature
-  db.run(`CREATE TABLE IF NOT EXISTS ticket_vulnerabilities (
+            // 3. Ticket-vulnerability junction table
+            // References vulnerabilities_current for future mitigation tracking feature
+            db.run(`CREATE TABLE IF NOT EXISTS ticket_vulnerabilities (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     ticket_id TEXT NOT NULL,
     vulnerability_id INTEGER NOT NULL,
@@ -107,9 +107,9 @@ function createTables(db) {
     FOREIGN KEY (vulnerability_id) REFERENCES vulnerabilities_current (id)
   )`);
 
-  // 4. Vulnerability snapshots - historical data
-  // NEW (Migration 006): Added operating_system and solution_text columns
-  db.run(`CREATE TABLE IF NOT EXISTS vulnerability_snapshots (
+            // 4. Vulnerability snapshots - historical data
+            // NEW (Migration 006): Added operating_system and solution_text columns
+            db.run(`CREATE TABLE IF NOT EXISTS vulnerability_snapshots (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     import_id INTEGER NOT NULL,
     scan_date TEXT NOT NULL,
@@ -139,9 +139,9 @@ function createTables(db) {
     FOREIGN KEY (import_id) REFERENCES vulnerability_imports (id)
   )`);
 
-  // 5. Current vulnerabilities - active data
-  // NEW (Migration 006): Added operating_system and solution_text columns
-  db.run(`CREATE TABLE IF NOT EXISTS vulnerabilities_current (
+            // 5. Current vulnerabilities - active data
+            // NEW (Migration 006): Added operating_system and solution_text columns
+            db.run(`CREATE TABLE IF NOT EXISTS vulnerabilities_current (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     import_id INTEGER NOT NULL,
     scan_date TEXT NOT NULL,
@@ -174,8 +174,8 @@ function createTables(db) {
     FOREIGN KEY (import_id) REFERENCES vulnerability_imports (id)
   )`);
 
-  // 6. Daily vulnerability totals - aggregated metrics
-  db.run(`CREATE TABLE IF NOT EXISTS vulnerability_daily_totals (
+            // 6. Daily vulnerability totals - aggregated metrics
+            db.run(`CREATE TABLE IF NOT EXISTS vulnerability_daily_totals (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     scan_date TEXT NOT NULL UNIQUE,
     critical_count INTEGER DEFAULT 0,
@@ -193,10 +193,10 @@ function createTables(db) {
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
 
-  // 6b. Vendor daily totals - vendor-specific aggregated metrics (Migration 008)
-  // Permanent storage for vendor-specific trend data
-  // Never cleaned up by db-snapshot-cleanup.js
-  db.run(`CREATE TABLE IF NOT EXISTS vendor_daily_totals (
+            // 6b. Vendor daily totals - vendor-specific aggregated metrics (Migration 008)
+            // Permanent storage for vendor-specific trend data
+            // Never cleaned up by db-snapshot-cleanup.js
+            db.run(`CREATE TABLE IF NOT EXISTS vendor_daily_totals (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     scan_date TEXT NOT NULL,
     vendor TEXT NOT NULL,
@@ -214,9 +214,9 @@ function createTables(db) {
     UNIQUE(scan_date, vendor)
   )`);
 
-  // 7. Vulnerability staging - import staging area
-  // NEW (Migration 006): Added operating_system and solution_text columns
-  db.run(`CREATE TABLE IF NOT EXISTS vulnerability_staging (
+            // 7. Vulnerability staging - import staging area
+            // NEW (Migration 006): Added operating_system and solution_text columns
+            db.run(`CREATE TABLE IF NOT EXISTS vulnerability_staging (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     import_id INTEGER NOT NULL,
     hostname TEXT,
@@ -248,8 +248,8 @@ function createTables(db) {
     FOREIGN KEY (import_id) REFERENCES vulnerability_imports (id)
   )`);
 
-  // 8. Email templates
-  db.run(`CREATE TABLE IF NOT EXISTS email_templates (
+            // 8. Email templates
+            db.run(`CREATE TABLE IF NOT EXISTS email_templates (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL UNIQUE,
     description TEXT,
@@ -262,8 +262,8 @@ function createTables(db) {
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
 
-  // 9. KEV (Known Exploited Vulnerabilities) status
-  db.run(`CREATE TABLE IF NOT EXISTS kev_status (
+            // 9. KEV (Known Exploited Vulnerabilities) status
+            db.run(`CREATE TABLE IF NOT EXISTS kev_status (
     cve_id TEXT PRIMARY KEY,
     date_added DATE NOT NULL,
     vulnerability_name TEXT,
@@ -276,8 +276,8 @@ function createTables(db) {
     last_synced TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`);
 
-  // 10. Sync metadata
-  db.run(`CREATE TABLE IF NOT EXISTS sync_metadata (
+            // 10. Sync metadata
+            db.run(`CREATE TABLE IF NOT EXISTS sync_metadata (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     sync_type TEXT NOT NULL,
     sync_time TIMESTAMP NOT NULL,
@@ -288,8 +288,8 @@ function createTables(db) {
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`);
 
-  // 11. Ticket templates
-  db.run(`CREATE TABLE IF NOT EXISTS ticket_templates (
+            // 11. Ticket templates
+            db.run(`CREATE TABLE IF NOT EXISTS ticket_templates (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL UNIQUE,
     description TEXT,
@@ -302,8 +302,8 @@ function createTables(db) {
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
 
-  // 12. Vulnerability templates
-  db.run(`CREATE TABLE IF NOT EXISTS vulnerability_templates (
+            // 12. Vulnerability templates
+            db.run(`CREATE TABLE IF NOT EXISTS vulnerability_templates (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL UNIQUE,
     description TEXT,
@@ -316,8 +316,8 @@ function createTables(db) {
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
 
-  // 14. Users - Authentication and authorization
-  db.run(`CREATE TABLE IF NOT EXISTS users (
+            // 14. Users - Authentication and authorization
+            db.run(`CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,
     username TEXT UNIQUE NOT NULL,
     email TEXT,
@@ -331,8 +331,8 @@ function createTables(db) {
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
 
-  // 15. User Preferences - Cross-device settings persistence (HEX-138)
-  db.run(`CREATE TABLE IF NOT EXISTS user_preferences (
+            // 15. User Preferences - Cross-device settings persistence (HEX-138)
+            db.run(`CREATE TABLE IF NOT EXISTS user_preferences (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id TEXT NOT NULL,
     preference_key TEXT NOT NULL,
@@ -343,8 +343,8 @@ function createTables(db) {
     UNIQUE(user_id, preference_key)
   )`);
 
-  // Trigger to maintain updated_at timestamp for user_preferences
-  db.run(`CREATE TRIGGER IF NOT EXISTS user_preferences_updated_at
+            // Trigger to maintain updated_at timestamp for user_preferences
+            db.run(`CREATE TRIGGER IF NOT EXISTS user_preferences_updated_at
     AFTER UPDATE ON user_preferences
     FOR EACH ROW
   BEGIN
@@ -353,88 +353,111 @@ function createTables(db) {
     WHERE id = NEW.id;
   END`);
 
-  // Create indexes for performance
-  db.run("CREATE INDEX IF NOT EXISTS idx_vulnerabilities_hostname ON vulnerabilities (hostname)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_vulnerabilities_severity ON vulnerabilities (severity)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_vulnerabilities_cve ON vulnerabilities (cve)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_vulnerabilities_import ON vulnerabilities (import_id)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_ticket_vulns_ticket ON ticket_vulnerabilities (ticket_id)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_ticket_vulns_vuln ON ticket_vulnerabilities (vulnerability_id)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_tickets_status ON tickets (status)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_tickets_site ON tickets (site)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_tickets_location ON tickets (location)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_tickets_xt ON tickets (xt_number)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_snapshots_scan_date ON vulnerability_snapshots (scan_date)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_snapshots_hostname ON vulnerability_snapshots (hostname)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_snapshots_severity ON vulnerability_snapshots (severity)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_snapshots_enhanced_key ON vulnerability_snapshots (enhanced_unique_key)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_snapshots_cve ON vulnerability_snapshots (cve)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_current_unique_key ON vulnerabilities_current (unique_key)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_current_scan_date ON vulnerabilities_current (scan_date)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_current_enhanced_unique_key ON vulnerabilities_current (enhanced_unique_key)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_current_lifecycle_scan ON vulnerabilities_current (lifecycle_state, scan_date)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_current_confidence_tier ON vulnerabilities_current (confidence_score, dedup_tier)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_current_active_severity ON vulnerabilities_current (lifecycle_state, severity)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_current_resolved_date ON vulnerabilities_current (resolved_date)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_current_cve ON vulnerabilities_current (cve)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_current_vendor ON vulnerabilities_current (vendor)"); // HEX-101 Blocking Issue #3
-  db.run("CREATE INDEX IF NOT EXISTS idx_staging_import_id ON vulnerability_staging (import_id)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_staging_processed ON vulnerability_staging (processed)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_staging_batch_id ON vulnerability_staging (batch_id)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_staging_unprocessed_batch ON vulnerability_staging (processed, batch_id)");
-  // Vendor daily totals indexes (Migration 008)
-  db.run("CREATE INDEX IF NOT EXISTS idx_vendor_daily_scan_date ON vendor_daily_totals(scan_date)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_vendor_daily_vendor ON vendor_daily_totals(vendor)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_vendor_daily_composite ON vendor_daily_totals(vendor, scan_date)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_email_templates_name ON email_templates (name)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_email_templates_active ON email_templates (is_active)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_email_templates_category ON email_templates (category)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_kev_status_ransomware ON kev_status(known_ransomware_use) WHERE known_ransomware_use = 1");
-  db.run("CREATE INDEX IF NOT EXISTS idx_kev_status_date_added ON kev_status(date_added)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_kev_status_cve_id ON kev_status(cve_id)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_kev_status_due_date ON kev_status(due_date)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_sync_metadata_type_time ON sync_metadata(sync_type, sync_time DESC)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_ticket_templates_name ON ticket_templates (name)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_ticket_templates_category ON ticket_templates (category)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_ticket_templates_active ON ticket_templates (is_active)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_vulnerability_templates_name ON vulnerability_templates (name)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_vulnerability_templates_category ON vulnerability_templates (category)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_vulnerability_templates_active ON vulnerability_templates (is_active)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_users_username ON users (username)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_users_email ON users (email)");
-  db.run("CREATE INDEX IF NOT EXISTS idx_user_preferences_user_id ON user_preferences (user_id)");
+            // Create indexes for performance
+            db.run("CREATE INDEX IF NOT EXISTS idx_vulnerabilities_hostname ON vulnerabilities (hostname)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_vulnerabilities_severity ON vulnerabilities (severity)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_vulnerabilities_cve ON vulnerabilities (cve)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_vulnerabilities_import ON vulnerabilities (import_id)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_ticket_vulns_ticket ON ticket_vulnerabilities (ticket_id)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_ticket_vulns_vuln ON ticket_vulnerabilities (vulnerability_id)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_tickets_status ON tickets (status)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_tickets_site ON tickets (site)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_tickets_location ON tickets (location)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_tickets_xt ON tickets (xt_number)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_snapshots_scan_date ON vulnerability_snapshots (scan_date)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_snapshots_hostname ON vulnerability_snapshots (hostname)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_snapshots_severity ON vulnerability_snapshots (severity)");
+            db.run(
+                "CREATE INDEX IF NOT EXISTS idx_snapshots_enhanced_key ON vulnerability_snapshots (enhanced_unique_key)",
+            );
+            db.run("CREATE INDEX IF NOT EXISTS idx_snapshots_cve ON vulnerability_snapshots (cve)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_current_unique_key ON vulnerabilities_current (unique_key)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_current_scan_date ON vulnerabilities_current (scan_date)");
+            db.run(
+                "CREATE INDEX IF NOT EXISTS idx_current_enhanced_unique_key ON vulnerabilities_current (enhanced_unique_key)",
+            );
+            db.run(
+                "CREATE INDEX IF NOT EXISTS idx_current_lifecycle_scan ON vulnerabilities_current (lifecycle_state, scan_date)",
+            );
+            db.run(
+                "CREATE INDEX IF NOT EXISTS idx_current_confidence_tier ON vulnerabilities_current (confidence_score, dedup_tier)",
+            );
+            db.run(
+                "CREATE INDEX IF NOT EXISTS idx_current_active_severity ON vulnerabilities_current (lifecycle_state, severity)",
+            );
+            db.run("CREATE INDEX IF NOT EXISTS idx_current_resolved_date ON vulnerabilities_current (resolved_date)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_current_cve ON vulnerabilities_current (cve)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_current_vendor ON vulnerabilities_current (vendor)"); // HEX-101 Blocking Issue #3
+            db.run("CREATE INDEX IF NOT EXISTS idx_staging_import_id ON vulnerability_staging (import_id)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_staging_processed ON vulnerability_staging (processed)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_staging_batch_id ON vulnerability_staging (batch_id)");
+            db.run(
+                "CREATE INDEX IF NOT EXISTS idx_staging_unprocessed_batch ON vulnerability_staging (processed, batch_id)",
+            );
+            // Vendor daily totals indexes (Migration 008)
+            db.run("CREATE INDEX IF NOT EXISTS idx_vendor_daily_scan_date ON vendor_daily_totals(scan_date)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_vendor_daily_vendor ON vendor_daily_totals(vendor)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_vendor_daily_composite ON vendor_daily_totals(vendor, scan_date)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_email_templates_name ON email_templates (name)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_email_templates_active ON email_templates (is_active)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_email_templates_category ON email_templates (category)");
+            db.run(
+                "CREATE INDEX IF NOT EXISTS idx_kev_status_ransomware ON kev_status(known_ransomware_use) WHERE known_ransomware_use = 1",
+            );
+            db.run("CREATE INDEX IF NOT EXISTS idx_kev_status_date_added ON kev_status(date_added)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_kev_status_cve_id ON kev_status(cve_id)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_kev_status_due_date ON kev_status(due_date)");
+            db.run(
+                "CREATE INDEX IF NOT EXISTS idx_sync_metadata_type_time ON sync_metadata(sync_type, sync_time DESC)",
+            );
+            db.run("CREATE INDEX IF NOT EXISTS idx_ticket_templates_name ON ticket_templates (name)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_ticket_templates_category ON ticket_templates (category)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_ticket_templates_active ON ticket_templates (is_active)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_vulnerability_templates_name ON vulnerability_templates (name)");
+            db.run(
+                "CREATE INDEX IF NOT EXISTS idx_vulnerability_templates_category ON vulnerability_templates (category)",
+            );
+            db.run(
+                "CREATE INDEX IF NOT EXISTS idx_vulnerability_templates_active ON vulnerability_templates (is_active)",
+            );
+            db.run("CREATE INDEX IF NOT EXISTS idx_users_username ON users (username)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_users_email ON users (email)");
+            db.run("CREATE INDEX IF NOT EXISTS idx_user_preferences_user_id ON user_preferences (user_id)");
 
-  // Wait for the last index creation to complete before resolving
-  db.run("CREATE INDEX IF NOT EXISTS idx_user_preferences_key ON user_preferences (user_id, preference_key)", (err) => {
-    if (err) {
-      console.error("Error creating indexes:", err.message);
-      reject(err);
-      return;
-    }
+            // Wait for the last index creation to complete before resolving
+            db.run(
+                "CREATE INDEX IF NOT EXISTS idx_user_preferences_key ON user_preferences (user_id, preference_key)",
+                (err) => {
+                    if (err) {
+                        console.error("Error creating indexes:", err.message);
+                        reject(err);
+                        return;
+                    }
 
-    console.log("Database initialized successfully!");
-    console.log("Tables created:");
-    console.log(" - tickets (ticket management)");
-    console.log(" - vulnerability_imports (import tracking)");
-    console.log(" - vulnerabilities (legacy vulnerability data)");
-    console.log(" - ticket_vulnerabilities (cross-referencing)");
-    console.log(" - vulnerability_snapshots (historical data)");
-    console.log(" - vulnerabilities_current (active vulnerabilities)");
-    console.log(" - vulnerability_daily_totals (aggregated metrics)");
-    console.log(" - vulnerability_staging (import staging)");
-    console.log(" - email_templates (email templates)");
-    console.log(" - kev_status (CISA KEV data)");
-    console.log(" - sync_metadata (sync tracking)");
-    console.log(" - ticket_templates (ticket templates)");
-    console.log(" - vulnerability_templates (vulnerability templates)");
-    console.log(" - users (authentication and authorization)");
-    console.log(" - user_preferences (cross-device settings - HEX-138)");
-    console.log("All 15 tables and 37 indexes created successfully!");
+                    console.log("Database initialized successfully!");
+                    console.log("Tables created:");
+                    console.log(" - tickets (ticket management)");
+                    console.log(" - vulnerability_imports (import tracking)");
+                    console.log(" - vulnerabilities (legacy vulnerability data)");
+                    console.log(" - ticket_vulnerabilities (cross-referencing)");
+                    console.log(" - vulnerability_snapshots (historical data)");
+                    console.log(" - vulnerabilities_current (active vulnerabilities)");
+                    console.log(" - vulnerability_daily_totals (aggregated metrics)");
+                    console.log(" - vulnerability_staging (import staging)");
+                    console.log(" - email_templates (email templates)");
+                    console.log(" - kev_status (CISA KEV data)");
+                    console.log(" - sync_metadata (sync tracking)");
+                    console.log(" - ticket_templates (ticket templates)");
+                    console.log(" - vulnerability_templates (vulnerability templates)");
+                    console.log(" - users (authentication and authorization)");
+                    console.log(" - user_preferences (cross-device settings - HEX-138)");
+                    console.log("All 15 tables and 37 indexes created successfully!");
 
-    resolve();
-  });
+                    resolve();
+                },
+            );
+        });
     });
-  });
 }
 
 /**
@@ -443,79 +466,79 @@ function createTables(db) {
  * @returns {Promise<void>}
  */
 async function seedInitialData(db) {
-  return new Promise((resolve, reject) => {
-    db.get("SELECT COUNT(*) as count FROM users WHERE username = ?", ["admin"], async (err, row) => {
-      if (err) {
-        console.error("Error checking for admin user:", err.message);
-        reject(err);
-        return;
-      }
-
-      // Only seed admin if it doesn't exist
-      if (!row || row.count === 0) {
-        try {
-          // Default initial password (MUST be changed after first login)
-          const initialPassword = "admin123!";
-
-          // Hash password with Argon2id
-          const passwordHash = await argon2.hash(initialPassword, {
-            type: argon2.argon2id,
-            memoryCost: 19456,
-            timeCost: 2,
-            parallelism: 1
-          });
-
-          // Insert admin user
-          db.run(
-            `INSERT INTO users (id, username, email, password_hash, role)
-             VALUES (?, ?, ?, ?, ?)`,
-            [
-              "00000000-0000-0000-0000-000000000001",
-              "admin",
-              "admin@hextrackr.local",
-              passwordHash,
-              "superadmin"
-            ],
-            (insertErr) => {
-              if (insertErr) {
-                console.error("Error creating admin user:", insertErr.message);
-                reject(insertErr);
+    return new Promise((resolve, reject) => {
+        db.get("SELECT COUNT(*) as count FROM users WHERE username = ?", ["admin"], async (err, row) => {
+            if (err) {
+                console.error("Error checking for admin user:", err.message);
+                reject(err);
                 return;
-              }
-
-              console.log("");
-              console.log("═══════════════════════════════════════════════════════");
-              console.log("INITIAL ADMIN CREDENTIALS (SAVE THESE!)");
-              console.log("═══════════════════════════════════════════════════════");
-              console.log("Username: admin");
-              console.log(`Password: ${initialPassword}`);
-              console.log("═══════════════════════════════════════════════════════");
-              console.log("CHANGE THIS PASSWORD IMMEDIATELY AFTER FIRST LOGIN!");
-              console.log("═══════════════════════════════════════════════════════");
-              console.log("");
-
-              resolve();
             }
-          );
-        } catch (hashError) {
-          console.error("Error hashing password:", hashError.message);
-          reject(hashError);
-        }
-      } else {
-        console.log("Admin user already exists - skipping seed");
-        resolve();
-      }
+
+            // Only seed admin if it doesn't exist
+            if (!row || row.count === 0) {
+                try {
+                    // Default initial password (MUST be changed after first login)
+                    const initialPassword = "admin123!";
+
+                    // Hash password with Argon2id
+                    const passwordHash = await argon2.hash(initialPassword, {
+                        type: argon2.argon2id,
+                        memoryCost: 19456,
+                        timeCost: 2,
+                        parallelism: 1,
+                    });
+
+                    // Insert admin user
+                    db.run(
+                        `INSERT INTO users (id, username, email, password_hash, role)
+             VALUES (?, ?, ?, ?, ?)`,
+                        [
+                            "00000000-0000-0000-0000-000000000001",
+                            "admin",
+                            "admin@hextrackr.local",
+                            passwordHash,
+                            "superadmin",
+                        ],
+                        (insertErr) => {
+                            if (insertErr) {
+                                console.error("Error creating admin user:", insertErr.message);
+                                reject(insertErr);
+                                return;
+                            }
+
+                            console.log("");
+                            console.log("═══════════════════════════════════════════════════════");
+                            console.log("INITIAL ADMIN CREDENTIALS (SAVE THESE!)");
+                            console.log("═══════════════════════════════════════════════════════");
+                            console.log("Username: admin");
+                            console.log(`Password: ${initialPassword}`);
+                            console.log("═══════════════════════════════════════════════════════");
+                            console.log("CHANGE THIS PASSWORD IMMEDIATELY AFTER FIRST LOGIN!");
+                            console.log("═══════════════════════════════════════════════════════");
+                            console.log("");
+
+                            resolve();
+                        },
+                    );
+                } catch (hashError) {
+                    console.error("Error hashing password:", hashError.message);
+                    reject(hashError);
+                }
+            } else {
+                console.log("Admin user already exists - skipping seed");
+                resolve();
+            }
+        });
     });
-  });
 }
 
 // Execute database initialization
 initializeDatabase()
-  .then(() => {
-    console.log("Database initialization completed successfully");
-    process.exit(0);
-  })
-  .catch((error) => {
-    console.error("Database initialization failed:", error);
-    process.exit(1);
-  });
+    .then(() => {
+        console.log("Database initialization completed successfully");
+        process.exit(0);
+    })
+    .catch((error) => {
+        console.error("Database initialization failed:", error);
+        process.exit(1);
+    });

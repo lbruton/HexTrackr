@@ -7,12 +7,12 @@
 /* eslint-env browser */
 /* global window, fetch, console */
 
-(function() {
+(function () {
     "use strict";
-    
+
     // Initialize global config object
     window.HexTrackrConfig = window.HexTrackrConfig || {};
-    
+
     /**
      * Load application configuration from server
      * @returns {Promise<void>}
@@ -20,43 +20,42 @@
     async function loadConfig() {
         try {
             logger.debug("ui", "Loading HexTrackr configuration...");
-            
+
             // Fetch version and health info from server
             const response = await fetch("/health", {
                 method: "GET",
                 headers: {
-                    "Accept": "application/json"
+                    Accept: "application/json",
                 },
                 // Add timeout to prevent hanging
-                signal: AbortSignal.timeout(5000)
+                signal: AbortSignal.timeout(5000),
             });
-            
+
             if (!response.ok) {
                 throw new Error(`Health endpoint returned ${response.status}: ${response.statusText}`);
             }
-            
+
             const healthData = await response.json();
-            
+
             // Store configuration in global object
             window.HexTrackrConfig = {
                 version: healthData.version || "unknown",
                 status: healthData.status,
                 dbConnected: healthData.db,
                 uptime: healthData.uptime,
-                loadTime: new Date().toISOString()
+                loadTime: new Date().toISOString(),
             };
-            
+
             logger.debug("ui", ` HexTrackr configuration loaded: v${window.HexTrackrConfig.version}`);
-            
+
             // Dispatch custom event to notify other components that config is ready
             const configLoadedEvent = new CustomEvent("hextrackr:config:loaded", {
-                detail: window.HexTrackrConfig
+                detail: window.HexTrackrConfig,
             });
             document.dispatchEvent(configLoadedEvent);
-            
         } catch (error) {
             logger.warn("ui", "Failed to load HexTrackr configuration:", error.message);
-            
+
             // Set fallback configuration
             window.HexTrackrConfig = {
                 version: "unknown",
@@ -64,17 +63,17 @@
                 dbConnected: false,
                 uptime: 0,
                 loadTime: new Date().toISOString(),
-                error: error.message
+                error: error.message,
             };
-            
+
             // Still dispatch event so components don't hang waiting
             const configErrorEvent = new CustomEvent("hextrackr:config:error", {
-                detail: { error: error.message }
+                detail: { error: error.message },
             });
             document.dispatchEvent(configErrorEvent);
         }
     }
-    
+
     /**
      * Get current version string
      * @returns {string} Current application version
@@ -82,21 +81,23 @@
     function getVersion() {
         return window.HexTrackrConfig?.version || "unknown";
     }
-    
+
     /**
      * Check if configuration is loaded and valid
      * @returns {boolean} True if config is loaded
      */
     function isConfigLoaded() {
-        return window.HexTrackrConfig && 
-               typeof window.HexTrackrConfig.version === "string" && 
-               window.HexTrackrConfig.version !== "unknown";
+        return (
+            window.HexTrackrConfig &&
+            typeof window.HexTrackrConfig.version === "string" &&
+            window.HexTrackrConfig.version !== "unknown"
+        );
     }
-    
+
     // Add utility methods to global config
     window.HexTrackrConfig.getVersion = getVersion;
     window.HexTrackrConfig.isLoaded = isConfigLoaded;
-    
+
     // Load configuration when DOM is ready
     if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", loadConfig);
@@ -104,5 +105,4 @@
         // DOM is already ready
         loadConfig();
     }
-    
 })();
