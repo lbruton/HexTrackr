@@ -60,10 +60,10 @@ class PreferencesService {
                             key: row.preference_key,
                             value: parsedValue,
                             created_at: row.created_at,
-                            updated_at: row.updated_at
-                        }
+                            updated_at: row.updated_at,
+                        },
                     });
-                }
+                },
             );
         });
     }
@@ -87,7 +87,7 @@ class PreferencesService {
                     }
 
                     // Parse JSON values for each preference
-                    const preferences = rows.map(row => {
+                    const preferences = rows.map((row) => {
                         let parsedValue;
                         try {
                             parsedValue = JSON.parse(row.preference_value);
@@ -99,15 +99,15 @@ class PreferencesService {
                             key: row.preference_key,
                             value: parsedValue,
                             created_at: row.created_at,
-                            updated_at: row.updated_at
+                            updated_at: row.updated_at,
                         };
                     });
 
                     resolve({
                         success: true,
-                        data: preferences
+                        data: preferences,
                     });
-                }
+                },
             );
         });
     }
@@ -123,9 +123,7 @@ class PreferencesService {
     async setPreference(userId, key, value) {
         return new Promise((resolve, reject) => {
             // Stringify value if it's an object or array
-            const stringValue = typeof value === "object"
-                ? JSON.stringify(value)
-                : String(value);
+            const stringValue = typeof value === "object" ? JSON.stringify(value) : String(value);
 
             // Use UPSERT: INSERT or UPDATE if exists
             this.db.run(
@@ -136,16 +134,16 @@ class PreferencesService {
                      preference_value = excluded.preference_value,
                      updated_at = CURRENT_TIMESTAMP`,
                 [userId, key, stringValue],
-                function(err) {
+                function (err) {
                     if (err) {
                         return reject(new Error("Database error setting preference: " + err.message));
                     }
 
                     resolve({
                         success: true,
-                        message: "Preference saved successfully"
+                        message: "Preference saved successfully",
                     });
-                }
+                },
             );
         });
     }
@@ -163,7 +161,7 @@ class PreferencesService {
             if (keys.length === 0) {
                 return resolve({
                     success: true,
-                    message: "No preferences to set"
+                    message: "No preferences to set",
                 });
             }
 
@@ -174,12 +172,10 @@ class PreferencesService {
                 }
 
                 // Prepare promises for each preference
-                const promises = keys.map(key => {
+                const promises = keys.map((key) => {
                     return new Promise((resolveSet, rejectSet) => {
                         const value = preferences[key];
-                        const stringValue = typeof value === "object"
-                            ? JSON.stringify(value)
-                            : String(value);
+                        const stringValue = typeof value === "object" ? JSON.stringify(value) : String(value);
 
                         this.db.run(
                             `INSERT INTO user_preferences (user_id, preference_key, preference_value)
@@ -189,12 +185,12 @@ class PreferencesService {
                                  preference_value = excluded.preference_value,
                                  updated_at = CURRENT_TIMESTAMP`,
                             [userId, key, stringValue],
-                            function(err) {
+                            function (err) {
                                 if (err) {
                                     return rejectSet(err);
                                 }
                                 resolveSet();
-                            }
+                            },
                         );
                     });
                 });
@@ -208,7 +204,7 @@ class PreferencesService {
                             }
                             resolve({
                                 success: true,
-                                message: `${keys.length} preferences saved successfully`
+                                message: `${keys.length} preferences saved successfully`,
                             });
                         });
                     })
@@ -233,7 +229,7 @@ class PreferencesService {
                 `DELETE FROM user_preferences
                  WHERE user_id = ? AND preference_key = ?`,
                 [userId, key],
-                function(err) {
+                function (err) {
                     if (err) {
                         return reject(new Error("Database error deleting preference: " + err.message));
                     }
@@ -241,15 +237,15 @@ class PreferencesService {
                     if (this.changes === 0) {
                         return resolve({
                             success: false,
-                            error: "Preference not found"
+                            error: "Preference not found",
                         });
                     }
 
                     resolve({
                         success: true,
-                        message: "Preference deleted successfully"
+                        message: "Preference deleted successfully",
                     });
-                }
+                },
             );
         });
     }
@@ -261,20 +257,16 @@ class PreferencesService {
      */
     async deleteAllPreferences(userId) {
         return new Promise((resolve, reject) => {
-            this.db.run(
-                "DELETE FROM user_preferences WHERE user_id = ?",
-                [userId],
-                function(err) {
-                    if (err) {
-                        return reject(new Error("Database error deleting preferences: " + err.message));
-                    }
-
-                    resolve({
-                        success: true,
-                        message: `${this.changes} preferences deleted successfully`
-                    });
+            this.db.run("DELETE FROM user_preferences WHERE user_id = ?", [userId], function (err) {
+                if (err) {
+                    return reject(new Error("Database error deleting preferences: " + err.message));
                 }
-            );
+
+                resolve({
+                    success: true,
+                    message: `${this.changes} preferences deleted successfully`,
+                });
+            });
         });
     }
 
@@ -295,7 +287,7 @@ class PreferencesService {
                         return reject(new Error("Database error checking preference: " + err.message));
                     }
                     resolve(!!row);
-                }
+                },
             );
         });
     }
@@ -307,16 +299,12 @@ class PreferencesService {
      */
     async getPreferenceCount(userId) {
         return new Promise((resolve, reject) => {
-            this.db.get(
-                "SELECT COUNT(*) as count FROM user_preferences WHERE user_id = ?",
-                [userId],
-                (err, row) => {
-                    if (err) {
-                        return reject(new Error("Database error counting preferences: " + err.message));
-                    }
-                    resolve(row.count);
+            this.db.get("SELECT COUNT(*) as count FROM user_preferences WHERE user_id = ?", [userId], (err, row) => {
+                if (err) {
+                    return reject(new Error("Database error counting preferences: " + err.message));
                 }
-            );
+                resolve(row.count);
+            });
         });
     }
 
@@ -349,19 +337,17 @@ class PreferencesService {
                         /_token$/i,
                         /^cisco_api_key$/i,
                         /^servicenow_password$/i,
-                        /^servicenow_credentials$/i
+                        /^servicenow_credentials$/i,
                     ];
 
                     // Filter and parse preferences
                     const safePreferences = rows
-                        .filter(row => {
+                        .filter((row) => {
                             // Exclude if matches any sensitive pattern
-                            const isSensitive = sensitivePatterns.some(pattern =>
-                                pattern.test(row.preference_key)
-                            );
+                            const isSensitive = sensitivePatterns.some((pattern) => pattern.test(row.preference_key));
                             return !isSensitive;
                         })
-                        .map(row => {
+                        .map((row) => {
                             let parsedValue;
                             try {
                                 parsedValue = JSON.parse(row.preference_value);
@@ -373,7 +359,7 @@ class PreferencesService {
                                 key: row.preference_key,
                                 value: parsedValue,
                                 created_at: row.created_at,
-                                updated_at: row.updated_at
+                                updated_at: row.updated_at,
                             };
                         });
 
@@ -383,16 +369,16 @@ class PreferencesService {
                         exported_at: new Date().toISOString(),
                         user: {
                             username: username,
-                            user_id: userId
+                            user_id: userId,
                         },
                         metadata: {
                             total_preferences: rows.length,
                             exported_preferences: safePreferences.length,
-                            filtered_out: rows.length - safePreferences.length
+                            filtered_out: rows.length - safePreferences.length,
                         },
-                        preferences: safePreferences
+                        preferences: safePreferences,
                     });
-                }
+                },
             );
         });
     }
@@ -424,14 +410,12 @@ class PreferencesService {
                 /_token$/i,
                 /^cisco_api_key$/i,
                 /^servicenow_password$/i,
-                /^servicenow_credentials$/i
+                /^servicenow_credentials$/i,
             ];
 
             // Filter preferences
-            const safePreferences = importData.preferences.filter(pref => {
-                const isSensitive = sensitivePatterns.some(pattern =>
-                    pattern.test(pref.key)
-                );
+            const safePreferences = importData.preferences.filter((pref) => {
+                const isSensitive = sensitivePatterns.some((pattern) => pattern.test(pref.key));
                 return !isSensitive && pref.key && pref.value !== undefined;
             });
 
@@ -440,7 +424,7 @@ class PreferencesService {
                     success: true,
                     message: "No safe preferences to import",
                     imported: 0,
-                    skipped: importData.preferences.length
+                    skipped: importData.preferences.length,
                 });
             }
 
@@ -451,11 +435,10 @@ class PreferencesService {
                 }
 
                 // Import each preference
-                const promises = safePreferences.map(pref => {
+                const promises = safePreferences.map((pref) => {
                     return new Promise((resolveImport, rejectImport) => {
-                        const stringValue = typeof pref.value === "object"
-                            ? JSON.stringify(pref.value)
-                            : String(pref.value);
+                        const stringValue =
+                            typeof pref.value === "object" ? JSON.stringify(pref.value) : String(pref.value);
 
                         this.db.run(
                             `INSERT INTO user_preferences (user_id, preference_key, preference_value)
@@ -465,12 +448,12 @@ class PreferencesService {
                                  preference_value = excluded.preference_value,
                                  updated_at = CURRENT_TIMESTAMP`,
                             [userId, pref.key, stringValue],
-                            function(err) {
+                            function (err) {
                                 if (err) {
                                     return rejectImport(err);
                                 }
                                 resolveImport();
-                            }
+                            },
                         );
                     });
                 });
@@ -486,7 +469,7 @@ class PreferencesService {
                                 success: true,
                                 message: `Successfully imported ${safePreferences.length} preferences`,
                                 imported: safePreferences.length,
-                                skipped: importData.preferences.length - safePreferences.length
+                                skipped: importData.preferences.length - safePreferences.length,
                             });
                         });
                     })

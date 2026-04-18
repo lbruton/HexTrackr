@@ -46,7 +46,7 @@ class CiscoController {
             if (status.syncInProgress) {
                 return res.status(409).json({
                     error: "Sync already in progress",
-                    status: status
+                    status: status,
                 });
             }
 
@@ -54,9 +54,14 @@ class CiscoController {
             const result = await this.ciscoAdvisoryService.syncCiscoAdvisories(req.session.userId);
 
             if (global.logger?.info) {
-                global.logger.info("backend", "cisco", "Cisco advisory sync completed", { totalAdvisories: result.totalAdvisories, matchedCount: result.matchedCount });
+                global.logger.info("backend", "cisco", "Cisco advisory sync completed", {
+                    totalAdvisories: result.totalAdvisories,
+                    matchedCount: result.matchedCount,
+                });
             } else {
-                console.log(` Cisco advisory sync completed: ${result.totalAdvisories} advisories, ${result.matchedCount} matched`);
+                console.log(
+                    ` Cisco advisory sync completed: ${result.totalAdvisories} advisories, ${result.matchedCount} matched`,
+                );
             }
 
             // Clear all caches after sync (vulnerabilities may have new fix data)
@@ -68,9 +73,8 @@ class CiscoController {
                 totalAdvisories: result.totalAdvisories,
                 matchedCount: result.matchedCount,
                 totalCvesChecked: result.totalCvesChecked,
-                lastSync: result.lastSync
+                lastSync: result.lastSync,
             });
-
         } catch (error) {
             if (global.logger?.error) {
                 global.logger.error("backend", "cisco", "Cisco advisory sync failed", { error: error.message });
@@ -79,7 +83,7 @@ class CiscoController {
             }
             res.status(500).json({
                 error: "Failed to sync Cisco advisory data",
-                message: error.message
+                message: error.message,
             });
         }
     }
@@ -97,13 +101,15 @@ class CiscoController {
             res.json(status);
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "cisco", "Failed to get Cisco advisory status", { error: error.message });
+                global.logger.error("backend", "cisco", "Failed to get Cisco advisory status", {
+                    error: error.message,
+                });
             } else {
                 console.error("Failed to get Cisco advisory status:", error);
             }
             res.status(500).json({
                 error: "Failed to get Cisco advisory status",
-                message: error.message
+                message: error.message,
             });
         }
     }
@@ -121,7 +127,7 @@ class CiscoController {
 
             if (!cveId) {
                 return res.status(400).json({
-                    error: "CVE ID is required"
+                    error: "CVE ID is required",
                 });
             }
 
@@ -136,16 +142,18 @@ class CiscoController {
 
             // Return null for 404s (frontend handles this gracefully)
             return res.json(advisoryData || null);
-
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "cisco", "Failed to get Cisco advisory", { cveId: req.params.cveId, error: error.message });
+                global.logger.error("backend", "cisco", "Failed to get Cisco advisory", {
+                    cveId: req.params.cveId,
+                    error: error.message,
+                });
             } else {
                 console.error(` Failed to get Cisco advisory for CVE ${req.params.cveId}:`, error);
             }
             res.status(500).json({
                 error: "Failed to get Cisco advisory data",
-                message: error.message
+                message: error.message,
             });
         }
     }
@@ -164,18 +172,19 @@ class CiscoController {
 
             res.json({
                 autoSyncNeeded: needed,
-                hoursThreshold: hoursThreshold
+                hoursThreshold: hoursThreshold,
             });
-
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "cisco", "Failed to check Cisco auto-sync status", { error: error.message });
+                global.logger.error("backend", "cisco", "Failed to check Cisco auto-sync status", {
+                    error: error.message,
+                });
             } else {
                 console.error("Failed to check Cisco auto-sync status:", error);
             }
             res.status(500).json({
                 error: "Failed to check auto-sync status",
-                message: error.message
+                message: error.message,
             });
         }
     }
@@ -195,7 +204,7 @@ class CiscoController {
 
             if (!cveId) {
                 return res.status(400).json({
-                    error: "CVE ID is required"
+                    error: "CVE ID is required",
                 });
             }
 
@@ -205,16 +214,18 @@ class CiscoController {
             res.setHeader("Cache-Control", "public, max-age=60, must-revalidate");
 
             res.json(versions);
-
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "cisco", "Failed to get fixed versions", { cveId: req.params.cveId, error: error.message });
+                global.logger.error("backend", "cisco", "Failed to get fixed versions", {
+                    cveId: req.params.cveId,
+                    error: error.message,
+                });
             } else {
                 console.error(` Failed to get fixed versions for ${req.params.cveId}:`, error);
             }
             res.status(500).json({
                 error: "Failed to get fixed versions",
-                message: error.message
+                message: error.message,
             });
         }
     }

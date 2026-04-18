@@ -22,7 +22,7 @@ class AuditLogModalManager {
         this.filters = {
             startDate: null,
             endDate: null,
-            category: null
+            category: null,
         };
 
         this.init();
@@ -52,7 +52,6 @@ class AuditLogModalManager {
             if (window.logger?.info) {
                 window.logger.info("audit", "AuditLogModalManager initialized");
             }
-
         } catch (error) {
             if (window.logger?.error) {
                 window.logger.error("audit", "Failed to initialize AuditLogModalManager", { error: error.message });
@@ -132,7 +131,6 @@ class AuditLogModalManager {
             this.stats = result.data;
             this.renderStats();
             this.populateCategoryFilter();
-
         } catch (error) {
             console.error("Failed to load audit log stats:", error);
             global.logger?.error("frontend", "audit", "Failed to load audit log stats", { error: error.message });
@@ -174,7 +172,7 @@ class AuditLogModalManager {
         select.innerHTML = '<option value="">All Categories</option>';
 
         // Add category options
-        this.stats.categoriesTracked.forEach(category => {
+        this.stats.categoriesTracked.forEach((category) => {
             const option = document.createElement("option");
             option.value = category;
             option.textContent = category;
@@ -194,7 +192,7 @@ class AuditLogModalManager {
             // Build query parameters
             const params = new URLSearchParams({
                 page: this.currentPage,
-                limit: this.pageLimit
+                limit: this.pageLimit,
             });
 
             if (this.filters.startDate) {
@@ -225,7 +223,6 @@ class AuditLogModalManager {
             // Render logs
             this.renderLogs(result.data.logs);
             this.renderPagination(result.data.pagination);
-
         } catch (error) {
             console.error("Failed to load audit logs:", error);
             global.logger?.error("frontend", "audit", "Failed to load audit logs", { error: error.message });
@@ -255,7 +252,7 @@ class AuditLogModalManager {
 
         emptyState?.classList.add("d-none");
 
-        logs.forEach(log => {
+        logs.forEach((log) => {
             const row = document.createElement("tr");
 
             // Extract message string from object
@@ -271,9 +268,7 @@ class AuditLogModalManager {
             }
 
             // Truncate long messages
-            const truncatedMessage = messageStr.length > 80
-                ? messageStr.substring(0, 80) + "..."
-                : messageStr;
+            const truncatedMessage = messageStr.length > 80 ? messageStr.substring(0, 80) + "..." : messageStr;
 
             // Display username, or truncated UUID (last 8 chars), or dash
             let userDisplay = "-";
@@ -422,7 +417,7 @@ class AuditLogModalManager {
         this.filters = {
             startDate: null,
             endDate: null,
-            category: null
+            category: null,
         };
 
         // Reset to page 1
@@ -457,7 +452,6 @@ class AuditLogModalManager {
             if (window.logger?.info) {
                 window.logger.info("audit", `Exported audit logs as ${format}`);
             }
-
         } catch (error) {
             if (window.logger?.error) {
                 window.logger.error("audit", `Failed to export logs as ${format}`, { error: error.message });
@@ -487,7 +481,7 @@ class AuditLogModalManager {
                 throw new Error(result.error || "Failed to load log details");
             }
 
-            const log = result.data.logs.find(l => l.id === logId);
+            const log = result.data.logs.find((l) => l.id === logId);
 
             if (!log) {
                 throw new Error("Log not found");
@@ -495,7 +489,6 @@ class AuditLogModalManager {
 
             this.renderLogDetails(log);
             this.detailsModal.show();
-
         } catch (error) {
             console.error("Failed to show log details:", error);
             global.logger?.error("frontend", "audit", "Failed to show log details", { error: error.message });
@@ -624,7 +617,7 @@ class AuditLogModalManager {
                 totalTickets: "Total Tickets",
                 successCount: "Successfully Migrated",
                 errorCount: "Errors",
-                migrationSource: "Migration Source"
+                migrationSource: "Migration Source",
             };
 
             // Special rendering for import.complete with diff data
@@ -640,16 +633,20 @@ class AuditLogModalManager {
                     <span class="badge bg-danger me-1">${diff.newCves.count} CVEs</span>
                     <span class="badge bg-secondary me-1">${diff.newCves.totalVulnerabilities} vulnerabilities</span>
                     <span class="badge bg-warning">${diff.newCves.totalVpr.toFixed(1)} VPR</span>
-                    ${diff.newCves.topCritical && diff.newCves.topCritical.length > 0 ? `
+                    ${
+                        diff.newCves.topCritical && diff.newCves.topCritical.length > 0
+                            ? `
                         <div class="mt-2">
                             <strong>Top Critical:</strong>
                             <ul class="mb-0">
-                                ${diff.newCves.topCritical.map(c =>
-                                    `<li>${this.escapeHtml(c.cve)} (${c.hosts} hosts)</li>`
-                                ).join("")}
+                                ${diff.newCves.topCritical
+                                    .map((c) => `<li>${this.escapeHtml(c.cve)} (${c.hosts} hosts)</li>`)
+                                    .join("")}
                             </ul>
                         </div>
-                    ` : ""}
+                    `
+                            : ""
+                    }
                 </dd>
 
                 <!-- Resolved CVEs Section -->
@@ -658,16 +655,20 @@ class AuditLogModalManager {
                     <span class="badge bg-success me-1">${diff.resolvedCves.count} CVEs</span>
                     <span class="badge bg-secondary me-1">${diff.resolvedCves.totalVulnerabilities} vulnerabilities</span>
                     <span class="badge bg-info">${diff.resolvedCves.totalVpr.toFixed(1)} VPR</span>
-                    ${diff.resolvedCves.topCritical && diff.resolvedCves.topCritical.length > 0 ? `
+                    ${
+                        diff.resolvedCves.topCritical && diff.resolvedCves.topCritical.length > 0
+                            ? `
                         <div class="mt-2">
                             <strong>Top Critical Resolved:</strong>
                             <ul class="mb-0">
-                                ${diff.resolvedCves.topCritical.map(c =>
-                                    `<li>${this.escapeHtml(c.cve)} (${c.hosts} hosts)</li>`
-                                ).join("")}
+                                ${diff.resolvedCves.topCritical
+                                    .map((c) => `<li>${this.escapeHtml(c.cve)} (${c.hosts} hosts)</li>`)
+                                    .join("")}
                             </ul>
                         </div>
-                    ` : ""}
+                    `
+                            : ""
+                    }
                 </dd>
 
                 <!-- Net Change Section -->
@@ -679,9 +680,7 @@ class AuditLogModalManager {
                     <span class="badge ${diff.percentageChange > 0 ? "bg-danger" : "bg-success"}">
                         ${diff.percentageChange > 0 ? "+" : ""}${diff.percentageChange.toFixed(1)}%
                     </span>
-                    ${diff.significantChange ?
-                        "<span class=\"badge bg-warning ms-2\">⚠️ Significant Change</span>"
-                        : ""}
+                    ${diff.significantChange ? '<span class="badge bg-warning ms-2">⚠️ Significant Change</span>' : ""}
                 </dd>
 
                 <!-- Severity Changes Section -->
@@ -757,7 +756,7 @@ class AuditLogModalManager {
         // Convert camelCase to Title Case with spaces
         return fieldName
             .replace(/([A-Z])/g, " $1")
-            .replace(/^./, str => str.toUpperCase())
+            .replace(/^./, (str) => str.toUpperCase())
             .trim();
     }
 
@@ -829,25 +828,25 @@ class AuditLogModalManager {
     getCategoryBadgeColor(category) {
         const colorMap = {
             // User authentication
-            "user.login": "bg-success",           // Green for successful logins
-            "user.logout": "bg-secondary",        // Gray for logouts
-            "user.failed_login": "bg-danger",     // Red for failed logins
+            "user.login": "bg-success", // Green for successful logins
+            "user.logout": "bg-secondary", // Gray for logouts
+            "user.failed_login": "bg-danger", // Red for failed logins
             // Ticket operations
-            "ticket.create": "bg-success",        // Green for ticket creation
-            "ticket.update": "bg-primary",        // Blue for ticket updates
-            "ticket.delete": "bg-danger",         // Red for ticket deletion
+            "ticket.create": "bg-success", // Green for ticket creation
+            "ticket.update": "bg-primary", // Blue for ticket updates
+            "ticket.delete": "bg-danger", // Red for ticket deletion
             "ticket.status_change": "bg-warning", // Yellow for status changes
-            "ticket.migrate": "bg-info",          // Cyan for migrations
+            "ticket.migrate": "bg-info", // Cyan for migrations
             // Import operations
-            "import.start": "bg-info",            // Cyan for import start
-            "import.complete": "bg-primary",      // Blue for imports
-            "import.failed": "bg-danger",         // Red for failed imports
+            "import.start": "bg-info", // Cyan for import start
+            "import.complete": "bg-primary", // Blue for imports
+            "import.failed": "bg-danger", // Red for failed imports
             // Database operations
-            "database.vacuum": "bg-warning",      // Yellow for database maintenance
+            "database.vacuum": "bg-warning", // Yellow for database maintenance
             // System messages
-            "system.error": "bg-danger",          // Red for errors
-            "system.warning": "bg-warning",       // Yellow for warnings
-            "system.info": "bg-info"              // Cyan for info
+            "system.error": "bg-danger", // Red for errors
+            "system.warning": "bg-warning", // Yellow for warnings
+            "system.info": "bg-info", // Cyan for info
         };
 
         return colorMap[category] || "bg-info"; // Default to info blue
@@ -869,7 +868,7 @@ class AuditLogModalManager {
             day: "numeric",
             hour: "2-digit",
             minute: "2-digit",
-            second: "2-digit"
+            second: "2-digit",
         });
     }
 

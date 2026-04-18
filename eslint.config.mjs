@@ -138,7 +138,7 @@ export default [
       '@stylistic': stylistic
     },
     rules: {
-      "@stylistic/quotes": ["error", "double"],
+      "@stylistic/quotes": ["error", "double", { "avoidEscape": true }],
       "@stylistic/semi": ["error", "always"],
       "curly": ["error", "all"],
       "no-unused-vars": ["error", {
@@ -211,7 +211,7 @@ export default [
       '@stylistic': stylistic
     },
     rules: {
-      "@stylistic/quotes": ["error", "double"],
+      "@stylistic/quotes": ["error", "double", { "avoidEscape": true }],
       "@stylistic/semi": ["error", "always"],
       "curly": ["error", "all"],
       "no-lone-blocks": "error",
@@ -312,7 +312,7 @@ export default [
       '@stylistic': stylistic
     },
     rules: {
-      "@stylistic/quotes": ["error", "double"],
+      "@stylistic/quotes": ["error", "double", { "avoidEscape": true }],
       "@stylistic/semi": ["error", "always"],
       "curly": ["error", "all"],
       "no-lone-blocks": "error",
@@ -350,7 +350,7 @@ export default [
       '@stylistic': stylistic
     },
     rules: {
-      "@stylistic/quotes": ["error", "double"],
+      "@stylistic/quotes": ["error", "double", { "avoidEscape": true }],
       "@stylistic/semi": ["error", "always"],
       "curly": ["error", "all"],
       "no-lone-blocks": "error",
@@ -400,7 +400,7 @@ export default [
       '@stylistic': stylistic
     },
     rules: {
-      "@stylistic/quotes": ["error", "double"],
+      "@stylistic/quotes": ["error", "double", { "avoidEscape": true }],
       "@stylistic/semi": ["error", "always"],
       "curly": ["error", "all"],
       "no-lone-blocks": "error",
@@ -433,7 +433,7 @@ export default [
       '@stylistic': stylistic
     },
     rules: {
-      "@stylistic/quotes": ["error", "double"],
+      "@stylistic/quotes": ["error", "double", { "avoidEscape": true }],
       "@stylistic/semi": ["error", "always"],
       "curly": ["error", "all"],
       "no-lone-blocks": "error",
@@ -515,7 +515,7 @@ export default [
       '@stylistic': stylistic
     },
     rules: {
-      "@stylistic/quotes": ["error", "double"],
+      "@stylistic/quotes": ["error", "double", { "avoidEscape": true }],
       "@stylistic/semi": ["error", "always"],
       "curly": ["error", "all"],
       "no-lone-blocks": "error",
@@ -594,7 +594,7 @@ export default [
       '@stylistic': stylistic
     },
     rules: {
-      "@stylistic/quotes": ["error", "double"],
+      "@stylistic/quotes": ["error", "double", { "avoidEscape": true }],
       "@stylistic/semi": ["error", "always"],
       "curly": ["error", "all"],
       "no-lone-blocks": "error",

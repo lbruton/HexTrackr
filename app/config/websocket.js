@@ -13,7 +13,7 @@ const {
     CORS_ORIGINS,
     CORS_METHODS,
     WEBSOCKET_PING_TIMEOUT,
-    WEBSOCKET_PING_INTERVAL
+    WEBSOCKET_PING_INTERVAL,
 } = require("../utils/constants");
 
 /**
@@ -40,7 +40,7 @@ const websocketConfig = {
         cors: {
             origin: CORS_ORIGINS,
             methods: CORS_METHODS,
-            credentials: true
+            credentials: true,
         },
 
         /**
@@ -79,7 +79,7 @@ const websocketConfig = {
          * Allow HTTP long-polling fallback
          * @type {boolean}
          */
-        allowEIO3: true
+        allowEIO3: true,
     },
 
     /**
@@ -105,7 +105,7 @@ const websocketConfig = {
 
         // General data events
         DATA_REFRESH: "data-refresh",
-        NOTIFICATION: "notification"
+        NOTIFICATION: "notification",
     },
 
     /**
@@ -130,7 +130,7 @@ const websocketConfig = {
          * Admin operations room
          * @type {string}
          */
-        ADMIN: "admin"
+        ADMIN: "admin",
     },
 
     /**
@@ -154,7 +154,7 @@ const websocketConfig = {
          * Maximum number of rooms a client can join
          * @type {number}
          */
-        maxRoomsPerClient: 10
+        maxRoomsPerClient: 10,
     },
 
     /**
@@ -178,8 +178,8 @@ const websocketConfig = {
          * Log progress updates
          * @type {boolean}
          */
-        logProgress: false // Set to true for verbose progress logging
-    }
+        logProgress: false, // Set to true for verbose progress logging
+    },
 };
 
 /**
@@ -238,5 +238,5 @@ module.exports = {
     getRoomConfig,
     getProgressRoom,
     getDebugConfig,
-    getLimitsConfig
+    getLimitsConfig,
 };

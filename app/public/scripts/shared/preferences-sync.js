@@ -113,7 +113,7 @@ class PreferencesSync {
             if (result.data && result.data.preferences) {
                 let themePreference = null;
 
-                result.data.preferences.forEach(pref => {
+                result.data.preferences.forEach((pref) => {
                     // CRITICAL FIX: Check if localStorage has a fresher value before overwriting
                     // This prevents stale database values from overwriting fresh user changes
                     const storageKey = this.getStorageKey(pref.key);
@@ -132,11 +132,17 @@ class PreferencesSync {
                                 const age = Date.now() - cached.timestamp;
                                 if (age < 500) {
                                     // localStorage value is very fresh, preserve it (prevents race condition)
-                                    logger.debug("ui", `🔒 Preserving fresh localStorage theme (${age}ms old): ${cached.theme}`);
+                                    logger.debug(
+                                        "ui",
+                                        `🔒 Preserving fresh localStorage theme (${age}ms old): ${cached.theme}`,
+                                    );
                                     shouldUpdate = false;
                                 } else {
                                     // localStorage value is stale, use database value for cross-device sync
-                                    logger.debug("ui", ` Updating stale localStorage theme (${age}ms old) with database value`);
+                                    logger.debug(
+                                        "ui",
+                                        ` Updating stale localStorage theme (${age}ms old) with database value`,
+                                    );
                                 }
                             }
                             // Store theme for reuse (handles both old and new JSON formats)
@@ -157,7 +163,7 @@ class PreferencesSync {
                     // CRITICAL FIX: Reuse already-parsed value instead of calling JSON.parse again
                     // This prevents SyntaxError when legacy users have plain string themes
                     if (pref.key === "theme") {
-                        themePreference = shouldUpdate ? pref.value : (cachedTheme || pref.value);
+                        themePreference = shouldUpdate ? pref.value : cachedTheme || pref.value;
                     }
                 });
 
@@ -169,14 +175,18 @@ class PreferencesSync {
                     document.documentElement.setAttribute("data-bs-theme", themePreference);
 
                     // Dispatch themeInitialized event for charts and other components
-                    document.dispatchEvent(new CustomEvent("themeInitialized", {
-                        detail: { theme: themePreference, source: "database" }
-                    }));
+                    document.dispatchEvent(
+                        new CustomEvent("themeInitialized", {
+                            detail: { theme: themePreference, source: "database" },
+                        }),
+                    );
 
                     // Also dispatch preferencesLoaded for other listeners
-                    window.dispatchEvent(new CustomEvent("preferencesLoaded", {
-                        detail: { theme: themePreference, source: "database" }
-                    }));
+                    window.dispatchEvent(
+                        new CustomEvent("preferencesLoaded", {
+                            detail: { theme: themePreference, source: "database" },
+                        }),
+                    );
 
                     logger.debug("ui", ` Applied theme from database: ${themePreference}`);
                 }
@@ -184,7 +194,6 @@ class PreferencesSync {
 
             this.initialized = true;
             return true;
-
         } catch (error) {
             logger.error("ui", "Error initializing preferences sync:", error);
             this.initialized = true; // Still mark as initialized to allow localStorage-only mode
@@ -213,7 +222,7 @@ class PreferencesSync {
                     theme: value,
                     timestamp: Date.now(),
                     source: "database",
-                    version: "1.0.0"
+                    version: "1.0.0",
                 };
                 localStorage.setItem(storageKey, JSON.stringify(themeData));
             } else if (typeof value === "object") {
@@ -221,7 +230,6 @@ class PreferencesSync {
             } else {
                 localStorage.setItem(storageKey, String(value));
             }
-
         } catch (error) {
             logger.warn("ui", `Failed to update localStorage cache for '${key}':`, error);
         }
@@ -237,12 +245,12 @@ class PreferencesSync {
     getStorageKey(prefKey) {
         // Map common preference keys to their localStorage equivalents
         const keyMap = {
-            "theme": "hextrackr-theme",
-            "markdown_template_ticket": "hextrackr-markdown-ticket",
-            "markdown_template_vulnerability": "hextrackr-markdown-vulnerability",
-            "pagination_enabled": "hextrackr_enablePagination",
-            "kev_auto_refresh": "kevAutoSyncEnabled",
-            "cisco_api_key": "hextrackr-cisco-key"
+            theme: "hextrackr-theme",
+            markdown_template_ticket: "hextrackr-markdown-ticket",
+            markdown_template_vulnerability: "hextrackr-markdown-vulnerability",
+            pagination_enabled: "hextrackr_enablePagination",
+            kev_auto_refresh: "kevAutoSyncEnabled",
+            cisco_api_key: "hextrackr-cisco-key",
         };
 
         return keyMap[prefKey] || `hextrackr-${prefKey}`;
@@ -280,7 +288,6 @@ class PreferencesSync {
             } else {
                 logger.warn("ui", "Failed to sync theme to database:", result.error);
             }
-
         } catch (error) {
             logger.error("ui", "Error syncing theme to database:", error);
         }
@@ -302,7 +309,6 @@ class PreferencesSync {
         try {
             const key = `markdown_template_${type}`;
             this.queueSync(key, template);
-
         } catch (error) {
             logger.error("ui", `Error syncing ${type} template to database:`, error);
         }
@@ -322,7 +328,6 @@ class PreferencesSync {
 
         try {
             this.queueSync("pagination_enabled", enabled);
-
         } catch (error) {
             logger.error("ui", "Error syncing pagination enabled to database:", error);
         }
@@ -342,7 +347,6 @@ class PreferencesSync {
 
         try {
             this.queueSync("kev_auto_refresh", enabled);
-
         } catch (error) {
             logger.error("ui", "Error syncing KEV auto-refresh to database:", error);
         }
@@ -375,7 +379,6 @@ class PreferencesSync {
                     logger.warn("ui", "Could not remove Cisco credentials from localStorage:", removeError);
                 }
             }
-
         } catch (error) {
             logger.error("ui", "Error syncing Cisco credentials to database:", error);
         }
@@ -392,7 +395,7 @@ class PreferencesSync {
         // Add to sync queue
         this.syncQueue.set(key, {
             value: value,
-            timestamp: Date.now()
+            timestamp: Date.now(),
         });
 
         // Clear existing timeout
@@ -434,7 +437,6 @@ class PreferencesSync {
                 logger.warn("ui", "Failed to sync preferences to database:", result.error);
                 // Keep in queue for retry
             }
-
         } catch (error) {
             logger.error("ui", "Error flushing sync queue:", error);
         }
@@ -498,7 +500,6 @@ class PreferencesSync {
             }
 
             return false;
-
         } catch (error) {
             logger.error("ui", `Error migrating '${localStorageKey}':`, error);
             return false;
@@ -516,7 +517,7 @@ class PreferencesSync {
             serviceAvailable: !!this.prefsService,
             queueSize: this.syncQueue.size,
             pendingSync: !!this.syncTimeout,
-            queuedKeys: Array.from(this.syncQueue.keys())
+            queuedKeys: Array.from(this.syncQueue.keys()),
         };
     }
 }
@@ -538,7 +539,7 @@ if (document.readyState === "loading") {
 } else {
     // DOM already loaded
     if (window.authState) {
-        window.authState.init().then(isAuth => {
+        window.authState.init().then((isAuth) => {
             if (isAuth) {
                 preferencesSync.initialize();
             }

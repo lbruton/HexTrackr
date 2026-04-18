@@ -7,7 +7,6 @@
 const { isValidIPAddress, normalizeHostname, normalizeIPAddress } = require("../utils/helpers");
 
 class ValidationService {
-
     // =============================================================================
     // INPUT VALIDATION METHODS
     // =============================================================================
@@ -57,7 +56,7 @@ class ValidationService {
             location: 100,
             supervisor: 100,
             tech: 100,
-            notes: 1000
+            notes: 1000,
         };
 
         for (const [field, limit] of Object.entries(fieldLimits)) {
@@ -69,7 +68,7 @@ class ValidationService {
         return {
             success: errors.length === 0,
             errors,
-            warnings
+            warnings,
         };
     }
 
@@ -133,7 +132,7 @@ class ValidationService {
         return {
             success: errors.length === 0,
             errors,
-            warnings
+            warnings,
         };
     }
 
@@ -181,8 +180,8 @@ class ValidationService {
                 validRows: 0,
                 invalidRows: 0,
                 rowErrors: [],
-                fieldStats: {}
-            }
+                fieldStats: {},
+            },
         };
 
         // Validate each row
@@ -196,13 +195,13 @@ class ValidationService {
                 results.stats.rowErrors.push({
                     row: index + 1,
                     errors: validation.errors,
-                    warnings: validation.warnings
+                    warnings: validation.warnings,
                 });
             }
 
             // Collect warnings at import level
             if (validation.warnings.length > 0) {
-                results.warnings.push(...validation.warnings.map(w => `Row ${index + 1}: ${w}`));
+                results.warnings.push(...validation.warnings.map((w) => `Row ${index + 1}: ${w}`));
             }
         });
 
@@ -232,8 +231,8 @@ class ValidationService {
 
         // Handle comma-separated IPs (validate first one)
         if (ip.includes(",")) {
-            const ips = ip.split(",").map(i => i.trim());
-            return ips.some(singleIP => isValidIPAddress(singleIP));
+            const ips = ip.split(",").map((i) => i.trim());
+            return ips.some((singleIP) => isValidIPAddress(singleIP));
         }
 
         return isValidIPAddress(ip);
@@ -260,7 +259,8 @@ class ValidationService {
         }
 
         // Basic hostname validation
-        const hostnameRegex = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+        const hostnameRegex =
+            /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
         return hostnameRegex.test(cleaned) && cleaned.length <= 255;
     }
 
@@ -417,9 +417,21 @@ class ValidationService {
         }
 
         const validStatuses = [
-            "Open", "In Progress", "Pending", "Resolved", "Closed",
-            "open", "in progress", "pending", "resolved", "closed",
-            "OPEN", "IN PROGRESS", "PENDING", "RESOLVED", "CLOSED"
+            "Open",
+            "In Progress",
+            "Pending",
+            "Resolved",
+            "Closed",
+            "open",
+            "in progress",
+            "pending",
+            "resolved",
+            "closed",
+            "OPEN",
+            "IN PROGRESS",
+            "PENDING",
+            "RESOLVED",
+            "CLOSED",
         ];
 
         return validStatuses.includes(status.trim());
@@ -436,9 +448,24 @@ class ValidationService {
         }
 
         const validSeverities = [
-            "Critical", "High", "Medium", "Low", "Info", "Informational",
-            "critical", "high", "medium", "low", "info", "informational",
-            "CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO", "INFORMATIONAL"
+            "Critical",
+            "High",
+            "Medium",
+            "Low",
+            "Info",
+            "Informational",
+            "critical",
+            "high",
+            "medium",
+            "low",
+            "info",
+            "informational",
+            "CRITICAL",
+            "HIGH",
+            "MEDIUM",
+            "LOW",
+            "INFO",
+            "INFORMATIONAL",
         ];
 
         return validSeverities.includes(severity.trim());
@@ -455,8 +482,18 @@ class ValidationService {
         }
 
         const validStates = [
-            "ACTIVE", "FIXED", "RESURFACED", "NEW", "OPEN", "CLOSED",
-            "active", "fixed", "resurfaced", "new", "open", "closed"
+            "ACTIVE",
+            "FIXED",
+            "RESURFACED",
+            "NEW",
+            "OPEN",
+            "CLOSED",
+            "active",
+            "fixed",
+            "resurfaced",
+            "new",
+            "open",
+            "closed",
         ];
 
         return validStates.includes(state.trim());
@@ -476,7 +513,8 @@ class ValidationService {
             return "";
         }
 
-        return input.trim()
+        return input
+            .trim()
             .replace(/[<>]/g, "") // Remove potential HTML tags
             .replace(/['"]/g, "") // Remove quotes to prevent injection
             .replace(/[\x00-\x1f\x7f]/g, "") // Remove control characters
@@ -537,7 +575,7 @@ class ValidationService {
         return {
             page: sanitizedPage,
             limit: sanitizedLimit,
-            offset: (sanitizedPage - 1) * sanitizedLimit
+            offset: (sanitizedPage - 1) * sanitizedLimit,
         };
     }
 
@@ -556,7 +594,8 @@ class ValidationService {
 
         // Check for required identification fields
         const hasHostname = row["asset.name"] || row["hostname"] || row["Host"];
-        const hasIP = row["asset.display_ipv4_address"] || row["asset.ipv4_addresses"] || row["ip_address"] || row["IP Address"];
+        const hasIP =
+            row["asset.display_ipv4_address"] || row["asset.ipv4_addresses"] || row["ip_address"] || row["IP Address"];
 
         if (!hasHostname && !hasIP) {
             errors.push("Missing both hostname and IP address");
@@ -570,14 +609,20 @@ class ValidationService {
         // Check for vulnerability identification
         const hasCVE = row["definition.cve"] || row["cve"] || row["CVE"];
         const hasPluginId = row["definition.id"] || row["plugin_id"] || row["Plugin ID"];
-        const hasDescription = row["definition.description"] || row["definition.name"] || row["plugin_name"] || row["description"] || row["Description"];
+        const hasDescription =
+            row["definition.description"] ||
+            row["definition.name"] ||
+            row["plugin_name"] ||
+            row["description"] ||
+            row["Description"];
 
         if (!hasCVE && !hasPluginId && !hasDescription) {
             errors.push("Missing vulnerability identification (CVE, Plugin ID, or Description)");
         }
 
         // Validate scores if present
-        const vprScore = row["definition.vpr.score"] || row["definition.vpr_v2.score"] || row["vpr_score"] || row["VPR Score"];
+        const vprScore =
+            row["definition.vpr.score"] || row["definition.vpr_v2.score"] || row["vpr_score"] || row["VPR Score"];
         if (vprScore && !this.validateVPRScore(vprScore)) {
             warnings.push("Invalid VPR score");
         }
@@ -596,7 +641,7 @@ class ValidationService {
         return {
             success: errors.length === 0,
             errors,
-            warnings
+            warnings,
         };
     }
 
@@ -642,7 +687,7 @@ class ValidationService {
         return {
             success: errors.length === 0,
             errors,
-            warnings
+            warnings,
         };
     }
 }

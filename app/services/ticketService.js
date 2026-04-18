@@ -80,7 +80,7 @@ class TicketService {
                 }
 
                 // Transform the rows to ensure each ticket has an id (use xt_number if id is null)
-                const transformedRows = rows.map(row => {
+                const transformedRows = rows.map((row) => {
                     const currentXt = row.xt_number;
                     const normalizedXt = currentXt ? normalizeXtNumber(currentXt) : undefined;
 
@@ -98,7 +98,7 @@ class TicketService {
                                     if (updateErr) {
                                         _log("error", "Failed to normalize xt_number for ticket", row.id, updateErr);
                                     }
-                                }
+                                },
                             );
                         }
                         row.xt_number = normalizedXt;
@@ -135,7 +135,7 @@ class TicketService {
         const payload = {
             ...ticket,
             xt_number: normalizedXt,
-            xtNumber: normalizedXt
+            xtNumber: normalizedXt,
         };
 
         // HEX-196: Validate XT# uniqueness across ALL tickets (active + deleted)
@@ -146,9 +146,11 @@ class TicketService {
                     "SELECT id, xt_number, deleted FROM tickets WHERE xt_number = ? LIMIT 1",
                     [normalizedXt],
                     (err, row) => {
-                        if (err) {return reject(err);}
+                        if (err) {
+                            return reject(err);
+                        }
                         resolve(row);
-                    }
+                    },
                 );
             });
 
@@ -156,7 +158,7 @@ class TicketService {
                 const status = existingTicket.deleted ? "deleted" : "active";
                 throw new Error(
                     `CRITICAL: XT# ${normalizedXt} already exists (${status} ticket ${existingTicket.id}). ` +
-                    "This indicates frontend failed to call /api/tickets/next-xt-number correctly."
+                        "This indicates frontend failed to call /api/tickets/next-xt-number correctly.",
                 );
             }
         }
@@ -222,21 +224,21 @@ class TicketService {
                     payload.shippingLine2 || payload.shipping_line2,
                     payload.shippingCity || payload.shipping_city,
                     payload.shippingState || payload.shipping_state,
-                    payload.shippingZip || payload.shipping_zip
+                    payload.shippingZip || payload.shipping_zip,
                 ),
                 this._formatAddress(
                     payload.returnLine1 || payload.return_line1,
                     payload.returnLine2 || payload.return_line2,
                     payload.returnCity || payload.return_city,
                     payload.returnState || payload.return_state,
-                    payload.returnZip || payload.return_zip
+                    payload.returnZip || payload.return_zip,
                 ),
                 // Additional fields
                 payload.installedVersions || payload.installed_versions || null,
-                payload.deviceStatus || payload.device_status || null
+                payload.deviceStatus || payload.device_status || null,
             ];
 
-            this.db.run(sql, params, function(err) {
+            this.db.run(sql, params, function (err) {
                 if (err) {
                     return reject(new Error("Failed to save ticket: " + err.message));
                 }
@@ -265,7 +267,8 @@ class TicketService {
             }
 
             // Merge the updates with existing data, ensuring required fields are preserved
-            const normalizedXt = normalizeXtNumber(ticket.xt_number || ticket.xtNumber || existingTicket.xt_number) || null;
+            const normalizedXt =
+                normalizeXtNumber(ticket.xt_number || ticket.xtNumber || existingTicket.xt_number) || null;
             const payload = {
                 // Required fields - use || to prevent empty values
                 dateSubmitted: ticket.dateSubmitted || ticket.date_submitted || existingTicket.date_submitted,
@@ -277,7 +280,8 @@ class TicketService {
 
                 // Optional fields - use ?? to allow clearing with empty strings
                 hexagonTicket: ticket.hexagonTicket ?? ticket.hexagon_ticket ?? existingTicket.hexagon_ticket,
-                serviceNowTicket: ticket.serviceNowTicket ?? ticket.service_now_ticket ?? existingTicket.service_now_ticket,
+                serviceNowTicket:
+                    ticket.serviceNowTicket ?? ticket.service_now_ticket ?? existingTicket.service_now_ticket,
                 location: ticket.location ?? existingTicket.location,
                 supervisor: ticket.supervisor ?? existingTicket.supervisor,
                 tech: ticket.tech ?? existingTicket.tech,
@@ -299,12 +303,15 @@ class TicketService {
                 returnCity: ticket.returnCity ?? ticket.return_city ?? existingTicket.return_city,
                 returnState: ticket.returnState ?? ticket.return_state ?? existingTicket.return_state,
                 returnZip: ticket.returnZip ?? ticket.return_zip ?? existingTicket.return_zip,
-                outboundTracking: ticket.outboundTracking ?? ticket.outbound_tracking ?? existingTicket.outbound_tracking,
+                outboundTracking:
+                    ticket.outboundTracking ?? ticket.outbound_tracking ?? existingTicket.outbound_tracking,
                 returnTracking: ticket.returnTracking ?? ticket.return_tracking ?? existingTicket.return_tracking,
 
                 // Job-specific fields
-                softwareVersions: ticket.softwareVersions ?? ticket.software_versions ?? existingTicket.software_versions,
-                mitigationDetails: ticket.mitigationDetails ?? ticket.mitigation_details ?? existingTicket.mitigation_details
+                softwareVersions:
+                    ticket.softwareVersions ?? ticket.software_versions ?? existingTicket.software_versions,
+                mitigationDetails:
+                    ticket.mitigationDetails ?? ticket.mitigation_details ?? existingTicket.mitigation_details,
             };
 
             return new Promise((resolve, reject) => {
@@ -329,7 +336,9 @@ class TicketService {
                     payload.status,
                     payload.jobType || payload.job_type || "Upgrade",
                     payload.notes,
-                    typeof payload.attachments === "string" ? payload.attachments : JSON.stringify(payload.attachments || []),
+                    typeof payload.attachments === "string"
+                        ? payload.attachments
+                        : JSON.stringify(payload.attachments || []),
                     payload.updatedAt,
                     payload.site,
                     payload.xt_number,
@@ -356,22 +365,22 @@ class TicketService {
                         payload.shippingLine2,
                         payload.shippingCity,
                         payload.shippingState,
-                        payload.shippingZip
+                        payload.shippingZip,
                     ),
                     this._formatAddress(
                         payload.returnLine1,
                         payload.returnLine2,
                         payload.returnCity,
                         payload.returnState,
-                        payload.returnZip
+                        payload.returnZip,
                     ),
                     // Job-specific fields
                     payload.softwareVersions || null,
                     payload.mitigationDetails || null,
-                    ticketId
+                    ticketId,
                 ];
 
-                this.db.run(sql, params, function(err) {
+                this.db.run(sql, params, function (err) {
                     if (err) {
                         return reject(new Error("Failed to update ticket: " + err.message));
                     }
@@ -398,12 +407,12 @@ class TicketService {
                      deleted_by = ?
                  WHERE id = ?`,
                 [deletionReason, deletedBy, ticketId],
-                function(err) {
+                function (err) {
                     if (err) {
                         return reject(new Error("Failed to delete ticket: " + err.message));
                     }
                     resolve(this.changes);
-                }
+                },
             );
         });
     }
@@ -419,8 +428,11 @@ class TicketService {
                 if (mode === "replace") {
                     await new Promise((res, rej) => {
                         this.db.run("DELETE FROM tickets", (err) => {
-                            if (err) {rej(err);}
-                            else {res();}
+                            if (err) {
+                                rej(err);
+                            } else {
+                                res();
+                            }
                         });
                     });
                 }
@@ -464,7 +476,7 @@ class TicketService {
                             deleted: ticket.deleted || 0,
                             deletedAt: ticket.deleted_at || ticket.deletedAt || null,
                             deletionReason: ticket.deletion_reason || ticket.deletionReason || null,
-                            deletedBy: ticket.deleted_by || ticket.deletedBy || null
+                            deletedBy: ticket.deleted_by || ticket.deletedBy || null,
                         };
 
                         await this.createTicket(mappedTicket);
@@ -497,7 +509,7 @@ class TicketService {
             let successCount = 0;
             let errorCount = 0;
 
-            tickets.forEach(ticket => {
+            tickets.forEach((ticket) => {
                 const params = [
                     ticket.id,
                     ticket.start_date,
@@ -516,10 +528,10 @@ class TicketService {
                     ticket.display_site_code,
                     ticket.ticket_number,
                     ticket.site_id,
-                    ticket.location_id
+                    ticket.location_id,
                 ];
 
-                this.db.run(sql, params, function(err) {
+                this.db.run(sql, params, function (err) {
                     if (err) {
                         _log("error", "Error migrating ticket:", err);
                         errorCount++;
@@ -559,33 +571,36 @@ class TicketService {
                 try {
                     const mapped = this._mapTicketRow(row, index);
 
-                    stmt.run([
-                        mapped.id,
-                        mapped.xtNumber,
-                        mapped.dateSubmitted,
-                        mapped.dateDue,
-                        mapped.hexagonTicket,
-                        mapped.serviceNowTicket,
-                        mapped.location,
-                        mapped.devices,
-                        mapped.supervisor,
-                        mapped.tech,
-                        mapped.status,
-                        mapped.notes,
-                        mapped.createdAt,
-                        mapped.updatedAt,
-                        mapped.deleted || 0,
-                        mapped.deletedAt || null,
-                        mapped.deletionReason || null,
-                        mapped.deletedBy || null
-                    ], (err) => {
-                        if (err) {
-                            _log("error", `Error importing ticket row ${index + 1}:`, err);
-                            errors.push(`Row ${index + 1}: ${err.message}`);
-                        } else {
-                            imported++;
-                        }
-                    });
+                    stmt.run(
+                        [
+                            mapped.id,
+                            mapped.xtNumber,
+                            mapped.dateSubmitted,
+                            mapped.dateDue,
+                            mapped.hexagonTicket,
+                            mapped.serviceNowTicket,
+                            mapped.location,
+                            mapped.devices,
+                            mapped.supervisor,
+                            mapped.tech,
+                            mapped.status,
+                            mapped.notes,
+                            mapped.createdAt,
+                            mapped.updatedAt,
+                            mapped.deleted || 0,
+                            mapped.deletedAt || null,
+                            mapped.deletionReason || null,
+                            mapped.deletedBy || null,
+                        ],
+                        (err) => {
+                            if (err) {
+                                _log("error", `Error importing ticket row ${index + 1}:`, err);
+                                errors.push(`Row ${index + 1}: ${err.message}`);
+                            } else {
+                                imported++;
+                            }
+                        },
+                    );
                 } catch (error) {
                     errors.push(`Row ${index + 1}: ${error.message}`);
                 }
@@ -598,7 +613,7 @@ class TicketService {
 
                 resolve({
                     imported: imported,
-                    errors: errors
+                    errors: errors,
                 });
             });
         });
@@ -610,7 +625,8 @@ class TicketService {
      */
     _mapTicketRow(row, index) {
         const now = new Date().toISOString();
-        const xtNumber = normalizeXtNumber(row.xt_number || row["XT Number"] || row.xtNumber) || String(index + 1).padStart(4, "0");
+        const xtNumber =
+            normalizeXtNumber(row.xt_number || row["XT Number"] || row.xtNumber) || String(index + 1).padStart(4, "0");
         const ticketId = row.id || `ticket_${Date.now()}_${index}`;
 
         return {
@@ -631,7 +647,7 @@ class TicketService {
             deleted: row.deleted || row["Deleted"] || 0,
             deletedAt: row.deleted_at || row["Deleted At"] || null,
             deletionReason: row.deletion_reason || row["Deletion Reason"] || null,
-            deletedBy: row.deleted_by || row["Deleted By"] || null
+            deletedBy: row.deleted_by || row["Deleted By"] || null,
         };
     }
 
@@ -650,7 +666,7 @@ class TicketService {
                     type: "tickets",
                     count: rows.length,
                     data: rows,
-                    exported_at: new Date().toISOString()
+                    exported_at: new Date().toISOString(),
                 });
             });
         });
@@ -663,25 +679,22 @@ class TicketService {
         return new Promise((resolve, reject) => {
             // IMPORTANT: NO deleted=0 filter here - must include ALL tickets (deleted + active)
             // to guarantee XT# uniqueness across entire database lifetime (HEX-196)
-            this.db.all(
-                "SELECT xt_number FROM tickets WHERE xt_number IS NOT NULL",
-                (err, rows) => {
-                    if (err) {
-                        return reject(new Error("Failed to generate ticket number: " + err.message));
-                    }
-
-                    const numbers = (rows || [])
-                        .map(r => normalizeXtNumber(r.xt_number))
-                        .filter(Boolean)
-                        .map(value => parseInt(value, 10))
-                        .filter(num => !isNaN(num));
-
-                    const maxNumber = numbers.length > 0 ? Math.max(...numbers) : 0;
-                    const nextNumber = maxNumber + 1;
-
-                    resolve(String(nextNumber).padStart(4, "0"));
+            this.db.all("SELECT xt_number FROM tickets WHERE xt_number IS NOT NULL", (err, rows) => {
+                if (err) {
+                    return reject(new Error("Failed to generate ticket number: " + err.message));
                 }
-            );
+
+                const numbers = (rows || [])
+                    .map((r) => normalizeXtNumber(r.xt_number))
+                    .filter(Boolean)
+                    .map((value) => parseInt(value, 10))
+                    .filter((num) => !isNaN(num));
+
+                const maxNumber = numbers.length > 0 ? Math.max(...numbers) : 0;
+                const nextNumber = maxNumber + 1;
+
+                resolve(String(nextNumber).padStart(4, "0"));
+            });
         });
     }
 
@@ -694,7 +707,7 @@ class TicketService {
             const sql = "UPDATE tickets SET devices = ?, updated_at = ? WHERE id = ?";
             const params = [JSON.stringify(devices), new Date().toISOString(), ticketId];
 
-            this.db.run(sql, params, function(err) {
+            this.db.run(sql, params, function (err) {
                 if (err) {
                     return reject(new Error("Failed to update ticket devices: " + err.message));
                 }
@@ -747,7 +760,7 @@ class TicketService {
                 }
 
                 // Parse devices JSON for each ticket
-                const tickets = rows.map(row => {
+                const tickets = rows.map((row) => {
                     try {
                         row.devices = JSON.parse(row.devices);
                     } catch (parseError) {
@@ -794,7 +807,7 @@ class TicketService {
                 }
 
                 // Parse devices JSON for each ticket
-                const tickets = rows.map(row => {
+                const tickets = rows.map((row) => {
                     try {
                         row.devices = JSON.parse(row.devices);
                     } catch (parseError) {
@@ -842,7 +855,7 @@ class TicketService {
 
             // Pre-lowercase hostnames for case-insensitive matching
             // This matches the original lower(?) pattern
-            const params = hostnames.map(h => h.toLowerCase());
+            const params = hostnames.map((h) => h.toLowerCase());
 
             this.db.all(query, params, (err, rows) => {
                 if (err) {
@@ -851,21 +864,21 @@ class TicketService {
 
                 // Create map for quick lookup
                 const countMap = {};
-                rows.forEach(row => {
+                rows.forEach((row) => {
                     countMap[row.hostname] = {
                         count: row.ticket_count,
-                        latestCreated: row.latest_created
+                        latestCreated: row.latest_created,
                     };
                 });
 
                 // Now fetch status and job type for devices that have tickets
                 // Only query devices with count > 0 to minimize overhead
-                const devicesWithTickets = rows.filter(r => r.ticket_count > 0).map(r => r.hostname);
+                const devicesWithTickets = rows.filter((r) => r.ticket_count > 0).map((r) => r.hostname);
 
                 if (devicesWithTickets.length === 0) {
                     // No devices have tickets, return empty data
                     const result = {};
-                    hostnames.forEach(hostname => {
+                    hostnames.forEach((hostname) => {
                         result[hostname.toLowerCase()] = { count: 0, status: null, jobType: null };
                     });
                     return resolve(result);
@@ -897,18 +910,18 @@ class TicketService {
                     const result = {};
 
                     // Initialize all hostnames with zero counts
-                    hostnames.forEach(hostname => {
+                    hostnames.forEach((hostname) => {
                         const normalizedHostname = hostname.toLowerCase();
                         result[normalizedHostname] = {
                             count: 0,
                             status: null,
                             jobType: null,
-                            tickets: []  // Array of ticket IDs
+                            tickets: [], // Array of ticket IDs
                         };
                     });
 
                     // Add ticket counts
-                    Object.keys(countMap).forEach(hostname => {
+                    Object.keys(countMap).forEach((hostname) => {
                         if (result[hostname]) {
                             result[hostname].count = countMap[hostname].count;
                         }
@@ -921,14 +934,14 @@ class TicketService {
                     //   - Orange: Has tickets, none overdue
                     //   - Red: Has at least one overdue ticket
                     const ticketMap = {};
-                    detailRows.forEach(row => {
+                    detailRows.forEach((row) => {
                         if (!ticketMap[row.hostname]) {
                             // First ticket for this device
                             ticketMap[row.hostname] = {
                                 status: row.status,
                                 jobType: row.job_type,
                                 tickets: [],
-                                hasOverdue: row.status === "Overdue"
+                                hasOverdue: row.status === "Overdue",
                             };
                         } else {
                             // Multiple tickets - check if ANY are overdue
@@ -941,7 +954,7 @@ class TicketService {
                     });
 
                     // Merge ticket data into result
-                    Object.keys(ticketMap).forEach(hostname => {
+                    Object.keys(ticketMap).forEach((hostname) => {
                         if (result[hostname]) {
                             result[hostname].status = ticketMap[hostname].status;
                             result[hostname].jobType = ticketMap[hostname].jobType;
@@ -1031,14 +1044,20 @@ class TicketService {
         // Filter out empty/null/undefined values
         const parts = [];
 
-        if (line1) {parts.push(line1);}
-        if (line2) {parts.push(line2);}
+        if (line1) {
+            parts.push(line1);
+        }
+        if (line2) {
+            parts.push(line2);
+        }
         if (city && state && zip) {
             parts.push(`${city}, ${state} ${zip}`);
         } else if (city || state || zip) {
             // Handle partial city/state/zip
             const cityStateZip = [city, state, zip].filter(Boolean).join(" ");
-            if (cityStateZip) {parts.push(cityStateZip);}
+            if (cityStateZip) {
+                parts.push(cityStateZip);
+            }
         }
 
         return parts.length > 0 ? parts.join("\n") : null;

@@ -85,7 +85,7 @@ class TemplateController {
             res.json({
                 success: true,
                 data: templates,
-                count: templates.length
+                count: templates.length,
             });
         } catch (error) {
             if (global.logger?.error) {
@@ -96,7 +96,7 @@ class TemplateController {
             res.status(500).json({
                 success: false,
                 error: "Failed to fetch templates",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -115,24 +115,27 @@ class TemplateController {
             if (!template) {
                 return res.status(404).json({
                     success: false,
-                    error: "Template not found"
+                    error: "Template not found",
                 });
             }
 
             res.json({
                 success: true,
-                data: template
+                data: template,
             });
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "template", "Error fetching template by ID", { error: error.message, id: req.params.id });
+                global.logger.error("backend", "template", "Error fetching template by ID", {
+                    error: error.message,
+                    id: req.params.id,
+                });
             } else {
                 console.error("Error fetching template:", error);
             }
             res.status(500).json({
                 success: false,
                 error: "Failed to fetch template",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -151,34 +154,37 @@ class TemplateController {
             if (!template) {
                 return res.status(404).json({
                     success: false,
-                    error: "Template not found"
+                    error: "Template not found",
                 });
             }
 
             res.json({
                 success: true,
-                data: template
+                data: template,
             });
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "template", "Error fetching template by name", { error: error.message, name: req.params.name });
+                global.logger.error("backend", "template", "Error fetching template by name", {
+                    error: error.message,
+                    name: req.params.name,
+                });
             } else {
                 console.error("Error fetching template by name:", error);
             }
             res.status(500).json({
                 success: false,
                 error: "Failed to fetch template",
-                details: error.message
+                details: error.message,
             });
         }
     }
 
     /**
- * Update template content
- * PUT /api/templates/:id
- * @param {Request} req - Express request
- * @param {Response} res - Express response
- */
+     * Update template content
+     * PUT /api/templates/:id
+     * @param {Request} req - Express request
+     * @param {Response} res - Express response
+     */
     async updateTemplate(req, res) {
         try {
             const { id } = req.params;
@@ -187,7 +193,7 @@ class TemplateController {
             if (!template_content) {
                 return res.status(400).json({
                     success: false,
-                    error: "template_content is required"
+                    error: "template_content is required",
                 });
             }
 
@@ -197,7 +203,7 @@ class TemplateController {
                 return res.status(400).json({
                     success: false,
                     error: "Template validation failed",
-                    details: validationResult.errors
+                    details: validationResult.errors,
                 });
             }
 
@@ -205,31 +211,34 @@ class TemplateController {
                 template_content,
                 description,
                 category,
-                template_name
+                template_name,
             });
 
             if (!updatedTemplate) {
                 return res.status(404).json({
                     success: false,
-                    error: "Template not found"
+                    error: "Template not found",
                 });
             }
 
             res.json({
                 success: true,
                 data: updatedTemplate,
-                message: "Template updated successfully"
+                message: "Template updated successfully",
             });
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "template", "Error updating template", { error: error.message, id: req.params.id });
+                global.logger.error("backend", "template", "Error updating template", {
+                    error: error.message,
+                    id: req.params.id,
+                });
             } else {
                 console.error("Error updating template:", error);
             }
             res.status(500).json({
                 success: false,
                 error: "Failed to update template",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -247,7 +256,7 @@ class TemplateController {
             if (!name || !template_content) {
                 return res.status(400).json({
                     success: false,
-                    error: "name and template_content are required"
+                    error: "name and template_content are required",
                 });
             }
 
@@ -257,17 +266,20 @@ class TemplateController {
                 default_content,
                 variables,
                 category,
-                description
+                description,
             });
 
             res.status(201).json({
                 success: true,
                 data: createdTemplate,
-                message: "Template created successfully"
+                message: "Template created successfully",
             });
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "template", "Error creating template", { error: error.message, name: req.body.name });
+                global.logger.error("backend", "template", "Error creating template", {
+                    error: error.message,
+                    name: req.body.name,
+                });
             } else {
                 console.error("Error creating template:", error);
             }
@@ -275,13 +287,13 @@ class TemplateController {
                 return res.status(409).json({
                     success: false,
                     error: "Template already exists",
-                    details: error.message
+                    details: error.message,
                 });
             }
             res.status(500).json({
                 success: false,
                 error: "Failed to create template",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -301,25 +313,28 @@ class TemplateController {
             if (!resetTemplate) {
                 return res.status(404).json({
                     success: false,
-                    error: "Template not found"
+                    error: "Template not found",
                 });
             }
 
             res.json({
                 success: true,
                 data: resetTemplate,
-                message: "Template reset to default successfully"
+                message: "Template reset to default successfully",
             });
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "template", "Error resetting template to default", { error: error.message, id: req.params.id });
+                global.logger.error("backend", "template", "Error resetting template to default", {
+                    error: error.message,
+                    id: req.params.id,
+                });
             } else {
                 console.error("Error resetting template:", error);
             }
             res.status(500).json({
                 success: false,
                 error: "Failed to reset template",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -338,7 +353,7 @@ class TemplateController {
             if (!ticketData) {
                 return res.status(400).json({
                     success: false,
-                    error: "ticketData is required for preview"
+                    error: "ticketData is required for preview",
                 });
             }
 
@@ -347,26 +362,29 @@ class TemplateController {
             if (!processedTemplate) {
                 return res.status(404).json({
                     success: false,
-                    error: "Template not found"
+                    error: "Template not found",
                 });
             }
 
             res.json({
                 success: true,
                 data: {
-                    processed_content: processedTemplate
-                }
+                    processed_content: processedTemplate,
+                },
             });
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "template", "Error previewing template with data", { error: error.message, id: req.params.id });
+                global.logger.error("backend", "template", "Error previewing template with data", {
+                    error: error.message,
+                    id: req.params.id,
+                });
             } else {
                 console.error("Error previewing template:", error);
             }
             res.status(500).json({
                 success: false,
                 error: "Failed to preview template",
-                details: error.message
+                details: error.message,
             });
         }
     }

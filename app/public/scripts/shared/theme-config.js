@@ -18,18 +18,18 @@ const COLOR_PALETTE = {
     // Primary brand colors
     primary: {
         light: "#206bc4",
-        dark: "#2563eb"
+        dark: "#2563eb",
     },
 
     // Navy theme colors for dark mode (from AG-Grid theme builder)
     navy: {
-        background: "#0F1C31",      // Dark navy background
-        backgroundAlt: "#1a2744",   // Slightly lighter navy
-        surface1: "#1e293b",        // Cards and surfaces
-        surface2: "#2a3f5f",        // Elevated surfaces
-        border: "#2a3f5f",          // Subtle navy border
-        text: "#FFFFFF",            // Pure white text
-        textMuted: "#94a3b8"        // Muted text
+        background: "#0F1C31", // Dark navy background
+        backgroundAlt: "#1a2744", // Slightly lighter navy
+        surface1: "#1e293b", // Cards and surfaces
+        surface2: "#2a3f5f", // Elevated surfaces
+        border: "#2a3f5f", // Subtle navy border
+        text: "#FFFFFF", // Pure white text
+        textMuted: "#94a3b8", // Muted text
     },
 
     // Light theme colors
@@ -40,7 +40,7 @@ const COLOR_PALETTE = {
         surface2: "#f8f9fa",
         border: "#e2e8f0",
         text: "#2d3748",
-        textMuted: "#718096"
+        textMuted: "#718096",
     },
 
     // Semantic colors (same for both themes)
@@ -48,7 +48,7 @@ const COLOR_PALETTE = {
         success: "#16a34a",
         warning: "#d97706",
         danger: "#dc2626",
-        info: "#2563eb"
+        info: "#2563eb",
     },
 
     // VPR severity colors
@@ -56,15 +56,15 @@ const COLOR_PALETTE = {
         critical: "#dc2626",
         high: "#d97706",
         medium: "#2563eb",
-        low: "#16a34a"
+        low: "#16a34a",
     },
 
     // Interactive states
     interactive: {
         hover: "rgba(37, 99, 235, 0.15)",
         selected: "#2563eb",
-        focus: "rgba(37, 99, 235, 0.2)"
-    }
+        focus: "rgba(37, 99, 235, 0.2)",
+    },
 };
 
 /**
@@ -72,8 +72,8 @@ const COLOR_PALETTE = {
  */
 const TYPOGRAPHY = {
     fontFamily: {
-        base: "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
-        mono: "SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace"
+        base: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+        mono: 'SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
     },
     fontSize: {
         xs: "0.75rem",
@@ -82,14 +82,14 @@ const TYPOGRAPHY = {
         lg: "1.125rem",
         xl: "1.25rem",
         "2xl": "1.5rem",
-        "3xl": "1.875rem"
+        "3xl": "1.875rem",
     },
     fontWeight: {
         normal: 400,
         medium: 500,
         semibold: 600,
-        bold: 700
-    }
+        bold: 700,
+    },
 };
 
 /**
@@ -102,7 +102,7 @@ const SPACING = {
     lg: "1.5rem",
     xl: "2rem",
     "2xl": "3rem",
-    "3xl": "4rem"
+    "3xl": "4rem",
 };
 
 /**
@@ -113,14 +113,14 @@ const SHADOWS = {
         sm: "0 1px 3px rgba(0, 0, 0, 0.1)",
         md: "0 4px 12px rgba(0, 0, 0, 0.15)",
         lg: "0 8px 24px rgba(0, 0, 0, 0.2)",
-        xl: "0 12px 48px rgba(0, 0, 0, 0.25)"
+        xl: "0 12px 48px rgba(0, 0, 0, 0.25)",
     },
     dark: {
         sm: "0 1px 3px rgba(0, 0, 0, 0.3)",
         md: "0 4px 12px rgba(0, 0, 0, 0.4)",
         lg: "0 8px 24px rgba(0, 0, 0, 0.5)",
-        xl: "0 12px 48px rgba(0, 0, 0, 0.6)"
-    }
+        xl: "0 12px 48px rgba(0, 0, 0, 0.6)",
+    },
 };
 
 /**
@@ -141,25 +141,25 @@ const AG_GRID_THEMES = {
         borderColor: "#e2e8f0",
         selectedRowBackgroundColor: "#3182ce",
         rowHoverColor: "rgba(49, 130, 206, 0.1)",
-        rangeSelectionBackgroundColor: "rgba(49, 130, 206, 0.2)"
+        rangeSelectionBackgroundColor: "rgba(49, 130, 206, 0.2)",
     },
     dark: {
-        backgroundColor: "#0F1C31",              // Dark navy background - EXACT from theme builder
-        foregroundColor: "#FFF",                 // Pure white text
+        backgroundColor: "#0F1C31", // Dark navy background - EXACT from theme builder
+        foregroundColor: "#FFF", // Pure white text
         browserColorScheme: "dark",
-        chromeBackgroundColor: "#202c3f",        // EXACT header color from theme builder (not using mix)
-        headerBackgroundColor: "#202c3f",        // EXACT header color you specified
+        chromeBackgroundColor: "#202c3f", // EXACT header color from theme builder (not using mix)
+        headerBackgroundColor: "#202c3f", // EXACT header color you specified
         headerTextColor: "#FFF",
         headerFontSize: 14,
         oddRowBackgroundColor: "rgba(255, 255, 255, 0.02)",
         rowBorder: false,
         headerRowBorder: false,
         columnBorder: false,
-        borderColor: "#2a3f5f",                  // Subtle navy border
-        selectedRowBackgroundColor: "#2563eb",   // Bright blue
+        borderColor: "#2a3f5f", // Subtle navy border
+        selectedRowBackgroundColor: "#2563eb", // Bright blue
         rowHoverColor: "rgba(37, 99, 235, 0.15)", // Blue hover
-        rangeSelectionBackgroundColor: "rgba(37, 99, 235, 0.2)"
-    }
+        rangeSelectionBackgroundColor: "rgba(37, 99, 235, 0.2)",
+    },
 };
 
 /**
@@ -173,28 +173,28 @@ const APEX_CHARTS_THEMES = {
             enabled: false,
             color: "#206bc4",
             shadeTo: "light",
-            shadeIntensity: 0.65
+            shadeIntensity: 0.65,
         },
         colors: ["#206bc4", "#16a34a", "#d97706", "#dc2626", "#2563eb", "#7c3aed"],
         background: "transparent",
         foreColor: "#2d3748",
         grid: {
-            borderColor: "#e2e8f0"
+            borderColor: "#e2e8f0",
         },
         stroke: {
-            colors: ["#ffffff"]
+            colors: ["#ffffff"],
         },
         dataLabels: {
             style: {
-                colors: ["#2d3748"]
-            }
+                colors: ["#2d3748"],
+            },
         },
         tooltip: {
             theme: "light",
             style: {
-                fontSize: "12px"
-            }
-        }
+                fontSize: "12px",
+            },
+        },
     },
     dark: {
         mode: "dark",
@@ -203,29 +203,29 @@ const APEX_CHARTS_THEMES = {
             enabled: false,
             color: "#2563eb",
             shadeTo: "dark",
-            shadeIntensity: 0.65
+            shadeIntensity: 0.65,
         },
         colors: ["#2563eb", "#34d399", "#fb923c", "#f87171", "#60a5fa", "#a78bfa"],
         background: "transparent",
         foreColor: "#ffffff",
         grid: {
-            borderColor: "#2a3f5f"
+            borderColor: "#2a3f5f",
         },
         stroke: {
-            colors: ["#0F1C31"]
+            colors: ["#0F1C31"],
         },
         dataLabels: {
             style: {
-                colors: ["#ffffff"]
-            }
+                colors: ["#ffffff"],
+            },
         },
         tooltip: {
             theme: "dark",
             style: {
-                fontSize: "12px"
-            }
-        }
-    }
+                fontSize: "12px",
+            },
+        },
+    },
 };
 
 /**
@@ -264,7 +264,7 @@ const CSS_VARIABLES = {
         "--vpr-critical": COLOR_PALETTE.vpr.critical,
         "--vpr-high": COLOR_PALETTE.vpr.high,
         "--vpr-medium": COLOR_PALETTE.vpr.medium,
-        "--vpr-low": COLOR_PALETTE.vpr.low
+        "--vpr-low": COLOR_PALETTE.vpr.low,
     },
     dark: {
         // Primary colors
@@ -297,8 +297,8 @@ const CSS_VARIABLES = {
         "--vpr-critical": COLOR_PALETTE.vpr.critical,
         "--vpr-high": COLOR_PALETTE.vpr.high,
         "--vpr-medium": COLOR_PALETTE.vpr.medium,
-        "--vpr-low": COLOR_PALETTE.vpr.low
-    }
+        "--vpr-low": COLOR_PALETTE.vpr.low,
+    },
 };
 
 /**
@@ -344,7 +344,7 @@ export const THEME_CONFIG = {
             shadows: isDark ? SHADOWS.dark : SHADOWS.light,
             agGrid: isDark ? AG_GRID_THEMES.dark : AG_GRID_THEMES.light,
             apexCharts: isDark ? APEX_CHARTS_THEMES.dark : APEX_CHARTS_THEMES.light,
-            cssVariables: isDark ? CSS_VARIABLES.dark : CSS_VARIABLES.light
+            cssVariables: isDark ? CSS_VARIABLES.dark : CSS_VARIABLES.light,
         };
     },
 
@@ -385,7 +385,7 @@ export const THEME_CONFIG = {
         Object.entries(variables).forEach(([key, value]) => {
             element.style.setProperty(key, value);
         });
-    }
+    },
 };
 
 // Export individual components for convenience

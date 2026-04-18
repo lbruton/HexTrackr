@@ -80,7 +80,7 @@ class BackupService {
                             vulnerabilities: vulnCount,
                             tickets: ticketCount,
                             total: vulnCount + ticketCount,
-                            dbSize: dbSize
+                            dbSize: dbSize,
                         });
                     } catch (statError) {
                         reject(new Error("Failed to get database file size: " + statError.message));
@@ -108,54 +108,65 @@ class BackupService {
                     this._fetchData("SELECT * FROM kev_status"),
                     this._fetchData("SELECT * FROM ticket_vulnerabilities"),
                     this._fetchData("SELECT * FROM cisco_advisories"),
-                    this._fetchData("SELECT * FROM palo_alto_advisories")
+                    this._fetchData("SELECT * FROM palo_alto_advisories"),
                 ]);
 
-                const [current, snapshots, dailyTotals, vendorDailyTotals, imports, templates, kevStatus, ticketVulns, ciscoAdvisories, paloAdvisories] = vulnerabilitiesData;
+                const [
+                    current,
+                    snapshots,
+                    dailyTotals,
+                    vendorDailyTotals,
+                    imports,
+                    templates,
+                    kevStatus,
+                    ticketVulns,
+                    ciscoAdvisories,
+                    paloAdvisories,
+                ] = vulnerabilitiesData;
 
                 resolve({
                     type: "vulnerabilities_complete",
                     vulnerabilities_current: {
                         count: current.length,
-                        data: current
+                        data: current,
                     },
                     vulnerability_snapshots: {
                         count: snapshots.length,
-                        data: snapshots
+                        data: snapshots,
                     },
                     vulnerability_daily_totals: {
                         count: dailyTotals.length,
-                        data: dailyTotals
+                        data: dailyTotals,
                     },
                     vendor_daily_totals: {
                         count: vendorDailyTotals.length,
-                        data: vendorDailyTotals
+                        data: vendorDailyTotals,
                     },
                     vulnerability_imports: {
                         count: imports.length,
-                        data: imports
+                        data: imports,
                     },
                     vulnerability_templates: {
                         count: templates.length,
-                        data: templates
+                        data: templates,
                     },
                     kev_status: {
                         count: kevStatus.length,
-                        data: kevStatus
+                        data: kevStatus,
                     },
                     ticket_vulnerabilities: {
                         count: ticketVulns.length,
-                        data: ticketVulns
+                        data: ticketVulns,
                     },
                     cisco_advisories: {
                         count: ciscoAdvisories.length,
-                        data: ciscoAdvisories
+                        data: ciscoAdvisories,
                     },
                     palo_alto_advisories: {
                         count: paloAdvisories.length,
-                        data: paloAdvisories
+                        data: paloAdvisories,
                     },
-                    exported_at: new Date().toISOString()
+                    exported_at: new Date().toISOString(),
                 });
             } catch (error) {
                 reject(new Error("Vulnerability export failed: " + error.message));
@@ -176,7 +187,7 @@ class BackupService {
                     this._fetchData("SELECT * FROM ticket_templates"),
                     this._fetchData("SELECT * FROM email_templates"),
                     this._fetchData("SELECT * FROM ticket_vulnerabilities"),
-                    this._fetchData("SELECT * FROM sync_metadata")
+                    this._fetchData("SELECT * FROM sync_metadata"),
                 ]);
 
                 const [tickets, ticketTemplates, emailTemplates, ticketVulns, syncMeta] = ticketData;
@@ -185,25 +196,25 @@ class BackupService {
                     type: "tickets_complete",
                     tickets: {
                         count: tickets.length,
-                        data: tickets
+                        data: tickets,
                     },
                     ticket_templates: {
                         count: ticketTemplates.length,
-                        data: ticketTemplates
+                        data: ticketTemplates,
                     },
                     email_templates: {
                         count: emailTemplates.length,
-                        data: emailTemplates
+                        data: emailTemplates,
                     },
                     ticket_vulnerabilities: {
                         count: ticketVulns.length,
-                        data: ticketVulns
+                        data: ticketVulns,
                     },
                     sync_metadata: {
                         count: syncMeta.length,
-                        data: syncMeta
+                        data: syncMeta,
                     },
-                    exported_at: new Date().toISOString()
+                    exported_at: new Date().toISOString(),
                 });
             } catch (error) {
                 reject(new Error("Ticket export failed: " + error.message));
@@ -223,7 +234,7 @@ class BackupService {
             const [vulnerabilityData, ticketData, preferencesData] = await Promise.all([
                 this.exportVulnerabilities(),
                 this.exportTickets(),
-                this._fetchData("SELECT * FROM user_preferences")
+                this._fetchData("SELECT * FROM user_preferences"),
             ]);
 
             // ✅ SECURITY: DO NOT export users table (contains Argon2id password hashes)
@@ -231,14 +242,17 @@ class BackupService {
 
             // Calculate total record counts for logging
             const totalVulnRecords = Object.keys(vulnerabilityData)
-                .filter(key => key !== "type" && key !== "exported_at")
+                .filter((key) => key !== "type" && key !== "exported_at")
                 .reduce((sum, key) => sum + (vulnerabilityData[key]?.count || 0), 0);
 
             const totalTicketRecords = Object.keys(ticketData)
-                .filter(key => key !== "type" && key !== "exported_at")
+                .filter((key) => key !== "type" && key !== "exported_at")
                 .reduce((sum, key) => sum + (ticketData[key]?.count || 0), 0);
 
-            _log("info", `Backup complete: ${totalVulnRecords} vulnerability records, ${totalTicketRecords} ticket/template records`);
+            _log(
+                "info",
+                `Backup complete: ${totalVulnRecords} vulnerability records, ${totalTicketRecords} ticket/template records`,
+            );
 
             return {
                 type: "complete_backup_enhanced",
@@ -247,17 +261,16 @@ class BackupService {
                     total_vulnerability_records: totalVulnRecords,
                     total_ticket_records: totalTicketRecords,
                     database_version: "v1.0.24-enhanced",
-                    backup_schema_version: "2.0"
+                    backup_schema_version: "2.0",
                 },
                 vulnerability_data: vulnerabilityData,
                 ticket_data: ticketData,
                 user_preferences: {
                     count: preferencesData.length,
-                    data: preferencesData
+                    data: preferencesData,
                 },
-                exported_at: new Date().toISOString()
+                exported_at: new Date().toISOString(),
             };
-
         } catch (error) {
             _log("error", "Complete backup failed:", error.message);
             throw new Error("Complete backup failed: " + error.message);
@@ -277,22 +290,52 @@ class BackupService {
                 try {
                     const clearPromises = [
                         // Data tables
-                        new Promise((res, rej) => this.db.run("DELETE FROM vulnerability_imports", err => err ? rej(err) : res())),
-                        new Promise((res, rej) => this.db.run("DELETE FROM kev_status", err => err ? rej(err) : res())),
-                        new Promise((res, rej) => this.db.run("DELETE FROM ticket_templates", err => err ? rej(err) : res())),
-                        new Promise((res, rej) => this.db.run("DELETE FROM email_templates", err => err ? rej(err) : res())),
-                        new Promise((res, rej) => this.db.run("DELETE FROM ticket_vulnerabilities", err => err ? rej(err) : res())),
-                        new Promise((res, rej) => this.db.run("DELETE FROM vulnerability_snapshots", err => err ? rej(err) : res())),
-                        new Promise((res, rej) => this.db.run("DELETE FROM vulnerabilities_current", err => err ? rej(err) : res())),
-                        new Promise((res, rej) => this.db.run("DELETE FROM vulnerability_daily_totals", err => err ? rej(err) : res())),
-                        new Promise((res, rej) => this.db.run("DELETE FROM vendor_daily_totals", err => err ? rej(err) : res())),
-                        new Promise((res, rej) => this.db.run("DELETE FROM tickets", err => err ? rej(err) : res())),
-                        new Promise((res, rej) => this.db.run("DELETE FROM sync_metadata", err => err ? rej(err) : res())),
-                        new Promise((res, rej) => this.db.run("DELETE FROM backup_metadata", err => err ? rej(err) : res())),
+                        new Promise((res, rej) =>
+                            this.db.run("DELETE FROM vulnerability_imports", (err) => (err ? rej(err) : res())),
+                        ),
+                        new Promise((res, rej) =>
+                            this.db.run("DELETE FROM kev_status", (err) => (err ? rej(err) : res())),
+                        ),
+                        new Promise((res, rej) =>
+                            this.db.run("DELETE FROM ticket_templates", (err) => (err ? rej(err) : res())),
+                        ),
+                        new Promise((res, rej) =>
+                            this.db.run("DELETE FROM email_templates", (err) => (err ? rej(err) : res())),
+                        ),
+                        new Promise((res, rej) =>
+                            this.db.run("DELETE FROM ticket_vulnerabilities", (err) => (err ? rej(err) : res())),
+                        ),
+                        new Promise((res, rej) =>
+                            this.db.run("DELETE FROM vulnerability_snapshots", (err) => (err ? rej(err) : res())),
+                        ),
+                        new Promise((res, rej) =>
+                            this.db.run("DELETE FROM vulnerabilities_current", (err) => (err ? rej(err) : res())),
+                        ),
+                        new Promise((res, rej) =>
+                            this.db.run("DELETE FROM vulnerability_daily_totals", (err) => (err ? rej(err) : res())),
+                        ),
+                        new Promise((res, rej) =>
+                            this.db.run("DELETE FROM vendor_daily_totals", (err) => (err ? rej(err) : res())),
+                        ),
+                        new Promise((res, rej) =>
+                            this.db.run("DELETE FROM tickets", (err) => (err ? rej(err) : res())),
+                        ),
+                        new Promise((res, rej) =>
+                            this.db.run("DELETE FROM sync_metadata", (err) => (err ? rej(err) : res())),
+                        ),
+                        new Promise((res, rej) =>
+                            this.db.run("DELETE FROM backup_metadata", (err) => (err ? rej(err) : res())),
+                        ),
                         // HEX-303: Clear user preferences (will be recreated on login)
-                        new Promise((res, rej) => this.db.run("DELETE FROM user_preferences", err => err ? rej(err) : res())),
+                        new Promise((res, rej) =>
+                            this.db.run("DELETE FROM user_preferences", (err) => (err ? rej(err) : res())),
+                        ),
                         // HEX-303: Clear all users except admin (admin will be reset to default password)
-                        new Promise((res, rej) => this.db.run("DELETE FROM users WHERE username != 'admin'", err => err ? rej(err) : res()))
+                        new Promise((res, rej) =>
+                            this.db.run("DELETE FROM users WHERE username != 'admin'", (err) =>
+                                err ? rej(err) : res(),
+                            ),
+                        ),
                     ];
 
                     // Clear all data first
@@ -308,20 +351,18 @@ class BackupService {
                     _audit("SECURITY", "SYSTEM_RESET", {
                         action: "clear_all_data",
                         admin_password_reset: true,
-                        timestamp: new Date().toISOString()
+                        timestamp: new Date().toISOString(),
                     });
 
                     resolve({
                         message: "Complete system reset: All data cleared and admin password reset to 'admin123!'",
                         clearedCount: "all",
-                        admin_reset: true
+                        admin_reset: true,
                     });
-
                 } catch (err) {
                     _log("error", "System reset failed:", err.message);
                     reject(new Error("Failed to clear all data: " + err.message));
                 }
-
             } else if (type === "vulnerabilities") {
                 // Clear vulnerability tables in dependency order (cascade deletes)
                 // HEX-270: Preserve cisco_advisories, palo_alto_advisories (not in backups, managed by sync services)
@@ -357,8 +398,9 @@ class BackupService {
                                         }
 
                                         resolve({
-                                            message: "Vulnerability data cleared successfully (vendor advisories preserved)",
-                                            clearedCount: "vulnerabilities"
+                                            message:
+                                                "Vulnerability data cleared successfully (vendor advisories preserved)",
+                                            clearedCount: "vulnerabilities",
                                         });
                                     });
                                 });
@@ -366,7 +408,6 @@ class BackupService {
                         });
                     });
                 });
-
             } else if (type === "tickets") {
                 // Clear junction table first (foreign key dependency)
                 this.db.run("DELETE FROM ticket_vulnerabilities", (junctionErr) => {
@@ -375,18 +416,17 @@ class BackupService {
                     }
 
                     // Then clear tickets
-                    this.db.run("DELETE FROM tickets", function(err) {
+                    this.db.run("DELETE FROM tickets", function (err) {
                         if (err) {
                             return reject(new Error("Failed to clear tickets"));
                         }
 
                         resolve({
                             message: "Tickets cleared successfully (including relationships)",
-                            clearedCount: this.changes
+                            clearedCount: this.changes,
                         });
                     });
                 });
-
             } else {
                 reject(new Error("Invalid clear type. Must be: all, vulnerabilities, or tickets"));
             }
@@ -422,8 +462,11 @@ class BackupService {
                         if (ticketsData.data && Array.isArray(ticketsData.data)) {
                             // Old format: ticketsData.data
                             ticketsArray = ticketsData.data;
-                        } else if (ticketsData.tickets && ticketsData.tickets.data &&
-                                   Array.isArray(ticketsData.tickets.data)) {
+                        } else if (
+                            ticketsData.tickets &&
+                            ticketsData.tickets.data &&
+                            Array.isArray(ticketsData.tickets.data)
+                        ) {
                             // New format: ticketsData.tickets.data
                             ticketsArray = ticketsData.tickets.data;
                         } else if (Array.isArray(ticketsData)) {
@@ -439,8 +482,8 @@ class BackupService {
                         }
 
                         // Insert tickets data (HEX-270: preserve ALL columns including soft-delete metadata)
-                        const ticketValues = ticketsArray.map(ticket => [
-                            ticket.id || null,  // CRITICAL: Preserve ticket ID to prevent NULL corruption
+                        const ticketValues = ticketsArray.map((ticket) => [
+                            ticket.id || null, // CRITICAL: Preserve ticket ID to prevent NULL corruption
                             ticket.xt_number || "",
                             ticket.date_submitted || "",
                             ticket.date_due || "",
@@ -458,7 +501,7 @@ class BackupService {
                             ticket.site || "",
                             ticket.site_id || "",
                             ticket.location_id || "",
-                            ticket.deleted || 0,  // CRITICAL: Preserve soft-delete state
+                            ticket.deleted || 0, // CRITICAL: Preserve soft-delete state
                             ticket.deleted_at || null,
                             ticket.job_type || "Upgrade",
                             ticket.tracking_number || "",
@@ -481,12 +524,13 @@ class BackupService {
                             ticket.site_address || "",
                             ticket.return_address || "",
                             ticket.installed_versions || "",
-                            ticket.device_status || ""
+                            ticket.device_status || "",
                         ]);
 
                         for (const values of ticketValues) {
                             // Use INSERT OR IGNORE to skip duplicates (HEX-270)
-                            await this._executeQuery(`
+                            await this._executeQuery(
+                                `
                                 INSERT OR IGNORE INTO tickets
                                 (id, xt_number, date_submitted, date_due, hexagon_ticket, service_now_ticket,
                                 location, devices, supervisor, tech, status, notes, attachments, created_at, updated_at,
@@ -496,7 +540,9 @@ class BackupService {
                                 return_zip, outbound_tracking, return_tracking, deletion_reason, deleted_by,
                                 site_address, return_address, installed_versions, device_status)
                                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                            `, values);
+                            `,
+                                values,
+                            );
                             restoredCount++;
                         }
 
@@ -528,20 +574,37 @@ class BackupService {
                 if (currentVulns.length > 0) {
                     _log("info", `Restoring ${currentVulns.length} vulnerabilities_current records`);
                     for (const vuln of currentVulns) {
-                        await this._executeQuery(`
+                        await this._executeQuery(
+                            `
                             INSERT INTO vulnerabilities_current
                             (hostname, ip_address, cve, severity, vpr_score, cvss_score, first_seen, last_seen,
                              plugin_id, plugin_name, description, solution, vendor_reference, vendor, scan_date,
                              unique_key, lifecycle_state, confidence_score, dedup_tier, enhanced_unique_key)
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                        `, [
-                            vuln.hostname || "", vuln.ip_address || "", vuln.cve || "", vuln.severity || "",
-                            vuln.vpr_score || 0, vuln.cvss_score || 0, vuln.first_seen || "", vuln.last_seen || "",
-                            vuln.plugin_id || "", vuln.plugin_name || "", vuln.description || "", vuln.solution || "",
-                            vuln.vendor_reference || "", vuln.vendor || "", vuln.scan_date || "",
-                            vuln.unique_key || "", vuln.lifecycle_state || "active", vuln.confidence_score || 0,
-                            vuln.dedup_tier || 0, vuln.enhanced_unique_key || ""
-                        ]);
+                        `,
+                            [
+                                vuln.hostname || "",
+                                vuln.ip_address || "",
+                                vuln.cve || "",
+                                vuln.severity || "",
+                                vuln.vpr_score || 0,
+                                vuln.cvss_score || 0,
+                                vuln.first_seen || "",
+                                vuln.last_seen || "",
+                                vuln.plugin_id || "",
+                                vuln.plugin_name || "",
+                                vuln.description || "",
+                                vuln.solution || "",
+                                vuln.vendor_reference || "",
+                                vuln.vendor || "",
+                                vuln.scan_date || "",
+                                vuln.unique_key || "",
+                                vuln.lifecycle_state || "active",
+                                vuln.confidence_score || 0,
+                                vuln.dedup_tier || 0,
+                                vuln.enhanced_unique_key || "",
+                            ],
+                        );
                         restoredCount++;
                     }
                     details.vulnerabilities_current = currentVulns.length;
@@ -552,17 +615,31 @@ class BackupService {
                 if (snapshots.length > 0) {
                     _log("info", `Restoring ${snapshots.length} vulnerability_snapshots records`);
                     for (const snap of snapshots) {
-                        await this._executeQuery(`
+                        await this._executeQuery(
+                            `
                             INSERT INTO vulnerability_snapshots
                             (scan_date, hostname, ip_address, cve, severity, vpr_score, cvss_score, first_seen, last_seen,
                              plugin_id, plugin_name, description, vendor, unique_key, enhanced_unique_key)
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                        `, [
-                            snap.scan_date || "", snap.hostname || "", snap.ip_address || "", snap.cve || "",
-                            snap.severity || "", snap.vpr_score || 0, snap.cvss_score || 0, snap.first_seen || "",
-                            snap.last_seen || "", snap.plugin_id || "", snap.plugin_name || "", snap.description || "",
-                            snap.vendor || "", snap.unique_key || "", snap.enhanced_unique_key || ""
-                        ]);
+                        `,
+                            [
+                                snap.scan_date || "",
+                                snap.hostname || "",
+                                snap.ip_address || "",
+                                snap.cve || "",
+                                snap.severity || "",
+                                snap.vpr_score || 0,
+                                snap.cvss_score || 0,
+                                snap.first_seen || "",
+                                snap.last_seen || "",
+                                snap.plugin_id || "",
+                                snap.plugin_name || "",
+                                snap.description || "",
+                                snap.vendor || "",
+                                snap.unique_key || "",
+                                snap.enhanced_unique_key || "",
+                            ],
+                        );
                         restoredCount++;
                     }
                     details.vulnerability_snapshots = snapshots.length;
@@ -573,17 +650,27 @@ class BackupService {
                 if (dailyTotals.length > 0) {
                     _log("info", `Restoring ${dailyTotals.length} vulnerability_daily_totals records`);
                     for (const total of dailyTotals) {
-                        await this._executeQuery(`
+                        await this._executeQuery(
+                            `
                             INSERT INTO vulnerability_daily_totals
                             (scan_date, critical_count, critical_total_vpr, high_count, high_total_vpr,
                              medium_count, medium_total_vpr, low_count, low_total_vpr, total_vulnerabilities, total_vpr)
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                        `, [
-                            total.scan_date || "", total.critical_count || 0, total.critical_total_vpr || 0,
-                            total.high_count || 0, total.high_total_vpr || 0, total.medium_count || 0,
-                            total.medium_total_vpr || 0, total.low_count || 0, total.low_total_vpr || 0,
-                            total.total_vulnerabilities || 0, total.total_vpr || 0
-                        ]);
+                        `,
+                            [
+                                total.scan_date || "",
+                                total.critical_count || 0,
+                                total.critical_total_vpr || 0,
+                                total.high_count || 0,
+                                total.high_total_vpr || 0,
+                                total.medium_count || 0,
+                                total.medium_total_vpr || 0,
+                                total.low_count || 0,
+                                total.low_total_vpr || 0,
+                                total.total_vulnerabilities || 0,
+                                total.total_vpr || 0,
+                            ],
+                        );
                         restoredCount++;
                     }
                     details.vulnerability_daily_totals = dailyTotals.length;
@@ -594,16 +681,28 @@ class BackupService {
                 if (vendorTotals.length > 0) {
                     _log("info", `Restoring ${vendorTotals.length} vendor_daily_totals records`);
                     for (const vt of vendorTotals) {
-                        await this._executeQuery(`
+                        await this._executeQuery(
+                            `
                             INSERT INTO vendor_daily_totals
                             (scan_date, vendor, critical_count, critical_total_vpr, high_count, high_total_vpr,
                              medium_count, medium_total_vpr, low_count, low_total_vpr, total_vulnerabilities, total_vpr)
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                        `, [
-                            vt.scan_date || "", vt.vendor || "", vt.critical_count || 0, vt.critical_total_vpr || 0,
-                            vt.high_count || 0, vt.high_total_vpr || 0, vt.medium_count || 0, vt.medium_total_vpr || 0,
-                            vt.low_count || 0, vt.low_total_vpr || 0, vt.total_vulnerabilities || 0, vt.total_vpr || 0
-                        ]);
+                        `,
+                            [
+                                vt.scan_date || "",
+                                vt.vendor || "",
+                                vt.critical_count || 0,
+                                vt.critical_total_vpr || 0,
+                                vt.high_count || 0,
+                                vt.high_total_vpr || 0,
+                                vt.medium_count || 0,
+                                vt.medium_total_vpr || 0,
+                                vt.low_count || 0,
+                                vt.low_total_vpr || 0,
+                                vt.total_vulnerabilities || 0,
+                                vt.total_vpr || 0,
+                            ],
+                        );
                         restoredCount++;
                     }
                     details.vendor_daily_totals = vendorTotals.length;
@@ -614,14 +713,21 @@ class BackupService {
                 if (imports.length > 0) {
                     _log("info", `Restoring ${imports.length} vulnerability_imports records`);
                     for (const imp of imports) {
-                        await this._executeQuery(`
+                        await this._executeQuery(
+                            `
                             INSERT INTO vulnerability_imports
                             (filename, import_date, row_count, vendor, file_size, processing_time)
                             VALUES (?, ?, ?, ?, ?, ?)
-                        `, [
-                            imp.filename || "", imp.import_date || "", imp.row_count || 0,
-                            imp.vendor || "", imp.file_size || 0, imp.processing_time || 0
-                        ]);
+                        `,
+                            [
+                                imp.filename || "",
+                                imp.import_date || "",
+                                imp.row_count || 0,
+                                imp.vendor || "",
+                                imp.file_size || 0,
+                                imp.processing_time || 0,
+                            ],
+                        );
                         restoredCount++;
                     }
                     details.vulnerability_imports = imports.length;
@@ -632,16 +738,25 @@ class BackupService {
                 if (kevStatus.length > 0) {
                     _log("info", `Restoring ${kevStatus.length} kev_status records`);
                     for (const kev of kevStatus) {
-                        await this._executeQuery(`
+                        await this._executeQuery(
+                            `
                             INSERT INTO kev_status
                             (cve_id, date_added, vulnerability_name, vendor_project, product, required_action,
                              due_date, known_ransomware_use, notes)
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                        `, [
-                            kev.cve_id || "", kev.date_added || "", kev.vulnerability_name || "",
-                            kev.vendor_project || "", kev.product || "", kev.required_action || "",
-                            kev.due_date || "", kev.known_ransomware_use || 0, kev.notes || ""
-                        ]);
+                        `,
+                            [
+                                kev.cve_id || "",
+                                kev.date_added || "",
+                                kev.vulnerability_name || "",
+                                kev.vendor_project || "",
+                                kev.product || "",
+                                kev.required_action || "",
+                                kev.due_date || "",
+                                kev.known_ransomware_use || 0,
+                                kev.notes || "",
+                            ],
+                        );
                         restoredCount++;
                     }
                     details.kev_status = kevStatus.length;
@@ -652,10 +767,13 @@ class BackupService {
                 if (ticketVulns.length > 0) {
                     _log("info", `Restoring ${ticketVulns.length} ticket_vulnerabilities records`);
                     for (const tv of ticketVulns) {
-                        await this._executeQuery(`
+                        await this._executeQuery(
+                            `
                             INSERT INTO ticket_vulnerabilities (ticket_id, vulnerability_id)
                             VALUES (?, ?)
-                        `, [tv.ticket_id || null, tv.vulnerability_id || null]);
+                        `,
+                            [tv.ticket_id || null, tv.vulnerability_id || null],
+                        );
                         restoredCount++;
                     }
                     details.ticket_vulnerabilities = ticketVulns.length;
@@ -666,16 +784,25 @@ class BackupService {
                 if (ciscoAdvisories.length > 0) {
                     _log("info", `Restoring ${ciscoAdvisories.length} cisco_advisories records`);
                     for (const ca of ciscoAdvisories) {
-                        await this._executeQuery(`
+                        await this._executeQuery(
+                            `
                             INSERT INTO cisco_advisories
                             (cve_id, advisory_id, advisory_title, severity, cvss_score, first_fixed,
                              affected_releases, product_names, publication_url)
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                        `, [
-                            ca.cve_id || "", ca.advisory_id || "", ca.advisory_title || "", ca.severity || "",
-                            ca.cvss_score || "", ca.first_fixed || "", ca.affected_releases || "",
-                            ca.product_names || "", ca.publication_url || ""
-                        ]);
+                        `,
+                            [
+                                ca.cve_id || "",
+                                ca.advisory_id || "",
+                                ca.advisory_title || "",
+                                ca.severity || "",
+                                ca.cvss_score || "",
+                                ca.first_fixed || "",
+                                ca.affected_releases || "",
+                                ca.product_names || "",
+                                ca.publication_url || "",
+                            ],
+                        );
                         restoredCount++;
                     }
                     details.cisco_advisories = ciscoAdvisories.length;
@@ -686,16 +813,25 @@ class BackupService {
                 if (paloAdvisories.length > 0) {
                     _log("info", `Restoring ${paloAdvisories.length} palo_alto_advisories records`);
                     for (const pa of paloAdvisories) {
-                        await this._executeQuery(`
+                        await this._executeQuery(
+                            `
                             INSERT INTO palo_alto_advisories
                             (cve_id, advisory_id, advisory_title, severity, cvss_score, first_fixed,
                              affected_versions, product_name, publication_url)
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                        `, [
-                            pa.cve_id || "", pa.advisory_id || "", pa.advisory_title || "", pa.severity || "",
-                            pa.cvss_score || "", pa.first_fixed || "", pa.affected_versions || "",
-                            pa.product_name || "", pa.publication_url || ""
-                        ]);
+                        `,
+                            [
+                                pa.cve_id || "",
+                                pa.advisory_id || "",
+                                pa.advisory_title || "",
+                                pa.severity || "",
+                                pa.cvss_score || "",
+                                pa.first_fixed || "",
+                                pa.affected_versions || "",
+                                pa.product_name || "",
+                                pa.publication_url || "",
+                            ],
+                        );
                         restoredCount++;
                     }
                     details.palo_alto_advisories = paloAdvisories.length;
@@ -714,9 +850,8 @@ class BackupService {
             return {
                 message: `Successfully restored ${restoredCount} records`,
                 restoredCount: restoredCount,
-                details: details
+                details: details,
             };
-
         } catch (error) {
             // Clean up on error
             try {
@@ -737,7 +872,7 @@ class BackupService {
      */
     _executeQuery(sql, params = []) {
         return new Promise((resolve, reject) => {
-            this.db.run(sql, params, function(err) {
+            this.db.run(sql, params, function (err) {
                 if (err) {
                     reject(err);
                 } else {
@@ -792,7 +927,10 @@ class BackupService {
                     }
                 }
             }
-            _log("info", `Reassembled ${allRecords.length} records from ${chunkIndex.num_chunks} chunks for ${tableName}`);
+            _log(
+                "info",
+                `Reassembled ${allRecords.length} records from ${chunkIndex.num_chunks} chunks for ${tableName}`,
+            );
             return allRecords;
         }
 
@@ -814,11 +952,6 @@ class BackupService {
         return [];
     }
 
-
-
-
-
-
     /**
      * Export complete backup as ZIP file
      * Creates a comprehensive backup with all tables in ZIP format
@@ -837,17 +970,35 @@ class BackupService {
             // Add individual table exports for easier restoration
             // NOTE: Skipping combined complete_backup.json to avoid JSON.stringify length limits
             // with 95K+ vulnerability records. Individual files provide same data without memory issues.
-            zip.file("vulnerabilities_current.json", JSON.stringify(backupData.vulnerability_data.vulnerabilities_current, null, 2));
-            zip.file("vulnerability_snapshots.json", JSON.stringify(backupData.vulnerability_data.vulnerability_snapshots, null, 2));
-            zip.file("vulnerability_daily_totals.json", JSON.stringify(backupData.vulnerability_data.vulnerability_daily_totals, null, 2));
-            zip.file("vendor_daily_totals.json", JSON.stringify(backupData.vulnerability_data.vendor_daily_totals, null, 2));
-            zip.file("vulnerability_imports.json", JSON.stringify(backupData.vulnerability_data.vulnerability_imports, null, 2));
+            zip.file(
+                "vulnerabilities_current.json",
+                JSON.stringify(backupData.vulnerability_data.vulnerabilities_current, null, 2),
+            );
+            zip.file(
+                "vulnerability_snapshots.json",
+                JSON.stringify(backupData.vulnerability_data.vulnerability_snapshots, null, 2),
+            );
+            zip.file(
+                "vulnerability_daily_totals.json",
+                JSON.stringify(backupData.vulnerability_data.vulnerability_daily_totals, null, 2),
+            );
+            zip.file(
+                "vendor_daily_totals.json",
+                JSON.stringify(backupData.vulnerability_data.vendor_daily_totals, null, 2),
+            );
+            zip.file(
+                "vulnerability_imports.json",
+                JSON.stringify(backupData.vulnerability_data.vulnerability_imports, null, 2),
+            );
             zip.file("tickets.json", JSON.stringify(backupData.ticket_data.tickets, null, 2));
             zip.file("ticket_templates.json", JSON.stringify(backupData.ticket_data.ticket_templates, null, 2));
             zip.file("email_templates.json", JSON.stringify(backupData.ticket_data.email_templates, null, 2));
             zip.file("kev_status.json", JSON.stringify(backupData.vulnerability_data.kev_status, null, 2));
             zip.file("cisco_advisories.json", JSON.stringify(backupData.vulnerability_data.cisco_advisories, null, 2));
-            zip.file("palo_alto_advisories.json", JSON.stringify(backupData.vulnerability_data.palo_alto_advisories, null, 2));
+            zip.file(
+                "palo_alto_advisories.json",
+                JSON.stringify(backupData.vulnerability_data.palo_alto_advisories, null, 2),
+            );
             zip.file("user_preferences.json", JSON.stringify(backupData.user_preferences, null, 2));
 
             // ✅ SECURITY: users.json NOT included (contains password hashes)
@@ -858,15 +1009,27 @@ class BackupService {
                 created_at: new Date().toISOString(),
                 version: "2.0",
                 tables_included: [
-                    "vulnerabilities_current", "vulnerability_snapshots", "vulnerability_daily_totals",
-                    "vendor_daily_totals", "vulnerability_imports", "vulnerability_templates", "kev_status",
-                    "ticket_vulnerabilities", "cisco_advisories", "palo_alto_advisories",
-                    "tickets", "ticket_templates", "email_templates", "sync_metadata",
-                    "user_preferences"
+                    "vulnerabilities_current",
+                    "vulnerability_snapshots",
+                    "vulnerability_daily_totals",
+                    "vendor_daily_totals",
+                    "vulnerability_imports",
+                    "vulnerability_templates",
+                    "kev_status",
+                    "ticket_vulnerabilities",
+                    "cisco_advisories",
+                    "palo_alto_advisories",
+                    "tickets",
+                    "ticket_templates",
+                    "email_templates",
+                    "sync_metadata",
+                    "user_preferences",
                 ],
                 security_note: "users table NOT included (password hashes excluded for security)",
-                total_records: backupData.backup_metadata.total_vulnerability_records + backupData.backup_metadata.total_ticket_records,
-                restore_instructions: "Use the comprehensive backup restore API with this ZIP file"
+                total_records:
+                    backupData.backup_metadata.total_vulnerability_records +
+                    backupData.backup_metadata.total_ticket_records,
+                restore_instructions: "Use the comprehensive backup restore API with this ZIP file",
             };
             zip.file("backup_metadata.json", JSON.stringify(metadata, null, 2));
 
@@ -874,13 +1037,12 @@ class BackupService {
             const zipBuffer = await zip.generateAsync({
                 type: "nodebuffer",
                 compression: "DEFLATE",
-                compressionOptions: { level: 6 }
+                compressionOptions: { level: 6 },
             });
 
             _log("info", `ZIP backup created: ${(zipBuffer.length / 1024 / 1024).toFixed(1)}MB`);
 
             return zipBuffer;
-
         } catch (error) {
             _log("error", "ZIP backup creation failed:", error.message);
             throw new Error(`ZIP backup failed: ${error.message}`);
@@ -903,14 +1065,14 @@ class BackupService {
             const metadata = {
                 type: vulnData.type,
                 exported_at: vulnData.exported_at,
-                tables: Object.keys(vulnData).filter(key => key !== "type" && key !== "exported_at")
+                tables: Object.keys(vulnData).filter((key) => key !== "type" && key !== "exported_at"),
             };
             zip.file("_metadata.json", JSON.stringify(metadata, null, 2));
 
             // Add individual tables with chunking for large datasets
             // JSON.stringify has ~500MB string length limit, so chunk large tables
             const CHUNK_SIZE = 10000; // 10K records per chunk
-            Object.keys(vulnData).forEach(key => {
+            Object.keys(vulnData).forEach((key) => {
                 if (key !== "type" && key !== "exported_at" && vulnData[key].data) {
                     const tableData = vulnData[key].data;
                     const recordCount = tableData.length;
@@ -934,7 +1096,10 @@ class BackupService {
                             total_records: recordCount,
                             chunk_size: CHUNK_SIZE,
                             num_chunks: numChunks,
-                            chunks: Array.from({ length: numChunks }, (_, i) => `${key}_chunk_${i + 1}_of_${numChunks}.json`)
+                            chunks: Array.from(
+                                { length: numChunks },
+                                (_, i) => `${key}_chunk_${i + 1}_of_${numChunks}.json`,
+                            ),
                         };
                         zip.file(`${key}_chunks_index.json`, JSON.stringify(chunkIndex, null, 2));
                     } else {
@@ -948,7 +1113,6 @@ class BackupService {
             _log("info", `Vulnerabilities ZIP created: ${(zipBuffer.length / 1024 / 1024).toFixed(1)}MB`);
 
             return zipBuffer;
-
         } catch (error) {
             _log("error", "Vulnerabilities ZIP backup failed:", error.message);
             throw new Error(`Vulnerabilities ZIP backup failed: ${error.message}`);
@@ -971,12 +1135,12 @@ class BackupService {
             const metadata = {
                 type: ticketData.type,
                 exported_at: ticketData.exported_at,
-                tables: Object.keys(ticketData).filter(key => key !== "type" && key !== "exported_at")
+                tables: Object.keys(ticketData).filter((key) => key !== "type" && key !== "exported_at"),
             };
             zip.file("_metadata.json", JSON.stringify(metadata, null, 2));
 
             // Add individual tables only (avoids JSON.stringify length limits on huge combined object)
-            Object.keys(ticketData).forEach(key => {
+            Object.keys(ticketData).forEach((key) => {
                 if (key !== "type" && key !== "exported_at" && ticketData[key].data) {
                     zip.file(`${key}.json`, JSON.stringify(ticketData[key], null, 2));
                 }
@@ -986,7 +1150,6 @@ class BackupService {
             _log("info", `Tickets ZIP created: ${(zipBuffer.length / 1024 / 1024).toFixed(1)}MB`);
 
             return zipBuffer;
-
         } catch (error) {
             _log("error", "Tickets ZIP backup failed:", error.message);
             throw new Error(`Tickets ZIP backup failed: ${error.message}`);
@@ -1048,20 +1211,19 @@ class BackupService {
                 backups: {
                     json_zip: {
                         path: zipPath,
-                        size_mb: (zipStats.size / 1024 / 1024).toFixed(2)
+                        size_mb: (zipStats.size / 1024 / 1024).toFixed(2),
                     },
                     database: {
                         path: dbBackupPath,
-                        size_mb: (dbStats.size / 1024 / 1024).toFixed(2)
-                    }
+                        size_mb: (dbStats.size / 1024 / 1024).toFixed(2),
+                    },
                 },
-                total_size_mb: ((zipStats.size + dbStats.size) / 1024 / 1024).toFixed(2)
+                total_size_mb: ((zipStats.size + dbStats.size) / 1024 / 1024).toFixed(2),
             };
 
             _audit("backup.scheduled", "Scheduled backup completed", result);
 
             return result;
-
         } catch (error) {
             _log("error", "Scheduled backup failed", { error: error.message });
             throw new Error(`Scheduled backup failed: ${error.message}`);
@@ -1081,7 +1243,7 @@ class BackupService {
                 return {
                     success: true,
                     backups: [],
-                    message: "No backups directory found"
+                    message: "No backups directory found",
                 };
             }
 
@@ -1146,7 +1308,7 @@ class BackupService {
                     created_at: stats.mtime,
                     age_days: ((Date.now() - stats.mtimeMs) / 86400000).toFixed(1),
                     is_manual: isManual,
-                    is_automated: !isManual
+                    is_automated: !isManual,
                 });
             }
 
@@ -1159,9 +1321,8 @@ class BackupService {
                 success: true,
                 backups: backups,
                 total_count: backups.length,
-                total_size_mb: backups.reduce((sum, b) => sum + parseFloat(b.size_mb), 0).toFixed(2)
+                total_size_mb: backups.reduce((sum, b) => sum + parseFloat(b.size_mb), 0).toFixed(2),
             };
-
         } catch (error) {
             _log("error", "Failed to retrieve backup history", { error: error.message });
             throw new Error(`Failed to retrieve backup history: ${error.message}`);
@@ -1196,11 +1357,10 @@ class BackupService {
 
             _audit("backup.download", "Backup file downloaded", {
                 filename: filename,
-                size_mb: (fileBuffer.length / 1024 / 1024).toFixed(2)
+                size_mb: (fileBuffer.length / 1024 / 1024).toFixed(2),
             });
 
             return fileBuffer;
-
         } catch (error) {
             _log("error", "Backup download failed", { error: error.message, filename });
             throw new Error(`Backup download failed: ${error.message}`);
@@ -1258,7 +1418,7 @@ class BackupService {
                 size_mb: (zipBuffer.length / 1024 / 1024).toFixed(2),
                 type: type,
                 timestamp: timestamp,
-                is_manual: true
+                is_manual: true,
             };
 
             _audit("backup.manual", "Manual backup saved to disk", result);
@@ -1268,7 +1428,6 @@ class BackupService {
             await this.cleanupOldBackups();
 
             return result;
-
         } catch (error) {
             _log("error", "Manual backup failed", { error: error.message, type });
             throw new Error(`Manual backup failed: ${error.message}`);
@@ -1296,7 +1455,7 @@ class BackupService {
             const backupsByType = {
                 tickets: { manual: [], automated: [] },
                 vulnerabilities: { manual: [], automated: [] },
-                database: { manual: [], automated: [] }
+                database: { manual: [], automated: [] },
             };
 
             // Categorize backups by type and source
@@ -1325,7 +1484,7 @@ class BackupService {
                         file,
                         filePath,
                         stats,
-                        mtime: stats.mtimeMs
+                        mtime: stats.mtimeMs,
                     });
                 }
             }
@@ -1357,14 +1516,17 @@ class BackupService {
                     deletedCount++;
                 }
 
-                _log("info", `${type}: Keeping ${Math.min(categories.automated.length - automatedToDelete.length, 7)} automated + ${Math.min(categories.manual.length - manualToDelete.length, 3)} manual`);
+                _log(
+                    "info",
+                    `${type}: Keeping ${Math.min(categories.automated.length - automatedToDelete.length, 7)} automated + ${Math.min(categories.manual.length - manualToDelete.length, 3)} manual`,
+                );
             }
 
             const result = {
                 success: true,
                 deleted: deletedCount,
                 freed_mb: (deletedSize / 1024 / 1024).toFixed(2),
-                retention_policy: "7 automated + 3 manual per type"
+                retention_policy: "7 automated + 3 manual per type",
             };
 
             if (deletedCount > 0) {
@@ -1375,7 +1537,6 @@ class BackupService {
             }
 
             return result;
-
         } catch (error) {
             _log("error", "Backup cleanup failed", { error: error.message });
             throw new Error(`Backup cleanup failed: ${error.message}`);

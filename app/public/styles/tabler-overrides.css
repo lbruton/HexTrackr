@@ -34,158 +34,158 @@
  * These execute BEFORE Tabler CSS loads, so Tabler uses our colors natively
  */
 [data-bs-theme="dark"] {
-  /* ===========================
+    /* ===========================
      Primary Background Colors
      =========================== */
 
-  /**
+    /**
    * Body background - main page background
    * TEMPORARILY USING TABLER DEFAULT to eliminate flash
    * Tabler default: #0f172a
    */
-  --tblr-body-bg: #0f172a;
-  --tblr-body-bg-rgb: 15, 23, 42;
+    --tblr-body-bg: #0f172a;
+    --tblr-body-bg-rgb: 15, 23, 42;
 
-  /**
+    /**
    * Secondary background - used for cards, panels
    * TEMPORARILY USING TABLER DEFAULT to eliminate flash
    * Tabler default: #1d273b
    */
-  --tblr-secondary-bg: #1d273b;
-  --tblr-secondary-bg-rgb: 29, 39, 59;
+    --tblr-secondary-bg: #1d273b;
+    --tblr-secondary-bg-rgb: 29, 39, 59;
 
-  /**
+    /**
    * Tertiary background - used for subtle surfaces
    * TEMPORARILY USING TABLER DEFAULT to eliminate flash
    * Tabler default: #161f33
    */
-  --tblr-tertiary-bg: #161f33;
-  --tblr-tertiary-bg-rgb: 22, 31, 51;
+    --tblr-tertiary-bg: #161f33;
+    --tblr-tertiary-bg-rgb: 22, 31, 51;
 
-  /* ===========================
+    /* ===========================
      Text Colors
      =========================== */
 
-  /**
+    /**
    * Body text color
    * Tabler default: #6c7a91
    * HexTrackr: #e2e8f0 (lighter for better contrast)
    */
-  --tblr-body-color: #e2e8f0;
-  --tblr-body-color-rgb: 226, 232, 240;
+    --tblr-body-color: #e2e8f0;
+    --tblr-body-color-rgb: 226, 232, 240;
 
-  /**
+    /**
    * Emphasis text - headings, important text
    * Tabler default: #f1f5f9
    * HexTrackr: #ffffff (pure white for maximum contrast)
    */
-  --tblr-emphasis-color: #ffffff;
-  --tblr-emphasis-color-rgb: 255, 255, 255;
+    --tblr-emphasis-color: #ffffff;
+    --tblr-emphasis-color-rgb: 255, 255, 255;
 
-  /**
+    /**
    * Heading color
    * Tabler default: #ffffff
    * HexTrackr: #ffffff (keep pure white)
    */
-  --tblr-heading-color: #ffffff;
+    --tblr-heading-color: #ffffff;
 
-  /**
+    /**
    * Secondary text - muted labels, helper text
    * Tabler default: rgba(108, 122, 145, 0.75)
    * HexTrackr: #94a3b8 (solid color, better readability)
    */
-  --tblr-secondary-color: #94a3b8;
-  --tblr-secondary-color-rgb: 148, 163, 184;
+    --tblr-secondary-color: #94a3b8;
+    --tblr-secondary-color-rgb: 148, 163, 184;
 
-  /* ===========================
+    /* ===========================
      Border Colors
      =========================== */
 
-  /**
+    /**
    * Border color - dividers, card borders
    * Tabler default: #313c52
    * HexTrackr: rgba(255, 255, 255, 0.15) (subtle white borders)
    */
-  --tblr-border-color: rgb(255, 255, 255, 0.15);
-  --tblr-border-color-translucent: rgb(255, 255, 255, 0.15);
+    --tblr-border-color: rgb(255, 255, 255, 0.15);
+    --tblr-border-color-translucent: rgb(255, 255, 255, 0.15);
 
-  /* ===========================
+    /* ===========================
      Link Colors
      =========================== */
 
-  /**
+    /**
    * Link color - primary brand blue
    * Tabler default: #79a6dc
    * HexTrackr: Keep Tabler's lighter blue for dark mode
    */
-  --tblr-link-color: #79a6dc;
-  --tblr-link-color-rgb: 121, 166, 220;
+    --tblr-link-color: #79a6dc;
+    --tblr-link-color-rgb: 121, 166, 220;
 
-  /**
+    /**
    * Link hover color
    * Tabler default: #a6c4e7
    * HexTrackr: Keep Tabler's lighter hover blue
    */
-  --tblr-link-hover-color: #a6c4e7;
-  --tblr-link-hover-color-rgb: 166, 196, 231;
+    --tblr-link-hover-color: #a6c4e7;
+    --tblr-link-hover-color-rgb: 166, 196, 231;
 
-  /* ===========================
+    /* ===========================
      Card Component Variables
      =========================== */
 
-  /**
+    /**
    * IMPORTANT: These are Tabler's internal card variables
    * By setting them here, cards use HexTrackr colors from the start
    * No need for !important overrides in dark-theme.css
    */
 
-  /* Card backgrounds - TEMPORARILY USING TABLER DEFAULTS */
-  --tblr-card-bg: #1d273b;              /* Main card background (Tabler default) */
-  --tblr-card-cap-bg: #161f33;          /* Card header background (Tabler default) */
-  --tblr-card-border-color: rgb(255, 255, 255, 0.15);  /* Card borders (matches Tabler) */
+    /* Card backgrounds - TEMPORARILY USING TABLER DEFAULTS */
+    --tblr-card-bg: #1d273b; /* Main card background (Tabler default) */
+    --tblr-card-cap-bg: #161f33; /* Card header background (Tabler default) */
+    --tblr-card-border-color: rgb(255, 255, 255, 0.15); /* Card borders (matches Tabler) */
 
-  /* ===========================
+    /* ===========================
      Form Component Variables
      =========================== */
 
-  /**
+    /**
    * Form controls (inputs, selects, textareas)
    * TEMPORARILY USING TABLER DEFAULTS
    */
-  --tblr-form-control-bg: #1e293b;      /* Input background (Tabler default) */
-  --tblr-form-control-disabled-bg: #161f33;  /* Disabled input background (Tabler default) */
+    --tblr-form-control-bg: #1e293b; /* Input background (Tabler default) */
+    --tblr-form-control-disabled-bg: #161f33; /* Disabled input background (Tabler default) */
 
-  /* ===========================
+    /* ===========================
      Modal Component Variables
      =========================== */
 
-  /**
+    /**
    * Modals and overlays
    * TEMPORARILY USING TABLER DEFAULTS
    */
-  --tblr-modal-bg: #1e293b;             /* Modal background (Tabler default) */
-  --tblr-modal-header-bg: #1a2234;      /* Modal header background (Tabler default) */
+    --tblr-modal-bg: #1e293b; /* Modal background (Tabler default) */
+    --tblr-modal-header-bg: #1a2234; /* Modal header background (Tabler default) */
 
-  /* ===========================
+    /* ===========================
      Dropdown Component Variables
      =========================== */
 
-  /**
+    /**
    * Dropdown menus
    * TEMPORARILY USING TABLER DEFAULTS
    */
-  --tblr-dropdown-bg: #1e293b;          /* Dropdown background (Tabler default) */
-  --tblr-dropdown-border-color: rgb(255, 255, 255, 0.15);  /* Dropdown borders */
-  --tblr-dropdown-link-hover-bg: #1a2234;  /* Dropdown item hover (Tabler default) */
+    --tblr-dropdown-bg: #1e293b; /* Dropdown background (Tabler default) */
+    --tblr-dropdown-border-color: rgb(255, 255, 255, 0.15); /* Dropdown borders */
+    --tblr-dropdown-link-hover-bg: #1a2234; /* Dropdown item hover (Tabler default) */
 
-  /* ===========================
+    /* ===========================
      Code and Syntax Highlighting
      =========================== */
 
-  /**
+    /**
    * Code blocks and inline code
    */
-  --tblr-code-color: #e685a7;           /* Keep Tabler's pink for code */
+    --tblr-code-color: #e685a7; /* Keep Tabler's pink for code */
 }
 
 /* ===========================

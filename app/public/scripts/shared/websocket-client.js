@@ -30,9 +30,9 @@ class WebSocketClient {
             autoReconnect: true,
             heartbeatInterval: 30000,
             maxReconnectAttempts: 5,
-            progressThrottle: 100
+            progressThrottle: 100,
         };
-        
+
         this.lastProgressUpdate = {};
         this.progressThrottleTimers = new Map();
     }
@@ -74,25 +74,25 @@ class WebSocketClient {
                 }
                 const url = `${protocol}//${this.config.host}${this.config.port ? ":" + this.config.port : ""}`;
                 this.debug("Connecting to WebSocket server", { url });
-                
+
                 this.socket = io(url, {
                     transports: ["polling", "websocket"],
                     upgrade: true,
                     upgradeTimeout: 10000,
                     autoConnect: true,
                     reconnection: false,
-                    forceNew: true
+                    forceNew: true,
                 });
-                
+
                 this.setupEventListeners();
-                
+
                 const timeout = window.setTimeout(() => {
                     if (!this.isConnected) {
                         this.socket.disconnect();
                         reject(new Error("Connection timeout"));
                     }
                 }, 10000);
-                
+
                 this.socket.on("connect", () => {
                     window.clearTimeout(timeout);
                     this.isConnected = true;
@@ -102,25 +102,24 @@ class WebSocketClient {
                     this.startHeartbeat();
                     resolve(true);
                 });
-                
+
                 this.socket.on("connect_error", (error) => {
                     window.clearTimeout(timeout);
                     logger.error("websocket", "WebSocket connection error", { error: error.message });
                     this.handleConnectionError();
                     reject(error);
                 });
-
             } catch (error) {
                 logger.error("websocket", "WebSocket connection failed", { error: error.message });
                 reject(error);
             }
         });
     }
-    
+
     handleConnectionError() {
         this.isConnected = false;
         this.stopHeartbeat();
-        
+
         if (this.config.autoReconnect && this.reconnectAttempts < this.maxReconnectAttempts) {
             this.reconnectAttempts++;
             this.attemptReconnection();
@@ -129,16 +128,20 @@ class WebSocketClient {
             this.triggerCallback("connectionFailed", { attempts: this.reconnectAttempts });
         }
     }
-    
+
     attemptReconnection() {
         const delay = Math.min(this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1), 30000);
-        this.debug("Reconnecting to WebSocket", { delay, attempt: this.reconnectAttempts, maxAttempts: this.maxReconnectAttempts });
+        this.debug("Reconnecting to WebSocket", {
+            delay,
+            attempt: this.reconnectAttempts,
+            maxAttempts: this.maxReconnectAttempts,
+        });
 
         window.setTimeout(() => {
             this.connect();
         }, delay);
     }
-    
+
     startHeartbeat() {
         this.heartbeatInterval = window.setInterval(() => {
             if (this.isConnected && this.socket) {
@@ -146,19 +149,19 @@ class WebSocketClient {
             }
         }, 30000);
     }
-    
+
     stopHeartbeat() {
         if (this.heartbeatInterval) {
             window.clearInterval(this.heartbeatInterval);
             this.heartbeatInterval = null;
         }
     }
-    
+
     setupEventListeners() {
         if (!this.socket) {
             return;
         }
-        
+
         this.socket.on("disconnect", (reason) => {
             this.debug("WebSocket disconnected", { reason });
             this.isConnected = false;
@@ -189,39 +192,39 @@ class WebSocketClient {
             this.triggerCallback("progressComplete", data);
         });
     }
-    
+
     handleProgressUpdate(data) {
         const { sessionId } = data;
-        
+
         const now = Date.now();
         const lastUpdate = this.lastProgressUpdate[sessionId] || 0;
-        
+
         if (now - lastUpdate < this.config.progressThrottle) {
             if (this.progressThrottleTimers.has(sessionId)) {
                 window.clearTimeout(this.progressThrottleTimers.get(sessionId));
             }
-            
+
             const timer = window.setTimeout(() => {
                 this.lastProgressUpdate[sessionId] = Date.now();
                 this.triggerCallback("progress", data);
                 this.progressThrottleTimers.delete(sessionId);
             }, this.config.progressThrottle);
-            
+
             this.progressThrottleTimers.set(sessionId, timer);
             return;
         }
-        
+
         this.lastProgressUpdate[sessionId] = now;
         this.triggerCallback("progress", data);
     }
-    
+
     on(event, callback) {
         if (!this.eventCallbacks.has(event)) {
             this.eventCallbacks.set(event, []);
         }
         this.eventCallbacks.get(event).push(callback);
     }
-    
+
     off(event, callback) {
         if (this.eventCallbacks.has(event)) {
             const callbacks = this.eventCallbacks.get(event);
@@ -231,10 +234,10 @@ class WebSocketClient {
             }
         }
     }
-    
+
     triggerCallback(event, data) {
         if (this.eventCallbacks.has(event)) {
-            this.eventCallbacks.get(event).forEach(callback => {
+            this.eventCallbacks.get(event).forEach((callback) => {
                 try {
                     callback(data);
                 } catch (error) {
@@ -243,7 +246,7 @@ class WebSocketClient {
             });
         }
     }
-    
+
     joinProgressRoom(sessionId) {
         if (this.isConnected && this.socket) {
             this.debug("Joining progress room", { sessionId });
@@ -262,20 +265,20 @@ class WebSocketClient {
         this.debug("Disconnecting WebSocket client");
         this.config.autoReconnect = false;
         this.stopHeartbeat();
-        
+
         if (this.socket) {
             this.socket.disconnect();
             this.socket = null;
         }
-        
+
         this.isConnected = false;
         this.reconnectAttempts = 0;
-        
-        this.progressThrottleTimers.forEach(timer => window.clearTimeout(timer));
+
+        this.progressThrottleTimers.forEach((timer) => window.clearTimeout(timer));
         this.progressThrottleTimers.clear();
         this.lastProgressUpdate = {};
     }
-    
+
     isSocketConnected() {
         return this.isConnected && this.socket && this.socket.connected;
     }

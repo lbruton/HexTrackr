@@ -56,8 +56,8 @@ class ProgressTracker {
                 totalSteps: 0,
                 currentStep: 0,
                 message: "",
-                ...metadata
-            }
+                ...metadata,
+            },
         };
 
         this.sessions.set(sessionId, session);
@@ -93,7 +93,7 @@ class ProgressTracker {
 
         // Throttle progress events to prevent spam
         const lastEmit = this.eventThrottle.get(sessionId) || 0;
-        const shouldEmit = (now - lastEmit) >= this.THROTTLE_INTERVAL || progress >= 100;
+        const shouldEmit = now - lastEmit >= this.THROTTLE_INTERVAL || progress >= 100;
 
         if (shouldEmit) {
             this.eventThrottle.set(sessionId, now);
@@ -105,7 +105,7 @@ class ProgressTracker {
                 message,
                 status: session.status,
                 timestamp: now,
-                metadata: session.metadata
+                metadata: session.metadata,
             });
 
             console.log(`Progress ${sessionId}: ${progress}% - ${message}`);
@@ -144,7 +144,7 @@ class ProgressTracker {
             status: "completed",
             timestamp: session.lastUpdate,
             metadata: session.metadata,
-            duration: session.lastUpdate - session.startTime
+            duration: session.lastUpdate - session.startTime,
         });
 
         console.log(`Progress session completed: ${sessionId} - ${message}`);
@@ -185,7 +185,7 @@ class ProgressTracker {
             status: "error",
             timestamp: session.lastUpdate,
             metadata: session.metadata,
-            error: errorData
+            error: errorData,
         });
 
         console.error(`Progress session error: ${sessionId} - ${errorMessage}`, errorData);

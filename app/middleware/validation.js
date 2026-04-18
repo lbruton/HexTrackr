@@ -31,7 +31,7 @@ function createValidationMiddleware(validatorFn, sourceProperty = "body") {
                     success: false,
                     error: "Validation failed",
                     details: validation.errors.join(", "),
-                    warnings: validation.warnings || []
+                    warnings: validation.warnings || [],
                 });
             }
 
@@ -46,7 +46,7 @@ function createValidationMiddleware(validatorFn, sourceProperty = "body") {
             return res.status(500).json({
                 success: false,
                 error: "Internal validation error",
-                details: error.message
+                details: error.message,
             });
         }
     };
@@ -64,16 +64,11 @@ const csvUpload = multer({
     dest: "uploads/",
     limits: {
         fileSize: 100 * 1024 * 1024, // 100MB limit
-        files: 1 // Only one file per request
+        files: 1, // Only one file per request
     },
     fileFilter: (req, file, cb) => {
         // Validate MIME type and extension
-        const allowedMimeTypes = [
-            "text/csv",
-            "application/csv",
-            "text/plain",
-            "application/vnd.ms-excel"
-        ];
+        const allowedMimeTypes = ["text/csv", "application/csv", "text/plain", "application/vnd.ms-excel"];
 
         const allowedExtensions = [".csv", ".txt"];
         const fileExtension = file.originalname.toLowerCase().substring(file.originalname.lastIndexOf("."));
@@ -83,7 +78,7 @@ const csvUpload = multer({
         } else {
             cb(new Error("Invalid file type. Only CSV files are allowed."), false);
         }
-    }
+    },
 });
 
 /**
@@ -93,14 +88,10 @@ const jsonUpload = multer({
     dest: "uploads/",
     limits: {
         fileSize: 100 * 1024 * 1024, // 100MB limit
-        files: 1
+        files: 1,
     },
     fileFilter: (req, file, cb) => {
-        const allowedMimeTypes = [
-            "application/json",
-            "text/json",
-            "text/plain"
-        ];
+        const allowedMimeTypes = ["application/json", "text/json", "text/plain"];
 
         const allowedExtensions = [".json"];
         const fileExtension = file.originalname.toLowerCase().substring(file.originalname.lastIndexOf("."));
@@ -110,7 +101,7 @@ const jsonUpload = multer({
         } else {
             cb(new Error("Invalid file type. Only JSON files are allowed."), false);
         }
-    }
+    },
 });
 
 /**
@@ -153,7 +144,7 @@ const validateFileUpload = (req, res, next) => {
         return res.status(400).json({
             success: false,
             error: "No file uploaded",
-            details: "A file is required for this operation"
+            details: "A file is required for this operation",
         });
     }
 
@@ -162,7 +153,7 @@ const validateFileUpload = (req, res, next) => {
         return res.status(400).json({
             success: false,
             error: "Invalid filename",
-            details: "File must have a valid name"
+            details: "File must have a valid name",
         });
     }
 
@@ -171,7 +162,7 @@ const validateFileUpload = (req, res, next) => {
         return res.status(400).json({
             success: false,
             error: "Empty file",
-            details: "Uploaded file is empty"
+            details: "Uploaded file is empty",
         });
     }
 
@@ -185,17 +176,14 @@ const validateFileUpload = (req, res, next) => {
 /**
  * Ticket input validation middleware
  */
-const validateTicketInput = createValidationMiddleware(
-    (data) => validationService.validateTicketInput(data),
-    "body"
-);
+const validateTicketInput = createValidationMiddleware((data) => validationService.validateTicketInput(data), "body");
 
 /**
  * Vulnerability input validation middleware
  */
 const validateVulnerabilityInput = createValidationMiddleware(
     (data) => validationService.validateVulnerabilityInput(data),
-    "body"
+    "body",
 );
 
 /**
@@ -210,7 +198,7 @@ const validateCSVImportData = (type) => {
                 return res.status(400).json({
                     success: false,
                     error: "Invalid data format",
-                    details: "Data must be an array of objects"
+                    details: "Data must be an array of objects",
                 });
             }
 
@@ -218,7 +206,7 @@ const validateCSVImportData = (type) => {
                 return res.status(400).json({
                     success: false,
                     error: "No data provided",
-                    details: "CSV data array is empty"
+                    details: "CSV data array is empty",
                 });
             }
 
@@ -230,7 +218,7 @@ const validateCSVImportData = (type) => {
                     error: "Import data validation failed",
                     details: validation.errors.join(", "),
                     warnings: validation.warnings || [],
-                    stats: validation.stats
+                    stats: validation.stats,
                 });
             }
 
@@ -243,7 +231,7 @@ const validateCSVImportData = (type) => {
             return res.status(500).json({
                 success: false,
                 error: "Internal validation error",
-                details: error.message
+                details: error.message,
             });
         }
     };
@@ -272,7 +260,7 @@ const validatePaginationParams = (req, res, next) => {
         return res.status(400).json({
             success: false,
             error: "Invalid pagination parameters",
-            details: error.message
+            details: error.message,
         });
     }
 };
@@ -288,7 +276,7 @@ const validateDateRangeParams = (req, res, next) => {
             return res.status(400).json({
                 success: false,
                 error: "Invalid start date format",
-                details: "Start date must be a valid date"
+                details: "Start date must be a valid date",
             });
         }
 
@@ -296,7 +284,7 @@ const validateDateRangeParams = (req, res, next) => {
             return res.status(400).json({
                 success: false,
                 error: "Invalid end date format",
-                details: "End date must be a valid date"
+                details: "End date must be a valid date",
             });
         }
 
@@ -309,7 +297,7 @@ const validateDateRangeParams = (req, res, next) => {
                 return res.status(400).json({
                     success: false,
                     error: "Invalid date range",
-                    details: "Start date must be before end date"
+                    details: "Start date must be before end date",
                 });
             }
         }
@@ -320,7 +308,7 @@ const validateDateRangeParams = (req, res, next) => {
         return res.status(400).json({
             success: false,
             error: "Invalid date parameters",
-            details: error.message
+            details: error.message,
         });
     }
 };
@@ -363,7 +351,7 @@ const validateNumericId = (paramName = "id") => {
                 return res.status(400).json({
                     success: false,
                     error: "Missing ID parameter",
-                    details: `${paramName} parameter is required`
+                    details: `${paramName} parameter is required`,
                 });
             }
 
@@ -372,7 +360,7 @@ const validateNumericId = (paramName = "id") => {
                 return res.status(400).json({
                     success: false,
                     error: "Invalid ID format",
-                    details: `${paramName} must be a positive integer`
+                    details: `${paramName} must be a positive integer`,
                 });
             }
 
@@ -385,7 +373,7 @@ const validateNumericId = (paramName = "id") => {
             return res.status(400).json({
                 success: false,
                 error: "Invalid ID parameter",
-                details: error.message
+                details: error.message,
             });
         }
     };
@@ -406,7 +394,7 @@ const validateImportType = (req, res, next) => {
             return res.status(400).json({
                 success: false,
                 error: "Missing import type",
-                details: "Type parameter is required"
+                details: "Type parameter is required",
             });
         }
 
@@ -415,7 +403,7 @@ const validateImportType = (req, res, next) => {
             return res.status(400).json({
                 success: false,
                 error: "Invalid import type",
-                details: `Type must be one of: ${validTypes.join(", ")}`
+                details: `Type must be one of: ${validTypes.join(", ")}`,
             });
         }
 
@@ -425,7 +413,7 @@ const validateImportType = (req, res, next) => {
         return res.status(400).json({
             success: false,
             error: "Invalid import type parameter",
-            details: error.message
+            details: error.message,
         });
     }
 };
@@ -452,7 +440,7 @@ const validateVendorParam = (req, res, next) => {
         return res.status(400).json({
             success: false,
             error: "Invalid vendor parameter",
-            details: error.message
+            details: error.message,
         });
     }
 };
@@ -477,7 +465,7 @@ const validateSearchQuery = (req, res, next) => {
             return res.status(400).json({
                 success: false,
                 error: "Search query too long",
-                details: "Search query must be 200 characters or less"
+                details: "Search query must be 200 characters or less",
             });
         }
 
@@ -487,7 +475,7 @@ const validateSearchQuery = (req, res, next) => {
         return res.status(400).json({
             success: false,
             error: "Invalid search query",
-            details: error.message
+            details: error.message,
         });
     }
 };
@@ -504,7 +492,7 @@ const validateFilterParams = (req, res, next) => {
             return res.status(400).json({
                 success: false,
                 error: "Invalid severity filter",
-                details: "Severity must be one of: Critical, High, Medium, Low, Info"
+                details: "Severity must be one of: Critical, High, Medium, Low, Info",
             });
         }
 
@@ -513,7 +501,7 @@ const validateFilterParams = (req, res, next) => {
             return res.status(400).json({
                 success: false,
                 error: "Invalid status filter",
-                details: "Status must be one of: Open, In Progress, Pending, Resolved, Closed"
+                details: "Status must be one of: Open, In Progress, Pending, Resolved, Closed",
             });
         }
 
@@ -528,7 +516,7 @@ const validateFilterParams = (req, res, next) => {
         return res.status(400).json({
             success: false,
             error: "Invalid filter parameters",
-            details: error.message
+            details: error.message,
         });
     }
 };
@@ -565,5 +553,5 @@ module.exports = {
     validateVendorParam,
 
     // Validation service access
-    validationService
+    validationService,
 };

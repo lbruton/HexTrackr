@@ -119,9 +119,9 @@ class LocationController {
             // Cache key: "location-stats" (no vendor filtering in v1)
             await cacheService.withCaching(
                 res,
-                "stats",                    // Cache type (invalidated on CSV import)
-                "location-stats",           // Cache key
-                300,                        // Server TTL: 5 minutes
+                "stats", // Cache type (invalidated on CSV import)
+                "location-stats", // Cache key
+                300, // Server TTL: 5 minutes
                 async () => {
                     const result = await controller.locationService.getLocationStats();
 
@@ -133,7 +133,7 @@ class LocationController {
                     // Return the full {success, data, error} object
                     return result;
                 },
-                60                          // Browser TTL: 60 seconds
+                60, // Browser TTL: 60 seconds
             );
         } catch (error) {
             if (global.logger?.error) {
@@ -144,7 +144,7 @@ class LocationController {
             res.status(500).json({
                 success: false,
                 error: "Failed to fetch location statistics",
-                details: error.message
+                details: error.message,
             });
         }
     }

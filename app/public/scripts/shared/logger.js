@@ -24,16 +24,17 @@ class Logger {
         this.debugMode = this._isDebugMode();
 
         // Check if we're in development environment
-        this.isDevelopment = window.location.hostname === "localhost" ||
-                             window.location.hostname === "127.0.0.1" ||
-                             window.location.hostname === "dev.hextrackr.com";
+        this.isDevelopment =
+            window.location.hostname === "localhost" ||
+            window.location.hostname === "127.0.0.1" ||
+            window.location.hostname === "dev.hextrackr.com";
 
         // Configuration cache
         this.config = null;
         this.configLoaded = false;
 
         // Load configuration asynchronously (non-blocking)
-        this.loadConfig().catch(err => {
+        this.loadConfig().catch((err) => {
             console.warn("Failed to load logging config, using defaults:", err.message);
         });
 
@@ -80,10 +81,10 @@ class Logger {
                     ticket: { enabled: true },
                     websocket: { enabled: true },
                     import: { enabled: true },
-                    database: { enabled: true }
-                }
+                    database: { enabled: true },
+                },
             },
-            emojis: { debug: "🐛", info: "ℹ️", warn: "⚠️", error: "❌", success: "✅" }
+            emojis: { debug: "🐛", info: "ℹ️", warn: "⚠️", error: "❌", success: "✅" },
         };
     }
 
@@ -94,8 +95,10 @@ class Logger {
      */
     _isDebugMode() {
         try {
-            return localStorage.getItem("hextrackr_debug") === "true" ||
-                   sessionStorage.getItem("hextrackr_debug") === "true";
+            return (
+                localStorage.getItem("hextrackr_debug") === "true" ||
+                sessionStorage.getItem("hextrackr_debug") === "true"
+            );
         } catch (e) {
             return false;
         }
@@ -255,13 +258,13 @@ class Logger {
             const response = await fetch("/api/audit-logs", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
                     category,
                     message,
-                    data
-                })
+                    data,
+                }),
             });
 
             if (!response.ok) {

@@ -16,17 +16,17 @@ app/
 
 ### From server.js lines extracted
 
-| Server.js Lines | Functionality | Module Location |
-|-----------------|---------------|-----------------|
-| 3320-3344 | GET /api/tickets - List all tickets | routes/tickets.js + controller + service |
-| 3369-3394 | POST /api/tickets - Create new ticket | routes/tickets.js + controller + service |
-| 3396-3422 | PUT /api/tickets/:id - Update ticket | routes/tickets.js + controller + service |
-| 3424-3435 | DELETE /api/tickets/:id - Delete ticket | routes/tickets.js + controller + service |
-| 3437-3479 | POST /api/tickets/migrate - Migrate tickets | routes/tickets.js + controller + service |
-| 3482-3498 | POST /api/import/tickets - Import CSV* | controller + service (*route conflict - see notes) |
-| 3606-3621 | GET /api/backup/tickets - Export* | controller + service (*route conflict - see notes) |
-| 1802-1823 | mapTicketRow() function | service._mapTicketRow() |
-| 1825-1874 | processTicketRows() function | service.importTickets() |
+| Server.js Lines | Functionality                               | Module Location                                     |
+| --------------- | ------------------------------------------- | --------------------------------------------------- |
+| 3320-3344       | GET /api/tickets - List all tickets         | routes/tickets.js + controller + service            |
+| 3369-3394       | POST /api/tickets - Create new ticket       | routes/tickets.js + controller + service            |
+| 3396-3422       | PUT /api/tickets/:id - Update ticket        | routes/tickets.js + controller + service            |
+| 3424-3435       | DELETE /api/tickets/:id - Delete ticket     | routes/tickets.js + controller + service            |
+| 3437-3479       | POST /api/tickets/migrate - Migrate tickets | routes/tickets.js + controller + service            |
+| 3482-3498       | POST /api/import/tickets - Import CSV\*     | controller + service (\*route conflict - see notes) |
+| 3606-3621       | GET /api/backup/tickets - Export\*          | controller + service (\*route conflict - see notes) |
+| 1802-1823       | mapTicketRow() function                     | service.\_mapTicketRow()                            |
+| 1825-1874       | processTicketRows() function                | service.importTickets()                             |
 
 ## Route Conflicts and Special Cases
 

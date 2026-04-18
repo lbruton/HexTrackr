@@ -1,9 +1,9 @@
 /**
  * AG Grid Responsive Configuration for HexTrackr
- * 
+ *
  * This module provides responsive AG Grid configuration for vulnerability management.
  * Extracted from inline JavaScript for better code organization and maintainability.
- * 
+ *
  * @fileoverview AG Grid responsive configuration utilities with v33 theming support
  * @author HexTrackr Development Team
  * @version 2.0.0 - AG-Grid v33 Quartz theme integration
@@ -22,13 +22,12 @@
  */
 function debounce(func, delay) {
     let timeout;
-    return function(...args) {
+    return function (...args) {
         const context = this;
         clearTimeout(timeout);
         timeout = setTimeout(() => func.apply(context, args), delay);
     };
 }
-
 
 /**
  * Creates and returns the complete AG Grid configuration object.
@@ -42,7 +41,7 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
     // Column definitions with optimized responsive width management
     const isDesktop = window.innerWidth >= 1200;
     const isMobile = window.innerWidth < 768;
-    
+
     const columnDefs = [
         {
             headerName: "First Seen",
@@ -73,7 +72,7 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
             cellRenderer: (params) => {
                 const hostname = params.value || "-";
                 return `<a href="#" class="fw-bold link-primary" style="cursor: pointer;">${hostname}</a>`;
-            }
+            },
         },
         {
             headerName: "IP Address",
@@ -87,8 +86,10 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
             hide: isMobile,
             cellRenderer: (params) => {
                 const ip = params.value || "N/A";
-                return ip !== "N/A" ? `<code class="text-muted-var small">${ip}</code>` : "<span class=\"text-muted-var\">N/A</span>";
-            }
+                return ip !== "N/A"
+                    ? `<code class="text-muted-var small">${ip}</code>`
+                    : '<span class="text-muted-var">N/A</span>';
+            },
         },
         {
             headerName: "Vendor",
@@ -103,14 +104,14 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
             cellRenderer: (params) => {
                 const vendor = params.value || "Other";
                 // Colored text instead of badges - cleaner table design
-                let colorClass = "text-secondary";  // Gray for Other
+                let colorClass = "text-secondary"; // Gray for Other
                 if (vendor === "CISCO") {
-                    colorClass = "text-primary";     // Blue for Cisco
+                    colorClass = "text-primary"; // Blue for Cisco
                 } else if (vendor === "Palo Alto") {
-                    colorClass = "text-warning";     // Orange for Palo Alto
+                    colorClass = "text-warning"; // Orange for Palo Alto
                 }
                 return `<span class="${colorClass} fw-bold">${vendor}</span>`;
-            }
+            },
         },
         {
             headerName: "Installed",
@@ -137,7 +138,7 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
                 }
 
                 return `<span class="font-monospace ${className} small">${displayVersion}</span>`;
-            }
+            },
         },
         {
             headerName: "Fixed",
@@ -157,7 +158,9 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
                 // Async lookup in setTimeout (non-blocking)
                 setTimeout(async () => {
                     const cell = document.getElementById(cellId);
-                    if (!cell) {return;}
+                    if (!cell) {
+                        return;
+                    }
 
                     // Determine which advisory helper to use based on vendor
                     let advisoryHelper = null;
@@ -169,37 +172,35 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
 
                     // Unsupported vendor or helper not loaded
                     if (!advisoryHelper) {
-                        cell.innerHTML = "<span class=\"font-monospace text-muted small\">N/A</span>";
-                        params.node.setDataValue("fixed_version", "N/A");  // Update AG-Grid data model for search
-                        params.data.fixed_version = "N/A";  // HEX-234: Update source data for search
+                        cell.innerHTML = '<span class="font-monospace text-muted small">N/A</span>';
+                        params.node.setDataValue("fixed_version", "N/A"); // Update AG-Grid data model for search
+                        params.data.fixed_version = "N/A"; // HEX-234: Update source data for search
                         return;
                     }
 
                     try {
                         const installedVersion = params.data.operating_system;
-                        const fixedVersion = await advisoryHelper.getFixedVersion(
-                            cveId, vendor, installedVersion
-                        );
+                        const fixedVersion = await advisoryHelper.getFixedVersion(cveId, vendor, installedVersion);
 
                         if (fixedVersion) {
                             cell.innerHTML = `<span class="font-monospace text-success small">${DOMPurify.sanitize(fixedVersion)}</span>`;
-                            params.node.setDataValue("fixed_version", fixedVersion);  // Update AG-Grid data model
-                            params.data.fixed_version = fixedVersion;  // HEX-234: Update source data for search
+                            params.node.setDataValue("fixed_version", fixedVersion); // Update AG-Grid data model
+                            params.data.fixed_version = fixedVersion; // HEX-234: Update source data for search
                         } else {
-                            cell.innerHTML = "<span class=\"font-monospace text-muted small\">No Fix</span>";
+                            cell.innerHTML = '<span class="font-monospace text-muted small">No Fix</span>';
                             params.node.setDataValue("fixed_version", "No Fix");
-                            params.data.fixed_version = "No Fix";  // HEX-234: Update source data for search
+                            params.data.fixed_version = "No Fix"; // HEX-234: Update source data for search
                         }
                     } catch (error) {
-                        cell.innerHTML = "<span class=\"font-monospace text-muted small\">Error</span>";
+                        cell.innerHTML = '<span class="font-monospace text-muted small">Error</span>';
                         params.node.setDataValue("fixed_version", "Error");
-                        params.data.fixed_version = "Error";  // HEX-234: Update source data for search
+                        params.data.fixed_version = "Error"; // HEX-234: Update source data for search
                     }
                 }, 0);
 
                 // Return placeholder while async lookup runs
                 return `<span id="${cellId}" class="font-monospace text-muted small">...</span>`;
-            }
+            },
         },
         {
             headerName: "Vulnerability",
@@ -258,7 +259,7 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
                 }
 
                 return "-";
-            }
+            },
         },
         {
             headerName: "VPR",
@@ -272,16 +273,16 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
             cellRenderer: (params) => {
                 const score = parseFloat(params.value) || 0;
                 // Colored text based on score - cleaner table design
-                let colorClass = "text-success";  // Green for low (0-3.9)
+                let colorClass = "text-success"; // Green for low (0-3.9)
                 if (score >= 9.0) {
-                    colorClass = "text-danger";   // Red for critical (9-10)
+                    colorClass = "text-danger"; // Red for critical (9-10)
                 } else if (score >= 7.0) {
-                    colorClass = "text-orange";   // Orange for high (7-8.9)
+                    colorClass = "text-orange"; // Orange for high (7-8.9)
                 } else if (score >= 4.0) {
-                    colorClass = "text-warning";  // Yellow for medium (4-6.9)
+                    colorClass = "text-warning"; // Yellow for medium (4-6.9)
                 }
                 return `<span class="${colorClass} fw-bold">${score.toFixed(1)}</span>`;
-            }
+            },
         },
         {
             headerName: "CVSS",
@@ -295,19 +296,19 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
             cellRenderer: (params) => {
                 const cvss = parseFloat(params.value) || 0;
                 // Colored text based on CVSS score - cleaner table design
-                let colorClass = "text-success";  // Green for low (0-3.9)
+                let colorClass = "text-success"; // Green for low (0-3.9)
                 if (cvss >= 9.0) {
-                    colorClass = "text-danger";   // Red for critical (9-10)
+                    colorClass = "text-danger"; // Red for critical (9-10)
                 } else if (cvss >= 7.0) {
-                    colorClass = "text-orange";   // Orange for high (7-8.9)
+                    colorClass = "text-orange"; // Orange for high (7-8.9)
                 } else if (cvss >= 4.0) {
-                    colorClass = "text-warning";  // Yellow for medium (4-6.9)
+                    colorClass = "text-warning"; // Yellow for medium (4-6.9)
                 }
                 if (cvss === 0) {
-                    return "<span class=\"text-muted\">N/A</span>";
+                    return '<span class="text-muted">N/A</span>';
                 }
                 return `<span class="${colorClass} fw-bold">${cvss.toFixed(1)}</span>`;
-            }
+            },
         },
         {
             headerName: "Severity",
@@ -321,29 +322,29 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
             cellRenderer: (params) => {
                 const severity = params.value || "Low";
                 // Colored text based on severity - cleaner table design
-                let colorClass = "text-success";  // Green for Low
+                let colorClass = "text-success"; // Green for Low
                 if (severity.toUpperCase() === "CRITICAL") {
-                    colorClass = "text-danger";   // Red for Critical
+                    colorClass = "text-danger"; // Red for Critical
                 } else if (severity.toUpperCase() === "HIGH") {
-                    colorClass = "text-orange";   // Orange for High
+                    colorClass = "text-orange"; // Orange for High
                 } else if (severity.toUpperCase() === "MEDIUM") {
-                    colorClass = "text-warning";  // Yellow for Medium
+                    colorClass = "text-warning"; // Yellow for Medium
                 }
                 return `<span class="${colorClass} fw-bold text-uppercase">${severity}</span>`;
-            }
+            },
         },
         {
-            headerName: "",  // Empty - will show icon via CSS
-            headerClass: "ticket-header-icon",  // Custom class for icon styling
+            headerName: "", // Empty - will show icon via CSS
+            headerClass: "ticket-header-icon", // Custom class for icon styling
             field: "ticket_status",
             sortable: true,
-            filter: false,  // No filter icon, just sorting
+            filter: false, // No filter icon, just sorting
             width: 80,
             minWidth: 70,
             maxWidth: 100,
             resizable: true,
             cellStyle: {
-                textAlign: "center"
+                textAlign: "center",
             },
             cellRenderer: (params) => {
                 const ticketStatus = params.value;
@@ -364,15 +365,15 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
                 }
 
                 // Has tickets - show colored indicator based on status
-                let colorClass = "text-secondary";  // Gray for unknown
+                let colorClass = "text-secondary"; // Gray for unknown
                 const icon = "fas fa-ticket-alt";
 
                 if (ticketStatus === "Overdue") {
-                    colorClass = "text-danger";     // Red
+                    colorClass = "text-danger"; // Red
                 } else if (ticketStatus === "Pending") {
-                    colorClass = "text-warning";    // Yellow
+                    colorClass = "text-warning"; // Yellow
                 } else if (ticketStatus === "Open") {
-                    colorClass = "text-primary";    // Blue
+                    colorClass = "text-primary"; // Blue
                 }
 
                 // Single ticket - navigate directly
@@ -393,8 +394,8 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
                            title="${ticketCount} ${ticketStatus} tickets for ${hostname} - click to choose">
                            <i class="${icon}"></i>
                         </a>`;
-            }
-        }
+            },
+        },
     ];
 
     // Use centralized AGGridThemeManager for consistent theming across all grids
@@ -418,38 +419,41 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
 
         // Enable auto-height to let pagination control vertical display
         domLayout: "autoHeight",
-        
+
         // Enhanced horizontal scrolling support
         suppressColumnVirtualisation: false,
         suppressHorizontalScroll: false,
         suppressScrollOnNewData: true,
         alwaysShowHorizontalScroll: false,
-        
+
         // Single-row display optimizations
         rowHeight: 42,
         suppressRowTransform: false,
-        
+
         // Enhanced features for requirements (Community edition only)
         // enableRangeSelection: true, // Enterprise feature - removed
         // enableRangeHandle: true, // Enterprise feature - removed
         // enableFillHandle: true, // Enterprise feature - removed
-        
+
         // Column sizing enhancements
         maintainColumnOrder: true,
         // Note: Column resizing controlled by defaultColDef.resizable (already set to true)
         suppressAutoSize: false,
         skipHeaderOnAutoSize: false,
-        
+
         onGridReady: (params) => {
             // Responsive column management on resize
-            window.addEventListener("resize", debounce(() => {
-                if (componentContext.gridApi) {
-                    // Update column visibility based on screen size
-                    updateColumnVisibility(params.api);
-                    // Ensure columns fill available width after resize
-                    params.api.sizeColumnsToFit();
-                }
-            }, 200));
+            window.addEventListener(
+                "resize",
+                debounce(() => {
+                    if (componentContext.gridApi) {
+                        // Update column visibility based on screen size
+                        updateColumnVisibility(params.api);
+                        // Ensure columns fill available width after resize
+                        params.api.sizeColumnsToFit();
+                    }
+                }, 200),
+            );
 
             // Set initial column visibility and sizing
             setTimeout(() => {
@@ -509,7 +513,7 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
     function updateColumnVisibility(api) {
         const gridWidth = window.innerWidth;
         const breakpoints = { small: 768, large: 1200 };
-        
+
         const allColumns = api.getColumns();
         if (!allColumns) {
             return;
@@ -518,7 +522,7 @@ function createVulnerabilityGridOptions(componentContext, isDarkMode = false, us
         const columnsToShow = [];
         const columnsToHide = [];
 
-        allColumns.forEach(column => {
+        allColumns.forEach((column) => {
             const colId = column.getColId();
             switch (colId) {
                 case "last_seen":
@@ -584,8 +588,11 @@ function handleGridCreateTicket(event, link) {
 
             // Filter for KEV devices at same location
             deviceList = allDevices
-                .filter(device => device.hostname.toLowerCase().startsWith(location.toLowerCase()) && device.hasKev === true)
-                .map(device => device.hostname.toUpperCase())
+                .filter(
+                    (device) =>
+                        device.hostname.toLowerCase().startsWith(location.toLowerCase()) && device.hasKev === true,
+                )
+                .map((device) => device.hostname.toUpperCase())
                 .sort(); // HEX-313: Alphabetical sorting for boot order planning
 
             logger.debug("ui", `[Grid Power Tool] KEV mode - found ${deviceList.length} KEV devices at ${location}`);
@@ -603,11 +610,14 @@ function handleGridCreateTicket(event, link) {
 
             // Filter for all devices at same location
             deviceList = allDevices
-                .filter(device => device.hostname.toLowerCase().startsWith(location.toLowerCase()))
-                .map(device => device.hostname.toUpperCase())
+                .filter((device) => device.hostname.toLowerCase().startsWith(location.toLowerCase()))
+                .map((device) => device.hostname.toUpperCase())
                 .sort(); // HEX-313: Alphabetical sorting for boot order planning
 
-            logger.debug("ui", `[Grid Power Tool] All devices mode - found ${deviceList.length} devices at ${location}`);
+            logger.debug(
+                "ui",
+                `[Grid Power Tool] All devices mode - found ${deviceList.length} devices at ${location}`,
+            );
         } else {
             logger.error("ui", "[Grid Power Tool] vulnManager.dataManager not available");
         }
@@ -626,21 +636,22 @@ function handleGridCreateTicket(event, link) {
         site: site,
         location: location,
         mode: mode,
-        timestamp: Date.now()
+        timestamp: Date.now(),
     };
 
     // Set sessionStorage for tickets.html to read
     sessionStorage.setItem("createTicketData", JSON.stringify(ticketData));
-    sessionStorage.setItem("createTicketDevice", deviceList[0]);  // Backward compatibility
+    sessionStorage.setItem("createTicketDevice", deviceList[0]); // Backward compatibility
     sessionStorage.setItem("autoOpenModal", "true");
 
     // Show toast message
     const deviceCount = deviceList.length;
-    const modeLabel = {
-        "single": "device",
-        "bulk-all": `devices at ${location}`,
-        "bulk-kev": `KEV devices at ${location}`
-    }[mode] || "device";
+    const modeLabel =
+        {
+            single: "device",
+            "bulk-all": `devices at ${location}`,
+            "bulk-kev": `KEV devices at ${location}`,
+        }[mode] || "device";
 
     if (window.vulnManager && typeof window.vulnManager.showToast === "function") {
         window.vulnManager.showToast(`Creating ticket for ${deviceCount} ${modeLabel}...`, "info");
@@ -674,7 +685,7 @@ async function handleGridViewTickets(event, link) {
     // Fetch tickets for this device
     try {
         const response = await fetch(`/api/tickets/by-device/${encodeURIComponent(hostname)}`, {
-            credentials: "include"
+            credentials: "include",
         });
 
         if (!response.ok) {
@@ -694,7 +705,6 @@ async function handleGridViewTickets(event, link) {
 
         // Show the picker modal
         showGridTicketPickerModal(hostname, tickets);
-
     } catch (error) {
         logger.error("ui", "[Grid View Tickets] Error fetching tickets:", error);
     }
@@ -711,7 +721,7 @@ async function handleGridViewTickets(event, link) {
 function showGridTicketPickerModal(hostname, tickets) {
     logger.debug("ui", `[Grid Ticket Picker] Opening picker for ${hostname} with ${tickets.length} tickets`);
 
-    const validTickets = tickets.filter(t => t !== null && t.id);
+    const validTickets = tickets.filter((t) => t !== null && t.id);
     logger.debug("ui", `[Grid Ticket Picker] Valid tickets: ${validTickets.length}`, validTickets);
 
     if (validTickets.length === 0) {
@@ -729,11 +739,11 @@ function showGridTicketPickerModal(hostname, tickets) {
     // Helper function to get status badge color
     const getStatusBadgeColor = (status) => {
         const colorMap = {
-            "Open": "primary",
-            "Pending": "warning",
-            "Overdue": "danger",
-            "Completed": "success",
-            "Cancelled": "secondary"
+            Open: "primary",
+            Pending: "warning",
+            Overdue: "danger",
+            Completed: "success",
+            Cancelled: "secondary",
         };
         return colorMap[status] || "secondary";
     };
@@ -743,7 +753,9 @@ function showGridTicketPickerModal(hostname, tickets) {
             <strong>${hostname}</strong> has <strong>${validTickets.length}</strong> open tickets. Which would you like to view?
         </p>
         <div class="list-group">
-            ${validTickets.map(ticket => `
+            ${validTickets
+                .map(
+                    (ticket) => `
                 <button type="button" class="list-group-item list-group-item-action"
                         onclick="window.location.href='/tickets.html?openTicket=${ticket.id}';">
                     <div class="d-flex w-100 justify-content-between align-items-center">
@@ -754,7 +766,9 @@ function showGridTicketPickerModal(hostname, tickets) {
                         <span class="badge bg-${getStatusBadgeColor(ticket.status)}">${ticket.status}</span>
                     </div>
                 </button>
-            `).join("")}
+            `,
+                )
+                .join("")}
         </div>
     `;
 
@@ -780,7 +794,7 @@ function showGridTicketPickerModal(hostname, tickets) {
 if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         debounce,
-        createVulnerabilityGridOptions
+        createVulnerabilityGridOptions,
     };
 }
 

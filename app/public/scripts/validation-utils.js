@@ -26,7 +26,9 @@
  * isValidCVE('invalid-cve'); // false
  */
 function isValidCVE(cve) {
-    if (typeof cve !== "string") {return false;}
+    if (typeof cve !== "string") {
+        return false;
+    }
     // Matches 'CVE-' followed by 4 digits (year) and 4 or more digits (sequence). Case-insensitive.
     const cveRegex = /^CVE-\d{4}-\d{4,}$/i;
     return cveRegex.test(cve.trim());
@@ -42,11 +44,14 @@ function isValidCVE(cve) {
  * isValidIP('999.999.999.999'); // false
  */
 function isValidIP(ip) {
-    if (typeof ip !== "string") {return false;}
+    if (typeof ip !== "string") {
+        return false;
+    }
     // This regex is a simplified check and may not cover all edge cases,
     // but is generally sufficient for typical IPv4 and IPv6 formats.
     const ipv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-    const ipv6Regex = /(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))/;
+    const ipv6Regex =
+        /(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))/;
     return ipv4Regex.test(ip.trim()) || ipv6Regex.test(ip.trim());
 }
 
@@ -76,7 +81,9 @@ function isValidVPR(score) {
  * normalizeDate('invalid date'); // null
  */
 function normalizeDate(dateInput) {
-    if (!dateInput) {return null;}
+    if (!dateInput) {
+        return null;
+    }
     const date = new Date(dateInput);
     if (isNaN(date.getTime())) {
         return null;
@@ -116,11 +123,12 @@ function isValidHostname(hostname) {
  * isValidSeverity('Urgent'); // false
  */
 function isValidSeverity(severity) {
-    if (typeof severity !== "string") {return false;}
+    if (typeof severity !== "string") {
+        return false;
+    }
     const validSeverities = ["critical", "high", "medium", "low", "info"];
     return validSeverities.includes(severity.trim().toLowerCase());
 }
-
 
 // =================================================================================================
 // ERROR HANDLING UTILITIES
@@ -150,7 +158,7 @@ function formatApiError(err) {
     if (err.isOperational) {
         return {
             status: err.status,
-            message: err.message
+            message: err.message,
         };
     }
     // For non-operational errors, log them and send a generic message
@@ -159,7 +167,7 @@ function formatApiError(err) {
         status: "error",
         message: "Something went very wrong!",
         // Only expose stack in development
-        ...(isDevelopment && { stack: err.stack })
+        ...(isDevelopment && { stack: err.stack }),
     };
 }
 
@@ -181,20 +189,19 @@ const errorMessages = {
     csv: {
         invalidRow: (rowNumber, error) => `Invalid data in CSV row ${rowNumber}: ${error}`,
         missingHeader: (header) => `CSV file is missing required header: "${header}".`,
-        fileReadError: "Could not read the uploaded CSV file."
+        fileReadError: "Could not read the uploaded CSV file.",
     },
     db: {
         connection: "Could not connect to the database.",
         constraintViolation: "An item with this identifier already exists.",
-        operationFailed: "The database operation failed."
+        operationFailed: "The database operation failed.",
     },
     api: {
         notFound: (resource) => `${resource} not found.`,
         invalidInput: "The data provided is invalid.",
-        unauthorized: "You are not authorized to perform this action."
-    }
+        unauthorized: "You are not authorized to perform this action.",
+    },
 };
-
 
 // =================================================================================================
 // INTEGRATION EXAMPLES & WRAPPERS
@@ -232,13 +239,13 @@ function validateCsvRow(row, rowIndex) {
     } else {
         validatedData.vpr_score = row["VPR Score"] ? parseFloat(row["VPR Score"]) : null;
     }
-    
+
     // Add more validations for other fields...
 
     return {
         isValid: errors.length === 0,
         errors,
-        validatedData
+        validatedData,
     };
 }
 
@@ -286,6 +293,6 @@ if (typeof module !== "undefined" && module.exports) {
         log,
         errorMessages,
         validateCsvRow,
-        handleDbOperation
+        handleDbOperation,
     };
 }

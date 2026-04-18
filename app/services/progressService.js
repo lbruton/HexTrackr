@@ -31,7 +31,7 @@ class ProgressService {
             PARSING: { start: 0, end: 15, name: "parsing" },
             STAGING: { start: 15, end: 60, name: "staging" },
             PROCESSING: { start: 60, end: 95, name: "processing" },
-            FINALIZING: { start: 95, end: 100, name: "finalizing" }
+            FINALIZING: { start: 95, end: 100, name: "finalizing" },
         };
 
         // Export phase definitions
@@ -39,7 +39,7 @@ class ProgressService {
             PREPARING: { start: 0, end: 20, name: "preparing" },
             QUERYING: { start: 20, end: 70, name: "querying" },
             FORMATTING: { start: 70, end: 90, name: "formatting" },
-            FINALIZING: { start: 90, end: 100, name: "finalizing" }
+            FINALIZING: { start: 90, end: 100, name: "finalizing" },
         };
     }
 
@@ -64,15 +64,21 @@ class ProgressService {
             phase: "initializing",
             processedRows: 0,
             insertedRows: 0,
-            errorCount: 0
+            errorCount: 0,
         };
 
-        const sessionId = customSessionId ?
-            this.progressTracker.createSessionWithId(customSessionId, metadata) :
-            this.progressTracker.createSession(metadata);
+        const sessionId = customSessionId
+            ? this.progressTracker.createSessionWithId(customSessionId, metadata)
+            : this.progressTracker.createSession(metadata);
 
         if (global.logger?.info) {
-            global.logger.info("backend", "progress", "Import session started", { sessionId, filename, totalRows, vendor, scanDate });
+            global.logger.info("backend", "progress", "Import session started", {
+                sessionId,
+                filename,
+                totalRows,
+                vendor,
+                scanDate,
+            });
         } else {
             console.log(` Import session started: ${sessionId} for ${filename} (${totalRows} rows)`);
         }
@@ -92,7 +98,9 @@ class ProgressService {
         const session = this.progressTracker.getSession(sessionId);
         if (!session) {
             if (global.logger?.warn) {
-                global.logger.warn("backend", "progress", "Import progress update attempted for unknown session", { sessionId });
+                global.logger.warn("backend", "progress", "Import progress update attempted for unknown session", {
+                    sessionId,
+                });
             } else {
                 console.warn(`Import progress update attempted for unknown session: ${sessionId}`);
             }
@@ -106,7 +114,7 @@ class ProgressService {
         const totalInPhase = additionalData.totalInPhase || session.metadata.totalRows || 1;
         const phaseProgress = Math.min(100, (processed / totalInPhase) * 100);
         const progressRange = phaseConfig.end - phaseConfig.start;
-        const overallProgress = phaseConfig.start + (phaseProgress * progressRange / 100);
+        const overallProgress = phaseConfig.start + (phaseProgress * progressRange) / 100;
 
         const message = this.formatImportMessage(phase, processed, totalInPhase, status);
 
@@ -116,7 +124,7 @@ class ProgressService {
             totalInPhase: totalInPhase,
             phaseProgress: phaseProgress,
             currentStep: additionalData.currentStep || session.metadata.currentStep,
-            ...additionalData
+            ...additionalData,
         });
     }
 
@@ -131,7 +139,7 @@ class ProgressService {
         return this.updateImportProgress(sessionId, rowCount, status, {
             phase: "parsing",
             currentStep: 1,
-            totalInPhase: rowCount
+            totalInPhase: rowCount,
         });
     }
 
@@ -148,7 +156,7 @@ class ProgressService {
             phase: "staging",
             currentStep: 2,
             totalInPhase: total,
-            insertedToStaging: staged
+            insertedToStaging: staged,
         });
     }
 
@@ -164,7 +172,7 @@ class ProgressService {
     updateImportBatchProgress(sessionId, currentBatch, totalBatches, processedRows, _status = "processing") {
         const batchProgress = (currentBatch / totalBatches) * 100;
         const phaseConfig = this.IMPORT_PHASES.PROCESSING;
-        const overallProgress = phaseConfig.start + (batchProgress * (phaseConfig.end - phaseConfig.start) / 100);
+        const overallProgress = phaseConfig.start + (batchProgress * (phaseConfig.end - phaseConfig.start)) / 100;
 
         const message = `Processing batch ${currentBatch}/${totalBatches} (${processedRows} rows processed)...`;
 
@@ -174,7 +182,7 @@ class ProgressService {
             currentBatch: currentBatch,
             totalBatches: totalBatches,
             processedRows: processedRows,
-            batchProgress: batchProgress
+            batchProgress: batchProgress,
         });
     }
 
@@ -185,13 +193,7 @@ class ProgressService {
      * @returns {boolean} Success status
      */
     completeImport(sessionId, results = {}) {
-        const {
-            totalProcessed = 0,
-            totalInserted = 0,
-            totalErrors = 0,
-            duration = 0,
-            ...additionalResults
-        } = results;
+        const { totalProcessed = 0, totalInserted = 0, totalErrors = 0, duration = 0, ...additionalResults } = results;
 
         const message = `Import completed: ${totalInserted} records inserted, ${totalErrors} errors`;
 
@@ -202,7 +204,7 @@ class ProgressService {
             totalErrors: totalErrors,
             duration: duration,
             successRate: totalProcessed > 0 ? ((totalInserted / totalProcessed) * 100).toFixed(1) : 0,
-            ...additionalResults
+            ...additionalResults,
         });
     }
 
@@ -224,15 +226,20 @@ class ProgressService {
             currentStep: 0,
             phase: "preparing",
             processedItems: 0,
-            exportedItems: 0
+            exportedItems: 0,
         };
 
-        const sessionId = customSessionId ?
-            this.progressTracker.createSessionWithId(customSessionId, metadata) :
-            this.progressTracker.createSession(metadata);
+        const sessionId = customSessionId
+            ? this.progressTracker.createSessionWithId(customSessionId, metadata)
+            : this.progressTracker.createSession(metadata);
 
         if (global.logger?.info) {
-            global.logger.info("backend", "progress", "Export session started", { sessionId, exportType: type, totalItems, format });
+            global.logger.info("backend", "progress", "Export session started", {
+                sessionId,
+                exportType: type,
+                totalItems,
+                format,
+            });
         } else {
             console.log(` Export session started: ${sessionId} for ${type} (${totalItems} items, ${format} format)`);
         }
@@ -252,7 +259,9 @@ class ProgressService {
         const session = this.progressTracker.getSession(sessionId);
         if (!session) {
             if (global.logger?.warn) {
-                global.logger.warn("backend", "progress", "Export progress update attempted for unknown session", { sessionId });
+                global.logger.warn("backend", "progress", "Export progress update attempted for unknown session", {
+                    sessionId,
+                });
             } else {
                 console.warn(`Export progress update attempted for unknown session: ${sessionId}`);
             }
@@ -265,7 +274,7 @@ class ProgressService {
         // Calculate progress within the current phase
         const phaseProgress = Math.min(100, (processed / totalItems) * 100);
         const progressRange = phaseConfig.end - phaseConfig.start;
-        const overallProgress = phaseConfig.start + (phaseProgress * progressRange / 100);
+        const overallProgress = phaseConfig.start + (phaseProgress * progressRange) / 100;
 
         const message = this.formatExportMessage(phase, processed, totalItems, status);
 
@@ -274,7 +283,7 @@ class ProgressService {
             processedItems: processed,
             totalItems: totalItems,
             phaseProgress: phaseProgress,
-            currentStep: this.getExportStepNumber(phase)
+            currentStep: this.getExportStepNumber(phase),
         });
     }
 
@@ -285,13 +294,7 @@ class ProgressService {
      * @returns {boolean} Success status
      */
     completeExport(sessionId, results = {}) {
-        const {
-            totalExported = 0,
-            fileSize = 0,
-            filePath = "",
-            duration = 0,
-            ...additionalResults
-        } = results;
+        const { totalExported = 0, fileSize = 0, filePath = "", duration = 0, ...additionalResults } = results;
 
         const message = `Export completed: ${totalExported} records exported${fileSize > 0 ? ` (${this.formatFileSize(fileSize)})` : ""}`;
 
@@ -301,7 +304,7 @@ class ProgressService {
             fileSize: fileSize,
             filePath: filePath,
             duration: duration,
-            ...additionalResults
+            ...additionalResults,
         });
     }
 
@@ -335,7 +338,7 @@ class ProgressService {
             if (session.status !== "completed" && session.status !== "error") {
                 sessions.push({
                     sessionId,
-                    ...session
+                    ...session,
                 });
             }
         }
@@ -418,11 +421,16 @@ class ProgressService {
      */
     getExportStepNumber(phase) {
         switch (phase.toLowerCase()) {
-            case "preparing": return 1;
-            case "querying": return 2;
-            case "formatting": return 3;
-            case "finalizing": return 4;
-            default: return 2;
+            case "preparing":
+                return 1;
+            case "querying":
+                return 2;
+            case "formatting":
+                return 3;
+            case "finalizing":
+                return 4;
+            default:
+                return 2;
         }
     }
 
@@ -431,7 +439,9 @@ class ProgressService {
      * @private
      */
     formatFileSize(bytes) {
-        if (bytes === 0) {return "0 B";}
+        if (bytes === 0) {
+            return "0 B";
+        }
         const k = 1024;
         const sizes = ["B", "KB", "MB", "GB"];
         const i = Math.floor(Math.log(bytes) / Math.log(k));

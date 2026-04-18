@@ -35,16 +35,16 @@
  * to prevent false matches (e.g., "nswitch" before "nswan")
  */
 const DEVICE_TYPE_PATTERNS = [
-    "nswan",      // Network switch (WAN) - most common
-    "nrwan",      // Network router (WAN)
-    "nfpan",      // Network firewall (PAN) - Palo Alto
-    "nfwan",      // Network firewall (WAN) - generic
-    "nswitch",    // Network switch - generic
-    "nrouter",    // Network router - generic
-    "nfirewall",  // Network firewall - generic
-    "nmpan",      // Network management (PAN)
-    "nwwbr",      // Network wireless bridge (specific)
-    "wwbr",       // Wireless bridge (generic)
+    "nswan", // Network switch (WAN) - most common
+    "nrwan", // Network router (WAN)
+    "nfpan", // Network firewall (PAN) - Palo Alto
+    "nfwan", // Network firewall (WAN) - generic
+    "nswitch", // Network switch - generic
+    "nrouter", // Network router - generic
+    "nfirewall", // Network firewall - generic
+    "nmpan", // Network management (PAN)
+    "nwwbr", // Network wireless bridge (specific)
+    "wwbr", // Wireless bridge (generic)
 ];
 
 /**
@@ -147,7 +147,7 @@ if (typeof window !== "undefined") {
         extractLocationFromHostname,
         extractSiteCode,
         parseHostname,
-        DEVICE_TYPE_PATTERNS  // Export patterns for reference
+        DEVICE_TYPE_PATTERNS, // Export patterns for reference
     };
 }
 
@@ -157,6 +157,6 @@ if (typeof module !== "undefined" && module.exports) {
         extractLocationFromHostname,
         extractSiteCode,
         parseHostname,
-        DEVICE_TYPE_PATTERNS
+        DEVICE_TYPE_PATTERNS,
     };
 }

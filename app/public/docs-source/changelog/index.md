@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## Recent Releases
 
 ### [v1.1.12](#changelog/versions/1.1.12) - 2025-11-04
+
 **Category**: Update
 
 Restored Material Design elevation principles to light mode with blue-gray surface hierarchy, fixed missing CSS files across tickets.html and documentation portal, and unified search bar presentation with card-based design. This release brings light mode visual depth on par with dark mode, creating proper contrast and "pop" for elevated UI elements.
@@ -22,6 +23,7 @@ Restored Material Design elevation principles to light mode with blue-gray surfa
 [View full changelog →](#changelog/versions/1.1.12)
 
 ### [v1.1.11](#changelog/versions/1.1.11) - 2025-10-31
+
 **Category**: Bug Fix
 
 Fixed critical vulnerability backup/restore system bugs that prevented 95K+ record recovery, and removed legacy `vulnerabilities` table from schema to complete HEX-300 rollover architecture migration. This release ensures data integrity during backup/restore operations and eliminates technical debt from unused database tables.
@@ -29,6 +31,7 @@ Fixed critical vulnerability backup/restore system bugs that prevented 95K+ reco
 [View full changelog →](#changelog/versions/1.1.11)
 
 ### [v1.1.10](#changelog/versions/1.1.10) - 2025-10-28
+
 **Category**: Bug Fix
 
 Replaced simple substring extraction with intelligent hostname parsing for ticket creation. Location values now use HostnameParserService API (e.g., "BARNHA" instead of "BARNH"), and site codes are intelligently pre-filled from historical tickets database or left blank for user entry from Hexagon EAM.
@@ -36,6 +39,7 @@ Replaced simple substring extraction with intelligent hostname parsing for ticke
 [View full changelog →](#changelog/versions/1.1.10)
 
 ### [v1.1.9](#changelog/versions/1.1.9) - 2025-10-28
+
 **Category**: Update
 
 Implemented Phase 1 of UI/UX refinements based on team presentation feedback from October 28, 2025. Added enhanced sort options for Devices and Locations views, cleaned up redundant Cisco advisory descriptions, created shared hostname parsing utilities for location extraction, and added clickable location links in Device Security Modal with proper AG-Grid async cell rendering.
@@ -43,6 +47,7 @@ Implemented Phase 1 of UI/UX refinements based on team presentation feedback fro
 [View full changelog →](#changelog/versions/1.1.9)
 
 ### [v1.1.8](#changelog/versions/1.1.8) - 2025-10-25
+
 **Category**: Maintenance
 
 Major milestone in HEX-254 unified logging system implementation. Migrated 203 console statements across 25 files (backend services, controllers, and frontend utilities) to use the unified LoggingService with defensive fallback patterns.
@@ -50,6 +55,7 @@ Major milestone in HEX-254 unified logging system implementation. Migrated 203 c
 [View full changelog →](#changelog/versions/1.1.8)
 
 ### [v1.1.7](#changelog/versions/1.1.7) - 2025-10-25
+
 **Category**: Maintenance
 
 Code quality improvement that eliminates duplicate cache-busting helper functions by extracting them into a shared utility module, reducing code duplication by 56 lines and improving maintainability.
@@ -57,6 +63,7 @@ Code quality improvement that eliminates duplicate cache-busting helper function
 [View full changelog →](#changelog/versions/1.1.7)
 
 ### [v1.1.6](#changelog/versions/1.1.6) - 2025-10-25
+
 **Category**: Bug Fix
 
 Fixed location cards multi-ticket modal displaying placeholder data instead of proper ticket details, removed three debug console.log statements from CSV import controller, and updated documentation version footer.
@@ -64,6 +71,7 @@ Fixed location cards multi-ticket modal displaying placeholder data instead of p
 [View full changelog →](#changelog/versions/1.1.6)
 
 ### [v1.1.5](#changelog/versions/1.1.5) - 2025-10-24
+
 **Category**: Bug Fix
 
 Resolved JSDoc developer documentation portal failing to apply HexTrackr's dark mode theme by integrating theme injection into the automated documentation build workflow.
@@ -71,6 +79,7 @@ Resolved JSDoc developer documentation portal failing to apply HexTrackr's dark 
 [View full changelog →](#changelog/versions/1.1.5)
 
 ### [v1.1.4](#changelog/versions/1.1.4) - 2025-10-23
+
 **Category**: Update
 
 Major Node.js runtime upgrade from v18 LTS to v22 LTS, improving performance, security, and long-term support through April 2027.
@@ -78,6 +87,7 @@ Major Node.js runtime upgrade from v18 LTS to v22 LTS, improving performance, se
 [View full changelog →](#changelog/versions/1.1.4)
 
 ### [v1.1.3](#changelog/versions/1.1.3) - 2025-10-23
+
 **Category**: Maintenance
 
 HexTrackr v1.1.3 removes two unused dependencies (Chart.js and Stagehand) that were creating technical debt and dependency conflicts. This cleanup eliminates ~300KB of unused packages, resolves peer dependency issues with dotenv, and removes misleading documentation that incorrectly referenced Chart.js instead of the actually-used ApexCharts library.

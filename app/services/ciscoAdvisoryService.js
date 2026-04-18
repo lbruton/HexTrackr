@@ -61,7 +61,6 @@ class CiscoAdvisoryService {
         // (cisco_advisories, cisco_fixed_versions created by init-database-v1.1.0.js)
     }
 
-
     /**
      * Fallback HTTPS client for environments without global fetch
      * @private
@@ -77,7 +76,7 @@ class CiscoAdvisoryService {
                     port: urlObj.port || 443,
                     path: urlObj.pathname + urlObj.search,
                     method: options.method || "GET",
-                    headers: options.headers || {}
+                    headers: options.headers || {},
                 };
 
                 if (options.body) {
@@ -97,7 +96,7 @@ class CiscoAdvisoryService {
                             status: response.statusCode,
                             statusText: response.statusMessage,
                             json: () => Promise.resolve(JSON.parse(data)),
-                            text: () => Promise.resolve(data)
+                            text: () => Promise.resolve(data),
                         });
                     });
                 });
@@ -130,9 +129,9 @@ class CiscoAdvisoryService {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded",
-                    "Authorization": "Basic " + Buffer.from(`${clientId}:${clientSecret}`).toString("base64")
+                    Authorization: "Basic " + Buffer.from(`${clientId}:${clientSecret}`).toString("base64"),
                 },
-                body: "grant_type=client_credentials"
+                body: "grant_type=client_credentials",
             });
 
             if (!tokenResponse.ok) {
@@ -194,7 +193,8 @@ class CiscoAdvisoryService {
      */
     async getDeviceCveVersionPairs(ttlDays = 30) {
         return await new Promise((resolve, reject) => {
-            this.db.all(`
+            this.db.all(
+                `
                 SELECT DISTINCT
                     vc.cve,
                     vc.operating_system
@@ -209,13 +209,16 @@ class CiscoAdvisoryService {
                       ca.cve_id IS NULL  -- Never synced
                       OR julianday('now') - julianday(ca.last_synced) > ?  -- Stale (>TTL days)
                   )
-            `, [ttlDays], (err, rows) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(rows);
-                }
-            });
+            `,
+                [ttlDays],
+                (err, rows) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(rows);
+                    }
+                },
+            );
         });
     }
 
@@ -230,7 +233,8 @@ class CiscoAdvisoryService {
      */
     async getUniqueDeviceVersions(ttlDays = 30) {
         return await new Promise((resolve, reject) => {
-            this.db.all(`
+            this.db.all(
+                `
                 SELECT DISTINCT
                     vc.operating_system
                 FROM vulnerabilities_current vc
@@ -239,13 +243,16 @@ class CiscoAdvisoryService {
                   AND vc.vendor LIKE '%Cisco%'
                   AND vc.operating_system IS NOT NULL
                   AND vc.lifecycle_state IN ('active', 'reopened')
-            `, [], (err, rows) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(rows.map(row => row.operating_system));
-                }
-            });
+            `,
+                [],
+                (err, rows) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(rows.map((row) => row.operating_system));
+                    }
+                },
+            );
         });
     }
 
@@ -258,20 +265,24 @@ class CiscoAdvisoryService {
      */
     async getAllCiscoCveIds() {
         return await new Promise((resolve, reject) => {
-            this.db.all(`
+            this.db.all(
+                `
                 SELECT DISTINCT cve
                 FROM vulnerabilities_current
                 WHERE cve IS NOT NULL
                   AND cve LIKE 'CVE-%'
                   AND vendor LIKE '%Cisco%'
                   AND lifecycle_state IN ('active', 'reopened')
-            `, [], (err, rows) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(new Set(rows.map(row => row.cve)));
-                }
-            });
+            `,
+                [],
+                (err, rows) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(new Set(rows.map((row) => row.cve)));
+                    }
+                },
+            );
         });
     }
 
@@ -286,7 +297,8 @@ class CiscoAdvisoryService {
      */
     async getAllCveIds(ttlDays = 30) {
         return await new Promise((resolve, reject) => {
-            this.db.all(`
+            this.db.all(
+                `
                 SELECT DISTINCT vc.cve
                 FROM vulnerabilities_current vc
                 LEFT JOIN cisco_advisories ca ON vc.cve = ca.cve_id
@@ -297,13 +309,16 @@ class CiscoAdvisoryService {
                       ca.cve_id IS NULL  -- Never synced
                       OR julianday('now') - julianday(ca.last_synced) > ?  -- Stale (>TTL days)
                   )
-            `, [ttlDays], (err, rows) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(rows.map(row => row.cve));
-                }
-            });
+            `,
+                [ttlDays],
+                (err, rows) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(rows.map((row) => row.cve));
+                    }
+                },
+            );
         });
     }
 
@@ -318,9 +333,9 @@ class CiscoAdvisoryService {
         try {
             const response = await this.fetch(`${this.ciscoPsirtBaseUrl}/cve/${cveId}.json`, {
                 headers: {
-                    "Authorization": `Bearer ${accessToken}`,
-                    "Accept": "application/json"
-                }
+                    Authorization: `Bearer ${accessToken}`,
+                    Accept: "application/json",
+                },
             });
 
             if (response.status === 404) {
@@ -364,9 +379,8 @@ class CiscoAdvisoryService {
         // For now, if Cisco has an advisory, we mark is_fix_available=1 and link to publicationUrl.
 
         // Extract product count for metadata
-        const productCount = (advisory.productNames && Array.isArray(advisory.productNames))
-            ? advisory.productNames.length
-            : 0;
+        const productCount =
+            advisory.productNames && Array.isArray(advisory.productNames) ? advisory.productNames.length : 0;
         _log("info", ` Affected products: ${productCount}`);
 
         return {
@@ -378,7 +392,7 @@ class CiscoAdvisoryService {
             first_fixed: JSON.stringify([]), // Empty - use csafUrl or publicationUrl for fix details
             affected_releases: JSON.stringify(advisory.iosRelease || []), // JSON array
             product_names: JSON.stringify(advisory.productNames || []), // Array of strings
-            publication_url: advisory.publicationUrl || advisory.csafUrl || null // Link to full advisory
+            publication_url: advisory.publicationUrl || advisory.csafUrl || null, // Link to full advisory
         };
     }
 
@@ -405,7 +419,7 @@ class CiscoAdvisoryService {
             { pattern: /Cisco NX-OS(?:\s+Software)?\s+([\d.()]+\S*)/i, osType: "nxos" },
             { pattern: /Cisco ASA(?:\s+Software)?\s+([\d.()]+\S*)/i, osType: "asa" },
             { pattern: /Cisco FTD(?:\s+Software)?\s+([\d.()]+\S*)/i, osType: "ftd" },
-            { pattern: /Cisco FXOS(?:\s+Software)?\s+([\d.()]+\S*)/i, osType: "fxos" }
+            { pattern: /Cisco FXOS(?:\s+Software)?\s+([\d.()]+\S*)/i, osType: "fxos" },
         ];
 
         for (const productName of productNames) {
@@ -414,7 +428,7 @@ class CiscoAdvisoryService {
                 if (match) {
                     return {
                         osType,
-                        version: match[1]
+                        version: match[1],
                     };
                 }
             }
@@ -449,7 +463,7 @@ class CiscoAdvisoryService {
             { pattern: /FTD\s+(?:SOFTWARE\s+)?([\d.()]+\S*)/i, osType: "ftd" },
             { pattern: /FXOS\s+(?:SOFTWARE\s+)?([\d.()]+\S*)/i, osType: "fxos" },
             // Generic IOS (must come after IOS XE/XR checks)
-            { pattern: /IOS\s+(?:SOFTWARE\s+)?([\d.()]+\S*)/i, osType: "ios" }
+            { pattern: /IOS\s+(?:SOFTWARE\s+)?([\d.()]+\S*)/i, osType: "ios" },
         ];
 
         for (const { pattern, osType } of patterns) {
@@ -457,7 +471,7 @@ class CiscoAdvisoryService {
             if (match) {
                 return {
                     osType,
-                    version: match[1]
+                    version: match[1],
                 };
             }
         }
@@ -482,9 +496,9 @@ class CiscoAdvisoryService {
             const response = await this.fetch(url, {
                 method: "GET",
                 headers: {
-                    "Accept": "application/json",
-                    "Authorization": `Bearer ${accessToken}`
-                }
+                    Accept: "application/json",
+                    Authorization: `Bearer ${accessToken}`,
+                },
             });
 
             if (!response.ok) {
@@ -500,7 +514,7 @@ class CiscoAdvisoryService {
 
                 for (const advisory of data.advisories) {
                     if (advisory.firstFixed && Array.isArray(advisory.firstFixed)) {
-                        advisory.firstFixed.forEach(version => {
+                        advisory.firstFixed.forEach((version) => {
                             if (version) {
                                 allFixedVersions.add(version);
                             }
@@ -509,7 +523,10 @@ class CiscoAdvisoryService {
                 }
 
                 const fixedArray = Array.from(allFixedVersions);
-                _log("info", ` Found ${fixedArray.length} fixed versions: ${fixedArray.slice(0, 3).join(", ")}${fixedArray.length > 3 ? "..." : ""}`);
+                _log(
+                    "info",
+                    ` Found ${fixedArray.length} fixed versions: ${fixedArray.slice(0, 3).join(", ")}${fixedArray.length > 3 ? "..." : ""}`,
+                );
                 return fixedArray;
             }
 
@@ -578,10 +595,10 @@ class CiscoAdvisoryService {
                     `${this.ciscoPsirtBaseUrl}/OSType/${osInfo.osType}?version=${encodeURIComponent(osInfo.version)}`,
                     {
                         headers: {
-                            "Accept": "application/json",
-                            "Authorization": `Bearer ${accessToken}`
-                        }
-                    }
+                            Accept: "application/json",
+                            Authorization: `Bearer ${accessToken}`,
+                        },
+                    },
                 );
 
                 if (!response.ok) {
@@ -619,7 +636,7 @@ class CiscoAdvisoryService {
                             first_fixed: JSON.stringify(advisory.firstFixed || []),
                             affected_releases: JSON.stringify(advisory.iosRelease || []),
                             product_names: JSON.stringify(advisory.productNames || []),
-                            publication_url: advisory.publicationUrl || advisory.csafUrl || null
+                            publication_url: advisory.publicationUrl || advisory.csafUrl || null,
                         };
 
                         if (parsed) {
@@ -627,7 +644,8 @@ class CiscoAdvisoryService {
 
                             // 1. Insert/update advisory metadata (one row per CVE)
                             await new Promise((resolve, reject) => {
-                                this.db.run(`
+                                this.db.run(
+                                    `
                                     INSERT INTO cisco_advisories (
                                         cve_id, advisory_id, advisory_title, severity, cvss_score,
                                         first_fixed, affected_releases, product_names, publication_url, last_synced
@@ -639,62 +657,77 @@ class CiscoAdvisoryService {
                                         cvss_score = COALESCE(excluded.cvss_score, cisco_advisories.cvss_score),
                                         publication_url = COALESCE(excluded.publication_url, cisco_advisories.publication_url),
                                         last_synced = CURRENT_TIMESTAMP
-                                `, [
-                                    parsed.cve_id,
-                                    parsed.advisory_id,
-                                    parsed.advisory_title,
-                                    parsed.severity,
-                                    parsed.cvss_score,
-                                    parsed.first_fixed,  // Keep for backward compatibility (will remove in Migration 008)
-                                    parsed.affected_releases,
-                                    parsed.product_names,
-                                    parsed.publication_url
-                                ], (err) => {
-                                    if (err) {
-                                        _log("error", ` Advisory insert failed for ${cveId}:`, err);
-                                        reject(err);
-                                    } else {
-                                        resolve();
-                                    }
-                                });
+                                `,
+                                    [
+                                        parsed.cve_id,
+                                        parsed.advisory_id,
+                                        parsed.advisory_title,
+                                        parsed.severity,
+                                        parsed.cvss_score,
+                                        parsed.first_fixed, // Keep for backward compatibility (will remove in Migration 008)
+                                        parsed.affected_releases,
+                                        parsed.product_names,
+                                        parsed.publication_url,
+                                    ],
+                                    (err) => {
+                                        if (err) {
+                                            _log("error", ` Advisory insert failed for ${cveId}:`, err);
+                                            reject(err);
+                                        } else {
+                                            resolve();
+                                        }
+                                    },
+                                );
                             });
 
                             // 2. Insert fixed versions (one row per OS family + version)
                             const fixedVersionsArray = advisory.firstFixed || [];
                             for (const version of fixedVersionsArray) {
                                 await new Promise((resolve, reject) => {
-                                    this.db.run(`
+                                    this.db.run(
+                                        `
                                         INSERT INTO cisco_fixed_versions (
                                             cve_id, os_family, fixed_version, affected_version, last_synced
                                         ) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
                                         ON CONFLICT(cve_id, os_family, fixed_version) DO UPDATE SET
                                             last_synced = CURRENT_TIMESTAMP
-                                    `, [cveId, osInfo.osType, version, osInfo.version], (err) => {
-                                        if (err) {
-                                            _log("error", ` Fixed version insert failed for ${cveId} ${osInfo.osType} ${version}:`, err);
-                                            reject(err);
-                                        } else {
-                                            resolve();
-                                        }
-                                    });
+                                    `,
+                                        [cveId, osInfo.osType, version, osInfo.version],
+                                        (err) => {
+                                            if (err) {
+                                                _log(
+                                                    "error",
+                                                    ` Fixed version insert failed for ${cveId} ${osInfo.osType} ${version}:`,
+                                                    err,
+                                                );
+                                                reject(err);
+                                            } else {
+                                                resolve();
+                                            }
+                                        },
+                                    );
                                 });
                             }
 
                             // 3. Update vulnerabilities_current with vendor-neutral fix flag
                             const hasFixAvailable = fixedVersionsArray.length > 0 ? 1 : 0;
                             await new Promise((resolve, reject) => {
-                                this.db.run(`
+                                this.db.run(
+                                    `
                                     UPDATE vulnerabilities_current
                                     SET is_fix_available = ?
                                     WHERE cve = ?
-                                `, [hasFixAvailable, cveId], (err) => {
-                                    if (err) {
-                                        _log("error", ` Update failed for ${cveId}:`, err);
-                                        reject(err);
-                                    } else {
-                                        resolve();
-                                    }
-                                });
+                                `,
+                                    [hasFixAvailable, cveId],
+                                    (err) => {
+                                        if (err) {
+                                            _log("error", ` Update failed for ${cveId}:`, err);
+                                            reject(err);
+                                        } else {
+                                            resolve();
+                                        }
+                                    },
+                                );
                             });
 
                             advisoryCount++;
@@ -704,14 +737,20 @@ class CiscoAdvisoryService {
                     }
                 }
 
-                _log("info", ` Processed ${cvesProcessedFromThisVersion} CVEs from this version (total matched: ${matchedCount})`);
+                _log(
+                    "info",
+                    ` Processed ${cvesProcessedFromThisVersion} CVEs from this version (total matched: ${matchedCount})`,
+                );
 
                 // Rate limiting: wait between each query to honor Cisco API limits
                 if (i < uniqueVersions.length - 1) {
                     const remainingVersions = uniqueVersions.length - i - 1;
                     const estimatedMinutesRemaining = Math.ceil((remainingVersions * delayBetweenVersions) / 60000);
-                    _log("info", ` Rate limiting: waiting 10 seconds before next version query (${remainingVersions} versions remaining, ~${estimatedMinutesRemaining} min)`);
-                    await new Promise(resolve => setTimeout(resolve, delayBetweenVersions));
+                    _log(
+                        "info",
+                        ` Rate limiting: waiting 10 seconds before next version query (${remainingVersions} versions remaining, ~${estimatedMinutesRemaining} min)`,
+                    );
+                    await new Promise((resolve) => setTimeout(resolve, delayBetweenVersions));
                 }
             }
 
@@ -722,12 +761,18 @@ class CiscoAdvisoryService {
             // Get ACTUAL database count (not the counter - same CVE may be processed multiple times)
             const actualDbCount = await new Promise((resolve, reject) => {
                 this.db.get("SELECT COUNT(*) as count FROM cisco_advisories", (err, row) => {
-                    if (err) {reject(err);}
-                    else {resolve(row?.count || 0);}
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(row?.count || 0);
+                    }
                 });
             });
 
-            _log("info", ` Cisco advisory sync completed: ${queriesExecuted} versions queried, ${advisoryCount} advisories processed (${actualDbCount} unique CVEs in DB), ${matchedCount} CVEs matched`);
+            _log(
+                "info",
+                ` Cisco advisory sync completed: ${queriesExecuted} versions queried, ${advisoryCount} advisories processed (${actualDbCount} unique CVEs in DB), ${matchedCount} CVEs matched`,
+            );
 
             // HEX-272: Force WAL checkpoint to flush all changes to disk
             // This ensures data survives Docker restarts immediately after sync
@@ -749,14 +794,13 @@ class CiscoAdvisoryService {
 
             return {
                 success: true,
-                totalAdvisories: actualDbCount,  // Return actual DB count, not counter
+                totalAdvisories: actualDbCount, // Return actual DB count, not counter
                 matchedCount: matchedCount,
                 totalCvesChecked: allCiscoCveIds.size,
                 versionsQueried: queriesExecuted,
-                advisoriesProcessed: advisoryCount,  // Keep counter for metrics
-                lastSync: this.lastSyncTime
+                advisoriesProcessed: advisoryCount, // Keep counter for metrics
+                lastSync: this.lastSyncTime,
             };
-
         } catch (error) {
             _log("error", "Cisco advisory sync failed:", error);
             this.syncInProgress = false;
@@ -827,16 +871,19 @@ class CiscoAdvisoryService {
      */
     async getMatchedVulnerabilitiesCount() {
         const result = await new Promise((resolve, reject) => {
-            this.db.get(`
+            this.db.get(
+                `
                 SELECT COUNT(DISTINCT cve_id) as count
                 FROM cisco_fixed_versions
-            `, (err, row) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(row);
-                }
-            });
+            `,
+                (err, row) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(row);
+                    }
+                },
+            );
         });
 
         return result?.count || 0;
@@ -864,44 +911,53 @@ class CiscoAdvisoryService {
 
         // Get total Cisco CVEs count from vulnerabilities table
         const totalCiscoCvesResult = await new Promise((resolve, reject) => {
-            this.db.get(`
+            this.db.get(
+                `
                 SELECT COUNT(DISTINCT cve) as count
                 FROM vulnerabilities_current
                 WHERE vendor LIKE '%Cisco%'
                   AND lifecycle_state IN ('active', 'reopened')
-            `, (err, row) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(row);
-                }
-            });
+            `,
+                (err, row) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(row);
+                    }
+                },
+            );
         });
 
         // Get count of synced advisories with no fixes available yet
         const noFixAvailableResult = await new Promise((resolve, reject) => {
-            this.db.get(`
+            this.db.get(
+                `
                 SELECT COUNT(*) as count
                 FROM cisco_advisories
                 WHERE (first_fixed IS NULL OR first_fixed = '[]')
-            `, (err, row) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(row);
-                }
-            });
+            `,
+                (err, row) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(row);
+                    }
+                },
+            );
         });
 
         // Get sync metadata
         const metadata = await new Promise((resolve, reject) => {
-            this.db.get("SELECT * FROM sync_metadata WHERE sync_type = 'cisco' ORDER BY sync_time DESC LIMIT 1", (err, row) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(row);
-                }
-            });
+            this.db.get(
+                "SELECT * FROM sync_metadata WHERE sync_type = 'cisco' ORDER BY sync_time DESC LIMIT 1",
+                (err, row) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(row);
+                    }
+                },
+            );
         });
 
         const totalCiscoCves = totalCiscoCvesResult?.count || 0;
@@ -918,7 +974,7 @@ class CiscoAdvisoryService {
             lastSync: metadata?.sync_time || null,
             nextSync: metadata?.next_sync_time || null,
             recordCount: metadata?.record_count || 0,
-            syncInProgress: this.syncInProgress
+            syncInProgress: this.syncInProgress,
         };
     }
 
@@ -930,23 +986,27 @@ class CiscoAdvisoryService {
      */
     async updateSyncMetadata(recordCount) {
         // Calculate next sync time (24 hours from now)
-        const nextSyncTime = new Date(Date.now() + (24 * 60 * 60 * 1000)).toISOString();
+        const nextSyncTime = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
         _log("info", ` Updating sync metadata: ${this.lastSyncTime}, next: ${nextSyncTime}, ${recordCount} records`);
         try {
             await new Promise((resolve, reject) => {
-                this.db.run(`
+                this.db.run(
+                    `
                     INSERT INTO sync_metadata (sync_type, sync_time, next_sync_time, version, record_count)
                     VALUES ('cisco', ?, ?, NULL, ?)
-                `, [this.lastSyncTime, nextSyncTime, recordCount], (err) => {
-                    if (err) {
-                        _log("error", " Sync metadata update FAILED:", err);
-                        reject(err);
-                    } else {
-                        _log("info", " Sync metadata updated successfully");
-                        resolve();
-                    }
-                });
+                `,
+                    [this.lastSyncTime, nextSyncTime, recordCount],
+                    (err) => {
+                        if (err) {
+                            _log("error", " Sync metadata update FAILED:", err);
+                            reject(err);
+                        } else {
+                            _log("info", " Sync metadata updated successfully");
+                            resolve();
+                        }
+                    },
+                );
             });
         } catch (error) {
             _log("error", " Exception in updateSyncMetadata:", error);
@@ -962,13 +1022,16 @@ class CiscoAdvisoryService {
      */
     async isAutoSyncNeeded(hoursThreshold = 24) {
         const metadata = await new Promise((resolve, reject) => {
-            this.db.get("SELECT sync_time FROM sync_metadata WHERE sync_type = 'cisco' ORDER BY sync_time DESC LIMIT 1", (err, row) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(row);
-                }
-            });
+            this.db.get(
+                "SELECT sync_time FROM sync_metadata WHERE sync_type = 'cisco' ORDER BY sync_time DESC LIMIT 1",
+                (err, row) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(row);
+                    }
+                },
+            );
         });
 
         if (!metadata?.sync_time) {

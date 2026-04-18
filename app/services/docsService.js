@@ -37,11 +37,14 @@ class DocsService {
             return {
                 apiEndpoints,
                 jsFunctions,
-                frameworks: frameworks.length
+                frameworks: frameworks.length,
             };
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "docs", "DocsService.computeStats failed", { error: error.message, stack: error.stack });
+                global.logger.error("backend", "docs", "DocsService.computeStats failed", {
+                    error: error.message,
+                    stack: error.stack,
+                });
             } else {
                 console.error("DocsService.computeStats failed:", error);
             }
@@ -71,7 +74,10 @@ class DocsService {
             return [...new Set(matches)].length; // dedupe
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "docs", "Failed to compute API endpoints", { error: error.message, filePath: this.serverFilePath });
+                global.logger.error("backend", "docs", "Failed to compute API endpoints", {
+                    error: error.message,
+                    filePath: this.serverFilePath,
+                });
             } else {
                 console.error("Failed to compute API endpoints:", error);
             }
@@ -96,14 +102,14 @@ class DocsService {
         try {
             const jsTargets = [
                 path.join(__dirname, "../public/scripts"),
-                path.join(__dirname, "../public/docs-html/js")
+                path.join(__dirname, "../public/docs-html/js"),
             ];
 
             let jsFunctions = 0;
             const fnRegexes = [
-                /function\s+\w+/g,           // function declarations
-                /const\s+\w+\s*=\s*\(/g,     // const arrow functions
-                /\w+\s*:\s*function/g        // object method functions
+                /function\s+\w+/g, // function declarations
+                /const\s+\w+\s*=\s*\(/g, // const arrow functions
+                /\w+\s*:\s*function/g, // object method functions
             ];
 
             const filesToScan = [this.serverFilePath]; // always include server.js
