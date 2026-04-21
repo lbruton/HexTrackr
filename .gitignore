@@ -94,7 +94,16 @@ Thumbs.db
 # ============================================
 
 # Claude Code (session-specific config, agents, commands)
-.claude/
+# Root-level CLAUDE.md / AGENTS.md / GEMINI.md ARE tracked — they describe the project.
+# Only the tool-specific config dirs stay local.
+.claude/*
+!.claude/project.json
+
+# Other AI tool config dirs (local only)
+.gemini/
+.codex/
+.kimi/
+.opencode/
 
 # Cursor IDE rules
 .cursor/
@@ -114,9 +123,6 @@ broken_opencode.json
 
 # Claude session rewind logs
 .rewindlog_*
-
-# Claude agent description (local dev reference)
-AGENTS.md
 
 # Codacy AI rules (already handled by .codacy/.gitignore)
 .github/instructions/codacy.instructions.md
