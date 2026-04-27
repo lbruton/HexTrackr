@@ -1,0 +1,8 @@
+{
+  "project": "HexTrackr",
+  "docvault": "../DocVault",
+  "issue_prefix": "HXTR",
+  "issue_backend": "plane",
+  "plane_workspace": "lbruton",
+  "plane_project_id": "105dd863-e217-40a1-bc23-8c4fb0f39279"
+}
