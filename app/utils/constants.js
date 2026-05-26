@@ -11,9 +11,11 @@ const PORT = process.env.PORT || 8080;
 const WEBSOCKET_PORT = 8988; // Planned WebSocket port
 
 // CORS Origins - Dynamic HTTPS-only configuration
-const CORS_ORIGINS = function(origin, callback) {
+const CORS_ORIGINS = function (origin, callback) {
     // Allow same-origin requests (no origin header)
-    if (!origin) {return callback(null, true);}
+    if (!origin) {
+        return callback(null, true);
+    }
 
     // Allow any HTTPS connection
     if (origin.startsWith("https://")) {
@@ -55,8 +57,8 @@ const EXPRESS_URLENCODED_LIMIT = "100mb";
 // With cache-aware rate limiting, cache HITs don't count toward limit
 // Reduced from 100 to 60 (40% reduction) since cached responses are now excluded
 const IS_PRODUCTION = process.env.NODE_ENV === "production";
-const RATE_LIMIT_WINDOW_MS = IS_PRODUCTION ? 15 * 60 * 1000 : 1 * 60 * 1000; // 15 min (prod) / 1 min (dev)
-const RATE_LIMIT_MAX_REQUESTS = IS_PRODUCTION ? 60 : 10000; // 60 (prod) / 10000 (dev) - cache HITs excluded
+const RATE_LIMIT_WINDOW_MS = IS_PRODUCTION ? 1 * 60 * 1000 : 1 * 60 * 1000; // 1 min (prod) / 1 min (dev)
+const RATE_LIMIT_MAX_REQUESTS = IS_PRODUCTION ? 1000 : 10000; // 1000 (prod) / 10000 (dev) - cache HITs excluded
 const RATE_LIMIT_MESSAGE = "Too many requests from this IP, please try again later.";
 
 // ================================
@@ -66,7 +68,7 @@ const RATE_LIMIT_MESSAGE = "Too many requests from this IP, please try again lat
 const SECURITY_HEADERS = {
     X_CONTENT_TYPE_OPTIONS: "nosniff",
     X_FRAME_OPTIONS: "DENY",
-    X_XSS_PROTECTION: "1; mode=block"
+    X_XSS_PROTECTION: "1; mode=block",
 };
 
 // ================================
@@ -138,7 +140,7 @@ const API_ENDPOINTS = {
     // Utility endpoints
     SITES: "/api/sites",
     LOCATIONS: "/api/locations",
-    RESTORE: "/api/restore"
+    RESTORE: "/api/restore",
 };
 
 // ================================
@@ -149,7 +151,7 @@ const DATABASE_LIMITS = {
     RECENT_TRENDS_LIMIT: 2,
     BACKUP_QUERY_LIMIT: 100,
     VULNERABILITY_EXPORT_LIMIT: 10000,
-    TICKET_EXPORT_LIMIT: 10000
+    TICKET_EXPORT_LIMIT: 10000,
 };
 
 // ================================
@@ -161,7 +163,7 @@ const TIME_INTERVALS = {
     THIRTY_MINUTES: 30 * 60 * 1000,
     ONE_HOUR: 60 * 60 * 1000,
     ONE_SECOND: 1000,
-    TEN_SECONDS: 10000
+    TEN_SECONDS: 10000,
 };
 
 // ================================
@@ -172,7 +174,7 @@ const FILE_PROCESSING = {
     CSV_IMPORT_OPERATION: "csv-import",
     WEB_UPLOAD_FILENAME: "web-upload.csv",
     WEB_IMPORT_SOURCE: "web-import",
-    PERCENTAGE_PRECISION: 100 // For Math.round calculations (e.g., VPR * 100 / 100)
+    PERCENTAGE_PRECISION: 100, // For Math.round calculations (e.g., VPR * 100 / 100)
 };
 
 // ================================
@@ -183,7 +185,7 @@ const DOCUMENTATION_SECTIONS = [
     "architecture/index",
     "architecture/backend",
     "architecture/database",
-    "architecture/deployment"
+    "architecture/deployment",
 ];
 
 // Export all constants
@@ -246,5 +248,5 @@ module.exports = {
     FILE_PROCESSING,
 
     // Documentation
-    DOCUMENTATION_SECTIONS
+    DOCUMENTATION_SECTIONS,
 };

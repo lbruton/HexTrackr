@@ -25,10 +25,10 @@ function createKevRouter(db) {
         max: 3, // Max 3 sync requests per 5 minutes per IP
         message: {
             error: "Too many sync requests",
-            message: "Please wait before requesting another sync"
+            message: "Please wait before requesting another sync",
         },
         standardHeaders: true,
-        legacyHeaders: false
+        legacyHeaders: false,
     });
 
     // API Routes

@@ -44,7 +44,6 @@ class KevService {
         // (kev_status, sync_metadata created by init-database-v1.1.0.js)
     }
 
-
     /**
      * Fallback HTTPS client for environments without global fetch
      * @private
@@ -66,7 +65,7 @@ class KevService {
                             ok: response.statusCode >= 200 && response.statusCode < 300,
                             status: response.statusCode,
                             statusText: response.statusMessage,
-                            json: () => Promise.resolve(JSON.parse(data))
+                            json: () => Promise.resolve(JSON.parse(data)),
                         });
                     });
                 });
@@ -103,8 +102,11 @@ class KevService {
             // Use promise-based database operations
             await new Promise((resolve, reject) => {
                 this.db.run("BEGIN TRANSACTION", (err) => {
-                    if (err) {reject(err);}
-                    else {resolve();}
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve();
+                    }
                 });
             });
 
@@ -112,23 +114,32 @@ class KevService {
                 // Simple refresh strategy: truncate and reload
                 await new Promise((resolve, reject) => {
                     this.db.run("DELETE FROM kev_status", (err) => {
-                        if (err) {reject(err);}
-                        else {resolve();}
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve();
+                        }
                     });
                 });
                 _log("info", "Cleared existing KEV data");
 
                 // Prepare insert statement
                 const insertStmt = await new Promise((resolve, reject) => {
-                    const stmt = this.db.prepare(`
+                    const stmt = this.db.prepare(
+                        `
                         INSERT INTO kev_status (
                             cve_id, date_added, vulnerability_name, vendor_project,
                             product, required_action, due_date, known_ransomware_use, notes
                         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    `, (err) => {
-                        if (err) {reject(err);}
-                        else {resolve(stmt);}
-                    });
+                    `,
+                        (err) => {
+                            if (err) {
+                                reject(err);
+                            } else {
+                                resolve(stmt);
+                            }
+                        },
+                    );
                 });
 
                 // Bulk insert KEV data
@@ -152,7 +163,7 @@ class KevService {
                                 } else {
                                     resolve();
                                 }
-                            }
+                            },
                         );
                     });
                     insertCount++;
@@ -160,15 +171,21 @@ class KevService {
 
                 await new Promise((resolve, reject) => {
                     insertStmt.finalize((err) => {
-                        if (err) {reject(err);}
-                        else {resolve();}
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve();
+                        }
                     });
                 });
 
                 await new Promise((resolve, reject) => {
                     this.db.run("COMMIT", (err) => {
-                        if (err) {reject(err);}
-                        else {resolve();}
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve();
+                        }
                     });
                 });
 
@@ -186,19 +203,20 @@ class KevService {
                     totalKevs: insertCount,
                     matchedCount: matchedCount,
                     lastSync: this.lastSyncTime,
-                    catalogVersion: kevData.catalogVersion
+                    catalogVersion: kevData.catalogVersion,
                 };
-
             } catch (dbError) {
                 await new Promise((resolve, reject) => {
                     this.db.run("ROLLBACK", (err) => {
-                        if (err) {reject(err);}
-                        else {resolve();}
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve();
+                        }
                     });
                 });
                 throw dbError;
             }
-
         } catch (error) {
             _log("error", "KEV sync failed:", error);
             throw error;
@@ -214,12 +232,17 @@ class KevService {
      * @returns {Promise<boolean>} True if CVE is in KEV catalog
      */
     async isKevVulnerability(cveId) {
-        if (!cveId) {return false;}
+        if (!cveId) {
+            return false;
+        }
 
         const result = await new Promise((resolve, reject) => {
             this.db.get("SELECT 1 FROM kev_status WHERE cve_id = ?", [cveId], (err, row) => {
-                if (err) {reject(err);}
-                else {resolve(row);}
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row);
+                }
             });
         });
 
@@ -233,12 +256,17 @@ class KevService {
      * @returns {Promise<Object|null>} KEV metadata or null if not found
      */
     async getKevMetadata(cveId) {
-        if (!cveId) {return null;}
+        if (!cveId) {
+            return null;
+        }
 
         return await new Promise((resolve, reject) => {
             this.db.get("SELECT * FROM kev_status WHERE cve_id = ?", [cveId], (err, row) => {
-                if (err) {reject(err);}
-                else {resolve(row);}
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row);
+                }
             });
         });
     }
@@ -251,8 +279,11 @@ class KevService {
     async getAllKevs() {
         return await new Promise((resolve, reject) => {
             this.db.all("SELECT * FROM kev_status ORDER BY date_added DESC", (err, rows) => {
-                if (err) {reject(err);}
-                else {resolve(rows);}
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(rows);
+                }
             });
         });
     }
@@ -264,15 +295,21 @@ class KevService {
      */
     async getMatchedVulnerabilitiesCount() {
         const result = await new Promise((resolve, reject) => {
-            this.db.get(`
+            this.db.get(
+                `
                 SELECT COUNT(DISTINCT v.cve) as count
                 FROM vulnerabilities_current v
                 INNER JOIN kev_status k ON v.cve = k.cve_id
                 WHERE v.state IN ('ACTIVE', 'NEW', 'RESURFACED')
-            `, (err, row) => {
-                if (err) {reject(err);}
-                else {resolve(row);}
-            });
+            `,
+                (err, row) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(row);
+                    }
+                },
+            );
         });
 
         return result?.count || 0;
@@ -286,7 +323,8 @@ class KevService {
      */
     async getMatchedVulnerabilities(limit = 100) {
         return await new Promise((resolve, reject) => {
-            this.db.all(`
+            this.db.all(
+                `
                 SELECT
                     v.*,
                     k.date_added as kev_date_added,
@@ -301,10 +339,16 @@ class KevService {
                 WHERE v.state IN ('ACTIVE', 'NEW', 'RESURFACED')
                 ORDER BY k.due_date ASC, v.cvss_score DESC
                 LIMIT ?
-            `, [limit], (err, rows) => {
-                if (err) {reject(err);}
-                else {resolve(rows);}
-            });
+            `,
+                [limit],
+                (err, rows) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(rows);
+                    }
+                },
+            );
         });
     }
 
@@ -317,8 +361,11 @@ class KevService {
         // Get total KEV count
         const kevCountResult = await new Promise((resolve, reject) => {
             this.db.get("SELECT COUNT(*) as count FROM kev_status", (err, row) => {
-                if (err) {reject(err);}
-                else {resolve(row);}
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(row);
+                }
             });
         });
 
@@ -327,10 +374,16 @@ class KevService {
 
         // Get sync metadata
         const metadata = await new Promise((resolve, reject) => {
-            this.db.get("SELECT * FROM sync_metadata WHERE sync_type = 'kev' ORDER BY sync_time DESC LIMIT 1", (err, row) => {
-                if (err) {reject(err);}
-                else {resolve(row);}
-            });
+            this.db.get(
+                "SELECT * FROM sync_metadata WHERE sync_type = 'kev' ORDER BY sync_time DESC LIMIT 1",
+                (err, row) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(row);
+                    }
+                },
+            );
         });
 
         return {
@@ -339,7 +392,7 @@ class KevService {
             lastSync: metadata?.sync_time || null,
             nextSync: metadata?.next_sync_time || null,
             catalogVersion: metadata?.version || null,
-            syncInProgress: this.syncInProgress
+            syncInProgress: this.syncInProgress,
         };
     }
 
@@ -352,16 +405,23 @@ class KevService {
      */
     async updateSyncMetadata(version, recordCount) {
         // Calculate next sync time (24 hours from now)
-        const nextSyncTime = new Date(Date.now() + (24 * 60 * 60 * 1000)).toISOString();
+        const nextSyncTime = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
         await new Promise((resolve, reject) => {
-            this.db.run(`
+            this.db.run(
+                `
                 INSERT INTO sync_metadata (sync_type, sync_time, next_sync_time, version, record_count)
                 VALUES ('kev', ?, ?, ?, ?)
-            `, [this.lastSyncTime, nextSyncTime, version, recordCount], (err) => {
-                if (err) {reject(err);}
-                else {resolve();}
-            });
+            `,
+                [this.lastSyncTime, nextSyncTime, version, recordCount],
+                (err) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve();
+                    }
+                },
+            );
         });
     }
 
@@ -373,10 +433,16 @@ class KevService {
      */
     async isAutoSyncNeeded(hoursThreshold = 24) {
         const metadata = await new Promise((resolve, reject) => {
-            this.db.get("SELECT sync_time FROM sync_metadata WHERE sync_type = 'kev' ORDER BY sync_time DESC LIMIT 1", (err, row) => {
-                if (err) {reject(err);}
-                else {resolve(row);}
-            });
+            this.db.get(
+                "SELECT sync_time FROM sync_metadata WHERE sync_type = 'kev' ORDER BY sync_time DESC LIMIT 1",
+                (err, row) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(row);
+                    }
+                },
+            );
         });
 
         if (!metadata?.sync_time) {
@@ -396,7 +462,8 @@ class KevService {
      */
     async getDashboardStats() {
         const stats = await new Promise((resolve, reject) => {
-            this.db.get(`
+            this.db.get(
+                `
                 SELECT
                     (SELECT COUNT(*) FROM kev_status) as total_kevs,
                     (SELECT COUNT(*) FROM kev_status WHERE known_ransomware_use = 1) as ransomware_kevs,
@@ -408,18 +475,25 @@ class KevService {
                      FROM vulnerabilities_current v
                      INNER JOIN kev_status k ON v.cve = k.cve_id
                      WHERE v.state IN ('ACTIVE', 'NEW', 'RESURFACED') AND k.due_date < date('now')) as overdue_kevs
-            `, (err, row) => {
-                if (err) {reject(err);}
-                else {resolve(row);}
-            });
+            `,
+                (err, row) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(row);
+                    }
+                },
+            );
         });
 
-        return stats || {
-            total_kevs: 0,
-            ransomware_kevs: 0,
-            matched_kevs: 0,
-            overdue_kevs: 0
-        };
+        return (
+            stats || {
+                total_kevs: 0,
+                ransomware_kevs: 0,
+                matched_kevs: 0,
+                overdue_kevs: 0,
+            }
+        );
     }
 }
 

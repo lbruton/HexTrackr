@@ -43,7 +43,9 @@ class PaloAdvisoryHelper {
      * @returns {string} Normalized version string
      */
     normalizeVersion(versionString) {
-        if (!versionString) {return "Unknown";}
+        if (!versionString) {
+            return "Unknown";
+        }
 
         // Azure marketplace format: 11.1.203 → 11.1.2-h3
         // Pattern: major.minor.patchHotfix (where last 2 digits are hotfix number)
@@ -73,12 +75,14 @@ class PaloAdvisoryHelper {
         // Extract version components: major.minor.patch-hHotfix
         const parseVersion = (ver) => {
             const match = ver.match(/^(\d+)\.(\d+)\.(\d+)(?:-h(\d+))?/);
-            if (!match) {return { major: 0, minor: 0, patch: 0, hotfix: 0 };}
+            if (!match) {
+                return { major: 0, minor: 0, patch: 0, hotfix: 0 };
+            }
             return {
                 major: parseInt(match[1], 10),
                 minor: parseInt(match[2], 10),
                 patch: parseInt(match[3], 10),
-                hotfix: match[4] ? parseInt(match[4], 10) : 0
+                hotfix: match[4] ? parseInt(match[4], 10) : 0,
             };
         };
 
@@ -86,9 +90,15 @@ class PaloAdvisoryHelper {
         const vB = parseVersion(b);
 
         // Compare major, minor, patch, hotfix in order
-        if (vA.major !== vB.major) {return vB.major - vA.major;}
-        if (vA.minor !== vB.minor) {return vB.minor - vA.minor;}
-        if (vA.patch !== vB.patch) {return vB.patch - vA.patch;}
+        if (vA.major !== vB.major) {
+            return vB.major - vA.major;
+        }
+        if (vA.minor !== vB.minor) {
+            return vB.minor - vA.minor;
+        }
+        if (vA.patch !== vB.patch) {
+            return vB.patch - vA.patch;
+        }
         return vB.hotfix - vA.hotfix;
     }
 
@@ -125,9 +135,11 @@ class PaloAdvisoryHelper {
         const installedKey = `${installedMajor}.${installedMinor}`;
 
         // Filter fixed versions matching the same major.minor family
-        const matchingVersions = fixedVersionsArray.filter(v => {
+        const matchingVersions = fixedVersionsArray.filter((v) => {
             const fixedMatch = v.match(/^(\d+)\.(\d+)/);
-            if (!fixedMatch) {return false;}
+            if (!fixedMatch) {
+                return false;
+            }
             const [, fixedMajor, fixedMinor] = fixedMatch;
             return `${fixedMajor}.${fixedMinor}` === installedKey;
         });
@@ -138,7 +150,10 @@ class PaloAdvisoryHelper {
         }
 
         // No match found for this major.minor family
-        logger.warn("ui", `No ${installedKey}.x fix found for ${installedVersion}. Available: ${fixedVersionsArray.join(", ")}`);
+        logger.warn(
+            "ui",
+            `No ${installedKey}.x fix found for ${installedVersion}. Available: ${fixedVersionsArray.join(", ")}`,
+        );
         return null;
     }
 
@@ -164,7 +179,7 @@ class PaloAdvisoryHelper {
 
         // Check cache first (5-minute TTL)
         const cached = this.advisoryCache.get(cveId);
-        if (cached && (Date.now() - cached.timestamp) < this.cacheTTL) {
+        if (cached && Date.now() - cached.timestamp < this.cacheTTL) {
             // Apply version matching if installed version provided
             if (installedVersion && cached.fixedVersionsArray && cached.fixedVersionsArray.length > 0) {
                 return this.matchFixedVersion(installedVersion, cached.fixedVersionsArray);
@@ -185,7 +200,7 @@ class PaloAdvisoryHelper {
                 // Cache empty result to prevent repeated failures
                 this.advisoryCache.set(cveId, {
                     fixedVersionsArray: [],
-                    timestamp: Date.now()
+                    timestamp: Date.now(),
                 });
                 return null;
             }
@@ -196,7 +211,7 @@ class PaloAdvisoryHelper {
             if (!advisory) {
                 this.advisoryCache.set(cveId, {
                     fixedVersionsArray: [],
-                    timestamp: Date.now()
+                    timestamp: Date.now(),
                 });
                 return null;
             }
@@ -215,7 +230,7 @@ class PaloAdvisoryHelper {
             // We'll apply version matching at lookup time based on installed version
             this.advisoryCache.set(cveId, {
                 fixedVersionsArray: firstFixed,
-                timestamp: Date.now()
+                timestamp: Date.now(),
             });
 
             // Apply version matching if installed version provided
@@ -228,14 +243,13 @@ class PaloAdvisoryHelper {
             }
 
             return fixedVersion;
-
         } catch (error) {
             logger.warn("ui", `Failed to fetch advisory for ${cveId}:`, error.message);
 
             // Cache empty result to prevent repeated failures
             this.advisoryCache.set(cveId, {
                 fixedVersionsArray: [],
-                timestamp: Date.now()
+                timestamp: Date.now(),
             });
 
             return null;
@@ -259,7 +273,7 @@ class PaloAdvisoryHelper {
         }
 
         // Get unique CVEs for this device
-        const cves = [...new Set(device.vulnerabilities.map(v => v.cve))];
+        const cves = [...new Set(device.vulnerabilities.map((v) => v.cve))];
 
         if (cves.length === 0) {
             return null;
@@ -268,11 +282,11 @@ class PaloAdvisoryHelper {
         // Fetch advisories for all CVEs in parallel
         // Pass device.operating_system for version matching
         const advisories = await Promise.all(
-            cves.map(cve => this.getFixedVersion(cve, device.vendor, device.operating_system))
+            cves.map((cve) => this.getFixedVersion(cve, device.vendor, device.operating_system)),
         );
 
         // Filter out nulls and deduplicate
-        const validVersions = [...new Set(advisories.filter(v => v !== null))];
+        const validVersions = [...new Set(advisories.filter((v) => v !== null))];
 
         if (validVersions.length === 0) {
             return null;
@@ -305,7 +319,7 @@ class PaloAdvisoryHelper {
     getCacheStats() {
         return {
             size: this.advisoryCache.size,
-            entries: Array.from(this.advisoryCache.keys())
+            entries: Array.from(this.advisoryCache.keys()),
         };
     }
 }

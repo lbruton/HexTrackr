@@ -23,11 +23,11 @@
  * Uses CSS variables for background to support dark mode
  */
 body {
-  background: var(--hextrackr-bg-primary);
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    background: var(--hextrackr-bg-primary);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* ===========================
@@ -39,8 +39,8 @@ body {
  * Max-width ensures readability on large screens
  */
 .login-card {
-  max-width: 440px;
-  width: 100%;
+    max-width: 440px;
+    width: 100%;
 }
 
 /* ===========================
@@ -52,8 +52,8 @@ body {
  * Uses CSS variable for primary brand color (theme-aware)
  */
 .brand-logo {
-  font-size: 3rem;
-  color: var(--hextrackr-primary);
+    font-size: 3rem;
+    color: var(--hextrackr-primary);
 }
 
 /* ===========================
@@ -65,21 +65,22 @@ body {
  * Applied to .card element when login fails
  */
 .shake {
-  animation: shake 0.5s;
+    animation: shake 0.5s;
 }
 
 @keyframes shake {
-  0%, 100% {
-    transform: translateX(0);
-  }
+    0%,
+    100% {
+        transform: translateX(0);
+    }
 
-  25% {
-    transform: translateX(-10px);
-  }
+    25% {
+        transform: translateX(-10px);
+    }
 
-  75% {
-    transform: translateX(10px);
-  }
+    75% {
+        transform: translateX(10px);
+    }
 }
 
 /* ===========================
@@ -91,8 +92,8 @@ body {
  * Accessible on all viewport sizes
  */
 .theme-toggle-btn {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  z-index: 1000;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1000;
 }

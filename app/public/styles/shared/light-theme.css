@@ -15,34 +15,34 @@
      * =========================================== */
 
     /* Chart Color Palette - Professional Light Theme */
-    --chart-color-1: #3b82f6;                 /* Primary blue */
-    --chart-color-2: #10b981;                 /* Success green */
-    --chart-color-3: #f59e0b;                 /* Warning amber */
-    --chart-color-4: #ef4444;                 /* Danger red */
-    --chart-color-5: #8b5cf6;                 /* Purple */
-    --chart-color-6: #06b6d4;                 /* Cyan */
-    --chart-color-7: #84cc16;                 /* Lime green */
-    --chart-color-8: #f97316;                 /* Orange */
+    --chart-color-1: #3b82f6; /* Primary blue */
+    --chart-color-2: #10b981; /* Success green */
+    --chart-color-3: #f59e0b; /* Warning amber */
+    --chart-color-4: #ef4444; /* Danger red */
+    --chart-color-5: #8b5cf6; /* Purple */
+    --chart-color-6: #06b6d4; /* Cyan */
+    --chart-color-7: #84cc16; /* Lime green */
+    --chart-color-8: #f97316; /* Orange */
 
     /* Vulnerability Chart Specific Colors - Severity Mapping */
-    --chart-vuln-critical-color: #dc2626;     /* Critical: Red */
-    --chart-vuln-high-color: #ea580c;         /* High: Orange */
-    --chart-vuln-medium-color: #2563eb;       /* Medium: Blue */
-    --chart-vuln-low-color: #16a34a;          /* Low: Green */
+    --chart-vuln-critical-color: #dc2626; /* Critical: Red */
+    --chart-vuln-high-color: #ea580c; /* High: Orange */
+    --chart-vuln-medium-color: #2563eb; /* Medium: Blue */
+    --chart-vuln-low-color: #16a34a; /* Low: Green */
 
     /* Chart Background and Grid - Light Theme */
-    --chart-background: var(--hextrackr-surface-1);  /* Chart background - use surface variable */
-    --chart-grid-color: #e5e7eb;              /* Grid lines */
-    --chart-text-color: #6b7280;              /* Chart text */
-    --chart-title-color: #111827;             /* Chart titles */
-    --chart-axis-color: #9ca3af;              /* Axis lines and labels */
+    --chart-background: var(--hextrackr-surface-1); /* Chart background - use surface variable */
+    --chart-grid-color: #e5e7eb; /* Grid lines */
+    --chart-text-color: #6b7280; /* Chart text */
+    --chart-title-color: #111827; /* Chart titles */
+    --chart-axis-color: #9ca3af; /* Axis lines and labels */
 
     /* ===========================================
      * AG-GRID THEMING - LIGHT MODE
      * =========================================== */
 
     /* AG-Grid Quartz Theme Variables for Light Mode */
-    --ag-background-color: var(--hextrackr-surface-1);  /* Use surface variable */
+    --ag-background-color: var(--hextrackr-surface-1); /* Use surface variable */
     --ag-foreground-color: #000000;
     --ag-border-color: #dde2e6;
     --ag-header-background-color: #f8f9fa;
@@ -55,11 +55,11 @@
      * =========================================== */
 
     /* Surface elevation hierarchy for light mode */
-    --hextrackr-surface-base: #d0dae6;        /* Page background - darker blue-gray foundation (like dark mode hierarchy) */
-    --hextrackr-surface-1: #ffffff;           /* Cards - crisp white popping from darker background */
-    --hextrackr-surface-2: #f9fafb;           /* Tables - subtle off-white */
-    --hextrackr-surface-3: #ffffff;           /* Modals - pure white */
-    --hextrackr-surface-4: #f5f7fa;           /* Modal containers - very light blue-gray */
+    --hextrackr-surface-base: #d0dae6; /* Page background - darker blue-gray foundation (like dark mode hierarchy) */
+    --hextrackr-surface-1: #ffffff; /* Cards - crisp white popping from darker background */
+    --hextrackr-surface-2: #f9fafb; /* Tables - subtle off-white */
+    --hextrackr-surface-3: #ffffff; /* Modals - pure white */
+    --hextrackr-surface-4: #f5f7fa; /* Modal containers - very light blue-gray */
 }
 
 /* ===========================================
@@ -71,7 +71,9 @@
 .theme-light .navbar {
     background-color: #ffffff !important;
     border-bottom: 1px solid rgb(0, 0, 0, 0.1);
-    box-shadow: 0 1px 3px 0 rgb(0, 0, 0, 0.1), 0 1px 2px 0 rgb(0, 0, 0, 0.06);
+    box-shadow:
+        0 1px 3px 0 rgb(0, 0, 0, 0.1),
+        0 1px 2px 0 rgb(0, 0, 0, 0.06);
 }
 
 /* Stats cards at top of page need more depth */
@@ -83,6 +85,8 @@
 
 [data-bs-theme="light"] .card.stats-card:hover,
 .theme-light .card.stats-card:hover {
-    box-shadow: 0 4px 6px -1px rgb(0, 0, 0, 0.1), 0 2px 4px -1px rgb(0, 0, 0, 0.06);
+    box-shadow:
+        0 4px 6px -1px rgb(0, 0, 0, 0.1),
+        0 2px 4px -1px rgb(0, 0, 0, 0.06);
     transform: translateY(-1px);
 }

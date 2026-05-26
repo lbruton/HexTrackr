@@ -37,7 +37,7 @@ const databaseConfig = {
          * Directory containing the database file
          * @type {string}
          */
-        dataDirectory: "data"
+        dataDirectory: "data",
     },
 
     /**
@@ -85,7 +85,7 @@ const databaseConfig = {
          * Cache size in pages (negative value means KB)
          * @type {number}
          */
-        cacheSize: -64000 // 64MB cache
+        cacheSize: -64000, // 64MB cache
     },
 
     /**
@@ -116,7 +116,7 @@ const databaseConfig = {
          * Maximum time to wait for connection in milliseconds
          * @type {number}
          */
-        acquireTimeoutMillis: 60000 // 1 minute
+        acquireTimeoutMillis: 60000, // 1 minute
     },
 
     /**
@@ -160,7 +160,7 @@ const databaseConfig = {
             "vulnerability_snapshots",
             "vulnerabilities_current",
             "vulnerability_daily_totals",
-            "vulnerability_staging"
+            "vulnerability_staging",
         ],
 
         /**
@@ -187,8 +187,8 @@ const databaseConfig = {
             "idx_staging_import_id",
             "idx_staging_processed",
             "idx_staging_batch_id",
-            "idx_staging_unprocessed_batch"
-        ]
+            "idx_staging_unprocessed_batch",
+        ],
     },
 
     /**
@@ -224,7 +224,7 @@ const databaseConfig = {
          * Maximum number of rows to process in memory
          * @type {number}
          */
-        maxRowsInMemory: 50000
+        maxRowsInMemory: 50000,
     },
 
     /**
@@ -240,7 +240,7 @@ const databaseConfig = {
             verbose: true,
             enableQueryLogging: true,
             backupOnStartup: false,
-            validateSchema: true
+            validateSchema: true,
         },
 
         /**
@@ -251,7 +251,7 @@ const databaseConfig = {
             verbose: false,
             enableQueryLogging: false,
             backupOnStartup: true,
-            validateSchema: true
+            validateSchema: true,
         },
 
         /**
@@ -264,8 +264,8 @@ const databaseConfig = {
             backupOnStartup: false,
             validateSchema: false,
             // Use in-memory database for tests
-            useMemoryDatabase: true
-        }
+            useMemoryDatabase: true,
+        },
     },
 
     /**
@@ -295,7 +295,7 @@ const databaseConfig = {
          * Enable SQL injection protection
          * @type {boolean}
          */
-        preventSqlInjection: true
+        preventSqlInjection: true,
     },
 
     /**
@@ -331,8 +331,8 @@ const databaseConfig = {
          * Analyze statistics schedule (days between operations)
          * @type {number}
          */
-        analyzeIntervalDays: 1
-    }
+        analyzeIntervalDays: 1,
+    },
 };
 
 /**
@@ -350,22 +350,24 @@ function getEnvironmentConfig(env = process.env.NODE_ENV || "development") {
         options: {
             ...baseConfig.options,
             verbose: envConfig.verbose,
-            enableQueryLogging: envConfig.enableQueryLogging
+            enableQueryLogging: envConfig.enableQueryLogging,
         },
         maintenance: {
             ...baseConfig.maintenance,
-            backupOnStartup: envConfig.backupOnStartup
+            backupOnStartup: envConfig.backupOnStartup,
         },
         schema: {
             ...baseConfig.schema,
-            validateSchema: envConfig.validateSchema
+            validateSchema: envConfig.validateSchema,
         },
         // Override database path for test environment
-        path: envConfig.useMemoryDatabase ? {
-            ...baseConfig.path,
-            absolute: ":memory:",
-            relative: ":memory:"
-        } : baseConfig.path
+        path: envConfig.useMemoryDatabase
+            ? {
+                  ...baseConfig.path,
+                  absolute: ":memory:",
+                  relative: ":memory:",
+              }
+            : baseConfig.path,
     };
 }
 
@@ -436,5 +438,5 @@ module.exports = {
     DATABASE_PATH: databaseConfig.path.relative,
     SCHEMA_VERSION: databaseConfig.schema.version,
     BATCH_SIZE: databaseConfig.performance.batchSize,
-    MAX_IMPORT_SIZE: databaseConfig.security.maxImportFileSize
+    MAX_IMPORT_SIZE: databaseConfig.security.maxImportFileSize,
 };

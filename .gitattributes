@@ -1,2 +1,11 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Exclude dev tooling from release archives (git archive / GitHub zip)
+.claude/            export-ignore
+.husky/             export-ignore
+.githooks/          export-ignore
+.prettierrc         export-ignore
+.prettierignore     export-ignore
+.gitattributes      export-ignore
+CLAUDE.md           export-ignore

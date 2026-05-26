@@ -5,25 +5,25 @@
 
 /**
  * HexTrackr - Real-Time Progress Modal Component
- * 
+ *
  * 🎯 SHARED COMPONENT PATTERN
- * 
+ *
  * This component provides real-time progress tracking for long-running operations
  * like CSV imports, data processing, and other background tasks. It integrates
  * with the existing WebSocket client for real-time updates and follows HexTrackr's
  * established modal patterns.
- * 
+ *
  * @file progress-modal.js
  * @description Real-time progress modal with WebSocket integration
  * @version 1.0.0
  * @author HexTrackr Development Team
  * @since 2025-01-07
- * 
+ *
  * Dependencies:
  * - Bootstrap 5 (modals, progress bars)
  * - Tabler.io CSS Framework
  * - WebSocket Client (scripts/shared/websocket-client.js)
- * 
+ *
  * @example
  * // Initialize and show progress modal
  * const progressModal = new ProgressModal(websocketClient);
@@ -56,9 +56,9 @@ class ProgressModal {
             current: 0,
             total: 0,
             eta: null,
-            error: null
+            error: null,
         };
-        
+
         // Bind methods to maintain context
         this.handleProgressUpdate = this.handleProgressUpdate.bind(this);
         this.handleProgressStatus = this.handleProgressStatus.bind(this);
@@ -67,16 +67,16 @@ class ProgressModal {
         this.handleCancel = this.handleCancel.bind(this);
         this.handleExport = this.handleExport.bind(this);
         this.handleClose = this.handleClose.bind(this);
-        
+
         // Create modal HTML
         this.createModalHTML();
-        
+
         // Setup WebSocket listeners
         if (this.websocketClient) {
             this.setupWebSocketListeners();
         }
     }
-    
+
     /**
      * Create the modal HTML structure following HexTrackr patterns
      */
@@ -174,7 +174,7 @@ class ProgressModal {
                 </div>
             </div>
         `;
-        
+
         // Insert modal into DOM
         let modalContainer = document.getElementById("progressModalContainer");
         if (!modalContainer) {
@@ -183,15 +183,15 @@ class ProgressModal {
             document.body.appendChild(modalContainer);
         }
         modalContainer.innerHTML = modalHTML;
-        
+
         // Get modal elements
         this.modal = document.getElementById("progressModal");
         this.bsModal = new bootstrap.Modal(this.modal);
-        
+
         // Setup event listeners
         this.setupEventListeners();
     }
-    
+
     /**
      * Setup event listeners for modal interactions
      */
@@ -201,7 +201,7 @@ class ProgressModal {
         if (cancelBtn) {
             cancelBtn.addEventListener("click", this.handleCancel);
         }
-        
+
         // Export button
         const exportBtn = document.getElementById("progressExportBtn");
         if (exportBtn) {
@@ -213,12 +213,12 @@ class ProgressModal {
         if (closeBtn) {
             closeBtn.addEventListener("click", this.handleClose);
         }
-        
+
         // Modal events
         this.modal.addEventListener("hidden.bs.modal", () => {
             this.cleanup();
         });
-        
+
         // Prevent modal from being closed during active progress
         this.modal.addEventListener("hide.bs.modal", (event) => {
             if (this.isActiveProgress() && !this.progressData.error) {
@@ -227,7 +227,7 @@ class ProgressModal {
             }
         });
     }
-    
+
     /**
      * Setup WebSocket event listeners
      */
@@ -238,7 +238,7 @@ class ProgressModal {
         this.websocketClient.on("connectionFailed", this.handleWebSocketError);
         this.websocketClient.on("disconnect", this.handleWebSocketError);
     }
-    
+
     /**
      * Remove WebSocket event listeners
      */
@@ -251,7 +251,7 @@ class ProgressModal {
             this.websocketClient.off("disconnect", this.handleWebSocketError);
         }
     }
-    
+
     /**
      * Show the progress modal
      * @param {Object} options - Configuration options
@@ -267,9 +267,8 @@ class ProgressModal {
             sessionId,
             allowCancel = true,
             onCancel = null,
-            initialMessage = "Starting process..."
+            initialMessage = "Starting process...",
         } = options;
-
 
         // Add theme detection
         const currentTheme = document.documentElement.getAttribute("data-bs-theme") || "light";
@@ -302,14 +301,13 @@ class ProgressModal {
             this.websocketClient.joinProgressRoom(sessionId);
         }
 
-
         // Show modal
         this.isVisible = true;
         this.bsModal.show();
 
         logger.debug("ui", "Progress modal shown with session:", sessionId);
     }
-    
+
     /**
      * Hide the progress modal
      */
@@ -318,7 +316,7 @@ class ProgressModal {
             this.bsModal.hide();
         }
     }
-    
+
     /**
      * Update progress manually (for non-WebSocket usage)
      * @param {Object} data - Progress data
@@ -327,31 +325,39 @@ class ProgressModal {
         this.progressData = { ...this.progressData, ...data };
         this.updateUI();
     }
-    
+
     /**
      * Handle progress updates from WebSocket
      * @param {Object} data - Progress data from WebSocket
      */
     handleProgressUpdate(data) {
-        logger.debug("ui", "Progress update received:", data, "Visible:", this.isVisible, "Session match:", data.sessionId === this.currentSessionId);
-        
+        logger.debug(
+            "ui",
+            "Progress update received:",
+            data,
+            "Visible:",
+            this.isVisible,
+            "Session match:",
+            data.sessionId === this.currentSessionId,
+        );
+
         if (!this.isVisible || data.sessionId !== this.currentSessionId) {
             logger.debug("ui", "Progress update ignored - modal not visible or session mismatch");
             return;
         }
-        
+
         this.progressData = { ...this.progressData, ...data };
-        
+
         // Use requestAnimationFrame for smooth updates
         if (this.animationFrameId) {
             cancelAnimationFrame(this.animationFrameId);
         }
-        
+
         this.animationFrameId = requestAnimationFrame(() => {
             this.updateUI();
         });
     }
-    
+
     /**
      * Handle status updates from WebSocket
      * @param {Object} data - Status data from WebSocket
@@ -360,22 +366,30 @@ class ProgressModal {
         if (!this.isVisible || data.sessionId !== this.currentSessionId) {
             return;
         }
-        
+
         if (data.status === "completed") {
             this.showSuccess(data.message || "Process completed successfully!");
         } else if (data.status === "error") {
             this.showError(data.message || "An error occurred during processing.");
         }
     }
-    
+
     /**
      * Handle progress completion from WebSocket
      * @param {Object} data - Completion data from WebSocket
      */
     handleProgressComplete(data) {
         logger.debug("ui", "📨 handleProgressComplete() received data:", data);
-        logger.debug("ui", "Modal state - isVisible:", this.isVisible, "currentSessionId:", this.currentSessionId, "data.sessionId:", data.sessionId);
-        
+        logger.debug(
+            "ui",
+            "Modal state - isVisible:",
+            this.isVisible,
+            "currentSessionId:",
+            this.currentSessionId,
+            "data.sessionId:",
+            data.sessionId,
+        );
+
         if (!this.isVisible || data.sessionId !== this.currentSessionId) {
             logger.warn("ui", "Progress complete ignored - modal not visible or session mismatch");
             return;
@@ -406,7 +420,7 @@ class ProgressModal {
         // Modal will stay open until user manually closes it
         // Page refresh will be triggered by the Close button handler when import summary is present
     }
-    
+
     /**
      * Handle WebSocket connection errors
      */
@@ -415,57 +429,56 @@ class ProgressModal {
             this.showError("Connection lost. Please check your network and try again.");
         }
     }
-    
+
     /**
      * Update the UI with current progress data
      */
     updateUI() {
-        const {
-            progress = 0,
-            message = "",
-            stage = "",
-            current = 0,
-            total = 0,
-            eta = null
-        } = this.progressData;
-        
+        const { progress = 0, message = "", stage = "", current = 0, total = 0, eta = null } = this.progressData;
+
         // Update progress bar
         const progressBar = document.getElementById("progressBar");
         const percentage = Math.min(Math.max(progress, 0), 100);
-        
+
         if (progressBar) {
             progressBar.style.width = `${percentage}%`;
             progressBar.setAttribute("aria-valuenow", percentage);
         }
-        
+
         // Update percentage display
         const percentageEl = document.getElementById("progressPercentage");
         if (percentageEl) {
             percentageEl.textContent = `${Math.round(percentage)}%`;
         }
-        
+
         // Update stage
         const stageEl = document.getElementById("progressStage");
         if (stageEl && stage) {
             stageEl.textContent = stage;
         }
-        
+
         // Update message
         const messageEl = document.getElementById("progressMessage");
         if (messageEl && message) {
             messageEl.textContent = message;
         }
-        
+
         // Update details
         const currentEl = document.getElementById("progressCurrent");
         const totalEl = document.getElementById("progressTotal");
         const etaEl = document.getElementById("progressETA");
-        
-        if (currentEl) {currentEl.textContent = current.toLocaleString();}
-        if (totalEl) {totalEl.textContent = total.toLocaleString();}
-        if (etaEl) {etaEl.textContent = eta || "--";}
+
+        if (currentEl) {
+            currentEl.textContent = current.toLocaleString();
+        }
+        if (totalEl) {
+            totalEl.textContent = total.toLocaleString();
+        }
+        if (etaEl) {
+            etaEl.textContent = eta || "--";
+        }
     }
-    
+
     /**
      * Show success state
      * @param {string} message - Success message
@@ -473,7 +486,7 @@ class ProgressModal {
      */
     showSuccess(message, importSummary = null) {
         logger.debug("ui", "showSuccess() called with:", { message, hasImportSummary: !!importSummary });
-        
+
         // Hide spinner
         const spinner = this.modal.querySelector(".spinner-border");
         if (spinner) {
@@ -594,7 +607,7 @@ class ProgressModal {
                                     <tbody>
                 `;
 
-                topCves.forEach(cve => {
+                topCves.forEach((cve) => {
                     const severityClass = cve.severity.toLowerCase();
                     html += `
                         <tr>
@@ -646,7 +659,7 @@ class ProgressModal {
                                     <tbody>
                 `;
 
-                topResolved.forEach(cve => {
+                topResolved.forEach((cve) => {
                     const severityClass = cve.severity.toLowerCase();
                     const lastSeenDate = new Date(cve.lastSeen + "T00:00:00").toLocaleDateString();
                     html += `
@@ -679,7 +692,7 @@ class ProgressModal {
                         <div class="row">
             `;
 
-            ["critical", "high", "medium", "low"].forEach(severity => {
+            ["critical", "high", "medium", "low"].forEach((severity) => {
                 const impact = severityImpact[severity];
                 if (impact && Math.abs(impact.netChange) > 0) {
                     const changeIcon = impact.netChange > 0 ? "↗️" : "↘️";
@@ -708,8 +721,11 @@ class ProgressModal {
         if (comparison) {
             const changePercentage = comparison.percentageChange;
             const changeIcon = changePercentage > 0 ? "↗️" : changePercentage < 0 ? "↘️" : "➡️";
-            const changeClass = comparison.significantChange ?
-                (changePercentage > 0 ? "text-danger" : "text-success") : "text-muted";
+            const changeClass = comparison.significantChange
+                ? changePercentage > 0
+                    ? "text-danger"
+                    : "text-success"
+                : "text-muted";
 
             html += `
                 <div class="row mt-3">
@@ -720,7 +736,7 @@ class ProgressModal {
                                 ${changeIcon} ${changePercentage > 0 ? "+" : ""}${changePercentage.toFixed(1)}%
                                 (${comparison.netChange > 0 ? "+" : ""}${formatNumber(comparison.netChange)} vulnerabilities)
                             </span>
-                            ${comparison.significantChange ? " <small class=\"badge bg-warning text-dark\">Significant Change</small>" : ""}
+                            ${comparison.significantChange ? ' <small class="badge bg-warning text-dark">Significant Change</small>' : ""}
                         </div>
                     </div>
                 </div>
@@ -734,26 +750,26 @@ class ProgressModal {
 
         return html;
     }
-    
+
     /**
      * Show error state
      * @param {string} message - Error message
      */
     showError(message) {
         this.progressData.error = message;
-        
+
         // Hide spinner
         const spinner = this.modal.querySelector(".spinner-border");
         if (spinner) {
             spinner.style.display = "none";
         }
-        
+
         // Update header to error state
         const header = this.modal.querySelector(".modal-header");
         if (header) {
             header.className = "modal-header bg-danger text-white";
         }
-        
+
         // Show error alert
         const errorAlert = document.getElementById("progressError");
         const errorMessage = document.getElementById("progressErrorMessage");
@@ -761,13 +777,13 @@ class ProgressModal {
             errorMessage.textContent = message;
             errorAlert.classList.remove("d-none");
         }
-        
+
         // Update buttons
         this.showCompleteButtons();
-        
+
         logger.error("ui", "Progress modal: Error state shown -", message);
     }
-    
+
     /**
      * Show completion buttons (hide cancel, show close)
      */
@@ -779,7 +795,7 @@ class ProgressModal {
         logger.debug("ui", "showCompleteButtons() called - Button elements:", {
             cancelBtn: !!cancelBtn,
             exportBtn: !!exportBtn,
-            closeBtn: !!closeBtn
+            closeBtn: !!closeBtn,
         });
 
         if (cancelBtn) {
@@ -805,26 +821,26 @@ class ProgressModal {
 
             // ALWAYS update button text to "OK - Refresh Page" on completion
             // This ensures cache is busted even without import summary
-            closeBtn.innerHTML = "<i class=\"fas fa-check me-1\"></i>OK - Refresh Page";
+            closeBtn.innerHTML = '<i class="fas fa-check me-1"></i>OK - Refresh Page';
             closeBtn.classList.add("btn-pulse");
-            
+
             // Make button more prominent with success styling
             closeBtn.classList.remove("btn-secondary");
             closeBtn.classList.add("btn-success");
-            
+
             logger.debug("ui", "Close button shown with text:", closeBtn.innerHTML);
         } else {
             logger.error("ui", "Close button not found!");
         }
     }
-    
+
     /**
      * Handle cancel button click
      */
     handleCancel() {
         this.showCancelConfirmation();
     }
-    
+
     /**
      * Show cancel confirmation dialog
      */
@@ -833,20 +849,20 @@ class ProgressModal {
             this.hide();
             return;
         }
-        
+
         const confirmed = confirm("Are you sure you want to cancel this operation? This action cannot be undone.");
         if (confirmed && this.onCancelCallback) {
             this.onCancelCallback();
             this.hide();
         }
     }
-    
+
     /**
      * Handle close button click
      */
     handleClose() {
         const wasSuccessfulImport = this.progressData.progress === 100 && !this.progressData.error;
-        
+
         this.hide();
 
         // ALWAYS trigger page refresh after successful import (with or without summary)
@@ -879,7 +895,7 @@ class ProgressModal {
             const exportBtn = document.getElementById("progressExportBtn");
             if (exportBtn) {
                 const originalText = exportBtn.innerHTML;
-                exportBtn.innerHTML = "<i class=\"fas fa-exclamation-triangle me-1\"></i>Failed!";
+                exportBtn.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i>Failed!';
                 exportBtn.classList.add("btn-outline-danger");
                 exportBtn.classList.remove("btn-outline-info");
 
@@ -899,13 +915,13 @@ class ProgressModal {
      */
     async extractEmbeddedCSS() {
         const cssFiles = [
-            "/vendor/tabler/css/tabler.min.css",           // Tabler.io framework
-            "/styles/css-variables.css",                   // HexTrackr CSS variables
-            "/styles/shared/base.css",                     // Base styles
-            "/styles/shared/modals.css",                   // Modal styles
-            "/styles/shared/badges.css",                   // Severity badges
-            "/styles/shared/cards.css",                    // Card components
-            "/styles/shared/tables.css"                    // Table styles
+            "/vendor/tabler/css/tabler.min.css", // Tabler.io framework
+            "/styles/css-variables.css", // HexTrackr CSS variables
+            "/styles/shared/base.css", // Base styles
+            "/styles/shared/modals.css", // Modal styles
+            "/styles/shared/badges.css", // Severity badges
+            "/styles/shared/cards.css", // Card components
+            "/styles/shared/tables.css", // Table styles
         ];
 
         let combinedCSS = "";
@@ -1004,7 +1020,7 @@ class ProgressModal {
             month: "long",
             day: "numeric",
             hour: "2-digit",
-            minute: "2-digit"
+            minute: "2-digit",
         });
 
         // Extract filename from import metadata if available
@@ -1094,7 +1110,7 @@ ${embeddedCSS}
             // Show loading state using the export button
             if (exportBtn) {
                 exportBtn.disabled = true;
-                exportBtn.innerHTML = "<i class=\"fas fa-spinner fa-spin me-1\"></i>Generating...";
+                exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Generating...';
             }
 
             // Generate complete HTML report
@@ -1121,7 +1137,7 @@ ${embeddedCSS}
 
             // Show success state
             if (exportBtn) {
-                exportBtn.innerHTML = "<i class=\"fas fa-check me-1\"></i>Downloaded!";
+                exportBtn.innerHTML = '<i class="fas fa-check me-1"></i>Downloaded!';
                 setTimeout(() => {
                     exportBtn.disabled = false;
                     exportBtn.innerHTML = originalBtnText;
@@ -1130,7 +1146,6 @@ ${embeddedCSS}
 
             // Show success feedback
             logger.debug("ui", `Import report downloaded: ${filename}`);
-
         } catch (error) {
             // Restore button state on error
             if (exportBtn) {
@@ -1148,11 +1163,9 @@ ${embeddedCSS}
      * @returns {boolean} True if progress is active
      */
     isActiveProgress() {
-        return this.isVisible && 
-               this.progressData.progress < 100 && 
-               !this.progressData.error;
+        return this.isVisible && this.progressData.progress < 100 && !this.progressData.error;
     }
-    
+
     /**
      * Reset progress state to initial values
      */
@@ -1165,26 +1178,30 @@ ${embeddedCSS}
             total: 0,
             eta: null,
             error: null,
-            importSummary: null
+            importSummary: null,
         };
-        
+
         // Reset UI elements
         const header = this.modal.querySelector(".modal-header");
         if (header) {
             header.className = "modal-header bg-dark text-white";
         }
-        
+
         // Show spinner
         const spinner = this.modal.querySelector(".spinner-border");
         if (spinner) {
             spinner.style.display = "inline-block";
         }
-        
+
         // Hide alerts
         const successAlert = document.getElementById("progressSuccess");
         const errorAlert = document.getElementById("progressError");
-        if (successAlert) {successAlert.classList.add("d-none");}
-        if (errorAlert) {errorAlert.classList.add("d-none");}
+        if (successAlert) {
+            successAlert.classList.add("d-none");
+        }
+        if (errorAlert) {
+            errorAlert.classList.add("d-none");
+        }
 
         // Hide and clear previous import summary
         const summaryContainer = document.getElementById("progressSummary");
@@ -1197,54 +1214,60 @@ ${embeddedCSS}
         const cancelBtn = document.getElementById("progressCancelBtn");
         const exportBtn = document.getElementById("progressExportBtn");
         const closeBtn = document.getElementById("progressCloseBtn");
-        if (cancelBtn) {cancelBtn.classList.remove("d-none");}
-        if (exportBtn) {exportBtn.classList.add("d-none");}
-        if (closeBtn) {closeBtn.classList.add("d-none");}
-        
+        if (cancelBtn) {
+            cancelBtn.classList.remove("d-none");
+        }
+        if (exportBtn) {
+            exportBtn.classList.add("d-none");
+        }
+        if (closeBtn) {
+            closeBtn.classList.add("d-none");
+        }
+
         // Update UI
         this.updateUI();
     }
-    
+
     /**
      * Cleanup resources when modal is hidden
      */
     cleanup() {
         this.isVisible = false;
-        
+
         // Leave WebSocket room
         if (this.currentSessionId && this.websocketClient) {
             this.websocketClient.leaveProgressRoom(this.currentSessionId);
             this.currentSessionId = null;
         }
-        
+
         // Cancel animation frame
         if (this.animationFrameId) {
             cancelAnimationFrame(this.animationFrameId);
             this.animationFrameId = null;
         }
-        
+
         // Clear callbacks
         this.onCancelCallback = null;
-        
+
         logger.debug("ui", "Progress modal: Cleanup completed");
     }
-    
+
     /**
      * Destroy the modal and remove all event listeners
      */
     destroy() {
         this.cleanup();
         this.removeWebSocketListeners();
-        
+
         if (this.bsModal) {
             this.bsModal.dispose();
         }
-        
+
         const container = document.getElementById("progressModalContainer");
         if (container) {
             container.remove();
         }
-        
+
         logger.debug("ui", "Progress modal: Destroyed");
     }
 }

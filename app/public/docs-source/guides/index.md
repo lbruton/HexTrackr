@@ -10,10 +10,12 @@
 
 ---
 
-## Advanced Features
+## Integrations
 
 - **[KEV Integration Guide](./kev-integration.md)**: Understanding CISA Known Exploited Vulnerabilities (KEV) integration including what KEV is, automatic tracking with daily synchronization, priority remediation workflows, settings configuration, KEV badges, threat intelligence, and compliance tracking
 
-- **[HTTPS Setup Guide](./https-setup.md)**: Complete guide for configuring HTTPS support across different platforms (macOS, Ubuntu/Linux, Windows), production deployment with Let's Encrypt and nginx reverse proxy, certificate management (self-signed certificates, SubjectAltName extensions), and troubleshooting certificate errors and port conflicts
+- **[Cisco PSIRT Integration](./cisco-psirt-integration.md)**: Cisco PSIRT advisory integration — OAuth2 setup, advisory sync, and vulnerability correlation
+
+- **[Palo Alto Advisory Integration](./palo-alto-advisory-integration.md)**: Palo Alto Networks security advisory tracking and version matching
 
 ---

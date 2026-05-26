@@ -28,7 +28,7 @@ const {
     RATE_LIMIT_WINDOW_MS,
     RATE_LIMIT_MAX_REQUESTS,
     RATE_LIMIT_MESSAGE,
-    SECURITY_HEADERS
+    SECURITY_HEADERS,
 } = require("../utils/constants");
 
 /**
@@ -178,7 +178,7 @@ function createCorsMiddleware() {
         origin: CORS_ORIGINS,
         methods: CORS_METHODS,
         allowedHeaders: CORS_HEADERS,
-        credentials: true
+        credentials: true,
     });
 }
 
@@ -203,7 +203,7 @@ function createRateLimitMiddleware() {
             console.warn(` Rate limit exceeded: ${req.ip} → ${req.method} ${req.path}`);
             res.status(429).json({
                 error: "Too many requests from this IP, please try again later",
-                retryAfter: Math.ceil(RATE_LIMIT_WINDOW_MS / 1000)
+                retryAfter: Math.ceil(RATE_LIMIT_WINDOW_MS / 1000),
             });
         },
         // Skip rate limiting for cache HITs (no server load, unlimited OK)
@@ -211,10 +211,10 @@ function createRateLimitMiddleware() {
             // Check if response has X-Cache header indicating cache hit
             const cacheHeader = res.getHeader("X-Cache");
             if (cacheHeader && (cacheHeader.includes("HIT") || cacheHeader.includes("HIT-LARGE-QUERY"))) {
-                return true;  // Don't count this request toward limit
+                return true; // Don't count this request toward limit
             }
-            return false;  // Count this request (cache MISS or uncached endpoint)
-        }
+            return false; // Count this request (cache MISS or uncached endpoint)
+        },
     });
 }
 
@@ -257,7 +257,10 @@ function requestSanitizationMiddleware(req, res, next) {
         // Validate Content-Type for POST/PUT requests
         if (["POST", "PUT", "PATCH"].includes(req.method)) {
             const contentType = req.get("Content-Type");
-            if (contentType && !contentType.match(/^(application\/json|multipart\/form-data|application\/x-www-form-urlencoded)/)) {
+            if (
+                contentType &&
+                !contentType.match(/^(application\/json|multipart\/form-data|application\/x-www-form-urlencoded)/)
+            ) {
                 console.warn(`Suspicious Content-Type from IP ${req.ip}: ${contentType}`);
             }
         }
@@ -306,14 +309,16 @@ function apiSecurityMiddleware(req, res, next) {
 function securityErrorHandler(err, req, res, next) {
     try {
         // Log security-related errors
-        if (err.message.includes("Path traversal") ||
+        if (
+            err.message.includes("Path traversal") ||
             err.message.includes("Invalid file path") ||
-            err.message.includes("Invalid path component")) {
+            err.message.includes("Invalid path component")
+        ) {
             console.error(`Security Error from IP ${req.ip}:`, err.message);
             return res.status(403).json({
                 success: false,
                 error: "Forbidden",
-                details: "Invalid request"
+                details: "Invalid request",
             });
         }
 
@@ -323,7 +328,7 @@ function securityErrorHandler(err, req, res, next) {
         console.error("Security error handler failed:", handlerError);
         res.status(500).json({
             success: false,
-            error: "Internal server error"
+            error: "Internal server error",
         });
     }
 }
@@ -376,7 +381,7 @@ module.exports = {
     securityErrorHandler,
 
     // Convenience function to apply all security middleware
-    applySecurityMiddleware: function(app) {
+    applySecurityMiddleware: function (app) {
         // Apply CORS
         app.use(this.createCorsMiddleware());
 
@@ -396,5 +401,5 @@ module.exports = {
         app.use(this.inputValidationMiddleware);
 
         return app;
-    }
+    },
 };

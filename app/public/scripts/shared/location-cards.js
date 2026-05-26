@@ -88,29 +88,29 @@ class LocationCardsManager {
             logger.debug("location-filter", "Applying location filter", {
                 selectedLocation,
                 selectedDisplayName,
-                totalLocations: this.locationData.length
+                totalLocations: this.locationData.length,
             });
-            filtered = filtered.filter(location => {
+            filtered = filtered.filter((location) => {
                 // Compare against location_display (uppercase) or fallback to uppercase location
                 const displayName = (location.location_display || location.location || "").toUpperCase();
                 const matches = displayName === selectedDisplayName;
                 if (matches) {
                     logger.debug("location-filter", "Location matched", {
                         displayName,
-                        selectedDisplayName
+                        selectedDisplayName,
                     });
                 }
                 return matches;
             });
             logger.debug("location-filter", "Location filter applied", {
-                matchedCount: filtered.length
+                matchedCount: filtered.length,
             });
         }
 
         // Apply search filter on top of location filter
         if (searchTerm && searchTerm.trim() !== "") {
             const term = searchTerm.toLowerCase().trim();
-            filtered = filtered.filter(location => {
+            filtered = filtered.filter((location) => {
                 const locationMatch = (location.location_display || "").toLowerCase().includes(term);
                 const network = this.calculateNetwork24(location.device_ips || []);
                 const networkMatch = network.toLowerCase().includes(term);
@@ -144,7 +144,7 @@ class LocationCardsManager {
         if (selectedLocation && selectedLocation.trim() !== "") {
             // Match against display name (case-insensitive)
             const selectedDisplayName = selectedLocation.toUpperCase().trim();
-            filtered = filtered.filter(location => {
+            filtered = filtered.filter((location) => {
                 const displayName = (location.location_display || location.location || "").toUpperCase();
                 return displayName === selectedDisplayName;
             });
@@ -153,7 +153,7 @@ class LocationCardsManager {
         // Apply search filter on top of location filter
         if (searchTerm && searchTerm.trim() !== "") {
             const term = searchTerm.toLowerCase().trim();
-            filtered = filtered.filter(location => {
+            filtered = filtered.filter((location) => {
                 const locationMatch = (location.location_display || "").toLowerCase().includes(term);
                 const network = this.calculateNetwork24(location.device_ips || []);
                 const networkMatch = network.toLowerCase().includes(term);
@@ -172,7 +172,7 @@ class LocationCardsManager {
         logger.debug("search", "Location cards filtered", {
             searchTerm,
             totalLocations: this.locationData.length,
-            filteredLocations: this.filteredData.length
+            filteredLocations: this.filteredData.length,
         });
     }
 
@@ -196,7 +196,7 @@ class LocationCardsManager {
         const paginatedLocations = this.pagination.getCurrentPageData(this.filteredData);
 
         // Render cards (now async - HEX-344 Step 2)
-        this.generateLocationCardsHTML(paginatedLocations).then(html => {
+        this.generateLocationCardsHTML(paginatedLocations).then((html) => {
             container.innerHTML = html;
         });
 
@@ -209,19 +209,15 @@ class LocationCardsManager {
             { value: "location_name_asc", label: "Name A-Z" },
             { value: "location_name_desc", label: "Name Z-A" },
             { value: "device_count", label: "Device Count (High-Low)" },
-            { value: "device_count_low", label: "Device Count (Low-High)" }
+            { value: "device_count_low", label: "Device Count (Low-High)" },
         ];
 
-        this.pagination.renderTopControls(
-            "locationControlsTop",
-            () => this.render(),
-            {
-                sortOptions: sortOptions,
-                currentSort: this.sortBy,
-                onSortChange: (sortValue) => this.changeSort(sortValue),
-                itemType: "Locations"
-            }
-        );
+        this.pagination.renderTopControls("locationControlsTop", () => this.render(), {
+            sortOptions: sortOptions,
+            currentSort: this.sortBy,
+            onSortChange: (sortValue) => this.changeSort(sortValue),
+            itemType: "Locations",
+        });
 
         // Render pagination controls (arrows/numbers)
         this.pagination.renderPaginationControls("locationPaginationControls", () => this.render());
@@ -318,62 +314,63 @@ class LocationCardsManager {
         }
 
         // HEX-344 Step 2: Fetch ticket data for all devices across all locations
-        const allHostnames = locations.flatMap(loc => loc.device_hostnames || []);
+        const allHostnames = locations.flatMap((loc) => loc.device_hostnames || []);
         const ticketMap = await this.checkTicketStatusBatch(allHostnames);
 
-        return locations.map(location => {
-            const totalVPR = location.total_vpr || 0;
-            const deviceCount = location.device_count || 0;
-            const locationDisplay = location.location_display || location.location || "Unknown";
-            const locationKey = location.location || "";
+        return locations
+            .map((location) => {
+                const totalVPR = location.total_vpr || 0;
+                const deviceCount = location.device_count || 0;
+                const locationDisplay = location.location_display || location.location || "Unknown";
+                const locationKey = location.location || "";
 
-            // Severity breakdown
-            const severityBreakdown = location.severity_breakdown || {
-                Critical: { count: 0, vpr: 0 },
-                High: { count: 0, vpr: 0 },
-                Medium: { count: 0, vpr: 0 },
-                Low: { count: 0, vpr: 0 }
-            };
+                // Severity breakdown
+                const severityBreakdown = location.severity_breakdown || {
+                    Critical: { count: 0, vpr: 0 },
+                    High: { count: 0, vpr: 0 },
+                    Medium: { count: 0, vpr: 0 },
+                    Low: { count: 0, vpr: 0 },
+                };
 
-            const criticalCount = severityBreakdown.Critical?.count || 0;
-            const highCount = severityBreakdown.High?.count || 0;
-            const mediumCount = severityBreakdown.Medium?.count || 0;
-            const lowCount = severityBreakdown.Low?.count || 0;
+                const criticalCount = severityBreakdown.Critical?.count || 0;
+                const highCount = severityBreakdown.High?.count || 0;
+                const mediumCount = severityBreakdown.Medium?.count || 0;
+                const lowCount = severityBreakdown.Low?.count || 0;
 
-            const criticalVPR = severityBreakdown.Critical?.vpr || 0;
-            const highVPR = severityBreakdown.High?.vpr || 0;
-            const mediumVPR = severityBreakdown.Medium?.vpr || 0;
-            const lowVPR = severityBreakdown.Low?.vpr || 0;
+                const criticalVPR = severityBreakdown.Critical?.vpr || 0;
+                const highVPR = severityBreakdown.High?.vpr || 0;
+                const mediumVPR = severityBreakdown.Medium?.vpr || 0;
+                const lowVPR = severityBreakdown.Low?.vpr || 0;
 
-            // Escape location for JavaScript (MUST be defined BEFORE use in KEV badge)
-            const escapedLocation = locationKey.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/"/g, "\\\"");
+                // Escape location for JavaScript (MUST be defined BEFORE use in KEV badge)
+                const escapedLocation = locationKey.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/"/g, '\\"');
 
-            // Vendor breakdown (Cisco, Other, Palo Alto)
-            const vendorBreakdown = location.vendor_breakdown || {};
-            const ciscoCount = vendorBreakdown["CISCO"] || 0;
-            const paloCount = vendorBreakdown["Palo Alto"] || 0;
-            const otherCount = vendorBreakdown["Other"] || 0;
+                // Vendor breakdown (Cisco, Other, Palo Alto)
+                const vendorBreakdown = location.vendor_breakdown || {};
+                const ciscoCount = vendorBreakdown["CISCO"] || 0;
+                const paloCount = vendorBreakdown["Palo Alto"] || 0;
+                const otherCount = vendorBreakdown["Other"] || 0;
 
-            // Vendor VPR totals (stub for now - backend doesn't provide this yet)
-            // TODO HEX-293: Add vendor_vpr to backend locationService.js
-            const ciscoVPR = 0;
-            const paloVPR = 0;
-            const otherVPR = 0;
+                // Vendor VPR totals (stub for now - backend doesn't provide this yet)
+                // TODO HEX-293: Add vendor_vpr to backend locationService.js
+                const ciscoVPR = 0;
+                const paloVPR = 0;
+                const otherVPR = 0;
 
-            // KEV badge (top-left, outside card) - shows DEVICE count not KEV count
-            const kevDeviceCount = (location.kev_devices || []).length;
-            const kevDevices = location.kev_devices || [];
-            let kevBadge = "";
+                // KEV badge (top-left, outside card) - shows DEVICE count not KEV count
+                const kevDeviceCount = (location.kev_devices || []).length;
+                const kevDevices = location.kev_devices || [];
+                let kevBadge = "";
 
-            if (kevDeviceCount > 0) {
-                // Store KEV devices data for modal
-                const kevDataId = `kev-location-${locationKey.replace(/[^a-zA-Z0-9]/g, "")}-${Date.now()}`;
-                if (!window.locationKevData) {
-                    window.locationKevData = {};
-                }
-                window.locationKevData[kevDataId] = kevDevices;
+                if (kevDeviceCount > 0) {
+                    // Store KEV devices data for modal
+                    const kevDataId = `kev-location-${locationKey.replace(/[^a-zA-Z0-9]/g, "")}-${Date.now()}`;
+                    if (!window.locationKevData) {
+                        window.locationKevData = {};
+                    }
+                    window.locationKevData[kevDataId] = kevDevices;
 
-                kevBadge = `
+                    kevBadge = `
                     <span class="badge kev-badge" role="button" tabindex="0"
                           style="position: absolute; top: 0.5rem; left: 0.5rem; z-index: 10;"
                           onclick="event.stopPropagation(); window.showLocationKevModal('${escapedLocation}', window.locationKevData['${kevDataId}'])"
@@ -382,15 +379,15 @@ class LocationCardsManager {
                         KEV${kevDeviceCount > 1 ? ` (${kevDeviceCount})` : ""}
                     </span>
                 `;
-            }
+                }
 
-            // Calculate most common /24 network
-            const network = this.calculateNetwork24(location.device_ips || []);
+                // Calculate most common /24 network
+                const network = this.calculateNetwork24(location.device_ips || []);
 
-            // Serialize location data for modal (Session 3: HEX-295)
-            const locationDataForModal = JSON.stringify(location).replace(/'/g, "&#39;").replace(/"/g, "&quot;");
+                // Serialize location data for modal (Session 3: HEX-295)
+                const locationDataForModal = JSON.stringify(location).replace(/'/g, "&#39;").replace(/"/g, "&quot;");
 
-            return `
+                return `
             <div class="col-lg-4 col-md-6 mb-3 fade-in">
                 <div class="card device-card" style="cursor: pointer; position: relative;"
                      onclick="window.locationDetailsModal?.showLocationDetails(JSON.parse(this.dataset.location), window.vulnManager?.dataManager)"
@@ -469,7 +466,8 @@ class LocationCardsManager {
                 </div>
             </div>
             `;
-        }).join("");
+            })
+            .join("");
     }
 
     /**
@@ -482,7 +480,7 @@ class LocationCardsManager {
                 animation: 150,
                 ghostClass: "sortable-ghost",
                 chosenClass: "sortable-chosen",
-                dragClass: "sortable-drag"
+                dragClass: "sortable-drag",
             });
         }
     }
@@ -506,8 +504,10 @@ class LocationCardsManager {
         // Count frequency of management networks (fallback)
         const managementNetworkCounts = {};
 
-        deviceIPs.forEach(ip => {
-            if (!ip) {return;}
+        deviceIPs.forEach((ip) => {
+            if (!ip) {
+                return;
+            }
 
             // Extract first 3 octets
             const parts = ip.split(".");
@@ -515,7 +515,7 @@ class LocationCardsManager {
                 const network = `${parts[0]}.${parts[1]}.${parts[2]}.0/24`;
 
                 // Check if this IP is in a management subnet
-                const isManagementIP = managementSubnets.some(subnet => ip.startsWith(subnet + "."));
+                const isManagementIP = managementSubnets.some((subnet) => ip.startsWith(subnet + "."));
 
                 if (isManagementIP) {
                     managementNetworkCounts[network] = (managementNetworkCounts[network] || 0) + 1;
@@ -569,15 +569,15 @@ class LocationCardsManager {
         const locationKey = location.location || "";
         const site = ""; // Always blank - will be populated manually by user
 
-        deviceHostnames.forEach(hostname => {
+        deviceHostnames.forEach((hostname) => {
             // CRITICAL: Use lowercase for lookup (backend returns lowercase keys)
             const ticketData = ticketMap[hostname.toLowerCase()] || { count: 0, tickets: [] };
             if (ticketData.count > 0) {
-                ticketData.tickets.forEach(ticketId => {
+                ticketData.tickets.forEach((ticketId) => {
                     locationTickets.set(ticketId, {
                         id: ticketId,
                         status: ticketData.status,
-                        jobType: ticketData.jobType
+                        jobType: ticketData.jobType,
                     });
                 });
             }
@@ -604,7 +604,7 @@ class LocationCardsManager {
             buttonIcon = "fas fa-folder-open";
         } else {
             // Multiple tickets: ORANGE or RED (red if ANY ticket is overdue)
-            const hasOverdue = ticketArray.some(ticket => ticket.status === "Overdue");
+            const hasOverdue = ticketArray.some((ticket) => ticket.status === "Overdue");
             buttonText = `View Tickets (${uniqueTicketCount})`;
             buttonClass = hasOverdue ? "btn-outline-danger" : "btn-outline-warning";
             buttonIcon = "fas fa-layer-group";
@@ -673,12 +673,12 @@ class LocationCardsManager {
 
         // Determine mode based on keyboard modifiers
         let mode = "bulk-all"; // Default: all devices at location
-        let deviceList = allDevices.map(h => h.toUpperCase()); // UPPERCASE for ticket form
+        let deviceList = allDevices.map((h) => h.toUpperCase()); // UPPERCASE for ticket form
 
         // Cmd+Shift or Ctrl+Shift → KEV devices only
         if ((event.metaKey || event.ctrlKey) && event.shiftKey) {
             mode = "bulk-kev";
-            deviceList = kevDevices.map(d => d.hostname.toUpperCase());
+            deviceList = kevDevices.map((d) => d.hostname.toUpperCase());
             logger.info("tickets", `[KEV Filter] Creating ticket with ${deviceList.length} KEV devices`);
         } else {
             logger.info("tickets", `Creating ticket with ${deviceList.length} devices at ${locationKey}`);
@@ -698,7 +698,7 @@ class LocationCardsManager {
                 finalLocation = parseData.data.location.toUpperCase();
                 logger.info("tickets", `[HEX-350] Parsed location from hostname: ${finalLocation}`, {
                     hostname: firstHostname,
-                    confidence: parseData.data.confidence
+                    confidence: parseData.data.confidence,
                 });
 
                 // Lookup site from tickets database
@@ -714,11 +714,11 @@ class LocationCardsManager {
 
         // Build sessionStorage data for ticket creation
         const ticketData = {
-            devices: deviceList,              // UPPERCASE hostnames
-            site: finalSite,                  // UPPERCASE site (or blank if no match)
-            location: finalLocation,          // UPPERCASE location (parsed or fallback)
+            devices: deviceList, // UPPERCASE hostnames
+            site: finalSite, // UPPERCASE site (or blank if no match)
+            location: finalLocation, // UPPERCASE location (parsed or fallback)
             mode: mode,
-            timestamp: Date.now()
+            timestamp: Date.now(),
         };
 
         // Store in sessionStorage and navigate to tickets page
@@ -763,7 +763,6 @@ class LocationCardsManager {
                 logger.error("tickets", "VulnerabilityCardsManager not available");
                 alert("Unable to show ticket picker. Please refresh the page.");
             }
-
         } catch (error) {
             logger.error("tickets", `Failed to fetch tickets for location ${locationKey}:`, error);
             alert(`Failed to load tickets: ${error.message}`);
@@ -779,7 +778,9 @@ class LocationCardsManager {
      */
     overrideModalCreateButton(locationKey) {
         const modal = document.getElementById("ticketPickerModal");
-        if (!modal) {return;}
+        if (!modal) {
+            return;
+        }
 
         // Find the "Create New Ticket Anyway" button
         const createButton = modal.querySelector("button.btn-success");
@@ -808,7 +809,7 @@ class LocationCardsManager {
 
             // Get device data from location button
             const allDevices = JSON.parse(locationButton.dataset.allDevices || "[]");
-            const deviceList = allDevices.map(h => h.toUpperCase());
+            const deviceList = allDevices.map((h) => h.toUpperCase());
 
             // HEX-350: Use HostnameParserService API for intelligent location extraction
             // No fallback - internal API must work for app to function
@@ -824,7 +825,9 @@ class LocationCardsManager {
                     finalLocation = parseData.data.location.toUpperCase();
 
                     // Lookup site from tickets database
-                    const siteResponse = await fetch(`/api/tickets/site-by-location/${encodeURIComponent(finalLocation)}`);
+                    const siteResponse = await fetch(
+                        `/api/tickets/site-by-location/${encodeURIComponent(finalLocation)}`,
+                    );
                     const siteData = await siteResponse.json();
                     if (siteData.success && siteData.site) {
                         finalSite = siteData.site.toUpperCase();
@@ -839,7 +842,7 @@ class LocationCardsManager {
                 site: finalSite,
                 location: finalLocation,
                 mode: "bulk-all",
-                timestamp: Date.now()
+                timestamp: Date.now(),
             };
 
             // Store and navigate
@@ -866,11 +869,11 @@ class LocationCardsManager {
         try {
             // CRITICAL: Normalize hostnames to lowercase for API call
             // Backend ticketService.js:822 returns lowercase keys
-            const normalizedHostnames = hostnames.map(h => h.toLowerCase());
+            const normalizedHostnames = hostnames.map((h) => h.toLowerCase());
 
             // Get CSRF token first (required for POST requests)
             const csrfResponse = await fetch("/api/auth/csrf", {
-                credentials: "include"
+                credentials: "include",
             });
             const { csrfToken } = await csrfResponse.json();
 
@@ -878,10 +881,10 @@ class LocationCardsManager {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "x-csrf-token": csrfToken
+                    "x-csrf-token": csrfToken,
                 },
                 credentials: "include",
-                body: JSON.stringify({ hostnames: normalizedHostnames })
+                body: JSON.stringify({ hostnames: normalizedHostnames }),
             });
 
             if (!response.ok) {
@@ -904,7 +907,9 @@ class LocationCardsManager {
      */
     updatePaginationInfo() {
         const container = document.getElementById("locationPaginationInfo");
-        if (!container) {return;}
+        if (!container) {
+            return;
+        }
 
         const info = this.pagination.getPageInfo();
         container.innerHTML = `
@@ -931,15 +936,18 @@ class LocationCardsManager {
 window.locationCardsManager = new LocationCardsManager();
 
 // Global function for filtering by location (called from card click)
-window.filterByLocation = function(location) {
+window.filterByLocation = function (location) {
     logger.info("ui", "Filtering by location:", { location });
 
     // Store filter in sessionStorage
-    sessionStorage.setItem("activeFilters", JSON.stringify({
-        location: location,
-        vendor: null,
-        severity: null
-    }));
+    sessionStorage.setItem(
+        "activeFilters",
+        JSON.stringify({
+            location: location,
+            vendor: null,
+            severity: null,
+        }),
+    );
 
     // Switch to table view
     const tableViewButton = document.getElementById("view-table");
@@ -956,7 +964,7 @@ window.filterByLocation = function(location) {
 };
 
 // Global function for showing KEV modal for a location
-window.showLocationKevModal = function(location, kevDevices) {
+window.showLocationKevModal = function (location, kevDevices) {
     logger.info("ui", "Showing KEV modal for location:", { location, deviceCount: kevDevices.length });
 
     if (!kevDevices || kevDevices.length === 0) {
@@ -967,7 +975,7 @@ window.showLocationKevModal = function(location, kevDevices) {
     // Store location KEV context for back navigation
     window.locationKevPickerContext = {
         location: location,
-        kevDevices: kevDevices
+        kevDevices: kevDevices,
     };
 
     // Create modal HTML
@@ -984,12 +992,16 @@ window.showLocationKevModal = function(location, kevDevices) {
     }
 
     // Build device list HTML with new picker pattern
-    const deviceListHtml = kevDevices.map((device, index) => {
-        const cveList = device.cves.map(cve =>
-            `<a href="#" class="badge bg-red-lt me-1 mb-1" onclick="event.preventDefault(); event.stopPropagation(); window.showKevDetails('${cve}', true); bootstrap.Modal.getInstance(document.getElementById('locationKevModal')).hide(); return false;">${cve}</a>`
-        ).join("");
+    const deviceListHtml = kevDevices
+        .map((device, index) => {
+            const cveList = device.cves
+                .map(
+                    (cve) =>
+                        `<a href="#" class="badge bg-red-lt me-1 mb-1" onclick="event.preventDefault(); event.stopPropagation(); window.showKevDetails('${cve}', true); bootstrap.Modal.getInstance(document.getElementById('locationKevModal')).hide(); return false;">${cve}</a>`,
+                )
+                .join("");
 
-        return `
+            return `
             <div class="list-group-item list-group-item-action"
                  style="cursor: pointer;"
                  onclick="window.selectLocationKevDevice('${device.hostname}')"
@@ -1015,7 +1027,8 @@ window.showLocationKevModal = function(location, kevDevices) {
                 </div>
             </div>
         `;
-    }).join("");
+        })
+        .join("");
 
     modal.innerHTML = `
         <div class="modal-dialog modal-lg">
@@ -1062,7 +1075,7 @@ window.showLocationKevModal = function(location, kevDevices) {
  * Updates the selected radio button and stores the selection
  * @param {string} hostname - Hostname that was selected
  */
-window.selectLocationKevDevice = function(hostname) {
+window.selectLocationKevDevice = function (hostname) {
     logger.debug("ui", "Selected location KEV device:", hostname);
 
     // Store the selected device
@@ -1079,7 +1092,7 @@ window.selectLocationKevDevice = function(hostname) {
  * View device details for the selected device from location KEV picker modal
  * Opens the device security modal for the selected device
  */
-window.viewSelectedLocationKevDevice = function() {
+window.viewSelectedLocationKevDevice = function () {
     if (!window.selectedLocationKevDevice) {
         logger.warn("ui", "No device selected from location KEV picker");
         return;
@@ -1096,7 +1109,7 @@ window.viewSelectedLocationKevDevice = function() {
     // Wait for modal to close, then open device details
     setTimeout(() => {
         // Clean up any stray modal backdrops
-        document.querySelectorAll(".modal-backdrop").forEach(backdrop => backdrop.remove());
+        document.querySelectorAll(".modal-backdrop").forEach((backdrop) => backdrop.remove());
         document.body.classList.remove("modal-open");
         document.body.style.overflow = "";
         document.body.style.paddingRight = "";
@@ -1116,7 +1129,7 @@ window.viewSelectedLocationKevDevice = function() {
  * Return to location KEV picker modal from KEV details modal
  * Closes KEV details and re-opens location picker with stored context
  */
-window.returnToLocationKevPicker = function() {
+window.returnToLocationKevPicker = function () {
     logger.debug("ui", "Returning to location KEV picker modal");
 
     // Close the KEV details modal
@@ -1128,14 +1141,17 @@ window.returnToLocationKevPicker = function() {
     // Wait for modal to close, then re-open location picker
     setTimeout(() => {
         // Clean up any stray modal backdrops
-        document.querySelectorAll(".modal-backdrop").forEach(backdrop => backdrop.remove());
+        document.querySelectorAll(".modal-backdrop").forEach((backdrop) => backdrop.remove());
         document.body.classList.remove("modal-open");
         document.body.style.overflow = "";
         document.body.style.paddingRight = "";
 
         // Re-open the location KEV picker modal with stored context
         if (window.locationKevPickerContext) {
-            window.showLocationKevModal(window.locationKevPickerContext.location, window.locationKevPickerContext.kevDevices);
+            window.showLocationKevModal(
+                window.locationKevPickerContext.location,
+                window.locationKevPickerContext.kevDevices,
+            );
         } else {
             logger.error("ui", "No location KEV picker context available");
         }
