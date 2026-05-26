@@ -1,153 +1,152 @@
 /* eslint-env browser */
 /* global fetch, window, document, console, setTimeout, bootstrap */
- 
+
 // HexTrackr Shared Header Loader
-(function() {
-  "use strict";
-  
-  async function loadHeader() {
-    try {
-      // Determine the correct path based on current location
-      const basePath = window.location.pathname.includes("/docs-html/") ? "../" : "";
-      
-      // Fetch the header HTML
-      const response = await fetch(`${basePath}scripts/shared/header.html`);
-      if (!response.ok) {
-        throw new Error(`Failed to load header: ${response.status}`);
-      }
-      
-      const headerHtml = await response.text();
-      
-      // Find the header container or create one if it doesn't exist
-      let headerContainer = document.getElementById("headerContainer");
-      if (!headerContainer) {
-        headerContainer = document.createElement("div");
-        headerContainer.id = "headerContainer";
-        document.body.insertBefore(headerContainer, document.body.firstChild);
-      }
-      
-      // Inject the header HTML
-      headerContainer.innerHTML = headerHtml;
-      
-      // Initialize header functionality
-      initHeaderFunctionality();
-      
-      // Initialize theme management
-      await initThemeManagement();
+(function () {
+    "use strict";
 
-      // Initialize shared modals (settings, backup, audit logs)
-      await initSharedModals();
+    async function loadHeader() {
+        try {
+            // Determine the correct path based on current location
+            const basePath = window.location.pathname.includes("/docs-html/") ? "../" : "";
 
-      logger.debug("ui", "HexTrackr Header (shared) loaded successfully");
+            // Fetch the header HTML
+            const response = await fetch(`${basePath}scripts/shared/header.html`);
+            if (!response.ok) {
+                throw new Error(`Failed to load header: ${response.status}`);
+            }
 
-    } catch (error) {
-      logger.error("ui", "Failed to load shared header:", error);
-      // Fallback: show basic navigation if loading fails
-      showFallbackHeader();
-    }
-  }
-  
-  function initHeaderFunctionality() {
-    // Set active navigation item based on current path
-    const pathname = window.location.pathname;
-    const navLinks = document.querySelectorAll(".navbar-nav .nav-link");
-    navLinks.forEach(link => {
-      const href = link.getAttribute("href");
-      const isDocs = pathname.startsWith("/docs-html/");
-      const match =
-        (href === "/tickets.html" && pathname.endsWith("/tickets.html")) ||
-        (href === "/vulnerabilities.html" && pathname.endsWith("/vulnerabilities.html")) ||
-        (href === "/docs-html/" && isDocs);
-      link.classList.toggle("active", !!match);
-    });
-    
-    // Handle Import CSV Data link to open settings modal with specific tab
-    const importCsvLink = document.querySelector("a[data-settings-tab=\"data-management\"]");
-    if (importCsvLink) {
-      importCsvLink.addEventListener("click", function(e) {
-        e.preventDefault();
-        
-        // Wait for settings modal to be loaded, then open specific tab
-        setTimeout(() => {
-          const dataManagementTab = document.getElementById("data-management-tab");
-          if (dataManagementTab) {
-            dataManagementTab.click();
-          }
-        }, 100);
-      });
-    }
-    
-    // Initialize Bootstrap components if needed
-    if (typeof bootstrap !== "undefined") {
-      // Initialize any Bootstrap tooltips in the header
-      const tooltipTriggerList = [].slice.call(document.querySelectorAll("[data-bs-toggle=\"tooltip\"]"));
-      tooltipTriggerList.map(function(tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-      });
-    }
-  }
-  
-  async function initThemeManagement() {
-    try {
-      // Dynamically import the header theme manager
-      const { HeaderThemeManager } = await import("./header.js");
-      
-      // Create and initialize theme manager
-      const themeManager = new HeaderThemeManager();
-      themeManager.init();
-      
-      // Expose theme manager globally for access - T028
-      window.headerThemeManager = themeManager;
-      
-      logger.debug("ui", "Theme management initialized");
-    } catch (error) {
-      logger.error("ui", "Failed to initialize theme management:", error);
-      // Graceful degradation - header still works without theme switching
-    }
-  }
-  
-  async function initSharedModals() {
-    try {
-      // Initialize settings modal
-      if (window.SettingsModal && typeof window.SettingsModal.init === "function") {
-        await window.SettingsModal.init();
-        logger.debug("ui", "Settings modal initialized via header-loader");
-      } else {
-        logger.warn("ui", "SettingsModal not available - script may not be loaded yet");
-      }
+            const headerHtml = await response.text();
 
-      // Backup modal manager is already initialized on script load
-      // It creates window.backupModalManager = new BackupModalManager() at load time
-      if (window.backupModalManager) {
-        logger.debug("ui", "Backup modal manager available");
-      } else {
-        logger.warn("ui", "Backup modal manager not available - script may not be loaded yet");
-      }
+            // Find the header container or create one if it doesn't exist
+            let headerContainer = document.getElementById("headerContainer");
+            if (!headerContainer) {
+                headerContainer = document.createElement("div");
+                headerContainer.id = "headerContainer";
+                document.body.insertBefore(headerContainer, document.body.firstChild);
+            }
 
-      // Audit log modal manager is already initialized on script load
-      // It creates window.auditLogModalManager = new AuditLogModalManager() at load time
-      if (window.auditLogModalManager) {
-        logger.debug("ui", "Audit log modal manager available");
-      } else {
-        logger.warn("ui", "Audit log modal manager not available - script may not be loaded yet");
-      }
+            // Inject the header HTML
+            headerContainer.innerHTML = headerHtml;
 
-      logger.debug("ui", "Shared modals initialization complete");
-    } catch (error) {
-      logger.error("ui", "Failed to initialize shared modals:", error);
-      // Graceful degradation - header still works without modals
-    }
-  }
+            // Initialize header functionality
+            initHeaderFunctionality();
 
-  function showFallbackHeader() {
-    let headerContainer = document.getElementById("headerContainer");
-    if (!headerContainer) {
-      headerContainer = document.createElement("div");
-      headerContainer.id = "headerContainer";
-      document.body.insertBefore(headerContainer, document.body.firstChild);
+            // Initialize theme management
+            await initThemeManagement();
+
+            // Initialize shared modals (settings, backup, audit logs)
+            await initSharedModals();
+
+            logger.debug("ui", "HexTrackr Header (shared) loaded successfully");
+        } catch (error) {
+            logger.error("ui", "Failed to load shared header:", error);
+            // Fallback: show basic navigation if loading fails
+            showFallbackHeader();
+        }
     }
 
-  headerContainer.innerHTML = `
+    function initHeaderFunctionality() {
+        // Set active navigation item based on current path
+        const pathname = window.location.pathname;
+        const navLinks = document.querySelectorAll(".navbar-nav .nav-link");
+        navLinks.forEach((link) => {
+            const href = link.getAttribute("href");
+            const isDocs = pathname.startsWith("/docs-html/");
+            const match =
+                (href === "/tickets.html" && pathname.endsWith("/tickets.html")) ||
+                (href === "/vulnerabilities.html" && pathname.endsWith("/vulnerabilities.html")) ||
+                (href === "/docs-html/" && isDocs);
+            link.classList.toggle("active", !!match);
+        });
+
+        // Handle Import CSV Data link to open settings modal with specific tab
+        const importCsvLink = document.querySelector('a[data-settings-tab="data-management"]');
+        if (importCsvLink) {
+            importCsvLink.addEventListener("click", function (e) {
+                e.preventDefault();
+
+                // Wait for settings modal to be loaded, then open specific tab
+                setTimeout(() => {
+                    const dataManagementTab = document.getElementById("data-management-tab");
+                    if (dataManagementTab) {
+                        dataManagementTab.click();
+                    }
+                }, 100);
+            });
+        }
+
+        // Initialize Bootstrap components if needed
+        if (typeof bootstrap !== "undefined") {
+            // Initialize any Bootstrap tooltips in the header
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        }
+    }
+
+    async function initThemeManagement() {
+        try {
+            // Dynamically import the header theme manager
+            const { HeaderThemeManager } = await import("./header.js");
+
+            // Create and initialize theme manager
+            const themeManager = new HeaderThemeManager();
+            themeManager.init();
+
+            // Expose theme manager globally for access - T028
+            window.headerThemeManager = themeManager;
+
+            logger.debug("ui", "Theme management initialized");
+        } catch (error) {
+            logger.error("ui", "Failed to initialize theme management:", error);
+            // Graceful degradation - header still works without theme switching
+        }
+    }
+
+    async function initSharedModals() {
+        try {
+            // Initialize settings modal
+            if (window.SettingsModal && typeof window.SettingsModal.init === "function") {
+                await window.SettingsModal.init();
+                logger.debug("ui", "Settings modal initialized via header-loader");
+            } else {
+                logger.warn("ui", "SettingsModal not available - script may not be loaded yet");
+            }
+
+            // Backup modal manager is already initialized on script load
+            // It creates window.backupModalManager = new BackupModalManager() at load time
+            if (window.backupModalManager) {
+                logger.debug("ui", "Backup modal manager available");
+            } else {
+                logger.warn("ui", "Backup modal manager not available - script may not be loaded yet");
+            }
+
+            // Audit log modal manager is already initialized on script load
+            // It creates window.auditLogModalManager = new AuditLogModalManager() at load time
+            if (window.auditLogModalManager) {
+                logger.debug("ui", "Audit log modal manager available");
+            } else {
+                logger.warn("ui", "Audit log modal manager not available - script may not be loaded yet");
+            }
+
+            logger.debug("ui", "Shared modals initialization complete");
+        } catch (error) {
+            logger.error("ui", "Failed to initialize shared modals:", error);
+            // Graceful degradation - header still works without modals
+        }
+    }
+
+    function showFallbackHeader() {
+        let headerContainer = document.getElementById("headerContainer");
+        if (!headerContainer) {
+            headerContainer = document.createElement("div");
+            headerContainer.id = "headerContainer";
+            document.body.insertBefore(headerContainer, document.body.firstChild);
+        }
+
+        headerContainer.innerHTML = `
       <header class="navbar navbar-expand-md navbar-light d-print-none">
         <div class="container-xl">
           <h1 class="navbar-brand">
@@ -162,20 +161,19 @@
       </header>
     `;
 
-    logger.debug("ui", "HexTrackr Header fallback loaded");
-  }
-  
-  // Load header when DOM is ready
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", loadHeader);
-  } else {
-    loadHeader();
-  }
-  
-  // Export for testing purposes
-  window.HexTrackrHeader = {
-    loadHeader,
-    initHeaderFunctionality
-  };
-  
+        logger.debug("ui", "HexTrackr Header fallback loaded");
+    }
+
+    // Load header when DOM is ready
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", loadHeader);
+    } else {
+        loadHeader();
+    }
+
+    // Export for testing purposes
+    window.HexTrackrHeader = {
+        loadHeader,
+        initHeaderFunctionality,
+    };
 })();

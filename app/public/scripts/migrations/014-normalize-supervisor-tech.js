@@ -56,20 +56,25 @@ function normalizePersonName(input) {
     }
 
     const trimmed = input.trim();
-    if (!trimmed) {return "";}
+    if (!trimmed) {
+        return "";
+    }
 
     // Split on semicolon (multiple people)
-    const people = trimmed.split(";").map(p => p.trim()).filter(Boolean);
+    const people = trimmed
+        .split(";")
+        .map((p) => p.trim())
+        .filter(Boolean);
 
     // Transform each person
-    const normalized = people.map(person => {
+    const normalized = people.map((person) => {
         // If no comma, assume "First Last" format (just capitalize)
         if (!person.includes(",")) {
             return toProperCase(person);
         }
 
         // "LAST,FIRST" format - reverse and capitalize
-        const parts = person.split(",").map(p => p.trim());
+        const parts = person.split(",").map((p) => p.trim());
         if (parts.length < 2) {
             return toProperCase(person); // Fallback
         }
@@ -90,8 +95,10 @@ function normalizePersonName(input) {
  * @returns {string} String with first letter of each word capitalized
  */
 function toProperCase(str) {
-    if (!str) {return str;}
-    return str.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+    if (!str) {
+        return str;
+    }
+    return str.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
 // ========================================
@@ -120,8 +127,11 @@ function analyzeCurrentFormats(db) {
         `;
 
         db.get(query, (err, row) => {
-            if (err) {reject(err);}
-            else {resolve(row);}
+            if (err) {
+                reject(err);
+            } else {
+                resolve(row);
+            }
         });
     });
 }
@@ -144,8 +154,11 @@ function getSampleTickets(db, limit) {
         `;
 
         db.all(query, [limit], (err, rows) => {
-            if (err) {reject(err);}
-            else {resolve(rows);}
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows);
+            }
         });
     });
 }
@@ -208,51 +221,46 @@ function executeMigration(db) {
                         const normalizedSupervisor = normalizePersonName(ticket.supervisor);
                         const normalizedTech = normalizePersonName(ticket.tech);
 
-                        updateStmt.run(
-                            normalizedSupervisor,
-                            normalizedTech,
-                            ticket.id,
-                            (err) => {
-                                if (err) {
-                                    console.error(`[ERROR] Failed to update ticket ${ticket.id}:`, err.message);
-                                    errors++;
-                                } else {
-                                    updated++;
-                                }
-
-                                // Check if this was the last ticket
-                                if (index === tickets.length - 1) {
-                                    updateStmt.finalize((finalizeErr) => {
-                                        if (finalizeErr) {
-                                            db.run("ROLLBACK");
-                                            reject(finalizeErr);
-                                            return;
-                                        }
-
-                                        if (errors > 0) {
-                                            console.error(`[ERROR] ${errors} tickets failed to update, rolling back...`);
-                                            db.run("ROLLBACK");
-                                            reject(new Error(`${errors} tickets failed to update`));
-                                        } else {
-                                            // Commit transaction
-                                            db.run("COMMIT", (commitErr) => {
-                                                if (commitErr) {
-                                                    reject(commitErr);
-                                                    return;
-                                                }
-
-                                                const duration = ((Date.now() - startTime) / 1000).toFixed(2);
-                                                resolve({
-                                                    updated,
-                                                    errors,
-                                                    duration
-                                                });
-                                            });
-                                        }
-                                    });
-                                }
+                        updateStmt.run(normalizedSupervisor, normalizedTech, ticket.id, (err) => {
+                            if (err) {
+                                console.error(`[ERROR] Failed to update ticket ${ticket.id}:`, err.message);
+                                errors++;
+                            } else {
+                                updated++;
                             }
-                        );
+
+                            // Check if this was the last ticket
+                            if (index === tickets.length - 1) {
+                                updateStmt.finalize((finalizeErr) => {
+                                    if (finalizeErr) {
+                                        db.run("ROLLBACK");
+                                        reject(finalizeErr);
+                                        return;
+                                    }
+
+                                    if (errors > 0) {
+                                        console.error(`[ERROR] ${errors} tickets failed to update, rolling back...`);
+                                        db.run("ROLLBACK");
+                                        reject(new Error(`${errors} tickets failed to update`));
+                                    } else {
+                                        // Commit transaction
+                                        db.run("COMMIT", (commitErr) => {
+                                            if (commitErr) {
+                                                reject(commitErr);
+                                                return;
+                                            }
+
+                                            const duration = ((Date.now() - startTime) / 1000).toFixed(2);
+                                            resolve({
+                                                updated,
+                                                errors,
+                                                duration,
+                                            });
+                                        });
+                                    }
+                                });
+                            }
+                        });
                     });
                 });
             });
@@ -277,8 +285,11 @@ function verifyMigration(db) {
         `;
 
         db.get(query, (err, row) => {
-            if (err) {reject(err);}
-            else {resolve(row);}
+            if (err) {
+                reject(err);
+            } else {
+                resolve(row);
+            }
         });
     });
 }
@@ -296,7 +307,7 @@ function verifyMigration(db) {
 function askQuestion(question) {
     const rl = readline.createInterface({
         input: process.stdin,
-        output: process.stdout
+        output: process.stdout,
     });
 
     return new Promise((resolve) => {
@@ -359,8 +370,12 @@ async function main() {
         console.log(`  Total Tickets:          ${analysis.total_tickets}`);
         console.log(`  Unique Supervisors:     ${analysis.unique_supervisors}`);
         console.log(`  Unique Techs:           ${analysis.unique_techs}`);
-        console.log(`  Supervisor EAM Format:  ${analysis.supervisor_eam_format} (${((analysis.supervisor_eam_format / analysis.total_tickets) * 100).toFixed(1)}%)`);
-        console.log(`  Tech EAM Format:        ${analysis.tech_eam_format} (${((analysis.tech_eam_format / analysis.total_tickets) * 100).toFixed(1)}%)`);
+        console.log(
+            `  Supervisor EAM Format:  ${analysis.supervisor_eam_format} (${((analysis.supervisor_eam_format / analysis.total_tickets) * 100).toFixed(1)}%)`,
+        );
+        console.log(
+            `  Tech EAM Format:        ${analysis.tech_eam_format} (${((analysis.tech_eam_format / analysis.total_tickets) * 100).toFixed(1)}%)`,
+        );
         console.log(`  Supervisor Empty:       ${analysis.supervisor_empty}`);
         console.log(`  Tech Empty:             ${analysis.tech_empty}\n`);
 
@@ -428,7 +443,6 @@ async function main() {
             console.log("Migration 014 Complete");
             console.log("========================================\n");
         });
-
     } catch (error) {
         console.error("\n[ERROR] Migration failed:", error.message);
         db.close();

@@ -57,7 +57,7 @@ class PreferencesController {
             if (!key) {
                 return res.status(400).json({
                     success: false,
-                    error: "Preference key is required"
+                    error: "Preference key is required",
                 });
             }
 
@@ -67,15 +67,14 @@ class PreferencesController {
             if (!result.success) {
                 return res.status(404).json({
                     success: false,
-                    error: result.error
+                    error: result.error,
                 });
             }
 
             res.json({
                 success: true,
-                data: result.data
+                data: result.data,
             });
-
         } catch (error) {
             if (global.logger?.error) {
                 global.logger.error("backend", "preferences", "Get preference error", { error: error.message });
@@ -85,7 +84,7 @@ class PreferencesController {
             res.status(500).json({
                 success: false,
                 error: "Failed to retrieve preference",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -108,10 +107,9 @@ class PreferencesController {
                 success: true,
                 data: {
                     preferences: result.data,
-                    count: result.data.length
-                }
+                    count: result.data.length,
+                },
             });
-
         } catch (error) {
             if (global.logger?.error) {
                 global.logger.error("backend", "preferences", "Get all preferences error", { error: error.message });
@@ -121,7 +119,7 @@ class PreferencesController {
             res.status(500).json({
                 success: false,
                 error: "Failed to retrieve preferences",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -138,23 +136,26 @@ class PreferencesController {
      * @param {Object} res - Express response
      */
     static async setPreference(req, res) {
+        let key;
+        let value;
+
         try {
-            const { key } = req.params;
-            const { value } = req.body;
+            ({ key } = req.params);
+            ({ value } = req.body);
             const userId = req.user.id;
 
             // Input validation
             if (!key) {
                 return res.status(400).json({
                     success: false,
-                    error: "Preference key is required"
+                    error: "Preference key is required",
                 });
             }
 
             if (value === undefined || value === null) {
                 return res.status(400).json({
                     success: false,
-                    error: "Preference value is required"
+                    error: "Preference value is required",
                 });
             }
 
@@ -166,20 +167,23 @@ class PreferencesController {
                 data: {
                     message: result.message,
                     key,
-                    value
-                }
+                    value,
+                },
             });
-
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "preferences", "Set preference error", { error: error.message, key, value });
+                global.logger.error("backend", "preferences", "Set preference error", {
+                    error: error.message,
+                    key,
+                    value,
+                });
             } else {
                 console.error("Set preference error:", error);
             }
             res.status(500).json({
                 success: false,
                 error: "Failed to set preference",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -202,7 +206,7 @@ class PreferencesController {
             if (!preferences || typeof preferences !== "object" || Array.isArray(preferences)) {
                 return res.status(400).json({
                     success: false,
-                    error: "Preferences must be an object with key-value pairs"
+                    error: "Preferences must be an object with key-value pairs",
                 });
             }
 
@@ -210,7 +214,7 @@ class PreferencesController {
             if (keys.length === 0) {
                 return res.status(400).json({
                     success: false,
-                    error: "At least one preference must be provided"
+                    error: "At least one preference must be provided",
                 });
             }
 
@@ -221,20 +225,21 @@ class PreferencesController {
                 success: true,
                 data: {
                     message: result.message,
-                    count: keys.length
-                }
+                    count: keys.length,
+                },
             });
-
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "preferences", "Set multiple preferences error", { error: error.message });
+                global.logger.error("backend", "preferences", "Set multiple preferences error", {
+                    error: error.message,
+                });
             } else {
                 console.error("Set multiple preferences error:", error);
             }
             res.status(500).json({
                 success: false,
                 error: "Failed to set preferences",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -249,15 +254,17 @@ class PreferencesController {
      * @param {Object} res - Express response
      */
     static async deletePreference(req, res) {
+        let key;
+
         try {
-            const { key } = req.params;
+            ({ key } = req.params);
             const userId = req.user.id;
 
             // Input validation
             if (!key) {
                 return res.status(400).json({
                     success: false,
-                    error: "Preference key is required"
+                    error: "Preference key is required",
                 });
             }
 
@@ -267,7 +274,7 @@ class PreferencesController {
             if (!result.success) {
                 return res.status(404).json({
                     success: false,
-                    error: result.error
+                    error: result.error,
                 });
             }
 
@@ -275,10 +282,9 @@ class PreferencesController {
                 success: true,
                 data: {
                     message: result.message,
-                    key
-                }
+                    key,
+                },
             });
-
         } catch (error) {
             if (global.logger?.error) {
                 global.logger.error("backend", "preferences", "Delete preference error", { error: error.message, key });
@@ -288,7 +294,7 @@ class PreferencesController {
             res.status(500).json({
                 success: false,
                 error: "Failed to delete preference",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -310,10 +316,9 @@ class PreferencesController {
             res.json({
                 success: true,
                 data: {
-                    message: result.message
-                }
+                    message: result.message,
+                },
             });
-
         } catch (error) {
             if (global.logger?.error) {
                 global.logger.error("backend", "preferences", "Delete all preferences error", { error: error.message });
@@ -323,7 +328,7 @@ class PreferencesController {
             res.status(500).json({
                 success: false,
                 error: "Failed to delete preferences",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -352,8 +357,10 @@ class PreferencesController {
      * // Returns: 200 (if exists) or 404 (if not)
      */
     static async hasPreference(req, res) {
+        let key;
+
         try {
-            const { key } = req.params;
+            ({ key } = req.params);
             const userId = req.user.id;
 
             // Input validation
@@ -369,7 +376,6 @@ class PreferencesController {
             } else {
                 res.status(404).end();
             }
-
         } catch (error) {
             if (global.logger?.error) {
                 global.logger.error("backend", "preferences", "Has preference error", { error: error.message, key });
@@ -408,10 +414,9 @@ class PreferencesController {
             res.json({
                 success: true,
                 data: {
-                    count
-                }
+                    count,
+                },
             });
-
         } catch (error) {
             if (global.logger?.error) {
                 global.logger.error("backend", "preferences", "Get preference count error", { error: error.message });
@@ -421,7 +426,7 @@ class PreferencesController {
             res.status(500).json({
                 success: false,
                 error: "Failed to get preference count",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -471,17 +476,18 @@ class PreferencesController {
 
             // Send as formatted JSON string
             res.send(JSON.stringify(exportData, null, 2));
-
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "preferences", "Export user preferences error", { error: error.message });
+                global.logger.error("backend", "preferences", "Export user preferences error", {
+                    error: error.message,
+                });
             } else {
                 console.error("Export user preferences error:", error);
             }
             res.status(500).json({
                 success: false,
                 error: "Failed to export user preferences",
-                details: error.message
+                details: error.message,
             });
         }
     }
@@ -503,7 +509,7 @@ class PreferencesController {
             if (!importData || typeof importData !== "object") {
                 return res.status(400).json({
                     success: false,
-                    error: "Invalid import data - must be valid JSON object"
+                    error: "Invalid import data - must be valid JSON object",
                 });
             }
 
@@ -515,20 +521,21 @@ class PreferencesController {
                 data: {
                     message: result.message,
                     imported: result.imported,
-                    skipped: result.skipped
-                }
+                    skipped: result.skipped,
+                },
             });
-
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "preferences", "Import user preferences error", { error: error.message });
+                global.logger.error("backend", "preferences", "Import user preferences error", {
+                    error: error.message,
+                });
             } else {
                 console.error("Import user preferences error:", error);
             }
             res.status(500).json({
                 success: false,
                 error: "Failed to import user preferences",
-                details: error.message
+                details: error.message,
             });
         }
     }

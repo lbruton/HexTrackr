@@ -39,7 +39,7 @@ class HostnameController {
             if (!hostname) {
                 return res.status(400).json({
                     success: false,
-                    error: "Hostname parameter is required"
+                    error: "Hostname parameter is required",
                 });
             }
 
@@ -49,18 +49,21 @@ class HostnameController {
 
             res.json({
                 success: true,
-                data: result
+                data: result,
             });
         } catch (error) {
             if (global.logger?.error) {
-                global.logger.error("backend", "hostname", "Error parsing hostname", { error: error.message, hostname: req.params.hostname });
+                global.logger.error("backend", "hostname", "Error parsing hostname", {
+                    error: error.message,
+                    hostname: req.params.hostname,
+                });
             } else {
                 console.error(`Error parsing hostname ${req.params.hostname}:`, error);
             }
             res.status(500).json({
                 success: false,
                 error: "Failed to parse hostname",
-                details: error.message
+                details: error.message,
             });
         }
     }

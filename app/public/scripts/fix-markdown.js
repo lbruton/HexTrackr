@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
 /* eslint-env node */
- 
+
 /* global require, module, process, console */
 /* eslint no-undef: "off" */
 
 /**
  * HexTrackr Markdown Formatter
  * Fixes all Codacy markdown violations automatically
- * 
+ *
  * Usage:
  *   node scripts/fix-markdown.js --file=path/to/file.md
  *   node scripts/fix-markdown.js --all
@@ -47,7 +47,7 @@ class PathValidator {
 
     static safePathJoin(...components) {
         // Validate each component before joining
-        const validatedComponents = components.map(comp => PathValidator.validatePathComponent(comp));
+        const validatedComponents = components.map((comp) => PathValidator.validatePathComponent(comp));
         return path.join(...validatedComponents);
     }
 
@@ -58,7 +58,12 @@ class PathValidator {
 
         // Resolve the path to get absolute path
         const resolvedPath = path.resolve(filePath);
-        const resolvedBase = path.resolve(allowedBaseDir) && fs.existsSync(allowedBaseDir) ? path.resolve(allowedBaseDir) : (() => { throw new Error("Invalid base directory specified"); })();
+        const resolvedBase =
+            path.resolve(allowedBaseDir) && fs.existsSync(allowedBaseDir)
+                ? path.resolve(allowedBaseDir)
+                : (() => {
+                      throw new Error("Invalid base directory specified");
+                  })();
 
         // Check if the resolved path is within the allowed base directory
         if (!resolvedPath.startsWith(resolvedBase)) {
@@ -67,13 +72,13 @@ class PathValidator {
 
         // Additional security checks
         const normalized = path.normalize(filePath);
-        
+
         // Check for dangerous path components
         const dangerousPatterns = [
-            /\.\./,      // Parent directory traversal
-            /^\//,       // Absolute path (if not intended)
-            /[<>"|?*]/,  // Invalid filename characters
-            /\0/         // Null bytes
+            /\.\./, // Parent directory traversal
+            /^\//, // Absolute path (if not intended)
+            /[<>"|?*]/, // Invalid filename characters
+            /\0/, // Null bytes
         ];
 
         for (const pattern of dangerousPatterns) {
@@ -88,7 +93,9 @@ class PathValidator {
     static safeReadFileSync(filePath, options = "utf8") {
         const validatedPath = PathValidator.validatePath(filePath);
         const projectRoot = path.resolve(__dirname, "..");
-        if (!validatedPath.startsWith(projectRoot)) {throw new Error("Access to this file path is not allowed.");}
+        if (!validatedPath.startsWith(projectRoot)) {
+            throw new Error("Access to this file path is not allowed.");
+        }
         return fs.readFileSync(validatedPath, options);
     }
 
@@ -127,7 +134,7 @@ class MarkdownFormatter {
             listSpacingFixed: 0,
             emphasisToHeadingFixed: 0,
             orderedListFixed: 0,
-            duplicateHeadingsFixed: 0
+            duplicateHeadingsFixed: 0,
         };
     }
 
@@ -143,24 +150,24 @@ class MarkdownFormatter {
      */
     fixHeadingSpacing(content) {
         let fixes = 0;
-        
+
         // Split into lines for processing
         const lines = content.split("\n");
         const result = [];
-        
+
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
             const isHeading = /^#{1,6}\s/.test(line.trim());
-            
+
             if (isHeading) {
                 // Check if previous line needs blank line
                 if (i > 0 && lines[i - 1].trim() !== "") {
                     result.push("");
                     fixes++;
                 }
-                
+
                 result.push(line);
-                
+
                 // Check if next line needs blank line
                 if (i < lines.length - 1 && lines[i + 1].trim() !== "") {
                     result.push("");
@@ -170,7 +177,7 @@ class MarkdownFormatter {
                 result.push(line);
             }
         }
-        
+
         this.stats.headingSpacingFixed += fixes;
         return result.join("\n");
     }
@@ -183,32 +190,32 @@ class MarkdownFormatter {
         let fixes = 0;
         const lines = content.split("\n");
         const result = [];
-        
+
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
             const isListItem = /^[\s]*[-*+]\s/.test(line) || /^[\s]*\d+\.\s/.test(line);
             const prevLine = i > 0 ? lines[i - 1] : "";
             const nextLine = i < lines.length - 1 ? lines[i + 1] : "";
-            
+
             // Check if this is the start of a list
             const isListStart = isListItem && !(/^[\s]*[-*+]\s/.test(prevLine) || /^[\s]*\d+\.\s/.test(prevLine));
-            
+
             // Check if this is the end of a list
             const isListEnd = isListItem && !(/^[\s]*[-*+]\s/.test(nextLine) || /^[\s]*\d+\.\s/.test(nextLine));
-            
+
             if (isListStart && prevLine.trim() !== "") {
                 result.push("");
                 fixes++;
             }
-            
+
             result.push(line);
-            
+
             if (isListEnd && nextLine.trim() !== "") {
                 result.push("");
                 fixes++;
             }
         }
-        
+
         this.stats.listSpacingFixed += fixes;
         return result.join("\n");
     }
@@ -219,29 +226,30 @@ class MarkdownFormatter {
      */
     fixEmphasisAsHeading(content) {
         let fixes = 0;
-        
+
         const lines = content.split("\n");
         const result = [];
-        
+
         for (let i = 0; i < lines.length; i++) {
             let line = lines[i];
-            
+
             // Check if line starts with bold text that should be a heading
             const boldMatch = line.match(/^\*\*(.*?)\*\*\s*$/);
-            if (boldMatch && line.trim().length < 60) { // Likely a heading if short
+            if (boldMatch && line.trim().length < 60) {
+                // Likely a heading if short
                 const headingText = boldMatch[1];
                 const nextLine = i < lines.length - 1 ? lines[i + 1] : "";
-                
+
                 // Convert to heading based on context
                 if (nextLine.trim() === "" || i === lines.length - 1) {
                     line = `## ${headingText}`;
                     fixes++;
                 }
             }
-            
+
             result.push(line);
         }
-        
+
         this.stats.emphasisToHeadingFixed += fixes;
         return result.join("\n");
     }
@@ -254,20 +262,20 @@ class MarkdownFormatter {
         let fixes = 0;
         const lines = content.split("\n");
         const result = [];
-        
+
         let listNumber = 1;
         let inOrderedList = false;
-        
+
         for (let i = 0; i < lines.length; i++) {
             let line = lines[i];
             const orderedListMatch = line.match(/^(\s*)\d+\.\s(.*)$/);
-            
+
             if (orderedListMatch) {
                 if (!inOrderedList) {
                     listNumber = 1;
                     inOrderedList = true;
                 }
-                
+
                 const indent = orderedListMatch[1];
                 const content = orderedListMatch[2];
                 line = `${indent}${listNumber}. ${content}`;
@@ -277,10 +285,10 @@ class MarkdownFormatter {
                 inOrderedList = false;
                 listNumber = 1;
             }
-            
+
             result.push(line);
         }
-        
+
         this.stats.orderedListFixed += fixes;
         return result.join("\n");
     }
@@ -294,15 +302,15 @@ class MarkdownFormatter {
         const lines = content.split("\n");
         const headingSeen = new Map();
         const result = [];
-        
+
         for (let line of lines) {
             const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
-            
+
             if (headingMatch) {
                 const level = headingMatch[1];
                 const text = headingMatch[2];
                 const lowerText = text.toLowerCase();
-                
+
                 if (headingSeen.has(lowerText)) {
                     const count = headingSeen.get(lowerText) + 1;
                     headingSeen.set(lowerText, count);
@@ -312,10 +320,10 @@ class MarkdownFormatter {
                     headingSeen.set(lowerText, 1);
                 }
             }
-            
+
             result.push(line);
         }
-        
+
         this.stats.duplicateHeadingsFixed += fixes;
         return result.join("\n");
     }
@@ -325,20 +333,20 @@ class MarkdownFormatter {
      */
     formatFile(filePath) {
         this.log(`Processing: ${filePath}`);
-        
+
         try {
             let content = PathValidator.safeReadFileSync(filePath, "utf8");
-            
+
             // Apply all fixes in sequence
             content = this.fixHeadingSpacing(content);
             content = this.fixListSpacing(content);
             content = this.fixEmphasisAsHeading(content);
             content = this.fixOrderedLists(content);
             content = this.fixDuplicateHeadings(content);
-            
+
             // Clean up multiple consecutive blank lines
             content = content.replace(/\n{3,}/g, "\n\n");
-            
+
             // Ensure file ends with single newline
             content = content.replace(/\n*$/, "\n");
 
@@ -347,7 +355,6 @@ class MarkdownFormatter {
             }
             this.stats.filesProcessed++;
             this.log(`✅ Formatted: ${filePath}`);
-            
         } catch (error) {
             console.error(` Error processing ${filePath}:`, error.message);
         }
@@ -359,26 +366,28 @@ class MarkdownFormatter {
     findMarkdownFiles(dir = process.cwd()) {
         const markdownFiles = [];
         const excludeDirs = ["node_modules", ".git", "data", "docs-prototype"];
-        
+
         const scanDirectory = (currentDir) => {
             try {
                 const items = PathValidator.safeReaddirSync(currentDir);
-                
+
                 for (const item of items) {
                     // Validate the item name before using in path.join
-                    if (!item || typeof item !== "string") {continue;}
-                    
+                    if (!item || typeof item !== "string") {
+                        continue;
+                    }
+
                     // Use safe path joining to prevent path traversal
                     const fullPath = path.resolve(currentDir, PathValidator.validatePathComponent(item));
-                    
+
                     // Ensure the resolved path is still within currentDir bounds
                     if (!fullPath.startsWith(path.resolve(currentDir))) {
                         console.warn(`Skipping potential path traversal attempt: ${item}`);
                         continue;
                     }
-                    
+
                     const stat = PathValidator.safeStatSync(fullPath);
-                    
+
                     if (stat.isDirectory()) {
                         // Skip excluded directories
                         if (!excludeDirs.includes(item)) {
@@ -392,7 +401,7 @@ class MarkdownFormatter {
                 // Skip directories we can't read
             }
         };
-        
+
         scanDirectory(dir);
         return markdownFiles;
     }
@@ -408,11 +417,13 @@ class MarkdownFormatter {
         console.log(`Emphasis→heading fixes: ${this.stats.emphasisToHeadingFixed}`);
         console.log(`Ordered list fixes: ${this.stats.orderedListFixed}`);
         console.log(`Duplicate heading fixes: ${this.stats.duplicateHeadingsFixed}`);
-        
-        const totalFixes = Object.values(this.stats).reduce((sum, val) => 
-            typeof val === "number" && val !== this.stats.filesProcessed ? sum + val : sum, 0);
+
+        const totalFixes = Object.values(this.stats).reduce(
+            (sum, val) => (typeof val === "number" && val !== this.stats.filesProcessed ? sum + val : sum),
+            0,
+        );
         console.log(`Total fixes applied: ${totalFixes}`);
-        
+
         if (this.dryRun) {
             console.log("\nDRY RUN MODE - No files were modified");
         }
@@ -426,8 +437,8 @@ function main() {
         dryRun: args.includes("--dry-run"),
         verbose: args.includes("--verbose") || args.includes("-v"),
         all: args.includes("--all"),
-        file: args.find(arg => arg.startsWith("--file="))?.split("=")[1],
-        dir: args.find(arg => arg.startsWith("--dir="))?.split("=")[1]
+        file: args.find((arg) => arg.startsWith("--file="))?.split("=")[1],
+        dir: args.find((arg) => arg.startsWith("--dir="))?.split("=")[1],
     };
 
     console.log("HexTrackr Markdown Formatter");
@@ -459,8 +470,8 @@ function main() {
         // Format all markdown files
         const markdownFiles = formatter.findMarkdownFiles();
         console.log(`Found ${markdownFiles.length} markdown files\n`);
-        
-        markdownFiles.forEach(file => formatter.formatFile(file));
+
+        markdownFiles.forEach((file) => formatter.formatFile(file));
     } else {
         console.log("Usage:");
         console.log(" node scripts/fix-markdown.js --file=path/to/file.md");
