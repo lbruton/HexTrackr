@@ -2465,6 +2465,7 @@ logger.debug("ui", "HexTrackr Settings Modal (shared) loaded successfully");
             refreshStats,
             exportData,
             backupData,
+            openDatabaseBackupModal,
             importData,
             clearData,
             // HEX-141: Cisco PSIRT functions
@@ -2496,6 +2497,7 @@ logger.debug("ui", "HexTrackr Settings Modal (shared) loaded successfully");
     // Export individual functions for onclick handlers
     window.exportData = exportData;
     window.backupData = backupData;
+    window.openDatabaseBackupModal = openDatabaseBackupModal;
     window.importData = importData;
     window.clearData = clearData;
     window.exportAllDataAsCSV = exportAllDataAsCSV;
