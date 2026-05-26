@@ -320,7 +320,6 @@ class LocationCardsManager {
         return locations
             .map((location) => {
                 const totalVPR = location.total_vpr || 0;
-                const deviceCount = location.device_count || 0;
                 const locationDisplay = location.location_display || location.location || "Unknown";
                 const locationKey = location.location || "";
 
@@ -350,12 +349,6 @@ class LocationCardsManager {
                 const ciscoCount = vendorBreakdown["CISCO"] || 0;
                 const paloCount = vendorBreakdown["Palo Alto"] || 0;
                 const otherCount = vendorBreakdown["Other"] || 0;
-
-                // Vendor VPR totals (stub for now - backend doesn't provide this yet)
-                // TODO HEX-293: Add vendor_vpr to backend locationService.js
-                const ciscoVPR = 0;
-                const paloVPR = 0;
-                const otherVPR = 0;
 
                 // KEV badge (top-left, outside card) - shows DEVICE count not KEV count
                 const kevDeviceCount = (location.kev_devices || []).length;
