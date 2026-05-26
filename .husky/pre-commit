@@ -35,8 +35,11 @@ else
     echo "     CSS fixes applied (or errors found)"
 fi
 
-# Stage markdown/CSS auto-fixes
-git add -u
+# Stage markdown/CSS auto-fixes only for files already staged for this commit.
+mapfile -t staged_formatted_files < <(git diff --name-only --cached -- "*.md" "*.css")
+if [ ${#staged_formatted_files[@]} -gt 0 ]; then
+    git add -- "${staged_formatted_files[@]}"
+fi
 
 # --- Layer 2: Check JavaScript (warn only - NO AUTO-FIX) ---
 echo ""
