@@ -54,7 +54,6 @@ class LoggingService {
 
             this.isInitialized = true;
             this.info("backend", "auth", "LoggingService initialized successfully");
-
         } catch (error) {
             console.error("Failed to initialize LoggingService:", error.message);
             throw error;
@@ -96,42 +95,38 @@ class LoggingService {
     async initializeEncryption() {
         return new Promise((resolve, reject) => {
             // Check if encryption key exists in database
-            this.db.get(
-                "SELECT encryption_key FROM audit_log_config WHERE id = 1",
-                [],
-                (err, row) => {
-                    if (err) {
-                        reject(new Error("Failed to query encryption key: " + err.message));
-                        return;
-                    }
+            this.db.get("SELECT encryption_key FROM audit_log_config WHERE id = 1", [], (err, row) => {
+                if (err) {
+                    reject(new Error("Failed to query encryption key: " + err.message));
+                    return;
+                }
 
-                    if (row && row.encryption_key) {
-                        // Use existing key
-                        this.encryptionKey = row.encryption_key;
-                        resolve();
-                    } else {
-                        // Generate new 256-bit key
-                        this.encryptionKey = crypto.randomBytes(32);
+                if (row && row.encryption_key) {
+                    // Use existing key
+                    this.encryptionKey = row.encryption_key;
+                    resolve();
+                } else {
+                    // Generate new 256-bit key
+                    this.encryptionKey = crypto.randomBytes(32);
 
-                        // Store in database
-                        this.db.run(
-                            `UPDATE audit_log_config
+                    // Store in database
+                    this.db.run(
+                        `UPDATE audit_log_config
                              SET encryption_key = ?,
                                  key_created_at = datetime('now'),
                                  updated_at = datetime('now')
                              WHERE id = 1`,
-                            [this.encryptionKey],
-                            (updateErr) => {
-                                if (updateErr) {
-                                    reject(new Error("Failed to store encryption key: " + updateErr.message));
-                                    return;
-                                }
-                                resolve();
+                        [this.encryptionKey],
+                        (updateErr) => {
+                            if (updateErr) {
+                                reject(new Error("Failed to store encryption key: " + updateErr.message));
+                                return;
                             }
-                        );
-                    }
+                            resolve();
+                        },
+                    );
                 }
-            );
+            });
         });
     }
 
@@ -166,7 +161,7 @@ class LoggingService {
 
         return {
             encrypted: combined,
-            iv: iv
+            iv: iv,
         };
     }
 
@@ -202,7 +197,6 @@ class LoggingService {
             } catch {
                 return plaintext;
             }
-
         } catch (error) {
             throw new Error("Decryption failed: " + error.message);
         }
@@ -268,9 +262,9 @@ class LoggingService {
                         username,
                         ipAddress,
                         userAgent,
-                        encrypted.encrypted,  // Store combined payload in encrypted_message
-                        null,                  // Leave encrypted_data NULL (legacy column)
-                        encrypted.iv
+                        encrypted.encrypted, // Store combined payload in encrypted_message
+                        null, // Leave encrypted_data NULL (legacy column)
+                        encrypted.iv,
                     ],
                     (err) => {
                         if (err) {
@@ -280,14 +274,13 @@ class LoggingService {
 
                         // Increment counter
                         this.db.run(
-                            "UPDATE audit_log_config SET total_logs_written = total_logs_written + 1 WHERE id = 1"
+                            "UPDATE audit_log_config SET total_logs_written = total_logs_written + 1 WHERE id = 1",
                         );
 
                         resolve();
-                    }
+                    },
                 );
             });
-
         } catch (error) {
             console.error("Audit log write failed:", error.message);
         }
@@ -485,7 +478,7 @@ class LoggingService {
                     `DELETE FROM audit_logs
                      WHERE timestamp < datetime('now', '-' || ? || ' days')`,
                     [retentionDays],
-                    function(err) {
+                    function (err) {
                         if (err) {
                             reject(new Error("Audit log cleanup failed: " + err.message));
                             return;
@@ -494,7 +487,9 @@ class LoggingService {
                         const deletedCount = this.changes;
 
                         if (deletedCount > 0) {
-                            console.log(` Cleaned up ${deletedCount} old audit logs (retention: ${retentionDays} days)`);
+                            console.log(
+                                ` Cleaned up ${deletedCount} old audit logs (retention: ${retentionDays} days)`,
+                            );
                         }
 
                         // Update metadata (use db reference, not this.db)
@@ -503,16 +498,15 @@ class LoggingService {
                              SET total_logs_purged = total_logs_purged + ?,
                                  last_cleanup_at = datetime('now')
                              WHERE id = 1`,
-                            [deletedCount]
+                            [deletedCount],
                         );
 
                         resolve();
-                    }
+                    },
                 );
             });
 
             this.lastCleanup = new Date();
-
         } catch (error) {
             console.error("Audit log cleanup error:", error.message);
         }
@@ -557,12 +551,12 @@ class LoggingService {
                                 totalLogs: statsRow.totalLogs || 0,
                                 oldestLog: statsRow.oldestLog || null,
                                 newestLog: statsRow.newestLog || null,
-                                categoriesTracked: categoryRows.map(row => row.category),
-                                encryptionStatus: "active"
+                                categoriesTracked: categoryRows.map((row) => row.category),
+                                encryptionStatus: "active",
                             });
-                        }
+                        },
                     );
-                }
+                },
             );
         });
     }
@@ -579,13 +573,7 @@ class LoggingService {
                 return;
             }
 
-            const {
-                startDate = null,
-                endDate = null,
-                category = null,
-                page = 1,
-                limit = 100
-            } = filters;
+            const { startDate = null, endDate = null, category = null, page = 1, limit = 100 } = filters;
 
             // Build WHERE clauses
             const whereClauses = [];
@@ -607,22 +595,19 @@ class LoggingService {
             const whereClause = whereClauses.length > 0 ? "WHERE " + whereClauses.join(" AND ") : "";
 
             // Get total count for pagination
-            this.db.get(
-                `SELECT COUNT(*) as total FROM audit_logs ${whereClause}`,
-                params,
-                (countErr, countRow) => {
-                    if (countErr) {
-                        reject(new Error("Failed to count audit logs: " + countErr.message));
-                        return;
-                    }
+            this.db.get(`SELECT COUNT(*) as total FROM audit_logs ${whereClause}`, params, (countErr, countRow) => {
+                if (countErr) {
+                    reject(new Error("Failed to count audit logs: " + countErr.message));
+                    return;
+                }
 
-                    const total = countRow.total || 0;
-                    const pages = Math.ceil(total / limit);
-                    const offset = (page - 1) * limit;
+                const total = countRow.total || 0;
+                const pages = Math.ceil(total / limit);
+                const offset = (page - 1) * limit;
 
-                    // Get paginated logs
-                    this.db.all(
-                        `SELECT
+                // Get paginated logs
+                this.db.all(
+                    `SELECT
                             id, timestamp, category,
                             encrypted_message, encryption_iv, encrypted_data,
                             user_id, username, ip_address, user_agent, request_id
@@ -630,57 +615,56 @@ class LoggingService {
                          ${whereClause}
                          ORDER BY timestamp DESC
                          LIMIT ? OFFSET ?`,
-                        [...params, limit, offset],
-                        (logsErr, rows) => {
-                            if (logsErr) {
-                                reject(new Error("Failed to query audit logs: " + logsErr.message));
-                                return;
-                            }
-
-                            // Decrypt messages
-                            const logs = rows.map(row => {
-                                try {
-                                    const decrypted = this.decrypt(row.encrypted_message, row.encryption_iv);
-                                    return {
-                                        id: row.id,
-                                        timestamp: row.timestamp,
-                                        category: row.category,
-                                        message: decrypted || "[Decryption failed]",
-                                        user_id: row.user_id,
-                                        username: row.username,
-                                        ip_address: row.ip_address,
-                                        user_agent: row.user_agent,
-                                        request_id: row.request_id
-                                    };
-                                } catch (decryptErr) {
-                                    // Return partial data if decryption fails
-                                    return {
-                                        id: row.id,
-                                        timestamp: row.timestamp,
-                                        category: row.category,
-                                        message: "[Decryption failed]",
-                                        user_id: row.user_id,
-                                        username: row.username,
-                                        ip_address: row.ip_address,
-                                        user_agent: row.user_agent,
-                                        request_id: row.request_id
-                                    };
-                                }
-                            });
-
-                            resolve({
-                                logs,
-                                pagination: {
-                                    page,
-                                    limit,
-                                    total,
-                                    pages
-                                }
-                            });
+                    [...params, limit, offset],
+                    (logsErr, rows) => {
+                        if (logsErr) {
+                            reject(new Error("Failed to query audit logs: " + logsErr.message));
+                            return;
                         }
-                    );
-                }
-            );
+
+                        // Decrypt messages
+                        const logs = rows.map((row) => {
+                            try {
+                                const decrypted = this.decrypt(row.encrypted_message, row.encryption_iv);
+                                return {
+                                    id: row.id,
+                                    timestamp: row.timestamp,
+                                    category: row.category,
+                                    message: decrypted || "[Decryption failed]",
+                                    user_id: row.user_id,
+                                    username: row.username,
+                                    ip_address: row.ip_address,
+                                    user_agent: row.user_agent,
+                                    request_id: row.request_id,
+                                };
+                            } catch (decryptErr) {
+                                // Return partial data if decryption fails
+                                return {
+                                    id: row.id,
+                                    timestamp: row.timestamp,
+                                    category: row.category,
+                                    message: "[Decryption failed]",
+                                    user_id: row.user_id,
+                                    username: row.username,
+                                    ip_address: row.ip_address,
+                                    user_agent: row.user_agent,
+                                    request_id: row.request_id,
+                                };
+                            }
+                        });
+
+                        resolve({
+                            logs,
+                            pagination: {
+                                page,
+                                limit,
+                                total,
+                                pages,
+                            },
+                        });
+                    },
+                );
+            });
         });
     }
 
@@ -696,7 +680,7 @@ class LoggingService {
             backend: { categories: {} },
             audit: { whitelist: [] },
             emojis: { debug: "🐛", info: "ℹ️", warn: "⚠️", error: "❌", success: "✅" },
-            performance: { slowQueryThreshold: 500, slowRequestThreshold: 2000, logMemoryUsage: false }
+            performance: { slowQueryThreshold: 500, slowRequestThreshold: 2000, logMemoryUsage: false },
         };
     }
 }
@@ -724,5 +708,5 @@ module.exports = {
         const service = this.getInstance();
         await service.initialize(db);
         return service;
-    }
+    },
 };

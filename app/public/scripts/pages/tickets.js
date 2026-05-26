@@ -3,23 +3,23 @@
 
 /**
  * HexTrackr - Tickets Management System
- * 
+ *
  * This file contains all JavaScript functionality for the tickets management system.
  * It implements the HexagonTicketsManager class and related functions for managing
  * Hexagon security tickets, including CRUD operations, pagination, search, filtering,
  * CSV import/export, PDF generation, and drag-and-drop device management.
- * 
+ *
  * Used by: tickets.html
- * Dependencies: 
+ * Dependencies:
  * - Bootstrap 5, jsPDF, JSZip, XLSX (SheetJS)
  * - scripts/shared/settings-modal.js (shared Settings modal component)
- * 
+ *
  * Architecture: Modular JavaScript following CSS pattern
  * scripts/
  * ├── shared/           # Shared components (Settings modal, navigation, etc.)
  * ├── pages/           # Page-specific functionality
  * └── utils/           # Utility functions
- * 
+ *
  * @author HexTrackr Development Team
  * @version 2.0.0
  * @since 2025-08-24
@@ -58,20 +58,20 @@ class HexagonTicketsManager {
     async init() {
         // Check if we have localStorage data to migrate
         await this.migrateFromLocalStorageIfNeeded();
-        
+
         // Load tickets from database
         await this.loadTicketsFromDB();
-        
+
         this.loadSharedDocumentation();
         this.setupEventListeners();
         this.populateLocationFilter();
-        
+
         this.updateStatistics();
         this.renderTickets();
-        
+
         // Set default date to today
         document.getElementById("dateSubmitted").value = new Date().toISOString().split("T")[0];
-        
+
         // Set default due date to 7 days from now
         const dueDate = new Date();
         dueDate.setDate(dueDate.getDate() + 7);
@@ -93,7 +93,7 @@ class HexagonTicketsManager {
         const dueDate = rawTicket.date_due || rawTicket.dateDue;
         const isOverdue = dueDate ? new Date(dueDate + "T00:00:00") < new Date() : false;
         let status = rawTicket.status || "";
-        
+
         // Auto-update status to "Overdue" if conditions are met
         // Priority: Failed > Overdue (Failed tickets need re-queuing, not just follow-up)
         if (isOverdue && status !== "Completed" && status !== "Closed" && status !== "Failed" && status !== "Overdue") {
@@ -105,14 +105,17 @@ class HexagonTicketsManager {
 
         // Don't mark completed, closed, or failed tickets as overdue
         const isActiveOverdue = isOverdue && status !== "Completed" && status !== "Closed" && status !== "Failed";
-        
+
         const normalizedXtNumber = this.normalizeXtNumber(rawTicket.xt_number || rawTicket.xtNumber);
 
         return {
             ...rawTicket,
             status: status, // Use the potentially updated status
             devices: typeof rawTicket.devices === "string" ? JSON.parse(rawTicket.devices) : rawTicket.devices || [],
-            attachments: typeof rawTicket.attachments === "string" ? JSON.parse(rawTicket.attachments) : rawTicket.attachments || [],
+            attachments:
+                typeof rawTicket.attachments === "string"
+                    ? JSON.parse(rawTicket.attachments)
+                    : rawTicket.attachments || [],
             xtNumber: normalizedXtNumber,
             dateSubmitted: rawTicket.date_submitted || rawTicket.dateSubmitted,
             dateDue: rawTicket.date_due || rawTicket.dateDue,
@@ -120,7 +123,7 @@ class HexagonTicketsManager {
             serviceNowTicket: rawTicket.service_now_ticket || rawTicket.serviceNowTicket,
             site: rawTicket.site || "",
             location: rawTicket.location || "",
-            isOverdue: isActiveOverdue // Add the isOverdue flag
+            isOverdue: isActiveOverdue, // Add the isOverdue flag
         };
     }
 
@@ -143,10 +146,14 @@ class HexagonTicketsManager {
      * normalizeXtNumber(123);
      */
     normalizeXtNumber(value) {
-        if (!value) {return undefined;}
+        if (!value) {
+            return undefined;
+        }
 
         const digitMatch = value.match(/\d+/);
-        if (!digitMatch) {return undefined;}
+        if (!digitMatch) {
+            return undefined;
+        }
 
         const digits = digitMatch[0];
         return digits.padStart(4, "0");
@@ -173,20 +180,25 @@ class HexagonTicketsManager {
         }
 
         const trimmed = input.trim();
-        if (!trimmed) {return "";}
+        if (!trimmed) {
+            return "";
+        }
 
         // Split on semicolon (multiple people)
-        const people = trimmed.split(";").map(p => p.trim()).filter(Boolean);
+        const people = trimmed
+            .split(";")
+            .map((p) => p.trim())
+            .filter(Boolean);
 
         // Transform each person
-        const normalized = people.map(person => {
+        const normalized = people.map((person) => {
             // If no comma, assume "First Last" format (just capitalize)
             if (!person.includes(",")) {
                 return this.toProperCase(person);
             }
 
             // "LAST,FIRST" format - reverse and capitalize
-            const parts = person.split(",").map(p => p.trim());
+            const parts = person.split(",").map((p) => p.trim());
             if (parts.length < 2) {
                 return this.toProperCase(person); // Fallback
             }
@@ -208,8 +220,10 @@ class HexagonTicketsManager {
      * @returns {string} String with first letter of each word capitalized
      */
     toProperCase(str) {
-        if (!str) {return str;}
-        return str.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+        if (!str) {
+            return str;
+        }
+        return str.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
     }
 
     async loadTicketsFromDB() {
@@ -219,19 +233,23 @@ class HexagonTicketsManager {
                 const rawTickets = await response.json();
                 logger.debug("ui", "Raw tickets from DB:", rawTickets);
                 logger.debug("ui", "First raw ticket:", rawTickets[0]);
-                
+
                 // Changed from using map with this.transformTicketData to using an arrow function
                 // to ensure 'this' context is preserved
-                this.tickets = rawTickets.map(ticket => this.transformTicketData(ticket));
-                
+                this.tickets = rawTickets.map((ticket) => this.transformTicketData(ticket));
+
                 logger.debug("ui", "Loaded", this.tickets.length, "tickets from database");
                 // Debug: Check first ticket to ensure it has an id
                 if (this.tickets.length > 0) {
                     logger.debug("ui", "First transformed ticket:", this.tickets[0]);
                     logger.debug("ui", "First ticket ID:", this.tickets[0].id);
-                    
+
                     // Debug: Check all ticket IDs
-                    logger.debug("ui", "All ticket IDs:", this.tickets.map(t => t.id));
+                    logger.debug(
+                        "ui",
+                        "All ticket IDs:",
+                        this.tickets.map((t) => t.id),
+                    );
                 }
             } else {
                 logger.error("ui", "Failed to load tickets:", response.statusText);
@@ -245,15 +263,15 @@ class HexagonTicketsManager {
 
     async saveTicketToDB(ticket) {
         try {
-            const method = ticket.id && this.tickets.find(t => t.id === ticket.id) ? "PUT" : "POST";
+            const method = ticket.id && this.tickets.find((t) => t.id === ticket.id) ? "PUT" : "POST";
             const url = method === "PUT" ? `/api/tickets/${ticket.id}` : "/api/tickets";
-            
+
             const response = await authState.authenticatedFetch(url, {
                 method: method,
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
-                body: JSON.stringify(ticket)
+                body: JSON.stringify(ticket),
             });
 
             if (response.ok) {
@@ -279,9 +297,9 @@ class HexagonTicketsManager {
             const response = await authState.authenticatedFetch(`/api/tickets/${ticketId}`, {
                 method: "PUT",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ status: "Overdue" })
+                body: JSON.stringify({ status: "Overdue" }),
             });
 
             if (response.ok) {
@@ -297,7 +315,7 @@ class HexagonTicketsManager {
     async deleteTicketFromDB(ticketId) {
         try {
             const response = await authState.authenticatedFetch(`/api/tickets/${ticketId}`, {
-                method: "DELETE"
+                method: "DELETE",
             });
 
             if (response.ok) {
@@ -320,7 +338,9 @@ class HexagonTicketsManager {
     async migrateFromLocalStorageIfNeeded() {
         try {
             const localData = localStorage.getItem("hexagonTickets");
-            if (!localData) {return;}
+            if (!localData) {
+                return;
+            }
 
             const tickets = JSON.parse(localData);
             if (!Array.isArray(tickets) || tickets.length === 0) {
@@ -334,16 +354,16 @@ class HexagonTicketsManager {
             const response = await authState.authenticatedFetch("/api/tickets/migrate", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ tickets })
+                body: JSON.stringify({ tickets }),
             });
 
             if (response.ok) {
                 const result = await response.json();
                 logger.debug("ui", "Migration successful:", result.message);
                 this.showToast(`Migration successful: ${result.message}`, "success");
-                
+
                 // Clear localStorage after successful migration
                 localStorage.removeItem("hexagonTickets");
             } else {
@@ -423,7 +443,8 @@ class HexagonTicketsManager {
 
         // Update XT# when modal is shown for new tickets
         document.getElementById("ticketModal").addEventListener("show.bs.modal", () => {
-            if (!this.currentEditingId) { // Only for new tickets
+            if (!this.currentEditingId) {
+                // Only for new tickets
                 this.updateXtNumberDisplay();
                 // Use setTimeout to ensure DOM is fully rendered before updating device numbers
                 setTimeout(() => {
@@ -455,7 +476,7 @@ class HexagonTicketsManager {
         });
 
         // Input validation: City fields - letters, spaces, hyphens only
-        ["shippingCity", "returnCity"].forEach(id => {
+        ["shippingCity", "returnCity"].forEach((id) => {
             const field = document.getElementById(id);
             if (field) {
                 field.addEventListener("input", (e) => {
@@ -465,7 +486,7 @@ class HexagonTicketsManager {
         });
 
         // Input validation: ZIP fields - numbers and hyphens only
-        ["shippingZip", "returnZip"].forEach(id => {
+        ["shippingZip", "returnZip"].forEach((id) => {
             const field = document.getElementById(id);
             if (field) {
                 field.addEventListener("input", (e) => {
@@ -535,7 +556,7 @@ class HexagonTicketsManager {
      */
     setupDeviceManagement() {
         const container = document.getElementById("devicesContainer");
-        
+
         container.addEventListener("click", (e) => {
             // Use closest() to find the button even if clicking on nested elements (icon)
             const addBtn = e.target.closest(".add-device-btn");
@@ -570,14 +591,14 @@ class HexagonTicketsManager {
         const deviceEntry = document.createElement("div");
         deviceEntry.className = "device-entry mb-2";
         deviceEntry.draggable = true;
-        
+
         // Get the value from the last device input to smart increment
         const lastInput = container.querySelector(".device-entry:last-child .device-input");
         const suggestedValue = this.generateNextDeviceName(lastInput ? lastInput.value : "");
-        
+
         // SECURITY: Escape HTML to prevent XSS injection
         const escapedValue = escapeHtml(suggestedValue);
-        
+
         // SECURITY: Use safe innerHTML assignment to prevent XSS
         const deviceEntryHTML = `
             <div class="input-group">
@@ -604,15 +625,15 @@ class HexagonTicketsManager {
                 </button>
             </div>
         `;
-        
+
         // SECURITY: Use safe innerHTML assignment with DOMPurify sanitization
         window.safeSetInnerHTML(deviceEntry, deviceEntryHTML);
-        
+
         container.appendChild(deviceEntry);
         this.updateDeviceButtons();
         this.updateDeviceNumbers();
         this.setupDragAndDrop(deviceEntry);
-        
+
         // Focus and select the new input for easy editing
         const newInput = deviceEntry.querySelector(".device-input");
         newInput.focus();
@@ -626,19 +647,19 @@ class HexagonTicketsManager {
 
         // Look for patterns like: nswan01, host30, server123, etc.
         const match = previousValue.match(/^(.+?)(\d+)$/);
-        
+
         if (match) {
             const prefix = match[1]; // e.g., "nswan", "host", "server"
             const number = parseInt(match[2], 10); // e.g., 1, 30, 123
             const nextNumber = number + 1;
-            
+
             // Preserve leading zeros if they exist
             const originalNumberStr = match[2];
             const paddedNumber = nextNumber.toString().padStart(originalNumberStr.length, "0");
-            
+
             return prefix + paddedNumber;
         }
-        
+
         // If no numeric pattern found, return empty to let user type
         return "";
     }
@@ -749,7 +770,9 @@ class HexagonTicketsManager {
         }
 
         try {
-            const response = await fetch(`/api/tickets/address-suggestions?site=${encodeURIComponent(site)}&location=${encodeURIComponent(location)}`);
+            const response = await fetch(
+                `/api/tickets/address-suggestions?site=${encodeURIComponent(site)}&location=${encodeURIComponent(location)}`,
+            );
             const result = await response.json();
 
             if (result.success && result.data) {
@@ -780,7 +803,7 @@ class HexagonTicketsManager {
      */
     populateAddressFields(type, addresses) {
         const fields = ["line1", "line2", "city", "state", "zip"];
-        fields.forEach(field => {
+        fields.forEach((field) => {
             const elementId = `${type}${field.charAt(0).toUpperCase() + field.slice(1)}`;
             const element = document.getElementById(elementId);
             const dbField = `${type}_${field}`;
@@ -822,7 +845,7 @@ class HexagonTicketsManager {
             deviceEntry.parentNode.insertBefore(deviceEntry, previousSibling);
             this.updateDeviceNumbers();
             this.showMoveArrowFeedback("up");
-            
+
             // Re-initialize drag and drop after DOM change
             this.initializeDragAndDrop();
         }
@@ -838,7 +861,7 @@ class HexagonTicketsManager {
             deviceEntry.parentNode.insertBefore(nextSibling, deviceEntry);
             this.updateDeviceNumbers();
             this.showMoveArrowFeedback("down");
-            
+
             // Re-initialize drag and drop after DOM change
             this.initializeDragAndDrop();
         }
@@ -850,21 +873,21 @@ class HexagonTicketsManager {
     updateDeviceNumbers() {
         const container = document.getElementById("devicesContainer");
         const deviceEntries = container.querySelectorAll(".device-entry");
-        
+
         logger.debug("ui", `Updating ${deviceEntries.length} device numbers`); // Debug log
-        
+
         deviceEntries.forEach((entry, index) => {
             const numberIndicator = entry.querySelector(".device-number-indicator");
             if (numberIndicator) {
                 const newNumber = `#${index + 1}`;
                 logger.debug("ui", `Setting device ${index} to ${newNumber}`); // Debug log
                 numberIndicator.textContent = newNumber;
-                
+
                 // Add a subtle highlight effect to show the number updated
                 numberIndicator.style.backgroundColor = "#007bff";
                 numberIndicator.style.color = "white";
                 numberIndicator.style.transition = "all 0.3s ease";
-                
+
                 setTimeout(() => {
                     numberIndicator.style.backgroundColor = "";
                     numberIndicator.style.color = "#6c757d";
@@ -872,19 +895,19 @@ class HexagonTicketsManager {
             } else {
                 logger.warn("ui", `No number indicator found for device ${index}`); // Debug log
             }
-            
+
             // Update up/down button states
             const moveUpBtn = entry.querySelector(".move-up-btn");
             const moveDownBtn = entry.querySelector(".move-down-btn");
-            
+
             if (moveUpBtn && moveDownBtn) {
                 // Disable up button for first item
-                moveUpBtn.disabled = (index === 0);
-                moveUpBtn.style.opacity = (index === 0) ? "0.5" : "1";
-                
+                moveUpBtn.disabled = index === 0;
+                moveUpBtn.style.opacity = index === 0 ? "0.5" : "1";
+
                 // Disable down button for last item
-                moveDownBtn.disabled = (index === deviceEntries.length - 1);
-                moveDownBtn.style.opacity = (index === deviceEntries.length - 1) ? "0.5" : "1";
+                moveDownBtn.disabled = index === deviceEntries.length - 1;
+                moveDownBtn.style.opacity = index === deviceEntries.length - 1 ? "0.5" : "1";
             }
         });
     }
@@ -895,31 +918,31 @@ class HexagonTicketsManager {
     reverseDeviceOrder() {
         const container = document.getElementById("devicesContainer");
         const deviceEntries = Array.from(container.querySelectorAll(".device-entry"));
-        
+
         if (deviceEntries.length <= 1) {
             return; // Nothing to reverse
         }
-        
+
         logger.debug("ui", "Reversing device order"); // Debug log
-        
+
         // Clear the container
         container.innerHTML = "";
-        
+
         // Add devices back in reverse order
-        deviceEntries.reverse().forEach(entry => {
+        deviceEntries.reverse().forEach((entry) => {
             container.appendChild(entry);
         });
-        
+
         // Toggle the reverse state
         this.isDeviceOrderReversed = !this.isDeviceOrderReversed;
-        
+
         // Update the reverse button to reflect current state
         this.updateReverseButton();
-        
+
         // Update the numbering and button states
         this.updateDeviceNumbers();
         this.updateDeviceButtons();
-        
+
         // Show visual feedback
         this.showReverseOrderFeedback();
     }
@@ -931,12 +954,12 @@ class HexagonTicketsManager {
         const reverseBtn = document.getElementById("reverseDevicesBtn");
         if (reverseBtn) {
             if (this.isDeviceOrderReversed) {
-                reverseBtn.innerHTML = "<i class=\"fas fa-sort-amount-up\"></i> Restore";
+                reverseBtn.innerHTML = '<i class="fas fa-sort-amount-up"></i> Restore';
                 reverseBtn.title = "Restore original device order";
                 reverseBtn.classList.remove("btn-outline-primary");
                 reverseBtn.classList.add("btn-outline-warning");
             } else {
-                reverseBtn.innerHTML = "<i class=\"fas fa-sort-amount-down-alt\"></i> Reverse";
+                reverseBtn.innerHTML = '<i class="fas fa-sort-amount-down-alt"></i> Reverse';
                 reverseBtn.title = "Reverse device order";
                 reverseBtn.classList.remove("btn-outline-warning");
                 reverseBtn.classList.add("btn-outline-primary");
@@ -951,7 +974,7 @@ class HexagonTicketsManager {
         const container = document.getElementById("devicesContainer");
         const headerDiv = container.previousElementSibling;
         const label = headerDiv.querySelector("label");
-        
+
         if (label) {
             // Create feedback message based on current state
             const originalText = label.textContent; // Use textContent to avoid HTML
@@ -962,7 +985,7 @@ class HexagonTicketsManager {
             small.textContent = "Order " + escapeHtml(actionText) + "! ✓ Use arrows or drag to reorder boot sequence";
             label.appendChild(small);
             label.style.color = "#0d6efd";
-            
+
             // Reset after a short delay
             setTimeout(() => {
                 label.textContent = originalText; // Use textContent for safe restoration
@@ -979,21 +1002,21 @@ class HexagonTicketsManager {
         const container = document.getElementById("devicesContainer");
         const headerDiv = container.previousElementSibling;
         const label = headerDiv.querySelector("label");
-        
+
         if (label) {
             // Create a more prominent feedback message
             const originalText = label.textContent; // Use textContent to avoid HTML
             label.style.color = "#28a745";
             label.style.fontWeight = "bold";
             label.style.transition = "all 0.3s ease";
-            
+
             // Safe DOM manipulation instead of innerHTML
             label.textContent = "Devices ";
             const small = document.createElement("small");
             small.className = "text-success fw-bold";
             small.textContent = `(Moved ${escapeHtml(direction)}! ✓ Use arrows or drag to reorder boot sequence)`;
             label.appendChild(small);
-            
+
             setTimeout(() => {
                 label.style.color = "";
                 label.style.fontWeight = "";
@@ -1006,7 +1029,7 @@ class HexagonTicketsManager {
         // PMD-disable-next-line GlobalVariable
         const deviceInputs = document.querySelectorAll(".device-input");
         const devices = [];
-        deviceInputs.forEach(input => {
+        deviceInputs.forEach((input) => {
             if (input.value.trim()) {
                 devices.push(input.value.trim());
             }
@@ -1017,10 +1040,10 @@ class HexagonTicketsManager {
     setDevices(devices) {
         const container = document.getElementById("devicesContainer");
         container.innerHTML = "";
-        
+
         // Use local variable to avoid parameter modification
         const deviceList = devices.length === 0 ? [""] : devices;
-        
+
         deviceList.forEach((device) => {
             const deviceEntry = document.createElement("div");
             deviceEntry.className = "device-entry mb-2";
@@ -1043,7 +1066,7 @@ class HexagonTicketsManager {
                         </button>
                     </div>
                     <input type="text" class="form-control device-input" placeholder="Enter device name (e.g., host01)" value="${device}">
-                    <button type="button" class="btn btn-outline-danger remove-device-btn" ${devices.length === 1 ? "style=\"display: none;\"" : ""}>
+                    <button type="button" class="btn btn-outline-danger remove-device-btn" ${devices.length === 1 ? 'style="display: none;"' : ""}>
                         <i class="fas fa-minus"></i>
                     </button>
                     <button type="button" class="btn btn-outline-success add-device-btn">
@@ -1054,7 +1077,7 @@ class HexagonTicketsManager {
             container.appendChild(deviceEntry);
             this.setupDragAndDrop(deviceEntry);
         });
-        
+
         this.updateDeviceButtons();
         this.updateDeviceNumbers();
     }
@@ -1063,8 +1086,8 @@ class HexagonTicketsManager {
     initializeDragAndDrop() {
         const container = document.getElementById("devicesContainer");
         const deviceEntries = container.querySelectorAll(".device-entry");
-        
-        deviceEntries.forEach(entry => {
+
+        deviceEntries.forEach((entry) => {
             this.setupDragAndDrop(entry);
         });
     }
@@ -1088,20 +1111,20 @@ class HexagonTicketsManager {
 
     handleDragEnd(e) {
         e.currentTarget.classList.remove("dragging");
-        
+
         // Clean up any remaining drag-over classes
         const container = document.getElementById("devicesContainer");
         const entries = container.querySelectorAll(".device-entry");
-        entries.forEach(entry => {
+        entries.forEach((entry) => {
             entry.classList.remove("drag-over");
         });
-        
+
         // Remove any drag placeholder
         const placeholder = container.querySelector(".drag-placeholder");
         if (placeholder) {
             placeholder.remove();
         }
-        
+
         this.draggedElement = null;
     }
 
@@ -1125,18 +1148,18 @@ class HexagonTicketsManager {
     handleDrop(e) {
         e.preventDefault();
         e.stopPropagation();
-        
+
         const dropTarget = e.currentTarget;
-        
+
         if (dropTarget !== this.draggedElement && this.draggedElement) {
             const container = document.getElementById("devicesContainer");
             const allEntries = Array.from(container.querySelectorAll(".device-entry"));
             const draggedIndex = allEntries.indexOf(this.draggedElement);
             const dropIndex = allEntries.indexOf(dropTarget);
-            
+
             // Remove the dragged element from its current position
             this.draggedElement.remove();
-            
+
             // Insert the dragged element at the correct position
             if (dropIndex === 0) {
                 // Dropping at the top - insert as first child
@@ -1148,17 +1171,17 @@ class HexagonTicketsManager {
                 // Moving up - insert before the drop target
                 dropTarget.parentNode.insertBefore(this.draggedElement, dropTarget);
             }
-            
+
             // Update device numbers after reordering
             this.updateDeviceNumbers();
-            
+
             // Re-initialize drag and drop for all entries
             this.initializeDragAndDrop();
-            
+
             // Show visual feedback for successful reorder
             this.showReorderFeedback();
         }
-        
+
         dropTarget.classList.remove("drag-over");
         return false;
     }
@@ -1167,13 +1190,14 @@ class HexagonTicketsManager {
         const container = document.getElementById("devicesContainer");
         const headerDiv = container.previousElementSibling;
         const label = headerDiv.querySelector("label");
-        
+
         if (label) {
             // Temporarily highlight the label to show reordering happened
             const originalText = label.textContent; // Use textContent to avoid HTML
             label.style.color = "#28a745";
-            label.innerHTML = "Devices <small class=\"text-success\">(Reordered! ✓ Use arrows or drag to reorder boot sequence)</small>";
-            
+            label.innerHTML =
+                'Devices <small class="text-success">(Reordered! ✓ Use arrows or drag to reorder boot sequence)</small>';
+
             setTimeout(() => {
                 label.style.color = "";
                 label.textContent = originalText; // Use textContent for safe restoration
@@ -1185,13 +1209,13 @@ class HexagonTicketsManager {
         // Validate that both site and location are required
         const site = document.getElementById("site").value.trim();
         const location = document.getElementById("location").value.trim();
-        
+
         if (!site) {
             alert("Site is required.");
             document.getElementById("site").focus();
             return;
         }
-        
+
         if (!location) {
             alert("Location is required.");
             document.getElementById("location").focus();
@@ -1199,9 +1223,9 @@ class HexagonTicketsManager {
         }
 
         // Generate XT# for new tickets (await backend API call)
-        const xtNumber = this.currentEditingId ?
-            this.getTicketById(this.currentEditingId).xtNumber || this.getTicketById(this.currentEditingId).xt_number :
-            await this.generateNextXtNumber();
+        const xtNumber = this.currentEditingId
+            ? this.getTicketById(this.currentEditingId).xtNumber || this.getTicketById(this.currentEditingId).xt_number
+            : await this.generateNextXtNumber();
 
         const ticket = {
             id: this.currentEditingId || Date.now().toString(),
@@ -1232,14 +1256,20 @@ class HexagonTicketsManager {
             outboundTracking: document.getElementById("outboundTracking").value,
             returnTracking: document.getElementById("returnTracking").value,
             // Legacy/computed fields for template compatibility
-            trackingNumber: document.getElementById("outboundTracking").value + (document.getElementById("returnTracking").value ? " | " + document.getElementById("returnTracking").value : ""),
+            trackingNumber:
+                document.getElementById("outboundTracking").value +
+                (document.getElementById("returnTracking").value
+                    ? " | " + document.getElementById("returnTracking").value
+                    : ""),
             shippingAddress: this.formatAddress("shipping"),
             returnAddress: this.formatAddress("return"),
             softwareVersions: document.getElementById("softwareVersions").value,
             mitigationDetails: document.getElementById("mitigationDetailsInput").value,
             attachments: [], // No more attachments since we removed the file input
-            createdAt: this.currentEditingId ? this.getTicketById(this.currentEditingId).createdAt : new Date().toISOString(),
-            updatedAt: new Date().toISOString()
+            createdAt: this.currentEditingId
+                ? this.getTicketById(this.currentEditingId).createdAt
+                : new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
         };
 
         ticket.xt_number = ticket.xtNumber;
@@ -1251,7 +1281,7 @@ class HexagonTicketsManager {
             this.renderTickets();
             this.updateStatistics();
             this.populateLocationFilter();
-            
+
             // Close modal
             const modal = bootstrap.Modal.getInstance(document.getElementById("ticketModal"));
             modal.hide();
@@ -1266,10 +1296,12 @@ class HexagonTicketsManager {
 
     editTicket(id) {
         const ticket = this.getTicketById(id);
-        if (!ticket) {return;}
+        if (!ticket) {
+            return;
+        }
 
         this.currentEditingId = id;
-        
+
         document.getElementById("dateSubmitted").value = ticket.dateSubmitted;
         document.getElementById("dateDue").value = ticket.dateDue;
         document.getElementById("hexagonTicket").value = ticket.hexagonTicket;
@@ -1296,7 +1328,8 @@ class HexagonTicketsManager {
         document.getElementById("outboundTracking").value = ticket.outbound_tracking || ticket.outboundTracking || "";
         document.getElementById("returnTracking").value = ticket.return_tracking || ticket.returnTracking || "";
         document.getElementById("softwareVersions").value = ticket.software_versions || ticket.softwareVersions || "";
-        document.getElementById("mitigationDetailsInput").value = ticket.mitigation_details || ticket.mitigationDetails || "";
+        document.getElementById("mitigationDetailsInput").value =
+            ticket.mitigation_details || ticket.mitigationDetails || "";
 
         this.setDevices(ticket.devices || []);
 
@@ -1306,7 +1339,7 @@ class HexagonTicketsManager {
         // Show/hide conditional fields based on job type
         this.updateConditionalFields();
 
-        document.getElementById("ticketModalLabel").innerHTML = "<i class=\"fas fa-edit me-2\"></i>Edit Ticket";
+        document.getElementById("ticketModalLabel").innerHTML = '<i class="fas fa-edit me-2"></i>Edit Ticket';
 
         // Show "View Markdown" button when editing existing ticket
         const viewMarkdownBtn = document.getElementById("viewTicketMarkdownBtn");
@@ -1337,8 +1370,12 @@ class HexagonTicketsManager {
         }
 
         const parts = [];
-        if (line1) {parts.push(line1);}
-        if (line2) {parts.push(line2);}
+        if (line1) {
+            parts.push(line1);
+        }
+        if (line2) {
+            parts.push(line2);
+        }
         if (city || state || zip) {
             const cityStateZip = [city, state, zip].filter(Boolean).join(" ");
             parts.push(cityStateZip);
@@ -1392,8 +1429,7 @@ class HexagonTicketsManager {
         }
 
         // Populate modal
-        document.getElementById("deleteTicketNumber").textContent =
-            ticket.xt_number || ticket.id;
+        document.getElementById("deleteTicketNumber").textContent = ticket.xt_number || ticket.id;
         document.getElementById("deletionReasonInput").value = "";
         document.getElementById("deletionReasonInput").classList.remove("is-invalid");
 
@@ -1418,20 +1454,15 @@ class HexagonTicketsManager {
 
         try {
             // Send DELETE with body
-            const response = await authState.authenticatedFetch(
-                `/api/tickets/${this.pendingDeleteTicketId}`,
-                {
-                    method: "DELETE",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ deletion_reason: reason })
-                }
-            );
+            const response = await authState.authenticatedFetch(`/api/tickets/${this.pendingDeleteTicketId}`, {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ deletion_reason: reason }),
+            });
 
             if (response.ok) {
                 // Hide modal
-                const modal = bootstrap.Modal.getInstance(
-                    document.getElementById("deleteTicketModal")
-                );
+                const modal = bootstrap.Modal.getInstance(document.getElementById("deleteTicketModal"));
                 modal.hide();
 
                 // Reload and notify
@@ -1459,13 +1490,15 @@ class HexagonTicketsManager {
         }
 
         // Generate markdown content for the ticket (async)
-        this.generateMarkdown(ticket).then(markdownContent => {
-            // Display in the markdown view modal
-            document.getElementById("markdownContent").textContent = markdownContent;
-        }).catch(error => {
-            logger.error("ui", "Error generating ticket markdown:", error);
-            document.getElementById("markdownContent").textContent = "Error loading ticket details";
-        });
+        this.generateMarkdown(ticket)
+            .then((markdownContent) => {
+                // Display in the markdown view modal
+                document.getElementById("markdownContent").textContent = markdownContent;
+            })
+            .catch((error) => {
+                logger.error("ui", "Error generating ticket markdown:", error);
+                document.getElementById("markdownContent").textContent = "Error loading ticket details";
+            });
         document.getElementById("viewTicketModal").setAttribute("data-ticket-id", id);
 
         // Reset tabs to show ticket tab first
@@ -1522,7 +1555,7 @@ class HexagonTicketsManager {
                 await this.loadEmailMarkdownForModal();
             });
         }
-        
+
         // Check if we're using Bootstrap or Tabler
         const viewTicketModal = document.getElementById("viewTicketModal");
         if (typeof bootstrap !== "undefined" && bootstrap.Modal) {
@@ -1539,7 +1572,7 @@ class HexagonTicketsManager {
             viewTicketModal.classList.add("show");
             viewTicketModal.style.display = "block";
             document.body.classList.add("modal-open");
-            
+
             // Add backdrop
             const backdrop = document.createElement("div");
             backdrop.className = "modal-backdrop fade show";
@@ -1640,11 +1673,11 @@ class HexagonTicketsManager {
             }
 
             logger.debug("ui", "[VulnModal] Vulnerability markdown loaded successfully");
-
         } catch (error) {
             logger.error("ui", "[VulnModal] Error loading vulnerability markdown:", error);
             if (vulnContent) {
-                vulnContent.textContent = "# Error Loading Vulnerabilities\n\nFailed to load vulnerability data. Please try again.";
+                vulnContent.textContent =
+                    "# Error Loading Vulnerabilities\n\nFailed to load vulnerability data. Please try again.";
                 vulnContent.style.display = "block";
             }
             if (vulnLoading) {
@@ -1677,7 +1710,7 @@ class HexagonTicketsManager {
         // Calculate pagination
         const totalItems = filteredTickets.length;
         const totalPages = Math.ceil(totalItems / this.rowsPerPage);
-        
+
         // Ensure current page is valid
         if (this.currentPage > totalPages) {
             this.currentPage = totalPages;
@@ -1690,14 +1723,15 @@ class HexagonTicketsManager {
         const endIndex = Math.min(startIndex + this.rowsPerPage, totalItems);
         const paginatedTickets = filteredTickets.slice(startIndex, endIndex);
 
-        tbody.innerHTML = paginatedTickets.map(ticket => {
-            // Use server-calculated overdue status
-            const isOverdue = ticket.isOverdue || ticket.status === "Overdue";
-            
-            // Format XT# to show only last 4 digits - escape for safety
-            const displayXtNumber = ticket.xtNumber ? escapeHtml(ticket.xtNumber) : "N/A";
-            
-            return `
+        tbody.innerHTML = paginatedTickets
+            .map((ticket) => {
+                // Use server-calculated overdue status
+                const isOverdue = ticket.isOverdue || ticket.status === "Overdue";
+
+                // Format XT# to show only last 4 digits - escape for safety
+                const displayXtNumber = ticket.xtNumber ? escapeHtml(ticket.xtNumber) : "N/A";
+
+                return `
                 <tr class="${isOverdue ? "table-danger" : ""}" data-ticket-id="${escapeHtml(ticket.id)}">
                     <td class="text-center"><strong>${displayXtNumber}</strong></td>
                     <td class="text-center">${escapeHtml(this.formatDate(ticket.dateSubmitted))}</td>
@@ -1708,7 +1742,7 @@ class HexagonTicketsManager {
                     <td class="text-center">${this.createLocationChip(ticket.location || "")}</td>
                     <td class="text-center">
                         <div class="devices-list">
-                            ${ticket.devices.map(device => `<span class="device-tag enhanced">${this.highlightSearch(device)}</span>`).join("")}
+                            ${ticket.devices.map((device) => `<span class="device-tag enhanced">${this.highlightSearch(device)}</span>`).join("")}
                         </div>
                     </td>
                     <td class="text-center">
@@ -1735,7 +1769,8 @@ class HexagonTicketsManager {
                     </td>
                 </tr>
             `;
-        }).join("");
+            })
+            .join("");
 
         // Update pagination info and controls
         this.updatePaginationInfo(startIndex + 1, endIndex, totalItems);
@@ -1753,7 +1788,7 @@ class HexagonTicketsManager {
 
     renderPaginationControls(totalPages) {
         const paginationControls = document.getElementById("paginationControls");
-        
+
         if (totalPages <= 1) {
             paginationControls.innerHTML = "";
             return;
@@ -1789,7 +1824,7 @@ class HexagonTicketsManager {
                 </li>
             `;
             if (startPage > 2) {
-                html += "<li class=\"page-item disabled\"><span class=\"page-link\">...</span></li>";
+                html += '<li class="page-item disabled"><span class="page-link">...</span></li>';
             }
         }
 
@@ -1805,7 +1840,7 @@ class HexagonTicketsManager {
         // Last page and ellipsis if needed
         if (endPage < totalPages) {
             if (endPage < totalPages - 1) {
-                html += "<li class=\"page-item disabled\"><span class=\"page-link\">...</span></li>";
+                html += '<li class="page-item disabled"><span class="page-link">...</span></li>';
             }
             html += `
                 <li class="page-item">
@@ -1834,29 +1869,40 @@ class HexagonTicketsManager {
 
     // Helper function to create location chips
     createLocationChip(location) {
-        if (!location) {return "N/A";}
+        if (!location) {
+            return "N/A";
+        }
         const colorClass = this.getLocationColor(location);
         return `<span class="location-chip ${colorClass}">${this.highlightSearch(location)}</span>`;
     }
 
-    // Helper function to create site chips  
+    // Helper function to create site chips
     createSiteChip(site) {
-        if (!site) {return "N/A";}
+        if (!site) {
+            return "N/A";
+        }
         const colorClass = this.getSiteColor(site);
         return `<span class="site-chip ${colorClass}">${this.highlightSearch(site)}</span>`;
     }
 
     // Helper function to create supervisor chips
     createSupervisorChips(supervisorText) {
-        if (!supervisorText) {return "N/A";}
-        
+        if (!supervisorText) {
+            return "N/A";
+        }
+
         // Parse supervisors (semicolon separated only - names are "LAST, FIRST" format)
-        const supervisors = supervisorText.split(";").map(s => s.trim()).filter(s => s);
-        
-        return supervisors.map(supervisor => {
-            const colorClass = this.getSupervisorColor(supervisor);
-            return `<span class="supervisor-chip ${colorClass}">${this.highlightSearch(supervisor)}</span>`;
-        }).join("");
+        const supervisors = supervisorText
+            .split(";")
+            .map((s) => s.trim())
+            .filter((s) => s);
+
+        return supervisors
+            .map((supervisor) => {
+                const colorClass = this.getSupervisorColor(supervisor);
+                return `<span class="supervisor-chip ${colorClass}">${this.highlightSearch(supervisor)}</span>`;
+            })
+            .join("");
     }
 
     // Color assignment functions for consistent chip styling
@@ -1880,19 +1926,21 @@ class HexagonTicketsManager {
 
     // Helper function to create ServiceNow ticket display (clickable if enabled)
     createServiceNowDisplay(serviceNowTicket) {
-        if (!serviceNowTicket) {return this.highlightSearch("N/A");}
-        
+        if (!serviceNowTicket) {
+            return this.highlightSearch("N/A");
+        }
+
         // Check if ServiceNow integration is enabled (from shared settings modal)
         const isEnabled = window.isServiceNowEnabled && window.isServiceNowEnabled();
         const serviceNowUrl = window.generateServiceNowUrl && window.generateServiceNowUrl(serviceNowTicket);
-        
+
         // If enabled and we have a valid URL, make it clickable
         if (isEnabled && serviceNowUrl) {
             return `<a href="${serviceNowUrl}" target="_blank" class="text-decoration-none service-now-link" title="Open in ServiceNow">
                         <i class="fas fa-external-link-alt me-1 text-primary"></i>${this.highlightSearch(serviceNowTicket)}
                     </a>`;
         }
-        
+
         // Otherwise, just show the ticket number
         return this.highlightSearch(serviceNowTicket);
     }
@@ -1903,7 +1951,7 @@ class HexagonTicketsManager {
         for (let i = 0; i < str.length; i++) {
             const char = str.charCodeAt(i);
             // PMD-disable-next-line GlobalVariable
-            hash = ((hash << 5) - hash) + char;
+            hash = (hash << 5) - hash + char;
             // PMD-disable-next-line GlobalVariable
             hash = hash & hash; // Convert to 32-bit integer
         }
@@ -1922,9 +1970,10 @@ class HexagonTicketsManager {
         const jobTypeFilter = document.getElementById("jobTypeFilter").value;
         const locationFilter = document.getElementById("locationFilter").value;
 
-        return this.tickets.filter(ticket => {
+        return this.tickets.filter((ticket) => {
             // 1. Search filter (applies to all fields)
-            const matchesSearch = !searchTerm ||
+            const matchesSearch =
+                !searchTerm ||
                 (ticket.xtNumber && ticket.xtNumber.toLowerCase().includes(searchTerm)) ||
                 (ticket.hexagonTicket && ticket.hexagonTicket.toString().toLowerCase().includes(searchTerm)) ||
                 (ticket.serviceNowTicket && ticket.serviceNowTicket.toLowerCase().includes(searchTerm)) ||
@@ -1932,16 +1981,19 @@ class HexagonTicketsManager {
                 (ticket.site && ticket.site.toLowerCase().includes(searchTerm)) ||
                 (ticket.supervisor && ticket.supervisor.toLowerCase().includes(searchTerm)) ||
                 (ticket.tech && ticket.tech.toLowerCase().includes(searchTerm)) ||
-                (ticket.devices && Array.isArray(ticket.devices) && ticket.devices.some(device => device && device.toLowerCase().includes(searchTerm)));
+                (ticket.devices &&
+                    Array.isArray(ticket.devices) &&
+                    ticket.devices.some((device) => device && device.toLowerCase().includes(searchTerm)));
 
             // 2. Card filter (primary status filter)
             const matchesCardFilter = this.applyCardFilterLogic(ticket);
 
             // 3. Status dropdown (only if no card filter active)
-            const matchesStatus = this.activeCardFilter ? true : (!statusFilter || ticket.status === statusFilter);
+            const matchesStatus = this.activeCardFilter ? true : !statusFilter || ticket.status === statusFilter;
 
             // 4. Job Type filter
-            const matchesJobType = !jobTypeFilter || (ticket.jobType === jobTypeFilter || ticket.job_type === jobTypeFilter);
+            const matchesJobType =
+                !jobTypeFilter || ticket.jobType === jobTypeFilter || ticket.job_type === jobTypeFilter;
 
             // 5. Location filter
             const matchesLocation = !locationFilter || ticket.location === locationFilter;
@@ -1952,7 +2004,9 @@ class HexagonTicketsManager {
 
     highlightSearch(text) {
         let searchTerm = document.getElementById("searchInput").value.toLowerCase();
-        if (!searchTerm || !text) {return text;}
+        if (!searchTerm || !text) {
+            return text;
+        }
 
         // Defense-in-depth: Length limit to prevent excessive processing
         if (searchTerm.length > 100) {
@@ -1962,13 +2016,15 @@ class HexagonTicketsManager {
 
         // Security: Use split/join with escaped search term to prevent DoS attacks
         const parts = text.split(new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi"));
-        
-        return parts.map((part, index) => {
-            if (index % 2 === 1) {
-                return `<span class="highlight">${part}</span>`;
-            }
-            return part;
-        }).join("");
+
+        return parts
+            .map((part, index) => {
+                if (index % 2 === 1) {
+                    return `<span class="highlight">${part}</span>`;
+                }
+                return part;
+            })
+            .join("");
     }
 
     /**
@@ -1979,9 +2035,9 @@ class HexagonTicketsManager {
      */
     updateStatistics() {
         const total = this.tickets.length;
-        const open = this.tickets.filter(t => !["Closed", "Completed", "Failed"].includes(t.status)).length;
-        const completed = this.tickets.filter(t => ["Completed", "Closed"].includes(t.status)).length;
-        const overdue = this.tickets.filter(t => ["Overdue", "Failed"].includes(t.status)).length;
+        const open = this.tickets.filter((t) => !["Closed", "Completed", "Failed"].includes(t.status)).length;
+        const completed = this.tickets.filter((t) => ["Completed", "Closed"].includes(t.status)).length;
+        const overdue = this.tickets.filter((t) => ["Overdue", "Failed"].includes(t.status)).length;
 
         document.getElementById("totalTickets").textContent = total;
         document.getElementById("openTickets").textContent = open;
@@ -2063,7 +2119,7 @@ class HexagonTicketsManager {
      */
     updateCardStyles(activeFilter) {
         const cards = document.querySelectorAll(".stats-card");
-        cards.forEach(card => {
+        cards.forEach((card) => {
             const cardType = card.getAttribute("data-filter-type");
             if (cardType === activeFilter) {
                 card.classList.add("stats-card-active");
@@ -2084,10 +2140,10 @@ class HexagonTicketsManager {
      */
     announceFilterChange(filterType) {
         const messages = {
-            "all": "Showing all tickets",
-            "open": "Showing open tickets only",
-            "overdue": "Showing overdue and failed tickets",
-            "completed": "Showing completed tickets only"
+            all: "Showing all tickets",
+            open: "Showing open tickets only",
+            overdue: "Showing overdue and failed tickets",
+            completed: "Showing completed tickets only",
         };
 
         // Find or create announcement element
@@ -2105,18 +2161,18 @@ class HexagonTicketsManager {
     }
 
     populateLocationFilter() {
-        const locations = [...new Set(this.tickets.map(t => t.location))].sort();
+        const locations = [...new Set(this.tickets.map((t) => t.location))].sort();
         const filter = document.getElementById("locationFilter");
         const currentValue = filter.value;
-        
-        filter.innerHTML = "<option value=\"\">All Locations</option>";
-        locations.forEach(location => {
+
+        filter.innerHTML = '<option value="">All Locations</option>';
+        locations.forEach((location) => {
             const option = document.createElement("option");
             option.value = location;
             option.textContent = location;
             filter.appendChild(option);
         });
-        
+
         filter.value = currentValue;
     }
 
@@ -2129,7 +2185,7 @@ class HexagonTicketsManager {
     resetForm() {
         document.getElementById("ticketForm").reset();
         this.currentEditingId = null;
-        document.getElementById("ticketModalLabel").innerHTML = "<i class=\"fas fa-plus me-2\"></i>Add New Ticket";
+        document.getElementById("ticketModalLabel").innerHTML = '<i class="fas fa-plus me-2"></i>Add New Ticket';
 
         // Hide "View Markdown" button for new tickets
         const viewMarkdownBtn = document.getElementById("viewTicketMarkdownBtn");
@@ -2142,7 +2198,7 @@ class HexagonTicketsManager {
         const dueDate = new Date();
         dueDate.setDate(dueDate.getDate() + 7);
         document.getElementById("dateDue").value = dueDate.toISOString().split("T")[0];
-        
+
         // Reset devices
         this.setDevices([""]);
         // Update device numbers to show proper numbering (fixes #0 display issue)
@@ -2159,20 +2215,20 @@ class HexagonTicketsManager {
             return new Date(year, month - 1, day).toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "short",
-                day: "numeric"
+                day: "numeric",
             });
         }
-        
+
         // Fallback for other date formats
         return new Date(dateString + "T00:00:00").toLocaleDateString("en-US", {
             year: "numeric",
             month: "short",
-            day: "numeric"
+            day: "numeric",
         });
     }
 
     getTicketById(id) {
-        return this.tickets.find(t => t.id === id);
+        return this.tickets.find((t) => t.id === id);
     }
 
     // Note: loadTickets() and saveTickets() methods removed - now using database API
@@ -2269,7 +2325,7 @@ class HexagonTicketsManager {
         doc.text("Task Instruction:", 20, yPosition);
         yPosition += lineHeight;
         doc.setFont("helvetica", "normal");
-        
+
         const taskText = `There are critical security patches that must be applied within 30 days at the [${ticket.location}] site.`;
         const splitTaskText = doc.splitTextToSize(taskText, 170);
         doc.text(splitTaskText, 20, yPosition);
@@ -2315,7 +2371,7 @@ class HexagonTicketsManager {
             doc.setTextColor(0, 0, 0);
             doc.text("Attached Documentation:", 20, yPosition);
             yPosition += 8;
-            
+
             doc.setFont("helvetica", "normal");
             doc.setFontSize(10);
             this.sharedDocumentation.forEach((doc_file, index) => {
@@ -2352,13 +2408,15 @@ class HexagonTicketsManager {
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = () => resolve(reader.result);
-            reader.onerror = error => reject(error);
+            reader.onerror = (error) => reject(error);
         });
     }
 
     // Simple hostname matching - case-insensitive only
     hostnameMatches(hostname1, hostname2) {
-        if (!hostname1 || !hostname2) {return false;}
+        if (!hostname1 || !hostname2) {
+            return false;
+        }
 
         // Simple case-insensitive match
         return hostname1.toLowerCase().trim() === hostname2.toLowerCase().trim();
@@ -2366,14 +2424,19 @@ class HexagonTicketsManager {
 
     // Fetch vulnerabilities for matched devices
     async fetchVulnerabilitiesForDevices(devices) {
-        if (!devices || devices.length === 0) {return [];}
+        if (!devices || devices.length === 0) {
+            return [];
+        }
 
         try {
             // Fetch vulnerabilities from the API
-            const response = await authState.authenticatedFetch("/api/vulnerabilities?" + new URLSearchParams({
-                limit: "10000",  // Get all vulnerabilities for these devices
-                sort: "severity"
-            }));
+            const response = await authState.authenticatedFetch(
+                "/api/vulnerabilities?" +
+                    new URLSearchParams({
+                        limit: "10000", // Get all vulnerabilities for these devices
+                        sort: "severity",
+                    }),
+            );
 
             if (!response.ok) {
                 logger.error("ui", "[VulnBundle] Failed to fetch vulnerabilities:", response.status);
@@ -2389,16 +2452,19 @@ class HexagonTicketsManager {
             }
 
             // Filter vulnerabilities to match our devices
-            const matchedVulns = data.data.filter(vuln => {
-                return devices.some(device => {
+            const matchedVulns = data.data.filter((vuln) => {
+                return devices.some((device) => {
                     return this.hostnameMatches(vuln.hostname, device);
                 });
             });
 
             // Log matching summary (production-friendly)
             if (matchedVulns.length > 0) {
-                const uniqueHosts = new Set(matchedVulns.map(v => v.hostname));
-                logger.debug("ui", `[VulnBundle] Found ${matchedVulns.length} vulnerabilities across ${uniqueHosts.size} device(s)`);
+                const uniqueHosts = new Set(matchedVulns.map((v) => v.hostname));
+                logger.debug(
+                    "ui",
+                    `[VulnBundle] Found ${matchedVulns.length} vulnerabilities across ${uniqueHosts.size} device(s)`,
+                );
             }
 
             return matchedVulns;
@@ -2411,7 +2477,7 @@ class HexagonTicketsManager {
     // Generate vulnerability markdown report
     async generateVulnerabilityMarkdown(ticket, vulnerabilities) {
         if (!vulnerabilities || vulnerabilities.length === 0) {
-            return null;  // No report if no vulnerabilities
+            return null; // No report if no vulnerabilities
         }
 
         try {
@@ -2437,12 +2503,12 @@ class HexagonTicketsManager {
     // Fallback vulnerability markdown generation (original hardcoded version)
     generateVulnerabilityMarkdownFallback(ticket, vulnerabilities) {
         if (!vulnerabilities || vulnerabilities.length === 0) {
-            return null;  // No report if no vulnerabilities
+            return null; // No report if no vulnerabilities
         }
 
         // Group vulnerabilities by device
         const vulnsByDevice = {};
-        vulnerabilities.forEach(vuln => {
+        vulnerabilities.forEach((vuln) => {
             const hostname = vuln.hostname || "Unknown Device";
             if (!vulnsByDevice[hostname]) {
                 vulnsByDevice[hostname] = [];
@@ -2462,7 +2528,7 @@ class HexagonTicketsManager {
 
         // Count by severity
         const severityCounts = { CRITICAL: 0, HIGH: 0, MEDIUM: 0, LOW: 0 };
-        vulnerabilities.forEach(v => {
+        vulnerabilities.forEach((v) => {
             const sev = (v.severity || "LOW").toUpperCase();
             if (severityCounts[sev] !== undefined) {
                 severityCounts[sev]++;
@@ -2471,39 +2537,45 @@ class HexagonTicketsManager {
         markdown += `- Critical: ${severityCounts.CRITICAL}, High: ${severityCounts.HIGH}, Medium: ${severityCounts.MEDIUM}, Low: ${severityCounts.LOW}\n\n`;
 
         // Add vulnerabilities by device
-        Object.keys(vulnsByDevice).sort().forEach(hostname => {
-            const deviceVulns = vulnsByDevice[hostname];
+        Object.keys(vulnsByDevice)
+            .sort()
+            .forEach((hostname) => {
+                const deviceVulns = vulnsByDevice[hostname];
 
-            markdown += `## Device: ${hostname}\n`;
-            markdown += `Total Vulnerabilities: ${deviceVulns.length}\n\n`;
+                markdown += `## Device: ${hostname}\n`;
+                markdown += `Total Vulnerabilities: ${deviceVulns.length}\n\n`;
 
-            // Sort by VPR score (highest to lowest)
-            deviceVulns.sort((a, b) => {
-                return (b.vpr_score || 0) - (a.vpr_score || 0);
+                // Sort by VPR score (highest to lowest)
+                deviceVulns.sort((a, b) => {
+                    return (b.vpr_score || 0) - (a.vpr_score || 0);
+                });
+
+                // Create table
+                markdown += "| CVE/Plugin | Description | Severity | VPR | First Seen | Last Seen |\n";
+                markdown += "|------------|-------------|----------|-----|------------|-------------||\n";
+
+                deviceVulns.forEach((vuln) => {
+                    const id = vuln.cve || vuln.plugin_id || "N/A";
+                    const desc = (vuln.plugin_name || vuln.description || "N/A").substring(0, 50);
+                    const severity = vuln.severity || "N/A";
+                    const vpr = vuln.vpr_score ? vuln.vpr_score.toFixed(1) : "N/A";
+                    const firstSeen = vuln.first_seen
+                        ? new Date(vuln.first_seen + "T00:00:00").toLocaleDateString()
+                        : "N/A";
+                    const lastSeen = vuln.last_seen
+                        ? new Date(vuln.last_seen + "T00:00:00").toLocaleDateString()
+                        : "N/A";
+
+                    markdown += `| ${id} | ${desc} | ${severity} | ${vpr} | ${firstSeen} | ${lastSeen} |\n`;
+                });
+
+                markdown += "\n";
             });
-
-            // Create table
-            markdown += "| CVE/Plugin | Description | Severity | VPR | First Seen | Last Seen |\n";
-            markdown += "|------------|-------------|----------|-----|------------|-------------||\n";
-
-            deviceVulns.forEach(vuln => {
-                const id = vuln.cve || vuln.plugin_id || "N/A";
-                const desc = (vuln.plugin_name || vuln.description || "N/A").substring(0, 50);
-                const severity = vuln.severity || "N/A";
-                const vpr = vuln.vpr_score ? vuln.vpr_score.toFixed(1) : "N/A";
-                const firstSeen = vuln.first_seen ? new Date(vuln.first_seen + "T00:00:00").toLocaleDateString() : "N/A";
-                const lastSeen = vuln.last_seen ? new Date(vuln.last_seen + "T00:00:00").toLocaleDateString() : "N/A";
-
-                markdown += `| ${id} | ${desc} | ${severity} | ${vpr} | ${firstSeen} | ${lastSeen} |\n`;
-            });
-
-            markdown += "\n";
-        });
 
         // Add devices with no vulnerabilities
         if (ticket.devices && ticket.devices.length > 0) {
-            const devicesWithoutVulns = ticket.devices.filter(device => {
-                return !vulnerabilities.some(v => {
+            const devicesWithoutVulns = ticket.devices.filter((device) => {
+                return !vulnerabilities.some((v) => {
                     return this.hostnameMatches(v.hostname, device);
                 });
             });
@@ -2511,7 +2583,7 @@ class HexagonTicketsManager {
             if (devicesWithoutVulns.length > 0) {
                 markdown += "---\n\n";
                 markdown += "## Devices with No Vulnerabilities Found\n";
-                devicesWithoutVulns.forEach(device => {
+                devicesWithoutVulns.forEach((device) => {
                     markdown += `- ${device}\n`;
                 });
                 markdown += "\n";
@@ -2539,7 +2611,7 @@ class HexagonTicketsManager {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF("p", "mm", "a4");
             const margin = 20;
-            const pageWidth = doc.internal.pageSize.getWidth() - (margin * 2);
+            const pageWidth = doc.internal.pageSize.getWidth() - margin * 2;
             const lineHeight = 6;
             let yPosition = margin;
 
@@ -2547,7 +2619,7 @@ class HexagonTicketsManager {
             doc.setFontSize(11);
 
             const wrappedLines = doc.splitTextToSize(ticketMarkdown, pageWidth);
-            wrappedLines.forEach(line => {
+            wrappedLines.forEach((line) => {
                 if (yPosition > doc.internal.pageSize.getHeight() - margin) {
                     doc.addPage();
                     doc.setFont("courier", "normal");
@@ -2596,12 +2668,18 @@ class HexagonTicketsManager {
                         const stats = await statsResponse.json();
 
                         // Calculate total vulnerabilities from all severities
-                        const totalVulns = (stats.critical?.count || 0) + (stats.high?.count || 0) +
-                                          (stats.medium?.count || 0) + (stats.low?.count || 0);
+                        const totalVulns =
+                            (stats.critical?.count || 0) +
+                            (stats.high?.count || 0) +
+                            (stats.medium?.count || 0) +
+                            (stats.low?.count || 0);
 
                         // Only proceed if there are vulnerabilities in the database
                         if (totalVulns > 0 && deviceArray.length > 0) {
-                            logger.debug("ui", `[VulnBundle] Checking ${deviceArray.length} devices for vulnerabilities...`);
+                            logger.debug(
+                                "ui",
+                                `[VulnBundle] Checking ${deviceArray.length} devices for vulnerabilities...`,
+                            );
                             const vulnerabilities = await this.fetchVulnerabilitiesForDevices(deviceArray);
 
                             if (vulnerabilities && vulnerabilities.length > 0) {
@@ -2645,17 +2723,17 @@ class HexagonTicketsManager {
                     for (let i = 0; i < binaryString.length; i++) {
                         bytes[i] = binaryString.charCodeAt(i);
                     }
-                    
+
                     // Rename file to match the base filename pattern
                     const fileExt = attachment.name.split(".").pop();
                     const newFileName = `${baseFilename}_attachment_${index + 1}.${fileExt}`;
-                    
+
                     zip.file(newFileName, bytes);
                 });
             }
 
             // Generate and download zip
-            const zipBlob = await zip.generateAsync({type: "blob"});
+            const zipBlob = await zip.generateAsync({ type: "blob" });
             const url = URL.createObjectURL(zipBlob);
             const a = document.createElement("a");
             a.href = url;
@@ -2675,7 +2753,7 @@ class HexagonTicketsManager {
     // Export Functions
     exportData(format) {
         const tickets = this.getFilteredTickets();
-        
+
         if (tickets.length === 0) {
             this.showToast("No tickets to export", "error");
             return;
@@ -2701,43 +2779,60 @@ class HexagonTicketsManager {
     }
 
     exportCSV(tickets) {
-        const headers = ["XT Number", "Date Submitted", "Date Due", "Hexagon Ticket #", "Service Now #", "Site", "Location", "Devices", "Supervisor", "Tech", "Status", "Notes"];
+        const headers = [
+            "XT Number",
+            "Date Submitted",
+            "Date Due",
+            "Hexagon Ticket #",
+            "Service Now #",
+            "Site",
+            "Location",
+            "Devices",
+            "Supervisor",
+            "Tech",
+            "Status",
+            "Notes",
+        ];
         const csvContent = [
             headers.join(","),
-            ...tickets.map(ticket => [
-                `"${ticket.xtNumber || ""}"`,
-                ticket.dateSubmitted,
-                ticket.dateDue,
-                `"${ticket.hexagonTicket}"`,
-                `"${ticket.serviceNowTicket || ""}"`,
-                `"${ticket.site || ""}"`,
-                `"${ticket.location || ""}"`,
-                `"${ticket.devices.join("; ")}"`,
-                `"${ticket.supervisor || ""}"`,
-                `"${ticket.tech || ""}"`,
-                `"${ticket.status}"`,
-                `"${ticket.notes || ""}"`
-            ].join(","))
+            ...tickets.map((ticket) =>
+                [
+                    `"${ticket.xtNumber || ""}"`,
+                    ticket.dateSubmitted,
+                    ticket.dateDue,
+                    `"${ticket.hexagonTicket}"`,
+                    `"${ticket.serviceNowTicket || ""}"`,
+                    `"${ticket.site || ""}"`,
+                    `"${ticket.location || ""}"`,
+                    `"${ticket.devices.join("; ")}"`,
+                    `"${ticket.supervisor || ""}"`,
+                    `"${ticket.tech || ""}"`,
+                    `"${ticket.status}"`,
+                    `"${ticket.notes || ""}"`,
+                ].join(","),
+            ),
         ].join("\n");
 
         this.downloadFile(csvContent, "hexagon-tickets.csv", "text/csv");
     }
 
     exportExcel(tickets) {
-        const ws = XLSX.utils.json_to_sheet(tickets.map(ticket => ({
-            "XT Number": ticket.xtNumber || "",
-            "Date Submitted": ticket.dateSubmitted,
-            "Date Due": ticket.dateDue,
-            "Hexagon Ticket #": ticket.hexagonTicket,
-            "Service Now #": ticket.serviceNowTicket,
-            "Site": ticket.site || "",
-            "Location": ticket.location || "",
-            "Devices": ticket.devices.join("; "),
-            "Supervisor": ticket.supervisor || "",
-            "Tech": ticket.tech || "",
-            "Status": ticket.status,
-            "Notes": ticket.notes || ""
-        })));
+        const ws = XLSX.utils.json_to_sheet(
+            tickets.map((ticket) => ({
+                "XT Number": ticket.xtNumber || "",
+                "Date Submitted": ticket.dateSubmitted,
+                "Date Due": ticket.dateDue,
+                "Hexagon Ticket #": ticket.hexagonTicket,
+                "Service Now #": ticket.serviceNowTicket,
+                Site: ticket.site || "",
+                Location: ticket.location || "",
+                Devices: ticket.devices.join("; "),
+                Supervisor: ticket.supervisor || "",
+                Tech: ticket.tech || "",
+                Status: ticket.status,
+                Notes: ticket.notes || "",
+            })),
+        );
 
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Hexagon Tickets");
@@ -2755,12 +2850,12 @@ class HexagonTicketsManager {
 
         doc.setFontSize(18);
         doc.text("Hexagon Tickets Report", 14, 22);
-        
+
         doc.setFontSize(12);
         doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 32);
         doc.text(`Total Tickets: ${tickets.length}`, 14, 40);
 
-        const tableData = tickets.map(ticket => [
+        const tableData = tickets.map((ticket) => [
             this.formatDate(ticket.dateSubmitted),
             this.formatDate(ticket.dateDue),
             ticket.hexagonTicket,
@@ -2769,17 +2864,29 @@ class HexagonTicketsManager {
             ticket.devices.join(", "),
             ticket.supervisor,
             ticket.tech,
-            ticket.status
+            ticket.status,
         ]);
 
         doc.autoTable({
-            head: [["Date Submitted", "Date Due", "Hexagon #", "Service Now #", "Location", "Devices", "Supervisor", "Tech", "Status"]],
+            head: [
+                [
+                    "Date Submitted",
+                    "Date Due",
+                    "Hexagon #",
+                    "Service Now #",
+                    "Location",
+                    "Devices",
+                    "Supervisor",
+                    "Tech",
+                    "Status",
+                ],
+            ],
             body: tableData,
             startY: 50,
             styles: { fontSize: 8 },
             columnStyles: {
-                5: { cellWidth: 40 }
-            }
+                5: { cellWidth: 40 },
+            },
         });
 
         doc.save("hexagon-tickets.pdf");
@@ -2820,7 +2927,9 @@ class HexagonTicketsManager {
                         </tr>
                     </thead>
                     <tbody>
-                        ${tickets.map(ticket => `
+                        ${tickets
+                            .map(
+                                (ticket) => `
                             <tr>
                                 <td>${this.formatDate(ticket.dateSubmitted)}</td>
                                 <td>${this.formatDate(ticket.dateDue)}</td>
@@ -2832,7 +2941,9 @@ class HexagonTicketsManager {
                                 <td>${ticket.tech}</td>
                                 <td>${ticket.status}</td>
                             </tr>
-                        `).join("")}
+                        `,
+                            )
+                            .join("")}
                     </tbody>
                 </table>
             </body>
@@ -2852,13 +2963,15 @@ class HexagonTicketsManager {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        
+
         this.showToast(`${filename} downloaded successfully!`, "success");
     }
 
     // Handle shared documentation upload
     async handleSharedDocumentation(files) {
-        if (files.length === 0) {return;}
+        if (files.length === 0) {
+            return;
+        }
 
         this.sharedDocumentation = [];
 
@@ -2869,7 +2982,7 @@ class HexagonTicketsManager {
                     name: file.name,
                     type: file.type,
                     size: file.size,
-                    content: base64Content
+                    content: base64Content,
                 });
             } catch (error) {
                 logger.error("ui", "Error processing shared documentation:", error);
@@ -2920,15 +3033,17 @@ class HexagonTicketsManager {
         const tooltipInstance = new bootstrap.Tooltip(btn, {
             html: true,
             placement: "bottom",
-            trigger: "hover"
+            trigger: "hover",
         });
 
         if (this.sharedDocumentation && this.sharedDocumentation.length > 0) {
             // Format file list for tooltip
-            const fileList = this.sharedDocumentation.map(doc => {
-                const sizeKB = (doc.size / 1024).toFixed(1);
-                return `• ${doc.name} (${sizeKB} KB)`;
-            }).join("<br>");
+            const fileList = this.sharedDocumentation
+                .map((doc) => {
+                    const sizeKB = (doc.size / 1024).toFixed(1);
+                    return `• ${doc.name} (${sizeKB} KB)`;
+                })
+                .join("<br>");
 
             const tooltipContent = `<strong>Attached Documentation:</strong><br>${fileList}<br><br><small><em>Shift+Click or Right-Click to clear</em></small>`;
 
@@ -3007,9 +3122,10 @@ class HexagonTicketsManager {
      */
     buildVariableMap(ticket, vulnerabilitiesOrType = null) {
         const deviceCount = ticket.devices ? ticket.devices.length : 0;
-        const deviceList = ticket.devices && ticket.devices.length > 0
-            ? ticket.devices.map((device, index) => `${index + 1}. ${device}`).join("\n")
-            : "Device list to be confirmed";
+        const deviceList =
+            ticket.devices && ticket.devices.length > 0
+                ? ticket.devices.map((device, index) => `${index + 1}. ${device}`).join("\n")
+                : "Device list to be confirmed";
 
         const variables = {
             "[HEXAGON_TICKET]": ticket.hexagonTicket || "N/A",
@@ -3032,32 +3148,38 @@ class HexagonTicketsManager {
             "[GENERATED_TIME]": new Date().toLocaleString(),
             "[GREETING]": this.getSupervisorGreeting(ticket.supervisor),
             // HEX-242: Address fields for Replace/Refresh tickets
-            "[SITE_ADDRESS]": ticket.site_address || this.formatAddress(
-                ticket.shipping_line1 || ticket.shippingLine1,
-                ticket.shipping_line2 || ticket.shippingLine2,
-                ticket.shipping_city || ticket.shippingCity,
-                ticket.shipping_state || ticket.shippingState,
-                ticket.shipping_zip || ticket.shippingZip
-            ) || "N/A",
-            "[RETURN_ADDRESS]": ticket.return_address || this.formatAddress(
-                ticket.return_line1 || ticket.returnLine1,
-                ticket.return_line2 || ticket.returnLine2,
-                ticket.return_city || ticket.returnCity,
-                ticket.return_state || ticket.returnState,
-                ticket.return_zip || ticket.returnZip
-            ) || "N/A",
+            "[SITE_ADDRESS]":
+                ticket.site_address ||
+                this.formatAddress(
+                    ticket.shipping_line1 || ticket.shippingLine1,
+                    ticket.shipping_line2 || ticket.shippingLine2,
+                    ticket.shipping_city || ticket.shippingCity,
+                    ticket.shipping_state || ticket.shippingState,
+                    ticket.shipping_zip || ticket.shippingZip,
+                ) ||
+                "N/A",
+            "[RETURN_ADDRESS]":
+                ticket.return_address ||
+                this.formatAddress(
+                    ticket.return_line1 || ticket.returnLine1,
+                    ticket.return_line2 || ticket.returnLine2,
+                    ticket.return_city || ticket.returnCity,
+                    ticket.return_state || ticket.returnState,
+                    ticket.return_zip || ticket.returnZip,
+                ) ||
+                "N/A",
             "[TRACKING_NUMBER]": ticket.outbound_tracking || ticket.outboundTracking || ticket.tracking_number || "N/A",
             "[RETURN_TRACKING]": ticket.return_tracking || ticket.returnTracking || "N/A",
             // Software versions and mitigation details for job-specific templates
             "[SOFTWARE_VERSIONS]": ticket.software_versions || ticket.softwareVersions || "N/A",
-            "[MITIGATION_DETAILS]": ticket.mitigation_details || ticket.mitigationDetails || "N/A"
+            "[MITIGATION_DETAILS]": ticket.mitigation_details || ticket.mitigationDetails || "N/A",
         };
 
         // Handle vulnerabilities array (backward compatibility)
         if (vulnerabilitiesOrType && Array.isArray(vulnerabilitiesOrType)) {
             const vulnerabilities = vulnerabilitiesOrType;
             const severityCounts = { CRITICAL: 0, HIGH: 0, MEDIUM: 0, LOW: 0 };
-            vulnerabilities.forEach(v => {
+            vulnerabilities.forEach((v) => {
                 const sev = (v.severity || "LOW").toUpperCase();
                 if (severityCounts[sev] !== undefined) {
                     severityCounts[sev]++;
@@ -3069,7 +3191,9 @@ class HexagonTicketsManager {
             variables["[HIGH_COUNT]"] = severityCounts.HIGH.toString();
             variables["[MEDIUM_COUNT]"] = severityCounts.MEDIUM.toString();
             variables["[LOW_COUNT]"] = severityCounts.LOW.toString();
-            variables["[DEVICE_COUNT]"] = Object.keys(this.groupVulnerabilitiesByDevice(vulnerabilities)).length.toString();
+            variables["[DEVICE_COUNT]"] = Object.keys(
+                this.groupVulnerabilitiesByDevice(vulnerabilities),
+            ).length.toString();
             variables["[VULNERABILITY_DETAILS]"] = this.buildVulnerabilityDetails(vulnerabilities);
         }
 
@@ -3088,7 +3212,7 @@ class HexagonTicketsManager {
 
     groupVulnerabilitiesByDevice(vulnerabilities) {
         const vulnsByDevice = {};
-        vulnerabilities.forEach(vuln => {
+        vulnerabilities.forEach((vuln) => {
             const hostname = vuln.hostname || "Unknown Device";
             if (!vulnsByDevice[hostname]) {
                 vulnsByDevice[hostname] = [];
@@ -3102,27 +3226,30 @@ class HexagonTicketsManager {
         const vulnsByDevice = this.groupVulnerabilitiesByDevice(vulnerabilities);
         let details = "";
 
-        Object.keys(vulnsByDevice).sort().forEach(hostname => {
-            const deviceVulns = vulnsByDevice[hostname];
-            details += `### Device: ${hostname}\n`;
-            details += `Total Vulnerabilities: ${deviceVulns.length}\n\n`;
+        Object.keys(vulnsByDevice)
+            .sort()
+            .forEach((hostname) => {
+                const deviceVulns = vulnsByDevice[hostname];
+                details += `### Device: ${hostname}\n`;
+                details += `Total Vulnerabilities: ${deviceVulns.length}\n\n`;
 
-            // Sort by VPR score (highest to lowest)
-            deviceVulns.sort((a, b) => (b.vpr_score || 0) - (a.vpr_score || 0));
+                // Sort by VPR score (highest to lowest)
+                deviceVulns.sort((a, b) => (b.vpr_score || 0) - (a.vpr_score || 0));
 
-            details += "| CVE | Severity | VPR | Description |\n";
-            details += "|-----|----------|-----|-------------|\n";
+                details += "| CVE | Severity | VPR | Description |\n";
+                details += "|-----|----------|-----|-------------|\n";
 
-            deviceVulns.slice(0, 10).forEach(vuln => { // Limit to top 10 per device
-                const cve = vuln.cve || "N/A";
-                const severity = vuln.severity || "Unknown";
-                const vpr = vuln.vpr_score || "N/A";
-                const desc = (vuln.description || "No description").substring(0, 50) + "...";
-                details += `| ${cve} | ${severity} | ${vpr} | ${desc} |\n`;
+                deviceVulns.slice(0, 10).forEach((vuln) => {
+                    // Limit to top 10 per device
+                    const cve = vuln.cve || "N/A";
+                    const severity = vuln.severity || "Unknown";
+                    const vpr = vuln.vpr_score || "N/A";
+                    const desc = (vuln.description || "No description").substring(0, 50) + "...";
+                    details += `| ${cve} | ${severity} | ${vpr} | ${desc} |\n`;
+                });
+
+                details += "\n";
             });
-
-            details += "\n";
-        });
 
         return details;
     }
@@ -3146,7 +3273,7 @@ class HexagonTicketsManager {
         let processedTemplate = template;
 
         // Replace all variables in the template
-        Object.keys(variables).forEach(variable => {
+        Object.keys(variables).forEach((variable) => {
             // Defense-in-depth: Length validation for variable names
             if (variable.length > 50) {
                 logger.warn("ui", "[Security] Variable name too long, skipping:", variable.substring(0, 20) + "...");
@@ -3155,7 +3282,10 @@ class HexagonTicketsManager {
 
             const value = variables[variable] || "";
             // Use global replace to handle multiple occurrences
-            processedTemplate = processedTemplate.replace(new RegExp(variable.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"), value);
+            processedTemplate = processedTemplate.replace(
+                new RegExp(variable.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"),
+                value,
+            );
         });
 
         return processedTemplate;
@@ -3236,21 +3366,19 @@ class HexagonTicketsManager {
         const deviceVulnMap = {};
 
         // Initialize all devices with 0 counts
-        ticket.devices.forEach(device => {
+        ticket.devices.forEach((device) => {
             deviceVulnMap[device.toUpperCase()] = {
                 critical: 0,
                 high: 0,
                 medium: 0,
                 low: 0,
-                total: 0
+                total: 0,
             };
         });
 
         // Count vulnerabilities per device
-        vulnerabilities.forEach(vuln => {
-            const matchedDevice = ticket.devices.find(device =>
-                this.hostnameMatches(vuln.hostname, device)
-            );
+        vulnerabilities.forEach((vuln) => {
+            const matchedDevice = ticket.devices.find((device) => this.hostnameMatches(vuln.hostname, device));
 
             if (matchedDevice) {
                 const key = matchedDevice.toUpperCase();
@@ -3265,7 +3393,7 @@ class HexagonTicketsManager {
         });
 
         // Generate summary lines
-        ticket.devices.forEach(device => {
+        ticket.devices.forEach((device) => {
             const key = device.toUpperCase();
             const counts = deviceVulnMap[key];
 
@@ -3276,10 +3404,18 @@ class HexagonTicketsManager {
 
                 // Add severity breakdown if there are vulnerabilities
                 const severityBreakdown = [];
-                if (counts.critical > 0) {severityBreakdown.push(`${counts.critical} critical`);}
-                if (counts.high > 0) {severityBreakdown.push(`${counts.high} high`);}
-                if (counts.medium > 0) {severityBreakdown.push(`${counts.medium} medium`);}
-                if (counts.low > 0) {severityBreakdown.push(`${counts.low} low`);}
+                if (counts.critical > 0) {
+                    severityBreakdown.push(`${counts.critical} critical`);
+                }
+                if (counts.high > 0) {
+                    severityBreakdown.push(`${counts.high} high`);
+                }
+                if (counts.medium > 0) {
+                    severityBreakdown.push(`${counts.medium} medium`);
+                }
+                if (counts.low > 0) {
+                    severityBreakdown.push(`${counts.low} low`);
+                }
 
                 if (severityBreakdown.length > 0) {
                     summary += ` (${severityBreakdown.join(", ")})`;
@@ -3310,7 +3446,9 @@ class HexagonTicketsManager {
             const parts = trimmed.split(",");
             if (parts.length >= 2) {
                 const firstName = parts[1].trim().split(" ")[0];
-                if (firstName) {return firstName;}
+                if (firstName) {
+                    return firstName;
+                }
             }
         }
 
@@ -3343,10 +3481,14 @@ class HexagonTicketsManager {
         const addressLines = [];
 
         // Add address line 1
-        if (line1) {addressLines.push(line1);}
+        if (line1) {
+            addressLines.push(line1);
+        }
 
         // Add address line 2
-        if (line2) {addressLines.push(line2);}
+        if (line2) {
+            addressLines.push(line2);
+        }
 
         // Add city, state, zip on one line
         if (city && state && zip) {
@@ -3354,7 +3496,9 @@ class HexagonTicketsManager {
         } else if (city || state || zip) {
             // Handle partial city/state/zip
             const cityStateZip = [city, state, zip].filter(Boolean).join(" ");
-            if (cityStateZip) {addressLines.push(cityStateZip);}
+            if (cityStateZip) {
+                addressLines.push(cityStateZip);
+            }
         }
 
         // Join with newlines for multi-line display in markdown
@@ -3374,19 +3518,19 @@ class HexagonTicketsManager {
      */
     getTemplateVariant(jobType) {
         if (!jobType) {
-            return "upgrade";  // Default fallback
+            return "upgrade"; // Default fallback
         }
 
         switch (jobType.toLowerCase()) {
             case "replace":
             case "refresh":
-                return "replacement";  // Both use same template (equipment swap workflow)
+                return "replacement"; // Both use same template (equipment swap workflow)
             case "mitigate":
-                return "mitigate";     // KEV emergency patching
+                return "mitigate"; // KEV emergency patching
             case "upgrade":
             case "other":
             default:
-                return "upgrade";      // Default for Upgrade and Other job types
+                return "upgrade"; // Default for Upgrade and Other job types
         }
     }
 
@@ -3439,7 +3583,8 @@ class HexagonTicketsManager {
 
         email += "There are critical security patches that must be applied within 30 days.\n\n";
 
-        email += "Please see the attached notes for more information. If you have any questions or concerns please feel free to reach out to NetOps at netops@oneok.com.\n\n";
+        email +=
+            "Please see the attached notes for more information. If you have any questions or concerns please feel free to reach out to NetOps at netops@oneok.com.\n\n";
 
         email += "**MAINTENANCE DETAILS:**\n";
         email += `• Location: ${siteName} - ${location}\n`;
@@ -3482,12 +3627,15 @@ class HexagonTicketsManager {
     // Copy ticket markdown to clipboard
     copyTicketMarkdown() {
         const content = document.getElementById("markdownContent").textContent;
-        navigator.clipboard.writeText(content).then(() => {
-            this.showToast("Ticket markdown copied to clipboard!", "success");
-        }).catch(err => {
-            logger.error("ui", "Failed to copy ticket markdown:", err);
-            this.showToast("Failed to copy ticket markdown", "error");
-        });
+        navigator.clipboard
+            .writeText(content)
+            .then(() => {
+                this.showToast("Ticket markdown copied to clipboard!", "success");
+            })
+            .catch((err) => {
+                logger.error("ui", "Failed to copy ticket markdown:", err);
+                this.showToast("Failed to copy ticket markdown", "error");
+            });
     }
 
     // Copy vulnerability markdown to clipboard
@@ -3507,12 +3655,15 @@ class HexagonTicketsManager {
             return;
         }
 
-        navigator.clipboard.writeText(content).then(() => {
-            this.showToast("Vulnerability report copied to clipboard!", "success");
-        }).catch(err => {
-            logger.error("ui", "Failed to copy vulnerability markdown:", err);
-            this.showToast("Failed to copy vulnerability report", "error");
-        });
+        navigator.clipboard
+            .writeText(content)
+            .then(() => {
+                this.showToast("Vulnerability report copied to clipboard!", "success");
+            })
+            .catch((err) => {
+                logger.error("ui", "Failed to copy vulnerability markdown:", err);
+                this.showToast("Failed to copy vulnerability report", "error");
+            });
     }
 
     // Copy email markdown to clipboard
@@ -3532,12 +3683,15 @@ class HexagonTicketsManager {
             return;
         }
 
-        navigator.clipboard.writeText(content).then(() => {
-            this.showToast("Email template copied to clipboard!", "success");
-        }).catch(err => {
-            logger.error("ui", "Failed to copy email markdown:", err);
-            this.showToast("Failed to copy email template", "error");
-        });
+        navigator.clipboard
+            .writeText(content)
+            .then(() => {
+                this.showToast("Email template copied to clipboard!", "success");
+            })
+            .catch((err) => {
+                logger.error("ui", "Failed to copy email markdown:", err);
+                this.showToast("Failed to copy email template", "error");
+            });
     }
 
     // Load email markdown for modal display
@@ -3547,7 +3701,8 @@ class HexagonTicketsManager {
 
         if (!ticket) {
             logger.error("ui", "[EmailTemplate] Ticket not found:", ticketId);
-            document.getElementById("emailMarkdownContent").textContent = "# Error Loading Email Template\n\nTicket not found.";
+            document.getElementById("emailMarkdownContent").textContent =
+                "# Error Loading Email Template\n\nTicket not found.";
             document.getElementById("emailMarkdownContent").style.display = "block";
             document.getElementById("emailLoadingMessage").style.display = "none";
             return;
@@ -3560,7 +3715,8 @@ class HexagonTicketsManager {
             let summaryBlock = "";
 
             if (ticket.devices && ticket.devices.length > 0) {
-                document.getElementById("emailLoadingMessage").textContent = "Generating email template with vulnerability summary...";
+                document.getElementById("emailLoadingMessage").textContent =
+                    "Generating email template with vulnerability summary...";
 
                 try {
                     const vulnerabilities = await this.fetchVulnerabilitiesForDevices(ticket.devices);
@@ -3597,7 +3753,8 @@ class HexagonTicketsManager {
             logger.debug("ui", "[EmailTemplate] Email template generated for ticket:", ticketId);
         } catch (error) {
             logger.error("ui", "[EmailTemplate] Error generating email template:", error);
-            document.getElementById("emailMarkdownContent").textContent = "# Error Loading Email Template\n\nFailed to generate email template. Please try again.";
+            document.getElementById("emailMarkdownContent").textContent =
+                "# Error Loading Email Template\n\nFailed to generate email template. Please try again.";
             document.getElementById("emailMarkdownContent").style.display = "block";
             document.getElementById("emailLoadingMessage").style.display = "none";
         }
@@ -3614,18 +3771,20 @@ class HexagonTicketsManager {
         // Get the ticket ID from the modal's data attribute
         const modal = document.getElementById("viewTicketModal");
         const ticketId = modal?.dataset.ticketId;
-        
+
         if (!ticketId) {
             this.showToast("No ticket selected for download", "error");
             return;
         }
-        
+
         this.bundleTicketFiles(ticketId);
     }
 
     // Handle CSV import
     async handleCsvImport(file) {
-        if (!file) {return;}
+        if (!file) {
+            return;
+        }
 
         if (!file.name.toLowerCase().endsWith(".csv")) {
             this.showToast("Please select a CSV file", "error");
@@ -3635,7 +3794,7 @@ class HexagonTicketsManager {
         try {
             const text = await file.text();
             const tickets = await this.parseCsvToTickets(text);
-            
+
             if (tickets.length === 0) {
                 this.showToast("No valid tickets found in CSV file", "warning");
                 return;
@@ -3644,9 +3803,9 @@ class HexagonTicketsManager {
             // Check if database has existing data
             const statsResponse = await authState.authenticatedFetch("/api/backup/stats");
             const stats = await statsResponse.json();
-            
+
             let mode = "check";
-            
+
             if (stats.tickets > 0) {
                 // Show import mode selection modal
                 mode = await this.showImportModeModal(stats.tickets, tickets.length);
@@ -3660,9 +3819,9 @@ class HexagonTicketsManager {
             const response = await authState.authenticatedFetch("/api/tickets/migrate", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ tickets, mode })
+                body: JSON.stringify({ tickets, mode }),
             });
 
             if (response.ok) {
@@ -3672,7 +3831,7 @@ class HexagonTicketsManager {
                 this.renderTickets();
                 this.updateStatistics();
                 this.populateLocationFilter();
-                
+
                 this.showToast(`Successfully imported ${tickets.length} ticket(s)!`, "success");
             } else {
                 const error = await response.json();
@@ -3726,10 +3885,10 @@ class HexagonTicketsManager {
                     </div>
                 </div>
             `;
-            
+
             document.body.appendChild(modal);
             const bsModal = new bootstrap.Modal(modal);
-            
+
             // Handle mode selection
             modal.addEventListener("click", (e) => {
                 if (e.target.dataset.mode) {
@@ -3737,23 +3896,25 @@ class HexagonTicketsManager {
                     resolve(e.target.dataset.mode);
                 }
             });
-            
+
             // Handle modal close without selection
             modal.addEventListener("hidden.bs.modal", () => {
                 document.body.removeChild(modal);
                 resolve(null);
             });
-            
+
             bsModal.show();
         });
     }
 
     // Parse CSV text to tickets array
     async parseCsvToTickets(csvText) {
-        const lines = csvText.split("\n").filter(line => line.trim());
-        if (lines.length < 2) {return [];}
+        const lines = csvText.split("\n").filter((line) => line.trim());
+        if (lines.length < 2) {
+            return [];
+        }
 
-        const headers = lines[0].split(",").map(h => h.trim().replace(/"/g, ""));
+        const headers = lines[0].split(",").map((h) => h.trim().replace(/"/g, ""));
         const tickets = [];
 
         let nextImportNumber = parseInt(await this.generateNextXtNumber(), 10);
@@ -3765,33 +3926,33 @@ class HexagonTicketsManager {
             const values = this.parseCsvLine(lines[i]);
             if (values.length === headers.length) {
                 const ticket = {};
-                
+
                 headers.forEach((header, index) => {
                     const value = values[index].trim().replace(/"/g, "");
-                    
+
                     // Map CSV headers to ticket properties
                     switch (header.toLowerCase()) {
                         case "date submitted":
                         case "datesubmitted":
-                        case "date_submitted":  // Support snake_case from export
+                        case "date_submitted": // Support snake_case from export
                             ticket.dateSubmitted = value;
                             break;
                         case "date due":
                         case "datedue":
-                        case "date_due":  // Support snake_case from export
+                        case "date_due": // Support snake_case from export
                             ticket.dateDue = value;
                             break;
                         case "hexagon ticket":
                         case "hexagon ticket #":
                         case "hexagonticket":
-                        case "hexagon_ticket":  // Support snake_case from export
+                        case "hexagon_ticket": // Support snake_case from export
                             ticket.hexagonTicket = value;
                             break;
                         case "service now #":
                         case "servicenow ticket":
                         case "servicenow ticket #":
                         case "servicenowticket":
-                        case "service_now_ticket":  // Support snake_case from export
+                        case "service_now_ticket": // Support snake_case from export
                             ticket.serviceNowTicket = value;
                             break;
                         case "site":
@@ -3807,10 +3968,20 @@ class HexagonTicketsManager {
                                 try {
                                     ticket.devices = JSON.parse(value);
                                 } catch (_e) {
-                                    ticket.devices = value ? value.split(";").map(d => d.trim()).filter(d => d) : [];
+                                    ticket.devices = value
+                                        ? value
+                                              .split(";")
+                                              .map((d) => d.trim())
+                                              .filter((d) => d)
+                                        : [];
                                 }
                             } else {
-                                ticket.devices = value ? value.split(";").map(d => d.trim()).filter(d => d) : [];
+                                ticket.devices = value
+                                    ? value
+                                          .split(";")
+                                          .map((d) => d.trim())
+                                          .filter((d) => d)
+                                    : [];
                             }
                             break;
                         case "supervisor":
@@ -3829,13 +4000,13 @@ class HexagonTicketsManager {
                         case "xt#":
                         case "xt":
                         case "xtnumber":
-                        case "xt_number":  // Support snake_case from export
+                        case "xt_number": // Support snake_case from export
                             ticket.xtNumber = this.normalizeXtNumber(value);
                             break;
-                        case "id":  // Pass through ID from export if present
+                        case "id": // Pass through ID from export if present
                             ticket.existingId = value;
                             break;
-                        case "created_at":  // Pass through timestamps from export
+                        case "created_at": // Pass through timestamps from export
                             ticket.createdAt = value;
                             break;
                         case "updated_at":
@@ -3846,7 +4017,8 @@ class HexagonTicketsManager {
 
                 // Set defaults for missing fields
                 ticket.dateSubmitted = ticket.dateSubmitted || new Date().toISOString().split("T")[0];
-                ticket.dateDue = ticket.dateDue || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+                ticket.dateDue =
+                    ticket.dateDue || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
                 ticket.hexagonTicket = ticket.hexagonTicket || "";
                 ticket.serviceNowTicket = ticket.serviceNowTicket || "";
                 ticket.site = ticket.site || "";
@@ -3868,7 +4040,9 @@ class HexagonTicketsManager {
                     // Generate ID using cryptographically secure random
                     const randomBytes = new Uint8Array(9);
                     window.crypto.getRandomValues(randomBytes);
-                    const randomString = Array.from(randomBytes, byte => byte.toString(36).padStart(2, "0")).join("").substr(0, 9);
+                    const randomString = Array.from(randomBytes, (byte) => byte.toString(36).padStart(2, "0"))
+                        .join("")
+                        .substr(0, 9);
                     ticket.id = Date.now().toString() + randomString;
                 }
 
@@ -3894,11 +4068,11 @@ class HexagonTicketsManager {
         const values = [];
         let current = "";
         let inQuotes = false;
-        
+
         for (let i = 0; i < line.length; i++) {
             const char = line[i];
-            
-            if (char === "\"") {
+
+            if (char === '"') {
                 inQuotes = !inQuotes;
             } else if (char === "," && !inQuotes) {
                 values.push(current);
@@ -3907,7 +4081,7 @@ class HexagonTicketsManager {
                 current += char;
             }
         }
-        
+
         values.push(current);
         return values;
     }
@@ -3955,7 +4129,7 @@ class HexagonTicketsManager {
 
     updateSortHeaders() {
         // Remove all sort classes
-        document.querySelectorAll(".sortable-header").forEach(header => {
+        document.querySelectorAll(".sortable-header").forEach((header) => {
             header.classList.remove("sort-asc", "sort-desc");
         });
 
@@ -3973,36 +4147,50 @@ class HexagonTicketsManager {
 // Explicitly assign to window object to ensure global scope
 window.ticketManager = null; // Will be initialized on DOMContentLoaded
 
-window.saveTicket = function() {
-    if (window.ticketManager) {window.ticketManager.saveTicket();}
+window.saveTicket = function () {
+    if (window.ticketManager) {
+        window.ticketManager.saveTicket();
+    }
 };
 
-window.editTicketFromView = function() {
-    if (window.ticketManager) {window.ticketManager.editTicketFromView();}
+window.editTicketFromView = function () {
+    if (window.ticketManager) {
+        window.ticketManager.editTicketFromView();
+    }
 };
 
-window.switchToViewTicketModal = function() {
-    if (window.ticketManager) {window.ticketManager.switchToViewTicketModal();}
+window.switchToViewTicketModal = function () {
+    if (window.ticketManager) {
+        window.ticketManager.switchToViewTicketModal();
+    }
 };
 
-window.copyMarkdownToClipboard = function() {
-    if (window.ticketManager) {window.ticketManager.copyMarkdownToClipboard();}
+window.copyMarkdownToClipboard = function () {
+    if (window.ticketManager) {
+        window.ticketManager.copyMarkdownToClipboard();
+    }
 };
 
-window.downloadBundleFromView = function() {
-    if (window.ticketManager) {window.ticketManager.downloadBundleFromView();}
+window.downloadBundleFromView = function () {
+    if (window.ticketManager) {
+        window.ticketManager.downloadBundleFromView();
+    }
 };
 
-window.exportData = function(format) {
-    if (window.ticketManager) {window.ticketManager.exportData(format);}
+window.exportData = function (format) {
+    if (window.ticketManager) {
+        window.ticketManager.exportData(format);
+    }
 };
 
-window.sortTable = function(column) {
-    if (window.ticketManager) {window.ticketManager.sortTable(column);}
+window.sortTable = function (column) {
+    if (window.ticketManager) {
+        window.ticketManager.sortTable(column);
+    }
 };
 
 // Page-specific refresh function for Settings modal integration
-window.refreshPageData = function(type) {
+window.refreshPageData = function (type) {
     if (type === "tickets" && window.ticketManager) {
         window.ticketManager.loadTicketsFromDB();
         window.ticketManager.renderTickets();
@@ -4015,14 +4203,14 @@ window.refreshPageData = function(type) {
 };
 
 // Page-specific toast integration for Settings modal
-window.showToast = function(message, type) {
+window.showToast = function (message, type) {
     if (window.ticketManager) {
         window.ticketManager.showToast(message, type);
     }
 };
 
 // Initialize the application
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     // Initialize the ticket manager and explicitly set it as a global variable
     window.ticketManager = new HexagonTicketsManager();
 
@@ -4044,13 +4232,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Check if we're coming from vulnerability page with a device to create a ticket for
     const autoOpen = sessionStorage.getItem("autoOpenModal");
-    const ticketDataRaw = sessionStorage.getItem("createTicketData");  // NEW: JSON format
+    const ticketDataRaw = sessionStorage.getItem("createTicketData"); // NEW: JSON format
     const deviceHostname = sessionStorage.getItem("createTicketDevice"); // OLD: String format (kept for backward compat)
 
     if (autoOpen === "true") {
         // Clear flags immediately
         sessionStorage.removeItem("autoOpenModal");
-        sessionStorage.removeItem("createTicketData");   // NEW
+        sessionStorage.removeItem("createTicketData"); // NEW
         sessionStorage.removeItem("createTicketDevice"); // EXISTING
 
         // Attempt to parse JSON format first
@@ -4070,7 +4258,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 devices: [deviceHostname],
                 site: deviceHostname.substring(0, 4),
                 location: deviceHostname.substring(0, 5),
-                mode: "single"
+                mode: "single",
             };
         }
 
@@ -4087,68 +4275,74 @@ document.addEventListener("DOMContentLoaded", function() {
                 modal.show();
 
                 // Wait for modal to be fully shown
-                ticketModal.addEventListener("shown.bs.modal", function onModalShown() {
-                    ticketModal.removeEventListener("shown.bs.modal", onModalShown);
+                ticketModal.addEventListener(
+                    "shown.bs.modal",
+                    function onModalShown() {
+                        ticketModal.removeEventListener("shown.bs.modal", onModalShown);
 
-                    setTimeout(() => {
-                        // --- NEW: Populate SITE field ---
-                        const siteField = document.getElementById("site");
-                        if (siteField && ticketData.site) {
-                            siteField.value = ticketData.site;
-                        }
+                        setTimeout(() => {
+                            // --- NEW: Populate SITE field ---
+                            const siteField = document.getElementById("site");
+                            if (siteField && ticketData.site) {
+                                siteField.value = ticketData.site;
+                            }
 
-                        // --- NEW: Populate Location field ---
-                        const locationField = document.getElementById("location");
-                        if (locationField && ticketData.location) {
-                            locationField.value = ticketData.location;
+                            // --- NEW: Populate Location field ---
+                            const locationField = document.getElementById("location");
+                            if (locationField && ticketData.location) {
+                                locationField.value = ticketData.location;
 
-                            // Set flag to disable location-to-device autofill (for Task 1.4)
-                            locationField.dataset.powerToolPopulated = "true";
-                        }
+                                // Set flag to disable location-to-device autofill (for Task 1.4)
+                                locationField.dataset.powerToolPopulated = "true";
+                            }
 
-                        // --- ENHANCED: Populate multiple devices ---
-                        const devices = ticketData.devices || [];
-                        if (devices.length > 0) {
-                            // Find first device input
-                            const firstDeviceInput = document.querySelector("#devicesContainer .device-input");
+                            // --- ENHANCED: Populate multiple devices ---
+                            const devices = ticketData.devices || [];
+                            if (devices.length > 0) {
+                                // Find first device input
+                                const firstDeviceInput = document.querySelector("#devicesContainer .device-input");
 
-                            if (firstDeviceInput) {
-                                // Populate first device in existing field
-                                firstDeviceInput.value = devices[0];
+                                if (firstDeviceInput) {
+                                    // Populate first device in existing field
+                                    firstDeviceInput.value = devices[0];
 
-                                // Add remaining devices (if any)
-                                for (let i = 1; i < devices.length; i++) {
-                                    // Add new device field
-                                    window.ticketManager.addDeviceField();
+                                    // Add remaining devices (if any)
+                                    for (let i = 1; i < devices.length; i++) {
+                                        // Add new device field
+                                        window.ticketManager.addDeviceField();
 
-                                    // Use setTimeout to ensure field is fully created before populating
-                                    ((deviceIndex) => {
-                                        setTimeout(() => {
-                                            const deviceInputs = document.querySelectorAll("#devicesContainer .device-input");
-                                            if (deviceInputs[deviceIndex]) {
-                                                deviceInputs[deviceIndex].value = devices[deviceIndex];
-                                            }
-                                        }, 50 * deviceIndex); // Stagger timeouts
-                                    })(i);
+                                        // Use setTimeout to ensure field is fully created before populating
+                                        ((deviceIndex) => {
+                                            setTimeout(() => {
+                                                const deviceInputs = document.querySelectorAll(
+                                                    "#devicesContainer .device-input",
+                                                );
+                                                if (deviceInputs[deviceIndex]) {
+                                                    deviceInputs[deviceIndex].value = devices[deviceIndex];
+                                                }
+                                            }, 50 * deviceIndex); // Stagger timeouts
+                                        })(i);
+                                    }
                                 }
                             }
-                        }
 
-                        // --- ENHANCED: Toast message with device count and mode ---
-                        const deviceCount = devices.length;
-                        const modeLabels = {
-                            "single": "device",
-                            "bulk-all": `devices at ${ticketData.location}`,
-                            "bulk-kev": `KEV devices at ${ticketData.location}`
-                        };
-                        const modeLabel = modeLabels[ticketData.mode] || "device";
+                            // --- ENHANCED: Toast message with device count and mode ---
+                            const deviceCount = devices.length;
+                            const modeLabels = {
+                                single: "device",
+                                "bulk-all": `devices at ${ticketData.location}`,
+                                "bulk-kev": `KEV devices at ${ticketData.location}`,
+                            };
+                            const modeLabel = modeLabels[ticketData.mode] || "device";
 
-                        window.ticketManager.showToast(
-                            `Ticket form pre-populated with ${deviceCount} ${modeLabel}`,
-                            "info"
-                        );
-                    }, 100);
-                }, { once: true });
+                            window.ticketManager.showToast(
+                                `Ticket form pre-populated with ${deviceCount} ${modeLabel}`,
+                                "info",
+                            );
+                        }, 100);
+                    },
+                    { once: true },
+                );
             }
         }, 500);
     }
