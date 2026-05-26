@@ -6,7 +6,7 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
 
 ## Project Overview
 
-**HexTrackr** is an enterprise vulnerability management system built with Node.js/Express backend and vanilla JavaScript frontend. The application tracks security vulnerabilities, maintenance tickets, and CISA KEV (Known Exploited Vulnerabilities) data with real-time WebSocket updates. Provides a Ticketing Bridge system to allow users to cordinate field operations between two independent teams.
+**HexTrackr** is an enterprise vulnerability management system built with Node.js/Express backend and vanilla JavaScript frontend. The application tracks security vulnerabilities, maintenance tickets, and CISA KEV (Known Exploited Vulnerabilities) data with real-time WebSocket updates. Provides a Ticketing Bridge system to allow users to coordinate field operations between two independent teams.
 
 **Current Version**: See root `package.json` (auto-synced to 5 files via `npm run release`)
 

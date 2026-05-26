@@ -211,7 +211,7 @@ class AuthController {
             res.status(500).json({
                 success: false,
                 error: "Login failed",
-                details: error.message,
+                details: "Internal server error",
             });
         }
     }
@@ -243,7 +243,7 @@ class AuthController {
                     return res.status(500).json({
                         success: false,
                         error: "Logout failed",
-                        details: err.message,
+                        details: "Internal server error",
                     });
                 }
 
@@ -293,7 +293,7 @@ class AuthController {
             res.status(500).json({
                 success: false,
                 error: "Logout failed",
-                details: error.message,
+                details: "Internal server error",
             });
         }
     }
@@ -354,7 +354,7 @@ class AuthController {
             res.status(500).json({
                 success: false,
                 error: "Status check failed",
-                details: error.message,
+                details: "Internal server error",
             });
         }
     }
@@ -449,7 +449,7 @@ class AuthController {
             res.status(500).json({
                 success: false,
                 error: "Password change failed",
-                details: error.message,
+                details: "Internal server error",
             });
         }
     }
@@ -520,7 +520,7 @@ class AuthController {
             res.status(500).json({
                 success: false,
                 error: "Failed to retrieve profile",
-                details: error.message,
+                details: "Internal server error",
             });
         }
     }
