@@ -49,7 +49,7 @@ class AGGridThemeManager {
             id: gridId,
             api: gridApi || null,
             element: gridElement || null,
-            adapter: null
+            adapter: null,
         };
 
         // Check if gridElement is actually a theme adapter
@@ -121,7 +121,7 @@ class AGGridThemeManager {
                 borderColor: "#2a3f5f",
                 selectedRowBackgroundColor: "#2563eb",
                 rowHoverColor: "rgba(37, 99, 235, 0.15)",
-                rangeSelectionBackgroundColor: "rgba(37, 99, 235, 0.2)"
+                rangeSelectionBackgroundColor: "rgba(37, 99, 235, 0.2)",
             });
         } else {
             // Return light theme configuration
@@ -140,7 +140,7 @@ class AGGridThemeManager {
                 borderColor: "#e2e8f0",
                 selectedRowBackgroundColor: "#3182ce",
                 rowHoverColor: "rgba(49, 130, 206, 0.1)",
-                rangeSelectionBackgroundColor: "rgba(49, 130, 206, 0.2)"
+                rangeSelectionBackgroundColor: "rgba(49, 130, 206, 0.2)",
             });
         }
     }
@@ -185,7 +185,7 @@ class AGGridThemeManager {
                     borderColor: "#2a3f5f", // Subtle navy border
                     selectedRowBackgroundColor: "#2563eb", // Bright blue for selection
                     rowHoverColor: "rgba(37, 99, 235, 0.15)", // Blue hover effect
-                    rangeSelectionBackgroundColor: "rgba(37, 99, 235, 0.2)"
+                    rangeSelectionBackgroundColor: "rgba(37, 99, 235, 0.2)",
                 });
             } else {
                 // Light mode Quartz theme
@@ -204,7 +204,7 @@ class AGGridThemeManager {
                     borderColor: "#e2e8f0",
                     selectedRowBackgroundColor: "#3182ce",
                     rowHoverColor: "rgba(49, 130, 206, 0.1)",
-                    rangeSelectionBackgroundColor: "rgba(49, 130, 206, 0.2)"
+                    rangeSelectionBackgroundColor: "rgba(49, 130, 206, 0.2)",
                 });
             }
 
@@ -277,8 +277,7 @@ class AGGridThemeManager {
         // Also observe Bootstrap theme attribute changes
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
-                if (mutation.type === "attributes" &&
-                    mutation.attributeName === "data-bs-theme") {
+                if (mutation.type === "attributes" && mutation.attributeName === "data-bs-theme") {
                     const isDark = document.documentElement.getAttribute("data-bs-theme") === "dark";
                     this.updateTheme(isDark);
                 }
@@ -287,7 +286,7 @@ class AGGridThemeManager {
 
         observer.observe(document.documentElement, {
             attributes: true,
-            attributeFilter: ["data-bs-theme"]
+            attributeFilter: ["data-bs-theme"],
         });
     }
 

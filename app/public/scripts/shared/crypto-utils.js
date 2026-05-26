@@ -46,9 +46,8 @@ function generateSecureId(prefix, randomBytes = 2) {
         window.crypto.getRandomValues(randomArray);
 
         // Convert to base36 string for compact representation
-        const randomString = arraySize === 1
-            ? randomArray[0].toString(36)
-            : randomArray[0].toString(36) + randomArray[1].toString(36);
+        const randomString =
+            arraySize === 1 ? randomArray[0].toString(36) : randomArray[0].toString(36) + randomArray[1].toString(36);
 
         return `${prefix}-${timestamp}-${randomString.substr(0, 9)}`;
     } else {

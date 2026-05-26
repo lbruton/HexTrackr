@@ -4,7 +4,6 @@
 
 // Import ES6 modules - converted to global references for browser compatibility
 // import { VulnerabilityCoreOrchestrator } from '../shared/vulnerability-core.js'; // Changed to global reference
- 
 
 /**
  * @fileoverview
@@ -43,10 +42,10 @@ export class ModernVulnManager {
     async initializeModules() {
         // Initialize core orchestrator - it will create and coordinate all modules
         this.coreOrchestrator = new window.VulnerabilityCoreOrchestrator();
-        
+
         // Let orchestrator handle all module creation and wiring
         await this.coreOrchestrator.initializeAllModules(this);
-        
+
         // Get references to modules from orchestrator for delegation
         this.dataManager = this.coreOrchestrator.dataManager;
         this.statisticsManager = this.coreOrchestrator.statisticsManager;
@@ -112,7 +111,7 @@ export class ModernVulnManager {
 }
 
 // Page-specific refresh function for Settings modal and Progress modal integration
-window.refreshPageData = function(type, bustCache = false) {
+window.refreshPageData = function (type, bustCache = false) {
     if (type === "vulnerabilities" && bustCache === false) {
         bustCache = true;
     }
@@ -127,7 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.modernVulnManager = new ModernVulnManager();
     // Create global alias for HTML onclick handlers
     window.vulnManager = window.modernVulnManager;
-    
+
     // Handle URL search parameter (e.g., ?search=LOCATION from tickets page)
     const urlParams = new URLSearchParams(window.location.search);
     const searchTerm = urlParams.get("search");
@@ -152,11 +151,13 @@ document.addEventListener("DOMContentLoaded", () => {
  * @returns {string} Current vendor ("", "CISCO", "Palo Alto", or "Other")
  */
 function getCurrentVendor() {
-    const checkedRadio = document.querySelector("input[name=\"vendor-filter\"]:checked");
-    if (!checkedRadio) {return "";} // Default to "All Vendors"
+    const checkedRadio = document.querySelector('input[name="vendor-filter"]:checked');
+    if (!checkedRadio) {
+        return "";
+    } // Default to "All Vendors"
 
     const label = document.querySelector(`label[for="${checkedRadio.id}"]`);
-    return label ? (label.dataset.vendor || "") : "";
+    return label ? label.dataset.vendor || "" : "";
 }
 
 // HEX-310: Expose as global for use by VulnerabilityDataManager and other modules
@@ -164,7 +165,7 @@ window.getCurrentVendor = getCurrentVendor;
 
 // Add event listener for chart metric toggle
 document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll("input[name=\"chart-metric\"]").forEach(radio => {
+    document.querySelectorAll('input[name="chart-metric"]').forEach((radio) => {
         radio.addEventListener("change", () => {
             if (window.modernVulnManager && window.modernVulnManager.chartManager) {
                 // Get current vendor selection and pass it to chart update
@@ -181,11 +182,13 @@ document.addEventListener("DOMContentLoaded", () => {
  * Vendor dropdown removed - radio buttons are the single source of truth
  */
 function setupVendorToggle() {
-    const vendorRadios = document.querySelectorAll("input[name=\"vendor-filter\"]");
+    const vendorRadios = document.querySelectorAll('input[name="vendor-filter"]');
 
-    vendorRadios.forEach(radio => {
+    vendorRadios.forEach((radio) => {
         radio.addEventListener("change", async (e) => {
-            if (!e.target.checked) {return;}
+            if (!e.target.checked) {
+                return;
+            }
 
             const label = document.querySelector(`label[for="${e.target.id}"]`);
             const vendor = label.dataset.vendor; // "" = All, "CISCO", "Palo Alto", "Other"
@@ -205,7 +208,6 @@ function setupVendorToggle() {
                 if (window.modernVulnManager.dataManager) {
                     window.modernVulnManager.dataManager.filterData();
                 }
-
             } catch (error) {
                 logger.error("ui", "Failed to update vendor filter:", { error: error.message });
             }

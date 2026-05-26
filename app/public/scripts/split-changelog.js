@@ -39,14 +39,14 @@ function parseChangelog() {
                 versions.push({
                     version: currentVersion.version,
                     date: currentVersion.date,
-                    content: currentContent.join("\n").trim()
+                    content: currentContent.join("\n").trim(),
                 });
             }
 
             // Start new version
             currentVersion = {
                 version: versionMatch[1],
-                date: versionMatch[2] || ""
+                date: versionMatch[2] || "",
             };
             currentContent = [line]; // Include the version header
         } else if (!inHeader && currentVersion) {
@@ -60,7 +60,7 @@ function parseChangelog() {
         versions.push({
             version: currentVersion.version,
             date: currentVersion.date,
-            content: currentContent.join("\n").trim()
+            content: currentContent.join("\n").trim(),
         });
     }
 
@@ -120,7 +120,6 @@ function main() {
         console.log("\nVersion Range:");
         console.log(` Newest: ${versions[0].version}`);
         console.log(` Oldest: ${versions[versions.length - 1].version}`);
-
     } catch (error) {
         console.error("Error splitting changelog:", error.message);
         process.exit(1);

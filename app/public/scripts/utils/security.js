@@ -18,7 +18,7 @@ function safeSetInnerHTML(element, htmlContent) {
     if (typeof DOMPurify !== "undefined") {
         element.innerHTML = DOMPurify.sanitize(htmlContent);
     } else {
-        console.warn("DOMPurify not available, falling back to textContent");  
+        console.warn("DOMPurify not available, falling back to textContent");
         element.textContent = htmlContent;
     }
 }
@@ -32,7 +32,7 @@ function escapeHtml(text) {
     if (!text) {
         return "";
     }
-    const div = document.createElement("div");  
+    const div = document.createElement("div");
     div.textContent = text;
     return div.innerHTML;
 }
@@ -45,8 +45,8 @@ function escapeHtml(text) {
  * @returns {HTMLElement} - The created element
  */
 function safeCreateElement(tagName, content = "", attributes = {}) {
-    const element = document.createElement(tagName);  
-    
+    const element = document.createElement(tagName);
+
     if (content) {
         if (typeof DOMPurify !== "undefined") {
             element.innerHTML = DOMPurify.sanitize(content);
@@ -54,21 +54,21 @@ function safeCreateElement(tagName, content = "", attributes = {}) {
             element.textContent = content;
         }
     }
-    
+
     // Set attributes safely
     for (const [key, value] of Object.entries(attributes)) {
         if (key.startsWith("on")) {
-            console.warn(`Skipping event attribute: ${key}`);  
+            console.warn(`Skipping event attribute: ${key}`);
             continue;
         }
         element.setAttribute(key, escapeHtml(value));
     }
-    
+
     return element;
 }
 
 // Make functions globally available
-if (typeof window !== "undefined") {  
+if (typeof window !== "undefined") {
     window.safeSetInnerHTML = safeSetInnerHTML;
     window.escapeHtml = escapeHtml;
     window.safeCreateElement = safeCreateElement;
