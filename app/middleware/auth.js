@@ -60,7 +60,9 @@ function requireAuth(req, res, next) {
             });
         }
         return res.status(401).json({
+            success: false,
             error: "Authentication required",
+            details: "No active session",
             authenticated: false,
         });
     }
@@ -100,6 +102,7 @@ function requireAdmin(req, res, next) {
         return res.status(403).json({
             success: false,
             error: "Admin access required",
+            details: "Insufficient role privileges",
         });
     }
 

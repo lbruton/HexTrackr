@@ -35,4 +35,4 @@ HexTrackr is monitored via **Codacy SRM**.
 
 ## Issue Tracking
 
-DocVault Prefix: `HEX-`. Use DocVault for all issues (Linear is retired).
+Plane Prefix: `HXTR-`. Use Plane for all new issues.

@@ -140,14 +140,16 @@ class AuditLogController {
      */
     static async getAuditLogs(req, res) {
         try {
+            const page = Math.max(1, Number.parseInt(req.query.page, 10) || 1);
+            const limit = Math.min(1000, Math.max(1, Number.parseInt(req.query.limit, 10) || 100));
             const filters = {
                 startDate: req.query.startDate || null,
                 endDate: req.query.endDate || null,
                 category: req.query.category || null,
                 severity: req.query.severity || null,
                 scope: req.query.scope || null,
-                page: parseInt(req.query.page) || 1,
-                limit: parseInt(req.query.limit) || 100,
+                page,
+                limit,
             };
 
             const controller = AuditLogController.getInstance();
@@ -184,12 +186,13 @@ class AuditLogController {
         try {
             const format = req.query.format || "json";
 
+            const limit = Math.min(10000, Math.max(1, Number.parseInt(req.query.limit, 10) || 10000));
             const filters = {
                 startDate: req.query.startDate || null,
                 endDate: req.query.endDate || null,
                 category: req.query.category || null,
                 page: 1,
-                limit: parseInt(req.query.limit) || 10000, // Large limit for export
+                limit,
             };
 
             const controller = AuditLogController.getInstance();
