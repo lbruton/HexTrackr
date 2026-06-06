@@ -1,0 +1,2182 @@
+{
+  "version": 1,
+  "metadata": {
+    "source": "remote",
+    "provider": "gh",
+    "organization": "lbruton",
+    "repositoryId": "799901",
+    "repositoryName": "HexTrackr",
+    "createdAt": "2026-06-06T17:16:41.626Z",
+    "updatedAt": "2026-06-06T17:16:41.626Z",
+    "languages": [
+      "CSS",
+      "Dockerfile",
+      "HTML",
+      "Javascript",
+      "JSON",
+      "Markdown",
+      "Python",
+      "Shell",
+      "SQL",
+      "TypeScript",
+      "XML",
+      "YAML"
+    ]
+  },
+  "tools": [
+    {
+      "toolId": "Semgrep",
+      "localConfigurationFile": "/Users/lbruton/codacy-mig-worktrees/HexTrackr/.semgrep.yaml",
+      "useLocalConfigurationFile": true,
+      "patterns": []
+    },
+    {
+      "toolId": "Trivy",
+      "patterns": [
+        {
+          "patternId": "Trivy_malicious_packages"
+        },
+        {
+          "patternId": "Trivy_vulnerability_high"
+        },
+        {
+          "patternId": "Trivy_vulnerability_critical"
+        },
+        {
+          "patternId": "Trivy_vulnerability_minor"
+        },
+        {
+          "patternId": "Trivy_vulnerability_medium"
+        },
+        {
+          "patternId": "Trivy_secret"
+        }
+      ]
+    },
+    {
+      "toolId": "markdownlint",
+      "localConfigurationFile": "/Users/lbruton/codacy-mig-worktrees/HexTrackr/.markdownlint.json",
+      "useLocalConfigurationFile": true,
+      "patterns": []
+    },
+    {
+      "toolId": "shellcheck",
+      "patterns": [
+        {
+          "patternId": "shellcheck_SC2035"
+        },
+        {
+          "patternId": "shellcheck_SC2086"
+        },
+        {
+          "patternId": "shellcheck_SC2025"
+        },
+        {
+          "patternId": "shellcheck_SC2148"
+        },
+        {
+          "patternId": "shellcheck_SC2029"
+        },
+        {
+          "patternId": "shellcheck_SC2006"
+        },
+        {
+          "patternId": "shellcheck_SC2016"
+        },
+        {
+          "patternId": "shellcheck_SC2001"
+        },
+        {
+          "patternId": "shellcheck_SC2024"
+        },
+        {
+          "patternId": "shellcheck_SC2028"
+        },
+        {
+          "patternId": "shellcheck_SC2004"
+        },
+        {
+          "patternId": "shellcheck_SC2002"
+        },
+        {
+          "patternId": "shellcheck_SC2026"
+        },
+        {
+          "patternId": "shellcheck_SC2033"
+        },
+        {
+          "patternId": "shellcheck_SC2015"
+        },
+        {
+          "patternId": "shellcheck_SC2034"
+        },
+        {
+          "patternId": "shellcheck_SC2020"
+        },
+        {
+          "patternId": "shellcheck_SC2027"
+        },
+        {
+          "patternId": "shellcheck_SC2036"
+        },
+        {
+          "patternId": "shellcheck_SC2003"
+        },
+        {
+          "patternId": "shellcheck_SC2031"
+        },
+        {
+          "patternId": "shellcheck_SC2022"
+        }
+      ]
+    },
+    {
+      "toolId": "PyLintPython3",
+      "patterns": [
+        {
+          "patternId": "PyLintPython3_E0203"
+        },
+        {
+          "patternId": "PyLintPython3_E0102"
+        },
+        {
+          "patternId": "PyLintPython3_E1102"
+        },
+        {
+          "patternId": "PyLintPython3_E1121"
+        },
+        {
+          "patternId": "PyLintPython3_W1301"
+        },
+        {
+          "patternId": "PyLintPython3_C0200"
+        },
+        {
+          "patternId": "PyLintPython3_E0241"
+        },
+        {
+          "patternId": "PyLintPython3_C0123"
+        },
+        {
+          "patternId": "PyLintPython3_W0101"
+        },
+        {
+          "patternId": "PyLintPython3_W0604"
+        },
+        {
+          "patternId": "PyLintPython3_E0107"
+        },
+        {
+          "patternId": "PyLintPython3_E0202"
+        },
+        {
+          "patternId": "PyLintPython3_E1003"
+        },
+        {
+          "patternId": "PyLintPython3_E0302"
+        },
+        {
+          "patternId": "PyLintPython3_E1306"
+        },
+        {
+          "patternId": "PyLintPython3_E0113"
+        },
+        {
+          "patternId": "PyLintPython3_E0301"
+        },
+        {
+          "patternId": "PyLintPython3_W0711"
+        },
+        {
+          "patternId": "PyLintPython3_E0108"
+        },
+        {
+          "patternId": "PyLintPython3_E0604"
+        },
+        {
+          "patternId": "PyLintPython3_W0102"
+        },
+        {
+          "patternId": "PyLintPython3_E0603"
+        },
+        {
+          "patternId": "PyLintPython3_W0150"
+        },
+        {
+          "patternId": "PyLintPython3_E0240"
+        },
+        {
+          "patternId": "PyLintPython3_E0101"
+        },
+        {
+          "patternId": "PyLintPython3_E0110"
+        },
+        {
+          "patternId": "PyLintPython3_E0112"
+        },
+        {
+          "patternId": "PyLintPython3_E0117"
+        },
+        {
+          "patternId": "PyLintPython3_E0211"
+        },
+        {
+          "patternId": "PyLintPython3_R0203"
+        },
+        {
+          "patternId": "PyLintPython3_E1303"
+        },
+        {
+          "patternId": "PyLintPython3_E0106"
+        },
+        {
+          "patternId": "PyLintPython3_E1300"
+        },
+        {
+          "patternId": "PyLintPython3_W1305"
+        },
+        {
+          "patternId": "PyLintPython3_E0105"
+        },
+        {
+          "patternId": "PyLintPython3_E1200"
+        },
+        {
+          "patternId": "PyLintPython3_W0107"
+        },
+        {
+          "patternId": "PyLintPython3_W0109"
+        },
+        {
+          "patternId": "PyLintPython3_W1306"
+        },
+        {
+          "patternId": "PyLintPython3_E0236"
+        },
+        {
+          "patternId": "PyLintPython3_E0712"
+        },
+        {
+          "patternId": "PyLintPython3_E0710"
+        },
+        {
+          "patternId": "PyLintPython3_E1301"
+        },
+        {
+          "patternId": "PyLintPython3_W0105"
+        },
+        {
+          "patternId": "PyLintPython3_E0104"
+        },
+        {
+          "patternId": "PyLintPython3_E0702"
+        },
+        {
+          "patternId": "PyLintPython3_E1132"
+        },
+        {
+          "patternId": "PyLintPython3_W0221"
+        },
+        {
+          "patternId": "PyLintPython3_E0701"
+        },
+        {
+          "patternId": "PyLintPython3_E1206"
+        },
+        {
+          "patternId": "PyLintPython3_W0104"
+        },
+        {
+          "patternId": "PyLintPython3_E0238"
+        },
+        {
+          "patternId": "PyLintPython3_E1126"
+        },
+        {
+          "patternId": "PyLintPython3_E0114"
+        },
+        {
+          "patternId": "PyLintPython3_W0702"
+        },
+        {
+          "patternId": "PyLintPython3_E0100"
+        },
+        {
+          "patternId": "PyLintPython3_W0106"
+        },
+        {
+          "patternId": "PyLintPython3_E0601"
+        },
+        {
+          "patternId": "PyLintPython3_W1307"
+        },
+        {
+          "patternId": "PyLintPython3_E1302"
+        },
+        {
+          "patternId": "PyLintPython3_W0120"
+        },
+        {
+          "patternId": "PyLintPython3_W0612"
+        },
+        {
+          "patternId": "PyLintPython3_E1125"
+        },
+        {
+          "patternId": "PyLintPython3_W0622"
+        },
+        {
+          "patternId": "PyLintPython3_E1111"
+        },
+        {
+          "patternId": "PyLintPython3_E1305"
+        },
+        {
+          "patternId": "PyLintPython3_R0202"
+        },
+        {
+          "patternId": "PyLintPython3_E0103"
+        },
+        {
+          "patternId": "PyLintPython3_W0124"
+        },
+        {
+          "patternId": "PyLintPython3_W0404"
+        },
+        {
+          "patternId": "PyLintPython3_W0410"
+        },
+        {
+          "patternId": "PyLintPython3_E0115"
+        },
+        {
+          "patternId": "PyLintPython3_W0611"
+        },
+        {
+          "patternId": "PyLintPython3_E1304"
+        },
+        {
+          "patternId": "PyLintPython3_E1123"
+        },
+        {
+          "patternId": "PyLintPython3_W0108"
+        },
+        {
+          "patternId": "PyLintPython3_W0233"
+        },
+        {
+          "patternId": "PyLintPython3_W1303"
+        },
+        {
+          "patternId": "PyLintPython3_W0199"
+        },
+        {
+          "patternId": "PyLintPython3_W0705"
+        },
+        {
+          "patternId": "PyLintPython3_E1124"
+        },
+        {
+          "patternId": "PyLintPython3_E0704"
+        },
+        {
+          "patternId": "PyLintPython3_W0601"
+        },
+        {
+          "patternId": "PyLintPython3_E0239"
+        },
+        {
+          "patternId": "PyLintPython3_E1120"
+        },
+        {
+          "patternId": "PyLintPython3_W1302"
+        },
+        {
+          "patternId": "PyLintPython3_W0222"
+        },
+        {
+          "patternId": "PyLintPython3_E0711"
+        },
+        {
+          "patternId": "PyLintPython3_W1300"
+        },
+        {
+          "patternId": "PyLintPython3_E1205"
+        },
+        {
+          "patternId": "PyLintPython3_E1201"
+        },
+        {
+          "patternId": "PyLintPython3_W0602"
+        },
+        {
+          "patternId": "PyLintPython3_W0122"
+        },
+        {
+          "patternId": "PyLintPython3_E1127"
+        }
+      ]
+    },
+    {
+      "toolId": "Hadolint",
+      "patterns": [
+        {
+          "patternId": "Hadolint_DL3021"
+        },
+        {
+          "patternId": "Hadolint_DL3024"
+        },
+        {
+          "patternId": "Hadolint_DL3023"
+        },
+        {
+          "patternId": "Hadolint_DL3022"
+        },
+        {
+          "patternId": "Hadolint_DL4003"
+        },
+        {
+          "patternId": "Hadolint_DL3006"
+        },
+        {
+          "patternId": "Hadolint_DL3007"
+        },
+        {
+          "patternId": "Hadolint_SC1007"
+        },
+        {
+          "patternId": "Hadolint_SC2164"
+        },
+        {
+          "patternId": "Hadolint_SC1035"
+        },
+        {
+          "patternId": "Hadolint_SC1065"
+        },
+        {
+          "patternId": "Hadolint_SC1083"
+        },
+        {
+          "patternId": "Hadolint_SC2140"
+        },
+        {
+          "patternId": "Hadolint_SC1097"
+        },
+        {
+          "patternId": "Hadolint_SC2015"
+        },
+        {
+          "patternId": "Hadolint_SC2035"
+        },
+        {
+          "patternId": "Hadolint_DL3014"
+        },
+        {
+          "patternId": "Hadolint_DL3008"
+        },
+        {
+          "patternId": "Hadolint_DL3005"
+        },
+        {
+          "patternId": "Hadolint_DL3010"
+        },
+        {
+          "patternId": "Hadolint_SC1066"
+        },
+        {
+          "patternId": "Hadolint_DL3012"
+        },
+        {
+          "patternId": "Hadolint_DL3002"
+        },
+        {
+          "patternId": "Hadolint_SC2026"
+        },
+        {
+          "patternId": "Hadolint_DL3020"
+        },
+        {
+          "patternId": "Hadolint_SC1045"
+        },
+        {
+          "patternId": "Hadolint_SC1095"
+        },
+        {
+          "patternId": "Hadolint_DL4004"
+        },
+        {
+          "patternId": "Hadolint_SC1081"
+        },
+        {
+          "patternId": "Hadolint_SC2028"
+        },
+        {
+          "patternId": "Hadolint_SC1077"
+        },
+        {
+          "patternId": "Hadolint_SC1087"
+        },
+        {
+          "patternId": "Hadolint_SC1010"
+        },
+        {
+          "patternId": "Hadolint_DL3001"
+        },
+        {
+          "patternId": "Hadolint_DL4001"
+        },
+        {
+          "patternId": "Hadolint_SC1079"
+        },
+        {
+          "patternId": "Hadolint_DL3003"
+        },
+        {
+          "patternId": "Hadolint_SC1001"
+        },
+        {
+          "patternId": "Hadolint_SC2002"
+        },
+        {
+          "patternId": "Hadolint_DL3004"
+        },
+        {
+          "patternId": "Hadolint_SC1099"
+        },
+        {
+          "patternId": "Hadolint_SC1068"
+        },
+        {
+          "patternId": "Hadolint_SC1078"
+        },
+        {
+          "patternId": "Hadolint_DL4000"
+        },
+        {
+          "patternId": "Hadolint_DL3000"
+        },
+        {
+          "patternId": "Hadolint_DL3009"
+        },
+        {
+          "patternId": "Hadolint_DL3011"
+        },
+        {
+          "patternId": "Hadolint_SC1098"
+        },
+        {
+          "patternId": "Hadolint_SC1000"
+        },
+        {
+          "patternId": "Hadolint_DL4005"
+        },
+        {
+          "patternId": "Hadolint_SC2046"
+        },
+        {
+          "patternId": "Hadolint_SC2086"
+        },
+        {
+          "patternId": "Hadolint_SC1086"
+        },
+        {
+          "patternId": "Hadolint_SC2154"
+        },
+        {
+          "patternId": "Hadolint_SC1018"
+        },
+        {
+          "patternId": "Hadolint_DL3013"
+        },
+        {
+          "patternId": "Hadolint_DL3015"
+        }
+      ]
+    },
+    {
+      "toolId": "Lizard",
+      "patterns": [
+        {
+          "patternId": "Lizard_file-nloc-medium",
+          "parameters": {
+            "threshold": "500"
+          }
+        },
+        {
+          "patternId": "Lizard_parameter-count-medium",
+          "parameters": {
+            "threshold": "8"
+          }
+        },
+        {
+          "patternId": "Lizard_nloc-medium",
+          "parameters": {
+            "threshold": "50"
+          }
+        },
+        {
+          "patternId": "Lizard_ccn-medium",
+          "parameters": {
+            "threshold": "8"
+          }
+        }
+      ]
+    },
+    {
+      "toolId": "ESLint9",
+      "localConfigurationFile": "/Users/lbruton/codacy-mig-worktrees/HexTrackr/eslint.config.mjs",
+      "useLocalConfigurationFile": true,
+      "patterns": []
+    },
+    {
+      "toolId": "Stylelint",
+      "localConfigurationFile": "/Users/lbruton/codacy-mig-worktrees/HexTrackr/.stylelintrc.json",
+      "useLocalConfigurationFile": true,
+      "patterns": []
+    },
+    {
+      "toolId": "Bandit",
+      "patterns": [
+        {
+          "patternId": "Bandit_B202"
+        },
+        {
+          "patternId": "Bandit_B113"
+        },
+        {
+          "patternId": "Bandit_B311"
+        },
+        {
+          "patternId": "Bandit_B301"
+        },
+        {
+          "patternId": "Bandit_B609"
+        },
+        {
+          "patternId": "Bandit_B506"
+        },
+        {
+          "patternId": "Bandit_B407"
+        },
+        {
+          "patternId": "Bandit_B317"
+        },
+        {
+          "patternId": "Bandit_B102"
+        },
+        {
+          "patternId": "Bandit_B111"
+        },
+        {
+          "patternId": "Bandit_B505"
+        },
+        {
+          "patternId": "Bandit_B108"
+        },
+        {
+          "patternId": "Bandit_B608"
+        },
+        {
+          "patternId": "Bandit_B702"
+        },
+        {
+          "patternId": "Bandit_B401"
+        },
+        {
+          "patternId": "Bandit_B406"
+        },
+        {
+          "patternId": "Bandit_B315"
+        },
+        {
+          "patternId": "Bandit_B501"
+        },
+        {
+          "patternId": "Bandit_B107"
+        },
+        {
+          "patternId": "Bandit_B110"
+        },
+        {
+          "patternId": "Bandit_B603"
+        },
+        {
+          "patternId": "Bandit_B109"
+        },
+        {
+          "patternId": "Bandit_B201"
+        },
+        {
+          "patternId": "Bandit_B104"
+        },
+        {
+          "patternId": "Bandit_B304"
+        },
+        {
+          "patternId": "Bandit_B601"
+        },
+        {
+          "patternId": "Bandit_B321"
+        },
+        {
+          "patternId": "Bandit_B309"
+        },
+        {
+          "patternId": "Bandit_B606"
+        },
+        {
+          "patternId": "Bandit_B310"
+        },
+        {
+          "patternId": "Bandit_B316"
+        },
+        {
+          "patternId": "Bandit_B105"
+        },
+        {
+          "patternId": "Bandit_B318"
+        },
+        {
+          "patternId": "Bandit_B112"
+        },
+        {
+          "patternId": "Bandit_B405"
+        },
+        {
+          "patternId": "Bandit_B402"
+        },
+        {
+          "patternId": "Bandit_B313"
+        },
+        {
+          "patternId": "Bandit_B320"
+        },
+        {
+          "patternId": "Bandit_B409"
+        },
+        {
+          "patternId": "Bandit_B602"
+        },
+        {
+          "patternId": "Bandit_B307"
+        },
+        {
+          "patternId": "Bandit_B303"
+        },
+        {
+          "patternId": "Bandit_B701"
+        },
+        {
+          "patternId": "Bandit_B403"
+        },
+        {
+          "patternId": "Bandit_B604"
+        },
+        {
+          "patternId": "Bandit_B312"
+        },
+        {
+          "patternId": "Bandit_B502"
+        },
+        {
+          "patternId": "Bandit_B411"
+        },
+        {
+          "patternId": "Bandit_B408"
+        },
+        {
+          "patternId": "Bandit_B308"
+        },
+        {
+          "patternId": "Bandit_B306"
+        },
+        {
+          "patternId": "Bandit_B410"
+        },
+        {
+          "patternId": "Bandit_B314"
+        },
+        {
+          "patternId": "Bandit_B302"
+        },
+        {
+          "patternId": "Bandit_B103"
+        },
+        {
+          "patternId": "Bandit_B319"
+        },
+        {
+          "patternId": "Bandit_B503"
+        },
+        {
+          "patternId": "Bandit_B504"
+        },
+        {
+          "patternId": "Bandit_B305"
+        },
+        {
+          "patternId": "Bandit_B404"
+        }
+      ]
+    },
+    {
+      "toolId": "PMD",
+      "useLocalConfigurationFile": true,
+      "patterns": []
+    },
+    {
+      "toolId": "Biome",
+      "patterns": [
+        {
+          "patternId": "Biome_lint_suspicious_useNamespaceKeyword"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_useIterableCallbackReturn"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_useIsArray"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_useGoogleFontDisplay"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_useGetterReturn"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_useDefaultSwitchClauseLast"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_useBiomeIgnoreFolder"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_useAdjacentOverloadSignatures"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noWith"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noUselessRegexBackrefs"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noUselessEscapeInString"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noUnsafeNegation"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noUnsafeDeclarationMerging"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noUnknownAtRules"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noTsIgnore"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noThenProperty"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noTemplateCurlyInString"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noSuspiciousSemicolonInJsx"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noSparseArray"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noShorthandPropertyOverrides"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noShadowRestrictedNames"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noSelfCompare"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noRedundantUseStrict"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noRedeclare"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noReactSpecificProps"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noQuickfixBiome"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noPrototypeBuiltins"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noOctalEscape"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noNonNullAssertedOptionalChain"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noMisrefactoredShorthandAssign"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noMisleadingInstantiator"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noMisleadingCharacterClass"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noLabelVar"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noIrregularWhitespace"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noImportAssign"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noImportantInKeyframe"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noImplicitAnyLet"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noHeadImportInDocument"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noGlobalIsNan"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noGlobalIsFinite"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noGlobalAssign"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noFunctionAssign"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noFocusedTests"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noFallthroughSwitchClause"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noExtraNonNullAssertion"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noExportsInTest"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noExplicitAny"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noEmptyInterface"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noEmptyBlock"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noDuplicateTestHooks"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noDuplicateSelectorsKeyframeBlock"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noDuplicateProperties"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noDuplicateParameters"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noDuplicateObjectKeys"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noDuplicateJsxProps"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noDuplicateFontNames"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noDuplicateFields"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noDuplicateElseIf"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noDuplicateCustomProperties"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noDuplicateClassMembers"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noDuplicateCase"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noDuplicateAtImportRules"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noDoubleEquals"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noDocumentImportInPage"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noDocumentCookie"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noDebugger"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noControlCharactersInRegex"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noConstEnum"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noConfusingVoidType"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noConfusingLabels"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noCompareNegZero"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noCommentText"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noClassAssign"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noCatchAssign"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noBiomeFirstException"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noAsyncPromiseExecutor"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noAssignInExpressions"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noArrayIndexKey"
+        },
+        {
+          "patternId": "Biome_lint_suspicious_noApproximativeNumericConstant"
+        },
+        {
+          "patternId": "Biome_lint_style_useTemplate"
+        },
+        {
+          "patternId": "Biome_lint_style_useShorthandFunctionType"
+        },
+        {
+          "patternId": "Biome_lint_style_useNodejsImportProtocol"
+        },
+        {
+          "patternId": "Biome_lint_style_useLiteralEnumMembers"
+        },
+        {
+          "patternId": "Biome_lint_style_useImportType"
+        },
+        {
+          "patternId": "Biome_lint_style_useExportType"
+        },
+        {
+          "patternId": "Biome_lint_style_useExponentiationOperator"
+        },
+        {
+          "patternId": "Biome_lint_style_useDeprecatedReason"
+        },
+        {
+          "patternId": "Biome_lint_style_useConst"
+        },
+        {
+          "patternId": "Biome_lint_style_useArrayLiterals"
+        },
+        {
+          "patternId": "Biome_lint_style_noNonNullAssertion"
+        },
+        {
+          "patternId": "Biome_lint_style_noHeadElement"
+        },
+        {
+          "patternId": "Biome_lint_style_noDescendingSpecificity"
+        },
+        {
+          "patternId": "Biome_lint_security_noGlobalEval"
+        },
+        {
+          "patternId": "Biome_lint_security_noDangerouslySetInnerHtmlWithChildren"
+        },
+        {
+          "patternId": "Biome_lint_security_noDangerouslySetInnerHtml"
+        },
+        {
+          "patternId": "Biome_lint_security_noBlankTarget"
+        },
+        {
+          "patternId": "Biome_lint_performance_useGoogleFontPreconnect"
+        },
+        {
+          "patternId": "Biome_lint_performance_noUnwantedPolyfillio"
+        },
+        {
+          "patternId": "Biome_lint_performance_noImgElement"
+        },
+        {
+          "patternId": "Biome_lint_performance_noDynamicNamespaceImportAccess"
+        },
+        {
+          "patternId": "Biome_lint_performance_noAccumulatingSpread"
+        },
+        {
+          "patternId": "Biome_lint_correctness_useYield"
+        },
+        {
+          "patternId": "Biome_lint_correctness_useValidTypeof"
+        },
+        {
+          "patternId": "Biome_lint_correctness_useValidForDirection"
+        },
+        {
+          "patternId": "Biome_lint_correctness_useQwikValidLexicalScope"
+        },
+        {
+          "patternId": "Biome_lint_correctness_useQwikMethodUsage"
+        },
+        {
+          "patternId": "Biome_lint_correctness_useQwikClasslist"
+        },
+        {
+          "patternId": "Biome_lint_correctness_useParseIntRadix"
+        },
+        {
+          "patternId": "Biome_lint_correctness_useJsxKeyInIterable"
+        },
+        {
+          "patternId": "Biome_lint_correctness_useIsNan"
+        },
+        {
+          "patternId": "Biome_lint_correctness_useImageSize"
+        },
+        {
+          "patternId": "Biome_lint_correctness_useHookAtTopLevel"
+        },
+        {
+          "patternId": "Biome_lint_correctness_useGraphqlNamedOperations"
+        },
+        {
+          "patternId": "Biome_lint_correctness_useExhaustiveDependencies"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noVueReservedProps"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noVueReservedKeys"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noVueDuplicateKeys"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noVueDataObjectDeclaration"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noVoidTypeReturn"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noVoidElementsWithChildren"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noUnusedVariables"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noUnusedPrivateClassMembers"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noUnusedLabels"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noUnusedImports"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noUnusedFunctionParameters"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noUnsafeOptionalChaining"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noUnsafeFinally"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noUnreachableSuper"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noUnreachable"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noUnmatchableAnbSelector"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noUnknownUnit"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noUnknownTypeSelector"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noUnknownPseudoElement"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noUnknownPseudoClass"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noUnknownProperty"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noUnknownMediaFeatureName"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noUnknownFunction"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noSwitchDeclarations"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noStringCaseMismatch"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noSetterReturn"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noSelfAssign"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noRenderReturnValue"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noQwikUseVisibleTask"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noPrivateImports"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noPrecisionLoss"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noNonoctalDecimalEscape"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noMissingVarFunction"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noInvalidUseBeforeDeclaration"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noInvalidPositionAtImportRule"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noInvalidGridAreas"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noInvalidDirectionInLinearGradient"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noInvalidConstructorSuper"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noInvalidBuiltinInstantiation"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noInnerDeclarations"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noGlobalObjectCalls"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noEmptyPattern"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noEmptyCharacterClassInRegex"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noConstructorReturn"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noConstAssign"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noConstantMathMinMaxClamp"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noConstantCondition"
+        },
+        {
+          "patternId": "Biome_lint_correctness_noChildrenProp"
+        },
+        {
+          "patternId": "Biome_lint_complexity_useSimpleNumberKeys"
+        },
+        {
+          "patternId": "Biome_lint_complexity_useRegexLiterals"
+        },
+        {
+          "patternId": "Biome_lint_complexity_useOptionalChain"
+        },
+        {
+          "patternId": "Biome_lint_complexity_useNumericLiterals"
+        },
+        {
+          "patternId": "Biome_lint_complexity_useLiteralKeys"
+        },
+        {
+          "patternId": "Biome_lint_complexity_useIndexOf"
+        },
+        {
+          "patternId": "Biome_lint_complexity_useFlatMap"
+        },
+        {
+          "patternId": "Biome_lint_complexity_useDateNow"
+        },
+        {
+          "patternId": "Biome_lint_complexity_useArrowFunction"
+        },
+        {
+          "patternId": "Biome_lint_complexity_noUselessUndefinedInitialization"
+        },
+        {
+          "patternId": "Biome_lint_complexity_noUselessTypeConstraint"
+        },
+        {
+          "patternId": "Biome_lint_complexity_noUselessThisAlias"
+        },
+        {
+          "patternId": "Biome_lint_complexity_noUselessTernary"
+        },
+        {
+          "patternId": "Biome_lint_complexity_noUselessSwitchCase"
+        },
+        {
+          "patternId": "Biome_lint_complexity_noUselessStringRaw"
+        },
+        {
+          "patternId": "Biome_lint_complexity_noUselessRename"
+        },
+        {
+          "patternId": "Biome_lint_complexity_noUselessLoneBlockStatements"
+        },
+        {
+          "patternId": "Biome_lint_complexity_noUselessLabel"
+        },
+        {
+          "patternId": "Biome_lint_complexity_noUselessFragments"
+        },
+        {
+          "patternId": "Biome_lint_complexity_noUselessEscapeInRegex"
+        },
+        {
+          "patternId": "Biome_lint_complexity_noUselessEmptyExport"
+        },
+        {
+          "patternId": "Biome_lint_complexity_noUselessContinue"
+        },
+        {
+          "patternId": "Biome_lint_complexity_noUselessConstructor"
+        },
+        {
+          "patternId": "Biome_lint_complexity_noUselessCatch"
+        },
+        {
+          "patternId": "Biome_lint_complexity_noThisInStatic"
+        },
+        {
+          "patternId": "Biome_lint_complexity_noStaticOnlyClass"
+        },
+        {
+          "patternId": "Biome_lint_complexity_noImportantStyles"
+        },
+        {
+          "patternId": "Biome_lint_complexity_noFlatMapIdentity"
+        },
+        {
+          "patternId": "Biome_lint_complexity_noExtraBooleanCast"
+        },
+        {
+          "patternId": "Biome_lint_complexity_noEmptyTypeParameters"
+        },
+        {
+          "patternId": "Biome_lint_complexity_noCommaOperator"
+        },
+        {
+          "patternId": "Biome_lint_complexity_noBannedTypes"
+        },
+        {
+          "patternId": "Biome_lint_complexity_noArguments"
+        },
+        {
+          "patternId": "Biome_lint_complexity_noAdjacentSpacesInRegex"
+        },
+        {
+          "patternId": "Biome_lint_a11y_useValidLang"
+        },
+        {
+          "patternId": "Biome_lint_a11y_useValidAutocomplete"
+        },
+        {
+          "patternId": "Biome_lint_a11y_useValidAriaValues"
+        },
+        {
+          "patternId": "Biome_lint_a11y_useValidAriaRole"
+        },
+        {
+          "patternId": "Biome_lint_a11y_useValidAriaProps"
+        },
+        {
+          "patternId": "Biome_lint_a11y_useValidAnchor"
+        },
+        {
+          "patternId": "Biome_lint_a11y_useSemanticElements"
+        },
+        {
+          "patternId": "Biome_lint_a11y_useMediaCaption"
+        },
+        {
+          "patternId": "Biome_lint_a11y_useKeyWithMouseEvents"
+        },
+        {
+          "patternId": "Biome_lint_a11y_useKeyWithClickEvents"
+        },
+        {
+          "patternId": "Biome_lint_a11y_useIframeTitle"
+        },
+        {
+          "patternId": "Biome_lint_a11y_useHtmlLang"
+        },
+        {
+          "patternId": "Biome_lint_a11y_useHeadingContent"
+        },
+        {
+          "patternId": "Biome_lint_a11y_useGenericFontNames"
+        },
+        {
+          "patternId": "Biome_lint_a11y_useFocusableInteractive"
+        },
+        {
+          "patternId": "Biome_lint_a11y_useButtonType"
+        },
+        {
+          "patternId": "Biome_lint_a11y_useAriaPropsSupportedByRole"
+        },
+        {
+          "patternId": "Biome_lint_a11y_useAriaPropsForRole"
+        },
+        {
+          "patternId": "Biome_lint_a11y_useAriaActivedescendantWithTabindex"
+        },
+        {
+          "patternId": "Biome_lint_a11y_useAnchorContent"
+        },
+        {
+          "patternId": "Biome_lint_a11y_useAltText"
+        },
+        {
+          "patternId": "Biome_lint_a11y_noSvgWithoutTitle"
+        },
+        {
+          "patternId": "Biome_lint_a11y_noStaticElementInteractions"
+        },
+        {
+          "patternId": "Biome_lint_a11y_noRedundantRoles"
+        },
+        {
+          "patternId": "Biome_lint_a11y_noRedundantAlt"
+        },
+        {
+          "patternId": "Biome_lint_a11y_noPositiveTabindex"
+        },
+        {
+          "patternId": "Biome_lint_a11y_noNoninteractiveTabindex"
+        },
+        {
+          "patternId": "Biome_lint_a11y_noNoninteractiveElementToInteractiveRole"
+        },
+        {
+          "patternId": "Biome_lint_a11y_noLabelWithoutControl"
+        },
+        {
+          "patternId": "Biome_lint_a11y_noInteractiveElementToNoninteractiveRole"
+        },
+        {
+          "patternId": "Biome_lint_a11y_noHeaderScope"
+        },
+        {
+          "patternId": "Biome_lint_a11y_noDistractingElements"
+        },
+        {
+          "patternId": "Biome_lint_a11y_noAutofocus"
+        },
+        {
+          "patternId": "Biome_lint_a11y_noAriaUnsupportedElements"
+        },
+        {
+          "patternId": "Biome_lint_a11y_noAriaHiddenOnFocusable"
+        },
+        {
+          "patternId": "Biome_lint_a11y_noAccessKey"
+        }
+      ]
+    },
+    {
+      "toolId": "Agentlinter",
+      "patterns": [
+        {
+          "patternId": "Agentlinter_token-budget_under-150-tokens"
+        },
+        {
+          "patternId": "Agentlinter_token-budget_total-tokens"
+        },
+        {
+          "patternId": "Agentlinter_token-budget_section-weight"
+        },
+        {
+          "patternId": "Agentlinter_token-budget_compressible-padding"
+        },
+        {
+          "patternId": "Agentlinter_structure_position-risk-warning"
+        },
+        {
+          "patternId": "Agentlinter_structure_no-empty-sections"
+        },
+        {
+          "patternId": "Agentlinter_structure_modular-files"
+        },
+        {
+          "patternId": "Agentlinter_structure_heading-hierarchy"
+        },
+        {
+          "patternId": "Agentlinter_structure_has-version-or-update-date"
+        },
+        {
+          "patternId": "Agentlinter_structure_has-sections"
+        },
+        {
+          "patternId": "Agentlinter_structure_has-main-file"
+        },
+        {
+          "patternId": "Agentlinter_structure_has-file-map"
+        },
+        {
+          "patternId": "Agentlinter_structure_file-size"
+        },
+        {
+          "patternId": "Agentlinter_structure_dead-import"
+        },
+        {
+          "patternId": "Agentlinter_structure_circular-import"
+        },
+        {
+          "patternId": "Agentlinter_skill-safety_skill-name-match-dir"
+        },
+        {
+          "patternId": "Agentlinter_skill-safety_skill-description-when-to-use"
+        },
+        {
+          "patternId": "Agentlinter_skill-safety_sensitive-paths"
+        },
+        {
+          "patternId": "Agentlinter_skill-safety_injection-vectors"
+        },
+        {
+          "patternId": "Agentlinter_skill-safety_has-metadata"
+        },
+        {
+          "patternId": "Agentlinter_skill-safety_excessive-permissions"
+        },
+        {
+          "patternId": "Agentlinter_skill-safety_data-exfiltration"
+        },
+        {
+          "patternId": "Agentlinter_skill-safety_dangerous-commands"
+        },
+        {
+          "patternId": "Agentlinter_security_prompt-injection-vulnerability"
+        },
+        {
+          "patternId": "Agentlinter_security_no-secrets"
+        },
+        {
+          "patternId": "Agentlinter_security_no-pii-exposure"
+        },
+        {
+          "patternId": "Agentlinter_security_no-injection-defense"
+        },
+        {
+          "patternId": "Agentlinter_security_has-permission-boundaries"
+        },
+        {
+          "patternId": "Agentlinter_security_has-injection-defense"
+        },
+        {
+          "patternId": "Agentlinter_security_env-var-references"
+        },
+        {
+          "patternId": "Agentlinter_security_api-key-exposure"
+        },
+        {
+          "patternId": "Agentlinter_runtime_token-strength"
+        },
+        {
+          "patternId": "Agentlinter_runtime_group-policy"
+        },
+        {
+          "patternId": "Agentlinter_runtime_gateway-bind"
+        },
+        {
+          "patternId": "Agentlinter_runtime_dm-policy"
+        },
+        {
+          "patternId": "Agentlinter_runtime_config-secrets"
+        },
+        {
+          "patternId": "Agentlinter_runtime_config-exists"
+        },
+        {
+          "patternId": "Agentlinter_runtime_auth-mode"
+        },
+        {
+          "patternId": "Agentlinter_remote-ready_workspace-path-specified"
+        },
+        {
+          "patternId": "Agentlinter_remote-ready_model-settings-specified"
+        },
+        {
+          "patternId": "Agentlinter_remote-ready_env-vars-documented"
+        },
+        {
+          "patternId": "Agentlinter_memory_no-mental-notes"
+        },
+        {
+          "patternId": "Agentlinter_memory_has-state-tracking"
+        },
+        {
+          "patternId": "Agentlinter_memory_has-memory-strategy"
+        },
+        {
+          "patternId": "Agentlinter_memory_has-learning-loop"
+        },
+        {
+          "patternId": "Agentlinter_memory_has-handoff-protocol"
+        },
+        {
+          "patternId": "Agentlinter_memory_has-file-based-notes"
+        },
+        {
+          "patternId": "Agentlinter_memory_has-context-window-awareness"
+        },
+        {
+          "patternId": "Agentlinter_consistency_tone-voice-alignment"
+        },
+        {
+          "patternId": "Agentlinter_consistency_timezone-locale-drift"
+        },
+        {
+          "patternId": "Agentlinter_consistency_stale-package-reference"
+        },
+        {
+          "patternId": "Agentlinter_consistency_stale-file-reference"
+        },
+        {
+          "patternId": "Agentlinter_consistency_stale-date"
+        },
+        {
+          "patternId": "Agentlinter_consistency_priority-conflict"
+        },
+        {
+          "patternId": "Agentlinter_consistency_permission-conflict"
+        },
+        {
+          "patternId": "Agentlinter_consistency_outdated-cross-references"
+        },
+        {
+          "patternId": "Agentlinter_consistency_no-duplicate-instructions"
+        },
+        {
+          "patternId": "Agentlinter_consistency_naming-convention"
+        },
+        {
+          "patternId": "Agentlinter_consistency_language-mixing"
+        },
+        {
+          "patternId": "Agentlinter_consistency_identity-alignment"
+        },
+        {
+          "patternId": "Agentlinter_consistency_circular-dependency"
+        },
+        {
+          "patternId": "Agentlinter_completeness_verification-criteria-required"
+        },
+        {
+          "patternId": "Agentlinter_completeness_session-learning-hooks"
+        },
+        {
+          "patternId": "Agentlinter_completeness_has-workflow"
+        },
+        {
+          "patternId": "Agentlinter_completeness_has-user-context"
+        },
+        {
+          "patternId": "Agentlinter_completeness_has-tools"
+        },
+        {
+          "patternId": "Agentlinter_completeness_has-priorities"
+        },
+        {
+          "patternId": "Agentlinter_completeness_has-output-format"
+        },
+        {
+          "patternId": "Agentlinter_completeness_has-identity"
+        },
+        {
+          "patternId": "Agentlinter_completeness_has-error-handling"
+        },
+        {
+          "patternId": "Agentlinter_completeness_has-boundaries"
+        },
+        {
+          "patternId": "Agentlinter_completeness_freshness-file-paths"
+        },
+        {
+          "patternId": "Agentlinter_completeness_command-coverage"
+        },
+        {
+          "patternId": "Agentlinter_claude-code_skills-vs-commands"
+        },
+        {
+          "patternId": "Agentlinter_claude-code_relevance-trap"
+        },
+        {
+          "patternId": "Agentlinter_claude-code_progressive-disclosure"
+        },
+        {
+          "patternId": "Agentlinter_claude-code_instruction-count"
+        },
+        {
+          "patternId": "Agentlinter_claude-code_hooks-structure"
+        },
+        {
+          "patternId": "Agentlinter_claude-code_descriptive-ratio"
+        },
+        {
+          "patternId": "Agentlinter_claude-code_agent-focus"
+        },
+        {
+          "patternId": "Agentlinter_clarity_token-efficiency-score"
+        },
+        {
+          "patternId": "Agentlinter_clarity_token-budget-range"
+        },
+        {
+          "patternId": "Agentlinter_clarity_sentence-complexity"
+        },
+        {
+          "patternId": "Agentlinter_clarity_priority-signal-missing"
+        },
+        {
+          "patternId": "Agentlinter_clarity_obvious-statements"
+        },
+        {
+          "patternId": "Agentlinter_consistency_referenced-files-exist"
+        },
+        {
+          "patternId": "Agentlinter_clarity_no-vague-instructions"
+        },
+        {
+          "patternId": "Agentlinter_clarity_no-contradictions"
+        },
+        {
+          "patternId": "Agentlinter_clarity_naked-conditional"
+        },
+        {
+          "patternId": "Agentlinter_clarity_instruction-density"
+        },
+        {
+          "patternId": "Agentlinter_clarity_has-examples"
+        },
+        {
+          "patternId": "Agentlinter_clarity_escape-hatch-missing"
+        },
+        {
+          "patternId": "Agentlinter_clarity_english-config-files"
+        },
+        {
+          "patternId": "Agentlinter_clarity_duplicate-content"
+        },
+        {
+          "patternId": "Agentlinter_clarity_compound-instruction"
+        },
+        {
+          "patternId": "Agentlinter_clarity_ambiguous-pronoun"
+        },
+        {
+          "patternId": "Agentlinter_clarity_action-without-context"
+        },
+        {
+          "patternId": "Agentlinter_clarity_actionable-instructions"
+        },
+        {
+          "patternId": "Agentlinter_blueprint_identity-defined"
+        },
+        {
+          "patternId": "Agentlinter_blueprint_coverage"
+        },
+        {
+          "patternId": "Agentlinter_blueprint_constraints-defined"
+        }
+      ]
+    },
+    {
+      "toolId": "Prospector",
+      "patterns": [
+        {
+          "patternId": "Prospector_profile-validator"
+        },
+        {
+          "patternId": "Prospector_pycodestyle"
+        },
+        {
+          "patternId": "Prospector_mccabe"
+        },
+        {
+          "patternId": "Prospector_pyflakes"
+        },
+        {
+          "patternId": "Prospector_pydocstyle"
+        },
+        {
+          "patternId": "Prospector_dodgy"
+        }
+      ]
+    },
+    {
+      "toolId": "jackson",
+      "patterns": [
+        {
+          "patternId": "jackson_duplicate-keys"
+        },
+        {
+          "patternId": "jackson_parse-error"
+        }
+      ]
+    },
+    {
+      "toolId": "Checkov",
+      "patterns": [
+        {
+          "patternId": "Checkov_CKV2_GCP_36"
+        },
+        {
+          "patternId": "Checkov_CKV2_GCP_35"
+        },
+        {
+          "patternId": "Checkov_CKV_AZURE_144"
+        },
+        {
+          "patternId": "Checkov_CKV_AZURE_142"
+        },
+        {
+          "patternId": "Checkov_CKV2_GCP_3"
+        },
+        {
+          "patternId": "Checkov_CKV_GCP_3"
+        }
+      ]
+    }
+  ],
+  "exclude": [
+    "app/public/docs-html/content/changelog/archive.html",
+    "app/public/docs-html/content/changelog/index.html",
+    "app/public/docs-html/content/changelog/versions/1.0.0.html",
+    "app/public/docs-html/content/changelog/versions/1.0.100.html",
+    "app/public/docs-html/content/changelog/versions/1.0.101.html",
+    "app/public/docs-html/content/changelog/versions/1.0.10.html",
+    "app/public/docs-html/content/changelog/versions/1.0.11.html",
+    "app/public/docs-html/content/changelog/versions/1.0.13.html",
+    "app/public/docs-html/content/changelog/versions/1.0.14.html",
+    "app/public/docs-html/content/changelog/versions/1.0.15.html",
+    "app/public/docs-html/content/changelog/versions/1.0.16.html",
+    "app/public/docs-html/content/changelog/versions/1.0.17.html",
+    "app/public/docs-html/content/changelog/versions/1.0.18.html",
+    "app/public/docs-html/content/changelog/versions/1.0.19.html",
+    "app/public/docs-html/content/changelog/versions/1.0.1.html",
+    "app/public/docs-html/content/changelog/versions/1.0.20.html",
+    "app/public/docs-html/content/changelog/versions/1.0.21.html",
+    "app/public/docs-html/content/changelog/versions/1.0.22.html",
+    "app/public/docs-html/content/changelog/versions/1.0.23.html",
+    "app/public/docs-html/content/changelog/versions/1.0.24.html",
+    "app/public/docs-html/content/changelog/versions/1.0.25.html",
+    "app/public/docs-html/content/changelog/versions/1.0.26.html",
+    "app/public/docs-html/content/changelog/versions/1.0.27.html",
+    "app/public/docs-html/content/changelog/versions/1.0.28.html",
+    "app/public/docs-html/content/changelog/versions/1.0.30.html",
+    "app/public/docs-html/content/changelog/versions/1.0.31.html",
+    "app/public/docs-html/content/changelog/versions/1.0.32.html",
+    "app/public/docs-html/content/changelog/versions/1.0.33.html",
+    "app/public/docs-html/content/changelog/versions/1.0.34.html",
+    "app/public/docs-html/content/changelog/versions/1.0.35.html",
+    "app/public/docs-html/content/changelog/versions/1.0.36.html",
+    "app/public/docs-html/content/changelog/versions/1.0.38.html",
+    "app/public/docs-html/content/changelog/versions/1.0.39.html",
+    "app/public/docs-html/content/changelog/versions/1.0.3.html",
+    "app/public/docs-html/content/changelog/versions/1.0.40.html",
+    "app/public/docs-html/content/changelog/versions/1.0.41.html",
+    "app/public/docs-html/content/changelog/versions/1.0.43.html",
+    "app/public/docs-html/content/changelog/versions/1.0.44.html",
+    "app/public/docs-html/content/changelog/versions/1.0.45.html",
+    "app/public/docs-html/content/changelog/versions/1.0.46.html",
+    "app/public/docs-html/content/changelog/versions/1.0.47.html",
+    "app/public/docs-html/content/changelog/versions/1.0.48.html",
+    "app/public/docs-html/content/changelog/versions/1.0.49.html",
+    "app/public/docs-html/content/changelog/versions/1.0.4.html",
+    "app/public/docs-html/content/changelog/versions/1.0.50.html",
+    "app/public/docs-html/content/changelog/versions/1.0.51.html",
+    "app/public/docs-html/content/changelog/versions/1.0.52.html",
+    "app/public/docs-html/content/changelog/versions/1.0.53.html",
+    "app/public/docs-html/content/changelog/versions/1.0.54.html",
+    "app/public/docs-html/content/changelog/versions/1.0.55.html",
+    "app/public/docs-html/content/changelog/versions/1.0.56.html",
+    "app/public/docs-html/content/changelog/versions/1.0.57.html",
+    "app/public/docs-html/content/changelog/versions/1.0.58.html",
+    "app/public/docs-html/content/changelog/versions/1.0.59.html",
+    "app/public/docs-html/content/changelog/versions/1.0.5.html",
+    "app/public/docs-html/content/changelog/versions/1.0.60.html",
+    "app/public/docs-html/content/changelog/versions/1.0.61.html",
+    "app/public/docs-html/content/changelog/versions/1.0.62.html",
+    "app/public/docs-html/content/changelog/versions/1.0.63.html",
+    "app/public/docs-html/content/changelog/versions/1.0.64.html",
+    "app/public/docs-html/content/changelog/versions/1.0.65.html",
+    "app/public/docs-html/content/changelog/versions/1.0.66.html",
+    "app/public/docs-html/content/changelog/versions/1.0.67.html",
+    "app/public/docs-html/content/changelog/versions/1.0.68.html",
+    "app/public/docs-html/content/changelog/versions/1.0.69.html",
+    "app/public/docs-html/content/changelog/versions/1.0.6.html",
+    "app/public/docs-html/content/changelog/versions/1.0.70.html",
+    "app/public/docs-html/content/changelog/versions/1.0.71.html",
+    "app/public/docs-html/content/changelog/versions/1.0.72.html",
+    "app/public/docs-html/content/changelog/versions/1.0.73.html",
+    "app/public/docs-html/content/changelog/versions/1.0.74.html",
+    "app/public/docs-html/content/changelog/versions/1.0.75.html",
+    "app/public/docs-html/content/changelog/versions/1.0.76.html",
+    "app/public/docs-html/content/changelog/versions/1.0.77.html",
+    "app/public/docs-html/content/changelog/versions/1.0.78.html",
+    "app/public/docs-html/content/changelog/versions/1.0.79.html",
+    "app/public/docs-html/content/changelog/versions/1.0.7.html",
+    "app/public/docs-html/content/changelog/versions/1.0.80.html",
+    "app/public/docs-html/content/changelog/versions/1.0.81.html",
+    "app/public/docs-html/content/changelog/versions/1.0.82.html",
+    "app/public/docs-html/content/changelog/versions/1.0.83.html",
+    "app/public/docs-html/content/changelog/versions/1.0.84.html",
+    "app/public/docs-html/content/changelog/versions/1.0.85.html",
+    "app/public/docs-html/content/changelog/versions/1.0.86.html",
+    "app/public/docs-html/content/changelog/versions/1.0.88.html",
+    "app/public/docs-html/content/changelog/versions/1.0.89.html",
+    "app/public/docs-html/content/changelog/versions/1.0.8.html",
+    "app/public/docs-html/content/changelog/versions/1.0.90.html",
+    "app/public/docs-html/content/changelog/versions/1.0.91.html",
+    "app/public/docs-html/content/changelog/versions/1.0.92.html",
+    "app/public/docs-html/content/changelog/versions/1.0.93.html",
+    "app/public/docs-html/content/changelog/versions/1.0.94.html",
+    "app/public/docs-html/content/changelog/versions/1.0.95.html",
+    "app/public/docs-html/content/changelog/versions/1.0.96.html",
+    "app/public/docs-html/content/changelog/versions/1.0.97.html",
+    "app/public/docs-html/content/changelog/versions/1.0.98.html",
+    "app/public/docs-html/content/changelog/versions/1.0.99.html",
+    "app/public/docs-html/content/changelog/versions/1.0.9.html",
+    "app/public/docs-html/content/changelog/versions/1.1.0.html",
+    "app/public/docs-html/content/changelog/versions/1.1.10.html",
+    "app/public/docs-html/content/changelog/versions/1.1.11.html",
+    "app/public/docs-html/content/changelog/versions/1.1.12.html",
+    "app/public/docs-html/content/changelog/versions/1.1.1.html",
+    "app/public/docs-html/content/changelog/versions/1.1.2.html",
+    "app/public/docs-html/content/changelog/versions/1.1.3.html",
+    "app/public/docs-html/content/changelog/versions/1.1.4.html",
+    "app/public/docs-html/content/changelog/versions/1.1.5.html",
+    "app/public/docs-html/content/changelog/versions/1.1.6.html",
+    "app/public/docs-html/content/changelog/versions/1.1.7.html",
+    "app/public/docs-html/content/changelog/versions/1.1.8.html",
+    "app/public/docs-html/content/changelog/versions/1.1.9.html",
+    "app/public/docs-html/content/guides/cisco-psirt-integration.html",
+    "app/public/docs-html/content/guides/index.html",
+    "app/public/docs-html/content/guides/kev-integration.html",
+    "app/public/docs-html/content/guides/palo-alto-advisory-integration.html",
+    "app/public/docs-html/content/guides/user-guide.html",
+    "app/public/docs-html/content/index.html",
+    "app/public/docs-html/content-manifest.json",
+    "app/public/docs-html/content/overview.html",
+    "app/public/docs-html/content/reference/index.html",
+    "app/public/docs-html/content/reference/system-requirements.html",
+    "app/public/docs-html/content/reference/troubleshooting.html",
+    "app/public/docs-html/content/ROADMAP.html",
+    "app/public/docs-html/css/docs-tabler.css",
+    "app/public/docs-html/database-erd-full.html",
+    "app/public/docs-html/html-content-updater.js",
+    "app/public/docs-html/index.html",
+    "app/public/docs-html/js/docs-portal-v2.js",
+    "app/public/docs-html/js/roadmap-table-sorter.js",
+    "app/public/docs-html/js/table-converter.js",
+    "app/public/docs-html/template.html",
+    "app/public/docs-source/changelog/archive.md",
+    "app/public/docs-source/changelog/index.md",
+    "app/public/docs-source/changelog/versions/1.0.0.md",
+    "app/public/docs-source/changelog/versions/1.0.100.md",
+    "app/public/docs-source/changelog/versions/1.0.101.md",
+    "app/public/docs-source/changelog/versions/1.0.10.md",
+    "app/public/docs-source/changelog/versions/1.0.11.md",
+    "app/public/docs-source/changelog/versions/1.0.13.md",
+    "app/public/docs-source/changelog/versions/1.0.14.md",
+    "app/public/docs-source/changelog/versions/1.0.15.md",
+    "app/public/docs-source/changelog/versions/1.0.16.md",
+    "app/public/docs-source/changelog/versions/1.0.17.md",
+    "app/public/docs-source/changelog/versions/1.0.18.md",
+    "app/public/docs-source/changelog/versions/1.0.19.md",
+    "app/public/docs-source/changelog/versions/1.0.1.md",
+    "app/public/docs-source/changelog/versions/1.0.20.md",
+    "app/public/docs-source/changelog/versions/1.0.21.md",
+    "app/public/docs-source/changelog/versions/1.0.22.md",
+    "app/public/docs-source/changelog/versions/1.0.23.md",
+    "app/public/docs-source/changelog/versions/1.0.24.md",
+    "app/public/docs-source/changelog/versions/1.0.25.md",
+    "app/public/docs-source/changelog/versions/1.0.26.md",
+    "app/public/docs-source/changelog/versions/1.0.27.md",
+    "app/public/docs-source/changelog/versions/1.0.28.md",
+    "app/public/docs-source/changelog/versions/1.0.30.md",
+    "app/public/docs-source/changelog/versions/1.0.31.md",
+    "app/public/docs-source/changelog/versions/1.0.32.md",
+    "app/public/docs-source/changelog/versions/1.0.33.md",
+    "app/public/docs-source/changelog/versions/1.0.34.md",
+    "app/public/docs-source/changelog/versions/1.0.35.md",
+    "app/public/docs-source/changelog/versions/1.0.36.md",
+    "app/public/docs-source/changelog/versions/1.0.38.md",
+    "app/public/docs-source/changelog/versions/1.0.39.md",
+    "app/public/docs-source/changelog/versions/1.0.3.md",
+    "app/public/docs-source/changelog/versions/1.0.40.md",
+    "app/public/docs-source/changelog/versions/1.0.41.md",
+    "app/public/docs-source/changelog/versions/1.0.43.md",
+    "app/public/docs-source/changelog/versions/1.0.44.md",
+    "app/public/docs-source/changelog/versions/1.0.45.md",
+    "app/public/docs-source/changelog/versions/1.0.46.md",
+    "app/public/docs-source/changelog/versions/1.0.47.md",
+    "app/public/docs-source/changelog/versions/1.0.48.md",
+    "app/public/docs-source/changelog/versions/1.0.49.md",
+    "app/public/docs-source/changelog/versions/1.0.4.md",
+    "app/public/docs-source/changelog/versions/1.0.50.md",
+    "app/public/docs-source/changelog/versions/1.0.51.md",
+    "app/public/docs-source/changelog/versions/1.0.52.md",
+    "app/public/docs-source/changelog/versions/1.0.53.md",
+    "app/public/docs-source/changelog/versions/1.0.54.md",
+    "app/public/docs-source/changelog/versions/1.0.55.md",
+    "app/public/docs-source/changelog/versions/1.0.56.md",
+    "app/public/docs-source/changelog/versions/1.0.57.md",
+    "app/public/docs-source/changelog/versions/1.0.58.md",
+    "app/public/docs-source/changelog/versions/1.0.59.md",
+    "app/public/docs-source/changelog/versions/1.0.5.md",
+    "app/public/docs-source/changelog/versions/1.0.60.md",
+    "app/public/docs-source/changelog/versions/1.0.61.md",
+    "app/public/docs-source/changelog/versions/1.0.62.md",
+    "app/public/docs-source/changelog/versions/1.0.63.md",
+    "app/public/docs-source/changelog/versions/1.0.64.md",
+    "app/public/docs-source/changelog/versions/1.0.65.md",
+    "app/public/docs-source/changelog/versions/1.0.66.md",
+    "app/public/docs-source/changelog/versions/1.0.67.md",
+    "app/public/docs-source/changelog/versions/1.0.68.md",
+    "app/public/docs-source/changelog/versions/1.0.69.md",
+    "app/public/docs-source/changelog/versions/1.0.6.md",
+    "app/public/docs-source/changelog/versions/1.0.70.md",
+    "app/public/docs-source/changelog/versions/1.0.71.md",
+    "app/public/docs-source/changelog/versions/1.0.72.md",
+    "app/public/docs-source/changelog/versions/1.0.73.md",
+    "app/public/docs-source/changelog/versions/1.0.74.md",
+    "app/public/docs-source/changelog/versions/1.0.75.md",
+    "app/public/docs-source/changelog/versions/1.0.76.md",
+    "app/public/docs-source/changelog/versions/1.0.77.md",
+    "app/public/docs-source/changelog/versions/1.0.78.md",
+    "app/public/docs-source/changelog/versions/1.0.79.md",
+    "app/public/docs-source/changelog/versions/1.0.7.md",
+    "app/public/docs-source/changelog/versions/1.0.80.md",
+    "app/public/docs-source/changelog/versions/1.0.81.md",
+    "app/public/docs-source/changelog/versions/1.0.82.md",
+    "app/public/docs-source/changelog/versions/1.0.83.md",
+    "app/public/docs-source/changelog/versions/1.0.84.md",
+    "app/public/docs-source/changelog/versions/1.0.85.md",
+    "app/public/docs-source/changelog/versions/1.0.86.md",
+    "app/public/docs-source/changelog/versions/1.0.88.md",
+    "app/public/docs-source/changelog/versions/1.0.89.md",
+    "app/public/docs-source/changelog/versions/1.0.8.md",
+    "app/public/docs-source/changelog/versions/1.0.90.md",
+    "app/public/docs-source/changelog/versions/1.0.91.md",
+    "app/public/docs-source/changelog/versions/1.0.92.md",
+    "app/public/docs-source/changelog/versions/1.0.93.md",
+    "app/public/docs-source/changelog/versions/1.0.94.md",
+    "app/public/docs-source/changelog/versions/1.0.95.md",
+    "app/public/docs-source/changelog/versions/1.0.96.md",
+    "app/public/docs-source/changelog/versions/1.0.97.md",
+    "app/public/docs-source/changelog/versions/1.0.98.md",
+    "app/public/docs-source/changelog/versions/1.0.99.md",
+    "app/public/docs-source/changelog/versions/1.0.9.md",
+    "app/public/docs-source/changelog/versions/1.1.0.md",
+    "app/public/docs-source/changelog/versions/1.1.10.md",
+    "app/public/docs-source/changelog/versions/1.1.11.md",
+    "app/public/docs-source/changelog/versions/1.1.12.md",
+    "app/public/docs-source/changelog/versions/1.1.1.md",
+    "app/public/docs-source/changelog/versions/1.1.2.md",
+    "app/public/docs-source/changelog/versions/1.1.3.md",
+    "app/public/docs-source/changelog/versions/1.1.4.md",
+    "app/public/docs-source/changelog/versions/1.1.5.md",
+    "app/public/docs-source/changelog/versions/1.1.6.md",
+    "app/public/docs-source/changelog/versions/1.1.7.md",
+    "app/public/docs-source/changelog/versions/1.1.8.md",
+    "app/public/docs-source/changelog/versions/1.1.9.md",
+    "app/public/docs-source/guides/cisco-psirt-integration.md",
+    "app/public/docs-source/guides/index.md",
+    "app/public/docs-source/guides/kev-integration.md",
+    "app/public/docs-source/guides/palo-alto-advisory-integration.md",
+    "app/public/docs-source/guides/user-guide.md",
+    "app/public/docs-source/index.md",
+    "app/public/docs-source/overview.md",
+    "app/public/docs-source/reference/index.md",
+    "app/public/docs-source/reference/system-requirements.md",
+    "app/public/docs-source/reference/troubleshooting.md",
+    "app/public/docs-source/ROADMAP.md",
+    "app/public/fonts/fontawesome.min.css",
+    "app/public/scripts/utils/purify.min.js",
+    "app/public/vendor/ag-grid/ag-theme-alpine.css",
+    "app/public/vendor/ag-grid/ag-theme-alpine-dark.css",
+    "app/public/vendor/ag-grid/ag-theme-quartz.css",
+    "app/public/vendor/dompurify/purify.min.js",
+    "app/public/vendor/socket.io/socket.io.min.js",
+    "app/public/vendor/sortablejs/Sortable.min.js",
+    "app/public/vendor/tabler/js/tabler.min.js",
+    ".codacy/cli.sh",
+    "jsdoc.conf.json",
+    "jsdoc.dev.json",
+    ".markdownlint.json",
+    ".markdownlint-precommit.json",
+    "package-lock.json",
+    ".stylelintrc.json",
+    "docs/**",
+    "app/public/docs-html/**",
+    "app/public/docs-source/**",
+    "docs-html/**",
+    "docs-source/**",
+    "docs-prototype/**",
+    "docs-source-backup-*/**",
+    "app/dev-docs-html/**",
+    "app/public/libs/**",
+    "node_modules/**",
+    "screenshots/**",
+    "test/**",
+    "claudelogs/**",
+    "hextrackr-specs/**",
+    ".markdownlint*.json",
+    ".markdownlintignore",
+    ".stylelintignore"
+  ]
+}
