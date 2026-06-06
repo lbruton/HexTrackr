@@ -26,7 +26,7 @@
   "tools": [
     {
       "toolId": "Semgrep",
-      "localConfigurationFile": "/Users/lbruton/codacy-mig-worktrees/HexTrackr/.semgrep.yaml",
+      "localConfigurationFile": ".semgrep.yaml",
       "useLocalConfigurationFile": true,
       "patterns": []
     },
@@ -55,7 +55,7 @@
     },
     {
       "toolId": "markdownlint",
-      "localConfigurationFile": "/Users/lbruton/codacy-mig-worktrees/HexTrackr/.markdownlint.json",
+      "localConfigurationFile": ".markdownlint.json",
       "useLocalConfigurationFile": true,
       "patterns": []
     },
@@ -624,13 +624,13 @@
     },
     {
       "toolId": "ESLint9",
-      "localConfigurationFile": "/Users/lbruton/codacy-mig-worktrees/HexTrackr/eslint.config.mjs",
+      "localConfigurationFile": "eslint.config.mjs",
       "useLocalConfigurationFile": true,
       "patterns": []
     },
     {
       "toolId": "Stylelint",
-      "localConfigurationFile": "/Users/lbruton/codacy-mig-worktrees/HexTrackr/.stylelintrc.json",
+      "localConfigurationFile": ".stylelintrc.json",
       "useLocalConfigurationFile": true,
       "patterns": []
     },
