@@ -100,16 +100,16 @@ Redeploy via UI: Stacks → hextrackr → Pull and redeploy.
 
 ## Development Process
 
-**HexTrackr uses the global spec-workflow** for features and enhancements:
+**HexTrackr uses the global sketch workflow** for features and enhancements:
 
 ```
-/chat (Phase 0) → Issue → /discover (Phase 1) → /spec (Phase 2-4) → /retro (Phase 5)
+/chat → Issue → /discover → /sketch (requirements → discovery → approach → tasks → run)
 ```
 
-Bug fast path: `/systematic-debugging` → issue → fix (skip Phases 0-2).
-Casual path: `/gsd` — no issue, no spec, `chore:` PR.
+Bug fast path: `/systematic-debugging` → issue → fix.
+Casual path: `/gsd` — no issue, no sketch, `chore:` PR.
 
-See `~/.claude/CLAUDE.md` for the full Spec Flow Lifecycle. SpecFlow config at `.specflow/config.json`.
+See `DocVault/sketch/conventions.md` for the sketch lifecycle. Plane binding lives in `.claude/project.json` (`plane` block).
 
 ## Version & Release
 
@@ -133,7 +133,7 @@ User docs live in `/app/public/docs-source/` (guides, reference, changelog). HTM
 
 HexTrackr issues use the `HXTR-` prefix and are tracked in Plane: <https://plane.lbruton.cc/lbruton/projects/105dd863-e217-40a1-bc23-8c4fb0f39279/>.
 
-Migrated to Plane on 2026-04-26 (was `HEX-` in DocVault, historical max 391). The pre-Plane DocVault issue archive lives at `DocVault/Archive/Issues-Pre-Plane/HexTrackr/` — open issues at migration time were renumbered HEX-381..HEX-391 → HXTR-1..HXTR-8 (see each archived file's `migrated_to` frontmatter for the mapping). New issues are created via `/issue` (which dispatches on `.specflow/config.json` `issue_backend`) or directly via `mcp__plane__create_issue`.
+Migrated to Plane on 2026-04-26 (was `HEX-` in DocVault, historical max 391). The pre-Plane DocVault issue archive lives at `DocVault/Archive/Issues-Pre-Plane/HexTrackr/` — open issues at migration time were renumbered HEX-381..HEX-391 → HXTR-1..HXTR-8 (see each archived file's `migrated_to` frontmatter for the mapping). New issues are created via `/issue` (which reads the `plane` block in `.claude/project.json`) or directly via `mcp__plane__create_issue`.
 
 ## Hooks
 
