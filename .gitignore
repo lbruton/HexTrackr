@@ -93,20 +93,11 @@ Thumbs.db
 # AI Tool Configurations (local dev only)
 # ============================================
 
-# Claude Code (session-specific config, agents, commands)
-# Root-level CLAUDE.md / AGENTS.md / GEMINI.md ARE tracked — they describe the project.
-# Only the tool-specific config dirs stay local.
-.claude/*
-!.claude/project.json
-
-# Other AI tool config dirs (local only)
-.gemini/
-.codex/
-.kimi/
-.opencode/
-
-# Cursor IDE rules
-.cursor/
+# AI tools: config and instructions are tracked; only machine-local state is ignored
+.claude/settings.local.json
+.claude/**/*.local.*
+.claude/worktrees/
+.worktrees/
 
 # Crush AI tool
 .crush/
@@ -119,7 +110,6 @@ Thumbs.db
 opencode.json
 opencode-config-update.json
 broken_opencode.json
-.opencode.json
 
 # Claude session rewind logs
 .rewindlog_*
