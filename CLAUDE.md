@@ -100,16 +100,16 @@ Redeploy via UI: Stacks → hextrackr → Pull and redeploy.
 
 ## Development Process
 
-**HexTrackr uses the global sketch workflow** for features and enhancements:
+**HexTrackr uses the global spec workflow** for features and enhancements:
 
 ```
-/chat → Issue → /discover → /sketch (requirements → discovery → approach → tasks → run)
+/chat → Issue → /discover → /spec (requirements → discovery → approach → tasks → run)
 ```
 
 Bug fast path: `/systematic-debugging` → issue → fix.
-Casual path: `/gsd` — no issue, no sketch, `chore:` PR.
+Casual path: `/gsd` — no issue, no spec, `chore:` PR.
 
-See `DocVault/sketch/conventions.md` for the sketch lifecycle. Plane binding lives in `.claude/project.json` (`plane` block).
+See `DocVault/spec/conventions.md` for the spec lifecycle. Plane binding lives in `.claude/project.json` (`plane` block).
 
 ## Version & Release
 
