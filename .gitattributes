@@ -9,3 +9,6 @@
 .prettierignore     export-ignore
 .gitattributes      export-ignore
 CLAUDE.md           export-ignore
+
+# In-repo Obsidian vault (DEVS-78)
+DocVault/             export-ignore
