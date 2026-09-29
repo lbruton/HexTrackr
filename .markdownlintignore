@@ -41,3 +41,6 @@ dist/
 build/
 .vscode/
 .idea/
+
+# In-repo Obsidian vault (DEVS-78) — linted by docvault-lint with DocVault/.markdownlint.jsonc
+DocVault
