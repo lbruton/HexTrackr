@@ -6,3 +6,6 @@ app/public/docs-html
 app/public/fonts
 *.min.js
 *.min.css
+
+# In-repo Obsidian vault (DEVS-78) — own conventions; linted by docvault-lint
+DocVault/

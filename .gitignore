@@ -175,3 +175,8 @@ Dockerfile.node.backup
 
 #Ignore cursor AI rules
 .cursor/rules/codacy.mdc
+
+# DocVault (Obsidian) per-machine state
+DocVault/.obsidian/workspace*.json
+DocVault/.obsidian/graph.json
+DocVault/.trash/

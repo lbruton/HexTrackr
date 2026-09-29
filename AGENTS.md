@@ -26,10 +26,10 @@ This file provides core guidance to Codex (Codex.ai/code) when working with code
 
 ## Documentation
 
-**DocVault master index**: `/Volumes/DATA/GitHub/DocVault/INDEX.md`
-**Project index**: `/Volumes/DATA/GitHub/DocVault/Projects/HexTrackr/_Index.md`
+**Project vault (in-repo)**: `DocVault/Overview.md` → `DocVault/HexTrackr.md` (public-safe deep dives; DEVS-78)
+**Private companion**: `Devops/DocVault/Projects/HexTrackr/` (`vault-path private`) — Foundation docs, security reviews, and any page with LAN IPs / internal hosts. This repo is public.
 
-**Tier 1 — Foundation docs** (start here). Canonical pages at `DocVault/Projects/HexTrackr/Foundation/`:
+**Tier 1 — Foundation docs** (start here). Canonical pages at `Devops/DocVault/Projects/HexTrackr/Foundation/` (private companion; not yet migrated to `.context/` — run `/setup-foundation-context` on revival, redacting infra into the companion):
 
 | File | When to read |
 |---|---|
@@ -41,11 +41,11 @@ This file provides core guidance to Codex (Codex.ai/code) when working with code
 | `api-reference.md` | REST endpoints, Argon2id auth, CSRF, rate limits, CORS |
 | `integrations.md` | Cisco PSIRT OAuth2, CISA KEV, Palo Alto advisories, sync scheduler |
 
-**Tier 2 — Deep dives.** Topic docs at `DocVault/Projects/HexTrackr/` — referenced from foundation docs via `[[wikilinks]]`. Archived retired docs live in `Archived/`.
+**Tier 2 — Deep dives.** Topic docs in the in-repo `DocVault/` (infra-heavy ones in the private companion). Retired docs stay in the archived central DocVault.
 
-**Tier 3 — Source code.** When foundation doc disagrees with code, code wins. Run `/vault-drift` periodically.
+**Tier 3 — Source code.** When foundation doc disagrees with code, code wins. Run `/context-drift` once foundation docs are in `.context/`.
 
-**Documentation quality**: Use `/obsidian-cli` or `/obsidian-markdown` for DocVault maintenance. Never edit DocVault files without proper frontmatter (tags, created, updated). Run `/vault-reconcile` for structural drift.
+**Documentation quality**: Use `/obsidian-markdown` conventions for vault pages. Never edit DocVault files without proper frontmatter (tags, created, updated). Run `/vault-reconcile` for structural drift.
 
 ## Core Services
 
