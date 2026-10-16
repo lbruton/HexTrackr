@@ -154,3 +154,13 @@ Migrated to Plane on 2026-04-26 (was `HEX-` in DocVault, historical max 391). Th
 ## Memory Backend
 
 **Active**: mem0 cloud (`mcp__mem0__*`) with `agent_id: "hextrackr"` for project-scoped memories.
+
+<!-- skills-deploy:rules begin -->
+## Library rules (managed by skills-deploy)
+
+At the start of every session, read each of these files in full. They hold the rules that apply
+to all work in this repo. They are copies of the skill library masters; edit the master, not
+the copy, and do not edit this block (skills-deploy rewrites it).
+
+- `.agents/rules/code-core.md`
+<!-- skills-deploy:rules end -->
