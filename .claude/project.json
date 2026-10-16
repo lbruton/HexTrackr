@@ -17,5 +17,19 @@
     "projectId": "4f9838fa-c87d-4728-8766-4c99652ab110",
     "defaultEnv": "dev",
     "secretPath": "/"
+  },
+  "kind": "code",
+  "harnesses": {
+    "claude": true,
+    "codex": true
+  },
+  "skills": {
+    "profiles": [
+      "code-core"
+    ],
+    "extra": [],
+    "exclude": [
+      "release"
+    ]
   }
 }
