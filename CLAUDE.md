@@ -45,7 +45,7 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
 
 **Tier 3 — Source code.** When foundation doc disagrees with code, code wins. Run `/context-drift` once foundation docs are in `.context/`.
 
-**Documentation quality**: Use `/obsidian-markdown` conventions for vault pages. Never edit DocVault files without proper frontmatter (tags, created, updated). Run `/vault-reconcile` for structural drift.
+**Documentation quality**: Use Obsidian Markdown conventions for vault pages (the `obsidian` plugin's `obsidian-markdown` skill). Never edit DocVault files without proper frontmatter (tags, created, updated).
 
 ## Core Services
 
@@ -103,11 +103,11 @@ Redeploy via UI: Stacks → hextrackr → Pull and redeploy.
 **HexTrackr uses the global spec workflow** for features and enhancements:
 
 ```
-/chat → Issue → /discover → /spec (requirements → discovery → approach → tasks → run)
+Issue → /discover → /spec (requirements → discovery → approach → tasks → run)
 ```
 
-Bug fast path: `/systematic-debugging` → issue → fix.
-Casual path: `/gsd` — no issue, no spec, `chore:` PR.
+Bug fast path: reproduce → issue → fix.
+Quick fix: no issue, no spec, worktree + `chore:` PR.
 
 See the `spec` skill's `references/conventions.md` for the spec lifecycle; specs live in `DocVault/specs/`. Plane binding lives in `.claude/project.json` (`plane` block).
 
