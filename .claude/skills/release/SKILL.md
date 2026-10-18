@@ -41,9 +41,11 @@ One concise paragraph (1-3 sentences) summarizing this version.
 
 ## Version Bump Workflow
 
-**There is no automated bump script.** `npm run release` is an alias for `npm run docs:generate`
-(`node app/public/docs-html/html-content-updater.js`): it only regenerates the docs HTML. It does not
-prompt for a version, edit version strings, commit or tag. The bump is manual.
+**There is no bump script that prompts for a version, commits or tags.** `npm run release` is an alias for
+`npm run docs:generate` (`node app/public/docs-html/html-content-updater.js`). Before rendering HTML, its
+`updateVersionsAcrossFiles()` syncs most version strings **from the root `package.json`**, so the bump is:
+edit the root version (and the two files the generator does not touch) by hand, then let the generator
+propagate it.
 
 HexTrackr is **main-only**: `main` is the deploy branch (Portainer redeploys on merge). Do the bump in a
 worktree branch cut from `origin/main` and ship it through a PR to `main`. Never push to `main` directly.
@@ -53,22 +55,30 @@ worktree branch cut from `origin/main` and ship it through a PR to `main`. Never
 - Major architectural changes → new minor version (e.g., v1.1.10 → v1.2.0)
 - Breaking changes → new major version (e.g., v1.2.0 → v2.0.0)
 
-### Step 1: Bump the Version Strings (8 files)
+### Step 1: Bump the Version by Hand (3 files)
 
-Replace the old version with the new one in each of these. Grep for the old version first
-(`grep -rn "OLD" --exclude-dir=node_modules --exclude-dir=docs-html --exclude-dir=.git .`) and confirm
-every hit below is covered and no others are expected.
+The generator does not touch these, so edit them yourself:
 
 | File | What to change |
 |---|---|
-| `package.json` | `"version"` |
+| `package.json` | `"version"` (the source of truth for the generator's sync) |
 | `package-lock.json` | the two top-level `"version"` lines only (lines 3 and 9); leave dependency versions alone |
+| `README.md` | the `badge/version-X.Y.Z-blue` badge URL (the generator only matches `HexTrackr-vX.Y.Z-blue`) |
+
+**Synced by `npm run docs:generate` in Step 4** (from `updateVersionsAcrossFiles()`; check them, don't
+hand-edit unless the sync missed one):
+
+| File | Pattern the generator rewrites |
+|---|---|
 | `app/public/package.json` | `"version"` |
 | `docker-compose.yml` | `HEXTRACKR_VERSION=X.Y.Z` |
-| `README.md` | version badge URL and the `Current version: **vX.Y.Z**` line |
-| `app/public/login.html` | `HexTrackr vX.Y.Z • Secure Authentication` |
-| `app/public/scripts/shared/footer.html` | `HexTrackr-vX.Y.Z` in the shields.io badge URL |
-| `app/public/docs-source/reference/troubleshooting.md` | `**Version**: vX.Y.Z` |
+| `README.md` | `Current version: **vX.Y.Z**` |
+| `app/public/login.html` | `HexTrackr vX.Y.Z` |
+| `app/public/scripts/shared/footer.html` | `HexTrackr-vX.Y.Z-blue?style=flat` badge |
+| `app/public/docs-source/**/*.md` except `changelog/versions/` | `**Version**: vX.Y.Z` and `**Current Version**: vX.Y.Z` headers (today only `reference/troubleshooting.md`) |
+
+It also rewrites a `HEXTRACKR_VERSION || "X.Y.Z"` fallback in `app/public/server.js`; the current
+fallback is `"unknown"`, so that is a no-op.
 
 ### Step 2: Create the Changelog Version File
 
@@ -90,14 +100,24 @@ python3 .claude/skills/release/scripts/validate_changelog.py app/public/docs-sou
 - ✓ File located in correct directory
 - ✓ Version format matches `X.Y.Z` pattern
 
-### Step 4: Regenerate the Docs HTML
+### Step 4: Regenerate the Docs HTML (and Sync Versions)
 
 ```bash
 npm run docs:generate
 ```
 
-It writes the HTML and then **errors at the end on a missing `logs/docs-source/` directory**. That error
-is harmless: the HTML is already written.
+It syncs the version strings listed in Step 1, writes the HTML, and then **errors at the end on a missing
+`logs/docs-source/` directory**. That error is harmless: the sync and the HTML are already written.
+
+Then check nothing still carries the old version. Historical changelog files and the generated changelog
+pages legitimately keep it, so exclude them:
+
+```bash
+grep -rn "OLD" --exclude-dir=node_modules --exclude-dir=docs-html --exclude-dir=.git --exclude-dir=.worktrees \
+  --exclude-dir=versions --exclude=index.md --exclude=archive.md .
+```
+
+Any remaining hit (other than an unrelated dependency version in `package-lock.json`) is a missed bump.
 
 The generator re-renders every page, so it also touches HTML for old changelog versions and guides that
 did not change. Keep only these generated files and revert the rest (`git checkout -- <path>`):
@@ -114,7 +134,7 @@ Plus any HTML for docs-source pages you actually edited in this change.
 
 ### Step 5: Commit and PR
 
-- Expected diff: the 8 version files, the new `versions/X.Y.Z.md`, and the generated files above.
+- Expected diff: the 3 hand-edited files plus the 6 synced ones from Step 1, the new `versions/X.Y.Z.md`, and the generated files above.
 - Commit `chore(release): bump version to X.Y.Z` on the worktree branch (the pre-commit hook runs
   markdown/stylelint fixes and gitleaks).
 - Push the branch and open a PR to `main`. The user merges; Portainer redeploys from `main` within about
@@ -157,7 +177,7 @@ ERROR: Version format invalid (expected X.Y.Z, got 1.1)
 2. **Missing Overview** → HR lines (`---`) appear in summaries
 3. **Wrong category value** → Use exact strings: "Bug Fix", "Update", "Maintenance", "Feature"
 4. **Manual index.md edits** → File regenerates on next `npm run docs:generate`
-5. **Missed version string** → grep for the old version after the bump; all 8 files must agree
+5. **Missed version string** → run the Step 4 grep after `docs:generate`; README's `version-X.Y.Z` badge and `package-lock.json` are not synced by the generator
 6. **Committing generator noise** → revert re-rendered HTML for pages that did not change
 7. **Editing `package-lock.json` dependency lines** → only the two top-level version lines change
 
