@@ -1,6 +1,6 @@
 <!-- Fragment template for documentation content injected by docs-tabler.js -->
 <section class="doc-fragment">
-    <h1>Troubleshooting Guide</h1><p><strong>Version</strong>: v1.1.12<br><strong>Last Updated</strong>: 2025-10-09</p>
+    <h1>Troubleshooting Guide</h1><p><strong>Version</strong>: v1.1.13<br><strong>Last Updated</strong>: 2025-10-09</p>
 <p>This guide covers common issues, solutions, and diagnostic steps for HexTrackr. Issues are organized by category for quick reference.</p>
 <hr>
 <h2>Docker & Environment Issues</h2><h3>Container Won't Start</h3><p><strong>Problem</strong>: Docker container fails to start or immediately exits</p>
@@ -348,14 +348,14 @@ Status: 101 Switching Protocols (success)</code></pre></li>
 <p><strong>Solutions</strong>:</p>
 <ol>
 <li><p><strong>Clear theme localStorage</strong>:</p>
-<pre><code class="language-javascript"><span class="hljs-variable language_">localStorage</span>.<span class="hljs-title function_">removeItem</span>(<span class="hljs-string">&#x27;hextrackr-theme&#x27;</span>);
+<pre><code class="language-javascript"><span class="hljs-variable language_">localStorage</span>.<span class="hljs-title function_">removeItem</span>(<span class="hljs-string">&quot;hextrackr-theme&quot;</span>);
 location.<span class="hljs-title function_">reload</span>();</code></pre></li>
 <li><p><strong>Check for CSS conflicts</strong>:</p>
 <pre><code class="language-text">F12 → Elements tab → Inspect &lt;body&gt; tag
 Should have: data-theme=&quot;dark&quot; or data-theme=&quot;light&quot;</code></pre></li>
 <li><p><strong>Verify AG-Grid theme sync</strong> (HEX-140+):</p>
 <pre><code class="language-javascript"><span class="hljs-comment">// In browser console</span>
-<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">localStorage</span>.<span class="hljs-title function_">getItem</span>(<span class="hljs-string">&#x27;hextrackr-theme&#x27;</span>));
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">localStorage</span>.<span class="hljs-title function_">getItem</span>(<span class="hljs-string">&quot;hextrackr-theme&quot;</span>));
 <span class="hljs-comment">// Should match visual theme</span></code></pre></li>
 <li><p><strong>Cross-tab sync not working</strong>:</p>
 <ul>
@@ -383,9 +383,11 @@ Should have: data-theme=&quot;dark&quot; or data-theme=&quot;light&quot;</code><
 </li>
 <li><p><strong>Check vendor normalization</strong>:</p>
 <pre><code class="language-javascript"><span class="hljs-comment">// In browser console</span>
-<span class="hljs-title function_">fetch</span>(<span class="hljs-string">&#x27;/api/vulnerabilities&#x27;</span>).<span class="hljs-title function_">then</span>(<span class="hljs-function"><span class="hljs-params">r</span> =&gt;</span> r.<span class="hljs-title function_">json</span>()).<span class="hljs-title function_">then</span>(<span class="hljs-function"><span class="hljs-params">data</span> =&gt;</span> {
-    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Vendors:&#x27;</span>, [...<span class="hljs-keyword">new</span> <span class="hljs-title class_">Set</span>(data.<span class="hljs-title function_">map</span>(<span class="hljs-function"><span class="hljs-params">v</span> =&gt;</span> v.<span class="hljs-property">vendor</span>))]);
-});
+<span class="hljs-title function_">fetch</span>(<span class="hljs-string">&quot;/api/vulnerabilities&quot;</span>)
+    .<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">r</span>) =&gt;</span> r.<span class="hljs-title function_">json</span>())
+    .<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">data</span>) =&gt;</span> {
+        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Vendors:&quot;</span>, [...<span class="hljs-keyword">new</span> <span class="hljs-title class_">Set</span>(data.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">v</span>) =&gt;</span> v.<span class="hljs-property">vendor</span>))]);
+    });
 <span class="hljs-comment">// Should show: [&quot;CISCO&quot;, &quot;Palo Alto&quot;, &quot;Other&quot;]</span></code></pre></li>
 <li><p><strong>Verify import.config.json vendor patterns</strong>:</p>
 <ul>
@@ -395,7 +397,7 @@ Should have: data-theme=&quot;dark&quot; or data-theme=&quot;light&quot;</code><
 </ul>
 </li>
 <li><p><strong>Clear filter cache</strong>:</p>
-<pre><code class="language-javascript"><span class="hljs-variable language_">localStorage</span>.<span class="hljs-title function_">removeItem</span>(<span class="hljs-string">&#x27;hextrackr-vendor-filter&#x27;</span>);
+<pre><code class="language-javascript"><span class="hljs-variable language_">localStorage</span>.<span class="hljs-title function_">removeItem</span>(<span class="hljs-string">&quot;hextrackr-vendor-filter&quot;</span>);
 location.<span class="hljs-title function_">reload</span>();</code></pre></li>
 </ol>
 <hr>
@@ -420,7 +422,9 @@ location.<span class="hljs-title function_">reload</span>();
 <pre><code class="language-bash">docker logs hextrackr-app | grep -i <span class="hljs-string">&quot;socket&quot;</span>
 docker logs hextrackr-app | grep -i <span class="hljs-string">&quot;websocket&quot;</span></code></pre></li>
 <li><p><strong>Verify session authentication</strong> (WebSocket requires valid session):</p>
-<pre><code class="language-javascript"><span class="hljs-title function_">fetch</span>(<span class="hljs-string">&#x27;/api/auth/status&#x27;</span>).<span class="hljs-title function_">then</span>(<span class="hljs-function"><span class="hljs-params">r</span> =&gt;</span> r.<span class="hljs-title function_">json</span>()).<span class="hljs-title function_">then</span>(<span class="hljs-variable language_">console</span>.<span class="hljs-property">log</span>);
+<pre><code class="language-javascript"><span class="hljs-title function_">fetch</span>(<span class="hljs-string">&quot;/api/auth/status&quot;</span>)
+    .<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">r</span>) =&gt;</span> r.<span class="hljs-title function_">json</span>())
+    .<span class="hljs-title function_">then</span>(<span class="hljs-variable language_">console</span>.<span class="hljs-property">log</span>);
 <span class="hljs-comment">// Should show: { authenticated: true }</span></code></pre></li>
 </ol>
 <h3>API Returns 404</h3><p><strong>Problem</strong>: API calls return 404 errors</p>
@@ -428,8 +432,8 @@ docker logs hextrackr-app | grep -i <span class="hljs-string">&quot;websocket&qu
 <ol>
 <li><p><strong>Verify API base URL is correct</strong>:</p>
 <pre><code class="language-javascript"><span class="hljs-comment">// All API endpoints start with /api/</span>
-<span class="hljs-title function_">fetch</span>(<span class="hljs-string">&#x27;/api/vulnerabilities&#x27;</span>)  <span class="hljs-comment">// ✅ Correct</span>
-<span class="hljs-title function_">fetch</span>(<span class="hljs-string">&#x27;api/vulnerabilities&#x27;</span>)   <span class="hljs-comment">// ❌ Wrong (missing leading slash)</span></code></pre></li>
+<span class="hljs-title function_">fetch</span>(<span class="hljs-string">&quot;/api/vulnerabilities&quot;</span>); <span class="hljs-comment">// ✅ Correct</span>
+<span class="hljs-title function_">fetch</span>(<span class="hljs-string">&quot;api/vulnerabilities&quot;</span>); <span class="hljs-comment">// ❌ Wrong (missing leading slash)</span></code></pre></li>
 <li><p><strong>Check route exists in server.js</strong>:</p>
 <pre><code class="language-bash"><span class="hljs-comment"># List all API routes</span>
 grep -r <span class="hljs-string">&quot;app\.\(get\|post\|put\|delete\)&quot;</span> app/routes/ | grep <span class="hljs-string">&quot;/api/&quot;</span></code></pre></li>
@@ -524,7 +528,7 @@ Look for: &quot;Import progress: X%&quot;, &quot;Processing rows...&quot;</code>
 <span class="hljs-variable language_">localStorage</span>.<span class="hljs-property">hextrackr_debug</span> = <span class="hljs-string">&quot;true&quot;</span>;
 <span class="hljs-comment">// Then toggle chart buttons and watch console</span></code></pre></li>
 <li><p><strong>Clear chart cache</strong>:</p>
-<pre><code class="language-javascript"><span class="hljs-variable language_">localStorage</span>.<span class="hljs-title function_">removeItem</span>(<span class="hljs-string">&#x27;hextrackr-chart-type&#x27;</span>);
+<pre><code class="language-javascript"><span class="hljs-variable language_">localStorage</span>.<span class="hljs-title function_">removeItem</span>(<span class="hljs-string">&quot;hextrackr-chart-type&quot;</span>);
 location.<span class="hljs-title function_">reload</span>();</code></pre></li>
 </ol>
 <hr>
@@ -541,7 +545,7 @@ location.<span class="hljs-title function_">reload</span>();</code></pre><p><str
 <li>AG-Grid event logging</li>
 </ul>
 <p><strong>Disable debug mode</strong>:</p>
-<pre><code class="language-javascript"><span class="hljs-variable language_">localStorage</span>.<span class="hljs-title function_">removeItem</span>(<span class="hljs-string">&#x27;hextrackr_debug&#x27;</span>);
+<pre><code class="language-javascript"><span class="hljs-variable language_">localStorage</span>.<span class="hljs-title function_">removeItem</span>(<span class="hljs-string">&quot;hextrackr_debug&quot;</span>);
 location.<span class="hljs-title function_">reload</span>();</code></pre><hr>
 <h2>Log Locations</h2><h3>Application Logs</h3><pre><code class="language-bash"><span class="hljs-comment"># Real-time logs (all containers)</span>
 docker-compose logs -f
@@ -594,17 +598,17 @@ docker-compose restart</code></pre><h3>"Only HTTPS connections allowed" (CORS Er
 <p><strong>Cause</strong>: CSRF token missing or invalid</p>
 <p><strong>Solution</strong>: Include CSRF token in request</p>
 <pre><code class="language-javascript"><span class="hljs-comment">// Get token</span>
-<span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string">&#x27;/api/auth/csrf&#x27;</span>);
+<span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string">&quot;/api/auth/csrf&quot;</span>);
 <span class="hljs-keyword">const</span> { csrfToken } = <span class="hljs-keyword">await</span> response.<span class="hljs-title function_">json</span>();
 
 <span class="hljs-comment">// Include in request header</span>
-<span class="hljs-title function_">fetch</span>(<span class="hljs-string">&#x27;/api/protected-endpoint&#x27;</span>, {
-    <span class="hljs-attr">method</span>: <span class="hljs-string">&#x27;POST&#x27;</span>,
+<span class="hljs-title function_">fetch</span>(<span class="hljs-string">&quot;/api/protected-endpoint&quot;</span>, {
+    <span class="hljs-attr">method</span>: <span class="hljs-string">&quot;POST&quot;</span>,
     <span class="hljs-attr">headers</span>: {
-        <span class="hljs-string">&#x27;X-CSRF-Token&#x27;</span>: csrfToken,
-        <span class="hljs-string">&#x27;Content-Type&#x27;</span>: <span class="hljs-string">&#x27;application/json&#x27;</span>
+        <span class="hljs-string">&quot;X-CSRF-Token&quot;</span>: csrfToken,
+        <span class="hljs-string">&quot;Content-Type&quot;</span>: <span class="hljs-string">&quot;application/json&quot;</span>,
     },
-    <span class="hljs-attr">body</span>: <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>({ data })
+    <span class="hljs-attr">body</span>: <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>({ data }),
 });</code></pre><hr>
 <h2>Getting Help</h2><p>If issues persist after trying these solutions:</p>
 <ol>
