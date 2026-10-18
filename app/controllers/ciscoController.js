@@ -83,7 +83,7 @@ class CiscoController {
             }
             res.status(500).json({
                 error: "Failed to sync Cisco advisory data",
-                message: error.message,
+                message: "Internal server error",
             });
         }
     }
@@ -109,7 +109,7 @@ class CiscoController {
             }
             res.status(500).json({
                 error: "Failed to get Cisco advisory status",
-                message: error.message,
+                message: "Internal server error",
             });
         }
     }
@@ -153,7 +153,7 @@ class CiscoController {
             }
             res.status(500).json({
                 error: "Failed to get Cisco advisory data",
-                message: error.message,
+                message: "Internal server error",
             });
         }
     }
@@ -184,7 +184,7 @@ class CiscoController {
             }
             res.status(500).json({
                 error: "Failed to check auto-sync status",
-                message: error.message,
+                message: "Internal server error",
             });
         }
     }
@@ -225,7 +225,7 @@ class CiscoController {
             }
             res.status(500).json({
                 error: "Failed to get fixed versions",
-                message: error.message,
+                message: "Internal server error",
             });
         }
     }

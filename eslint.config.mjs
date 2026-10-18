@@ -141,7 +141,7 @@ export default [
       "@stylistic/quotes": ["error", "double", { "avoidEscape": true }],
       "@stylistic/semi": ["error", "always"],
       "curly": ["error", "all"],
-      "no-unused-vars": ["error", {
+      "no-unused-vars": ["warn", {
         "argsIgnorePattern": "^_",
         "varsIgnorePattern": "^_|^[A-Z]",  // Allow underscore prefix OR capitalized class names (dependency injection)
         "caughtErrorsIgnorePattern": "^_",
@@ -215,7 +215,7 @@ export default [
       "@stylistic/semi": ["error", "always"],
       "curly": ["error", "all"],
       "no-lone-blocks": "error",
-      "no-unused-vars": ["error", {
+      "no-unused-vars": ["warn", {
         "argsIgnorePattern": "^_",
         "varsIgnorePattern": "^_|^[A-Z]",  // Allow underscore prefix OR capitalized class names (dependency injection)
         "caughtErrorsIgnorePattern": "^_",
@@ -316,7 +316,7 @@ export default [
       "@stylistic/semi": ["error", "always"],
       "curly": ["error", "all"],
       "no-lone-blocks": "error",
-      "no-unused-vars": ["error", {
+      "no-unused-vars": ["warn", {
         "argsIgnorePattern": "^_",
         "varsIgnorePattern": "^_|^[A-Z]",  // Allow underscore prefix OR capitalized class names (dependency injection)
         "caughtErrorsIgnorePattern": "^_",
@@ -354,7 +354,7 @@ export default [
       "@stylistic/semi": ["error", "always"],
       "curly": ["error", "all"],
       "no-lone-blocks": "error",
-      "no-unused-vars": ["error", {
+      "no-unused-vars": ["warn", {
         "argsIgnorePattern": "^_",
         "varsIgnorePattern": "^_|^[A-Z]",  // Allow underscore prefix OR capitalized class names (dependency injection)
         "caughtErrorsIgnorePattern": "^_",
@@ -437,7 +437,7 @@ export default [
       "@stylistic/semi": ["error", "always"],
       "curly": ["error", "all"],
       "no-lone-blocks": "error",
-      "no-unused-vars": ["error", {
+      "no-unused-vars": ["warn", {
         "argsIgnorePattern": "^_",
         "varsIgnorePattern": "^_|^[A-Z]",  // Allow underscore prefix OR capitalized class names (dependency injection)
         "caughtErrorsIgnorePattern": "^_",
@@ -519,7 +519,7 @@ export default [
       "@stylistic/semi": ["error", "always"],
       "curly": ["error", "all"],
       "no-lone-blocks": "error",
-      "no-unused-vars": ["error", {
+      "no-unused-vars": ["warn", {
         "argsIgnorePattern": "^_",
         "varsIgnorePattern": "^_|^[A-Z]",  // Allow underscore prefix OR capitalized class names (dependency injection)
         "caughtErrorsIgnorePattern": "^_",

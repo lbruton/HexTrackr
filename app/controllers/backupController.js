@@ -267,10 +267,9 @@ class BackupController {
             const controller = BackupController.getInstance();
             const zipBuffer = await controller.backupService.exportVulnerabilitiesAsZip();
 
-            const timestamp =
-                new Date().toISOString().replace(/[:.]/g, "-").split("T")[0] +
-                "_" +
-                new Date().toISOString().replace(/[:.]/g, "-").split("T")[1].substring(0, 8);
+            const nowStr = new Date().toISOString().replace(/[:.]/g, "-");
+            const parts = nowStr.split("T");
+            const timestamp = parts[0] + "_" + parts[1].substring(0, 8);
             const filename = `hextrackr_vulnerabilities_backup_${timestamp}_manual.zip`;
 
             // Send response to user first (prevents timeout on large files)
@@ -346,10 +345,9 @@ class BackupController {
             const controller = BackupController.getInstance();
             const zipBuffer = await controller.backupService.exportTicketsAsZip();
 
-            const timestamp =
-                new Date().toISOString().replace(/[:.]/g, "-").split("T")[0] +
-                "_" +
-                new Date().toISOString().replace(/[:.]/g, "-").split("T")[1].substring(0, 8);
+            const nowStr = new Date().toISOString().replace(/[:.]/g, "-");
+            const parts = nowStr.split("T");
+            const timestamp = parts[0] + "_" + parts[1].substring(0, 8);
             const filename = `hextrackr_tickets_backup_${timestamp}_manual.zip`;
 
             // Send response to user first (prevents timeout on large files)

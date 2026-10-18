@@ -1,0 +1,23 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <hr>
+<h2>title: "Version 1.1.13 - Dependency Security Refresh"
+date: "2026-10-18"
+version: "1.1.13"
+status: "Released"
+category: "Maintenance"</h2><h1>Version 1.1.13 - Dependency Security Refresh</h1><p><strong>Release Status</strong>: ✅ Released<br><strong>Release Date</strong>: 2026-10-18<br><strong>Parent Issues</strong>: Maintenance</p>
+<h2>Overview</h2><p>Brought the dependency updates that only existed on <code>main</code> into <code>dev</code> and ran <code>npm audit fix</code>, so <code>dev</code> is the single source of truth. Production dependencies now report zero known vulnerabilities.</p>
+<hr>
+<h2>[1.1.13]</h2><h3>Security</h3><ul>
+<li>Updated <code>dompurify</code> to 3.4.9, <code>express</code> to 4.22, <code>multer</code> to 2.1 and <code>uuid</code> to 14.</li>
+<li>Ran <code>npm audit fix</code> for production dependencies (previously 16 findings, 2 critical, including <code>proxy-addr</code>, <code>tar</code>, <code>ws</code>, <code>socket.io</code>).</li>
+</ul>
+<h3>Changed</h3><ul>
+<li>Merged <code>main</code> into <code>dev</code>, including lint and review cleanups in several controllers and shared scripts.</li>
+<li>Version references updated across the app, README and compose file.</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>

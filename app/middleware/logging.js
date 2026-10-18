@@ -222,7 +222,7 @@ function requestLoggingMiddleware(req, res, next) {
 
     // Log incoming request
     logger.info(
-        `${method} ${url}`,
+        `🔍 ${method} ${url}`,
         {
             ip,
             userAgent: userAgent.substring(0, 100),
@@ -242,12 +242,12 @@ function requestLoggingMiddleware(req, res, next) {
             contentLength: `${contentLength} bytes`,
         };
 
-        if (statusCode >= 400) {
-            logger.warn(`${method} ${url} - ${statusCode}`, responseData, requestId);
+    if (statusCode >= 400) {
+            logger.warn(`⚠️ ${method} ${url} - ${statusCode}`, responseData, requestId);
         } else if (duration > 2000) {
-            logger.warn(`Slow request: ${method} ${url}`, responseData, requestId);
+            logger.warn(`⚠️ Slow request: ${method} ${url}`, responseData, requestId);
         } else {
-            logger.debug(`${method} ${url} - ${statusCode}`, responseData, requestId);
+            logger.debug(`✅ ${method} ${url} - ${statusCode}`, responseData, requestId);
         }
     });
 
@@ -262,7 +262,7 @@ function errorLoggingMiddleware(err, req, res, _next) {
     const requestId = req.requestId || "unknown";
 
     logger.error(
-        "Unhandled request error",
+        "❌ Unhandled request error",
         {
             message: err.message,
             stack: process.env.NODE_ENV === "development" ? err.stack : undefined,
@@ -292,7 +292,7 @@ function logApiResponse(req, res, operation, result, error = null) {
 
     if (error) {
         logger.error(
-            `API operation failed: ${operation}`,
+            `❌ API operation failed: ${operation}`,
             {
                 error: error.message,
                 method: req.method,
@@ -302,7 +302,7 @@ function logApiResponse(req, res, operation, result, error = null) {
         );
     } else {
         logger.debug(
-            `API operation success: ${operation}`,
+            `✅ API operation success: ${operation}`,
             {
                 method: req.method,
                 url: req.url,

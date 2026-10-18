@@ -57,10 +57,10 @@ Example in HTML:
 
 - **Purpose**: Unified Settings modal functionality across all pages
 - **Features**:
-    - API configuration (Cisco PSIRT, Tenable)
-    - Data management (export, import, backup, clear)
-    - System configuration placeholders
-    - Database statistics display
+  - API configuration (Cisco PSIRT, Tenable)
+  - Data management (export, import, backup, clear)
+  - System configuration placeholders
+  - Database statistics display
 - **Integration**: Auto-initializes and provides global functions for all data operations
 
 ### Page Integration

@@ -81,8 +81,7 @@ if ! command -v gitleaks &> /dev/null; then
     fi
 fi
 
-# Run gitleaks detect on the repository
-if gitleaks detect --source . --no-git --verbose 2>&1 | grep -q "leaks found: [1-9]"; then
+if ! gitleaks protect --staged --verbose; then
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo "🚨 GITLEAKS DETECTED SECRETS IN YOUR CHANGES"
     echo ""
@@ -97,8 +96,11 @@ else
     echo "✅ No secrets detected"
 fi
 
-# Stage the auto-fixed files (only markdown and CSS)
-git add -u
+# Stage markdown/CSS auto-fixes only for files already staged for this commit.
+mapfile -t staged_formatted_files < <(git diff --name-only --cached -- "*.md" "*.css")
+if [ ${#staged_formatted_files[@]} -gt 0 ]; then
+    git add -- "${staged_formatted_files[@]}"
+fi
 
 echo ""
 echo "✅ Safe fixes applied and staged"

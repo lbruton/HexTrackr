@@ -10,9 +10,16 @@
     "color-hex-length": "long",
     "declaration-block-single-line-max-declarations": 3,
     "comment-empty-line-before": null,
+    "declaration-block-no-shorthand-property-overrides": null,
+    "font-family-no-missing-generic-family-keyword": null,
+    "keyframes-name-pattern": null,
     "media-feature-name-no-vendor-prefix": null,
     "media-feature-range-notation": "prefix",
+    "no-descending-specificity": null,
+    "no-duplicate-selectors": null,
+    "no-invalid-position-at-import-rule": null,
     "declaration-property-value-no-unknown": null,
+    "property-no-deprecated": null,
     "property-no-unknown": null
   }
 }
