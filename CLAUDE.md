@@ -26,10 +26,10 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
 
 ## Documentation
 
-**DocVault master index**: `/Volumes/DATA/GitHub/DocVault/INDEX.md`
-**Project index**: `/Volumes/DATA/GitHub/DocVault/Projects/HexTrackr/_Index.md`
+**Project vault (in-repo)**: `DocVault/Overview.md` → `DocVault/HexTrackr.md` (public-safe deep dives; DEVS-78)
+**Private companion**: `Devops/DocVault/Projects/HexTrackr/` (`vault-path private`) — Foundation docs, security reviews, and any page with LAN IPs / internal hosts. This repo is public.
 
-**Tier 1 — Foundation docs** (start here). Canonical pages at `DocVault/Projects/HexTrackr/Foundation/`:
+**Tier 1 — Foundation docs** (start here). Canonical pages at `Devops/DocVault/Projects/HexTrackr/Foundation/` (private companion; not yet migrated to `.context/` — run `/setup-foundation-context` on revival, redacting infra into the companion):
 
 | File | When to read |
 |---|---|
@@ -41,11 +41,11 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
 | `api-reference.md` | REST endpoints, Argon2id auth, CSRF, rate limits, CORS |
 | `integrations.md` | Cisco PSIRT OAuth2, CISA KEV, Palo Alto advisories, sync scheduler |
 
-**Tier 2 — Deep dives.** Topic docs at `DocVault/Projects/HexTrackr/` — referenced from foundation docs via `[[wikilinks]]`. Archived retired docs live in `Archived/`.
+**Tier 2 — Deep dives.** Topic docs in the in-repo `DocVault/` (infra-heavy ones in the private companion). Retired docs stay in the archived central DocVault.
 
-**Tier 3 — Source code.** When foundation doc disagrees with code, code wins. Run `/vault-drift` periodically.
+**Tier 3 — Source code.** When foundation doc disagrees with code, code wins. Run `/context-drift` once foundation docs are in `.context/`.
 
-**Documentation quality**: Use `/obsidian-cli` or `/obsidian-markdown` for DocVault maintenance. Never edit DocVault files without proper frontmatter (tags, created, updated). Run `/vault-reconcile` for structural drift.
+**Documentation quality**: Use Obsidian Markdown conventions for vault pages (the `obsidian` plugin's `obsidian-markdown` skill). Never edit DocVault files without proper frontmatter (tags, created, updated).
 
 ## Core Services
 
@@ -100,16 +100,16 @@ Redeploy via UI: Stacks → hextrackr → Pull and redeploy.
 
 ## Development Process
 
-**HexTrackr uses the global spec-workflow** for features and enhancements:
+**HexTrackr uses the global spec workflow** for features and enhancements:
 
 ```
-/chat (Phase 0) → Issue → /discover (Phase 1) → /spec (Phase 2-4) → /retro (Phase 5)
+Issue → /discover → /spec (requirements → discovery → approach → tasks → run)
 ```
 
-Bug fast path: `/systematic-debugging` → issue → fix (skip Phases 0-2).
-Casual path: `/gsd` — no issue, no spec, `chore:` PR.
+Bug fast path: reproduce → issue → fix.
+Quick fix: no issue, no spec, worktree + `chore:` PR.
 
-See `~/.claude/CLAUDE.md` for the full Spec Flow Lifecycle. SpecFlow config at `.specflow/config.json`.
+See the `spec` skill's `references/conventions.md` for the spec lifecycle; specs live in `DocVault/specs/`. Plane binding lives in `.claude/project.json` (`plane` block).
 
 ## Version & Release
 
@@ -123,17 +123,17 @@ User docs live in `/app/public/docs-source/` (guides, reference, changelog). HTM
 
 ## Git Branch Workflow
 
-**CRITICAL**: `main` branch is **PROTECTED** — never merge directly to main
+**Single-branch flow (decided 2026-10-18)**: `dev` is the only deploy target. Portainer stack 11 tracks `refs/heads/dev` and redeploys within about 5 minutes of a merge. There is no beta/prod split, so no `dev` → `main` release PR is needed.
 
-- `dev`: Development branch (default)
-- `main`: Production branch (protected, deploy-only)
-- `feature/*`: Feature branches (create from dev, merge back to dev)
+- `dev`: Default and deploy branch. Work in a worktree branch under `.worktrees/` and open a PR to `dev`.
+- `main`: Frozen legacy branch, not deployed anywhere. Do not open PRs against it and do not merge `dev` into it unless the user explicitly asks.
+- Merging to `dev` deploys to production, so bump the version (`/release patch`) for runtime changes and check the app after the redeploy.
 
 ## Issue Tracking
 
 HexTrackr issues use the `HXTR-` prefix and are tracked in Plane: <https://plane.lbruton.cc/lbruton/projects/105dd863-e217-40a1-bc23-8c4fb0f39279/>.
 
-Migrated to Plane on 2026-04-26 (was `HEX-` in DocVault, historical max 391). The pre-Plane DocVault issue archive lives at `DocVault/Archive/Issues-Pre-Plane/HexTrackr/` — open issues at migration time were renumbered HEX-381..HEX-391 → HXTR-1..HXTR-8 (see each archived file's `migrated_to` frontmatter for the mapping). New issues are created via `/issue` (which dispatches on `.specflow/config.json` `issue_backend`) or directly via `mcp__plane__create_issue`.
+Migrated to Plane on 2026-04-26 (was `HEX-` in DocVault, historical max 391). The pre-Plane DocVault issue archive lives at `DocVault/Archive/Issues-Pre-Plane/HexTrackr/` — open issues at migration time were renumbered HEX-381..HEX-391 → HXTR-1..HXTR-8 (see each archived file's `migrated_to` frontmatter for the mapping). New issues are created via `/issue` (which reads the `plane` block in `.claude/project.json`) or directly via `mcp__plane__workitem` (`action: "create"`).
 
 ## Hooks
 

@@ -1,6 +1,10 @@
-# Dependencies
-node_modules/
+# Dependencies (no trailing slash so a symlinked node_modules in a worktree is ignored too)
+node_modules
 npm-debug.log*
+
+# Scratch dirs from .claude/hooks/test_post_edit_lint.py (removed after each run)
+hooktest-scratch-*/
+__pycache__/
 
 # Environment variables (SECRETS - never commit)
 .env
@@ -93,20 +97,11 @@ Thumbs.db
 # AI Tool Configurations (local dev only)
 # ============================================
 
-# Claude Code (session-specific config, agents, commands)
-# Root-level CLAUDE.md / AGENTS.md / GEMINI.md ARE tracked — they describe the project.
-# Only the tool-specific config dirs stay local.
-.claude/*
-!.claude/project.json
-
-# Other AI tool config dirs (local only)
-.gemini/
-.codex/
-.kimi/
-.opencode/
-
-# Cursor IDE rules
-.cursor/
+# AI tools: config and instructions are tracked; only machine-local state is ignored
+.claude/settings.local.json
+.claude/**/*.local.*
+.claude/worktrees/
+.worktrees/
 
 # Crush AI tool
 .crush/
@@ -119,7 +114,6 @@ Thumbs.db
 opencode.json
 opencode-config-update.json
 broken_opencode.json
-.opencode.json
 
 # Claude session rewind logs
 .rewindlog_*
@@ -181,3 +175,8 @@ Dockerfile.node.backup
 
 #Ignore cursor AI rules
 .cursor/rules/codacy.mdc
+
+# DocVault (Obsidian) per-machine state
+DocVault/.obsidian/workspace*.json
+DocVault/.obsidian/graph.json
+DocVault/.trash/

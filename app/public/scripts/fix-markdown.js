@@ -365,7 +365,7 @@ class MarkdownFormatter {
      */
     findMarkdownFiles(dir = process.cwd()) {
         const markdownFiles = [];
-        const excludeDirs = ["node_modules", ".git", "data", "docs-prototype"];
+        const excludeDirs = ["node_modules", ".git", "data", "docs-prototype", "DocVault"];
 
         const scanDirectory = (currentDir) => {
             try {

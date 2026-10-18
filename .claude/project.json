@@ -1,0 +1,35 @@
+{
+  "name": "HexTrackr",
+  "tag": "hextrackr",
+  "issuePrefix": "HXTR",
+  "issueTag": "hextrackr",
+  "cachePrefix": "hextrackr",
+  "plane": {
+    "workspace": "lbruton",
+    "projectId": "105dd863-e217-40a1-bc23-8c4fb0f39279"
+  },
+  "mem0": {
+    "userId": "lbruton",
+    "project": "hextrackr"
+  },
+  "infisical": {
+    "host": "https://infisical.lbruton.cc",
+    "projectId": "4f9838fa-c87d-4728-8766-4c99652ab110",
+    "defaultEnv": "dev",
+    "secretPath": "/"
+  },
+  "kind": "code",
+  "harnesses": {
+    "claude": true,
+    "codex": true
+  },
+  "skills": {
+    "profiles": [
+      "code-core"
+    ],
+    "extra": [],
+    "exclude": [
+      "release"
+    ]
+  }
+}

@@ -1,5 +1,6 @@
 ---
 exclude_paths:
+  - "DocVault/**"   # in-repo Obsidian vault (DEVS-78)
   # Documentation (markdown/HTML - not application code)
   - "docs/**"
   - "app/public/docs-html/**"
