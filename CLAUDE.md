@@ -69,7 +69,7 @@ Key services to know: `databaseService.js` (SQLite WAL, sqlite3 callback API), `
 
 **Primary access**: https://hextrackr.lbruton.cc via Cloudflare Zero Trust tunnel (team 2FA, 8 members). Also accessible at https://hextrackr.com (NPM reverse proxy, home network).
 
-**Deploy Pattern**: PR to `dev` → merge → Portainer redeploy (pulls latest, rebuilds image, restarts).
+**Deploy Pattern**: PR to `main` → merge → Portainer redeploy (pulls latest, rebuilds image, restarts).
 Redeploy via API: `PUT /api/stacks/11/git/redeploy?endpointId=3` with `SESSION_SECRET` env var.
 Redeploy via UI: Stacks → hextrackr → Pull and redeploy.
 
@@ -87,7 +87,7 @@ Redeploy via UI: Stacks → hextrackr → Pull and redeploy.
 ## Testing & Development
 
 **Production (Portainer)**: Container `hextrackr-app` on Portainer VM, accessed via https://hextrackr.lbruton.cc
-**Testing after deploy**: PR to `dev` → merge → redeploy in Portainer → test at https://hextrackr.lbruton.cc
+**Testing after deploy**: PR to `main` → merge → redeploy in Portainer → test at https://hextrackr.lbruton.cc
 
 **Local dev build**: Run `docker build -t hextrackr-local .` to verify the image builds. For testing application behavior, use the Portainer deploy cycle — do NOT run `npm run dev` or `node` directly, as the app expects the Docker environment (volume mounts, env vars).
 
@@ -123,11 +123,11 @@ User docs live in `/app/public/docs-source/` (guides, reference, changelog). HTM
 
 ## Git Branch Workflow
 
-**Single-branch flow (decided 2026-10-18)**: `dev` is the only deploy target. Portainer stack 11 tracks `refs/heads/dev` and redeploys within about 5 minutes of a merge. There is no beta/prod split, so no `dev` → `main` release PR is needed.
+**Single-branch flow (decided 2026-10-18)**: `main` is the only long-lived branch and the deploy target. Portainer stack 11 tracks `refs/heads/main` and redeploys within about 5 minutes of a merge. There is no beta/prod split and no `dev` branch.
 
-- `dev`: Default and deploy branch. Work in a worktree branch under `.worktrees/` and open a PR to `dev`.
-- `main`: Frozen legacy branch, not deployed anywhere. Do not open PRs against it and do not merge `dev` into it unless the user explicitly asks.
-- Merging to `dev` deploys to production, so bump the version (`/release patch`) for runtime changes and check the app after the redeploy.
+- `main`: Default and deploy branch (protected). Work in a worktree branch under `.worktrees/` cut from `origin/main` and open a PR to `main`.
+- Merging to `main` deploys to production, so bump the version (`/release patch`) for runtime changes and check the app after the redeploy.
+- Dependabot and review bots target `main` as the default branch, so their PRs land where the deploy runs.
 
 ## Issue Tracking
 

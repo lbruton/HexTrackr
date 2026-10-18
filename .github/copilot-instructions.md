@@ -229,27 +229,27 @@ async function load() {
 
 ---
 
-## Git Workflow (Single-Branch: dev)
+## Git Workflow (Single-Branch: main)
 
-**Critical**: `dev` is the only deploy branch (Portainer stack 11 tracks `refs/heads/dev`). `main` is a frozen legacy branch that is not deployed.
+**Critical**: `main` is the only long-lived branch and the deploy target (Portainer stack 11 tracks `refs/heads/main`). There is no `dev` branch.
 
 ```bash
-# Daily workflow: worktree branch from dev, PR back to dev
+# Daily workflow: worktree branch from main, PR back to main
 git fetch origin
-git worktree add -b chore/short-desc .worktrees/chore-short-desc origin/dev
+git worktree add -b chore/short-desc .worktrees/chore-short-desc origin/main
 # ... make changes, test, commit ...
 git push -u origin chore/short-desc
 
-# Create PR on GitHub: chore/short-desc -> dev
+# Create PR on GitHub: chore/short-desc -> main
 # After the PR merges, rebase the main checkout
-git checkout dev
+git checkout main
 git pull --rebase
 ```
 
 **Never**:
-- ❌ Open PRs against `main` or merge `dev` into `main` unless explicitly asked
-- ❌ Push directly to `dev` (use a PR)
-- ❌ Forget that merging to `dev` deploys to production within about 5 minutes
+- ❌ Push directly to `main` (protected; use a PR)
+- ❌ Recreate a long-lived `dev` branch
+- ❌ Forget that merging to `main` deploys to production within about 5 minutes
 
 ---
 

@@ -7,7 +7,7 @@ tags:
   - vulnerability-management
 aliases: ["HexTrackr Overview", "HexTrackr"]
 created: "2026-03-11"
-updated: "2026-04-15"
+updated: "2026-10-18"
 ---
 
 # HexTrackr
@@ -22,7 +22,7 @@ Enterprise vulnerability management system with real-time WebSocket updates. Tra
 |-------|-------|
 | Repo | [lbruton/HexTrackr](https://github.com/lbruton/HexTrackr) |
 | Language | Node.js/Express backend, vanilla JavaScript frontend |
-| Branches | `dev` (default, deployed via Portainer) + `main` (frozen legacy, not deployed) |
+| Branches | `main` only (default, protected, deployed via Portainer) |
 | Version Lock | `devops/version.lock` (patched via `/release patch`) |
 | Issue Prefix | HEX (DocVault vault-based tracking) |
 | Path | `/Volumes/DATA/GitHub/HexTrackr/` |
@@ -39,7 +39,7 @@ Browser → Cloudflare Zero Trust tunnel (2FA) → NPM (443, Let's Encrypt) → 
 
 | Component | Detail |
 |-----------|--------|
-| Stack | [Stack Registry](/Volumes/DATA/GitHub/Devops/DocVault/KnowledgeBase/Infrastructure/Stack%20Registry.md) ID 11, repo-based from `dev` branch |
+| Stack | [Stack Registry](/Volumes/DATA/GitHub/Devops/DocVault/KnowledgeBase/Infrastructure/Stack%20Registry.md) ID 11, repo-based from `main` branch |
 | Port | 8989 (host) → 8080 (container) |
 | Database | SQLite (WAL mode) on [named volume](/Volumes/DATA/GitHub/Devops/DocVault/KnowledgeBase/Infrastructure/Named%20Volumes.md) `hextrackr_hextrackr-database` |
 | Volumes | 3 named: database (379M), uploads, backups |
@@ -48,7 +48,7 @@ Browser → Cloudflare Zero Trust tunnel (2FA) → NPM (443, Let's Encrypt) → 
 | Secrets | `SESSION_SECRET` via Portainer env var, sourced from Infisical |
 | Backups | [Backups](/Volumes/DATA/GitHub/Devops/DocVault/KnowledgeBase/Infrastructure/Backups.md) stack pulls SQLite via `sqlite3 .backup` |
 
-**Deploy pattern**: PR to `dev` → merge → Portainer redeploy (pulls latest, rebuilds image, restarts). Redeploy via API or Portainer UI.
+**Deploy pattern**: PR to `main` → merge → Portainer redeploy (pulls latest, rebuilds image, restarts). Redeploy via API or Portainer UI.
 
 ## Architecture
 
