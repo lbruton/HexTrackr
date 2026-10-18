@@ -24,8 +24,8 @@ Claude Code automatically loads this skill when you:
 
 2. **Guides Release Process**
    - Prompts for changelog creation after major sessions
-   - Walks through the manual bump (8 version-string files; there is no bump script, and
-     `npm run release` only regenerates docs HTML)
+   - Walks through the bump: hand-edit `package.json`, `package-lock.json` and the README badge, then
+     `npm run docs:generate` (= `npm run release`) syncs the other version strings and regenerates HTML
    - Runs validation before `npm run docs:generate`, then a PR to `main` (main-only flow)
 
 3. **Prevents Common Errors**

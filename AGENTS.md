@@ -8,7 +8,7 @@ This file provides core guidance to Codex (Codex.ai/code) when working with code
 
 **HexTrackr** is an enterprise vulnerability management system built with Node.js/Express backend and vanilla JavaScript frontend. The application tracks security vulnerabilities, maintenance tickets, and CISA KEV (Known Exploited Vulnerabilities) data with real-time WebSocket updates. Provides a Ticketing Bridge system to allow users to cordinate field operations between two independent teams.
 
-**Current Version**: See root `package.json` (bumped by hand in 8 files; see the `release` skill. `npm run release` only regenerates docs HTML)
+**Current Version**: See root `package.json` (bump it by hand, then `npm run docs:generate` syncs most other version strings; see the `release` skill)
 
 **Access Points**:
 
