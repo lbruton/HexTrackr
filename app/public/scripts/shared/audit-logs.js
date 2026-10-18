@@ -143,7 +143,7 @@ class AuditLogModalManager {
      * @private
      */
     renderStats() {
-        if (!this.stats) return;
+        if (!this.stats) {return;}
 
         document.getElementById("auditModalTotalLogs").textContent = this.stats.totalLogs.toLocaleString();
         document.getElementById("auditModalCategories").textContent = this.stats.categoriesTracked.length;
@@ -163,10 +163,10 @@ class AuditLogModalManager {
      * @private
      */
     populateCategoryFilter() {
-        if (!this.stats || !this.stats.categoriesTracked) return;
+        if (!this.stats || !this.stats.categoriesTracked) {return;}
 
         const select = document.getElementById("auditCategory");
-        if (!select) return;
+        if (!select) {return;}
 
         // Clear existing options (except "All Categories")
         select.innerHTML = '<option value="">All Categories</option>';
@@ -240,7 +240,7 @@ class AuditLogModalManager {
         const tbody = document.getElementById("auditLogsTableBody");
         const emptyState = document.getElementById("auditLogsEmpty");
 
-        if (!tbody) return;
+        if (!tbody) {return;}
 
         // Clear existing rows
         tbody.innerHTML = "";
@@ -303,7 +303,7 @@ class AuditLogModalManager {
      * @param {Object} pagination - {page, limit, total, pages}
      */
     renderPagination(pagination) {
-        if (!pagination) return;
+        if (!pagination) {return;}
 
         const { page, limit, total, pages } = pagination;
 
@@ -317,11 +317,11 @@ class AuditLogModalManager {
 
         // Render pagination buttons
         const paginationContainer = document.getElementById("auditLogsPagination");
-        if (!paginationContainer) return;
+        if (!paginationContainer) {return;}
 
         paginationContainer.innerHTML = "";
 
-        if (pages <= 1) return; // No pagination needed
+        if (pages <= 1) {return;} // No pagination needed
 
         // Previous button
         const prevLi = document.createElement("li");
@@ -409,9 +409,9 @@ class AuditLogModalManager {
         const endDate = document.getElementById("auditEndDate");
         const category = document.getElementById("auditCategory");
 
-        if (startDate) startDate.value = "";
-        if (endDate) endDate.value = "";
-        if (category) category.value = "";
+        if (startDate) {startDate.value = "";}
+        if (endDate) {endDate.value = "";}
+        if (category) {category.value = "";}
 
         // Clear filter state
         this.filters = {
@@ -470,11 +470,11 @@ class AuditLogModalManager {
         try {
             // Find log in current data (or fetch if needed)
             const tbody = document.getElementById("auditLogsTableBody");
-            if (!tbody) return;
+            if (!tbody) {return;}
 
             // For now, we'll need to fetch the full log details
             // In a production system, you might cache the full log data
-            const response = await fetch(`/api/audit-logs?page=1&limit=10000`);
+            const response = await fetch("/api/audit-logs?page=1&limit=10000");
             const result = await response.json();
 
             if (!result.success) {
@@ -503,7 +503,7 @@ class AuditLogModalManager {
      */
     renderLogDetails(log) {
         const content = document.getElementById("auditLogDetailsContent");
-        if (!content) return;
+        if (!content) {return;}
 
         // Extract message and metadata
         let messageStr = "";
@@ -575,7 +575,7 @@ class AuditLogModalManager {
         // Dynamically render metadata fields with friendly names
         if (Object.keys(metadata).length > 0) {
             // Separator before metadata section
-            html += `<div class="col-12"><hr class="my-2"></div>`;
+            html += "<div class=\"col-12\"><hr class=\"my-2\"></div>";
 
             // Define friendly labels for common metadata fields
             const fieldLabels = {
@@ -722,7 +722,7 @@ class AuditLogModalManager {
             // Render each metadata field (excluding diff, which was already rendered)
             for (const [key, value] of Object.entries(metadata)) {
                 // Skip diff field as it's been specially rendered above
-                if (key === "diff") continue;
+                if (key === "diff") {continue;}
 
                 const label = fieldLabels[key] || this.formatFieldName(key);
                 const displayValue = this.formatFieldValue(value);
@@ -859,7 +859,7 @@ class AuditLogModalManager {
      * @returns {string} Formatted timestamp
      */
     formatTimestamp(timestamp) {
-        if (!timestamp) return "-";
+        if (!timestamp) {return "-";}
 
         const date = new Date(timestamp);
         return date.toLocaleString("en-US", {

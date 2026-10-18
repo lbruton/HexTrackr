@@ -108,8 +108,8 @@ Group by unique vulnerabilities (CVE, Cisco SA, or Plugin ID):
 KEV vulnerabilities are marked throughout the interface:
 
 - **Table View**: Dedicated KEV column with YES/NO badges
-    - Red "YES" badge = In CISA catalog (prioritize!)
-    - Blue "NO" badge = Not in KEV catalog
+  - Red "YES" badge = In CISA catalog (prioritize!)
+  - Blue "NO" badge = Not in KEV catalog
 - **Vulnerability Cards**: Red KEV badge in upper-right corner
 - **Device Cards**: KEV badge appears if ANY vulnerability on that device is a KEV
 
@@ -169,8 +169,8 @@ The device management interface in the ticket modal provides powerful tools for 
 
 - Click the **+** button to add a new device row
 - **Smart Increment**: System automatically suggests the next device name
-    - Example: Adding after `host01` suggests `host02`
-    - Example: Adding after `server-a` suggests `server-b`
+  - Example: Adding after `host01` suggests `host02`
+  - Example: Adding after `server-a` suggests `server-b`
 
 **Bulk Import**: Add comma-separated or line-separated device lists
 

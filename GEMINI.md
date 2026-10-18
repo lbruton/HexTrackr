@@ -29,10 +29,10 @@ Specializes in: security audits (Codacy SRM), schema research, and spec-driven d
 
 ## Security & SRM
 
-HexTrackr is monitored via **Codacy SRM**. 
+HexTrackr is monitored via **Codacy SRM**.
 - Run `@audit` to check for Critical/Overdue findings.
 - Prioritize SAST and Secrets findings in the Peer Review phase.
 
 ## Issue Tracking
 
-DocVault Prefix: `HEX-`. Use DocVault for all issues (Linear is retired).
+Plane Prefix: `HXTR-`. Use Plane for all new issues.

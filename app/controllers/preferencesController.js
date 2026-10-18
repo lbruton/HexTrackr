@@ -136,9 +136,12 @@ class PreferencesController {
      * @param {Object} res - Express response
      */
     static async setPreference(req, res) {
+        let key;
+        let value;
+
         try {
-            const { key } = req.params;
-            const { value } = req.body;
+            ({ key } = req.params);
+            ({ value } = req.body);
             const userId = req.user.id;
 
             // Input validation
@@ -251,8 +254,10 @@ class PreferencesController {
      * @param {Object} res - Express response
      */
     static async deletePreference(req, res) {
+        let key;
+
         try {
-            const { key } = req.params;
+            ({ key } = req.params);
             const userId = req.user.id;
 
             // Input validation
@@ -352,8 +357,10 @@ class PreferencesController {
      * // Returns: 200 (if exists) or 404 (if not)
      */
     static async hasPreference(req, res) {
+        let key;
+
         try {
-            const { key } = req.params;
+            ({ key } = req.params);
             const userId = req.user.id;
 
             // Input validation

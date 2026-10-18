@@ -10,7 +10,7 @@ Our hooks use a **four-layer safety system**:
 
 1. **Layer 1: Safe Auto-Fixes** - Only formatting (markdown, CSS)
 2. **Layer 2: Manual Review** - JavaScript warnings but no auto-fix
-3. **Layer 3: Secret Detection** - Gitleaks security check (cannot be bypassed)
+3. **Layer 3: Secret Detection** - Gitleaks security check (blocking unless hooks are bypassed)
 4. **Layer 4: Documentation** - Guidelines to prevent Codacy false positives
 
 ## Current Hooks
@@ -25,10 +25,10 @@ Our hooks use a **four-layer safety system**:
 - ⚠️  ESLint JavaScript issues
 - 📚 Directs developer to `.github/CODACY_GUIDELINES.md`
 
-**Security Check (cannot be bypassed):**
+**Security Check (blocking unless hooks are bypassed):**
 - 🔒 Gitleaks secret detection (v8.21.2+)
 - Automatically installs gitleaks if not present
-- Blocks commit if secrets are detected
+- Blocks commit if secrets are detected and hooks are enabled
 
 **Interactive:**
 - Asks user permission to commit with ESLint warnings
