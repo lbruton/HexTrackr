@@ -14,30 +14,30 @@ sourceFiles:
 
 > [!warning] PARTIALLY STALE — rewrite pending HEX-389 Phase 3
 > - **Linear** references (issue creation, `linear-librarian`, `memento-oracle`, `/prime`, `/quickprime`) are RETIRED (2026-03-31). Issue tracking now uses the DocVault vault-based system (`/issue` skill).
-> - Branch flow was rewritten on 2026-10-18 for the single-branch (dev only) model.
+> - Branch flow was rewritten on 2026-10-18 for the single-branch (main only) model.
 > - Will be distilled into `Foundation/coding-standards.md` during HEX-389 Phase 3.
 
 # Git Workflow
 
-## Single-Branch Workflow (dev)
+## Single-Branch Workflow (main)
 
-Decided 2026-10-18: `dev` is the only deploy branch. Portainer stack 11 tracks `refs/heads/dev` and redeploys within about 5 minutes of a merge. `main` is a frozen legacy branch that is not deployed anywhere; do not open PRs against it.
+Decided 2026-10-18: `main` is the only long-lived branch and the deploy target. Portainer stack 11 tracks `refs/heads/main` and redeploys within about 5 minutes of a merge. The old `dev` integration branch was retired the same day (it dated from a local-Docker dev box plus a separate production PC, neither of which exists now).
 
 ```bash
 git fetch origin
-git worktree add -b chore/short-desc .worktrees/chore-short-desc origin/dev
+git worktree add -b chore/short-desc .worktrees/chore-short-desc origin/main
 # ... change, test, commit ...
 git push -u origin chore/short-desc
-# PR on GitHub: chore/short-desc -> dev
+# PR on GitHub: chore/short-desc -> main
 # After merge:
-git checkout dev && git pull --rebase
+git checkout main && git pull --rebase
 ```
 
 **Rules**:
 
-- Work in a worktree branch under `.worktrees/`, then PR to `dev`.
-- Bump the version (`/release patch`) for runtime changes; merging to `dev` deploys to production.
-- Do not merge `dev` into `main` unless the user explicitly asks.
+- Work in a worktree branch under `.worktrees/` cut from `origin/main`, then PR to `main`.
+- Bump the version (`/release patch`) for runtime changes; merging to `main` deploys to production.
+- Do not recreate a long-lived `dev` branch; local testing replaces it.
 
 ---
 
@@ -77,10 +77,10 @@ git checkout dev && git pull --rebase
    - `codebase-navigator` for architecture context
    - `memento-oracle` for historical patterns
    - `linear-librarian` for related issues
-5. **Create feature branch** from `dev` (not `main`!)
+5. **Create worktree branch** from `origin/main`
 6. **Implement** with Linear comment updates
 7. **Quality check**: Docker test, `npm run lint:all`
-8. **Create PR** to `dev` and merge
+8. **Create PR** to `main` and merge
 9. **Update Linear** status to Done
 
 ---
