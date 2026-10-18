@@ -123,11 +123,11 @@ User docs live in `/app/public/docs-source/` (guides, reference, changelog). HTM
 
 ## Git Branch Workflow
 
-**CRITICAL**: `main` branch is **PROTECTED** — never merge directly to main
+**Single-branch flow (decided 2026-10-18)**: `dev` is the only deploy target. Portainer stack 11 tracks `refs/heads/dev` and redeploys within about 5 minutes of a merge. There is no beta/prod split, so no `dev` → `main` release PR is needed.
 
-- `dev`: Development branch (default)
-- `main`: Production branch (protected, deploy-only)
-- `feature/*`: Feature branches (create from dev, merge back to dev)
+- `dev`: Default and deploy branch. Work in a worktree branch under `.worktrees/` and open a PR to `dev`.
+- `main`: Frozen legacy branch, not deployed anywhere. Do not open PRs against it and do not merge `dev` into it unless the user explicitly asks.
+- Merging to `dev` deploys to production, so bump the version (`/release patch`) for runtime changes and check the app after the redeploy.
 
 ## Issue Tracking
 
