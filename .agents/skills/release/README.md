@@ -24,8 +24,9 @@ Claude Code automatically loads this skill when you:
 
 2. **Guides Release Process**
    - Prompts for changelog creation after major sessions
-   - Runs validation before `npm run release`
-   - Reminds about post-release steps (Linear updates, git push --tags)
+   - Walks through the manual bump (8 version-string files; there is no bump script, and
+     `npm run release` only regenerates docs HTML)
+   - Runs validation before `npm run docs:generate`, then a PR to `main` (main-only flow)
 
 3. **Prevents Common Errors**
    - Missing frontmatter → Docs show "Unknown date"
@@ -36,7 +37,7 @@ Claude Code automatically loads this skill when you:
 
 ### Validate a Changelog File
 ```bash
-python3 .claude/skills/changelog-version-manager/scripts/validate_changelog.py \
+python3 .agents/skills/release/scripts/validate_changelog.py \
   app/public/docs-source/changelog/versions/1.1.11.md
 ```
 
@@ -47,10 +48,10 @@ python3 .claude/skills/changelog-version-manager/scripts/validate_changelog.py \
 ============================================================
 
 Next steps:
-  1. Run: npm run release
-  2. Verify HTML output in app/public/docs-html/content/changelog/
-  3. Update Linear issue status
-  4. Push changes: git push origin dev --tags
+  1. Run: npm run docs:generate (the trailing logs/docs-source/ error is harmless)
+  2. Revert re-rendered HTML for pages that did not change
+  3. Verify HTML output in app/public/docs-html/content/changelog/
+  4. Commit on the worktree branch and open a PR to main
 ```
 
 ### Error Output
@@ -63,7 +64,7 @@ ERROR: Missing '## Overview' section (docs generator needs this for summaries)
 ## File Structure
 
 ```
-changelog-version-manager/
+release/
 ├── SKILL.md                    # Skill instructions (loaded by Claude)
 ├── scripts/
 │   └── validate_changelog.py  # Validation script (deterministic)
@@ -76,7 +77,7 @@ changelog-version-manager/
 - **Instructions** (~2.5K tokens): Loaded only when you mention changelog/versioning
 - **Script Output** (~500 tokens): Loaded only when validation runs
 
-**Token Savings**: Without this skill, changelog requirements would be in CLAUDE.md (always loaded). Now they're on-demand.
+**Token Savings**: Without this skill, changelog requirements would be in AGENTS.md (always loaded). Now they're on-demand.
 
 ## Testing This Skill
 
@@ -86,14 +87,13 @@ Try these prompts to see the skill activate:
    → Skill loads, guides you through template usage, runs validation
 
 2. **"Let's bump the version"**
-   → Skill loads, suggests version number, walks through `npm run release`
+   → Skill loads, suggests version number, walks through the manual bump
 
 3. **"Check if my changelog is valid"**
    → Skill loads, runs validation script, provides actionable feedback
 
 ## References
 
-- **Process Guide**: `/docs/CHANGELOG AND VERSION BUMP PROCESS.md`
-- **Template**: `/docs/TEMPLATE_CHANGELOG.md`
-- **CLAUDE.md**: See "Changelogs" section
+- **Workflow**: `SKILL.md` in this directory (the old `/docs/` process guide and template no longer exist)
+- **AGENTS.md**: See "Version & Release" section
 - **Skill Docs**: https://docs.claude.com/en/docs/agents-and-tools/agent-skills/overview

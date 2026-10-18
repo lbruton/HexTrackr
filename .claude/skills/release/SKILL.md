@@ -41,22 +41,47 @@ One concise paragraph (1-3 sentences) summarizing this version.
 
 ## Version Bump Workflow
 
-### Step 1: Create Changelog Version File
+**There is no automated bump script.** `npm run release` is an alias for `npm run docs:generate`
+(`node app/public/docs-html/html-content-updater.js`): it only regenerates the docs HTML. It does not
+prompt for a version, edit version strings, commit or tag. The bump is manual.
 
-**Location**: `/app/public/docs-source/changelog/versions/X.Y.Z.md`
-
-**Use Template**: `/docs/TEMPLATE_CHANGELOG.md`
+HexTrackr is **main-only**: `main` is the deploy branch (Portainer redeploys on merge). Do the bump in a
+worktree branch cut from `origin/main` and ship it through a PR to `main`. Never push to `main` directly.
 
 **Version Strategy**:
 - Each major session/feature → new patch version (e.g., v1.1.9 → v1.1.10)
 - Major architectural changes → new minor version (e.g., v1.1.10 → v1.2.0)
 - Breaking changes → new major version (e.g., v1.2.0 → v2.0.0)
 
-### Step 2: Validate Changelog File
+### Step 1: Bump the Version Strings (8 files)
 
-**Automatic**: Run validation script before proceeding
+Replace the old version with the new one in each of these. Grep for the old version first
+(`grep -rn "OLD" --exclude-dir=node_modules --exclude-dir=docs-html --exclude-dir=.git .`) and confirm
+every hit below is covered and no others are expected.
+
+| File | What to change |
+|---|---|
+| `package.json` | `"version"` |
+| `package-lock.json` | the two top-level `"version"` lines only (lines 3 and 9); leave dependency versions alone |
+| `app/public/package.json` | `"version"` |
+| `docker-compose.yml` | `HEXTRACKR_VERSION=X.Y.Z` |
+| `README.md` | version badge URL and the `Current version: **vX.Y.Z**` line |
+| `app/public/login.html` | `HexTrackr vX.Y.Z • Secure Authentication` |
+| `app/public/scripts/shared/footer.html` | `HexTrackr-vX.Y.Z` in the shields.io badge URL |
+| `app/public/docs-source/reference/troubleshooting.md` | `**Version**: vX.Y.Z` |
+
+### Step 2: Create the Changelog Version File
+
+**Location**: `app/public/docs-source/changelog/versions/X.Y.Z.md`
+
+There is no template file. Copy the most recent version file in that directory and edit it: frontmatter
+(all 5 fields), `# Version X.Y.Z - Title`, release status/date lines, `## Overview`, then the change
+sections.
+
+### Step 3: Validate the Changelog File
+
 ```bash
-python3 .claude/skills/changelog-version-manager/scripts/validate_changelog.py app/public/docs-source/changelog/versions/X.Y.Z.md
+python3 .claude/skills/release/scripts/validate_changelog.py app/public/docs-source/changelog/versions/X.Y.Z.md
 ```
 
 **Required Checks**:
@@ -65,26 +90,39 @@ python3 .claude/skills/changelog-version-manager/scripts/validate_changelog.py a
 - ✓ File located in correct directory
 - ✓ Version format matches `X.Y.Z` pattern
 
-### Step 3: One-Button Release
+### Step 4: Regenerate the Docs HTML
 
-**Command**: `npm run release`
+```bash
+npm run docs:generate
+```
 
-**What It Does**:
-1. Prompts for new version number (X.Y.Z)
-2. Updates 5 files simultaneously:
-   - `package.json` (root)
-   - `package-lock.json` (root)
-   - `app/package.json` (app)
-   - `app/package-lock.json` (app)
-   - `DEPLOY/ansible-deploy/roles/nodejs/defaults/main.yml` (deployment)
-3. Runs `npm run docs:generate` to regenerate HTML
-4. Creates git commit with version bump message
-5. Creates git tag (e.g., `v1.1.10`)
+It writes the HTML and then **errors at the end on a missing `logs/docs-source/` directory**. That error
+is harmless: the HTML is already written.
 
-**Post-Release**:
-- Verify HTML output in `/app/public/docs-html/content/changelog/`
-- Check dropdown navigation shows last 10 versions (newest first)
-- Push changes: `git push origin dev --tags`
+The generator re-renders every page, so it also touches HTML for old changelog versions and guides that
+did not change. Keep only these generated files and revert the rest (`git checkout -- <path>`):
+
+- `app/public/docs-html/content-manifest.json`
+- `app/public/docs-html/content/changelog/index.html`
+- `app/public/docs-html/content/changelog/archive.html`
+- `app/public/docs-html/content/changelog/versions/X.Y.Z.html` (new)
+- `app/public/docs-html/content/reference/troubleshooting.html`
+- `app/public/docs-source/changelog/index.md`
+- `app/public/docs-source/changelog/archive.md`
+
+Plus any HTML for docs-source pages you actually edited in this change.
+
+### Step 5: Commit and PR
+
+- Expected diff: the 8 version files, the new `versions/X.Y.Z.md`, and the generated files above.
+- Commit `chore(release): bump version to X.Y.Z` on the worktree branch (the pre-commit hook runs
+  markdown/stylelint fixes and gitleaks).
+- Push the branch and open a PR to `main`. The user merges; Portainer redeploys from `main` within about
+  5 minutes. No git tag is required.
+
+**Post-Merge**:
+- Check the app at https://hextrackr.lbruton.cc shows the new version (login page, footer).
+- Check the changelog dropdown shows the last 10 versions (newest first).
 
 ## Rolling Window Architecture (v1.1.0+)
 
@@ -119,18 +157,14 @@ ERROR: Version format invalid (expected X.Y.Z, got 1.1)
 2. **Missing Overview** → HR lines (`---`) appear in summaries
 3. **Wrong category value** → Use exact strings: "Bug Fix", "Update", "Maintenance", "Feature"
 4. **Manual index.md edits** → File regenerates on next `npm run docs:generate`
-5. **Forgetting to push tags** → Deployment expects tagged versions
-
-## Reference Documentation
-
-- **Process Guide**: `/docs/CHANGELOG AND VERSION BUMP PROCESS.md`
-- **Template**: `/docs/TEMPLATE_CHANGELOG.md`
-- **CLAUDE.md Section**: See "Changelogs" section for complete requirements
+5. **Missed version string** → grep for the old version after the bump; all 8 files must agree
+6. **Committing generator noise** → revert re-rendered HTML for pages that did not change
+7. **Editing `package-lock.json` dependency lines** → only the two top-level version lines change
 
 ## Proactive Assistance
 
 After completing a major session or feature:
 1. Ask user: "Ready to create a changelog entry for this session?"
 2. Suggest version number based on scope (patch vs minor vs major)
-3. Run validation script automatically before `npm run release`
-4. Confirm git push with tags
+3. Run the validation script before `npm run docs:generate`
+4. Open the PR to `main`; leave the merge to the user
