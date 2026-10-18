@@ -229,35 +229,27 @@ async function load() {
 
 ---
 
-## Git Workflow (Dev Branch Strategy)
+## Git Workflow (Single-Branch: dev)
 
-**Critical**: GitHub `main` is protected. Always work from `dev` branch.
+**Critical**: `dev` is the only deploy branch (Portainer stack 11 tracks `refs/heads/dev`). `main` is a frozen legacy branch that is not deployed.
 
 ```bash
-# Daily workflow
-git checkout dev
-git pull origin main              # Sync dev with latest merged changes
-# ... make changes, test, commit to dev ...
-git push origin dev
+# Daily workflow: worktree branch from dev, PR back to dev
+git fetch origin
+git worktree add -b chore/short-desc .worktrees/chore-short-desc origin/dev
+# ... make changes, test, commit ...
+git push -u origin chore/short-desc
 
-# Create PR on GitHub: dev → main
-# After PR merges, sync dev again
+# Create PR on GitHub: chore/short-desc -> dev
+# After the PR merges, rebase the main checkout
 git checkout dev
-git pull origin main
-
-# Optional: Feature branch for complex work
-git checkout -b feature/hex-124-something
-# ... work ...
-git checkout dev
-git merge feature/hex-124-something
-git branch -d feature/hex-124-something
-git push origin dev
+git pull --rebase
 ```
 
 **Never**:
-- ❌ Branch from local `main` (it's stale)
-- ❌ Push directly to GitHub `main` (protected)
-- ❌ Forget to sync `dev` after PR merges
+- ❌ Open PRs against `main` or merge `dev` into `main` unless explicitly asked
+- ❌ Push directly to `dev` (use a PR)
+- ❌ Forget that merging to `dev` deploys to production within about 5 minutes
 
 ---
 
