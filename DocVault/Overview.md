@@ -22,7 +22,7 @@ Enterprise vulnerability management system with real-time WebSocket updates. Tra
 |-------|-------|
 | Repo | [lbruton/HexTrackr](https://github.com/lbruton/HexTrackr) |
 | Language | Node.js/Express backend, vanilla JavaScript frontend |
-| Branches | `dev` (default) + `main` (protected, deploy-only) |
+| Branches | `dev` (default, deployed via Portainer) + `main` (frozen legacy, not deployed) |
 | Version Lock | `devops/version.lock` (patched via `/release patch`) |
 | Issue Prefix | HEX (DocVault vault-based tracking) |
 | Path | `/Volumes/DATA/GitHub/HexTrackr/` |

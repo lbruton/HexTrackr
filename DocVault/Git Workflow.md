@@ -7,103 +7,37 @@ tags:
   - process
   - partial-stale
 created: 2026-03-12
-updated: 2026-04-15
+updated: 2026-10-18
 sourceFiles:
   - docs/GIT_WORKFLOW.md
 ---
 
 > [!warning] PARTIALLY STALE — rewrite pending HEX-389 Phase 3
 > - **Linear** references (issue creation, `linear-librarian`, `memento-oracle`, `/prime`, `/quickprime`) are RETIRED (2026-03-31). Issue tracking now uses the DocVault vault-based system (`/issue` skill).
-> - Core git mechanics (dev as integration branch, worktree + PR to dev, main protected) remain accurate.
+> - Branch flow was rewritten on 2026-10-18 for the single-branch (dev only) model.
 > - Will be distilled into `Foundation/coding-standards.md` during HEX-389 Phase 3.
 
 # Git Workflow
 
-## CRITICAL: Dev Branch Workflow (Integration Branch Pattern)
+## Single-Branch Workflow (dev)
 
-**GitHub main is protected** - You CANNOT push directly to main branch on GitHub.
-
-**Solution**: Use `dev` branch as your working baseline instead of local `main`.
-
-### The `dev` Branch Strategy
-
-**`dev` branch** = Your integration/development baseline
-
-- **Protected on GitHub**: Won't be deleted accidentally
-- **No Codacy restrictions**: Fast iteration, no review requirements
-- **Always current**: Sync with `git pull origin main` after each PR merge
-- **Purpose**: Replaces stale local main as branching point
-
-**Workflow Pattern**:
+Decided 2026-10-18: `dev` is the only deploy branch. Portainer stack 11 tracks `refs/heads/dev` and redeploys within about 5 minutes of a merge. `main` is a frozen legacy branch that is not deployed anywhere; do not open PRs against it.
 
 ```bash
-# Daily work (always from dev)
-git checkout dev
-git pull origin main          # Sync dev with GitHub main
-git checkout -b feature/hex-124-something  # Optional: for complex work
-# ... make changes, commit ...
-git checkout dev
-git merge feature/hex-124-something  # Optional: if using feature branch
-# OR just commit directly to dev for simple fixes
-git push origin dev
-
-# Create PR on GitHub: dev -> main
-# After PR merges on GitHub:
-git checkout dev
-git pull origin main          # Sync dev with merged changes
+git fetch origin
+git worktree add -b chore/short-desc .worktrees/chore-short-desc origin/dev
+# ... change, test, commit ...
+git push -u origin chore/short-desc
+# PR on GitHub: chore/short-desc -> dev
+# After merge:
+git checkout dev && git pull --rebase
 ```
 
-**Key Benefits**:
+**Rules**:
 
-- No stale baseline (dev syncs with main after each PR)
-- No branch drift (always branch from current code)
-- No merge conflicts (clean baseline)
-- No data loss (clear branch hierarchy)
-- Local main can stay stale (never used for work)
-
-**Feature Branches** (Optional, for complex/multi-commit work):
-
-- Created from `dev` (not `main`)
-- Merged back to `dev` before PR
-- Deleted after merge (ephemeral)
-- **Simple fixes**: Commit directly to `dev`, skip feature branch
-
-**NEVER**:
-
-- Create branches from local `main` (it's stale!)
-- Push feature branches to GitHub without merging to `dev` first
-- Forget to sync `dev` with `git pull origin main` after PR merges
-
-**Why This Works**: `dev` branch stays synchronized with GitHub main via pull after each PR merge. Feature branches created from `dev` have the latest code. No drift, no conflicts, no data loss.
-
-**Permissions**: Git push commands are enabled in project `.claude/settings.json` to allow automatic pushes to dev branch. GitHub's branch protection on main provides the real safety net against accidental pushes to protected branches.
-
----
-
-## Git Workflow Cheat Sheet
-
-```bash
-# Daily work pattern (dev branch workflow)
-git checkout dev
-git pull origin main              # Sync dev with GitHub main
-# ... make changes, test, commit to dev ...
-git push origin dev
-
-# Create PR on GitHub: dev -> main
-
-# After PR merges on GitHub
-git checkout dev
-git pull origin main              # Sync dev with merged changes
-
-# Optional: Feature branch for complex work
-git checkout dev
-git checkout -b feature/vX.Y.Z-name
-# ... work ...
-git checkout dev
-git merge feature/vX.Y.Z-name
-git branch -d feature/vX.Y.Z-name  # Clean up
-git push origin dev
-```
+- Work in a worktree branch under `.worktrees/`, then PR to `dev`.
+- Bump the version (`/release patch`) for runtime changes; merging to `dev` deploys to production.
+- Do not merge `dev` into `main` unless the user explicitly asks.
 
 ---
 
@@ -146,7 +80,7 @@ git push origin dev
 5. **Create feature branch** from `dev` (not `main`!)
 6. **Implement** with Linear comment updates
 7. **Quality check**: Docker test, `npm run lint:all`
-8. **Create PR** and merge to main
+8. **Create PR** to `dev` and merge
 9. **Update Linear** status to Done
 
 ---
