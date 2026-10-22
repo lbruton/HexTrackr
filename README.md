@@ -1,91 +1,74 @@
 # HexTrackr
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/80ae81dcc5fc499097b7d80a0e2610d0)](https://app.codacy.com/gh/lbruton/HexTrackr/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
-[![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-22-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
 [![Version](https://img.shields.io/badge/version-1.1.14-blue)](https://github.com/lbruton/HexTrackr)
 
-> Enterprise vulnerability management system for tracking security vulnerabilities, tickets, and Known Exploited Vulnerabilities (KEV)
+> Vulnerability management for a security team: scan imports, maintenance tickets and CISA Known Exploited Vulnerabilities (KEV) in one place.
 
 ## Features
 
-- **🎯 Vulnerability Management**: Import, track, and analyze security vulnerabilities with advanced filtering
-- **🎫 Ticket Management**: AG-Grid powered interface for maintenance ticket tracking
-- **🔒 KEV Integration**: CISA Known Exploited Vulnerabilities tracking and prioritization
-- **📊 Analytics Dashboard**: Real-time statistics and trend analysis
-- **🔐 HTTPS Support**: Built-in SSL/TLS for secure deployment and authentication
-- **🐳 Docker Ready**: Cross-platform containerized deployment
-- **📝 Template System**: Reusable templates for vulnerability response
-- **💾 Backup/Restore**: Comprehensive data export and backup capabilities
+- Vulnerabilities: import scanner CSV exports, track each finding per device, and search or filter by CVE, hostname, severity and location.
+- Tickets: record maintenance tickets for the field team in an AG Grid table, with markdown export for the second team.
+- KEV: sync the CISA Known Exploited Vulnerabilities catalog and flag matching CVEs.
+- Vendor advisories: fetch Cisco PSIRT (OAuth2) and Palo Alto advisories and map fixed versions to devices.
+- Statistics: show vulnerability counts and trends by severity. Import progress streams over WebSocket.
+- Templates: store reusable text for tickets, emails and vulnerability responses.
+- Backup and restore: export and import the database and settings as a ZIP file.
+- Audit log: record logins, ticket changes, imports and backups in an AES-256-GCM encrypted log that admins can filter and export.
 
-## Quick Start
+## Quick start
 
 ### Prerequisites
 
-- [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/)
+- [Docker](https://docs.docker.com/get-docker/) with Docker Compose
 - Git
 
-### Installation
+### Install
 
-1. **Clone and Install**
+1. Clone the repository and run the installer:
+
    ```bash
    git clone https://github.com/lbruton/HexTrackr.git
    cd HexTrackr
-   chmod +x install.sh
-   ./install.sh
+   ./scripts/install.sh
    ```
 
-2. **Access Application**
-   - **Main Application**: https://localhost
-   - **Tickets**: https://localhost/tickets.html
-   - **Vulnerabilities**: https://localhost/vulnerabilities.html
-   - **Documentation**: https://localhost/docs-html/
+2. Set `SESSION_SECRET` in the environment before you start the container. Login sessions need it.
 
-### HTTPS Configuration (Optional)
+3. Open the application:
 
-Enable HTTPS for authentication and secure deployment:
+   - Application: http://localhost:8989
+   - Tickets: http://localhost:8989/tickets.html
+   - Vulnerabilities: http://localhost:8989/vulnerabilities.html
+   - Documentation: http://localhost:8989/docs-html/
 
-```bash
-# Run SSL setup script
-./scripts/setup-ssl.sh
-
-# Access via HTTPS
-https://localhost:8989
-```
+The container listens on port 8080 and Docker Compose maps it to host port 8989. Put a TLS reverse proxy in front of it for remote access.
 
 ## Documentation
 
-- **📚 Complete Documentation**: [docs-html/](https://localhost:/docs-html/) (after installation)
-- **🚀 Getting Started**: [docs-source/guides/getting-started.md](app/public/docs-source/guides/getting-started.md)
-- **🔒 HTTPS Setup**: [docs-source/guides/https-setup.md](app/public/docs-source/guides/https-setup.md)
-- **👤 User Guide**: [docs-source/guides/user-guide.md](app/public/docs-source/guides/user-guide.md)
-- **🔧 API Reference**: Available in documentation portal
+- User documentation: `/docs-html/` in the running application
+- User guide: [user-guide.md](app/public/docs-source/guides/user-guide.md)
+- Integration guides: [KEV](app/public/docs-source/guides/kev-integration.md), [Cisco PSIRT](app/public/docs-source/guides/cisco-psirt-integration.md), [Palo Alto](app/public/docs-source/guides/palo-alto-advisory-integration.md)
+- Developer documentation: [DocVault/Overview.md](DocVault/Overview.md)
 
-## Management Scripts
+## Management scripts
 
-- **Start**: `./docker-start.sh`
-- **Stop**: `./docker-stop.sh`
-- **Rebuild**: `./docker-rebuild.sh`
-- **Logs**: `./docker-logs.sh`
-- **HTTPS Setup**: `./scripts/setup-ssl.sh`
+| Task | Command |
+| --- | --- |
+| Start | `./scripts/docker-start.sh` |
+| Stop | `./scripts/docker-stop.sh` |
+| Rebuild | `./scripts/docker-rebuild.sh` |
+| Logs | `./scripts/docker-logs.sh` |
 
-## System Requirements
+## System requirements
 
-- **RAM**: 2GB minimum, 4GB recommended
-- **Storage**: 1GB for application, additional space for data
-- **Ports**: 8989 (HTTP), 8443 (HTTPS)
-- **OS**: macOS, Linux, Windows (with Docker)
+- RAM: 4 GB. The container sets a 4 GB Node.js heap.
+- Storage: 1 GB for the application, plus space for the database and backups.
+- Port: 8989 (HTTP)
+- OS: macOS, Linux or Windows with Docker
 
 ## Version
 
-Current version: **v1.1.13**
-
-See [Changelog](app/public/docs-source/changelog/index.md) for detailed release notes.
-
-## License
-
-This project is licensed under the terms specified in the project documentation.
-
----
-
-*For development, deployment, and advanced configuration, see the complete documentation at `/docs-html/` after installation.*
+The version is in [package.json](package.json). Release notes are in the [changelog](app/public/docs-source/changelog/index.md).
