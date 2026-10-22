@@ -1308,7 +1308,7 @@
                 try {
                     // Wait for editors to be available
                     if (!window.ticketMarkdownEditor || !window.templateEditor || !window.vulnerabilityMarkdownEditor) {
-                        throw new Error('Template editors not fully loaded. Please refresh the page and try again.');
+                        throw new Error('The template editors did not load. Reload the page and open the editor again.');
                     }
                     // Get ticket data from modal
                     const ticketId = document.getElementById("viewTicketModal").getAttribute("data-ticket-id");

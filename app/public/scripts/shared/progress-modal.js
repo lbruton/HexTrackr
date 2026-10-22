@@ -426,7 +426,7 @@ class ProgressModal {
      */
     handleWebSocketError() {
         if (this.isVisible) {
-            this.showError("Connection lost. Please check your network and try again.");
+            this.showError("Connection to the server lost. Check the network connection, then reload the page.");
         }
     }
 
@@ -850,7 +850,7 @@ class ProgressModal {
             return;
         }
 
-        const confirmed = confirm("Are you sure you want to cancel this operation? This action cannot be undone.");
+        const confirmed = confirm("Cancel this operation? You cannot undo this.");
         if (confirmed && this.onCancelCallback) {
             this.onCancelCallback();
             this.hide();

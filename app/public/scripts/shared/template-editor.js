@@ -478,7 +478,7 @@ class TemplateEditor {
             return;
         }
 
-        if (!confirm("Reset template to default? This will lose all custom changes.")) {
+        if (!confirm("Reset the template to the default? Your custom changes are deleted.")) {
             return;
         }
 

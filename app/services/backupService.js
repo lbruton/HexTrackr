@@ -280,13 +280,12 @@ class BackupService {
     /**
      * Clear data by type
      * Extracted from server.js line 2701-2771
-     * HEX-303: Enhanced to clear ALL data including users and reset admin password when type === "all"
+     * When type is "all", also clears users and preferences and resets the admin password.
      */
     async clearData(type) {
         return new Promise(async (resolve, reject) => {
             if (type === "all") {
-                // HEX-303: Clear EVERYTHING including users and preferences, then reset admin password
-                // This is a complete system reset to factory defaults
+                // Factory reset: clear every table including users and preferences, then reset the admin password
                 try {
                     const clearPromises = [
                         // Data tables
@@ -326,11 +325,11 @@ class BackupService {
                         new Promise((res, rej) =>
                             this.db.run("DELETE FROM backup_metadata", (err) => (err ? rej(err) : res())),
                         ),
-                        // HEX-303: Clear user preferences (will be recreated on login)
+                        // User preferences are recreated on the next login
                         new Promise((res, rej) =>
                             this.db.run("DELETE FROM user_preferences", (err) => (err ? rej(err) : res())),
                         ),
-                        // HEX-303: Clear all users except admin (admin will be reset to default password)
+                        // Keep the admin row; its password is reset to the default below
                         new Promise((res, rej) =>
                             this.db.run("DELETE FROM users WHERE username != 'admin'", (err) =>
                                 err ? rej(err) : res(),
@@ -341,7 +340,6 @@ class BackupService {
                     // Clear all data first
                     await Promise.all(clearPromises);
 
-                    // HEX-303: Reset admin password to default 'admin123!'
                     const AuthService = require("./authService");
                     const authService = new AuthService();
                     authService.initialize(this.db);
@@ -483,7 +481,7 @@ class BackupService {
 
                         // Insert tickets data (HEX-270: preserve ALL columns including soft-delete metadata)
                         const ticketValues = ticketsArray.map((ticket) => [
-                            ticket.id || null, // CRITICAL: Preserve ticket ID to prevent NULL corruption
+                            ticket.id || null, // Keep the backup's ticket ID; a NULL ID breaks ticket-vulnerability links
                             ticket.xt_number || "",
                             ticket.date_submitted || "",
                             ticket.date_due || "",
