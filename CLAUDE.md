@@ -45,6 +45,8 @@ This file provides core guidance to Claude Code (claude.ai/code) when working wi
 
 **Tier 3 — Source code.** When foundation doc disagrees with code, code wins. Run `/context-drift` once foundation docs are in `.context/`.
 
+**Voice**: `.context/voice.md` sets the audience, register and prose dials (comments, README, UI copy) on top of `.claude/rules/prose-core.md`.
+
 **Documentation quality**: Use Obsidian Markdown conventions for vault pages (the `obsidian` plugin's `obsidian-markdown` skill). Never edit DocVault files without proper frontmatter (tags, created, updated).
 
 ## Core Services
