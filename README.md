@@ -3,7 +3,7 @@
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/80ae81dcc5fc499097b7d80a0e2610d0)](https://app.codacy.com/gh/lbruton/HexTrackr/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![Node.js](https://img.shields.io/badge/Node.js-22-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
-[![Version](https://img.shields.io/badge/version-1.1.13-blue)](https://github.com/lbruton/HexTrackr)
+[![Version](https://img.shields.io/badge/version-1.1.14-blue)](https://github.com/lbruton/HexTrackr)
 
 > Vulnerability management for a security team: scan imports, maintenance tickets and CISA Known Exploited Vulnerabilities (KEV) in one place.
 

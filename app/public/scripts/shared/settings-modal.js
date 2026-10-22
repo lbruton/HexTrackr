@@ -829,7 +829,7 @@ logger.debug("ui", "HexTrackr Settings Modal (shared) loaded successfully");
      */
     async function clearCiscoCredentials() {
         if (
-            !confirm("Are you sure you want to delete your Cisco PSIRT API credentials? This action cannot be undone.")
+            !confirm("Delete the Cisco PSIRT API credentials? You cannot undo this.")
         ) {
             return;
         }
@@ -1656,7 +1656,7 @@ logger.debug("ui", "HexTrackr Settings Modal (shared) loaded successfully");
             }
         } catch (error) {
             logger.error("ui", "Error saving settings:", error);
-            showNotification("Error saving settings. Please try again.", "danger");
+            showNotification("Could not save the settings. Check the connection and save again.", "danger");
         }
     }
 

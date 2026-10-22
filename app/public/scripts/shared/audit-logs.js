@@ -134,7 +134,7 @@ class AuditLogModalManager {
         } catch (error) {
             console.error("Failed to load audit log stats:", error);
             global.logger?.error("frontend", "audit", "Failed to load audit log stats", { error: error.message });
-            this.showError("Failed to load audit log statistics. Please try again.");
+            this.showError("Could not load the audit log statistics. Reload the page. If it fails again, check the server log.");
         }
     }
 
@@ -227,7 +227,7 @@ class AuditLogModalManager {
             console.error("Failed to load audit logs:", error);
             global.logger?.error("frontend", "audit", "Failed to load audit logs", { error: error.message });
             this.hideLoading();
-            this.showError("Failed to load audit logs. Please try again.");
+            this.showError("Could not load the audit logs. Reload the page. If it fails again, check the server log.");
         }
     }
 
@@ -458,7 +458,7 @@ class AuditLogModalManager {
             } else {
                 console.error(`Failed to export logs as ${format}:`, error);
             }
-            this.showError(`Failed to export logs as ${format.toUpperCase()}. Please try again.`);
+            this.showError(`Could not export the logs as ${format.toUpperCase()}. Reload the page and export again.`);
         }
     }
 
@@ -492,7 +492,7 @@ class AuditLogModalManager {
         } catch (error) {
             console.error("Failed to show log details:", error);
             global.logger?.error("frontend", "audit", "Failed to show log details", { error: error.message });
-            this.showError("Failed to load log details. Please try again.");
+            this.showError("Could not load the log entry details. Close the details and open them again.");
         }
     }
 

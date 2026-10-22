@@ -508,7 +508,11 @@ class HexagonTicketsManager {
         attachBtn.addEventListener("click", (e) => {
             // Check if user is holding Shift key to clear attachments
             if (e.shiftKey && this.sharedDocumentation && this.sharedDocumentation.length > 0) {
-                if (confirm(`Clear all ${this.sharedDocumentation.length} attached documentation file(s)?`)) {
+                if (
+                    confirm(
+                        `Remove the ${this.sharedDocumentation.length} attached documentation file(s)? You cannot undo this.`,
+                    )
+                ) {
                     this.sharedDocumentation = [];
                     this.saveSharedDocumentation();
                     this.updateAttachmentTooltip();
@@ -523,7 +527,11 @@ class HexagonTicketsManager {
         attachBtn.addEventListener("contextmenu", (e) => {
             e.preventDefault();
             if (this.sharedDocumentation && this.sharedDocumentation.length > 0) {
-                if (confirm(`Clear all ${this.sharedDocumentation.length} attached documentation file(s)?`)) {
+                if (
+                    confirm(
+                        `Remove the ${this.sharedDocumentation.length} attached documentation file(s)? You cannot undo this.`,
+                    )
+                ) {
                     this.sharedDocumentation = [];
                     this.saveSharedDocumentation();
                     this.updateAttachmentTooltip();
@@ -1677,7 +1685,7 @@ class HexagonTicketsManager {
             logger.error("ui", "[VulnModal] Error loading vulnerability markdown:", error);
             if (vulnContent) {
                 vulnContent.textContent =
-                    "# Error Loading Vulnerabilities\n\nFailed to load vulnerability data. Please try again.";
+                    "# Error Loading Vulnerabilities\n\nCould not load the vulnerability data. Reload the page and open the ticket again.";
                 vulnContent.style.display = "block";
             }
             if (vulnLoading) {
@@ -3754,7 +3762,7 @@ class HexagonTicketsManager {
         } catch (error) {
             logger.error("ui", "[EmailTemplate] Error generating email template:", error);
             document.getElementById("emailMarkdownContent").textContent =
-                "# Error Loading Email Template\n\nFailed to generate email template. Please try again.";
+                "# Error Loading Email Template\n\nCould not generate the email template. Reload the page and open the ticket again.";
             document.getElementById("emailMarkdownContent").style.display = "block";
             document.getElementById("emailLoadingMessage").style.display = "none";
         }
