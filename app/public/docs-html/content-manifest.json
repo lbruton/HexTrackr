@@ -1,11 +1,16 @@
 {
-  "generated": "2026-10-18T18:18:05.298Z",
+  "generated": "2026-10-22T21:06:00.352Z",
   "sections": {
     "changelog": {
       "title": "Changelog",
       "icon": "fas fa-list",
       "indexFile": "changelog/index",
       "children": {
+        "1.1.14": {
+          "file": "changelog/versions/1.1.14",
+          "title": "1.1.14",
+          "path": "changelog/versions/1.1.14.html"
+        },
         "1.1.13": {
           "file": "changelog/versions/1.1.13",
           "title": "1.1.13",
@@ -50,14 +55,14 @@
           "file": "changelog/versions/1.1.5",
           "title": "1.1.5",
           "path": "changelog/versions/1.1.5.html"
-        },
+        }
+      },
+      "archivedVersions": {
         "1.1.4": {
           "file": "changelog/versions/1.1.4",
           "title": "1.1.4",
           "path": "changelog/versions/1.1.4.html"
-        }
-      },
-      "archivedVersions": {
+        },
         "1.1.3": {
           "file": "changelog/versions/1.1.3",
           "title": "1.1.3",
@@ -624,5 +629,5 @@
       "path": "overview.html"
     }
   },
-  "totalFiles": 123
+  "totalFiles": 124
 }

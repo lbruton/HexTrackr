@@ -1,0 +1,24 @@
+<!-- Fragment template for documentation content injected by docs-tabler.js -->
+<section class="doc-fragment">
+    <hr>
+<h2>title: "Version 1.1.14 - Dialog and Error Text"
+date: "2026-10-22"
+version: "1.1.14"
+status: "Released"
+category: "Maintenance"</h2><h1>Version 1.1.14 - Dialog and Error Text</h1><p><strong>Release Status</strong>: Released<br><strong>Release Date</strong>: 2026-10-22<br><strong>Parent Issues</strong>: HXTR-12</p>
+<h2>Overview</h2><p>Confirm dialogs name the action and its effect, and error messages say what failed and what to do next. Stale task notes and issue-ID prefixes are gone from the vulnerability routes and the backup service.</p>
+<hr>
+<h2>[1.1.14]</h2><h3>Changed</h3><ul>
+<li>Confirm dialogs for deleting Cisco PSIRT credentials, cancelling an operation, resetting a template and removing attached documentation name the action and its effect.</li>
+<li>Sign-in errors say how long to wait after a lockout (15 minutes) or rate limit (one minute).</li>
+<li>Errors in the audit log viewer, settings, ticket views and the progress modal say what to do next.</li>
+</ul>
+<h3>Removed</h3><ul>
+<li>The task-note block at the end of <code>app/routes/vulnerabilities.js</code>.</li>
+<li>Issue-ID and <code>CRITICAL:</code> prefixes from comments in <code>app/services/backupService.js</code>.</li>
+</ul>
+
+    <!-- Note: This file is intentionally minimal. The full page scaffold, header, footer, and scripts
+             are provided by docs-html/index.html. Content generated using this template will be
+             fetched and injected into #content-container by docs-html/js/docs-portal-v2.js. -->
+</section>
