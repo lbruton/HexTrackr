@@ -10,37 +10,18 @@
 
 ## MANDATORY: Search-First Workflow
 
-**CRITICAL**: Claude Context and Memento are your PRIMARY discovery tools. Always search before building.
+**CRITICAL**: Search the codebase and Memento before building.
 
 ### Investigation Order (REQUIRED)
 
-1. **Check Claude Context Index** (30 seconds)
-   ```javascript
-   // Ensure fresh index before searching
-   mcp__claude-context__get_indexing_status({
-     path: "/Volumes/DATA/GitHub/HexTrackr"
-   })
-   
-   // If stale (>1 hour), re-index
-   mcp__claude-context__index_codebase({
-     path: "/Volumes/DATA/GitHub/HexTrackr",
-     splitter: "ast",
-     force: false
-   })
+1. **Search Existing Code** (1-2 minutes)
+   ```bash
+   # Search for existing solutions first: routes, controllers, services, field names
+   grep -rn "[feature]" app/routes app/controllers app/services app/public/scripts
    ```
+   Search synonyms too; a field or endpoint may use a different name. Read the hits.
 
-2. **Search Existing Code** (1-2 minutes)
-   ```javascript
-   // ALWAYS search for existing solutions first
-   mcp__claude-context__search_code({
-     path: "/Volumes/DATA/GitHub/HexTrackr",
-     query: "API endpoint [feature] controller method service",
-     limit: 15,
-     extensionFilter: [".js"]
-   })
-   ```
-
-3. **Search Memento for Patterns** (1-2 minutes)
+2. **Search Memento for Patterns** (1-2 minutes)
    ```javascript
    // Check for similar work, insights, anti-patterns
    mcp__memento__semantic_search({
@@ -51,25 +32,24 @@
    })
    ```
 
-4. **Verify with Route Files** (if needed)
-   - Use Claude Context to search `/app/routes/*.js`
-   - Only read files if search results are ambiguous
+3. **Verify with Route Files** (if needed)
+   - Search `/app/routes/*.js` for the endpoint path or handler name
 
-5. **Identify Solution**
+4. **Identify Solution**
    - ✅ Existing endpoint + query params? → USE IT
    - ✅ Data in memory but unmapped? → FIX MAPPING
    - ✅ Need transformation? → ADD HELPER
    - ⚠️ Truly new? → BUILD ENDPOINT
 
-**Anti-Pattern Example**: HEX-204 almost created database endpoint for vendor/CVE fields. Claude Context search found data already in frontend memory, just needed field mapping.
+**Anti-Pattern Example**: HEX-204 almost created database endpoint for vendor/CVE fields. A code search found the data already in frontend memory; it needed a field mapping only.
 
-**Key Principle**: Don't waste time reading files manually. Claude Context has the answers.
+**Key Principle**: Search first, then read only the files the search points to.
 
 ---
 
 ## Architecture Patterns (Core Knowledge)
 
-**Use Claude Context to discover details on-demand. This section has only the "must-know" patterns.**
+**Search the code for details on demand. This section has only the "must-know" patterns.**
 
 ### Backend: Modular MVC with Singleton Controllers
 
@@ -97,7 +77,7 @@ if (!success) return res.status(500).json({error});
 
 ### Frontend: Component-Based Vanilla JS
 
-**Key Components** (search Claude Context for usage):
+**Key Components** (search the code for usage):
 - `auth-state.js` - Authentication state
 - `websocket-client.js` - Real-time updates
 - `vulnerability-grid.js` - AG-Grid integration
@@ -127,7 +107,7 @@ Example testing request:
 
 ---
 
-## Development Workflow (Search Claude Context for Details)
+## Development Workflow
 
 ### Essential Commands (Most Common)
 ```bash

@@ -55,7 +55,7 @@ git checkout main && git pull --rebase
 | **Service descriptions** | `/search-code "service layer pattern"` |
 | **Active Linear issues** | `/prime` -> linear-librarian output |
 | **Historical patterns** | `/prime` -> memento-oracle output |
-| **Code patterns/locations** | `mcp__claude-context__search_code` |
+| **Code patterns/locations** | Grep the identifier, then read the hits |
 | **API documentation** | Linear DOCS-12 or `/search-code "API endpoints"` |
 | **Recent changes** | `/quickprime` -> git delta analysis |
 
@@ -63,7 +63,7 @@ git checkout main && git pull --rebase
 
 1. **Session Start**: Run `/prime` to get complete current state
 2. **After Auto-Compact**: Run `/quickprime` to restore context
-3. **Find Code**: Use `/search-code` or `mcp__claude-context__search_code`
+3. **Find Code**: Grep the identifier, then read the hits
 4. **Understand Patterns**: Check prime output or launch `memento-oracle` agent
 
 ---

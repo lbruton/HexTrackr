@@ -16,7 +16,7 @@ sourceFiles:
 > [!warning] PARTIALLY STALE — rewrite pending HEX-389 Phase 3
 > - **memento (Neo4j)** has been RETIRED — replaced by **mem0** (see `~/.claude/CLAUDE.md` for the current MCP inventory).
 > - Linear references throughout are retired (2026-03-31).
-> - Claude-context and code-graph-context entries are still valid.
+> - claude-context and code-graph-context are retired. Search code with grep and glob, then read the source.
 > - Authoritative MCP list lives in `~/.claude/CLAUDE.md` § MCP Servers; this doc will be distilled into `Foundation/reusable-patterns.md` during Phase 3.
 
 # MCP Tools
@@ -54,33 +54,6 @@ mcp__memento__open_nodes({
   names: ["Prime-Codebase-HEXTRACKR-2025-10-04-12-42-00"]
 })
 ```
-
----
-
-### claude-context (Codebase Search)
-
-**Purpose**: Semantic code search across indexed files
-**Index**: Re-indexes at session start if >1 hour old
-
-**Key Tools**:
-
-- `index_codebase` - Create/update semantic index
-- `search_code` - Natural language code search
-- `get_indexing_status` - Check index status
-- `clear_index` - Remove index
-
-**Usage**:
-
-```javascript
-// Find Express middleware patterns
-mcp__claude-context__search_code({
-  path: "/Volumes/DATA/GitHub/HexTrackr",
-  query: "express session middleware configuration",
-  limit: 10
-})
-```
-
-**Note**: Get current project info (file counts, architecture) via `/prime` or `/quickprime`, not from static documentation.
 
 ---
 
