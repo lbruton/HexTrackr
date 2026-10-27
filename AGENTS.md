@@ -155,7 +155,8 @@ Migrated to Plane on 2026-04-26 (was `HEX-` in DocVault, historical max 391). Th
 
 ## Memory Backend
 
-**Active**: mem0 cloud (`mcp__mem0__*`) with `agent_id: "hextrackr"` for project-scoped memories.
+**Active**: SessionFlow memory (`mcp__sessionflow__` memory tools). The `memory` block in
+`.claude/project.json` sets the project (`hextrackr`); the `code-core` rule holds the record standard.
 
 <!-- skills-deploy:rules begin -->
 ## Library rules (managed by skills-deploy)
